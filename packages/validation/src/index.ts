@@ -73,3 +73,195 @@ export const identityDocumentSchema = z.object({
     .positive()
     .max(10 * 1024 * 1024),
 });
+
+const uuidSchema = z.uuid();
+const dateSchema = z.iso.date();
+const timeSchema = z.iso.time({ precision: -1 });
+const positiveInteger = z.number().int().positive();
+const optionalBoundedText = (max: number) =>
+  z.string().trim().max(max).optional().default("");
+
+export const marketplacePriceModels = [
+  "FIXED",
+  "STARTING_AT",
+  "HOURLY",
+  "PER_UNIT",
+  "QUOTE",
+] as const;
+
+export const marketplaceModalities = ["IN_PERSON", "REMOTE", "BOTH"] as const;
+
+export const marketplaceScheduleTypes = [
+  "FIXED_SLOT",
+  "FLEXIBLE_WINDOW",
+  "DEADLINE",
+  "UNSCHEDULED",
+] as const;
+
+export const serviceSchema = z
+  .object({
+    skillId: uuidSchema,
+    title: z.string().trim().min(3).max(120),
+    description: z.string().trim().min(20).max(3000),
+    modality: z.enum(marketplaceModalities),
+    priceModel: z.enum(marketplacePriceModels),
+    priceAmount: positiveInteger.optional(),
+    currencyCode: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .regex(/^[A-Z]{3}$/),
+    priceUnit: z.string().trim().max(60).optional().default(""),
+    acceptsOffers: z.boolean(),
+    expectedDurationMinutes: positiveInteger.max(7 * 24 * 60).optional(),
+    scheduleType: z.enum(marketplaceScheduleTypes),
+    includes: optionalBoundedText(1500),
+    excludes: optionalBoundedText(1500),
+    materialsNotes: optionalBoundedText(1500),
+    isPublished: z.boolean(),
+    isPaused: z.boolean(),
+  })
+  .superRefine((value, context) => {
+    if (value.priceModel === "QUOTE" && value.priceAmount !== undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["priceAmount"],
+        message: "Quote services cannot have a fixed amount.",
+      });
+    }
+    if (value.priceModel !== "QUOTE" && value.priceAmount === undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["priceAmount"],
+        message: "This pricing model requires an amount.",
+      });
+    }
+    if (value.priceModel === "PER_UNIT" && !value.priceUnit) {
+      context.addIssue({
+        code: "custom",
+        path: ["priceUnit"],
+        message: "Per-unit services require a unit.",
+      });
+    }
+    if (value.priceModel !== "PER_UNIT" && value.priceUnit) {
+      context.addIssue({
+        code: "custom",
+        path: ["priceUnit"],
+        message: "Only per-unit services use a unit.",
+      });
+    }
+  });
+
+const professionalRecordBase = {
+  description: optionalBoundedText(2000),
+  isPublic: z.boolean(),
+  sortOrder: z.number().int().min(0).max(999),
+};
+
+export const experienceSchema = z
+  .object({
+    title: z.string().trim().min(2).max(160),
+    organization: optionalBoundedText(160),
+    ...professionalRecordBase,
+    startedOn: dateSchema,
+    endedOn: dateSchema.optional(),
+    isCurrent: z.boolean(),
+  })
+  .refine(
+    (value) =>
+      value.isCurrent ||
+      value.endedOn === undefined ||
+      value.endedOn >= value.startedOn,
+    {
+      message: "The end date must be after the start date.",
+      path: ["endedOn"],
+    },
+  );
+
+export const educationSchema = z
+  .object({
+    institution: z.string().trim().min(2).max(160),
+    fieldOfStudy: optionalBoundedText(160),
+    ...professionalRecordBase,
+    startedOn: dateSchema,
+    endedOn: dateSchema.optional(),
+  })
+  .refine(
+    (value) => value.endedOn === undefined || value.endedOn >= value.startedOn,
+    {
+      message: "The end date must be after the start date.",
+      path: ["endedOn"],
+    },
+  );
+
+export const certificationSchema = z
+  .object({
+    title: z.string().trim().min(2).max(160),
+    issuer: optionalBoundedText(160),
+    description: optionalBoundedText(1500),
+    issuedOn: dateSchema.optional(),
+    expiresOn: dateSchema.optional(),
+    isPublic: z.boolean(),
+    sortOrder: z.number().int().min(0).max(999),
+  })
+  .refine(
+    (value) =>
+      value.issuedOn === undefined ||
+      value.expiresOn === undefined ||
+      value.expiresOn >= value.issuedOn,
+    {
+      message: "The expiry date must be after the issue date.",
+      path: ["expiresOn"],
+    },
+  );
+
+export const portfolioSchema = z.object({
+  title: z.string().trim().min(2).max(160),
+  description: optionalBoundedText(1500),
+  isPublic: z.boolean(),
+  sortOrder: z.number().int().min(0).max(999),
+});
+
+export const serviceAreaSchema = z.object({
+  label: z.string().trim().min(2).max(160),
+  radiusMeters: positiveInteger.min(100).max(100_000),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  isActive: z.boolean(),
+});
+
+export const availabilityRuleSchema = z
+  .object({
+    weekday: z.number().int().min(0).max(6),
+    startTime: timeSchema,
+    endTime: timeSchema,
+    timezone: z.string().trim().min(1).max(64),
+    isActive: z.boolean(),
+  })
+  .refine((value) => value.endTime > value.startTime, {
+    message: "The end time must be after the start time.",
+    path: ["endTime"],
+  });
+
+export const availabilityBlockSchema = z
+  .object({
+    startsAt: z.iso.datetime(),
+    endsAt: z.iso.datetime(),
+    reason: optionalBoundedText(240),
+  })
+  .refine((value) => value.endsAt > value.startsAt, {
+    message: "The end must be after the start.",
+    path: ["endsAt"],
+  });
+
+export const providerMarketplaceSettingsSchema = z.object({
+  publicSlug: z
+    .string()
+    .trim()
+    .min(3)
+    .max(80)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  publicHeadline: optionalBoundedText(160),
+  marketplacePaused: z.boolean(),
+  availabilityPaused: z.boolean(),
+});

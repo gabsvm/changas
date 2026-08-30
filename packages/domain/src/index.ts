@@ -9,3 +9,12 @@ export {
   providerStatuses,
   type ProviderStatus,
 } from "./provider-status";
+export {
+  canPublishProviderOffering,
+  priceModels,
+  scheduleTypes,
+  serviceModalities,
+  type PriceModel,
+  type ScheduleType,
+  type ServiceModality,
+} from "./marketplace";
