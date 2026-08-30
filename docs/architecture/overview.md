@@ -2,7 +2,7 @@
 
 ## Scope
 
-Phase 01 adds account/authentication and the provider identity skeleton on top of the Phase 00 foundation. It deliberately contains no skills/services, marketplace catalog, conversations, jobs, payments, admin UI, or automated KYC.
+Phase 02 adds the provider marketplace data layer and explicit public provider/service projections on top of the Phase 00 foundation and Phase 01 account/identity boundary. It deliberately contains no discovery/search engine, conversations, proposals, jobs, payments, reviews, notifications, admin dashboard, or automated KYC.
 
 ## Workspace boundaries
 
@@ -19,7 +19,7 @@ The web application owns presentation and web runtime concerns. Business/domain 
 
 ## Request/data flow
 
-Server Components and Route Handlers call the cookie-aware server Supabase client. Browser components call the browser client with only the public URL and publishable key. A privileged client exists only in a server-only module and is reserved for explicitly authorized server operations in later phases.
+Server Components and Route Handlers call the cookie-aware server Supabase client. Browser components call the browser client with only the public URL and publishable key. A privileged client exists only in a server-only module and is reserved for explicitly authorized server-side/admin and local fixture operations. It is never imported by browser code.
 
 The proxy refreshes claims with `auth.getClaims()`. The browser never supplies an authoritative user ID or provider status. Actions resolve the authenticated subject with `auth.getUser()`, then write rows keyed to that subject. Future critical mutations must validate on the server, enforce authorization in RLS/database policies, and record an auditable event when the domain requires it.
 
@@ -27,11 +27,13 @@ The proxy refreshes claims with `auth.getClaims()`. The browser never supplies a
 
 - `profiles` contains fields suitable for a future deliberate public projection: display name, avatar URL, approximate zone, and bio.
 - `profile_private` contains legal name, private contact details, date of birth, exact address, and DNI number. It has no public policy.
-- `provider_profiles` owns onboarding progress and the provider status enum. A user can manage only `PROFILE_INCOMPLETE` and `IDENTITY_PENDING`; protected states require a later administrative flow.
+- `provider_profiles` owns onboarding progress, public provider presentation, and the provider status enum. A user can manage only `PROFILE_INCOMPLETE` and `IDENTITY_PENDING`; active providers can manage only marketplace pause/presentation fields, while protected status transitions require a later administrative flow.
 - `provider_documents` stores metadata only. The binary files live in the private `identity-documents` Storage bucket under an authenticated user's UUID folder.
 - `user_settings` is owner-only. `user_roles` is readable by its owner but has no client write policy; the Auth trigger creates the default `user` role.
+- `categories`, `skills`, and `skill_synonyms` are a controlled catalog. `provider_skills` is separate from `services`, so one provider can have unrelated skills and multiple services.
+- Provider-owned marketplace records include services, tags, experience, education, certifications, portfolio items, approximate service areas, availability rules, and availability blocks. Availability is descriptive metadata only; it does not book or reserve time.
 
-The public/private split is intentional. Future discovery must use an explicit public view or projection and must never select `profile_private` or expose Storage object URLs.
+The public/private split is intentional. Public pages read only explicit `public_*` views filtered to active/unpaused providers and published/unpaused services. They never select `profile_private`, exact coordinates, identity documents, certification evidence paths, or private portfolio records.
 
 ## Supabase boundaries
 
@@ -40,9 +42,10 @@ The public/private split is intentional. Future discovery must use an explicit p
 - `src/lib/supabase/admin.ts` imports `server-only` and uses `SUPABASE_SERVICE_ROLE_KEY` only for future privileged server operations.
 - `SUPABASE_SERVICE_ROLE_KEY` is never a `NEXT_PUBLIC_*` variable and never belongs in browser requests or committed values.
 - Every future user/private table must enable RLS before it is considered complete, with deny-by-default policies.
-- `profiles`, `profile_private`, `provider_profiles`, `provider_documents`, `user_settings`, and `user_roles` enable RLS in the Phase 01 migration.
-- Identity files use a private bucket and folder-scoped policies. The current UI does not create public or signed URLs.
-- `public.handle_new_user()` is the only `SECURITY DEFINER` function in this migration. It has an empty search path, fully qualified references, only creates default account records, and has execution revoked from client roles.
+- `profiles`, `profile_private`, `provider_profiles`, `provider_documents`, `user_settings`, `user_roles`, and all Phase 02 provider-owned tables enable RLS with explicit owner policies.
+- Identity files and certification evidence use private buckets and folder-scoped policies. Portfolio media remains in a separate private bucket and is readable anonymously only when the corresponding portfolio row is explicitly public and the provider is active/unpaused.
+- Public projection views expose only approved display/profile/professional fields, approximate service-area labels/radii, and intended public portfolio paths. Exact coordinates and private evidence remain inaccessible to client roles.
+- `public.handle_new_user()` remains tightly scoped; the Phase 02 `private.activate_provider_for_test(uuid)` function is executable only by `service_role` and is not exposed through the public API.
 
 ## Environment separation
 
@@ -50,7 +53,7 @@ The supported environments are `local`, `preview/staging`, and `production`. Pre
 
 ## Migration discipline
 
-Migrations are generated with the versioned Supabase CLI, deterministic, and append-only after sharing. Phase 00 installs only the extensions needed for future UUID generation, radius queries, and fuzzy text matching. Phase 01 adds account tables, RLS, the private identity bucket, and a rolled-back pgTAP test. No fake profiles or reviews are seeded.
+Migrations are generated with the versioned Supabase CLI, deterministic, and append-only after sharing. Phase 00 installs the extensions needed for UUID generation, radius-ready data, and fuzzy text matching. Phase 01 adds account tables, RLS, explicit grants, and the private identity bucket. Phase 02 adds the provider marketplace schema, indexes, explicit grants, public projections, private/publicly-intended Storage policies, pgTAP coverage, and synthetic catalog/demo fixtures. No reviews, jobs, payments, or real personal data are seeded.
 
 ## PWA and caching
 

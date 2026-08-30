@@ -1,6 +1,6 @@
 # Changas
 
-Changas is a mobile-first marketplace foundation for people who want to offer practical skills, trades, and knowledge. This checkout contains **Phase 00 — Foundation** and **Phase 01 — Accounts, auth and provider identity skeleton** from [`CHANGAS_MASTER_PLAN.md`](./CHANGAS_MASTER_PLAN.md). Later marketplace phases are intentionally not started.
+Changas is a mobile-first marketplace foundation for people who want to offer practical skills, trades, and knowledge. This checkout contains **Phase 00 — Foundation**, **Phase 01 — Accounts, auth and provider identity skeleton**, and **Phase 02 — Provider marketplace data and public provider/service pages** from [`CHANGAS_MASTER_PLAN.md`](./CHANGAS_MASTER_PLAN.md). Discovery/search and later marketplace phases are intentionally not started.
 
 ## Prerequisites
 
@@ -23,16 +23,16 @@ The local Supabase defaults are `http://127.0.0.1:54321` for the API and `http:/
 
 ## Supabase local workflow
 
-The repository includes a CLI-generated `supabase/config.toml`, an empty seed policy, and one foundation migration. With Docker Desktop running, use the versioned CLI:
+The repository includes a CLI-generated `supabase/config.toml`, synthetic Phase 02 seed data, and append-only migrations. With Docker Desktop running, use the versioned CLI:
 
 ```powershell
-pnpm dlx supabase@2.116.0 start
+pnpm dlx supabase@2.116.0 start --exclude edge-runtime
 pnpm dlx supabase@2.116.0 db reset
 pnpm dlx supabase@2.116.0 migration list --local
 pnpm dlx supabase@2.116.0 stop
 ```
 
-Phase 01 adds Auth-backed account tables, owner-only RLS, and the private `identity-documents` bucket. It creates no product/services catalog or fake user records. Configure the Auth provider and use these local callback origins:
+Phase 01 adds Auth-backed account tables, owner-only RLS, and the private `identity-documents` bucket. Phase 02 adds an explicit catalog, provider-owned skills/services/professional records, availability metadata, public projection views, and separate private certification/public-portfolio buckets. All demo data is synthetic. Configure the Auth provider and use these local callback origins:
 
 - `http://localhost:3000/auth/callback`
 - `http://127.0.0.1:3000/auth/callback`
@@ -46,7 +46,7 @@ pnpm dlx supabase@2.116.0 db reset --local --no-seed
 pnpm dlx supabase@2.116.0 test db --local
 ```
 
-Phase 01 uses explicit Data API grants. Authenticated users receive only the requested owner-scoped table operations; `service_role` receives explicit DML for server-side/admin operations and is never client-safe; `anon` and `PUBLIC` receive no Phase 01 table privileges. `supabase/config.toml` sets `auto_expose_new_tables = false` so local development does not hide missing grants.
+Phase 01 and Phase 02 use explicit Data API grants. Authenticated users receive only the requested owner-scoped table operations; public roles receive only catalog/public projection reads; `service_role` receives explicit server-side/admin DML and is never client-safe; `anon` and `PUBLIC` receive no private table privileges. `supabase/config.toml` sets `auto_expose_new_tables = false` so local development does not hide missing grants. Provider status activation remains outside normal client mutations and is test/admin-only until Phase 09.
 
 To run the client and Storage integration security checks against the local instance, export the values from `supabase status -o env` and run:
 
@@ -54,7 +54,7 @@ To run the client and Storage integration security checks against the local inst
 node apps/web/scripts/supabase-runtime-security.mjs
 ```
 
-The script creates only synthetic users and fixture content, then removes them. It verifies owner read/write, cross-user private-row denial, provider self-activation denial, and private Storage access for the owner versus another user and anonymous access. The same reset, pgTAP, and integration checks run in the `supabase-integration` GitHub Actions job without Supabase Cloud credentials.
+The script creates only synthetic users and fixture content, then removes them. It verifies owner read/write, cross-user private-row denial, provider self-activation denial, published public projections, private certification evidence, intended public portfolio media, identity-document privacy, and Storage access for owner/other-user/anonymous roles. The same reset, pgTAP, and integration checks run in the `supabase-integration` GitHub Actions job without Supabase Cloud credentials.
 
 ## Validation
 
@@ -79,4 +79,4 @@ supabase/          local config, migrations, and seed policy
 docs/              architecture and decision records
 ```
 
-The Phase 01 branch is `codex/phase-01-accounts`. This phase stops before Phase 02 and must be audited before any later phase starts.
+Phase 02 work is isolated on `codex/phase-02-provider-marketplace`. It stops before discovery/search, chat, jobs, payments, reviews, notifications, admin dashboard, and all later phases.
