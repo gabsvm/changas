@@ -105,7 +105,7 @@ Retain separate frozen install, lint, typecheck, unit test, and build steps in t
 
 - Modify: `.github/workflows/ci.yml`
 - Create: `apps/web/scripts/supabase-runtime-security.mjs`
-- Create: `apps/web/fixtures/synthetic-identity.txt`
+- Create: `apps/web/fixtures/synthetic-identity.png.b64`
 - Modify: `docs/reports/phase-01-accounts.md`
 
 **Interfaces:**

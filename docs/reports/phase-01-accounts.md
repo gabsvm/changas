@@ -58,7 +58,7 @@ El checkout local disponible usa Node `v26.4.0` y no tiene nvm/fnm/volta para ca
 4. El script `apps/web/scripts/supabase-runtime-security.mjs` con las credenciales locales emitidas por `status -o env`.
 5. `supabase stop` siempre, incluso ante fallas.
 
-El script usa dos usuarios sintéticos y un fixture mínimo sin datos personales (`apps/web/fixtures/synthetic-identity.txt`). Comprueba owner read/write, aislamiento de `profile_private`, rechazo de `ACTIVE`, y Storage privado: owner upload/download, usuario B rechazado y anónimo rechazado. La ejecución efectiva quedó `NOT RUN` porque el runner local no tiene Docker ni Podman, y el job remoto fue `skipped` por el bloqueo externo de GitHub. Por lo tanto, no se afirma evidencia runtime RLS/Storage todavía.
+El script usa dos usuarios sintéticos y un PNG mínimo codificado en base64, sin datos personales (`apps/web/fixtures/synthetic-identity.png.b64`). Comprueba owner read/write, aislamiento de `profile_private`, rechazo de `ACTIVE`, y Storage privado: owner upload/download, usuario B rechazado y anónimo rechazado. La ejecución efectiva quedó `NOT RUN` porque el runner local no tiene Docker ni Podman, y el job remoto fue `skipped` por el bloqueo externo de GitHub. Por lo tanto, no se afirma evidencia runtime RLS/Storage todavía.
 
 Antes de incorporar los comandos al workflow se consultaron los help de:
 

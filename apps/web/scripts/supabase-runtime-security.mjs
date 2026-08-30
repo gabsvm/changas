@@ -163,8 +163,14 @@ try {
     `Provider self-activation was not rejected: ${selfActivation.error?.message ?? "no error"}`,
   );
 
-  const fixture = await readFile(
-    new URL("../fixtures/synthetic-identity.txt", import.meta.url),
+  const fixture = Buffer.from(
+    (
+      await readFile(
+        new URL("../fixtures/synthetic-identity.png.b64", import.meta.url),
+        "utf8",
+      )
+    ).trim(),
+    "base64",
   );
   documentPath = `${users.owner.id}/runtime-${runId}.png`;
   const upload = await owner.client.storage
