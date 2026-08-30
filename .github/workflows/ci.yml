@@ -71,7 +71,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Start local Supabase
-        run: pnpm dlx supabase@2.116.0 start
+        # Edge Functions are out of Phase 02 scope and the runner's health
+        # check can fail independently of Postgres/Auth/Storage integration.
+        # Keep every service needed by these tests while excluding only it.
+        run: pnpm dlx supabase@2.116.0 start --exclude edge-runtime
 
       - name: Reset local database
         run: pnpm dlx supabase@2.116.0 db reset --local --no-seed
