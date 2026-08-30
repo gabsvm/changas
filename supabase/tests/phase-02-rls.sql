@@ -117,8 +117,20 @@ insert into public.experiences (provider_user_id, title, organization, started_o
 values ('02000000-0000-4000-8000-000000000001', 'Experiencia privada', 'Archivo privado', '2019-01-01', '2019-12-01', false, false);
 insert into public.education (provider_user_id, institution, field_of_study, started_on, is_public)
 values ('02000000-0000-4000-8000-000000000001', 'Instituto Técnico', 'Informática', '2018-01-01', true);
-insert into public.certifications (provider_user_id, title, issuer, issued_on, is_public, evidence_path)
-values ('02000000-0000-4000-8000-000000000001', 'Certificación sintética', 'Changas Test', '2024-01-01', true, '02000000-0000-4000-8000-000000000001/evidence.pdf');
+insert into public.certifications (
+  provider_user_id, title, issuer, issued_on, is_public,
+  evidence_path, evidence_mime_type, evidence_file_size_bytes
+)
+values (
+  '02000000-0000-4000-8000-000000000001',
+  'Certificación sintética',
+  'Changas Test',
+  '2024-01-01',
+  true,
+  '02000000-0000-4000-8000-000000000001/evidence.pdf',
+  'application/pdf',
+  512
+);
 insert into public.portfolio_items (provider_user_id, title, description, is_public)
 values ('02000000-0000-4000-8000-000000000001', 'Proyecto público', 'Una muestra sin datos personales.', true);
 insert into public.portfolio_items (provider_user_id, title, description, is_public)
