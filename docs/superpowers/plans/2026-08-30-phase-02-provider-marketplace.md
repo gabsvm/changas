@@ -34,23 +34,23 @@
 - Modify: `packages/validation/src/index.ts`
 - Create: `packages/validation/src/marketplace.test.ts`
 
-- [ ] **Step 1: Write failing domain tests**
+- [x] **Step 1: Write failing domain tests**
 
 Cover the five price models, three modalities, independent provider skills/services, and the rule that only `ACTIVE` providers can publish services.
 
-- [ ] **Step 2: Run the focused tests and verify RED**
+- [x] **Step 2: Run the focused tests and verify RED**
 
 Run `pnpm test -- packages/domain/src/marketplace.test.ts packages/validation/src/marketplace.test.ts`; the missing exports/contracts must fail for the intended reason.
 
-- [ ] **Step 3: Implement minimal shared constants and Zod schemas**
+- [x] **Step 3: Implement minimal shared constants and Zod schemas**
 
 Add literal unions/constants for `PriceModel`, `ServiceModality`, `ScheduleType`, and schemas for service, provider profile, professional records, service areas, availability rules, and blocks. Enforce positive integer price amounts except `QUOTE`, `PER_UNIT` units, valid date/time ranges, and bounded text.
 
-- [ ] **Step 4: Run focused tests GREEN and full unit tests**
+- [x] **Step 4: Run focused tests GREEN and full unit tests**
 
 Run the focused command, then `pnpm test`.
 
-- [ ] **Step 5: Commit contracts**
+- [x] **Step 5: Commit contracts**
 
 Commit with `feat(marketplace): add provider marketplace contracts`.
 
@@ -80,27 +80,27 @@ Commit with `feat(marketplace): add provider marketplace contracts`.
 
 **Grants:** Revoke defaults on all new tables/views; grant catalog/view `SELECT` to `anon` and `authenticated`, owner CRUD to `authenticated` tables, and explicit DML to `service_role`. Grant no `anon` access to owner tables or private evidence.
 
-- [ ] **Step 1: Create the migration filename using the CLI**
+- [x] **Step 1: Create the migration filename using the CLI**
 
 Run the help-verified `migration new` command and use the generated filename without inventing a timestamp.
 
-- [ ] **Step 2: Add pgTAP tests before production SQL**
+- [x] **Step 2: Add pgTAP tests before production SQL**
 
 Create `supabase/tests/phase-02-grants.sql` and `supabase/tests/phase-02-rls.sql` with positive/negative grant checks, structural skill/service checks, public-view redaction checks, two-provider isolation, publication/pause behavior, all price/modality variants, provider status protection, and certification/portfolio Storage policy assertions.
 
-- [ ] **Step 3: Implement the migration minimally**
+- [x] **Step 3: Implement the migration minimally**
 
 Write deterministic SQL in dependency order: enums/tables/indexes/triggers, policies/grants, views, Storage buckets/policies, test-only function, and limited catalog seed rows.
 
-- [ ] **Step 4: Add deterministic local/demo seed data**
+- [x] **Step 4: Add deterministic local/demo seed data**
 
 Use `supabase/seed.sql` for synthetic provider examples and services covering all price models, modalities, offer states, skills, public professional records, availability, and portfolio metadata. Do not add reviews, jobs, payments, identity documents, or real personal data.
 
-- [ ] **Step 5: Update generated-equivalent database types**
+- [x] **Step 5: Update generated-equivalent database types**
 
 Add all new tables, views, enums, inserts, updates, and function definitions to the typed Supabase database contract; no service-role types may be imported by client components.
 
-- [ ] **Step 6: Run SQL lint/static review and commit schema**
+- [x] **Step 6: Run SQL lint/static review and commit schema**
 
 Run the local CLI help-verified database lint if the local runtime is available, inspect the migration for search paths/grants/views, and commit with `feat(db): add provider marketplace schema and policies`.
 
@@ -117,23 +117,23 @@ Run the local CLI help-verified database lint if the local runtime is available,
 
 Implement authenticated server actions for provider settings, skills, services, pause/resume, experience, education, certifications/evidence upload, portfolio/public media upload, service areas, availability rules, and availability blocks. Every action must resolve `auth.getUser()`, validate FormData with shared Zod, use owner-scoped queries, return actionable validation/forbidden/conflict errors, clean up uploaded objects after metadata failure, and call `revalidatePath` only for Phase 02 routes. No action accepts an authoritative user/provider ID from the browser.
 
-- [ ] **Step 1: Add action tests or pure action payload tests first and verify RED**
+- [x] **Step 1: Add action tests or pure action payload tests first and verify RED**
 
 Cover malformed prices, invalid modality, quote-with-price, invalid time ranges, unsafe publication, and owner-scoped mutation payloads.
 
-- [ ] **Step 2: Implement the actions and upload cleanup paths**
+- [x] **Step 2: Implement the actions and upload cleanup paths**
 
 Use the authenticated server Supabase client for normal owner mutations; use no service-role client in the browser or client components. Keep the temporary activation function outside normal provider actions.
 
-- [ ] **Step 3: Add the management page and mobile-first forms**
+- [x] **Step 3: Add the management page and mobile-first forms**
 
 Create `/provider/manage` with clear sections for profile/pause state, skill catalog selection/removal, service CRUD and pause state, experience, education, certifications/evidence, portfolio, service areas, and availability rules/blocks. Include loading/pending/error/success states and explain that paused records are retained.
 
-- [ ] **Step 4: Link provider account navigation and run UI/unit tests**
+- [x] **Step 4: Link provider account navigation and run UI/unit tests**
 
 Link active providers from `/account` to management and preserve onboarding for incomplete providers. Run `pnpm test`, lint, and typecheck.
 
-- [ ] **Step 5: Commit management flow**
+- [x] **Step 5: Commit management flow**
 
 Commit with `feat(provider): add marketplace management flow`.
 
@@ -151,19 +151,19 @@ Commit with `feat(provider): add marketplace management flow`.
 
 Read only explicit public views with the cookie-aware server client, return `notFound()` for unpublished/paused/inactive rows, show approximate zone and public professional data, create public portfolio URLs only from the public portfolio bucket, and never select private identity tables or evidence paths. Do not add home search, category browsing, FTS, radius search UX, ranking, favorites, sitemap, or Phase 03 discovery.
 
-- [ ] **Step 1: Write render/data-shape tests first and verify RED**
+- [x] **Step 1: Write render/data-shape tests first and verify RED**
 
 Test that public DTOs contain allowed fields and exclude exact coordinates/address, DNI/private contact, evidence paths, and paused/unpublished services.
 
-- [ ] **Step 2: Implement public pages and responsive presentation**
+- [x] **Step 2: Implement public pages and responsive presentation**
 
 Use server-rendered pages with accessible headings, empty states, links between provider/service pages, and no auth wall.
 
-- [ ] **Step 3: Add browser smoke coverage and capture mobile/desktop screenshots**
+- [x] **Step 3: Add browser smoke coverage and capture mobile/desktop screenshots**
 
 Run the available Playwright/browser tooling against the development server at approximately 360×800 and 1280px widths. Record commands and screenshots in the phase report; if tooling is unavailable, record `NOT RUN` rather than infer QA.
 
-- [ ] **Step 4: Commit public surfaces**
+- [x] **Step 4: Commit public surfaces**
 
 Commit with `feat(marketplace): add public provider and service pages`.
 
@@ -180,26 +180,26 @@ Commit with `feat(marketplace): add public provider and service pages`.
 
 Extend the existing synthetic runtime script to create two users/providers and verify multiple unrelated skills, every price model/modality, owner CRUD and cross-provider denial, paused/published public views, active-provider status protection, private certification evidence denial, public portfolio behavior, and no exact location leakage. Keep the identity-document regression suite intact. Use only local Supabase credentials emitted by the CLI; no Cloud secrets.
 
-- [ ] **Step 1: Start/reset/test only with help-verified Supabase CLI commands**
+- [x] **Step 1: Start/reset/test only with help-verified Supabase CLI commands**
 
 Run `pnpm dlx supabase@2.116.0 start`, `db reset --local --no-seed`, `test db --local`, and the local runtime script. Run `db lint --local` when supported and `migration list --local` for evidence. Stop the stack in a finally/always path.
 
-- [ ] **Step 2: Fix runtime failures from their actual error**
+- [x] **Step 2: Fix runtime failures from their actual error**
 
 Do not weaken tests or rewrite prior Phase 01 assertions. If PostgreSQL rejects an assertion, correct only the assertion form after recording the cause.
 
-- [ ] **Step 3: Run all local validation gates**
+- [x] **Step 3: Run all local validation gates**
 
 Run install frozen, lint, typecheck, unit tests, build, format check, `git diff --check`, and available Supabase runtime checks. Record `PASS`, `FAIL`, or `NOT RUN` separately for local runtime and remote CI.
 
-- [ ] **Step 4: Push the phase branch and wait for remote CI**
+- [x] **Step 4: Push the phase branch and wait for remote CI**
 
 Push only `origin/codex/phase-02-provider-marketplace`; inspect every job and log. Do not claim completion if CI or required runtime evidence is unavailable.
 
-- [ ] **Step 5: Update the Phase 02 report with exact evidence**
+- [x] **Step 5: Update the Phase 02 report with exact evidence**
 
 Create `docs/reports/phase-02-provider-marketplace.md` with branch/HEAD, commits, features and omissions, migrations, schema/index/RLS/grant decisions, Storage, tests, CI, screenshots/manual QA, limitations, deviations, and explicit STOP.
 
-- [ ] **Step 6: Final diff/scope review and stop**
+- [x] **Step 6: Final diff/scope review and stop**
 
 Confirm no Phase 03+ files/features were added, branch and remote SHA match, working tree is clean, and stop after reporting the actual gate statuses.
