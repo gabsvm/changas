@@ -64,7 +64,7 @@ select
   ('02000000-0000-4000-8000-0000000000' || right('0' || row_number() over (order by s.price_model, s.modality)::text, 2))::uuid,
   '02000000-0000-4000-8000-000000000001',
   (select id from public.skills where slug = 'reparacion-pc'),
-  'fase-02-' || lower(s.price_model) || '-' || replace(lower(s.modality), '_', '-'),
+  'fase-02-' || replace(lower(s.price_model), '_', '-') || '-' || replace(lower(s.modality), '_', '-'),
   'Servicio de prueba de Phase 02 ' || s.price_model || ' ' || s.modality,
   'Revisión y ejecución con alcance documentado para validar el catálogo.',
   s.modality::public.service_modality,
