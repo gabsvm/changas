@@ -101,9 +101,15 @@ export default async function AccountPage() {
               </span>
               <Link
                 className="button-secondary border-white/25 bg-white/10 text-white hover:bg-white/20"
-                href="/provider/onboarding"
+                href={
+                  provider.status === "ACTIVE"
+                    ? "/provider/manage"
+                    : "/provider/onboarding"
+                }
               >
-                Continuar · paso {provider.onboarding_step}/4
+                {provider.status === "ACTIVE"
+                  ? "Gestionar marketplace"
+                  : `Continuar · paso ${provider.onboarding_step}/4`}
               </Link>
             </div>
           ) : (

@@ -32,6 +32,11 @@ const users = {
   },
 };
 let documentPath;
+let certificationPath;
+let portfolioPath;
+let serviceId;
+let certificationId;
+let portfolioId;
 
 function assert(condition, message) {
   if (!condition) {
@@ -153,6 +158,16 @@ try {
     "User B could modify User A private profile data.",
   );
 
+  const fixture = Buffer.from(
+    (
+      await readFile(
+        new URL("../fixtures/synthetic-identity.png.b64", import.meta.url),
+        "utf8",
+      )
+    ).trim(),
+    "base64",
+  );
+
   const selfActivation = await owner.client
     .from("provider_profiles")
     .update({ status: "ACTIVE" })
@@ -163,15 +178,169 @@ try {
     `Provider self-activation was not rejected: ${selfActivation.error?.message ?? "no error"}`,
   );
 
-  const fixture = Buffer.from(
-    (
-      await readFile(
-        new URL("../fixtures/synthetic-identity.png.b64", import.meta.url),
-        "utf8",
-      )
-    ).trim(),
-    "base64",
+  const activation = await admin
+    .from("provider_profiles")
+    .update({
+      status: "ACTIVE",
+      public_slug: `runtime-${runId}`,
+      public_headline: "Runtime security fixture",
+    })
+    .eq("user_id", users.owner.id)
+    .select("user_id")
+    .single();
+  assert(
+    !activation.error,
+    `Could not prepare active provider fixture: ${activation.error?.message ?? "unknown error"}`,
   );
+
+  const skill = await owner.client
+    .from("skills")
+    .select("id")
+    .eq("slug", "reparacion-pc")
+    .single();
+  assert(!skill.error && skill.data?.id, "Catalog skill fixture is missing.");
+
+  const providerSkill = await owner.client.from("provider_skills").insert({
+    provider_user_id: users.owner.id,
+    skill_id: skill.data.id,
+    is_featured: true,
+  });
+  assert(!providerSkill.error, "Owner could not add their catalog skill.");
+
+  const service = await owner.client
+    .from("services")
+    .insert({
+      provider_user_id: users.owner.id,
+      skill_id: skill.data.id,
+      public_slug: `runtime-service-${runId}`,
+      title: "Runtime support service",
+      description: "Synthetic service used to validate Phase 02 runtime rules.",
+      modality: "REMOTE",
+      price_model: "FIXED",
+      price_amount: 1000,
+      currency_code: "ARS",
+      accepts_offers: true,
+      schedule_type: "UNSCHEDULED",
+      is_published: true,
+    })
+    .select("id, public_slug")
+    .single();
+  assert(
+    !service.error && service.data,
+    `Owner could not publish their service: ${service.error?.message ?? "unknown error"}`,
+  );
+  serviceId = service.data.id;
+
+  const publicService = await anonymous
+    .from("public_provider_services")
+    .select("public_slug, provider_slug")
+    .eq("public_slug", service.data.public_slug)
+    .single();
+  assert(
+    !publicService.error &&
+      publicService.data?.provider_slug === `runtime-${runId}`,
+    "Anonymous user could not read the published public service projection.",
+  );
+
+  const privateExperience = await owner.client.from("experiences").insert({
+    provider_user_id: users.owner.id,
+    title: "Synthetic runtime experience",
+    started_on: "2021-01-01",
+    is_public: true,
+  });
+  assert(
+    !privateExperience.error,
+    "Owner could not write their public experience.",
+  );
+
+  certificationPath = `${users.owner.id}/runtime-${runId}.png`;
+  const certificationUpload = await owner.client.storage
+    .from("provider-certification-evidence")
+    .upload(certificationPath, new Blob([fixture], { type: "image/png" }), {
+      contentType: "image/png",
+      upsert: false,
+    });
+  assert(
+    !certificationUpload.error,
+    `Owner could not upload private certification evidence: ${certificationUpload.error?.message ?? "unknown error"}`,
+  );
+  const certification = await owner.client
+    .from("certifications")
+    .insert({
+      provider_user_id: users.owner.id,
+      title: "Synthetic runtime certification",
+      is_public: true,
+      evidence_path: certificationPath,
+      evidence_mime_type: "image/png",
+      evidence_file_size_bytes: fixture.length,
+    })
+    .select("id")
+    .single();
+  assert(
+    !certification.error && certification.data,
+    "Owner could not register certification metadata.",
+  );
+  certificationId = certification.data.id;
+
+  const ownerCertification = await owner.client.storage
+    .from("provider-certification-evidence")
+    .download(certificationPath);
+  assert(
+    !ownerCertification.error && ownerCertification.data,
+    "Owner could not read private certification evidence.",
+  );
+  const otherCertification = await other.client.storage
+    .from("provider-certification-evidence")
+    .download(certificationPath);
+  assert(
+    otherCertification.error,
+    "User B could read private certification evidence.",
+  );
+  const anonymousCertification = await anonymous.storage
+    .from("provider-certification-evidence")
+    .download(certificationPath);
+  assert(
+    anonymousCertification.error,
+    "Anonymous user could read private certification evidence.",
+  );
+
+  portfolioPath = `${users.owner.id}/runtime-${runId}.png`;
+  const portfolioUpload = await owner.client.storage
+    .from("provider-portfolio")
+    .upload(portfolioPath, new Blob([fixture], { type: "image/png" }), {
+      contentType: "image/png",
+      upsert: false,
+    });
+  assert(
+    !portfolioUpload.error,
+    `Owner could not upload portfolio fixture: ${portfolioUpload.error?.message ?? "unknown error"}`,
+  );
+  const portfolio = await owner.client
+    .from("portfolio_items")
+    .insert({
+      provider_user_id: users.owner.id,
+      title: "Synthetic public portfolio",
+      description: "Synthetic image only.",
+      media_path: portfolioPath,
+      media_mime_type: "image/png",
+      media_file_size_bytes: fixture.length,
+      is_public: true,
+    })
+    .select("id")
+    .single();
+  assert(
+    !portfolio.error && portfolio.data,
+    "Owner could not register public portfolio metadata.",
+  );
+  portfolioId = portfolio.data.id;
+  const anonymousPortfolio = await anonymous.storage
+    .from("provider-portfolio")
+    .download(portfolioPath);
+  assert(
+    !anonymousPortfolio.error && anonymousPortfolio.data,
+    "Anonymous user could not read intended public portfolio media.",
+  );
+
   documentPath = `${users.owner.id}/runtime-${runId}.png`;
   const upload = await owner.client.storage
     .from("identity-documents")
@@ -210,6 +379,19 @@ try {
   if (documentPath) {
     await admin.storage.from("identity-documents").remove([documentPath]);
   }
+  if (certificationPath) {
+    await admin.storage
+      .from("provider-certification-evidence")
+      .remove([certificationPath]);
+  }
+  if (portfolioPath) {
+    await admin.storage.from("provider-portfolio").remove([portfolioPath]);
+  }
+  if (serviceId) await admin.from("services").delete().eq("id", serviceId);
+  if (certificationId)
+    await admin.from("certifications").delete().eq("id", certificationId);
+  if (portfolioId)
+    await admin.from("portfolio_items").delete().eq("id", portfolioId);
   for (const user of [users.owner, users.other]) {
     if (user.id) {
       await admin.auth.admin.deleteUser(user.id);

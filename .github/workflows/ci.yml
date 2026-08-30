@@ -42,6 +42,12 @@ jobs:
       - name: Production build
         run: pnpm build
 
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Diff check
+        run: git diff --check
+
   supabase-integration:
     needs: validate
     runs-on: ubuntu-latest
