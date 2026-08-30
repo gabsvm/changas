@@ -1,6 +1,6 @@
 # Changas
 
-Changas is a mobile-first marketplace foundation for people who want to offer practical skills, trades, and knowledge. This checkout is limited to **Phase 00 — Foundation** from [`CHANGAS_MASTER_PLAN.md`](./CHANGAS_MASTER_PLAN.md).
+Changas is a mobile-first marketplace foundation for people who want to offer practical skills, trades, and knowledge. This checkout contains **Phase 00 — Foundation** and **Phase 01 — Accounts, auth and provider identity skeleton** from [`CHANGAS_MASTER_PLAN.md`](./CHANGAS_MASTER_PLAN.md). Later marketplace phases are intentionally not started.
 
 ## Prerequisites
 
@@ -13,6 +13,7 @@ Changas is a mobile-first marketplace foundation for people who want to offer pr
 ```powershell
 pnpm install
 Copy-Item .env.example .env.local
+# Fill NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY from the local CLI output.
 pnpm dev
 ```
 
@@ -31,7 +32,21 @@ pnpm dlx supabase@2.116.0 migration list --local
 pnpm dlx supabase@2.116.0 stop
 ```
 
-Phase 00 creates no product tables or user seed records. The migration installs only `pgcrypto`, `postgis`, and `pg_trgm` for approved future phases.
+Phase 01 adds Auth-backed account tables, owner-only RLS, and the private `identity-documents` bucket. It creates no product/services catalog or fake user records. Configure the Auth provider and use these local callback origins:
+
+- `http://localhost:3000/auth/callback`
+- `http://127.0.0.1:3000/auth/callback`
+
+Recovery links return through `/auth/callback?next=/update-password`. Set `NEXT_PUBLIC_SITE_URL` only when the public origin differs from `http://localhost:3000`. Google is an optional clean integration point: configure the Google provider in Supabase first, then set `NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED=true`.
+
+After local Supabase is running, reset and test the append-only migrations:
+
+```powershell
+pnpm dlx supabase@2.116.0 db reset
+pnpm dlx supabase@2.116.0 test db
+```
+
+The RLS and Storage behavior is not considered runtime-verified until those commands run successfully with Docker Desktop or Podman available.
 
 ## Validation
 
@@ -50,10 +65,10 @@ The Playwright configuration is ready for later user journeys; no product E2E jo
 ```text
 apps/web/          Next.js App Router PWA shell
 packages/domain/   portable JSON/domain primitives
-packages/validation shared Zod environment contracts
+packages/validation shared Zod environment and account contracts
 packages/config/   public and server-only environment readers
 supabase/          local config, migrations, and seed policy
 docs/              architecture and decision records
 ```
 
-The branch for this phase is `codex/phase-00-foundation`. Do not merge or begin Phase 01 until this branch has been audited and explicitly approved.
+The Phase 01 branch is `codex/phase-01-accounts`. This phase stops before Phase 02 and must be audited before any later phase starts.
