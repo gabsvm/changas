@@ -7,7 +7,12 @@ select ok(
   'services enforce a price-model amount invariant'
 );
 select ok(
-  (select count(*) = 1 from pg_constraint where conrelid = 'public.services'::regclass and contype = 'c' and pg_get_constraintdef(oid) like '%price_unit%'),
+  (select count(*) = 1
+   from pg_constraint
+   where conrelid = 'public.services'::regclass
+     and contype = 'c'
+     and pg_get_constraintdef(oid) like '%price_model = ''PER_UNIT''%'
+     and pg_get_constraintdef(oid) like '%price_unit%'),
   'services enforce a per-unit label invariant'
 );
 select ok(
