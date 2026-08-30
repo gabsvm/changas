@@ -37,7 +37,7 @@ export async function updateSession(
   });
 
   // Refresh the session claims without trusting a client-readable session as authorization.
-  await supabase.auth.getUser();
+  await supabase.auth.getClaims();
 
   return supabaseResponse;
 }

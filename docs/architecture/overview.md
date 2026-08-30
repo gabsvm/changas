@@ -21,7 +21,7 @@ The web application owns presentation and web runtime concerns. Business/domain 
 
 Server Components and Route Handlers call the cookie-aware server Supabase client. Browser components call the browser client with only the public URL and publishable key. A privileged client exists only in a server-only module and is reserved for explicitly authorized server operations in later phases.
 
-The browser never supplies an authoritative user ID or provider status. Actions resolve the authenticated subject with `auth.getUser()`, then write rows keyed to that subject. Future critical mutations must validate on the server, enforce authorization in RLS/database policies, and record an auditable event when the domain requires it.
+The proxy refreshes claims with `auth.getClaims()`. The browser never supplies an authoritative user ID or provider status. Actions resolve the authenticated subject with `auth.getUser()`, then write rows keyed to that subject. Future critical mutations must validate on the server, enforce authorization in RLS/database policies, and record an auditable event when the domain requires it.
 
 ## Account and identity boundaries
 

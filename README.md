@@ -4,7 +4,7 @@ Changas is a mobile-first marketplace foundation for people who want to offer pr
 
 ## Prerequisites
 
-- Node.js 20.9 or newer
+- Node.js 24.20.0 or newer
 - pnpm 11.19.0 (`corepack` or the pnpm installation supported by your environment)
 - Docker Desktop only when running Supabase locally
 
@@ -39,14 +39,22 @@ Phase 01 adds Auth-backed account tables, owner-only RLS, and the private `ident
 
 Recovery links return through `/auth/callback?next=/update-password`. Set `NEXT_PUBLIC_SITE_URL` only when the public origin differs from `http://localhost:3000`. Google is an optional clean integration point: configure the Google provider in Supabase first, then set `NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED=true`.
 
-After local Supabase is running, reset and test the append-only migrations:
+After local Supabase is running, reset and test the append-only migrations and pgTAP security assertions:
 
 ```powershell
-pnpm dlx supabase@2.116.0 db reset
-pnpm dlx supabase@2.116.0 test db
+pnpm dlx supabase@2.116.0 db reset --local --no-seed
+pnpm dlx supabase@2.116.0 test db --local
 ```
 
-The RLS and Storage behavior is not considered runtime-verified until those commands run successfully with Docker Desktop or Podman available.
+Phase 01 uses explicit Data API grants. Authenticated users receive only the requested owner-scoped table operations; `service_role` receives explicit DML for server-side/admin operations and is never client-safe; `anon` and `PUBLIC` receive no Phase 01 table privileges. `supabase/config.toml` sets `auto_expose_new_tables = false` so local development does not hide missing grants.
+
+To run the client and Storage integration security checks against the local instance, export the values from `supabase status -o env` and run:
+
+```powershell
+node apps/web/scripts/supabase-runtime-security.mjs
+```
+
+The script creates only synthetic users and fixture content, then removes them. It verifies owner read/write, cross-user private-row denial, provider self-activation denial, and private Storage access for the owner versus another user and anonymous access. The same reset, pgTAP, and integration checks run in the `supabase-integration` GitHub Actions job without Supabase Cloud credentials.
 
 ## Validation
 

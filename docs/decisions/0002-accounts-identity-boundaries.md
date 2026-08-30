@@ -8,7 +8,7 @@ Accepted for Phase 01.
 
 Keep public profile data, private identity data, provider onboarding state, and identity document metadata in separate tables. Enforce owner access with PostgreSQL RLS and keep the identity-document Storage bucket private with a first-folder UUID policy.
 
-Authentication uses Supabase Auth with the cookie-aware browser/server clients. Next.js `proxy.ts` refreshes claims with `auth.getUser()`. Mutations use server actions that resolve the authenticated user again and never accept a user ID or provider status as authority from a form.
+Authentication uses Supabase Auth with the cookie-aware browser/server clients. Next.js `proxy.ts` refreshes claims with `auth.getClaims()`. Mutations use server actions that resolve the authenticated user again with `auth.getUser()` and never accept a user ID or provider status as authority from a form.
 
 Provider owners can create and update only `PROFILE_INCOMPLETE` or `IDENTITY_PENDING`. States such as `UNDER_REVIEW` and `ACTIVE` are reserved for a later administrative workflow.
 
