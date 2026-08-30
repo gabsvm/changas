@@ -134,27 +134,33 @@ select set_config(
   true
 );
 
+update public.profiles
+set bio = 'owner update'
+where id = '00000000-0000-0000-0000-000000000001';
+
 select is(
-  (with changed as (
-    update public.profiles
-    set bio = 'owner update'
-    where id = '00000000-0000-0000-0000-000000000001'
-    returning id
-  ) select count(*)::integer from changed),
+  (select count(*)::integer
+   from public.profiles
+   where id = '00000000-0000-0000-0000-000000000001'
+     and bio = 'owner update'),
   1,
   'owner can update their own profile'
 );
 
+update public.profiles
+set bio = 'cross-user update'
+where id = '00000000-0000-0000-0000-000000000002';
+
+set local role postgres;
 select is(
-  (with changed as (
-    update public.profiles
-    set bio = 'cross-user update'
-    where id = '00000000-0000-0000-0000-000000000002'
-    returning id
-  ) select count(*)::integer from changed),
+  (select count(*)::integer
+   from public.profiles
+   where id = '00000000-0000-0000-0000-000000000002'
+     and bio = 'cross-user update'),
   0,
   'owner cannot update another profile'
 );
+set local role authenticated;
 
 select throws_ok(
   $$
