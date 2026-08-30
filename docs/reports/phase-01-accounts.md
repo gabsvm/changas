@@ -14,6 +14,8 @@ El run previo [33291486241](https://github.com/gabsvm/changas/actions/runs/33291
 
 Después de publicar los fixes, el nuevo run [33320897397](https://github.com/gabsvm/changas/actions/runs/33320897397), sobre `0eea648`, reprodujo la misma causa. El job `validate` terminó `failure` sin pasos y `supabase-integration` terminó `skipped` por su dependencia. No es una falla atribuible a los tests ni a la configuración ejecutada en el runner; requiere resolver el bloqueo de billing de GitHub para que Actions pueda arrancar.
 
+El run posterior [33321163445](https://github.com/gabsvm/changas/actions/runs/33321163445), sobre la cabeza publicada `a21eb0f`, confirmó nuevamente la misma annotation y el mismo estado (`validate` failure sin pasos, `supabase-integration` skipped).
+
 ## Cambios implementados
 
 ### Data API y RLS
@@ -84,6 +86,7 @@ El Proxy ahora usa únicamente `supabase.auth.getClaims()` para refrescar/valida
 - `1af6e53` — `chore: align project with node 24`
 - `ac95198` — `ci: add local supabase security integration`
 - `0eea648` — `fix(auth): refresh proxy claims with getClaims`
+- `a21eb0f` — `test(storage): use a valid synthetic png fixture`
 
 Commits previos preservados:
 
@@ -95,20 +98,20 @@ Commits previos preservados:
 
 ## Gates de validación
 
-| Gate                                  | Resultado          | Evidencia                                                                                  |
-| ------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------ |
-| `pnpm install --frozen-lockfile`      | PASS               | pnpm 11.19.0, workspace up to date                                                         |
-| `pnpm lint`                           | PASS               | ESLint sin errores                                                                         |
-| `pnpm typecheck`                      | PASS               | 4 proyectos workspace                                                                      |
-| `pnpm test`                           | PASS               | 5 archivos, 10 tests                                                                       |
-| `pnpm build`                          | PASS               | Build Next.js exitoso; rutas Auth/Account/Provider y Proxy generadas                       |
-| `pnpm format:check`                   | PASS               | Prettier sin diferencias                                                                   |
-| `git diff --check`                    | PASS               | Sin errores de whitespace                                                                  |
-| `supabase start` local                | NOT RUN            | Docker y Podman no están disponibles; CLI devolvió `docker: command not found`             |
-| `supabase db reset --local --no-seed` | NOT RUN            | No había servicio local inspeccionable                                                     |
-| `supabase test db --local` / pgTAP    | NOT RUN            | Conexión rechazada en `127.0.0.1:54322`                                                    |
-| Supabase client/Storage runtime       | NOT RUN            | Depende del servicio local no disponible                                                   |
-| GitHub Actions CI remoto              | FAIL / NOT STARTED | Run `33320897397`: cuenta bloqueada por billing; `validate` sin pasos, integración skipped |
+| Gate                                  | Resultado          | Evidencia                                                                                                   |
+| ------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `pnpm install --frozen-lockfile`      | PASS               | pnpm 11.19.0, workspace up to date                                                                          |
+| `pnpm lint`                           | PASS               | ESLint sin errores                                                                                          |
+| `pnpm typecheck`                      | PASS               | 4 proyectos workspace                                                                                       |
+| `pnpm test`                           | PASS               | 5 archivos, 10 tests                                                                                        |
+| `pnpm build`                          | PASS               | Build Next.js exitoso; rutas Auth/Account/Provider y Proxy generadas                                        |
+| `pnpm format:check`                   | PASS               | Prettier sin diferencias                                                                                    |
+| `git diff --check`                    | PASS               | Sin errores de whitespace                                                                                   |
+| `supabase start` local                | NOT RUN            | Docker y Podman no están disponibles; CLI devolvió `docker: command not found`                              |
+| `supabase db reset --local --no-seed` | NOT RUN            | No había servicio local inspeccionable                                                                      |
+| `supabase test db --local` / pgTAP    | NOT RUN            | Conexión rechazada en `127.0.0.1:54322`                                                                     |
+| Supabase client/Storage runtime       | NOT RUN            | Depende del servicio local no disponible                                                                    |
+| GitHub Actions CI remoto              | FAIL / NOT STARTED | Runs `33320897397` y `33321163445`: cuenta bloqueada por billing; `validate` sin pasos, integración skipped |
 
 ## Limitación restante y stop gate
 
