@@ -2,7 +2,7 @@
 
 ## Estado de la segunda auditoría
 
-La rama `codex/phase-01-accounts` contiene los hardening fixes solicitados y fue publicada en `origin/codex/phase-01-accounts`. La aprobación de Phase 01 queda pendiente: los gates locales de código están en PASS, pero Supabase runtime no pudo ejecutarse en esta máquina por falta de Docker/Podman y GitHub Actions sigue bloqueado antes de iniciar jobs por un problema de billing de la cuenta.
+La rama `codex/phase-01-accounts` contiene los hardening fixes solicitados y fue publicada en `origin/codex/phase-01-accounts`. El finding final de SSR quedó corregido. Los gates locales de código están en PASS y la validación Supabase runtime quedó en PASS dentro de GitHub Actions; el runtime local continúa sin ejecutarse en esta máquina por falta de Docker/Podman.
 
 No se inició Phase 02 ni se implementaron categorías, skills, servicios, marketplace, búsqueda, chat, jobs o pagos.
 
@@ -15,6 +15,10 @@ El run previo [33291486241](https://github.com/gabsvm/changas/actions/runs/33291
 Después de publicar los fixes, el nuevo run [33320897397](https://github.com/gabsvm/changas/actions/runs/33320897397), sobre `0eea648`, reprodujo la misma causa. El job `validate` terminó `failure` sin pasos y `supabase-integration` terminó `skipped` por su dependencia. No es una falla atribuible a los tests ni a la configuración ejecutada en el runner; requiere resolver el bloqueo de billing de GitHub para que Actions pueda arrancar.
 
 El run posterior [33321163445](https://github.com/gabsvm/changas/actions/runs/33321163445), sobre la cabeza publicada `a21eb0f`, confirmó nuevamente la misma annotation y el mismo estado (`validate` failure sin pasos, `supabase-integration` skipped).
+
+Cuando GitHub liberó el bloqueo, el run [33328402365](https://github.com/gabsvm/changas/actions/runs/33328402365), sobre `9d5c045`, ejecutó efectivamente los jobs: `validate` pasó, pero `supabase-integration` falló en pgTAP. La causa real fue una incompatibilidad de PostgreSQL 17 en `supabase/tests/phase-01-rls.sql`: dos assertions usaban CTEs data-modifying dentro de subqueries escalares, una forma que PostgreSQL rechaza con `WITH clause containing a data-modifying statement must be at the top level`. El plan declaraba 21 subtests, pero esa falla impidió ejecutar 3.
+
+El commit [5f61635](https://github.com/gabsvm/changas/commit/5f61635) reescribió únicamente esas assertions como `UPDATE` seguido de `SELECT` verificable, sin ampliar el scope de Phase 01. El rerun [33328676242](https://github.com/gabsvm/changas/actions/runs/33328676242), sobre `5f61635`, pasó ambos jobs: `validate` y `supabase-integration`.
 
 ## Cambios implementados
 
@@ -60,7 +64,7 @@ El checkout local disponible usa Node `v26.4.0` y no tiene nvm/fnm/volta para ca
 4. El script `apps/web/scripts/supabase-runtime-security.mjs` con las credenciales locales emitidas por `status -o env`.
 5. `supabase stop` siempre, incluso ante fallas.
 
-El script usa dos usuarios sintéticos y un PNG mínimo codificado en base64, sin datos personales (`apps/web/fixtures/synthetic-identity.png.b64`). Comprueba owner read/write, aislamiento de `profile_private`, rechazo de `ACTIVE`, y Storage privado: owner upload/download, usuario B rechazado y anónimo rechazado. La ejecución efectiva quedó `NOT RUN` porque el runner local no tiene Docker ni Podman, y el job remoto fue `skipped` por el bloqueo externo de GitHub. Por lo tanto, no se afirma evidencia runtime RLS/Storage todavía.
+El script usa dos usuarios sintéticos y un PNG mínimo codificado en base64, sin datos personales (`apps/web/fixtures/synthetic-identity.png.b64`). Comprueba owner read/write, aislamiento de `profile_private`, rechazo de `ACTIVE`, y Storage privado: owner upload/download, usuario B rechazado y anónimo rechazado. En el run remoto exitoso se aplicaron las tres migraciones desde cero, se hizo `db reset`, pgTAP terminó con 35 tests exitosos y `Supabase runtime security checks: PASS`. La ejecución equivalente en el host local quedó `NOT RUN` porque no hay Docker ni Podman; la evidencia runtime reportada aquí es la del runner Ubuntu de GitHub Actions y no requiere credenciales Cloud.
 
 Antes de incorporar los comandos al workflow se consultaron los help de:
 
@@ -92,6 +96,7 @@ El Proxy ahora acepta ese segundo argumento y copia cada entrada a la `NextRespo
 - `0eea648` — `fix(auth): refresh proxy claims with getClaims`
 - `a21eb0f` — `test(storage): use a valid synthetic png fixture`
 - `1644ae8` — `fix(auth): forward proxy refresh cache headers`
+- `5f61635` — `test(db): fix postgres 17 rls assertions`
 
 Commits previos preservados:
 
@@ -103,21 +108,22 @@ Commits previos preservados:
 
 ## Gates de validación
 
-| Gate                                  | Resultado          | Evidencia                                                                                                   |
-| ------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `pnpm install --frozen-lockfile`      | PASS               | pnpm 11.19.0, workspace up to date                                                                          |
-| `pnpm lint`                           | PASS               | ESLint sin errores                                                                                          |
-| `pnpm typecheck`                      | PASS               | 4 proyectos workspace                                                                                       |
-| `pnpm test`                           | PASS               | 5 archivos, 11 tests                                                                                        |
-| `pnpm build`                          | PASS               | Build Next.js exitoso; rutas Auth/Account/Provider y Proxy generadas                                        |
-| `pnpm format:check`                   | PASS               | Prettier sin diferencias                                                                                    |
-| `git diff --check`                    | PASS               | Sin errores de whitespace                                                                                   |
-| `supabase start` local                | NOT RUN            | Docker y Podman no están disponibles; CLI devolvió `docker: command not found`                              |
-| `supabase db reset --local --no-seed` | NOT RUN            | No había servicio local inspeccionable                                                                      |
-| `supabase test db --local` / pgTAP    | NOT RUN            | Conexión rechazada en `127.0.0.1:54322`                                                                     |
-| Supabase client/Storage runtime       | NOT RUN            | Depende del servicio local no disponible                                                                    |
-| GitHub Actions CI remoto              | FAIL / NOT STARTED | Runs `33320897397` y `33321163445`: cuenta bloqueada por billing; `validate` sin pasos, integración skipped |
+| Gate                                  | Resultado | Evidencia                                                                                  |
+| ------------------------------------- | --------- | ------------------------------------------------------------------------------------------ |
+| `pnpm install --frozen-lockfile`      | PASS      | pnpm 11.19.0, workspace up to date                                                         |
+| `pnpm lint`                           | PASS      | ESLint sin errores                                                                         |
+| `pnpm typecheck`                      | PASS      | 4 proyectos workspace                                                                      |
+| `pnpm test`                           | PASS      | 5 archivos, 11 tests                                                                       |
+| `pnpm build`                          | PASS      | Build Next.js exitoso; rutas Auth/Account/Provider y Proxy generadas                       |
+| `pnpm format:check`                   | PASS      | Prettier sin diferencias                                                                   |
+| `git diff --check`                    | PASS      | Sin errores de whitespace                                                                  |
+| `supabase start` local                | NOT RUN   | Docker y Podman no están disponibles; CLI devolvió `docker: command not found`             |
+| `supabase db reset --local --no-seed` | NOT RUN   | No había servicio local inspeccionable                                                     |
+| `supabase test db --local` / pgTAP    | NOT RUN   | Conexión rechazada en `127.0.0.1:54322`                                                    |
+| Supabase client/Storage runtime local | NOT RUN   | Depende del servicio local; Docker y Podman no están disponibles                           |
+| Supabase runtime en GitHub Actions    | PASS      | Run `33328676242`: migraciones, reset, pgTAP 35 tests y RLS/Storage client security checks |
+| GitHub Actions CI remoto              | PASS      | Run `33328676242`: `validate` e `supabase-integration` concluyeron exitosamente            |
 
 ## Limitación restante y stop gate
 
-La corrección está publicada, pero Phase 01 no puede declararse aprobada mientras no se habilite un runner de GitHub Actions y se obtenga PASS real del job `validate` y de `supabase-integration`, incluyendo migración/reset, pgTAP y pruebas RLS/Storage. La rama queda detenida en Phase 01; no se hace merge y no se inicia Phase 02.
+El runtime local queda como limitación de entorno (`NOT RUN`), pero los jobs remotos requeridos sí tienen evidencia `PASS` sobre Ubuntu con Docker, incluyendo migración/reset, pgTAP y pruebas RLS/Storage. La rama queda detenida en Phase 01; no se hace merge y no se inicia Phase 02.
