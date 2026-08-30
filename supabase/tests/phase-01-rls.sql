@@ -38,9 +38,9 @@ select ok(
   'profile_private has owner select/insert/update policies'
 );
 select ok(
-  (select count(*) = 3 from pg_policies
+  (select count(*) = 4 from pg_policies
    where schemaname = 'public' and tablename = 'provider_profiles'),
-  'provider_profiles has owner select/insert/update policies'
+  'provider_profiles retains owner policies plus the ACTIVE marketplace pause policy'
 );
 select ok(
   (select count(*) = 4 from pg_policies
