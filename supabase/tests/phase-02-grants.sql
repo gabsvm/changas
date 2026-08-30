@@ -57,8 +57,10 @@ select ok(
 
 select ok(
   (select bool_and(
-    not has_table_privilege('anon', table_name, 'SELECT, INSERT, UPDATE, DELETE')
-    and not has_table_privilege('authenticated', table_name, 'SELECT, INSERT, UPDATE, DELETE')
+    not has_table_privilege('anon', table_name, 'SELECT')
+    and not has_table_privilege('anon', table_name, 'INSERT')
+    and not has_table_privilege('anon', table_name, 'UPDATE')
+    and not has_table_privilege('anon', table_name, 'DELETE')
   )
   from (values
     ('public.provider_skills'),

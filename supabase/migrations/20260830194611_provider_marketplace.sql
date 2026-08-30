@@ -589,16 +589,26 @@ create policy availability_blocks_delete_own
 on public.availability_blocks for delete to authenticated
 using (provider_user_id = (select auth.uid()));
 
--- Keep the Phase 01 policy name/count stable while active providers gain the
--- ability to pause their marketplace. The trigger above remains the authority
--- that rejects any client-side status transition.
+-- Keep the original Phase 01 policy semantics intact. An additional policy
+-- lets an already ACTIVE provider edit only marketplace pause fields while the
+-- trigger above remains the authority that rejects any status transition.
 drop policy provider_profiles_update_own on public.provider_profiles;
 create policy provider_profiles_update_own
 on public.provider_profiles for update to authenticated
 using (user_id = (select auth.uid()))
 with check (
   user_id = (select auth.uid())
-  and status in ('PROFILE_INCOMPLETE', 'IDENTITY_PENDING', 'ACTIVE')
+  and status in ('PROFILE_INCOMPLETE', 'IDENTITY_PENDING')
+);
+create policy provider_profiles_update_active_marketplace
+on public.provider_profiles for update to authenticated
+using (
+  user_id = (select auth.uid())
+  and status = 'ACTIVE'
+)
+with check (
+  user_id = (select auth.uid())
+  and status = 'ACTIVE'
 );
 
 -- Explicit, narrow grants. No client role receives direct access to an

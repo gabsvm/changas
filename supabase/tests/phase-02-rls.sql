@@ -50,8 +50,8 @@ select ok(
   'provider can own two unrelated catalog skills'
 );
 select ok(
-  (select count(*) = 1 from information_schema.tables where table_schema = 'public' and table_name = 'services') = 1
-    and (select count(*) = 1 from information_schema.tables where table_schema = 'public' and table_name = 'skills') = 1,
+  (select count(*) = 1 from information_schema.tables where table_schema = 'public' and table_name = 'services')
+    and (select count(*) = 1 from information_schema.tables where table_schema = 'public' and table_name = 'skills'),
   'skills and services are separate relational concepts'
 );
 

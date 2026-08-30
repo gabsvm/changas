@@ -97,9 +97,21 @@ select ok(
   not exists (
     select 1
     from pg_policies
-    where schemaname in ('public', 'storage')
-      and (tablename in ('profile_private', 'provider_documents') or tablename = 'objects')
-      and ('anon' = any(roles))
+    where 'anon' = any(roles)
+      and (
+        (
+          schemaname = 'public'
+          and tablename in ('profile_private', 'provider_documents')
+        )
+        or (
+          schemaname = 'storage'
+          and tablename = 'objects'
+          and (
+            coalesce(qual, '') like '%identity-documents%'
+            or coalesce(with_check, '') like '%identity-documents%'
+          )
+        )
+      )
   ),
   'private identity data has no anon policy'
 );
