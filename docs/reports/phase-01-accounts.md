@@ -78,7 +78,11 @@ supabase status --help
 
 ### Proxy SSR
 
-El Proxy ahora usa únicamente `supabase.auth.getClaims()` para refrescar/validar claims. Se conserva `supabase.auth.getUser()` en Server Actions y páginas server-side que necesitan resolver el usuario autenticado actual. No se usa `getSession()` como fuente de autorización.
+La segunda auditoría confirmó que el Proxy usa `supabase.auth.getClaims()`, pero encontró que su `cookies.setAll` ignoraba el segundo argumento de headers. La versión pinned `@supabase/ssr@0.12.5` declara `setAll(cookiesToSet, headers)` con `headers: Record<string, string>`; esos headers incluyen directivas como `Cache-Control: private, no-cache, no-store, must-revalidate, max-age=0`, `Expires: 0` y `Pragma: no-cache`.
+
+El Proxy ahora acepta ese segundo argumento y copia cada entrada a la `NextResponse` final después de propagar cookies y sus opciones. El cambio se limitó a `apps/web/src/lib/supabase/proxy.ts`; `apps/web/src/lib/supabase/server.ts` no fue modificado. Se conserva `supabase.auth.getUser()` en Server Actions y páginas server-side que necesitan resolver el usuario autenticado actual. No se usa `getSession()` como fuente de autorización.
+
+`apps/web/src/lib/supabase/proxy-contract.test.ts` simula una cookie de sesión y los tres headers de cache, y verifica sus valores en el `NextResponse`. También verifica `getClaims()` llamado una vez, `getUser()` nunca llamado y `getSession()` nunca llamado. La prueba falló antes del fix por recibir `Cache-Control = null`, pasó después, y una mutación controlada a `getSession()` volvió a fallar.
 
 ## Commits de esta corrección
 
@@ -87,6 +91,7 @@ El Proxy ahora usa únicamente `supabase.auth.getClaims()` para refrescar/valida
 - `ac95198` — `ci: add local supabase security integration`
 - `0eea648` — `fix(auth): refresh proxy claims with getClaims`
 - `a21eb0f` — `test(storage): use a valid synthetic png fixture`
+- `1644ae8` — `fix(auth): forward proxy refresh cache headers`
 
 Commits previos preservados:
 
@@ -103,7 +108,7 @@ Commits previos preservados:
 | `pnpm install --frozen-lockfile`      | PASS               | pnpm 11.19.0, workspace up to date                                                                          |
 | `pnpm lint`                           | PASS               | ESLint sin errores                                                                                          |
 | `pnpm typecheck`                      | PASS               | 4 proyectos workspace                                                                                       |
-| `pnpm test`                           | PASS               | 5 archivos, 10 tests                                                                                        |
+| `pnpm test`                           | PASS               | 5 archivos, 11 tests                                                                                        |
 | `pnpm build`                          | PASS               | Build Next.js exitoso; rutas Auth/Account/Provider y Proxy generadas                                        |
 | `pnpm format:check`                   | PASS               | Prettier sin diferencias                                                                                    |
 | `git diff --check`                    | PASS               | Sin errores de whitespace                                                                                   |
