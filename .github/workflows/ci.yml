@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.9.0
+          node-version: 24.20.0
           cache: pnpm
 
       - name: Install dependencies
@@ -41,3 +41,54 @@ jobs:
 
       - name: Production build
         run: pnpm build
+
+  supabase-integration:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start local Supabase
+        run: pnpm dlx supabase@2.116.0 start
+
+      - name: Reset local database
+        run: pnpm dlx supabase@2.116.0 db reset --local --no-seed
+
+      - name: Run pgTAP security tests
+        run: pnpm dlx supabase@2.116.0 test db --local
+
+      - name: Export local Supabase credentials
+        shell: bash
+        run: |
+          pnpm dlx supabase@2.116.0 status -o env > "$RUNNER_TEMP/supabase.env"
+          set -a
+          source "$RUNNER_TEMP/supabase.env"
+          set +a
+          {
+            echo "API_URL=$API_URL"
+            echo "ANON_KEY=$ANON_KEY"
+            echo "SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+
+      - name: Run client and Storage security checks
+        run: node apps/web/scripts/supabase-runtime-security.mjs
+
+      - name: Stop local Supabase
+        if: always()
+        run: pnpm dlx supabase@2.116.0 stop
