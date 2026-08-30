@@ -1,0 +1,1 @@
+-- Phase 00 intentionally seeds no users, profiles, services, reviews, or other product data.

@@ -1,0 +1,22 @@
+{
+  "name": "@changas/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./public": "./src/public.ts",
+    "./server": "./src/server.ts"
+  },
+  "devDependencies": {
+    "@types/node": "26.4.0",
+    "typescript": "6.0.3"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@changas/validation": "workspace:*",
+    "server-only": "0.0.1"
+  }
+}
