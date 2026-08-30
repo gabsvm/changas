@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@11.19.0",
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "dev": "pnpm --filter @changas/web dev",
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
+    "@types/node": "24.13.3",
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "0.8.1",
     "vitest": "4.1.11"

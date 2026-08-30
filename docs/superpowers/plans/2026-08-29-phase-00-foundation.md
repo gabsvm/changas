@@ -249,7 +249,7 @@
 
 - [ ] **Step 2: Add CI with frozen installation**
 
-  Use Node 20+ and `pnpm/action-setup`, run `pnpm install --frozen-lockfile`, then `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build`. CI must not require Supabase secrets for the foundation build.
+  Use Node 24.20.0 and `pnpm/action-setup`, run `pnpm install --frozen-lockfile`, then `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build`. CI must not require Supabase secrets for the foundation build.
 
 - [ ] **Step 3: Write setup documentation**
 
