@@ -49,9 +49,9 @@ describe("sitemap chunk planning", () => {
     const materialized = materializePlans(counts);
 
     expect(plans.length).toBeGreaterThan(1);
-    expect(plans.every((plan) => plan.expectedUrls <= SITEMAP_URL_LIMIT)).toBe(
-      true,
-    );
+    expect(
+      plans.every((plan) => plan.expectedUrls <= SITEMAP_URL_LIMIT),
+    ).toBe(true);
     expect(materialized).toHaveLength(totalSitemapUrls(counts));
     expect(new Set(materialized).size).toBe(materialized.length);
   });
