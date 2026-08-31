@@ -46,3 +46,13 @@ export {
   distanceBucketLabels,
   type DistanceBucket,
 } from "./discovery-public";
+export {
+  conversationParticipantRoles,
+  conversationStatuses,
+  messageKinds,
+  type ConversationCursor,
+  type ConversationParticipantRole,
+  type ConversationStatus,
+  type MessageCursor,
+  type MessageKind,
+} from "./conversations";
