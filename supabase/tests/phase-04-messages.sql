@@ -1,6 +1,6 @@
 begin;
 
-select plan(12);
+select plan(13);
 
 select ok(
   to_regprocedure('public.send_conversation_text(uuid,text,uuid)') is not null,
