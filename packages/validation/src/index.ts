@@ -74,6 +74,8 @@ export const identityDocumentSchema = z.object({
     .max(10 * 1024 * 1024),
 });
 
+export const messageTextSchema = z.string().trim().min(1).max(4000);
+
 const uuidSchema = z.uuid();
 const dateSchema = z.iso.date();
 const timeSchema = z.iso.time({ precision: -1 });
