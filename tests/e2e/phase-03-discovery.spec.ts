@@ -117,14 +117,18 @@ test.describe("Phase 03 public discovery", () => {
   }) => {
     const indexResponse = await request.get("/sitemap.xml");
     expect(indexResponse.ok()).toBe(true);
-    expect(indexResponse.headers()["content-type"]).toContain("application/xml");
+    expect(indexResponse.headers()["content-type"]).toContain(
+      "application/xml",
+    );
     const indexXml = await indexResponse.text();
     expect(indexXml).toContain("<sitemapindex");
     expect(indexXml).toContain("/sitemaps/0");
 
     const chunkResponse = await request.get("/sitemaps/0");
     expect(chunkResponse.ok()).toBe(true);
-    expect(chunkResponse.headers()["content-type"]).toContain("application/xml");
+    expect(chunkResponse.headers()["content-type"]).toContain(
+      "application/xml",
+    );
     const chunkXml = await chunkResponse.text();
     expect(chunkXml).toContain("<urlset");
     expect(chunkXml).toContain("/p/demo-proveedor");
@@ -186,7 +190,10 @@ test.describe("Phase 03 public discovery", () => {
     ).toBeVisible();
   });
 
-  test("GPS retry clears a prior discovery error", async ({ page, context }) => {
+  test("GPS retry clears a prior discovery error", async ({
+    page,
+    context,
+  }) => {
     await context.grantPermissions(["geolocation"]);
     await context.setGeolocation({ latitude: -34.58, longitude: -58.43 });
     let attempts = 0;

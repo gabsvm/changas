@@ -4,7 +4,11 @@ import { getPublicSupabaseEnv } from "@changas/config/public";
 
 import type { Database } from "@/lib/supabase/database.types";
 
-import type { SitemapChunkPlan, SitemapCounts, SitemapRange } from "./pagination";
+import type {
+  SitemapChunkPlan,
+  SitemapCounts,
+  SitemapRange,
+} from "./pagination";
 
 export type SitemapCategoryRow = {
   slug: string;

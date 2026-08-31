@@ -12,17 +12,29 @@ function materializePlans(counts: SitemapCounts): string[] {
   for (const plan of buildSitemapChunkPlans(counts)) {
     if (plan.includeHome) values.push("home");
     if (plan.categories) {
-      for (let index = plan.categories.from; index <= plan.categories.to; index++) {
+      for (
+        let index = plan.categories.from;
+        index <= plan.categories.to;
+        index++
+      ) {
         values.push(`category:${index}`);
       }
     }
     if (plan.providers) {
-      for (let index = plan.providers.from; index <= plan.providers.to; index++) {
+      for (
+        let index = plan.providers.from;
+        index <= plan.providers.to;
+        index++
+      ) {
         values.push(`provider:${index}`);
       }
     }
     if (plan.services) {
-      for (let index = plan.services.from; index <= plan.services.to; index++) {
+      for (
+        let index = plan.services.from;
+        index <= plan.services.to;
+        index++
+      ) {
         values.push(`service:${index}`);
       }
     }

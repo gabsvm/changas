@@ -31,7 +31,9 @@ export function renderSitemapUrlSet(urls: SitemapUrl[]): string {
         ? `<changefreq>${url.changeFrequency}</changefreq>`
         : "";
       const priority =
-        url.priority === undefined ? "" : `<priority>${url.priority}</priority>`;
+        url.priority === undefined
+          ? ""
+          : `<priority>${url.priority}</priority>`;
       return `<url><loc>${escapeXml(url.loc)}</loc>${lastModified}${changeFrequency}${priority}</url>`;
     })
     .join("");
