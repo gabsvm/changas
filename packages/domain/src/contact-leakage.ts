@@ -1,8 +1,5 @@
 export type LeakageSignalType =
-  | "PHONE"
-  | "EMAIL"
-  | "PAYMENT_HANDLE"
-  | "EXTERNAL_CONTACT_REQUEST";
+  "PHONE" | "EMAIL" | "PAYMENT_HANDLE" | "EXTERNAL_CONTACT_REQUEST";
 
 export type LeakageSignal = {
   type: LeakageSignalType;
@@ -10,10 +7,13 @@ export type LeakageSignal = {
 };
 
 const emailPattern = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
-const explicitInternationalPhonePattern = /(?:^|\s)(\+\d{1,3}[\s().-]*(?:\d[\s().-]*){8,14}\d)(?=\s|$|[,.!?])/g;
+const explicitInternationalPhonePattern =
+  /(?:^|\s)(\+\d{1,3}[\s().-]*(?:\d[\s().-]*){8,14}\d)(?=\s|$|[,.!?])/g;
 const cbuCvuPattern = /\b(?:cbu|cvu)\s*(?:es|:|-)?\s*(\d{22})\b/gi;
-const paymentAliasPattern = /\b(?:alias|mercado\s*pago|transferime|pagame\s+por|p[aá]game\s+por)\b[^\n]{0,80}/gi;
-const externalContactPattern = /\b(?:te\s+paso\s+mi\s+(?:whatsapp|wsp|telegram)|mandame\s+(?:un\s+)?mensaje\s+por\s+(?:whatsapp|wsp|telegram)|escribime\s+por\s+(?:whatsapp|wsp|telegram)|hablemos\s+por\s+(?:whatsapp|wsp|telegram))\b/gi;
+const paymentAliasPattern =
+  /\b(?:alias|mercado\s*pago|transferime|pagame\s+por|p[aá]game\s+por)\b[^\n]{0,80}/gi;
+const externalContactPattern =
+  /\b(?:te\s+paso\s+mi\s+(?:whatsapp|wsp|telegram)|mandame\s+(?:un\s+)?mensaje\s+por\s+(?:whatsapp|wsp|telegram)|escribime\s+por\s+(?:whatsapp|wsp|telegram)|hablemos\s+por\s+(?:whatsapp|wsp|telegram))\b/gi;
 
 function collect(
   text: string,
