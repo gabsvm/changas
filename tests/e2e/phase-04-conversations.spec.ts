@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const supabaseUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey =
@@ -88,7 +88,7 @@ async function cleanupTestUser(id: string): Promise<void> {
   await deleteTestUser(id);
 }
 
-async function assertThreadRendered(page: Parameters<typeof test>[0] extends never ? never : any) {
+async function assertThreadRendered(page: Page): Promise<void> {
   const peer = page.getByText("Demo Proveedor").first();
   try {
     await expect(peer).toBeVisible({ timeout: 5000 });
