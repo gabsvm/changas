@@ -73,6 +73,10 @@ type ConversationRpcClient = {
     args: { target_conversation_id: string },
   ): Promise<{ data: ConversationContext[] | null; error: RpcError }>;
   rpc(
+    name: "get_my_conversation_block_state",
+    args: { target_conversation_id: string },
+  ): Promise<{ data: string | null; error: RpcError }>;
+  rpc(
     name: "mark_conversation_read",
     args: {
       target_conversation_id: string;
@@ -184,6 +188,18 @@ export async function getConversationContext(
 
   if (error) throw mapRpcError(error);
   return data?.[0] ?? null;
+}
+
+export async function getMyConversationBlockState(
+  conversationId: string,
+): Promise<string | null> {
+  const rpc = await getRpcClient();
+  const { data, error } = await rpc.rpc("get_my_conversation_block_state", {
+    target_conversation_id: conversationId,
+  });
+
+  if (error) throw mapRpcError(error);
+  return data;
 }
 
 export async function markConversationRead(
