@@ -9,7 +9,9 @@ import {
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export async function startServiceConversation(formData: FormData): Promise<void> {
+export async function startServiceConversation(
+  formData: FormData,
+): Promise<void> {
   const providerSlug = String(formData.get("providerSlug") ?? "");
   const serviceSlug = String(formData.get("serviceSlug") ?? "");
 

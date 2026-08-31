@@ -50,7 +50,9 @@ export default async function ConversationPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/login?next=${encodeURIComponent(`/messages/${conversationId}`)}`);
+    redirect(
+      `/login?next=${encodeURIComponent(`/messages/${conversationId}`)}`,
+    );
   }
 
   const { context, messages, blockedUserId, attachments } =

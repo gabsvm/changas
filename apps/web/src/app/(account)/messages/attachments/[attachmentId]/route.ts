@@ -10,7 +10,8 @@ export async function GET(
   const { attachmentId } = await params;
 
   try {
-    const attachment = await createConversationAttachmentSignedUrl(attachmentId);
+    const attachment =
+      await createConversationAttachmentSignedUrl(attachmentId);
     return NextResponse.redirect(attachment.url, 302);
   } catch (error) {
     if (error instanceof ConversationServerError) {

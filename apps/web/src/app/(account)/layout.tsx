@@ -22,7 +22,10 @@ export default function AccountLayout({
               Changas
             </span>
           </Link>
-          <nav className="flex flex-wrap items-center justify-end gap-4 text-sm" aria-label="Cuenta">
+          <nav
+            className="flex flex-wrap items-center justify-end gap-4 text-sm"
+            aria-label="Cuenta"
+          >
             <Link className="underline underline-offset-4" href="/messages">
               Mensajes
             </Link>
