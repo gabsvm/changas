@@ -13,7 +13,7 @@ declare
   caller_id uuid := auth.uid();
   target_service_id uuid;
   target_provider_id uuid;
-  conversation_id uuid;
+  created_conversation_id uuid;
 begin
   if caller_id is null then
     raise exception using errcode = '42501', message = 'authentication required';
@@ -50,15 +50,15 @@ begin
   )
   on conflict (service_id, client_user_id, provider_user_id)
   do update set updated_at = public.conversations.updated_at
-  returning id into conversation_id;
+  returning id into created_conversation_id;
 
   insert into public.conversation_participants (conversation_id, user_id, role)
   values
-    (conversation_id, caller_id, 'CLIENT'),
-    (conversation_id, target_provider_id, 'PROVIDER')
+    (created_conversation_id, caller_id, 'CLIENT'),
+    (created_conversation_id, target_provider_id, 'PROVIDER')
   on conflict (conversation_id, user_id) do nothing;
 
-  return conversation_id;
+  return created_conversation_id;
 end;
 $$;
 
