@@ -65,3 +65,7 @@ export {
   assessOutgoingMessage,
   type OutgoingMessageAssessment,
 } from "./outgoing-message";
+export {
+  mergeConversationMessages,
+  type MergeableConversationMessage,
+} from "./realtime-messages";
