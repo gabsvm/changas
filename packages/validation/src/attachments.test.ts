@@ -55,15 +55,15 @@ describe("conversationAttachmentSchema", () => {
 
 describe("sanitizeAttachmentFilename", () => {
   it("removes path traversal and unsafe characters while preserving a readable name", () => {
-    expect(sanitizeAttachmentFilename("../../Mi comprobante (final) #1.pdf")).toBe(
-      "Mi-comprobante-final-1.pdf",
-    );
+    expect(
+      sanitizeAttachmentFilename("../../Mi comprobante (final) #1.pdf"),
+    ).toBe("Mi-comprobante-final-1.pdf");
   });
 
   it("returns a bounded fallback when the name has no usable characters", () => {
     expect(sanitizeAttachmentFilename("../../....")).toBe("archivo");
-    expect(sanitizeAttachmentFilename(`${"á".repeat(250)}.pdf`).length).toBeLessThanOrEqual(
-      180,
-    );
+    expect(
+      sanitizeAttachmentFilename(`${"á".repeat(250)}.pdf`).length,
+    ).toBeLessThanOrEqual(180);
   });
 });

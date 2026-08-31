@@ -95,7 +95,11 @@ export const conversationAttachmentSchema = z
   .object({
     kind: z.enum(["IMAGE", "FILE"]),
     mimeType: z.string().trim().min(1).max(160),
-    fileSizeBytes: z.number().int().positive().max(maxConversationAttachmentBytes),
+    fileSizeBytes: z
+      .number()
+      .int()
+      .positive()
+      .max(maxConversationAttachmentBytes),
     originalName: z.string().trim().min(1).max(180),
   })
   .superRefine((value, context) => {

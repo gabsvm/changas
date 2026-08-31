@@ -26,7 +26,10 @@ type RpcError = { code?: string | null; message?: string | null } | null;
 
 type AttachmentRpcClient = {
   auth: {
-    getUser(): Promise<{ data: { user: { id: string } | null }; error: RpcError }>;
+    getUser(): Promise<{
+      data: { user: { id: string } | null };
+      error: RpcError;
+    }>;
   };
   rpc(
     name: "create_conversation_attachment_message",
@@ -48,7 +51,10 @@ type AttachmentRpcClient = {
   ): Promise<{ data: string | null; error: RpcError }>;
   from(table: "message_attachments"): {
     select(columns: string): {
-      eq(column: "id", value: string): {
+      eq(
+        column: "id",
+        value: string,
+      ): {
         maybeSingle(): Promise<{
           data: {
             id: string;
