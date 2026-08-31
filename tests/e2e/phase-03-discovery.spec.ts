@@ -43,6 +43,19 @@ test.describe("Phase 03 public discovery", () => {
     ).toBeVisible();
   });
 
+  test("URL-addressable filters narrow public results", async ({ page }) => {
+    await page.goto(
+      "/buscar?category=tecnologia&skill=diseno-grafico&priceModel=HOURLY&min=1000000&max=2000000&offers=true",
+    );
+    await expect(
+      page.getByRole("link", { name: "Diseño gráfico por hora" }),
+    ).toBeVisible();
+    await expect(page.locator("#search-category")).toHaveValue("tecnologia");
+    await expect(page.locator("#search-skill")).toHaveValue("diseno-grafico");
+    await expect(page.locator("#search-price-model")).toHaveValue("HOURLY");
+    await expect(page.locator("#search-offers")).toBeChecked();
+  });
+
   test("category browsing opens active technology results", async ({
     page,
   }) => {
