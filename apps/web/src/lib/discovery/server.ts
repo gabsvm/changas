@@ -54,6 +54,9 @@ export async function searchDiscovery(
     args.category_filter = input.filters.categorySlug;
   if (input.filters.maxPrice !== null) args.max_price = input.filters.maxPrice;
   if (input.filters.minPrice !== null) args.min_price = input.filters.minPrice;
+  if (input.filters.priceModel !== null) {
+    args.price_model_filter = input.filters.priceModel;
+  }
   const modality = rpcModality(input.filters.modality);
   if (modality) args.modality_filter = modality;
   if (latitude !== null && longitude !== null) {

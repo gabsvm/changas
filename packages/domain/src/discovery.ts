@@ -1,4 +1,9 @@
-import { serviceModalities, type ServiceModality } from "./marketplace";
+import {
+  priceModels,
+  serviceModalities,
+  type PriceModel,
+  type ServiceModality,
+} from "./marketplace";
 
 export type DiscoverySort =
   "recommended" | "nearest" | "price-asc" | "price-desc";
@@ -11,6 +16,7 @@ export type DiscoveryFilters = {
   minPrice: number | null;
   maxPrice: number | null;
   acceptsOffers: boolean | null;
+  priceModel: PriceModel | null;
   categorySlug: string | null;
   skillSlug: string | null;
   locationSlug: string | null;
@@ -66,6 +72,13 @@ function parseMode(value: string | undefined): ServiceModality | null {
     : null;
 }
 
+function parsePriceModel(value: string | undefined): PriceModel | null {
+  const normalized = value?.toUpperCase();
+  return priceModels.includes(normalized as PriceModel)
+    ? (normalized as PriceModel)
+    : null;
+}
+
 export function parseDiscoveryFilters(
   params: Record<string, string | undefined>,
 ): DiscoveryFilters {
@@ -92,6 +105,7 @@ export function parseDiscoveryFilters(
     minPrice,
     maxPrice,
     acceptsOffers: params.offers === "true" ? true : null,
+    priceModel: parsePriceModel(params.priceModel),
     categorySlug: params.category || null,
     skillSlug: params.skill || null,
     locationSlug: params.location || null,

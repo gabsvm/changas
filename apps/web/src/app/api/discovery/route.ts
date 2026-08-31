@@ -51,6 +51,7 @@ export async function POST(request: Request) {
       offers: filters.acceptsOffers === true ? "true" : undefined,
       page: String(filters.page ?? "1"),
       pageSize: String(filters.pageSize ?? "24"),
+      priceModel: stringParam(filters.priceModel),
       radius: String(filters.radiusMeters ?? "10000"),
       skill: stringParam(filters.skillSlug),
       sort: stringParam(filters.sort),

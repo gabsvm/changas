@@ -9,6 +9,7 @@ import {
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { LocationPicker } from "@/components/discovery/location-picker";
 import { searchDiscovery } from "@/lib/discovery/server";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Buscar servicios",
@@ -37,11 +38,28 @@ export default async function SearchPage({
     offers: stringParam(params.offers) || undefined,
     page: stringParam(params.page) || undefined,
     pageSize: stringParam(params.pageSize) || undefined,
+    priceModel: stringParam(params.priceModel) || undefined,
     radius: stringParam(params.radius) || undefined,
     skill: stringParam(params.skill) || undefined,
     sort: stringParam(params.sort) || undefined,
   });
-  const { rows } = await searchDiscovery({ query, filters });
+  const supabase = await createClient();
+  const [searchResult, categoriesResult, skillsResult] = await Promise.all([
+    searchDiscovery({ query, filters }, supabase),
+    supabase
+      .from("categories")
+      .select("slug, name")
+      .eq("is_active", true)
+      .order("sort_order"),
+    supabase
+      .from("skills")
+      .select("slug, name")
+      .eq("is_active", true)
+      .order("sort_order"),
+  ]);
+  const { rows } = searchResult;
+  const categories = categoriesResult.data ?? [];
+  const skills = skillsResult.data ?? [];
   const modeValue =
     filters.modality === "IN_PERSON"
       ? "presencial"
@@ -105,7 +123,49 @@ export default async function SearchPage({
             <button className="button-primary min-h-11" type="submit">
               Actualizar
             </button>
-            <div className="border-ink/10 grid gap-3 border-t pt-4 sm:col-span-3 sm:grid-cols-4">
+            <div className="border-ink/10 grid gap-3 border-t pt-4 sm:col-span-3 sm:grid-cols-4 lg:grid-cols-6">
+              <div>
+                <label
+                  className="text-ink/65 text-xs font-semibold"
+                  htmlFor="search-category"
+                >
+                  Categoría
+                </label>
+                <select
+                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  defaultValue={filters.categorySlug ?? ""}
+                  id="search-category"
+                  name="category"
+                >
+                  <option value="">Todas</option>
+                  {categories.map((category) => (
+                    <option key={category.slug} value={category.slug}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  className="text-ink/65 text-xs font-semibold"
+                  htmlFor="search-skill"
+                >
+                  Habilidad
+                </label>
+                <select
+                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  defaultValue={filters.skillSlug ?? ""}
+                  id="search-skill"
+                  name="skill"
+                >
+                  <option value="">Todas</option>
+                  {skills.map((skill) => (
+                    <option key={skill.slug} value={skill.slug}>
+                      {skill.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label
                   className="text-ink/65 text-xs font-semibold"
@@ -146,6 +206,27 @@ export default async function SearchPage({
               <div>
                 <label
                   className="text-ink/65 text-xs font-semibold"
+                  htmlFor="search-price-model"
+                >
+                  Modelo de precio
+                </label>
+                <select
+                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  defaultValue={filters.priceModel ?? ""}
+                  id="search-price-model"
+                  name="priceModel"
+                >
+                  <option value="">Todos</option>
+                  <option value="FIXED">Precio fijo</option>
+                  <option value="STARTING_AT">Desde</option>
+                  <option value="HOURLY">Por hora</option>
+                  <option value="PER_UNIT">Por unidad</option>
+                  <option value="QUOTE">A cotizar</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  className="text-ink/65 text-xs font-semibold"
                   htmlFor="search-min"
                 >
                   Precio desde
@@ -159,6 +240,42 @@ export default async function SearchPage({
                   placeholder="ARS"
                   type="number"
                 />
+              </div>
+              <div>
+                <label
+                  className="text-ink/65 text-xs font-semibold"
+                  htmlFor="search-max"
+                >
+                  Precio hasta
+                </label>
+                <input
+                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  defaultValue={filters.maxPrice ?? ""}
+                  id="search-max"
+                  min="1"
+                  name="max"
+                  placeholder="ARS"
+                  type="number"
+                />
+              </div>
+              <div>
+                <label
+                  className="text-ink/65 text-xs font-semibold"
+                  htmlFor="search-radius"
+                >
+                  Radio
+                </label>
+                <select
+                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  defaultValue={String(filters.radiusMeters ?? "")}
+                  id="search-radius"
+                  name="radius"
+                >
+                  <option value="">Predeterminado</option>
+                  <option value="5000">Hasta 5 km</option>
+                  <option value="10000">Hasta 10 km</option>
+                  <option value="25000">Hasta 25 km</option>
+                </select>
               </div>
               <div className="flex items-end gap-3">
                 <div className="flex min-h-10 items-center gap-2">

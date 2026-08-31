@@ -24,6 +24,7 @@ describe("discovery domain helpers", () => {
         min: "1000",
         max: "5000",
         offers: "true",
+        priceModel: "hourly",
       }),
     ).toEqual({
       modality: "REMOTE",
@@ -33,6 +34,7 @@ describe("discovery domain helpers", () => {
       minPrice: 1000,
       maxPrice: 5000,
       acceptsOffers: true,
+      priceModel: "HOURLY",
       categorySlug: null,
       skillSlug: null,
       locationSlug: null,
