@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+import { formatServicePrice } from "@changas/domain";
+
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -90,7 +92,7 @@ export default async function PublicProviderPage({
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-terracotta text-xs font-semibold tracking-[0.18em] uppercase">
-                Proveedor verificado
+                Perfil activo
               </p>
               <h1 className="font-display mt-3 text-5xl leading-none font-semibold tracking-[-0.04em]">
                 {provider.display_name}
@@ -102,9 +104,6 @@ export default async function PublicProviderPage({
                 {provider.bio ??
                   "Este proveedor todavía no agregó una presentación."}
               </p>
-            </div>
-            <div className="bg-moss/10 text-moss rounded-full px-4 py-2 text-xs font-semibold tracking-[0.12em] uppercase">
-              {provider.verification_badge.replaceAll("_", " ")}
             </div>
           </div>
           {provider.public_zone ? (
@@ -183,7 +182,7 @@ export default async function PublicProviderPage({
                       {service.description}
                     </p>
                     <p className="text-ink mt-4 text-sm font-semibold">
-                      {formatPrice(
+                      {formatServicePrice(
                         service.price_model,
                         service.price_amount,
                         service.currency_code,
@@ -271,22 +270,4 @@ function PublicCard({
       <div className="mt-4">{children}</div>
     </section>
   );
-}
-
-function formatPrice(
-  model: string,
-  amount: number | null,
-  currency: string,
-  unit: string | null,
-) {
-  if (model === "QUOTE") return "A cotizar";
-  if (amount === null) return "Consultar precio";
-  const formatted = new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency,
-  }).format(amount);
-  if (model === "STARTING_AT") return `Desde ${formatted}`;
-  if (model === "HOURLY") return `${formatted} / hora`;
-  if (model === "PER_UNIT") return `${formatted} / ${unit ?? "unidad"}`;
-  return formatted;
 }

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { formatServicePrice } from "@changas/domain";
+
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +30,7 @@ export default async function PublicServicePage({
       supabase
         .from("public_service_tags")
         .select("tag")
+        .eq("provider_slug", providerSlug)
         .eq("service_public_slug", serviceSlug),
     ]);
   if (!service || !provider) notFound();
@@ -70,7 +73,7 @@ export default async function PublicServicePage({
             <div>
               <p className="text-ink/50 text-xs uppercase">Precio</p>
               <p className="mt-1 text-lg font-semibold">
-                {formatPrice(
+                {formatServicePrice(
                   service.price_model,
                   service.price_amount,
                   service.currency_code,
@@ -134,21 +137,4 @@ function Info({ title, value }: { title: string; value: string | null }) {
       </p>
     </div>
   );
-}
-function formatPrice(
-  model: string,
-  amount: number | null,
-  currency: string,
-  unit: string | null,
-) {
-  if (model === "QUOTE") return "A cotizar";
-  if (amount === null) return "Consultar precio";
-  const formatted = new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency,
-  }).format(amount);
-  if (model === "STARTING_AT") return `Desde ${formatted}`;
-  if (model === "HOURLY") return `${formatted} / hora`;
-  if (model === "PER_UNIT") return `${formatted} / ${unit ?? "unidad"}`;
-  return formatted;
 }

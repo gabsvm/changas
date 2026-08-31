@@ -217,19 +217,45 @@ try {
       description: "Synthetic service used to validate Phase 02 runtime rules.",
       modality: "REMOTE",
       price_model: "FIXED",
-      price_amount: 1000,
+      price_amount: 100000,
       currency_code: "ARS",
       accepts_offers: true,
       schedule_type: "UNSCHEDULED",
       is_published: true,
     })
-    .select("id, public_slug")
+    .select("id, public_slug, price_amount")
     .single();
   assert(
     !service.error && service.data,
     `Owner could not publish their service: ${service.error?.message ?? "unknown error"}`,
   );
   serviceId = service.data.id;
+
+  assert(
+    service.data.price_amount === 100000,
+    "Service price was not stored as ARS minor units.",
+  );
+  const serviceTags = await owner.client.rpc("replace_service_tags", {
+    target_service_id: serviceId,
+    requested_tags: ["Hardware", "  soporte   remoto  "],
+  });
+  assert(
+    !serviceTags.error,
+    `Owner could not manage service tags: ${serviceTags.error?.message ?? "unknown error"}`,
+  );
+  const publicTags = await anonymous
+    .from("public_service_tags")
+    .select("provider_slug, service_public_slug, tag")
+    .eq("provider_slug", `runtime-${runId}`)
+    .eq("service_public_slug", service.data.public_slug);
+  assert(
+    !publicTags.error &&
+      publicTags.data
+        ?.map((tag) => tag.tag)
+        .sort()
+        .join(",") === "hardware,soporte remoto",
+    "Anonymous user could not read the normalized public service tags.",
+  );
 
   const publicService = await anonymous
     .from("public_provider_services")
@@ -263,6 +289,17 @@ try {
   assert(
     !certificationUpload.error,
     `Owner could not upload private certification evidence: ${certificationUpload.error?.message ?? "unknown error"}`,
+  );
+  const forgedCertification = await owner.client.from("certifications").insert({
+    provider_user_id: users.owner.id,
+    title: "Forged certification path",
+    evidence_path: `${users.other.id}/forged.pdf`,
+    evidence_mime_type: "application/pdf",
+    evidence_file_size_bytes: 12,
+  });
+  assert(
+    forgedCertification.error?.code === "23514",
+    "Owner could register certification metadata pointing to another user's folder.",
   );
   const certification = await owner.client
     .from("certifications")
@@ -333,6 +370,18 @@ try {
     "Owner could not register public portfolio metadata.",
   );
   portfolioId = portfolio.data.id;
+  const forgedPortfolio = await owner.client.from("portfolio_items").insert({
+    provider_user_id: users.owner.id,
+    title: "Forged portfolio path",
+    media_path: `${users.other.id}/forged.png`,
+    media_mime_type: "image/png",
+    media_file_size_bytes: fixture.length,
+    is_public: true,
+  });
+  assert(
+    forgedPortfolio.error?.code === "23514",
+    "Owner could register public portfolio metadata pointing to another user's folder.",
+  );
   const anonymousPortfolio = await anonymous.storage
     .from("provider-portfolio")
     .download(portfolioPath);

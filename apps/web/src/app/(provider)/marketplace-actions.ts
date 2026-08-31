@@ -1,5 +1,6 @@
 "use server";
 
+import { parseServicePrice, type PriceModel } from "@changas/domain";
 import {
   availabilityBlockSchema,
   availabilityRuleSchema,
@@ -10,6 +11,7 @@ import {
   providerMarketplaceSettingsSchema,
   serviceAreaSchema,
   serviceSchema,
+  serviceTagsSchema,
 } from "@changas/validation";
 import { revalidatePath } from "next/cache";
 
@@ -140,22 +142,26 @@ export async function removeProviderSkill(
     .delete()
     .eq("provider_user_id", user.id)
     .eq("skill_id", skillId);
-  if (error) return errorState("No pudimos quitar la habilidad.");
+  if (error) {
+    if (error.code === "23503") {
+      return errorState(
+        "No podés quitar esta habilidad porque tiene servicios asociados. Eliminá o reasigná esos servicios primero.",
+      );
+    }
+    return errorState("No pudimos quitar la habilidad.");
+  }
   revalidateMarketplace();
   return { success: "Habilidad quitada." };
 }
 
-function serviceInput(formData: FormData) {
+function serviceInput(formData: FormData, priceAmount?: number) {
   return {
     skillId: getFormString(formData, "skillId"),
     title: getFormString(formData, "title"),
     description: getFormString(formData, "description"),
     modality: getFormString(formData, "modality"),
     priceModel: getFormString(formData, "priceModel"),
-    priceAmount:
-      getFormString(formData, "priceModel") === "QUOTE"
-        ? undefined
-        : optionalNumber(getFormString(formData, "priceAmount")),
+    priceAmount,
     currencyCode: getFormString(formData, "currencyCode") || "ARS",
     priceUnit: getFormString(formData, "priceUnit"),
     acceptsOffers: checkbox(formData, "acceptsOffers"),
@@ -175,9 +181,37 @@ export async function saveService(
   _previousState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const parsed = serviceSchema.safeParse(serviceInput(formData));
+  const priceModel = getFormString(formData, "priceModel");
+  const currencyCode = getFormString(formData, "currencyCode") || "ARS";
+  let priceAmount: number | null;
+  try {
+    priceAmount = parseServicePrice(
+      priceModel as PriceModel,
+      getFormString(formData, "priceAmount"),
+      currencyCode,
+    );
+  } catch {
+    return errorState(
+      "El monto debe ser positivo, válido y estar expresado en ARS.",
+    );
+  }
+
+  const parsed = serviceSchema.safeParse(
+    serviceInput(formData, priceAmount ?? undefined),
+  );
   if (!parsed.success)
     return errorState("Revisá título, descripción y precio.");
+  const parsedTags = serviceTagsSchema.safeParse(
+    getFormString(formData, "tags")
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean),
+  );
+  if (!parsedTags.success) {
+    return errorState(
+      "Usá hasta ocho tags únicos de entre 2 y 80 caracteres, separados por comas.",
+    );
+  }
   const { supabase, user, provider } = await getContext();
   if (!user || !provider)
     return errorState("Prepará primero tu perfil de proveedor.");
@@ -208,12 +242,12 @@ export async function saveService(
         .update(payload)
         .eq("id", serviceId)
         .eq("provider_user_id", user.id)
-        .select("public_slug")
+        .select("id, public_slug")
         .maybeSingle()
     : await supabase
         .from("services")
         .insert({ ...payload, provider_user_id: user.id })
-        .select("public_slug")
+        .select("id, public_slug")
         .single();
 
   if (result.error) {
@@ -223,6 +257,14 @@ export async function saveService(
         : "No pudimos guardar el servicio.",
     );
   }
+  if (!result.data) return errorState("No pudimos encontrar el servicio.");
+
+  const { error: tagsError } = await supabase.rpc("replace_service_tags", {
+    target_service_id: result.data.id,
+    requested_tags: parsedTags.data,
+  });
+  if (tagsError) return errorState("No pudimos guardar los tags del servicio.");
+
   revalidateMarketplace();
   return { success: "Servicio guardado." };
 }

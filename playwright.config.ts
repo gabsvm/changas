@@ -15,6 +15,10 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "mobile-web",
+      use: { ...devices["Pixel 5"] },
+    },
   ],
   webServer: {
     command: "pnpm --filter @changas/web start",

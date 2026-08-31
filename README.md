@@ -11,7 +11,7 @@ Changas is a mobile-first marketplace foundation for people who want to offer pr
 ## Local setup
 
 ```powershell
-pnpm install
+pnpm install --frozen-lockfile
 Copy-Item .env.example .env.local
 # Fill NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY from the local CLI output.
 pnpm dev
@@ -46,6 +46,8 @@ pnpm dlx supabase@2.116.0 db reset --local --no-seed
 pnpm dlx supabase@2.116.0 test db --local
 ```
 
+The no-seed reset keeps pgTAP isolated. Use `pnpm dlx supabase@2.116.0 db reset --local` before opening the synthetic public provider pages or running the browser smoke suite so the demo provider is loaded.
+
 Phase 01 and Phase 02 use explicit Data API grants. Authenticated users receive only the requested owner-scoped table operations; public roles receive only catalog/public projection reads; `service_role` receives explicit server-side/admin DML and is never client-safe; `anon` and `PUBLIC` receive no private table privileges. `supabase/config.toml` sets `auto_expose_new_tables = false` so local development does not hide missing grants. Provider status activation remains outside normal client mutations and is test/admin-only until Phase 09.
 
 To run the client and Storage integration security checks against the local instance, export the values from `supabase status -o env` and run:
@@ -66,7 +68,7 @@ pnpm build
 pnpm format:check
 ```
 
-The Playwright configuration is ready for later user journeys; no product E2E journey is included in Phase 00. Browser screenshot QA and a live Supabase runtime require local services/tools and are recorded separately in the phase report.
+Phase 02 includes a small public-surface smoke suite in `tests/e2e/phase-02-public-surfaces.spec.ts`, including the provider management redirect and public provider/service pages at the `Pixel 5` mobile viewport. Run `pnpm build` followed by `pnpm test:e2e` after the seeded local reset. It does not add a native mobile client or marketplace journey beyond Phase 02.
 
 ## Workspace
 

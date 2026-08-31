@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 
+import { formatServicePrice, minorUnitsToMajorInput } from "@changas/domain";
+
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
 import type { Database } from "@/lib/supabase/database.types";
@@ -214,10 +216,12 @@ function ServiceForm({
   action,
   service,
   skills,
+  serviceTags,
 }: {
   action: ProviderAction;
   service?: Service;
   skills: Skill[];
+  serviceTags: string[];
 }) {
   return (
     <ActionForm
@@ -288,16 +292,23 @@ function ServiceForm({
           name="priceAmount"
           type="number"
           min={1}
-          defaultValue={service?.price_amount}
+          step="0.01"
+          defaultValue={
+            service ? minorUnitsToMajorInput(service.price_amount) : ""
+          }
         />
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        <Field
-          label="Moneda"
-          name="currencyCode"
-          defaultValue={service?.currency_code ?? "ARS"}
-          required
-        />
+        <label className="text-sm font-semibold">
+          Moneda
+          <select
+            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
+            name="currencyCode"
+            defaultValue="ARS"
+          >
+            <option value="ARS">ARS · Peso argentino</option>
+          </select>
+        </label>
         <Field
           label="Unidad (sólo por unidad)"
           name="priceUnit"
@@ -311,6 +322,11 @@ function ServiceForm({
           defaultValue={service?.expected_duration_minutes}
         />
       </div>
+      <Field
+        label="Tags (separados por comas, hasta 8)"
+        name="tags"
+        defaultValue={serviceTags.join(", ")}
+      />
       <div className="grid gap-4 md:grid-cols-2">
         <label className="text-sm font-semibold">
           Agenda
@@ -397,8 +413,10 @@ function ProfessionalRecordList({
 export function MarketplaceManagement({
   provider,
   skills,
+  catalogSkills,
   providerSkills,
   services,
+  serviceTagsByServiceId,
   experiences,
   education,
   certifications,
@@ -410,8 +428,10 @@ export function MarketplaceManagement({
 }: {
   provider: Provider;
   skills: Skill[];
+  catalogSkills: Skill[];
   providerSkills: ProviderSkill[];
   services: Service[];
+  serviceTagsByServiceId: Record<string, string[]>;
   experiences: Experience[];
   education: Education[];
   certifications: Certification[];
@@ -443,9 +463,11 @@ export function MarketplaceManagement({
   };
 }) {
   const categoryName = new Map(
-    skills.map((skill) => [skill.id, skill.category_name]),
+    catalogSkills.map((skill) => [skill.id, skill.category_name]),
   );
-  const skillName = new Map(skills.map((skill) => [skill.id, skill.name]));
+  const skillName = new Map(
+    catalogSkills.map((skill) => [skill.id, skill.name]),
+  );
   return (
     <div className="space-y-6">
       <Section
@@ -505,10 +527,10 @@ export function MarketplaceManagement({
               <select
                 className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
                 name="skillId"
-                defaultValue={skills[0]?.id}
+                defaultValue={catalogSkills[0]?.id}
                 required
               >
-                {skills.map((skill) => (
+                {catalogSkills.map((skill) => (
                   <option key={skill.id} value={skill.id}>
                     {skill.category_name} · {skill.name}
                   </option>
@@ -561,7 +583,18 @@ export function MarketplaceManagement({
         description="Definí precio fijo, desde, por hora, por unidad o a cotizar; modalidad presencial/remota/ambas; propuestas y pausa. Publicar queda bloqueado hasta que el proveedor esté ACTIVE."
       >
         <div className="space-y-5">
-          <ServiceForm action={actions.saveService} skills={skills} />
+          {skills.length ? (
+            <ServiceForm
+              action={actions.saveService}
+              skills={skills}
+              serviceTags={[]}
+            />
+          ) : (
+            <p className="text-ink/55 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
+              Primero agregá al menos una habilidad para poder crear un
+              servicio.
+            </p>
+          )}
           {services.map((service) => (
             <div
               className="border-ink/10 rounded-xl border bg-white/45 p-4"
@@ -577,13 +610,19 @@ export function MarketplaceManagement({
                   </p>
                 </div>
                 <span className="bg-moss/10 text-moss rounded-full px-3 py-1 text-xs font-semibold">
-                  {service.price_model}
+                  {formatServicePrice(
+                    service.price_model,
+                    service.price_amount,
+                    service.currency_code,
+                    service.price_unit,
+                  )}
                 </span>
               </div>
               <ServiceForm
                 action={actions.saveService}
                 service={service}
                 skills={skills}
+                serviceTags={serviceTagsByServiceId[service.id] ?? []}
               />
               <div className="mt-3 flex flex-wrap gap-3">
                 <ActionForm

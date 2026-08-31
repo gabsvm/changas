@@ -86,8 +86,11 @@ select ok(
   'authenticated can manage services'
 );
 select ok(
-  has_table_privilege('authenticated', 'public.service_tags', 'SELECT, INSERT, UPDATE, DELETE'),
-  'authenticated can manage service_tags'
+  has_table_privilege('authenticated', 'public.service_tags', 'SELECT')
+    and not has_table_privilege('authenticated', 'public.service_tags', 'INSERT, UPDATE, DELETE')
+    and has_function_privilege('authenticated', 'public.replace_service_tags(uuid, text[])', 'EXECUTE')
+    and not has_function_privilege('anon', 'public.replace_service_tags(uuid, text[])', 'EXECUTE'),
+  'authenticated manages service_tags through the bounded workflow function'
 );
 select ok(
   has_table_privilege('authenticated', 'public.experiences', 'SELECT, INSERT, UPDATE, DELETE'),

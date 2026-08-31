@@ -457,7 +457,6 @@ type PublicProviderProfilesRow = {
   public_zone: string | null;
   bio: string | null;
   public_headline: string | null;
-  verification_badge: string;
 };
 type PublicProviderSkillsRow = {
   provider_slug: string;
@@ -483,7 +482,11 @@ type PublicProviderServicesRow = Omit<
   skill_slug: string;
   skill_name: string;
 };
-type PublicServiceTagsRow = { service_public_slug: string; tag: string };
+type PublicServiceTagsRow = {
+  provider_slug: string;
+  service_public_slug: string;
+  tag: string;
+};
 type PublicProviderExperiencesRow = Omit<
   ExperiencesRow,
   "id" | "provider_user_id" | "created_at" | "updated_at" | "is_public"
@@ -617,6 +620,10 @@ export type Database = {
       is_public_portfolio_media: {
         Args: { object_path: string };
         Returns: boolean;
+      };
+      replace_service_tags: {
+        Args: { requested_tags: string[]; target_service_id: string };
+        Returns: undefined;
       };
     };
     Enums: {

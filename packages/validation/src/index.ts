@@ -78,6 +78,11 @@ const uuidSchema = z.uuid();
 const dateSchema = z.iso.date();
 const timeSchema = z.iso.time({ precision: -1 });
 const positiveInteger = z.number().int().positive();
+const positiveMinorUnits = z
+  .number()
+  .int()
+  .positive()
+  .max(Number.MAX_SAFE_INTEGER);
 const optionalBoundedText = (max: number) =>
   z.string().trim().max(max).optional().default("");
 
@@ -105,12 +110,8 @@ export const serviceSchema = z
     description: z.string().trim().min(20).max(3000),
     modality: z.enum(marketplaceModalities),
     priceModel: z.enum(marketplacePriceModels),
-    priceAmount: positiveInteger.optional(),
-    currencyCode: z
-      .string()
-      .trim()
-      .toUpperCase()
-      .regex(/^[A-Z]{3}$/),
+    priceAmount: positiveMinorUnits.optional(),
+    currencyCode: z.literal("ARS"),
     priceUnit: z.string().trim().max(60).optional().default(""),
     acceptsOffers: z.boolean(),
     expectedDurationMinutes: positiveInteger.max(7 * 24 * 60).optional(),
@@ -151,6 +152,33 @@ export const serviceSchema = z
       });
     }
   });
+
+export const maxServiceTags = 8;
+
+export function normalizeServiceTag(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+export const serviceTagsSchema = z
+  .array(z.string().trim().min(2).max(80))
+  .max(maxServiceTags)
+  .superRefine((tags, context) => {
+    const seen = new Map<string, number>();
+    tags.forEach((tag, index) => {
+      const normalized = normalizeServiceTag(tag);
+      const previousIndex = seen.get(normalized);
+      if (previousIndex !== undefined) {
+        context.addIssue({
+          code: "custom",
+          path: [index],
+          message: `Duplicate of tag at position ${previousIndex + 1}.`,
+        });
+      } else {
+        seen.set(normalized, index);
+      }
+    });
+  })
+  .transform((tags) => tags.map(normalizeServiceTag));
 
 const professionalRecordBase = {
   description: optionalBoundedText(2000),

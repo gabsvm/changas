@@ -44,6 +44,7 @@ export default async function ProviderMarketplaceManagePage() {
     { data: categories },
     { data: providerSkills },
     { data: services },
+    { data: serviceTags },
     { data: experiences },
     { data: education },
     { data: certifications },
@@ -84,6 +85,7 @@ export default async function ProviderMarketplaceManagePage() {
       .select("*")
       .eq("provider_user_id", user.id)
       .order("sort_order"),
+    supabase.from("service_tags").select("service_id, tag"),
     supabase
       .from("experiences")
       .select("*")
@@ -152,6 +154,17 @@ export default async function ProviderMarketplaceManagePage() {
     ...skill,
     category_name: categoryNames.get(skill.category_id) ?? "Catálogo",
   }));
+  const selectedSkillIds = new Set(
+    (providerSkills ?? []).map((providerSkill) => providerSkill.skill_id),
+  );
+  const selectedSkills = marketplaceSkills.filter((skill) =>
+    selectedSkillIds.has(skill.id),
+  );
+  const serviceTagsByServiceId: Record<string, string[]> = {};
+  for (const serviceTag of serviceTags ?? []) {
+    const tags = serviceTagsByServiceId[serviceTag.service_id] ?? [];
+    serviceTagsByServiceId[serviceTag.service_id] = [...tags, serviceTag.tag];
+  }
   const displayName =
     profile?.display_name ?? user.email?.split("@")[0] ?? "proveedor";
 
@@ -193,9 +206,11 @@ export default async function ProviderMarketplaceManagePage() {
       <div className="mt-10">
         <MarketplaceManagement
           provider={provider}
-          skills={marketplaceSkills}
+          catalogSkills={marketplaceSkills}
+          skills={selectedSkills}
           providerSkills={providerSkills ?? []}
           services={services ?? []}
+          serviceTagsByServiceId={serviceTagsByServiceId}
           experiences={experiences ?? []}
           education={education ?? []}
           certifications={certifications ?? []}

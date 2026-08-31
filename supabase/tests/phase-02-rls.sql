@@ -74,7 +74,7 @@ select
   'Revisión y ejecución con alcance documentado para validar el catálogo.',
   s.modality::public.service_modality,
   s.price_model::public.price_model,
-  case when s.price_model = 'QUOTE' then null else 12500 end,
+  case when s.price_model = 'QUOTE' then null else 1250000 end,
   'ARS',
   case when s.price_model = 'PER_UNIT' then 'equipo' else null end,
   s.price_model in ('STARTING_AT', 'QUOTE'),
@@ -110,11 +110,12 @@ select throws_ok(
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '02000000-0000-4000-8000-000000000001', true);
+select set_config('request.jwt.claim.role', 'authenticated', true);
 
-insert into public.service_tags (service_id, tag)
-select id, 'soporte remoto'
-from public.services
-where public_slug = 'fase-02-hourly-both';
+select public.replace_service_tags(
+  (select id from public.services where public_slug = 'fase-02-hourly-both'),
+  array['soporte remoto']
+);
 
 insert into public.experiences (provider_user_id, title, organization, started_on, is_current, is_public)
 values ('02000000-0000-4000-8000-000000000001', 'Técnica independiente', 'Changas Lab', '2020-01-01', true, true);

@@ -93,10 +93,25 @@ jobs:
             echo "API_URL=$API_URL"
             echo "ANON_KEY=$ANON_KEY"
             echo "SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
           } >> "$GITHUB_ENV"
 
       - name: Run client and Storage security checks
         run: node apps/web/scripts/supabase-runtime-security.mjs
+
+      - name: Reset local database with synthetic seed
+        run: pnpm dlx supabase@2.116.0 db reset --local
+
+      - name: Build web app for browser smoke tests
+        run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run mobile web smoke tests
+        run: pnpm test:e2e
 
       - name: Stop local Supabase
         if: always()

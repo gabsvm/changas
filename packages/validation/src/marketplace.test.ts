@@ -8,6 +8,7 @@ import {
   portfolioSchema,
   serviceAreaSchema,
   serviceSchema,
+  serviceTagsSchema,
 } from "./index";
 
 const baseService = {
@@ -16,7 +17,7 @@ const baseService = {
   description: "Reviso tu equipo y te explico el problema.",
   modality: "REMOTE" as const,
   priceModel: "FIXED" as const,
-  priceAmount: 30000,
+  priceAmount: 3_000_000,
   currencyCode: "ARS",
   priceUnit: undefined,
   acceptsOffers: false,
@@ -43,7 +44,7 @@ describe("marketplace validation", () => {
           ...baseService,
           priceModel,
           modality,
-          priceAmount: priceModel === "QUOTE" ? undefined : 12500,
+          priceAmount: priceModel === "QUOTE" ? undefined : 1_250_000,
           priceUnit: priceModel === "PER_UNIT" ? "equipo" : undefined,
         });
         expect(result.success, `${priceModel}/${modality}`).toBe(true);
@@ -72,6 +73,25 @@ describe("marketplace validation", () => {
         priceAmount: 0,
         isPublished: true,
       }).success,
+    ).toBe(false);
+    expect(
+      serviceSchema.safeParse({
+        ...baseService,
+        currencyCode: "USD",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("normalizes bounded tags and rejects normalized duplicates", () => {
+    expect(serviceTagsSchema.parse([" Hardware ", "soporte   remoto"])).toEqual(
+      ["hardware", "soporte remoto"],
+    );
+    expect(
+      serviceTagsSchema.safeParse(["Hardware", " hardware "]).success,
+    ).toBe(false);
+    expect(
+      serviceTagsSchema.safeParse(Array.from({ length: 9 }, () => "tag"))
+        .success,
     ).toBe(false);
   });
 
