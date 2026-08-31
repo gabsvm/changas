@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
   useTransition,
+  type FormEvent,
 } from "react";
 
 import { mergeConversationMessages } from "@changas/domain";
@@ -104,30 +105,11 @@ export function ConversationThread({
   const router = useRouter();
   const refreshThread = useCallback(() => router.refresh(), [router]);
   const [messages, setMessages] = useState(initialMessages);
-  const [attachments, setAttachments] = useState(initialAttachments);
   const [hasOlder, setHasOlder] = useState(initialMessages.length === 50);
   const [loadingOlder, startOlderTransition] = useTransition();
   const [blockedByMe, setBlockedByMe] = useState(initiallyBlockedByMe);
   const [changingBlock, startBlockTransition] = useTransition();
   const connectedOnce = useRef(false);
-
-  useEffect(() => {
-    setMessages((current) =>
-      mergeConversationMessages(current, initialMessages),
-    );
-  }, [initialMessages]);
-
-  useEffect(() => {
-    setAttachments((current) => {
-      const byId = new Map(
-        current.map((attachment) => [attachment.id, attachment]),
-      );
-      for (const attachment of initialAttachments) {
-        byId.set(attachment.id, attachment);
-      }
-      return [...byId.values()];
-    });
-  }, [initialAttachments]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -202,13 +184,13 @@ export function ConversationThread({
 
   const attachmentsByMessage = useMemo(() => {
     const map = new Map<string, ConversationAttachmentSummary[]>();
-    for (const attachment of attachments) {
+    for (const attachment of initialAttachments) {
       const items = map.get(attachment.messageId) ?? [];
       items.push(attachment);
       map.set(attachment.messageId, items);
     }
     return map;
-  }, [attachments]);
+  }, [initialAttachments]);
 
   return (
     <div className="mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-[1.75rem] border border-ink/10 bg-white/70 shadow-[0_20px_70px_rgba(22,56,50,0.08)] sm:min-h-[calc(100dvh-4rem)]">
@@ -413,33 +395,51 @@ function TextComposer({
   initialNonce: string;
   onSent: () => void;
 }) {
-  const [state, action, pending] = useActionState(
-    sendTextMessage,
-    textInitialState,
-  );
-  const [body, setBody] = useState("");
-  const [nonce, setNonce] = useState(initialNonce);
+  const formRef = useRef<HTMLFormElement>(null);
+  const nonceRef = useRef<HTMLInputElement>(null);
+  const [state, setState] = useState(textInitialState);
   const [warningDismissed, setWarningDismissed] = useState(false);
+  const [pending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (state.status === "WARNING") setWarningDismissed(false);
-    if (state.status !== "SUCCESS") return;
-    setBody("");
-    setNonce(crypto.randomUUID());
-    onSent();
-  }, [state, onSent]);
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+
+    if (
+      submitter instanceof HTMLButtonElement &&
+      submitter.name &&
+      submitter.value
+    ) {
+      data.set(submitter.name, submitter.value);
+    }
+
+    startTransition(async () => {
+      const result = await sendTextMessage(textInitialState, data);
+      setState(result);
+
+      if (result.status === "WARNING") {
+        setWarningDismissed(false);
+        return;
+      }
+
+      if (result.status === "SUCCESS") {
+        formRef.current?.reset();
+        if (nonceRef.current) nonceRef.current.value = crypto.randomUUID();
+        setWarningDismissed(false);
+        onSent();
+      }
+    });
+  }
 
   return (
-    <form action={action} className="flex items-end gap-2">
+    <form ref={formRef} onSubmit={submit} className="flex items-end gap-2">
       <input type="hidden" name="conversationId" value={conversationId} />
-      <input type="hidden" name="nonce" value={nonce} />
+      <input ref={nonceRef} type="hidden" name="nonce" defaultValue={initialNonce} />
       <textarea
         name="body"
-        value={body}
-        onChange={(event) => {
-          setBody(event.target.value);
-          setWarningDismissed(true);
-        }}
+        onChange={() => setWarningDismissed(true)}
         placeholder="Escribí un mensaje…"
         rows={1}
         maxLength={4000}
@@ -447,7 +447,7 @@ function TextComposer({
       />
       <button
         type="submit"
-        disabled={pending || !body.trim()}
+        disabled={pending}
         className="grid h-12 min-w-12 place-items-center rounded-2xl bg-ink px-4 text-sm font-bold text-white disabled:opacity-40"
       >
         {pending ? "…" : "Enviar"}
@@ -465,15 +465,15 @@ function TextComposer({
               type="submit"
               name="confirmLeakage"
               value="true"
-              className="rounded-full bg-terracotta px-4 py-2 text-xs font-bold text-white"
               disabled={pending}
+              className="rounded-full bg-terracotta px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
             >
               Enviar de todos modos
             </button>
             <button
               type="button"
-              className="rounded-full border border-ink/10 px-4 py-2 text-xs font-bold"
               onClick={() => setWarningDismissed(true)}
+              className="rounded-full border border-ink/10 px-4 py-2 text-xs font-bold"
             >
               Editar mensaje
             </button>
@@ -481,7 +481,10 @@ function TextComposer({
         </div>
       ) : null}
       {state.status === "ERROR" ? (
-        <p className="absolute right-4 bottom-[4.75rem] left-4 rounded-xl bg-[#fff7f2] px-3 py-2 text-xs text-terracotta" role="alert">
+        <p
+          className="absolute right-4 bottom-[4.75rem] left-4 rounded-xl bg-[#fff7f2] px-3 py-2 text-xs text-terracotta"
+          role="alert"
+        >
           {state.message}
         </p>
       ) : null}
@@ -498,29 +501,36 @@ function AttachmentComposer({
   initialNonce: string;
   onSent: () => void;
 }) {
-  const [state, action, pending] = useActionState(
-    sendAttachmentMessage,
-    attachmentInitialState,
-  );
-  const [nonce, setNonce] = useState(initialNonce);
   const formRef = useRef<HTMLFormElement>(null);
+  const nonceRef = useRef<HTMLInputElement>(null);
+  const [state, setState] = useState(attachmentInitialState);
+  const [pending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (state.status !== "success") return;
-    formRef.current?.reset();
-    setNonce(crypto.randomUUID());
-    onSent();
-  }, [state, onSent]);
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+
+    startTransition(async () => {
+      const result = await sendAttachmentMessage(attachmentInitialState, data);
+      setState(result);
+
+      if (result.status === "success") {
+        formRef.current?.reset();
+        if (nonceRef.current) nonceRef.current.value = crypto.randomUUID();
+        onSent();
+      }
+    });
+  }
 
   return (
-    <form ref={formRef} action={action} className="mt-2 flex items-center gap-2">
+    <form ref={formRef} onSubmit={submit} className="mt-2 flex items-center gap-2">
       <input type="hidden" name="conversationId" value={conversationId} />
-      <input type="hidden" name="nonce" value={nonce} />
+      <input ref={nonceRef} type="hidden" name="nonce" defaultValue={initialNonce} />
       <select
         name="kind"
-        className="h-9 rounded-full border border-ink/10 bg-white px-3 text-xs"
         defaultValue="IMAGE"
         aria-label="Tipo de adjunto"
+        className="h-9 rounded-full border border-ink/10 bg-white px-3 text-xs"
       >
         <option value="IMAGE">Imagen</option>
         <option value="FILE">Archivo</option>
@@ -533,8 +543,8 @@ function AttachmentComposer({
       />
       <button
         type="submit"
-        className="rounded-full border border-ink/10 bg-white px-3 py-2 text-xs font-bold disabled:opacity-40"
         disabled={pending}
+        className="rounded-full border border-ink/10 bg-white px-3 py-2 text-xs font-bold disabled:opacity-40"
       >
         {pending ? "Subiendo…" : "Adjuntar"}
       </button>
