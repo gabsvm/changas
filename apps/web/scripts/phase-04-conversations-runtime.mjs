@@ -207,7 +207,10 @@ try {
     message_body: "Este mensaje debe fallar mientras existe el bloqueo",
     message_nonce: crypto.randomUUID(),
   });
-  assert(Boolean(blockedSend.error), "Blocked participant can still send text.");
+  assert(
+    Boolean(blockedSend.error),
+    "Blocked participant can still send text.",
+  );
 
   const historyWhileBlocked = await client.rpc("list_conversation_messages", {
     target_conversation_id: conversationId,
@@ -257,7 +260,10 @@ try {
     report_category: "SCAM",
     report_reason: "Outsider must not report this conversation",
   });
-  assert(Boolean(outsiderReport.error), "Outsider can report another conversation.");
+  assert(
+    Boolean(outsiderReport.error),
+    "Outsider can report another conversation.",
+  );
 
   const warning = await client.rpc("record_conversation_moderation_warning", {
     target_conversation_id: conversationId,
