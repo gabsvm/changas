@@ -302,6 +302,23 @@ try {
     );
   }
 
+  const filtered = await anonymous.rpc("search_discovery_services", {
+    skill_filter: "ingles-conversacional",
+    price_model_filter: "HOURLY",
+    min_price: 100000,
+    max_price: 200000,
+    accepts_offers_filter: true,
+    page_number: 1,
+    page_size: 24,
+  });
+  assert(
+    !filtered.error &&
+      filtered.data?.some(
+        (row) => row.service_slug === "runtime-ingles-" + runId,
+      ),
+    "Combined category/skill, price, and offer filters did not narrow results.",
+  );
+
   const inside = await anonymous.rpc("search_discovery_services", {
     query_text: "electricista",
     modality_filter: "IN_PERSON",
