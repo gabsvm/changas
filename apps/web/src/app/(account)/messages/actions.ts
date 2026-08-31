@@ -1,14 +1,22 @@
 "use server";
 
+import {
+  assessOutgoingMessage,
+  type LeakageSignalType,
+} from "@changas/domain";
 import { messageTextSchema } from "@changas/validation";
 
 import { sendConversationText } from "@/lib/conversations/messages";
-import { ConversationServerError } from "@/lib/conversations/server";
+import {
+  ConversationServerError,
+  recordConversationModerationWarning,
+} from "@/lib/conversations/server";
 
 export type SendTextMessageState = {
-  status: "IDLE" | "SUCCESS" | "ERROR";
+  status: "IDLE" | "SUCCESS" | "WARNING" | "ERROR";
   message: string;
   messageId?: string;
+  signalTypes?: LeakageSignalType[];
 };
 
 const uuidPattern =
@@ -21,6 +29,7 @@ export async function sendTextMessage(
   const conversationId = String(formData.get("conversationId") ?? "");
   const nonce = String(formData.get("nonce") ?? "");
   const bodyResult = messageTextSchema.safeParse(formData.get("body"));
+  const explicitlyConfirmed = formData.get("confirmLeakage") === "true";
 
   if (!uuidPattern.test(conversationId) || !uuidPattern.test(nonce)) {
     return {
@@ -36,7 +45,28 @@ export async function sendTextMessage(
     };
   }
 
+  const assessment = assessOutgoingMessage(
+    bodyResult.data,
+    explicitlyConfirmed,
+  );
+
   try {
+    if (assessment.signalTypes.length > 0) {
+      await recordConversationModerationWarning(
+        conversationId,
+        assessment.signalTypes,
+      );
+    }
+
+    if (assessment.action === "WARN") {
+      return {
+        status: "WARNING",
+        message:
+          "Este mensaje parece incluir datos de contacto o pago. Si seguís, la operación puede quedar fuera de la protección de Changas.",
+        signalTypes: assessment.signalTypes,
+      };
+    }
+
     const messageId = await sendConversationText(
       conversationId,
       bodyResult.data,
