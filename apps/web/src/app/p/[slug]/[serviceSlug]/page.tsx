@@ -6,6 +6,8 @@ import { formatServicePrice } from "@changas/domain";
 
 import { createClient } from "@/lib/supabase/server";
 
+import { startServiceConversation } from "./actions";
+
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
@@ -150,14 +152,23 @@ export default async function PublicServicePage({
               ))}
             </div>
           ) : null}
-          <div className="bg-moss/10 mt-10 rounded-2xl p-5">
-            <p className="text-moss text-sm font-semibold">
-              Ofrece {provider.display_name}
-            </p>
-            <p className="text-ink/65 mt-1 text-sm">
-              Contactá al proveedor desde los canales que Changas habilite en
-              las próximas fases.
-            </p>
+          <div className="bg-moss/10 mt-10 rounded-2xl p-5 sm:flex sm:items-center sm:justify-between sm:gap-5">
+            <div>
+              <p className="text-moss text-sm font-semibold">
+                Ofrece {provider.display_name}
+              </p>
+              <p className="text-ink/65 mt-1 max-w-xl text-sm leading-6">
+                Conversá sobre alcance, tiempos y dudas sin salir de Changas.
+                Tus mensajes quedan asociados a este servicio.
+              </p>
+            </div>
+            <form action={startServiceConversation} className="mt-4 sm:mt-0">
+              <input type="hidden" name="providerSlug" value={providerSlug} />
+              <input type="hidden" name="serviceSlug" value={serviceSlug} />
+              <button className="button-primary w-full sm:w-auto" type="submit">
+                Consultar por este servicio
+              </button>
+            </form>
           </div>
         </article>
       </div>
