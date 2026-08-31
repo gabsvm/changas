@@ -131,21 +131,21 @@ ubicaciones manuales y formato de dinero existente.
 
 ## Validation gates
 
-| Gate | Resultado | Evidencia |
-| --- | --- | --- |
-| Install frozen | PASS | `pnpm install --frozen-lockfile` local y CI |
-| Lint | PASS | `pnpm lint` local y job `validate` |
-| Typecheck | PASS | `pnpm typecheck` local y job `validate` |
-| Unit tests | PASS | `pnpm test`: 11 files, 27 tests |
-| Production build | PASS | `pnpm build` local y job `validate` |
-| Format check | PASS | `pnpm format:check` local y job `validate` |
-| `git diff --check` | PASS | ejecución local y job `validate` |
-| Supabase migration/reset local | NOT RUN | Docker no está instalado en este Windows |
-| pgTAP local | NOT RUN | requiere Docker/Postgres local |
-| Runtime RLS/Storage/search local | NOT RUN | requiere Docker/Postgres/Auth/Storage local |
-| Supabase reset/pgTAP/runtime remoto | PENDING | run final de la rama en GitHub Actions |
-| Browser E2E desktop/Pixel 5 remoto | PENDING | run final de la rama en GitHub Actions |
-| GitHub Actions remoto | PENDING | se actualiza con el run final sobre este HEAD |
+| Gate                                | Resultado | Evidencia                                     |
+| ----------------------------------- | --------- | --------------------------------------------- |
+| Install frozen                      | PASS      | `pnpm install --frozen-lockfile` local y CI   |
+| Lint                                | PASS      | `pnpm lint` local y job `validate`            |
+| Typecheck                           | PASS      | `pnpm typecheck` local y job `validate`       |
+| Unit tests                          | PASS      | `pnpm test`: 11 files, 27 tests               |
+| Production build                    | PASS      | `pnpm build` local y job `validate`           |
+| Format check                        | PASS      | `pnpm format:check` local y job `validate`    |
+| `git diff --check`                  | PASS      | ejecución local y job `validate`              |
+| Supabase migration/reset local      | NOT RUN   | Docker no está instalado en este Windows      |
+| pgTAP local                         | NOT RUN   | requiere Docker/Postgres local                |
+| Runtime RLS/Storage/search local    | NOT RUN   | requiere Docker/Postgres/Auth/Storage local   |
+| Supabase reset/pgTAP/runtime remoto | PENDING   | run final de la rama en GitHub Actions        |
+| Browser E2E desktop/Pixel 5 remoto  | PENDING   | run final de la rama en GitHub Actions        |
+| GitHub Actions remoto               | PENDING   | se actualiza con el run final sobre este HEAD |
 
 ## Causa de fallos CI durante la implementación
 
