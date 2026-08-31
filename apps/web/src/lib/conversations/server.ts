@@ -1,14 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 
 export type ConversationErrorCode =
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "CONFLICT"
-  | "TRANSIENT";
+  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
 
 export class ConversationServerError extends Error {
-  constructor(public readonly code: ConversationErrorCode, message: string) {
+  constructor(
+    public readonly code: ConversationErrorCode,
+    message: string,
+  ) {
     super(message);
     this.name = "ConversationServerError";
   }
