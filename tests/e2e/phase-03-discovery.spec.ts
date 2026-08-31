@@ -14,7 +14,9 @@ test.describe("Phase 03 public discovery", () => {
     await expect(
       page.getByRole("link", { name: "Ver servicios remotos" }),
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: "Tecnología" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Tecnología" }).first(),
+    ).toBeVisible();
   });
 
   test("search returns a required discovery example", async ({ page }) => {
@@ -39,7 +41,7 @@ test.describe("Phase 03 public discovery", () => {
       page.getByRole("link", { name: "Clases de inglés conversacional" }),
     ).toBeVisible();
     await expect(
-      page.getByText("Remoto", { exact: true }).first(),
+      page.locator("article").getByText("Remoto", { exact: true }).first(),
     ).toBeVisible();
   });
 
