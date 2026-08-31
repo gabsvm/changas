@@ -21,11 +21,11 @@ import {
   saveExperience,
   savePortfolioItem,
   saveProviderSkill,
-  saveService,
   saveServiceArea,
   toggleServicePause,
   updateMarketplaceSettings,
 } from "../../marketplace-actions";
+import { saveServiceTransactional } from "../../service-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -222,7 +222,7 @@ export default async function ProviderMarketplaceManagePage() {
             settings: updateMarketplaceSettings,
             saveSkill: saveProviderSkill,
             removeSkill: removeProviderSkill,
-            saveService,
+            saveService: saveServiceTransactional,
             pauseService: toggleServicePause,
             deleteService,
             saveExperience,
