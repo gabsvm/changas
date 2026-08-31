@@ -145,22 +145,22 @@ pgTAP y smoke browser en desktop y viewport móvil Pixel 5 sobre:
 
 ## Validation gates
 
-| Gate | Resultado | Evidencia |
-| --- | --- | --- |
-| Install frozen | PASS | `pnpm install --frozen-lockfile` local |
-| Lint | PASS | `pnpm lint` local y job `validate` |
-| Typecheck | PASS | `pnpm typecheck` local y job `validate` |
-| Unit tests | PASS | `pnpm test`: 9 files, 22 tests |
-| Production build | PASS | `pnpm build`; rutas públicas, management y portfolio compiladas |
-| Format check | PASS | `pnpm format:check` local y job `validate` |
-| `git diff --check` | PASS | ejecución local |
-| Supabase migration/reset local | NOT RUN | Docker no está instalado en este checkout Windows |
-| pgTAP local | NOT RUN | requiere Docker/Postgres local |
-| Supabase migration/reset remoto | PASS | run `33350494409`, `ubuntu-latest`, clean reset y seeded reset |
-| pgTAP remoto | PASS | run `33350494409`: 24 audit tests, además de suites Phase 01/02 |
-| Runtime RLS/Auth/Storage remoto | PASS | run `33350494409`: script client/Storage completado |
-| Browser smoke remoto | PASS | run `33350494409`: desktop y Pixel 5 |
-| GitHub Actions remoto | PASS | [run 33350494409](https://github.com/gabsvm/changas/actions/runs/33350494409), ambos jobs PASS sobre `d189f93` |
+| Gate                            | Resultado | Evidencia                                                                                                      |
+| ------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------- |
+| Install frozen                  | PASS      | `pnpm install --frozen-lockfile` local                                                                         |
+| Lint                            | PASS      | `pnpm lint` local y job `validate`                                                                             |
+| Typecheck                       | PASS      | `pnpm typecheck` local y job `validate`                                                                        |
+| Unit tests                      | PASS      | `pnpm test`: 9 files, 22 tests                                                                                 |
+| Production build                | PASS      | `pnpm build`; rutas públicas, management y portfolio compiladas                                                |
+| Format check                    | PASS      | `pnpm format:check` local y job `validate`                                                                     |
+| `git diff --check`              | PASS      | ejecución local                                                                                                |
+| Supabase migration/reset local  | NOT RUN   | Docker no está instalado en este checkout Windows                                                              |
+| pgTAP local                     | NOT RUN   | requiere Docker/Postgres local                                                                                 |
+| Supabase migration/reset remoto | PASS      | run `33350494409`, `ubuntu-latest`, clean reset y seeded reset                                                 |
+| pgTAP remoto                    | PASS      | run `33350494409`: 24 audit tests, además de suites Phase 01/02                                                |
+| Runtime RLS/Auth/Storage remoto | PASS      | run `33350494409`: script client/Storage completado                                                            |
+| Browser smoke remoto            | PASS      | run `33350494409`: desktop y Pixel 5                                                                           |
+| GitHub Actions remoto           | PASS      | [run 33350494409](https://github.com/gabsvm/changas/actions/runs/33350494409), ambos jobs PASS sobre `d189f93` |
 
 El CI no usa credenciales Supabase Cloud: levanta el stack local del runner,
 exporta sus credenciales efímeras y limpia fixtures al finalizar. GitHub aún
