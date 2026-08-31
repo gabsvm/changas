@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useActionState,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -85,7 +86,8 @@ export function ConversationThread({
   initialMessages,
   initialAttachments,
   initiallyBlockedByMe,
-  initialNonce,
+  initialTextNonce,
+  initialAttachmentNonce,
 }: {
   conversationId: string;
   currentUserId: string;
@@ -96,9 +98,11 @@ export function ConversationThread({
   initialMessages: ConversationMessage[];
   initialAttachments: ConversationAttachmentSummary[];
   initiallyBlockedByMe: boolean;
-  initialNonce: string;
+  initialTextNonce: string;
+  initialAttachmentNonce: string;
 }) {
   const router = useRouter();
+  const refreshThread = useCallback(() => router.refresh(), [router]);
   const [messages, setMessages] = useState(initialMessages);
   const [attachments, setAttachments] = useState(initialAttachments);
   const [hasOlder, setHasOlder] = useState(initialMessages.length === 50);
@@ -115,7 +119,9 @@ export function ConversationThread({
 
   useEffect(() => {
     setAttachments((current) => {
-      const byId = new Map(current.map((attachment) => [attachment.id, attachment]));
+      const byId = new Map(
+        current.map((attachment) => [attachment.id, attachment]),
+      );
       for (const attachment of initialAttachments) {
         byId.set(attachment.id, attachment);
       }
@@ -147,20 +153,20 @@ export function ConversationThread({
           );
 
           if (incoming.kind === "IMAGE" || incoming.kind === "FILE") {
-            window.setTimeout(() => router.refresh(), 350);
+            window.setTimeout(refreshThread, 350);
           }
         },
       )
       .subscribe((status) => {
         if (status !== "SUBSCRIBED") return;
-        if (connectedOnce.current) router.refresh();
+        if (connectedOnce.current) refreshThread();
         connectedOnce.current = true;
       });
 
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [conversationId, router]);
+  }, [conversationId, refreshThread]);
 
   const latestMessageId = messages.at(-1)?.message_id;
   useEffect(() => {
@@ -190,7 +196,7 @@ export function ConversationThread({
       const next = !blockedByMe;
       await setConversationBlocked(conversationId, peerUserId, next);
       setBlockedByMe(next);
-      router.refresh();
+      refreshThread();
     });
   }
 
@@ -280,7 +286,9 @@ export function ConversationThread({
                 key={message.message_id}
                 message={message}
                 own={message.sender_user_id === currentUserId}
-                attachments={attachmentsByMessage.get(message.message_id) ?? []}
+                attachments={
+                  attachmentsByMessage.get(message.message_id) ?? []
+                }
               />
             ))}
           </div>
@@ -301,12 +309,13 @@ export function ConversationThread({
           <>
             <TextComposer
               conversationId={conversationId}
-              initialNonce={initialNonce}
-              onSent={() => router.refresh()}
+              initialNonce={initialTextNonce}
+              onSent={refreshThread}
             />
             <AttachmentComposer
               conversationId={conversationId}
-              onSent={() => router.refresh()}
+              initialNonce={initialAttachmentNonce}
+              onSent={refreshThread}
             />
           </>
         )}
@@ -341,7 +350,9 @@ function MessageBubble({
             : "rounded-bl-md border border-ink/10 bg-white text-ink"
         }`}
       >
-        {message.body ? <p className="whitespace-pre-wrap">{message.body}</p> : null}
+        {message.body ? (
+          <p className="whitespace-pre-wrap">{message.body}</p>
+        ) : null}
         {attachments.length > 0 ? (
           <div className="space-y-2">
             {attachments.map((attachment) => (
@@ -349,16 +360,24 @@ function MessageBubble({
                 key={attachment.id}
                 href={`/messages/attachments/${attachment.id}`}
                 className={`block rounded-xl border px-3 py-2 ${
-                  own ? "border-white/20 bg-white/10" : "border-ink/10 bg-canvas"
+                  own
+                    ? "border-white/20 bg-white/10"
+                    : "border-ink/10 bg-canvas"
                 }`}
                 target="_blank"
                 rel="noreferrer"
               >
                 <span className="block truncate font-semibold">
-                  {attachment.mimeType.startsWith("image/") ? "Imagen" : "Archivo"} ·{" "}
-                  {attachment.originalName}
+                  {attachment.mimeType.startsWith("image/")
+                    ? "Imagen"
+                    : "Archivo"}{" "}
+                  · {attachment.originalName}
                 </span>
-                <span className={`text-[11px] ${own ? "text-white/65" : "text-ink/50"}`}>
+                <span
+                  className={`text-[11px] ${
+                    own ? "text-white/65" : "text-ink/50"
+                  }`}
+                >
                   {formatBytes(attachment.sizeBytes)}
                 </span>
               </a>
@@ -394,16 +413,21 @@ function TextComposer({
   initialNonce: string;
   onSent: () => void;
 }) {
-  const [state, action, pending] = useActionState(sendTextMessage, textInitialState);
+  const [state, action, pending] = useActionState(
+    sendTextMessage,
+    textInitialState,
+  );
   const [body, setBody] = useState("");
   const [nonce, setNonce] = useState(initialNonce);
+  const [warningDismissed, setWarningDismissed] = useState(false);
 
   useEffect(() => {
+    if (state.status === "WARNING") setWarningDismissed(false);
     if (state.status !== "SUCCESS") return;
     setBody("");
     setNonce(crypto.randomUUID());
     onSent();
-  }, [state.status, state.messageId, onSent]);
+  }, [state, onSent]);
 
   return (
     <form action={action} className="flex items-end gap-2">
@@ -412,7 +436,10 @@ function TextComposer({
       <textarea
         name="body"
         value={body}
-        onChange={(event) => setBody(event.target.value)}
+        onChange={(event) => {
+          setBody(event.target.value);
+          setWarningDismissed(true);
+        }}
         placeholder="Escribí un mensaje…"
         rows={1}
         maxLength={4000}
@@ -425,12 +452,14 @@ function TextComposer({
       >
         {pending ? "…" : "Enviar"}
       </button>
-      {state.status === "WARNING" ? (
+      {state.status === "WARNING" && !warningDismissed ? (
         <div className="absolute right-3 bottom-[5.1rem] left-3 rounded-2xl border border-terracotta/20 bg-[#fff7f2] p-4 shadow-lg sm:right-4 sm:left-4">
           <p className="text-sm font-semibold text-terracotta">
             Revisá antes de enviar
           </p>
-          <p className="mt-1 text-xs leading-5 text-ink/65">{state.message}</p>
+          <p className="mt-1 text-xs leading-5 text-ink/65">
+            {state.message}
+          </p>
           <div className="mt-3 flex gap-2">
             <button
               type="submit"
@@ -444,7 +473,7 @@ function TextComposer({
             <button
               type="button"
               className="rounded-full border border-ink/10 px-4 py-2 text-xs font-bold"
-              onClick={() => setBody(body)}
+              onClick={() => setWarningDismissed(true)}
             >
               Editar mensaje
             </button>
@@ -452,7 +481,7 @@ function TextComposer({
         </div>
       ) : null}
       {state.status === "ERROR" ? (
-        <p className="sr-only" role="alert">
+        <p className="absolute right-4 bottom-[4.75rem] left-4 rounded-xl bg-[#fff7f2] px-3 py-2 text-xs text-terracotta" role="alert">
           {state.message}
         </p>
       ) : null}
@@ -462,16 +491,18 @@ function TextComposer({
 
 function AttachmentComposer({
   conversationId,
+  initialNonce,
   onSent,
 }: {
   conversationId: string;
+  initialNonce: string;
   onSent: () => void;
 }) {
   const [state, action, pending] = useActionState(
     sendAttachmentMessage,
     attachmentInitialState,
   );
-  const [nonce, setNonce] = useState(() => crypto.randomUUID());
+  const [nonce, setNonce] = useState(initialNonce);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -479,7 +510,7 @@ function AttachmentComposer({
     formRef.current?.reset();
     setNonce(crypto.randomUUID());
     onSent();
-  }, [state.status, state.messageId, onSent]);
+  }, [state, onSent]);
 
   return (
     <form ref={formRef} action={action} className="mt-2 flex items-center gap-2">
