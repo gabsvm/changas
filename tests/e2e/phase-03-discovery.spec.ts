@@ -112,6 +112,24 @@ test.describe("Phase 03 public discovery", () => {
     await expect(page).toHaveURL(/\/login\?next=.*%2Fp%2Fdemo-proveedor/);
   });
 
+  test("sitemap index exposes bounded public sitemap chunks", async ({
+    request,
+  }) => {
+    const indexResponse = await request.get("/sitemap.xml");
+    expect(indexResponse.ok()).toBe(true);
+    expect(indexResponse.headers()["content-type"]).toContain("application/xml");
+    const indexXml = await indexResponse.text();
+    expect(indexXml).toContain("<sitemapindex");
+    expect(indexXml).toContain("/sitemaps/0");
+
+    const chunkResponse = await request.get("/sitemaps/0");
+    expect(chunkResponse.ok()).toBe(true);
+    expect(chunkResponse.headers()["content-type"]).toContain("application/xml");
+    const chunkXml = await chunkResponse.text();
+    expect(chunkXml).toContain("<urlset");
+    expect(chunkXml).toContain("/p/demo-proveedor");
+  });
+
   test("GPS discovery paginates in memory without putting coordinates in URL", async ({
     page,
     context,
