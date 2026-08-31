@@ -127,20 +127,17 @@ select is(
   1,
   'client inbox returns the contextual conversation'
 );
+select throws_ok(
+  $$select public.start_service_conversation('phase04-rpc-provider', 'missing-service')$$,
+  'P0002',
+  null,
+  'conversation start rejects a provider and service that do not resolve together'
+);
 
 select set_config(
   'request.jwt.claim.sub',
   '04500000-0000-4000-8000-000000000002',
   true
-);
-
-select is(
-  (select count(*)::integer
-   from public.get_conversation_context(
-     public.start_service_conversation('phase04-rpc-provider', 'phase04-rpc-service')
-   )),
-  0,
-  'provider cannot start a conversation with their own service'
 );
 
 select throws_ok(
