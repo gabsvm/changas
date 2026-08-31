@@ -203,7 +203,7 @@ begin
     join public.skills sk on sk.id = s.skill_id and sk.is_active
     join public.categories c on c.id = sk.category_id and c.is_active
     cross join query_data q
-    cross join lateral (
+    join lateral (
       select
         (public.normalize_search_text(sk.slug) = q.normalized_query
           or public.normalize_search_text(sk.name) = q.normalized_query) as exact_skill_match,
