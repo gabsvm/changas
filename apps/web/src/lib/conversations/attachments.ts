@@ -22,7 +22,24 @@ export type RegisteredConversationAttachment = {
   sizeBytes: number;
 };
 
+export type ConversationAttachmentSummary = {
+  id: string;
+  messageId: string;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+};
+
 type RpcError = { code?: string | null; message?: string | null } | null;
+
+type AttachmentDatabaseRow = {
+  id: string;
+  message_id: string;
+  storage_path: string;
+  mime_type: string;
+  size_bytes: number;
+  original_name: string;
+};
 
 type AttachmentRpcClient = {
   auth: {
@@ -56,16 +73,17 @@ type AttachmentRpcClient = {
         value: string,
       ): {
         maybeSingle(): Promise<{
-          data: {
-            id: string;
-            storage_path: string;
-            mime_type: string;
-            size_bytes: number;
-            original_name: string;
-          } | null;
+          data: AttachmentDatabaseRow | null;
           error: RpcError;
         }>;
       };
+      in(
+        column: "message_id",
+        values: string[],
+      ): Promise<{
+        data: AttachmentDatabaseRow[] | null;
+        error: RpcError;
+      }>;
     };
   };
   storage: {
@@ -225,6 +243,29 @@ export async function uploadConversationAttachment(input: {
   };
 }
 
+export async function listConversationAttachments(
+  messageIds: string[],
+): Promise<ConversationAttachmentSummary[]> {
+  if (messageIds.length === 0) return [];
+  for (const messageId of messageIds) ensureUuid(messageId, "Mensaje");
+
+  const supabase = await getAttachmentClient();
+  const { data, error } = await supabase
+    .from("message_attachments")
+    .select("id,message_id,storage_path,mime_type,size_bytes,original_name")
+    .in("message_id", messageIds);
+
+  if (error) throw mapAttachmentError(error);
+
+  return (data ?? []).map((attachment) => ({
+    id: attachment.id,
+    messageId: attachment.message_id,
+    originalName: attachment.original_name,
+    mimeType: attachment.mime_type,
+    sizeBytes: attachment.size_bytes,
+  }));
+}
+
 export async function createConversationAttachmentSignedUrl(
   attachmentId: string,
 ): Promise<{ url: string; originalName: string; mimeType: string }> {
@@ -232,7 +273,7 @@ export async function createConversationAttachmentSignedUrl(
   const supabase = await getAttachmentClient();
   const attachment = await supabase
     .from("message_attachments")
-    .select("id,storage_path,mime_type,size_bytes,original_name")
+    .select("id,message_id,storage_path,mime_type,size_bytes,original_name")
     .eq("id", attachmentId)
     .maybeSingle();
 
