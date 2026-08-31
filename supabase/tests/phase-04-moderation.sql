@@ -1,6 +1,6 @@
 begin;
 
-select plan(15);
+select plan(16);
 
 select ok(
   to_regprocedure('public.block_user_for_conversation(uuid,uuid)') is not null,
