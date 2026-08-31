@@ -88,6 +88,19 @@ async function cleanupTestUser(id: string): Promise<void> {
   await deleteTestUser(id);
 }
 
+async function assertThreadRendered(page: Parameters<typeof test>[0] extends never ? never : any) {
+  const peer = page.getByText("Demo Proveedor").first();
+  try {
+    await expect(peer).toBeVisible({ timeout: 5000 });
+  } catch (error) {
+    const bodyText = (await page.locator("body").innerText()).slice(0, 2000);
+    throw new Error(
+      `Conversation URL loaded without the expected thread header. Rendered body:\n${bodyText}`,
+      { cause: error },
+    );
+  }
+}
+
 test.describe("Phase 04 contextual conversations", () => {
   test("authenticated client can use the protected conversation flow", async ({
     page,
@@ -110,7 +123,7 @@ test.describe("Phase 04 contextual conversations", () => {
         .click();
 
       await expect(page).toHaveURL(/\/messages\/[0-9a-f-]{36}$/i);
-      await expect(page.getByText("Demo Proveedor").first()).toBeVisible();
+      await assertThreadRendered(page);
       await expect(
         page.getByText("Revisión de PC a distancia").first(),
       ).toBeVisible();
