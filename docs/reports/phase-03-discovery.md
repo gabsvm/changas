@@ -22,8 +22,13 @@ ahora declara HEAD `61de1aabe0d74805202d6fccfdce76f45ac03074` y CI
 - `39fcd14` — `fix(phase03): qualify discovery result columns`
 - `47e3a6b` — `feat(phase03): expose complete discovery filters`
 - `f869ec3` — `test(phase03): cover URL discovery filters`
+- `1882ff3` — `docs(phase03): record discovery architecture and validation`
+- `c384727` — `style(phase03): format discovery report`
+- `ed55f98` — `test(phase03): exercise combined discovery filters`
+- `0531410` — `test(phase03): use seeded service in filter journey`
 
-HEAD de trabajo: `f869ec38c153b23a264a30c3afafc47ce0ab0f6d`.
+HEAD funcional validado: `0531410dcec83f2a28afaccaa2c44aea3445e366`.
+Los commits posteriores de este reporte son sólo evidencia documental.
 
 ## Migración y arquitectura de búsqueda
 
@@ -131,21 +136,21 @@ ubicaciones manuales y formato de dinero existente.
 
 ## Validation gates
 
-| Gate                                | Resultado | Evidencia                                     |
-| ----------------------------------- | --------- | --------------------------------------------- |
-| Install frozen                      | PASS      | `pnpm install --frozen-lockfile` local y CI   |
-| Lint                                | PASS      | `pnpm lint` local y job `validate`            |
-| Typecheck                           | PASS      | `pnpm typecheck` local y job `validate`       |
-| Unit tests                          | PASS      | `pnpm test`: 11 files, 27 tests               |
-| Production build                    | PASS      | `pnpm build` local y job `validate`           |
-| Format check                        | PASS      | `pnpm format:check` local y job `validate`    |
-| `git diff --check`                  | PASS      | ejecución local y job `validate`              |
-| Supabase migration/reset local      | NOT RUN   | Docker no está instalado en este Windows      |
-| pgTAP local                         | NOT RUN   | requiere Docker/Postgres local                |
-| Runtime RLS/Storage/search local    | NOT RUN   | requiere Docker/Postgres/Auth/Storage local   |
-| Supabase reset/pgTAP/runtime remoto | PENDING   | run final de la rama en GitHub Actions        |
-| Browser E2E desktop/Pixel 5 remoto  | PENDING   | run final de la rama en GitHub Actions        |
-| GitHub Actions remoto               | PENDING   | se actualiza con el run final sobre este HEAD |
+| Gate                                | Resultado | Evidencia                                                                                      |
+| ----------------------------------- | --------- | ---------------------------------------------------------------------------------------------- |
+| Install frozen                      | PASS      | `pnpm install --frozen-lockfile` local y CI                                                    |
+| Lint                                | PASS      | `pnpm lint` local y job `validate`                                                             |
+| Typecheck                           | PASS      | `pnpm typecheck` local y job `validate`                                                        |
+| Unit tests                          | PASS      | `pnpm test`: 11 files, 27 tests                                                                |
+| Production build                    | PASS      | `pnpm build` local y job `validate`                                                            |
+| Format check                        | PASS      | `pnpm format:check` local y job `validate`                                                     |
+| `git diff --check`                  | PASS      | ejecución local y job `validate`                                                               |
+| Supabase migration/reset local      | NOT RUN   | Docker no está instalado en este Windows                                                       |
+| pgTAP local                         | NOT RUN   | requiere Docker/Postgres local                                                                 |
+| Runtime RLS/Storage/search local    | NOT RUN   | requiere Docker/Postgres/Auth/Storage local                                                    |
+| Supabase reset/pgTAP/runtime remoto | PASS      | run `33355719126`, Ubuntu/Docker, reset limpio y seed sintético                                |
+| Browser E2E desktop/Pixel 5 remoto  | PASS      | run `33355719126`, journeys Phase 02 + Phase 03                                                |
+| GitHub Actions remoto               | PASS      | [run 33355719126](https://github.com/gabsvm/changas/actions/runs/33355719126), ambos jobs PASS |
 
 ## Causa de fallos CI durante la implementación
 
@@ -159,10 +164,16 @@ ubicaciones manuales y formato de dinero existente.
   fixture para probar el área inactiva.
 - Run `33354126458`: `distance_meters` era ambiguo entre el resultado OUT y la
   CTE; se calificaron las columnas del resultado y del ranking.
+- Run `33354740431`: las primeras aserciones E2E eran ambiguas para enlaces de
+  categorías repetidos y tomaban la opción oculta `Remoto`; se limitaron al
+  enlace visible y al contenido del artículo.
+- Run `33355056275`: el reporte nuevo no estaba formateado; se ejecutó
+  Prettier y se volvió a publicar.
 
 La annotation informativa de GitHub sobre actions internas que apuntan a Node
 20 no cambia el runtime del proyecto: `package.json`, lockfile, `@types/node`,
 `.nvmrc`, setup de Actions y documentación usan Node 24.
 
-Las limitaciones locales quedan explícitas por Docker ausente. No se declara
-Phase 03 terminada hasta que el run remoto final quede verde.
+Las limitaciones locales quedan explícitas por Docker ausente. El runtime
+reproducible remoto y el CI final quedaron verdes; no se agregan afirmaciones
+de reputación, disponibilidad o verificación que Phase 03 no pueda probar.
