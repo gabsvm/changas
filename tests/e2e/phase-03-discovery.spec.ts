@@ -47,14 +47,18 @@ test.describe("Phase 03 public discovery", () => {
 
   test("URL-addressable filters narrow public results", async ({ page }) => {
     await page.goto(
-      "/buscar?category=tecnologia&skill=diseno-grafico&priceModel=HOURLY&min=1000000&max=2000000&offers=true",
+      "/buscar?category=tecnologia&skill=soporte-tecnico-remoto&priceModel=STARTING_AT&min=800000&max=1000000&offers=true",
     );
     await expect(
-      page.getByRole("link", { name: "Diseño gráfico por hora" }),
+      page.getByRole("link", { name: "Soporte técnico remoto" }),
     ).toBeVisible();
     await expect(page.locator("#search-category")).toHaveValue("tecnologia");
-    await expect(page.locator("#search-skill")).toHaveValue("diseno-grafico");
-    await expect(page.locator("#search-price-model")).toHaveValue("HOURLY");
+    await expect(page.locator("#search-skill")).toHaveValue(
+      "soporte-tecnico-remoto",
+    );
+    await expect(page.locator("#search-price-model")).toHaveValue(
+      "STARTING_AT",
+    );
     await expect(page.locator("#search-offers")).toBeChecked();
   });
 
