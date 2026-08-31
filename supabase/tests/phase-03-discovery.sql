@@ -344,7 +344,7 @@ select ok(
     select 1
     from public.search_discovery_services_v3('electricista', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 1000, 'nearest', 1, 24)
     where service_slug = 'pgtap-electricista'
-      and distance_bucket < 1000
+      and distance_bucket = 'UNDER_2_KM'
   ),
   'inside-radius matching returns approximate distance'
 );
@@ -399,7 +399,7 @@ select ok(
     select 1
     from public.search_discovery_services_v3('instalar camara', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 1000, 'nearest', 1, 24)
     where service_slug = 'pgtap-camara'
-      and distance_bucket < 1000
+      and distance_bucket = 'UNDER_2_KM'
   )
   and not exists (
     select 1
