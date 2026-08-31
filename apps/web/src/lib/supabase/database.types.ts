@@ -516,6 +516,37 @@ type PublicProviderServiceAreasRow = {
   radius_meters: number;
 };
 
+export type DiscoveryServiceRow = {
+  provider_display_name: string;
+  provider_avatar_url: string | null;
+  provider_slug: string;
+  provider_zone: string | null;
+  service_title: string;
+  service_slug: string;
+  category_slug: string;
+  category_name: string;
+  skill_slug: string;
+  skill_name: string;
+  modality: ServiceModalityType;
+  price_model: PriceModelType;
+  price_amount: number | null;
+  currency_code: string;
+  price_unit: string | null;
+  accepts_offers: boolean;
+  distance_meters: number | null;
+  relevance: number;
+};
+
+type ProviderFavoritesRow = {
+  user_id: string;
+  provider_user_id: string;
+  created_at: string;
+};
+type ProviderFavoritesInsert = Omit<ProviderFavoritesRow, "created_at"> & {
+  created_at?: string;
+};
+type ProviderFavoritesUpdate = Partial<ProviderFavoritesInsert>;
+
 type ViewDefinition<Row> = { Row: Row; Relationships: [] };
 
 export type Database = {
@@ -604,6 +635,11 @@ export type Database = {
         AvailabilityBlocksInsert,
         AvailabilityBlocksUpdate
       >;
+      provider_favorites: TableDefinition<
+        ProviderFavoritesRow,
+        ProviderFavoritesInsert,
+        ProviderFavoritesUpdate
+      >;
     };
     Views: {
       public_provider_profiles: ViewDefinition<PublicProviderProfilesRow>;
@@ -624,6 +660,44 @@ export type Database = {
       replace_service_tags: {
         Args: { requested_tags: string[]; target_service_id: string };
         Returns: undefined;
+      };
+      normalize_search_text: {
+        Args: { input: string };
+        Returns: string;
+      };
+      search_discovery_services: {
+        Args: {
+          accepts_offers_filter?: boolean;
+          category_slug?: string;
+          max_price?: number;
+          min_price?: number;
+          modality_filter?: ServiceModalityType;
+          origin_lat?: number;
+          origin_lng?: number;
+          page_number?: number;
+          page_size?: number;
+          price_model_filter?: PriceModelType;
+          query_text?: string;
+          radius_meters?: number;
+          skill_slug?: string;
+          sort_key?: string;
+        };
+        Returns: DiscoveryServiceRow[];
+      };
+      set_provider_favorite: {
+        Args: { should_favorite: boolean; target_provider_slug: string };
+        Returns: boolean;
+      };
+      list_my_favorite_providers: {
+        Args: Record<string, never>;
+        Returns: Array<{
+          provider_slug: string;
+          display_name: string;
+          avatar_url: string | null;
+          public_zone: string | null;
+          public_headline: string | null;
+          bio: string | null;
+        }>;
       };
     };
     Enums: {

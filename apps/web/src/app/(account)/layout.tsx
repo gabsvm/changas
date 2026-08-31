@@ -32,6 +32,12 @@ export default function AccountLayout({
             >
               Configuración
             </Link>
+            <Link
+              className="underline underline-offset-4"
+              href="/account/favorites"
+            >
+              Guardados
+            </Link>
           </nav>
         </header>
         {children}

@@ -101,6 +101,9 @@ jobs:
       - name: Run client and Storage security checks
         run: node apps/web/scripts/supabase-runtime-security.mjs
 
+      - name: Run Phase 03 discovery runtime security checks
+        run: node apps/web/scripts/phase-03-discovery-runtime.mjs
+
       - name: Reset local database with synthetic seed
         run: pnpm dlx supabase@2.116.0 db reset --local
 

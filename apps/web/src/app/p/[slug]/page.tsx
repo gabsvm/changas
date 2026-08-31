@@ -1,12 +1,44 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { formatServicePrice } from "@changas/domain";
 
+import { toggleProviderFavorite } from "@/lib/favorites/actions";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = await createClient();
+  const { data: provider } = await supabase
+    .from("public_provider_profiles")
+    .select("public_slug, display_name, public_headline, bio")
+    .eq("public_slug", slug)
+    .maybeSingle();
+  if (!provider) return { title: "Proveedor no encontrado" };
+  const description =
+    provider.bio ??
+    provider.public_headline ??
+    "Servicios publicados en Changas.";
+  return {
+    title: provider.display_name,
+    description,
+    alternates: { canonical: "/p/" + provider.public_slug },
+    openGraph: {
+      title: provider.display_name + " · Changas",
+      description,
+      type: "profile",
+      url: "/p/" + provider.public_slug,
+    },
+  };
+}
 
 export default async function PublicProviderPage({
   params,
@@ -21,6 +53,16 @@ export default async function PublicProviderPage({
     .eq("public_slug", slug)
     .maybeSingle();
   if (!provider) notFound();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: favoriteProviders } = user
+    ? await supabase.rpc("list_my_favorite_providers")
+    : { data: null };
+  const isFavorite =
+    favoriteProviders?.some(
+      (favorite) => favorite.provider_slug === provider.public_slug,
+    ) ?? false;
 
   const [
     { data: skills },
@@ -105,6 +147,29 @@ export default async function PublicProviderPage({
                   "Este proveedor todavía no agregó una presentación."}
               </p>
             </div>
+            <form action={toggleProviderFavorite}>
+              <input
+                name="providerSlug"
+                type="hidden"
+                value={provider.public_slug}
+              />
+              <input
+                name="returnTo"
+                type="hidden"
+                value={"/p/" + provider.public_slug}
+              />
+              <input
+                name="shouldFavorite"
+                type="hidden"
+                value={String(!isFavorite)}
+              />
+              <button
+                className="button-secondary whitespace-nowrap"
+                type="submit"
+              >
+                {isFavorite ? "Quitar guardado" : "Guardar proveedor"}
+              </button>
+            </form>
           </div>
           {provider.public_zone ? (
             <p className="text-ink/60 mt-6 text-sm">

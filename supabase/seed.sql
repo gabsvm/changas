@@ -43,7 +43,10 @@ insert into public.provider_skills (provider_user_id, skill_id, is_featured, sor
 values
   ('23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000003', true, 10),
   ('23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000004', true, 20),
-  ('23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000010', false, 30)
+  ('23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000010', false, 30),
+  ('23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000005', false, 40),
+  ('23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000006', false, 50),
+  ('23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000015', true, 60)
 on conflict (provider_user_id, skill_id) do update set
   is_featured = excluded.is_featured,
   sort_order = excluded.sort_order;
@@ -57,7 +60,10 @@ insert into public.services (
   ('24000000-0000-4000-8000-000000000002', '23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000004', 'demo-soporte-remoto', 'Soporte técnico remoto', 'Ayuda guiada para resolver problemas habituales de software.', 'BOTH', 'STARTING_AT', 900000, 'ARS', null, true, 45, 'FLEXIBLE_WINDOW', 'Sesión inicial de orientación', true, 20),
   ('24000000-0000-4000-8000-000000000003', '23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000010', 'demo-diseno-hora', 'Diseño gráfico por hora', 'Diseño de piezas visuales simples para proyectos y comercios.', 'REMOTE', 'HOURLY', 1500000, 'ARS', null, true, 120, 'DEADLINE', 'Una ronda de ajustes', true, 30),
   ('24000000-0000-4000-8000-000000000004', '23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000003', 'demo-limpieza-equipo', 'Limpieza de equipo por unidad', 'Limpieza preventiva de un equipo con recomendaciones básicas.', 'IN_PERSON', 'PER_UNIT', 1000000, 'ARS', 'equipo', false, 90, 'FIXED_SLOT', 'Limpieza exterior y revisión visual', true, 40),
-  ('24000000-0000-4000-8000-000000000005', '23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000004', 'demo-proyecto-a-medida', 'Solución técnica a medida', 'Relevamiento y propuesta para necesidades técnicas particulares.', 'BOTH', 'QUOTE', null, 'ARS', null, true, null, 'UNSCHEDULED', 'Alcance acordado antes de comenzar', true, 50)
+  ('24000000-0000-4000-8000-000000000005', '23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000004', 'demo-proyecto-a-medida', 'Solución técnica a medida', 'Relevamiento y propuesta para necesidades técnicas particulares.', 'BOTH', 'QUOTE', null, 'ARS', null, true, null, 'UNSCHEDULED', 'Alcance acordado antes de comenzar', true, 50),
+  ('24000000-0000-4000-8000-000000000006', '23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000015', 'demo-instalacion-electrica', 'Instalación eléctrica del hogar', 'Trabajo de electricista para reparaciones e instalaciones eléctricas seguras.', 'IN_PERSON', 'QUOTE', null, 'ARS', null, false, 120, 'UNSCHEDULED', 'Relevamiento inicial y propuesta', true, 60),
+  ('24000000-0000-4000-8000-000000000007', '23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000006', 'demo-clases-ingles', 'Clases de inglés conversacional', 'Práctica de conversación y comprensión para estudiar o trabajar a distancia.', 'REMOTE', 'HOURLY', 1800000, 'ARS', null, true, 60, 'FLEXIBLE_WINDOW', 'Material sintético de práctica', true, 70),
+  ('24000000-0000-4000-8000-000000000008', '23000000-0000-4000-8000-000000000001', '22000000-0000-4000-8000-000000000005', 'demo-instalar-camara', 'Instalar cámara de seguridad', 'Instalación y configuración inicial de cámaras para el hogar.', 'BOTH', 'FIXED', 2500000, 'ARS', null, false, 120, 'FLEXIBLE_WINDOW', 'Configuración inicial del equipo', true, 80)
 on conflict (id) do update set
   is_published = excluded.is_published,
   is_paused = false,
@@ -67,7 +73,10 @@ insert into public.service_tags (service_id, tag)
 values
   ('24000000-0000-4000-8000-000000000001', 'diagnóstico'),
   ('24000000-0000-4000-8000-000000000002', 'ayuda remota'),
-  ('24000000-0000-4000-8000-000000000003', 'piezas visuales')
+  ('24000000-0000-4000-8000-000000000003', 'piezas visuales'),
+  ('24000000-0000-4000-8000-000000000006', 'electricista'),
+  ('24000000-0000-4000-8000-000000000007', 'clases ingles'),
+  ('24000000-0000-4000-8000-000000000008', 'instalar camara')
 on conflict (service_id, normalized_tag) do nothing;
 
 insert into public.experiences (

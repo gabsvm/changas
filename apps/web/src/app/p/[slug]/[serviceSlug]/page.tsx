@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { formatServicePrice } from "@changas/domain";
@@ -6,6 +7,42 @@ import { formatServicePrice } from "@changas/domain";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string; serviceSlug: string }>;
+}): Promise<Metadata> {
+  const { slug, serviceSlug } = await params;
+  const supabase = await createClient();
+  const [{ data: service }, { data: provider }] = await Promise.all([
+    supabase
+      .from("public_provider_services")
+      .select("public_slug, title, description, skill_name")
+      .eq("provider_slug", slug)
+      .eq("public_slug", serviceSlug)
+      .maybeSingle(),
+    supabase
+      .from("public_provider_profiles")
+      .select("public_slug, display_name")
+      .eq("public_slug", slug)
+      .maybeSingle(),
+  ]);
+  if (!service || !provider) return { title: "Servicio no encontrado" };
+  const description = service.description;
+  const canonical = "/p/" + provider.public_slug + "/" + service.public_slug;
+  return {
+    title: service.title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: service.title + " · " + provider.display_name,
+      description,
+      type: "website",
+      url: canonical,
+    },
+  };
+}
 
 export default async function PublicServicePage({
   params,

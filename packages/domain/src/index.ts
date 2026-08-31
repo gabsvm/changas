@@ -27,3 +27,16 @@ export {
   supportedCurrencyCodes,
   type CurrencyCode,
 } from "./money";
+export {
+  normalizeDiscoveryQuery,
+  parseDiscoveryFilters,
+  rankDiscoveryResult,
+  type DiscoveryFilters,
+  type DiscoveryRankingSignals,
+  type DiscoverySort,
+} from "./discovery";
+export {
+  getManualLocation,
+  manualLocations,
+  type ManualLocation,
+} from "./location";
