@@ -1,0 +1,41 @@
+name: Phase02 Format Debug
+
+on:
+  push:
+    branches: ["codex/phase-02-provider-marketplace"]
+
+permissions:
+  contents: read
+
+jobs:
+  format-debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Format exact closeout files
+        run: |
+          pnpm exec prettier --write \
+            'apps/web/src/app/(provider)/service-actions.ts' \
+            'docs/superpowers/plans/2026-08-31-phase02-closeout-and-phase03-discovery.md' \
+            'tests/e2e/phase-02-public-surfaces.spec.ts'
+      - name: Print formatted files as base64
+        shell: bash
+        run: |
+          for f in \
+            'apps/web/src/app/(provider)/service-actions.ts' \
+            'docs/superpowers/plans/2026-08-31-phase02-closeout-and-phase03-discovery.md' \
+            'tests/e2e/phase-02-public-surfaces.spec.ts'; do
+            echo "===BEGIN:$f==="
+            base64 -w0 "$f"
+            echo
+            echo "===END:$f==="
+          done
