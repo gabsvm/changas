@@ -50,6 +50,41 @@ function serviceInput(formData: FormData, priceAmount?: number) {
   };
 }
 
+type SaveServiceRpcArgs = {
+  target_service_id: string | null;
+  requested_skill_id: string;
+  requested_title: string;
+  requested_description: string;
+  requested_modality: "IN_PERSON" | "REMOTE" | "BOTH";
+  requested_price_model:
+    | "FIXED"
+    | "STARTING_AT"
+    | "HOURLY"
+    | "PER_UNIT"
+    | "QUOTE";
+  requested_price_amount: number | null;
+  requested_currency_code: "ARS";
+  requested_price_unit: string | null;
+  requested_accepts_offers: boolean;
+  requested_expected_duration_minutes: number | null;
+  requested_schedule_type:
+    | "FIXED_SLOT"
+    | "FLEXIBLE_WINDOW"
+    | "DEADLINE"
+    | "UNSCHEDULED";
+  requested_includes: string | null;
+  requested_excludes: string | null;
+  requested_materials_notes: string | null;
+  requested_is_published: boolean;
+  requested_is_paused: boolean;
+  requested_tags: string[];
+};
+
+type SaveServiceRpcResult = {
+  data: Array<{ id: string; public_slug: string }> | null;
+  error: { message: string } | null;
+};
+
 export async function saveServiceTransactional(
   _previousState: ActionState,
   formData: FormData,
@@ -101,7 +136,7 @@ export async function saveServiceTransactional(
     .maybeSingle();
   if (!provider) return errorState("Prepará primero tu perfil de proveedor.");
 
-  const { data, error } = await supabase.rpc("save_service_with_tags", {
+  const args: SaveServiceRpcArgs = {
     target_service_id: getFormString(formData, "serviceId") || null,
     requested_skill_id: parsed.data.skillId,
     requested_title: parsed.data.title,
@@ -121,7 +156,13 @@ export async function saveServiceTransactional(
     requested_is_published: parsed.data.isPublished,
     requested_is_paused: parsed.data.isPaused,
     requested_tags: parsedTags.data,
-  });
+  };
+
+  const rpc = supabase.rpc as unknown as (
+    functionName: "save_service_with_tags",
+    rpcArgs: SaveServiceRpcArgs,
+  ) => Promise<SaveServiceRpcResult>;
+  const { data, error } = await rpc("save_service_with_tags", args);
 
   if (error || !data?.length) {
     return errorState(
