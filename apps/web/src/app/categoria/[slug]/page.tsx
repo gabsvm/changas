@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 
 import { parseDiscoveryFilters } from "@changas/domain";
 
-import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { DiscoveryPagination } from "@/components/discovery/discovery-pagination";
+import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -67,7 +67,8 @@ export default async function CategoryPage({
     page: pageParam,
     pageSize: pageSizeParam,
   });
-  const { rows, hasMore } = await searchDiscovery({ query: "", filters });
+  const searchResult = await searchDiscovery({ query: "", filters });
+  const { rows, hasMore } = searchResult;
 
   return (
     <main
@@ -107,29 +108,32 @@ export default async function CategoryPage({
           <div className="mt-8">
             <DiscoveryResults
               enableNearby={false}
+              initialError={searchResult.error}
               initialHasMore={hasMore}
               initialRows={rows}
               query=""
               filters={filters}
             />
-            <DiscoveryPagination
-              previousHref={
-                filters.page > 1
-                  ? "/categoria/" +
-                    category.slug +
-                    "?page=" +
-                    (filters.page - 1)
-                  : null
-              }
-              nextHref={
-                hasMore
-                  ? "/categoria/" +
-                    category.slug +
-                    "?page=" +
-                    (filters.page + 1)
-                  : null
-              }
-            />
+            {!searchResult.error ? (
+              <DiscoveryPagination
+                previousHref={
+                  filters.page > 1
+                    ? "/categoria/" +
+                      category.slug +
+                      "?page=" +
+                      (filters.page - 1)
+                    : null
+                }
+                nextHref={
+                  hasMore
+                    ? "/categoria/" +
+                      category.slug +
+                      "?page=" +
+                      (filters.page + 1)
+                    : null
+                }
+              />
+            ) : null}
           </div>
         </section>
       </div>

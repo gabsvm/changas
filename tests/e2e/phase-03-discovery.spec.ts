@@ -167,4 +167,63 @@ test.describe("Phase 03 public discovery", () => {
       page.getByRole("heading", { name: /Servicio GPS 1/ }),
     ).toBeVisible();
   });
+
+  test("GPS retry clears a prior discovery error", async ({ page, context }) => {
+    await context.grantPermissions(["geolocation"]);
+    await context.setGeolocation({ latitude: -34.58, longitude: -58.43 });
+    let attempts = 0;
+    await page.route("**/api/discovery", async (route) => {
+      attempts += 1;
+      if (attempts === 1) {
+        await route.fulfill({
+          status: 503,
+          contentType: "application/json",
+          body: JSON.stringify({ error: "temporary" }),
+        });
+        return;
+      }
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          hasMore: false,
+          rows: [
+            {
+              provider_display_name: "Recovered Provider",
+              provider_avatar_url: null,
+              provider_slug: "recovered-provider",
+              provider_zone: "Palermo",
+              service_title: "Servicio recuperado",
+              service_slug: "recovered-service",
+              category_slug: "tecnologia",
+              category_name: "Tecnología",
+              skill_slug: "soporte-tecnico-remoto",
+              skill_name: "Soporte técnico remoto",
+              modality: "BOTH",
+              price_model: "FIXED",
+              price_amount: 900000,
+              currency_code: "ARS",
+              price_unit: null,
+              accepts_offers: false,
+              distance_bucket: "KM_2_TO_5",
+              relevance: 1,
+              has_more: false,
+            },
+          ],
+        }),
+      });
+    });
+
+    await page.goto("/buscar?category=tecnologia");
+    await page.getByRole("button", { name: "Buscar cerca mío" }).click();
+    await expect(
+      page.getByText("No pudimos cargar los resultados cerca tuyo."),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Buscar cerca mío" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Servicio recuperado" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("No pudimos cargar los resultados cerca tuyo."),
+    ).toHaveCount(0);
+  });
 });

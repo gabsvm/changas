@@ -71,8 +71,10 @@ export function DiscoveryResults({
 }) {
   const [rows, setRows] = useState(initialRows);
   const [hasMore, setHasMore] = useState(initialHasMore);
+  const [resultsError, setResultsError] = useState<string | null>(
+    initialError ? "No pudimos cargar los resultados." : null,
+  );
   const [nearbyLoading, setNearbyLoading] = useState(false);
-  const [nearbyError, setNearbyError] = useState<string | null>(null);
   const [gpsMode, setGpsMode] = useState(false);
   const [gpsPage, setGpsPage] = useState(1);
   const [gpsPoint, setGpsPoint] = useState<{
@@ -85,7 +87,7 @@ export function DiscoveryResults({
     point: { latitude: number; longitude: number },
   ) {
     setNearbyLoading(true);
-    setNearbyError(null);
+    setResultsError(null);
     try {
       const response = await fetch("/api/discovery", {
         method: "POST",
@@ -99,7 +101,7 @@ export function DiscoveryResults({
       });
       const payload: unknown = await response.json();
       if (!response.ok || !payload || typeof payload !== "object") {
-        throw new Error("No pudimos cargar los resultados cerca tuyo.");
+        throw new Error("discovery request failed");
       }
       const candidate = (payload as { rows?: unknown }).rows;
       const nextRows = Array.isArray(candidate)
@@ -109,8 +111,9 @@ export function DiscoveryResults({
       setHasMore((payload as { hasMore?: unknown }).hasMore === true);
       setGpsPage(page);
       setGpsMode(true);
+      setResultsError(null);
     } catch {
-      setNearbyError("No pudimos cargar los resultados cerca tuyo.");
+      setResultsError("No pudimos cargar los resultados cerca tuyo.");
     } finally {
       setNearbyLoading(false);
     }
@@ -118,11 +121,11 @@ export function DiscoveryResults({
 
   function searchNearby() {
     if (!navigator.geolocation) {
-      setNearbyError("Tu navegador no ofrece geolocalización.");
+      setResultsError("Tu navegador no ofrece geolocalización.");
       return;
     }
     setNearbyLoading(true);
-    setNearbyError(null);
+    setResultsError(null);
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         const point = {
@@ -133,7 +136,7 @@ export function DiscoveryResults({
         void fetchNearbyPage(1, point);
       },
       () => {
-        setNearbyError(
+        setResultsError(
           "No pudimos acceder a tu ubicación. Podés elegir una zona manualmente.",
         );
         setNearbyLoading(false);
@@ -142,15 +145,12 @@ export function DiscoveryResults({
     );
   }
 
-  const displayError = initialError
-    ? "No pudimos cargar los resultados."
-    : nearbyError;
   return (
     <section aria-live="polite" aria-label="Resultados de búsqueda">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-ink/60 text-sm">
-          {displayError
-            ? displayError
+          {resultsError
+            ? resultsError
             : rows.length === 0
               ? "No encontramos servicios con esos criterios."
               : rows.length + " resultado" + (rows.length === 1 ? "" : "s")}
@@ -166,7 +166,7 @@ export function DiscoveryResults({
           </button>
         ) : null}
       </div>
-      {rows.length ? (
+      {rows.length && !resultsError ? (
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {rows.map((row) => (
             <DiscoveryCard
@@ -175,7 +175,7 @@ export function DiscoveryResults({
             />
           ))}
         </div>
-      ) : !displayError ? (
+      ) : !resultsError ? (
         <div className="border-ink/10 mt-5 rounded-2xl border border-dashed bg-white/45 p-8 text-center">
           <p className="font-display text-2xl font-semibold">
             Probá otra búsqueda
@@ -185,7 +185,7 @@ export function DiscoveryResults({
           </p>
         </div>
       ) : null}
-      {enableNearby && gpsMode && gpsPoint ? (
+      {enableNearby && gpsMode && gpsPoint && !resultsError ? (
         <nav
           aria-label="Paginación de resultados cercanos"
           className="mt-8 flex items-center justify-between gap-4"
@@ -213,7 +213,7 @@ export function DiscoveryResults({
             </button>
           ) : null}
         </nav>
-      ) : enableNearby ? (
+      ) : enableNearby && !resultsError ? (
         <nav
           aria-label="Paginación de resultados"
           className="mt-8 flex items-center justify-between gap-4"
