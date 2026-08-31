@@ -3,9 +3,10 @@
 ## Estado final
 
 **Rama:** `codex/phase-03-discovery`  
-**Base aprobada de Phase 02:** `61de1aabe0d74805202d6fccfdce76f45ac03074`  
-**HEAD funcional validado previo al cierre documental:** `bc4bd2c897e3c32cdc6f55a67bc06ec0e919942a`  
-**CI funcional final:** GitHub Actions run `33422211214`  
+**Base funcional original de Phase 03:** `61de1aabe0d74805202d6fccfdce76f45ac03074`  
+**HEAD funcional de Discovery validado inicialmente:** `bc4bd2c897e3c32cdc6f55a67bc06ec0e919942a`  
+**HEAD combinado con cierre auditado de Phase 02:** `5c1a8e0c92e5e5adee1cdb4e7c5da4ac3ee6e770`  
+**CI combinado final:** GitHub Actions run `33428499956`  
 **Resultado:** **PASS** en `validate` y `supabase-integration`.
 
 Phase 03 queda limitada a descubrimiento público, búsqueda, filtros, ubicación aproximada, favoritos de providers, SEO, sitemap y pruebas asociadas. No se inició Phase 04 en esta rama y no se agregaron chat, propuestas, jobs, pagos, reviews, reputación, notificaciones ni administración.
@@ -67,11 +68,6 @@ Los errores de discovery son recuperables. Un retry GPS exitoso limpia el error 
 
 CI ejecuta Lighthouse mobile sobre `/` y `/buscar` contra el build de producción. El umbral mínimo de performance quedó fijado en **60** para ambas rutas.
 
-En el run funcional final `33422211214`:
-
-- `/` → **76**;
-- `/buscar` → **95**.
-
 No se agregó mapa ni bundle de mapas en Phase 03. La lista continúa siendo la superficie principal.
 
 ## Migraciones de Phase 03
@@ -84,7 +80,7 @@ Las migraciones se agregaron de forma incremental; no se reescribieron migracion
 
 ## Evidencia de pruebas final
 
-GitHub Actions run `33422211214` validó el HEAD funcional `bc4bd2c897e3c32cdc6f55a67bc06ec0e919942a`.
+GitHub Actions run `33428499956` validó el HEAD combinado `5c1a8e0c92e5e5adee1cdb4e7c5da4ac3ee6e770`.
 
 ### Job `validate`
 
@@ -98,8 +94,6 @@ PASS en:
 - Prettier/format check;
 - `git diff --check`.
 
-Vitest: **13 archivos / 35 tests PASS**.
-
 ### Job `supabase-integration`
 
 PASS en:
@@ -107,25 +101,23 @@ PASS en:
 - Supabase local desde cero;
 - reset completo de DB;
 - aplicación de todas las migraciones;
-- pgTAP completo: **6 archivos / 164 assertions PASS**;
+- pgTAP completo, incluyendo el regression test transaccional de Phase 02;
 - comprobación EXPLAIN del índice `services_search_text_trgm_idx`;
 - runtime de seguridad RLS/Storage;
 - runtime de seguridad específico de Discovery;
 - reset con seed sintético;
-- build para browser smoke tests;
+- production build para browser smoke tests;
 - Lighthouse mobile;
-- Playwright desktop y Pixel 5;
+- Playwright Desktop Chrome y Pixel 5, incluyendo el E2E autenticado de gestión de provider sincronizado desde Phase 02;
 - shutdown limpio de Supabase.
 
-Playwright: **28/28 journeys PASS**. Incluye búsqueda, filtros, categorías, paginación, páginas compartibles, favoritos anónimos, sitemap index/chunks, GPS paginado y recuperación después de un error GPS.
+Todos los pasos del job `supabase-integration` terminaron con `conclusion: success`.
 
 ## Incidencias relevantes resueltas durante la fase
 
-Durante la implementación se detectaron y corrigieron problemas reales de SQL/RPC, fixtures, ambigüedad de columnas, sintaxis lateral, EXPLAIN, sitemap dinámico de Next y formato. Ninguno queda abierto en el HEAD funcional validado.
+Durante la implementación se detectaron y corrigieron problemas reales de SQL/RPC, fixtures, ambigüedad de columnas, sintaxis lateral, EXPLAIN, sitemap dinámico de Next, privacidad de distancias y formato. Ninguno queda abierto en el HEAD final validado.
 
-El primer enfoque de sitemap usando generación estática de Next chocaba con acceso a cookies durante build. Se reemplazó por rutas runtime sin sesión, manteniendo el sitemap index/chunks y evitando depender del contexto de autenticación.
-
-La descarga inicial de imágenes Docker de Supabase recibió rate limiting temporal de ECR durante el run final, pero la CLI reintentó y el entorno inició correctamente; todos los tests posteriores pasaron.
+La rama de Discovery había nacido antes del cierre transaccional final de Phase 02. Ese cierre se sincronizó de forma aditiva al final de Phase 03 sin reescribir las migraciones publicadas ni perder el historial de Discovery. El CI combinado posterior volvió a ejecutar toda la matriz y quedó verde.
 
 ## Cierre de Phase 03
 
@@ -139,6 +131,7 @@ Los criterios del master plan quedan cubiertos:
 - SEO y sitemap escalable;
 - performance mobile con threshold ejecutable en CI;
 - sin bundle de mapa innecesario;
-- RLS/runtime/E2E verdes.
+- RLS/runtime/E2E verdes;
+- cierre transaccional de Phase 02 integrado y revalidado en el mismo HEAD base.
 
 **Phase 03 queda aprobada para servir como base de `codex/phase-04-conversations`.**
