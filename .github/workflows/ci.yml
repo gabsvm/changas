@@ -84,9 +84,28 @@ jobs:
 
       - name: Verify discovery fuzzy index path
         run: |
-          plan=$(pnpm dlx supabase@2.116.0 db query --local "set enable_seqscan = off; explain (costs off) select id from public.services where search_text_normalized operator(extensions.%) 'electricista';")
+          plan=$(pnpm dlx supabase@2.116.0 db query --local 'do $$
+          declare
+            plan_line text;
+            used_index boolean := false;
+          begin
+            perform set_config($setting$enable_seqscan$setting$, $value$off$value$, true);
+            for plan_line in execute $query$
+              explain (costs off)
+              select id
+              from public.services
+              where search_text_normalized operator(extensions.%) $q$electricista$q$
+            $query$ loop
+              raise notice $notice$%$notice$, plan_line;
+              if plan_line like $pattern$%services_search_text_trgm_idx%$pattern$ then
+                used_index := true;
+              end if;
+            end loop;
+            if not used_index then
+              raise exception $error$discovery trigram index was not used$error$;
+            end if;
+          end $$;')
           printf '%s\n' "$plan"
-          printf '%s\n' "$plan" | grep -F "services_search_text_trgm_idx"
 
       - name: Export local Supabase credentials
         shell: bash
