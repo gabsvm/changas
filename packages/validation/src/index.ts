@@ -76,6 +76,63 @@ export const identityDocumentSchema = z.object({
 
 export const messageTextSchema = z.string().trim().min(1).max(4000);
 
+export const conversationImageMimeTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
+
+export const conversationFileMimeTypes = [
+  "application/pdf",
+  "text/plain",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+] as const;
+
+export const maxConversationAttachmentBytes = 10 * 1024 * 1024;
+export const maxConversationAttachmentsPerMessage = 4;
+
+export const conversationAttachmentSchema = z
+  .object({
+    kind: z.enum(["IMAGE", "FILE"]),
+    mimeType: z.string().trim().min(1).max(160),
+    fileSizeBytes: z.number().int().positive().max(maxConversationAttachmentBytes),
+    originalName: z.string().trim().min(1).max(180),
+  })
+  .superRefine((value, context) => {
+    const allowed =
+      value.kind === "IMAGE"
+        ? conversationImageMimeTypes
+        : conversationFileMimeTypes;
+    if (!(allowed as readonly string[]).includes(value.mimeType)) {
+      context.addIssue({
+        code: "custom",
+        path: ["mimeType"],
+        message: "Unsupported attachment type.",
+      });
+    }
+  });
+
+export function sanitizeAttachmentFilename(value: string): string {
+  const basename = value.split(/[\\/]/).pop() ?? "";
+  const normalized = basename
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Za-z0-9._-]+/g, "-")
+    .replace(/[-_.]{2,}/g, (match) => (match.includes(".") ? "." : "-"))
+    .replace(/^[.\-_]+|[.\-_]+$/g, "");
+
+  if (!normalized) return "archivo";
+  if (normalized.length <= 180) return normalized;
+
+  const dot = normalized.lastIndexOf(".");
+  const extension = dot > 0 ? normalized.slice(dot).slice(0, 20) : "";
+  const stemLimit = Math.max(1, 180 - extension.length);
+  const stem = (dot > 0 ? normalized.slice(0, dot) : normalized)
+    .slice(0, stemLimit)
+    .replace(/[.\-_]+$/g, "");
+  return `${stem || "archivo"}${extension}`.slice(0, 180);
+}
+
 const uuidSchema = z.uuid();
 const dateSchema = z.iso.date();
 const timeSchema = z.iso.time({ precision: -1 });
