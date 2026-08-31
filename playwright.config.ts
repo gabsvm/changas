@@ -24,7 +24,6 @@ export default defineConfig({
     command: "pnpm --filter @changas/web start",
     url: "http://127.0.0.1:3000",
     reuseExistingServer:
-      Boolean(process.env.PLAYWRIGHT_REUSE_EXISTING_SERVER) ||
-      !process.env.CI,
+      Boolean(process.env.PLAYWRIGHT_REUSE_EXISTING_SERVER) || !process.env.CI,
   },
 });
