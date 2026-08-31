@@ -3,11 +3,7 @@ import type { LeakageSignalType } from "@changas/domain";
 import { createClient } from "@/lib/supabase/server";
 
 export type ConversationErrorCode =
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "CONFLICT"
-  | "TRANSIENT";
+  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
 
 export class ConversationServerError extends Error {
   constructor(

@@ -17,8 +17,7 @@ export function assessOutgoingMessage(
   );
 
   return {
-    action:
-      signalTypes.length > 0 && !explicitlyConfirmed ? "WARN" : "SEND",
+    action: signalTypes.length > 0 && !explicitlyConfirmed ? "WARN" : "SEND",
     signalTypes,
   };
 }

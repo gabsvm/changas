@@ -1,9 +1,6 @@
 "use server";
 
-import {
-  assessOutgoingMessage,
-  type LeakageSignalType,
-} from "@changas/domain";
+import { assessOutgoingMessage, type LeakageSignalType } from "@changas/domain";
 import { messageTextSchema } from "@changas/validation";
 
 import { sendConversationText } from "@/lib/conversations/messages";

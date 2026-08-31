@@ -1,11 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { sendConversationText, recordConversationModerationWarning } = vi.hoisted(
-  () => ({
+const { sendConversationText, recordConversationModerationWarning } =
+  vi.hoisted(() => ({
     sendConversationText: vi.fn(),
     recordConversationModerationWarning: vi.fn(),
-  }),
-);
+  }));
 
 vi.mock("@/lib/conversations/messages", () => ({
   sendConversationText,
