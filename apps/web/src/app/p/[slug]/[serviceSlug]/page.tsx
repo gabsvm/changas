@@ -10,9 +10,9 @@ export const dynamic = "force-dynamic";
 export default async function PublicServicePage({
   params,
 }: {
-  params: Promise<{ providerSlug: string; serviceSlug: string }>;
+  params: Promise<{ slug: string; serviceSlug: string }>;
 }) {
-  const { providerSlug, serviceSlug } = await params;
+  const { slug: providerSlug, serviceSlug } = await params;
   const supabase = await createClient();
   const [{ data: service }, { data: provider }, { data: tags }] =
     await Promise.all([
