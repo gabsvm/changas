@@ -63,7 +63,7 @@ select ok(
   'public provider projection has no fake verification claim'
 );
 select ok(
-  (select array_agg(column_name order by ordinal_position)
+  (select array_agg(column_name::text order by ordinal_position)
    from information_schema.columns
    where table_schema = 'public'
      and table_name = 'public_service_tags') =

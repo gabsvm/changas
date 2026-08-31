@@ -134,7 +134,7 @@ begin
      ) then
     raise exception 'service does not belong to the authenticated provider'
       using errcode = '42501';
-  elsif current_setting('request.jwt.claim.role', true) not in ('authenticated', 'service_role')
+  elsif coalesce(current_setting('request.jwt.claim.role', true), '') not in ('authenticated', 'service_role')
         and session_user not in ('postgres', 'service_role') then
     raise exception 'service tag replacement is restricted to provider or server roles'
       using errcode = '42501';
