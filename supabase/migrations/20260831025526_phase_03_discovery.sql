@@ -272,50 +272,50 @@ begin
     select
       eligible.*,
       (
-        least(greatest(text_relevance, 0), 1) * 1.5
-        + case when exact_skill_match then 0.45 else 0 end
-        + case when exact_category_match then 0.25 else 0 end
-        + case when tag_match then 0.15 else 0 end
-        + case when synonym_match then 0.2 else 0 end
+        least(greatest(eligible.text_relevance, 0), 1) * 1.5
+        + case when eligible.exact_skill_match then 0.45 else 0 end
+        + case when eligible.exact_category_match then 0.25 else 0 end
+        + case when eligible.tag_match then 0.15 else 0 end
+        + case when eligible.synonym_match then 0.2 else 0 end
         + case
-            when distance_meters is null then 0
-            else greatest(0::numeric, 0.2 - least(distance_meters, 20000)::numeric / 100000)
+            when eligible.distance_meters is null then 0
+            else greatest(0::numeric, 0.2 - least(eligible.distance_meters, 20000)::numeric / 100000)
           end
       )::numeric as discovery_relevance
     from eligible
   )
   select
-    display_name,
-    avatar_url,
-    public_slug,
-    public_zone,
-    title,
-    service_public_slug,
-    service_category_slug,
-    service_category_name,
-    service_skill_slug,
-    service_skill_name,
-    service_modality,
-    service_price_model,
-    service_price_amount,
-    service_currency_code,
-    service_price_unit,
-    service_accepts_offers,
-    distance_meters,
-    discovery_relevance
+    scored.display_name,
+    scored.avatar_url,
+    scored.public_slug,
+    scored.public_zone,
+    scored.title,
+    scored.service_public_slug,
+    scored.service_category_slug,
+    scored.service_category_name,
+    scored.service_skill_slug,
+    scored.service_skill_name,
+    scored.service_modality,
+    scored.service_price_model,
+    scored.service_price_amount,
+    scored.service_currency_code,
+    scored.service_price_unit,
+    scored.service_accepts_offers,
+    scored.distance_meters,
+    scored.discovery_relevance
   from scored
   where (
     origin_point is null
     or modality_filter is distinct from 'IN_PERSON'
-    or distance_meters is not null
+    or scored.distance_meters is not null
   )
   order by
-    case when sort_key = 'recommended' then discovery_relevance end desc nulls last,
-    case when sort_key = 'nearest' then distance_meters end asc nulls last,
-    case when sort_key = 'price-asc' then service_price_amount end asc nulls last,
-    case when sort_key = 'price-desc' then service_price_amount end desc nulls last,
-    public_slug,
-    service_public_slug
+    case when sort_key = 'recommended' then scored.discovery_relevance end desc nulls last,
+    case when sort_key = 'nearest' then scored.distance_meters end asc nulls last,
+    case when sort_key = 'price-asc' then scored.service_price_amount end asc nulls last,
+    case when sort_key = 'price-desc' then scored.service_price_amount end desc nulls last,
+    scored.public_slug,
+    scored.service_public_slug
   limit page_size
   offset (page_number - 1) * page_size;
 end;
