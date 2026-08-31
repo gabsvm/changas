@@ -21,7 +21,8 @@ function isDiscoveryRow(value: unknown): value is DiscoveryServiceRow {
     typeof row.modality === "string" &&
     typeof row.price_model === "string" &&
     typeof row.currency_code === "string" &&
-    typeof row.accepts_offers === "boolean"
+    typeof row.accepts_offers === "boolean" &&
+    typeof row.has_more === "boolean"
   );
 }
 

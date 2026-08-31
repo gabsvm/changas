@@ -1,16 +1,26 @@
 import type { Metadata, Viewport } from "next";
 
+import { getPublicSiteUrl } from "@changas/config/public";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getPublicSiteUrl()),
   title: {
     default: "Changas",
     template: "%s · Changas",
   },
   description:
     "Una base confiable para conectar habilidades con oportunidades.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Changas",
+    description:
+      "Una base confiable para conectar habilidades con oportunidades.",
+    type: "website",
+    url: "/",
+  },
 };
 
 export const viewport: Viewport = {

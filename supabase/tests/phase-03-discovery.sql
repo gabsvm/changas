@@ -1,6 +1,6 @@
 begin;
 
-select plan(36);
+select plan(43);
 
 select ok(
   to_regprocedure('public.normalize_search_text(text)') is not null,
@@ -16,12 +16,22 @@ select ok(
   'discovery has one bounded server-side RPC'
 );
 select ok(
+  to_regprocedure('public.search_discovery_services_v2(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)') is not null,
+  'discovery v2 exposes the paginated audit-hardened contract'
+);
+select ok(
   has_function_privilege('anon', 'public.search_discovery_services(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE'),
   'anon can execute only the safe discovery RPC'
 );
 select ok(
   has_function_privilege('authenticated', 'public.search_discovery_services(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE'),
   'authenticated can execute the safe discovery RPC'
+);
+select ok(
+  has_function_privilege('anon', 'public.search_discovery_services_v2(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE')
+    and has_function_privilege('authenticated', 'public.search_discovery_services_v2(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE')
+    and not has_function_privilege('public', 'public.search_discovery_services_v2(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE'),
+  'v2 grants execution only to explicit API roles'
 );
 select ok(
   not exists (
@@ -47,9 +57,12 @@ select ok(
   'anon has no favorite access and authenticated cannot update favorite ownership'
 );
 select ok(
-  has_table_privilege('authenticated', 'public.provider_favorites', 'SELECT, INSERT, DELETE')
+  has_table_privilege('authenticated', 'public.provider_favorites', 'SELECT')
+    and not has_table_privilege('authenticated', 'public.provider_favorites', 'INSERT')
+    and not has_table_privilege('authenticated', 'public.provider_favorites', 'UPDATE')
+    and not has_table_privilege('authenticated', 'public.provider_favorites', 'DELETE')
     and has_table_privilege('service_role', 'public.provider_favorites', 'SELECT, INSERT, UPDATE, DELETE'),
-  'favorite grants are explicit for owner operations and service role administration'
+  'favorite grants expose only authenticated reads and service-role administration'
 );
 select ok(
   has_function_privilege('authenticated', 'public.set_provider_favorite(text, boolean)', 'EXECUTE')
@@ -66,17 +79,13 @@ select ok(
   'favorite table keeps RLS enabled'
 );
 select ok(
-  (select count(*) = 3
+  (select count(*) = 1
    from pg_policies
    where schemaname = 'public'
      and tablename = 'provider_favorites'
      and roles = array['authenticated']::name[]
-     and policyname in (
-       'provider_favorites_select_own',
-       'provider_favorites_insert_own',
-       'provider_favorites_delete_own'
-     )),
-  'favorites have authenticated owner-only select/insert/delete policies'
+     and policyname = 'provider_favorites_select_own'),
+  'favorites have only an authenticated owner-only read policy'
 );
 
 select ok(
@@ -86,6 +95,16 @@ select ok(
 select ok(
   to_regclass('public.services_search_text_trgm_idx') is not null,
   'services have a trigram fuzzy-search index'
+);
+select ok(
+  exists (
+    select 1
+    from pg_indexes
+    where schemaname = 'public'
+      and indexname = 'services_search_text_trgm_idx'
+      and indexdef like '%search_text_normalized%'
+  ),
+  'trigram fuzzy predicate uses the stored normalized search expression'
 );
 select ok(
   to_regclass('public.service_areas_center_gist_idx') is not null,
@@ -131,12 +150,14 @@ insert into auth.users (
   email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data
 ) values
   ('00000000-0000-0000-0000-000000000000', '03300000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'phase03-pgtap-a@example.test', 'not-a-real-password', now(), now(), now(), '{}', '{"display_name":"PGTAP A"}'),
-  ('00000000-0000-0000-0000-000000000000', '03300000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'phase03-pgtap-b@example.test', 'not-a-real-password', now(), now(), now(), '{}', '{"display_name":"PGTAP B"}');
+  ('00000000-0000-0000-0000-000000000000', '03300000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'phase03-pgtap-b@example.test', 'not-a-real-password', now(), now(), now(), '{}', '{"display_name":"PGTAP B"}'),
+  ('00000000-0000-0000-0000-000000000000', '03300000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'phase03-pgtap-c@example.test', 'not-a-real-password', now(), now(), now(), '{}', '{"display_name":"PGTAP C"}');
 
 insert into public.provider_profiles (user_id, status, onboarding_step, public_slug, public_headline)
 values
   ('03300000-0000-4000-8000-000000000001', 'ACTIVE', 4, 'pgtap-discovery-a', 'PGTAP discovery A'),
-  ('03300000-0000-4000-8000-000000000002', 'PROFILE_INCOMPLETE', 1, 'pgtap-discovery-b', 'PGTAP discovery B');
+  ('03300000-0000-4000-8000-000000000002', 'PROFILE_INCOMPLETE', 1, 'pgtap-discovery-b', 'PGTAP discovery B'),
+  ('03300000-0000-4000-8000-000000000003', 'ACTIVE', 4, 'pgtap-discovery-c', 'PGTAP discovery C');
 
 insert into public.provider_skills (provider_user_id, skill_id)
 select '03300000-0000-4000-8000-000000000001', id
@@ -146,6 +167,10 @@ insert into public.provider_skills (provider_user_id, skill_id)
 select '03300000-0000-4000-8000-000000000002', id
 from public.skills
 where slug = 'instalacion-camaras';
+insert into public.provider_skills (provider_user_id, skill_id)
+select '03300000-0000-4000-8000-000000000003', id
+from public.skills
+where slug = 'electricista';
 
 insert into public.services (
   provider_user_id, skill_id, public_slug, title, description, modality,
@@ -194,6 +219,27 @@ select
 from public.skills s
 where s.slug = 'instalacion-camaras';
 
+insert into public.services (
+  provider_user_id, skill_id, public_slug, title, description, modality,
+  price_model, price_amount, currency_code, accepts_offers,
+  schedule_type, is_published
+)
+select
+  '03300000-0000-4000-8000-000000000003',
+  s.id,
+  'pgtap-cobertura',
+  'Cobertura de área',
+  'Servicio sintético para validar el radio de cobertura del proveedor.',
+  'IN_PERSON',
+  'FIXED',
+  900000,
+  'ARS',
+  true,
+  'UNSCHEDULED',
+  true
+from public.skills s
+where s.slug = 'electricista';
+
 insert into public.service_tags (service_id, tag)
 select id, 'instalar camara'
 from public.services
@@ -203,7 +249,8 @@ insert into public.service_areas (provider_user_id, label, center, radius_meters
 values
   ('03300000-0000-4000-8000-000000000001', 'Área cercana', extensions.st_setsrid(extensions.st_makepoint(-58.43, -34.58), 4326)::extensions.geography, 5000, true),
   ('03300000-0000-4000-8000-000000000001', 'Área lejana', extensions.st_setsrid(extensions.st_makepoint(-58.60, -34.70), 4326)::extensions.geography, 5000, true),
-  ('03300000-0000-4000-8000-000000000002', 'Área apagada', extensions.st_setsrid(extensions.st_makepoint(-58.43, -34.58), 4326)::extensions.geography, 5000, false);
+  ('03300000-0000-4000-8000-000000000002', 'Área apagada', extensions.st_setsrid(extensions.st_makepoint(-58.43, -34.58), 4326)::extensions.geography, 5000, false),
+  ('03300000-0000-4000-8000-000000000003', 'Cobertura variable', extensions.st_setsrid(extensions.st_makepoint(-58.43, -34.76), 4326)::extensions.geography, 5000, true);
 
 select ok(
   exists (select 1 from public.search_discovery_services('electricista', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
@@ -291,6 +338,38 @@ select ok(
   ),
   'outside-radius matching excludes in-person offerings'
 );
+select ok(
+  not exists (
+    select 1
+    from public.search_discovery_services('cobertura', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 25000, 'nearest', 1, 24)
+    where service_slug = 'pgtap-cobertura'
+  ),
+  'provider coverage radius excludes a center inside the client radius but outside the provider radius'
+);
+update public.service_areas
+set center = extensions.st_setsrid(extensions.st_makepoint(-58.43, -34.616), 4326)::extensions.geography,
+    radius_meters = 5000
+where provider_user_id = '03300000-0000-4000-8000-000000000003';
+select ok(
+  exists (
+    select 1
+    from public.search_discovery_services('cobertura', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 10000, 'nearest', 1, 24)
+    where service_slug = 'pgtap-cobertura'
+  ),
+  'provider coverage radius allows a point inside both provider and client radii'
+);
+update public.service_areas
+set center = extensions.st_setsrid(extensions.st_makepoint(-58.43, -34.652), 4326)::extensions.geography,
+    radius_meters = 10000
+where provider_user_id = '03300000-0000-4000-8000-000000000003';
+select ok(
+  not exists (
+    select 1
+    from public.search_discovery_services('cobertura', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 5000, 'nearest', 1, 24)
+    where service_slug = 'pgtap-cobertura'
+  ),
+  'client discovery radius remains an independent upper bound'
+);
 update public.provider_profiles
 set status = 'ACTIVE'
 where public_slug = 'pgtap-discovery-b';
@@ -331,6 +410,19 @@ select ok(
 select ok(
   (select count(*) from public.search_discovery_services(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 2)) = 2,
   'discovery pagination enforces the requested bounded page size'
+);
+select ok(
+  exists (
+    select 1
+    from public.search_discovery_services_v2(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 2)
+    where has_more
+  )
+  and not exists (
+    select 1
+    from public.search_discovery_services_v2(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 3, 2)
+    where has_more
+  ),
+  'v2 pagination exposes has_more without returning an extra row'
 );
 
 select * from finish();

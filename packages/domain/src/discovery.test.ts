@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   normalizeDiscoveryQuery,
   parseDiscoveryFilters,
+  parseDiscoveryFiltersFromInternal,
   rankDiscoveryResult,
 } from "./discovery";
 
@@ -21,8 +22,8 @@ describe("discovery domain helpers", () => {
         sort: "price-asc",
         page: "0",
         pageSize: "999",
-        min: "1000",
-        max: "5000",
+        min: "8000",
+        max: "10000",
         offers: "true",
         priceModel: "hourly",
       }),
@@ -31,8 +32,8 @@ describe("discovery domain helpers", () => {
       sort: "price-asc",
       page: 1,
       pageSize: 24,
-      minPrice: 1000,
-      maxPrice: 5000,
+      minPrice: 800000,
+      maxPrice: 1000000,
       acceptsOffers: true,
       priceModel: "HOURLY",
       categorySlug: null,
@@ -40,6 +41,34 @@ describe("discovery domain helpers", () => {
       locationSlug: null,
       radiusMeters: null,
     });
+  });
+
+  it("keeps internal geolocation filters in minor units without converting twice", () => {
+    expect(
+      parseDiscoveryFiltersFromInternal({
+        minPrice: 900000,
+        maxPrice: 1000000,
+        modality: "REMOTE",
+        page: 2,
+      }),
+    ).toMatchObject({
+      minPrice: 900000,
+      maxPrice: 1000000,
+      modality: "REMOTE",
+      page: 2,
+    });
+  });
+
+  it("rejects invalid, negative, and overflowing human price URL values", () => {
+    expect(parseDiscoveryFilters({ min: "-1" }).minPrice).toBeNull();
+    expect(parseDiscoveryFilters({ min: "abc" }).minPrice).toBeNull();
+    expect(parseDiscoveryFilters({ min: "90071992547409.92" }).minPrice).toBe(
+      null,
+    );
+    expect(parseDiscoveryFilters({ min: "1.234" }).minPrice).toBeNull();
+    expect(
+      parseDiscoveryFiltersFromInternal({ minPrice: -1, maxPrice: 2 }),
+    ).toMatchObject({ minPrice: null, maxPrice: 2 });
   });
 
   it("gives exact skill and synonym matches a deterministic advantage", () => {
@@ -71,5 +100,45 @@ describe("discovery domain helpers", () => {
         distanceMeters: null,
       }),
     ).toBe(0);
+  });
+
+  it("keeps the new-provider exposure signal modest and subordinate to relevance", () => {
+    const establishedRelevant = rankDiscoveryResult({
+      textRelevance: 0.8,
+      exactSkillMatch: false,
+      exactCategoryMatch: false,
+      tagMatch: false,
+      synonymMatch: false,
+      distanceMeters: null,
+    });
+    const newBarelyRelevant = rankDiscoveryResult({
+      textRelevance: 0.77,
+      exactSkillMatch: false,
+      exactCategoryMatch: false,
+      tagMatch: false,
+      synonymMatch: false,
+      distanceMeters: null,
+      newProviderExposure: true,
+    });
+    const established = rankDiscoveryResult({
+      textRelevance: 0.4,
+      exactSkillMatch: false,
+      exactCategoryMatch: false,
+      tagMatch: false,
+      synonymMatch: false,
+      distanceMeters: null,
+    });
+    const newProvider = rankDiscoveryResult({
+      textRelevance: 0.4,
+      exactSkillMatch: false,
+      exactCategoryMatch: false,
+      tagMatch: false,
+      synonymMatch: false,
+      distanceMeters: null,
+      newProviderExposure: true,
+    });
+
+    expect(establishedRelevant).toBeGreaterThan(newBarelyRelevant);
+    expect(newProvider - established).toBeCloseTo(0.04, 6);
   });
 });

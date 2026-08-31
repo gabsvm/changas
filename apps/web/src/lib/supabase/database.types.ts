@@ -535,6 +535,7 @@ export type DiscoveryServiceRow = {
   accepts_offers: boolean;
   distance_meters: number | null;
   relevance: number;
+  has_more: boolean;
 };
 
 type ProviderFavoritesRow = {
@@ -666,6 +667,25 @@ export type Database = {
         Returns: string;
       };
       search_discovery_services: {
+        Args: {
+          accepts_offers_filter?: boolean;
+          category_filter?: string;
+          max_price?: number;
+          min_price?: number;
+          modality_filter?: ServiceModalityType;
+          origin_lat?: number;
+          origin_lng?: number;
+          page_number?: number;
+          page_size?: number;
+          price_model_filter?: PriceModelType;
+          query_text?: string;
+          radius_meters?: number;
+          skill_filter?: string;
+          sort_key?: string;
+        };
+        Returns: Omit<DiscoveryServiceRow, "has_more">[];
+      };
+      search_discovery_services_v2: {
         Args: {
           accepts_offers_filter?: boolean;
           category_filter?: string;

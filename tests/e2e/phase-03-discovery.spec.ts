@@ -47,7 +47,7 @@ test.describe("Phase 03 public discovery", () => {
 
   test("URL-addressable filters narrow public results", async ({ page }) => {
     await page.goto(
-      "/buscar?category=tecnologia&skill=soporte-tecnico-remoto&priceModel=STARTING_AT&min=800000&max=1000000&offers=true",
+      "/buscar?category=tecnologia&skill=soporte-tecnico-remoto&priceModel=STARTING_AT&min=8000&max=10000&offers=true",
     );
     await expect(
       page.getByRole("link", { name: "Soporte técnico remoto" }),
@@ -59,6 +59,8 @@ test.describe("Phase 03 public discovery", () => {
     await expect(page.locator("#search-price-model")).toHaveValue(
       "STARTING_AT",
     );
+    await expect(page.locator("#search-min")).toHaveValue("8000");
+    await expect(page.locator("#search-max")).toHaveValue("10000");
     await expect(page.locator("#search-offers")).toBeChecked();
   });
 
@@ -72,6 +74,18 @@ test.describe("Phase 03 public discovery", () => {
     await expect(
       page.getByRole("link", { name: "Revisión de PC a distancia" }),
     ).toBeVisible();
+  });
+
+  test("pagination preserves public filters and uses real page state", async ({
+    page,
+  }) => {
+    await page.goto("/buscar?category=tecnologia&pageSize=1");
+    await expect(page.getByRole("link", { name: "Siguiente" })).toBeVisible();
+    await page.getByRole("link", { name: "Siguiente" }).click();
+    await expect(page).toHaveURL(
+      /\/buscar\?category=tecnologia&pageSize=1&page=2/,
+    );
+    await expect(page.getByRole("link", { name: "Anterior" })).toBeVisible();
   });
 
   test("public provider and service pages remain shareable", async ({

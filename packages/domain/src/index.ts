@@ -30,6 +30,7 @@ export {
 export {
   normalizeDiscoveryQuery,
   parseDiscoveryFilters,
+  parseDiscoveryFiltersFromInternal,
   rankDiscoveryResult,
   type DiscoveryFilters,
   type DiscoveryRankingSignals,

@@ -4,6 +4,7 @@ import {
   type PriceModel,
   type ServiceModality,
 } from "./marketplace";
+import { parseMajorAmountToMinor } from "./money";
 
 export type DiscoverySort =
   "recommended" | "nearest" | "price-asc" | "price-desc";
@@ -60,6 +61,21 @@ function positiveIntegerOrNull(value: string | undefined): number | null {
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
+function positiveInternalIntegerOrNull(value: unknown): number | null {
+  return typeof value === "number" && Number.isSafeInteger(value) && value > 0
+    ? value
+    : null;
+}
+
+function humanPriceToMinorOrNull(value: string | undefined): number | null {
+  if (!value?.trim()) return null;
+  try {
+    return parseMajorAmountToMinor(value);
+  } catch {
+    return null;
+  }
+}
+
 function parseMode(value: string | undefined): ServiceModality | null {
   if (value === "presencial") return "IN_PERSON";
   if (value === "remoto") return "REMOTE";
@@ -91,8 +107,8 @@ export function parseDiscoveryFilters(
     Math.max(1, positiveIntegerOrNull(params.pageSize) ?? MAX_PAGE_SIZE),
   );
   const radius = positiveIntegerOrNull(params.radius);
-  const minPrice = positiveIntegerOrNull(params.min);
-  const maxPrice = positiveIntegerOrNull(params.max);
+  const minPrice = humanPriceToMinorOrNull(params.min);
+  const maxPrice = humanPriceToMinorOrNull(params.max);
   const sort = SORTS.includes(params.sort as DiscoverySort)
     ? (params.sort as DiscoverySort)
     : "recommended";
@@ -112,6 +128,61 @@ export function parseDiscoveryFilters(
     radiusMeters: radius
       ? Math.min(MAX_RADIUS_METERS, Math.max(100, radius))
       : params.location
+        ? DEFAULT_RADIUS_METERS
+        : null,
+  };
+}
+
+export function parseDiscoveryFiltersFromInternal(
+  input: Record<string, unknown>,
+): DiscoveryFilters {
+  const page = Math.min(
+    MAX_PAGE,
+    Math.max(1, positiveInternalIntegerOrNull(input.page) ?? 1),
+  );
+  const pageSize = Math.min(
+    MAX_PAGE_SIZE,
+    Math.max(1, positiveInternalIntegerOrNull(input.pageSize) ?? MAX_PAGE_SIZE),
+  );
+  const radius = positiveInternalIntegerOrNull(input.radiusMeters);
+  const modality =
+    typeof input.modality === "string" ? parseMode(input.modality) : null;
+  const sort =
+    typeof input.sort === "string" &&
+    SORTS.includes(input.sort as DiscoverySort)
+      ? (input.sort as DiscoverySort)
+      : "recommended";
+  const minPrice = positiveInternalIntegerOrNull(input.minPrice);
+  const maxPrice = positiveInternalIntegerOrNull(input.maxPrice);
+  const locationSlug =
+    typeof input.locationSlug === "string" && input.locationSlug.trim()
+      ? input.locationSlug.trim()
+      : null;
+
+  return {
+    modality,
+    sort,
+    page,
+    pageSize,
+    minPrice,
+    maxPrice,
+    acceptsOffers: input.acceptsOffers === true ? true : null,
+    priceModel:
+      typeof input.priceModel === "string"
+        ? parsePriceModel(input.priceModel)
+        : null,
+    categorySlug:
+      typeof input.categorySlug === "string" && input.categorySlug.trim()
+        ? input.categorySlug.trim()
+        : null,
+    skillSlug:
+      typeof input.skillSlug === "string" && input.skillSlug.trim()
+        ? input.skillSlug.trim()
+        : null,
+    locationSlug,
+    radiusMeters: radius
+      ? Math.min(MAX_RADIUS_METERS, Math.max(100, radius))
+      : locationSlug
         ? DEFAULT_RADIUS_METERS
         : null,
   };

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { parseDiscoveryFilters } from "@changas/domain";
 
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
+import { DiscoveryPagination } from "@/components/discovery/discovery-pagination";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -46,14 +47,27 @@ export async function generateMetadata({
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
+  const queryParams = await searchParams;
   const { data: category } = await getCategory(slug);
   if (!category) notFound();
-  const filters = parseDiscoveryFilters({ category: category.slug });
-  const { rows } = await searchDiscovery({ query: "", filters });
+  const pageParam = Array.isArray(queryParams.page)
+    ? queryParams.page[0]
+    : queryParams.page;
+  const pageSizeParam = Array.isArray(queryParams.pageSize)
+    ? queryParams.pageSize[0]
+    : queryParams.pageSize;
+  const filters = parseDiscoveryFilters({
+    category: category.slug,
+    page: pageParam,
+    pageSize: pageSizeParam,
+  });
+  const { rows, hasMore } = await searchDiscovery({ query: "", filters });
 
   return (
     <main
@@ -92,6 +106,24 @@ export default async function CategoryPage({
           </p>
           <div className="mt-8">
             <DiscoveryResults initialRows={rows} query="" filters={filters} />
+            <DiscoveryPagination
+              previousHref={
+                filters.page > 1
+                  ? "/categoria/" +
+                    category.slug +
+                    "?page=" +
+                    (filters.page - 1)
+                  : null
+              }
+              nextHref={
+                hasMore
+                  ? "/categoria/" +
+                    category.slug +
+                    "?page=" +
+                    (filters.page + 1)
+                  : null
+              }
+            />
           </div>
         </section>
       </div>

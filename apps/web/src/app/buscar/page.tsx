@@ -2,11 +2,13 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 import {
+  minorUnitsToMajorInput,
   normalizeDiscoveryQuery,
   parseDiscoveryFilters,
 } from "@changas/domain";
 
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
+import { DiscoveryPagination } from "@/components/discovery/discovery-pagination";
 import { LocationPicker } from "@/components/discovery/location-picker";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
@@ -14,12 +16,40 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Buscar servicios",
   description: "Explorá servicios y habilidades publicados en Changas.",
+  robots: { index: false, follow: true },
 };
 
 export const dynamic = "force-dynamic";
 
 function stringParam(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+}
+
+function discoveryHref(
+  query: string,
+  filters: ReturnType<typeof parseDiscoveryFilters>,
+  page: number,
+): string {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (filters.categorySlug) params.set("category", filters.categorySlug);
+  if (filters.skillSlug) params.set("skill", filters.skillSlug);
+  if (filters.locationSlug) params.set("location", filters.locationSlug);
+  if (filters.modality === "IN_PERSON") params.set("mode", "presencial");
+  if (filters.modality === "REMOTE") params.set("mode", "remoto");
+  if (filters.minPrice !== null)
+    params.set("min", minorUnitsToMajorInput(filters.minPrice));
+  if (filters.maxPrice !== null)
+    params.set("max", minorUnitsToMajorInput(filters.maxPrice));
+  if (filters.radiusMeters !== null)
+    params.set("radius", String(filters.radiusMeters));
+  if (filters.acceptsOffers === true) params.set("offers", "true");
+  if (filters.priceModel) params.set("priceModel", filters.priceModel);
+  if (filters.sort !== "recommended") params.set("sort", filters.sort);
+  if (filters.pageSize !== 24) params.set("pageSize", String(filters.pageSize));
+  if (page > 1) params.set("page", String(page));
+  const search = params.toString();
+  return search ? "/buscar?" + search : "/buscar";
 }
 
 export default async function SearchPage({
@@ -57,7 +87,7 @@ export default async function SearchPage({
       .eq("is_active", true)
       .order("sort_order"),
   ]);
-  const { rows } = searchResult;
+  const { rows, hasMore } = searchResult;
   const categories = categoriesResult.data ?? [];
   const skills = skillsResult.data ?? [];
   const modeValue =
@@ -233,11 +263,12 @@ export default async function SearchPage({
                 </label>
                 <input
                   className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
-                  defaultValue={filters.minPrice ?? ""}
+                  defaultValue={minorUnitsToMajorInput(filters.minPrice)}
                   id="search-min"
-                  min="1"
+                  min="0.01"
                   name="min"
                   placeholder="ARS"
+                  step="0.01"
                   type="number"
                 />
               </div>
@@ -250,11 +281,12 @@ export default async function SearchPage({
                 </label>
                 <input
                   className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
-                  defaultValue={filters.maxPrice ?? ""}
+                  defaultValue={minorUnitsToMajorInput(filters.maxPrice)}
                   id="search-max"
-                  min="1"
+                  min="0.01"
                   name="max"
                   placeholder="ARS"
+                  step="0.01"
                   type="number"
                 />
               </div>
@@ -302,6 +334,16 @@ export default async function SearchPage({
               initialRows={rows}
               query={query}
               filters={filters}
+            />
+            <DiscoveryPagination
+              previousHref={
+                filters.page > 1
+                  ? discoveryHref(query, filters, filters.page - 1)
+                  : null
+              }
+              nextHref={
+                hasMore ? discoveryHref(query, filters, filters.page + 1) : null
+              }
             />
           </div>
         </section>

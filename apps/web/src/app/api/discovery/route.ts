@@ -1,4 +1,4 @@
-import { parseDiscoveryFilters } from "@changas/domain";
+import { parseDiscoveryFiltersFromInternal } from "@changas/domain";
 import { NextResponse } from "next/server";
 
 import {
@@ -13,10 +13,6 @@ type RequestBody = {
   latitude?: unknown;
   longitude?: unknown;
 };
-
-function stringParam(value: unknown): string | undefined {
-  return typeof value === "string" ? value : undefined;
-}
 
 export async function POST(request: Request) {
   let body: RequestBody;
@@ -39,23 +35,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const { rows, error } = await searchDiscovery({
+  const { rows, hasMore, error } = await searchDiscovery({
     query:
       typeof body.query === "string" ? body.query.trim().slice(0, 120) : "",
-    filters: parseDiscoveryFilters({
-      category: stringParam(filters.categorySlug),
-      location: undefined,
-      max: stringParam(filters.maxPrice),
-      min: stringParam(filters.minPrice),
-      mode: stringParam(filters.modality)?.toLowerCase(),
-      offers: filters.acceptsOffers === true ? "true" : undefined,
-      page: String(filters.page ?? "1"),
-      pageSize: String(filters.pageSize ?? "24"),
-      priceModel: stringParam(filters.priceModel),
-      radius: String(filters.radiusMeters ?? "10000"),
-      skill: stringParam(filters.skillSlug),
-      sort: stringParam(filters.sort),
-    }),
+    filters: parseDiscoveryFiltersFromInternal(filters),
     latitude,
     longitude,
   });
@@ -67,5 +50,5 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ rows: safeDiscoveryRows(rows) });
+  return NextResponse.json({ rows: safeDiscoveryRows(rows), hasMore });
 }

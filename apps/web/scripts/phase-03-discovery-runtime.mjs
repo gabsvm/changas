@@ -23,6 +23,10 @@ const password = "Phase03-" + runId + "-valid-password";
 const users = {
   owner: { email: "phase03-owner-" + runId + "@example.test", id: null },
   other: { email: "phase03-other-" + runId + "@example.test", id: null },
+  coverage: {
+    email: "phase03-coverage-" + runId + "@example.test",
+    id: null,
+  },
 };
 const serviceIds = [];
 const areaIds = [];
@@ -115,6 +119,7 @@ async function createService(
 try {
   await createSyntheticUser(users.owner);
   await createSyntheticUser(users.other);
+  await createSyntheticUser(users.coverage);
   const owner = await signIn(users.owner);
   const other = await signIn(users.other);
   const anonymous = createClient(supabaseUrl, anonKey, {
@@ -163,6 +168,15 @@ try {
   });
   assert(!otherProvider.error, "Could not create other provider.");
 
+  const coverageProvider = await admin.from("provider_profiles").insert({
+    user_id: users.coverage.id,
+    status: "ACTIVE",
+    onboarding_step: 4,
+    public_slug: "runtime-discovery-coverage-" + runId,
+    public_headline: "Coverage discovery fixture",
+  });
+  assert(!coverageProvider.error, "Could not create coverage provider.");
+
   const pcSkill = await getSkill("reparacion-pc");
   const cameraSkill = await getSkill("instalacion-camaras");
   const englishSkill = await getSkill("ingles-conversacional");
@@ -184,6 +198,11 @@ try {
     skill_id: cameraSkill,
   });
   assert(!otherSkill.error, "Could not add other catalog skill.");
+  const coverageSkill = await admin.from("provider_skills").insert({
+    provider_user_id: users.coverage.id,
+    skill_id: electricianSkill,
+  });
+  assert(!coverageSkill.error, "Could not add coverage catalog skill.");
 
   await createService(
     owner,
@@ -247,6 +266,18 @@ try {
   );
   serviceIds.push(inactiveService.data.id);
 
+  await createService(
+    admin,
+    users.coverage.id,
+    electricianSkill,
+    "runtime-coverage-" + runId,
+    "Cobertura de área",
+    "Fixture sintético para validar el radio propio del proveedor.",
+    "IN_PERSON",
+    "FIXED",
+    900000,
+  );
+
   const area = await admin
     .from("service_areas")
     .insert([
@@ -278,6 +309,22 @@ try {
     "Could not create service-area fixtures.",
   );
   areaIds.push(...area.data.map((entry) => entry.id));
+  const coverageArea = await admin
+    .from("service_areas")
+    .insert({
+      provider_user_id: users.coverage.id,
+      label: "Cobertura variable sintética",
+      center: "SRID=4326;POINT(-58.43 -34.76)",
+      radius_meters: 5000,
+      is_active: true,
+    })
+    .select("id")
+    .single();
+  assert(
+    !coverageArea.error && coverageArea.data,
+    "Could not create coverage area.",
+  );
+  areaIds.push(coverageArea.data.id);
 
   const requiredQueries = [
     "electricista",
@@ -287,11 +334,14 @@ try {
     "instalar camara",
   ];
   for (const query of requiredQueries) {
-    const { data, error } = await anonymous.rpc("search_discovery_services", {
-      query_text: query,
-      page_number: 1,
-      page_size: 24,
-    });
+    const { data, error } = await anonymous.rpc(
+      "search_discovery_services_v2",
+      {
+        query_text: query,
+        page_number: 1,
+        page_size: 24,
+      },
+    );
     assert(
       !error && data?.length,
       "No public result for required query: " + query,
@@ -302,7 +352,7 @@ try {
     );
   }
 
-  const filtered = await anonymous.rpc("search_discovery_services", {
+  const filtered = await anonymous.rpc("search_discovery_services_v2", {
     skill_filter: "ingles-conversacional",
     price_model_filter: "HOURLY",
     min_price: 100000,
@@ -319,7 +369,7 @@ try {
     "Combined category/skill, price, and offer filters did not narrow results.",
   );
 
-  const inside = await anonymous.rpc("search_discovery_services", {
+  const inside = await anonymous.rpc("search_discovery_services_v2", {
     query_text: "electricista",
     modality_filter: "IN_PERSON",
     origin_lat: -34.58,
@@ -349,7 +399,7 @@ try {
     "Radius result did not include safe approximate distance.",
   );
 
-  const outside = await anonymous.rpc("search_discovery_services", {
+  const outside = await anonymous.rpc("search_discovery_services_v2", {
     query_text: "electricista",
     modality_filter: "IN_PERSON",
     origin_lat: -34.8,
@@ -366,7 +416,81 @@ try {
     "Outside-radius service was returned.",
   );
 
-  const remote = await anonymous.rpc("search_discovery_services", {
+  const coverageOutsideProviderRadius = await anonymous.rpc(
+    "search_discovery_services_v2",
+    {
+      query_text: "cobertura",
+      modality_filter: "IN_PERSON",
+      origin_lat: -34.58,
+      origin_lng: -58.43,
+      radius_meters: 25000,
+      page_number: 1,
+      page_size: 24,
+    },
+  );
+  assert(
+    !coverageOutsideProviderRadius.error &&
+      !coverageOutsideProviderRadius.data?.some(
+        (row) => row.service_slug === "runtime-coverage-" + runId,
+      ),
+    "Provider coverage radius was not enforced.",
+  );
+  const coverageAreaInsideBothRadii = await admin
+    .from("service_areas")
+    .update({
+      center: "SRID=4326;POINT(-58.43 -34.616)",
+      radius_meters: 5000,
+    })
+    .eq("id", coverageArea.data.id);
+  assert(!coverageAreaInsideBothRadii.error, "Could not update coverage area.");
+  const coverageInside = await anonymous.rpc("search_discovery_services_v2", {
+    query_text: "cobertura",
+    modality_filter: "IN_PERSON",
+    origin_lat: -34.58,
+    origin_lng: -58.43,
+    radius_meters: 10000,
+    page_number: 1,
+    page_size: 24,
+  });
+  assert(
+    !coverageInside.error &&
+      coverageInside.data?.some(
+        (row) => row.service_slug === "runtime-coverage-" + runId,
+      ),
+    "Provider inside both radii was not returned.",
+  );
+  const coverageAreaOutsideClientRadius = await admin
+    .from("service_areas")
+    .update({
+      center: "SRID=4326;POINT(-58.43 -34.652)",
+      radius_meters: 10000,
+    })
+    .eq("id", coverageArea.data.id);
+  assert(
+    !coverageAreaOutsideClientRadius.error,
+    "Could not update client-radius coverage area.",
+  );
+  const coverageOutsideClientRadius = await anonymous.rpc(
+    "search_discovery_services_v2",
+    {
+      query_text: "cobertura",
+      modality_filter: "IN_PERSON",
+      origin_lat: -34.58,
+      origin_lng: -58.43,
+      radius_meters: 5000,
+      page_number: 1,
+      page_size: 24,
+    },
+  );
+  assert(
+    !coverageOutsideClientRadius.error &&
+      !coverageOutsideClientRadius.data?.some(
+        (row) => row.service_slug === "runtime-coverage-" + runId,
+      ),
+    "Client discovery radius was not enforced independently.",
+  );
+
+  const remote = await anonymous.rpc("search_discovery_services_v2", {
     query_text: "clases ingles",
     modality_filter: "REMOTE",
     origin_lat: -34.8,
@@ -383,7 +507,7 @@ try {
     "Remote service was disadvantaged by physical radius.",
   );
 
-  const inactiveArea = await anonymous.rpc("search_discovery_services", {
+  const inactiveArea = await anonymous.rpc("search_discovery_services_v2", {
     query_text: "cámara",
     modality_filter: "IN_PERSON",
     origin_lat: -34.58,
@@ -398,6 +522,17 @@ try {
         (row) => row.service_slug === "runtime-inactive-area-" + runId,
       ),
     "Inactive service area was used for discovery.",
+  );
+
+  const firstPage = await anonymous.rpc("search_discovery_services_v2", {
+    page_number: 1,
+    page_size: 1,
+  });
+  assert(
+    !firstPage.error &&
+      firstPage.data?.length === 1 &&
+      firstPage.data[0].has_more === true,
+    "Discovery pagination did not report an available next page.",
   );
 
   const favorite = await owner.rpc("set_provider_favorite", {
@@ -446,13 +581,42 @@ try {
     "Owner could not remove a provider favorite.",
   );
 
+  const pausedProvider = await admin
+    .from("provider_profiles")
+    .update({ marketplace_paused: true })
+    .eq("user_id", users.owner.id);
+  assert(!pausedProvider.error, "Could not pause favorite provider fixture.");
+  const pausedFavorite = await owner.rpc("set_provider_favorite", {
+    target_provider_slug: "runtime-discovery-" + runId,
+    should_favorite: true,
+  });
+  assert(pausedFavorite.error, "Paused provider could still be favorited.");
+  await admin
+    .from("provider_profiles")
+    .update({ marketplace_paused: false, status: "PROFILE_INCOMPLETE" })
+    .eq("user_id", users.owner.id);
+  const inactiveFavorite = await owner.rpc("set_provider_favorite", {
+    target_provider_slug: "runtime-discovery-" + runId,
+    should_favorite: true,
+  });
+  assert(inactiveFavorite.error, "Inactive provider could still be favorited.");
+  await admin
+    .from("provider_profiles")
+    .update({ status: "ACTIVE" })
+    .eq("user_id", users.owner.id);
+  const anonymousFavorite = await anonymous.rpc("set_provider_favorite", {
+    target_provider_slug: "runtime-discovery-" + runId,
+    should_favorite: true,
+  });
+  assert(anonymousFavorite.error, "Anonymous user could mutate favorites.");
+
   console.log("Phase 03 discovery runtime security checks: PASS");
 } finally {
   for (const id of areaIds)
     await admin.from("service_areas").delete().eq("id", id);
   for (const id of serviceIds)
     await admin.from("services").delete().eq("id", id);
-  for (const user of [users.owner, users.other]) {
+  for (const user of [users.owner, users.other, users.coverage]) {
     if (user.id) await admin.auth.admin.deleteUser(user.id);
   }
 }

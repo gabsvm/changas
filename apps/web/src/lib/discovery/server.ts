@@ -22,6 +22,7 @@ export type DiscoverySearchInput = {
 
 export type DiscoverySearchResult = {
   rows: DiscoveryServiceRow[];
+  hasMore: boolean;
   error: string | null;
 };
 
@@ -41,7 +42,7 @@ export async function searchDiscovery(
   const manualLocation = getManualLocation(input.filters.locationSlug);
   const latitude = input.latitude ?? manualLocation?.latitude ?? null;
   const longitude = input.longitude ?? manualLocation?.longitude ?? null;
-  const args: Database["public"]["Functions"]["search_discovery_services"]["Args"] =
+  const args: Database["public"]["Functions"]["search_discovery_services_v2"]["Args"] =
     {
       page_number: input.filters.page,
       page_size: input.filters.pageSize,
@@ -69,10 +70,14 @@ export async function searchDiscovery(
   }
   if (input.filters.skillSlug) args.skill_filter = input.filters.skillSlug;
 
-  const { data, error } = await supabase.rpc("search_discovery_services", args);
+  const { data, error } = await supabase.rpc(
+    "search_discovery_services_v2",
+    args,
+  );
 
   return {
     rows: data ?? [],
+    hasMore: data?.[0]?.has_more ?? false,
     error: error?.message ?? null,
   };
 }
@@ -105,7 +110,8 @@ export function safeDiscoveryRows(value: unknown): DiscoveryServiceRow[] {
       typeof candidate.modality === "string" &&
       typeof candidate.price_model === "string" &&
       typeof candidate.currency_code === "string" &&
-      typeof candidate.accepts_offers === "boolean"
+      typeof candidate.accepts_offers === "boolean" &&
+      typeof candidate.has_more === "boolean"
     );
   });
 }
