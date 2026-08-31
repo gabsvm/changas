@@ -8,10 +8,7 @@ export type ConversationErrorCode =
   | "TRANSIENT";
 
 export class ConversationServerError extends Error {
-  constructor(
-    public readonly code: ConversationErrorCode,
-    message: string,
-  ) {
+  constructor(public readonly code: ConversationErrorCode, message: string) {
     super(message);
     this.name = "ConversationServerError";
   }
