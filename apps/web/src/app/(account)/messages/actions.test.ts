@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const sendConversationText = vi.fn();
-const recordConversationModerationWarning = vi.fn();
+const { sendConversationText, recordConversationModerationWarning } = vi.hoisted(
+  () => ({
+    sendConversationText: vi.fn(),
+    recordConversationModerationWarning: vi.fn(),
+  }),
+);
 
 vi.mock("@/lib/conversations/messages", () => ({
   sendConversationText,
@@ -30,7 +34,9 @@ describe("sendTextMessage contact leakage warning", () => {
   beforeEach(() => {
     sendConversationText.mockReset();
     recordConversationModerationWarning.mockReset();
-    sendConversationText.mockResolvedValue("04850000-0000-4000-8000-000000000001");
+    sendConversationText.mockResolvedValue(
+      "04850000-0000-4000-8000-000000000001",
+    );
     recordConversationModerationWarning.mockResolvedValue(undefined);
   });
 
