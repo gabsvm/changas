@@ -31,6 +31,7 @@
 ### Task 1: Conversation domain, schema and participant-only RLS
 
 **Files:**
+
 - Create: `supabase/migrations/20260831_phase_04_conversations.sql`
 - Create: `supabase/tests/phase-04-conversations.sql`
 - Create: `packages/domain/src/conversations.ts`
@@ -38,6 +39,7 @@
 - Modify: `apps/web/src/lib/supabase/database.types.ts`
 
 **Interfaces:**
+
 - Produces enums/types `ConversationStatus`, `MessageKind`, `ConversationParticipantRole`.
 - Produces tables `conversations`, `conversation_participants`, `messages`, `message_attachments`, `conversation_reads`, `user_blocks`, `conversation_reports`, `conversation_moderation_events`.
 - `conversations.service_id` is immutable once created.
@@ -122,12 +124,14 @@ Commit: `feat(conversations): add participant-only conversation schema`
 ### Task 2: Contextual conversation start and inbox read model
 
 **Files:**
+
 - Create: `supabase/migrations/20260831_phase_04_conversation_rpcs.sql`
 - Extend: `supabase/tests/phase-04-conversations.sql`
 - Create: `apps/web/src/lib/conversations/server.ts`
 - Modify: `apps/web/src/lib/supabase/database.types.ts`
 
 **Interfaces:**
+
 - Produces RPC `public.start_service_conversation(provider_slug text, service_slug text) returns uuid`.
 - Produces RPC `public.list_my_conversations(limit_count integer, before_updated_at timestamptz, before_id uuid)`.
 - Produces RPC `public.get_conversation_context(target_conversation_id uuid)`.
@@ -136,6 +140,7 @@ Commit: `feat(conversations): add participant-only conversation schema`
 - [ ] **Step 1: Add failing pgTAP for start authorization/idempotency**
 
 Assert:
+
 - anonymous cannot start;
 - client cannot start conversation with self;
 - provider must be ACTIVE and service public/unpaused;
@@ -154,9 +159,16 @@ Inbox returns only participant-safe fields: conversation id, service title/slug,
 - [ ] **Step 4: Wrap RPCs in server helpers**
 
 ```ts
-export async function startConversationFromService(providerSlug: string, serviceSlug: string): Promise<string>
-export async function listMyConversations(cursor?: ConversationCursor): Promise<ConversationSummary[]>
-export async function getConversationContext(id: string): Promise<ConversationContext | null>
+export async function startConversationFromService(
+  providerSlug: string,
+  serviceSlug: string,
+): Promise<string>;
+export async function listMyConversations(
+  cursor?: ConversationCursor,
+): Promise<ConversationSummary[]>;
+export async function getConversationContext(
+  id: string,
+): Promise<ConversationContext | null>;
 ```
 
 Map raw DB errors to `UNAUTHORIZED | FORBIDDEN | NOT_FOUND | CONFLICT | TRANSIENT`, never display raw PostgreSQL text.
@@ -170,6 +182,7 @@ Commit: `feat(conversations): add contextual start and inbox contracts`
 ### Task 3: Text messages, pagination, idempotency and abuse bounds
 
 **Files:**
+
 - Modify: `supabase/migrations/20260831_phase_04_conversation_rpcs.sql` or add a new incremental Phase 04 migration if already committed.
 - Extend: `supabase/tests/phase-04-conversations.sql`
 - Modify: `packages/validation/src/index.ts`
@@ -177,6 +190,7 @@ Commit: `feat(conversations): add contextual start and inbox contracts`
 - Create: `apps/web/src/lib/conversations/messages.ts`
 
 **Interfaces:**
+
 - Produces `messageTextSchema`: trimmed 1..4000 chars.
 - Produces RPC `send_conversation_text(target_conversation_id uuid, message_body text, message_nonce uuid)`.
 - Produces RPC `list_conversation_messages(target_conversation_id uuid, before_created_at timestamptz, before_id uuid, page_size integer)` returning newest-first bounded pages, transformed to ascending UI order in TS.
@@ -213,6 +227,7 @@ Commit: `feat(conversations): add paginated idempotent text messaging`
 ### Task 4: Private image/file attachments
 
 **Files:**
+
 - Create: `supabase/migrations/20260831_phase_04_attachments.sql`
 - Extend: `supabase/tests/phase-04-conversations.sql`
 - Modify: `packages/validation/src/index.ts`
@@ -221,6 +236,7 @@ Commit: `feat(conversations): add paginated idempotent text messaging`
 - Create: `apps/web/scripts/phase-04-conversations-runtime.mjs`
 
 **Interfaces:**
+
 - Private bucket: `conversation-attachments`.
 - Allowed V1 image MIME: `image/jpeg`, `image/png`, `image/webp`.
 - Allowed V1 file MIME: `application/pdf`, `text/plain`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`.
@@ -256,12 +272,14 @@ Commit: `feat(conversations): add private chat attachments`
 ### Task 5: Unread/read state and immutable system events
 
 **Files:**
+
 - Add incremental Phase 04 migration.
 - Extend: `supabase/tests/phase-04-conversations.sql`
 - Modify: `apps/web/src/lib/conversations/server.ts`
 - Create: `apps/web/src/lib/conversations/events.ts`
 
 **Interfaces:**
+
 - RPC `mark_conversation_read(target_conversation_id uuid, through_message_id uuid)`.
 - Internal/server-only RPC `append_conversation_system_event(...)` is not executable by anon/authenticated clients.
 - Inbox unread count derives from last read position and participant-safe messages.
@@ -287,6 +305,7 @@ Commit: `feat(conversations): add unread state and system event foundation`
 ### Task 6: Block/report and anti-leakage warning baseline
 
 **Files:**
+
 - Add incremental Phase 04 migration.
 - Extend: `supabase/tests/phase-04-conversations.sql`
 - Create: `packages/domain/src/contact-leakage.ts`
@@ -296,6 +315,7 @@ Commit: `feat(conversations): add unread state and system event foundation`
 - Create: `apps/web/src/app/(account)/messages/moderation-actions.ts`
 
 **Interfaces:**
+
 - `detectContactLeakage(text: string): LeakageSignal[]` returns deterministic obvious signals only.
 - Signals: `PHONE`, `EMAIL`, `PAYMENT_HANDLE`, `EXTERNAL_CONTACT_REQUEST`.
 - RPCs `block_user_for_conversation`, `unblock_user`, `report_conversation`.
@@ -326,12 +346,14 @@ Commit: `feat(conversations): add reporting blocking and leakage warnings`
 ### Task 7: Realtime subscription with deduplication and reconnect convergence
 
 **Files:**
+
 - Create: `apps/web/src/lib/conversations/realtime.ts`
 - Create: `apps/web/src/lib/conversations/realtime.test.ts`
 - Create: `apps/web/src/components/conversations/conversation-live-client.tsx`
 - Modify migration to add `messages` to Supabase Realtime publication only if not already present.
 
 **Interfaces:**
+
 - `mergeMessagePage(current, incoming)` deduplicates by message `id`, sorts `(created_at,id)` ascending.
 - Browser subscription filters `conversation_id=eq.<id>` and never subscribes to unrestricted all-message traffic.
 
@@ -360,6 +382,7 @@ Commit: `feat(conversations): add realtime delivery with dedupe`
 ### Task 8: Inbox, contextual start CTA and mobile chat UI
 
 **Files:**
+
 - Modify: `apps/web/src/app/p/[slug]/[serviceSlug]/page.tsx`
 - Modify: `apps/web/src/app/(account)/layout.tsx`
 - Create: `apps/web/src/app/(account)/messages/page.tsx`
@@ -372,6 +395,7 @@ Commit: `feat(conversations): add realtime delivery with dedupe`
 - Create: `apps/web/src/components/conversations/system-message.tsx`
 
 **Interfaces:**
+
 - Service CTA: `Consultar por este servicio`.
 - Anonymous visitor is redirected to `/login?next=<encoded service URL>`; authenticated client calls contextual start and redirects to `/messages/<id>`.
 - Inbox route is authenticated.
@@ -409,12 +433,14 @@ Commit: `feat(conversations): build contextual inbox and mobile chat UX`
 ### Task 9: Phase 04 runtime/security E2E coverage and CI gate
 
 **Files:**
+
 - Modify: `supabase/seed.sql`
 - Extend: `apps/web/scripts/phase-04-conversations-runtime.mjs`
 - Create/extend: `tests/e2e/phase-04-conversations.spec.ts`
 - Modify: `.github/workflows/ci.yml`
 
 **Interfaces:**
+
 - Synthetic seed adds one client test account and deterministic Phase 04 conversation only; never real personal data.
 
 - [ ] **Step 1: Seed deterministic client credentials and conversation fixtures**
@@ -424,6 +450,7 @@ Use `.example.test` email addresses and a deterministic local Auth password hash
 - [ ] **Step 2: Runtime security script**
 
 Programmatically create participant A/B + outsider C, then prove:
+
 - A/B can read the conversation;
 - C cannot;
 - A/B attachment read succeeds and C fails;
@@ -435,6 +462,7 @@ Programmatically create participant A/B + outsider C, then prove:
 - [ ] **Step 3: E2E journeys**
 
 Desktop Chrome and Pixel 5 must prove:
+
 1. authenticated client starts from public service;
 2. sends text and sees it without duplicate;
 3. provider account sees same thread in inbox;
@@ -463,6 +491,7 @@ Commit: `test(conversations): gate realtime chat security and mobile journeys`
 ### Task 10: Final audit, report and stop gate
 
 **Files:**
+
 - Create: `docs/reports/phase-04-conversations.md`
 - Modify only Phase 04 files if audit finds a real defect.
 
@@ -497,6 +526,7 @@ Build/start production app and run `pnpm test:e2e` for Desktop Chrome + Pixel 5.
 - [ ] **Step 4: Audit acceptance criteria against the Master Plan**
 
 Explicitly prove in the report:
+
 - URL/ID tampering cannot open another user's conversation;
 - attachments remain private;
 - Realtime dedupes and reconnect converges;
