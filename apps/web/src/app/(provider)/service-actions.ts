@@ -57,21 +57,14 @@ type SaveServiceRpcArgs = {
   requested_description: string;
   requested_modality: "IN_PERSON" | "REMOTE" | "BOTH";
   requested_price_model:
-    | "FIXED"
-    | "STARTING_AT"
-    | "HOURLY"
-    | "PER_UNIT"
-    | "QUOTE";
+    "FIXED" | "STARTING_AT" | "HOURLY" | "PER_UNIT" | "QUOTE";
   requested_price_amount: number | null;
   requested_currency_code: "ARS";
   requested_price_unit: string | null;
   requested_accepts_offers: boolean;
   requested_expected_duration_minutes: number | null;
   requested_schedule_type:
-    | "FIXED_SLOT"
-    | "FLEXIBLE_WINDOW"
-    | "DEADLINE"
-    | "UNSCHEDULED";
+    "FIXED_SLOT" | "FLEXIBLE_WINDOW" | "DEADLINE" | "UNSCHEDULED";
   requested_includes: string | null;
   requested_excludes: string | null;
   requested_materials_notes: string | null;

@@ -27,11 +27,13 @@
 ### Task 1: Transactional service + tags save
 
 **Files:**
+
 - Create: `supabase/migrations/20260831_phase_02_service_transaction.sql`
 - Modify: `apps/web/src/app/(provider)/marketplace-actions.ts`
 - Modify: `supabase/tests/phase-02-audit.sql`
 
 **Interfaces:**
+
 - Produces RPC `public.save_service_with_tags(...)` returning `id` and `public_slug`.
 - RPC owns insert/update of the service plus replacement of normalized tags in one DB transaction.
 
@@ -43,10 +45,12 @@
 ### Task 2: Authenticated provider-management E2E
 
 **Files:**
+
 - Modify: `supabase/seed.sql`
 - Modify: `tests/e2e/phase-02-public-surfaces.spec.ts`
 
 **Interfaces:**
+
 - Synthetic seeded provider credentials are test-only and deterministic.
 
 - [ ] Add a deterministic password hash to the synthetic demo account suitable for local Supabase Auth.
@@ -57,6 +61,7 @@
 ### Task 3: Phase 02 verification/report
 
 **Files:**
+
 - Modify: `docs/reports/phase-02-provider-marketplace.md`
 
 - [ ] Verify remote CI is green after the functional closeout commit.
@@ -66,11 +71,13 @@
 ### Task 4: Create Phase 03 branch and discovery DB contract
 
 **Files:**
+
 - Create: `codex/phase-03-discovery` branch from Phase 02 closeout HEAD.
 - Create: `supabase/migrations/20260831_phase_03_discovery.sql`
 - Create: `supabase/tests/phase-03-discovery.sql`
 
 **Interfaces:**
+
 - Produces public/server search RPC returning only approved public fields plus computed distance/ranking data.
 
 - [ ] Add FTS-ready searchable document across service title/description, skill/category, synonyms and service tags.
@@ -84,6 +91,7 @@
 ### Task 5: Discovery domain/validation contracts
 
 **Files:**
+
 - Modify/Create focused files in `packages/domain/src` and `packages/validation/src`.
 
 - [ ] Add search/filter/sort types.
@@ -93,6 +101,7 @@
 ### Task 6: Public discovery UI
 
 **Files:**
+
 - Modify public home.
 - Create search/results/category routes/components under `apps/web/src/app`.
 
@@ -106,6 +115,7 @@
 ### Task 7: SEO/indexability
 
 **Files:**
+
 - Add metadata/sitemap/robots/OpenGraph support in Next.js routes as appropriate.
 
 - [ ] Add SEO metadata for home, category, provider and service surfaces.
@@ -115,6 +125,7 @@
 ### Task 8: Search acceptance and mobile E2E
 
 **Files:**
+
 - Extend `supabase/seed.sql` with synthetic search examples only.
 - Create/extend Playwright tests.
 
@@ -127,6 +138,7 @@
 ### Task 9: Final verification and report
 
 **Files:**
+
 - Create: `docs/reports/phase-03-discovery.md`
 
 - [ ] Run frozen install, lint, typecheck, unit tests, build, format check and diff check.

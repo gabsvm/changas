@@ -5,7 +5,9 @@ const serviceRoleKey = process.env.SERVICE_ROLE_KEY;
 
 async function adminRequest(path: string, init: RequestInit = {}) {
   if (!apiUrl || !serviceRoleKey) {
-    throw new Error("API_URL and SERVICE_ROLE_KEY are required for authenticated E2E");
+    throw new Error(
+      "API_URL and SERVICE_ROLE_KEY are required for authenticated E2E",
+    );
   }
   return fetch(`${apiUrl}${path}`, {
     ...init,
@@ -78,7 +80,9 @@ test.describe("Phase 02 mobile web smoke", () => {
       await expect(page.getByText("Habilidades que ofrecés")).toBeVisible();
     } finally {
       if (userId) {
-        await adminRequest(`/auth/v1/admin/users/${userId}`, { method: "DELETE" });
+        await adminRequest(`/auth/v1/admin/users/${userId}`, {
+          method: "DELETE",
+        });
       }
     }
   });
