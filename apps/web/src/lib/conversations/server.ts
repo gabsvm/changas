@@ -1,7 +1,13 @@
+import type { LeakageSignalType } from "@changas/domain";
+
 import { createClient } from "@/lib/supabase/server";
 
 export type ConversationErrorCode =
-  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "TRANSIENT";
 
 export class ConversationServerError extends Error {
   constructor(
@@ -77,6 +83,28 @@ type ConversationRpcClient = {
       through_message_id: string;
     },
   ): Promise<{ data: null; error: RpcError }>;
+  rpc(
+    name: "record_conversation_moderation_warning",
+    args: {
+      target_conversation_id: string;
+      signal_types: LeakageSignalType[];
+    },
+  ): Promise<{ data: string | null; error: RpcError }>;
+  rpc(
+    name: "block_user_for_conversation" | "unblock_user",
+    args: {
+      target_conversation_id: string;
+      target_user_id: string;
+    },
+  ): Promise<{ data: string | null; error: RpcError }>;
+  rpc(
+    name: "report_conversation",
+    args: {
+      target_conversation_id: string;
+      report_category: string;
+      report_reason: string | null;
+    },
+  ): Promise<{ data: string | null; error: RpcError }>;
 };
 
 function mapRpcError(error: RpcError): ConversationServerError {
@@ -173,4 +201,60 @@ export async function markConversationRead(
   });
 
   if (error) throw mapRpcError(error);
+}
+
+export async function recordConversationModerationWarning(
+  conversationId: string,
+  signalTypes: LeakageSignalType[],
+): Promise<void> {
+  const rpc = await getRpcClient();
+  const { error } = await rpc.rpc("record_conversation_moderation_warning", {
+    target_conversation_id: conversationId,
+    signal_types: signalTypes,
+  });
+
+  if (error) throw mapRpcError(error);
+}
+
+export async function blockConversationUser(
+  conversationId: string,
+  userId: string,
+): Promise<void> {
+  const rpc = await getRpcClient();
+  const { error } = await rpc.rpc("block_user_for_conversation", {
+    target_conversation_id: conversationId,
+    target_user_id: userId,
+  });
+
+  if (error) throw mapRpcError(error);
+}
+
+export async function unblockConversationUser(
+  conversationId: string,
+  userId: string,
+): Promise<void> {
+  const rpc = await getRpcClient();
+  const { error } = await rpc.rpc("unblock_user", {
+    target_conversation_id: conversationId,
+    target_user_id: userId,
+  });
+
+  if (error) throw mapRpcError(error);
+}
+
+export async function reportConversation(
+  conversationId: string,
+  category: string,
+  reason: string | null,
+): Promise<string> {
+  const rpc = await getRpcClient();
+  const { data, error } = await rpc.rpc("report_conversation", {
+    target_conversation_id: conversationId,
+    report_category: category,
+    report_reason: reason,
+  });
+
+  if (error) throw mapRpcError(error);
+  if (!data) throw mapRpcError(null);
+  return data;
 }
