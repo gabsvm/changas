@@ -1,7 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 
 export type ConversationErrorCode =
-  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "TRANSIENT";
 
 export class ConversationServerError extends Error {
   constructor(
@@ -28,7 +32,10 @@ export type ConversationSummary = {
   peer_display_name: string;
   peer_avatar_url: string | null;
   status: "OPEN" | "BLOCKED" | "CLOSED";
+  last_message_preview: string | null;
+  last_message_kind: "TEXT" | "IMAGE" | "FILE" | "SYSTEM" | null;
   last_message_at: string | null;
+  unread_count: number;
   updated_at: string;
 };
 
@@ -67,6 +74,13 @@ type ConversationRpcClient = {
     name: "get_conversation_context",
     args: { target_conversation_id: string },
   ): Promise<{ data: ConversationContext[] | null; error: RpcError }>;
+  rpc(
+    name: "mark_conversation_read",
+    args: {
+      target_conversation_id: string;
+      through_message_id: string;
+    },
+  ): Promise<{ data: null; error: RpcError }>;
 };
 
 function mapRpcError(error: RpcError): ConversationServerError {
@@ -79,7 +93,7 @@ function mapRpcError(error: RpcError): ConversationServerError {
     case "P0002":
       return new ConversationServerError(
         "NOT_FOUND",
-        "No encontramos el servicio o la conversación solicitada.",
+        "No encontramos el servicio, mensaje o conversación solicitada.",
       );
     case "22023":
     case "23505":
@@ -150,4 +164,17 @@ export async function getConversationContext(
 
   if (error) throw mapRpcError(error);
   return data?.[0] ?? null;
+}
+
+export async function markConversationRead(
+  conversationId: string,
+  throughMessageId: string,
+): Promise<void> {
+  const rpc = await getRpcClient();
+  const { error } = await rpc.rpc("mark_conversation_read", {
+    target_conversation_id: conversationId,
+    through_message_id: throughMessageId,
+  });
+
+  if (error) throw mapRpcError(error);
 }
