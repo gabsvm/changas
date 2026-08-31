@@ -26,23 +26,30 @@ ahora declara HEAD `61de1aabe0d74805202d6fccfdce76f45ac03074` y CI
 - `c384727` — `style(phase03): format discovery report`
 - `ed55f98` — `test(phase03): exercise combined discovery filters`
 - `0531410` — `test(phase03): use seeded service in filter journey`
+- `0113986` — `fix(phase03): harden discovery audit contracts`
+- `ace4311` — `ci(phase03): run explain in one database statement`
 
-HEAD funcional validado: `0531410dcec83f2a28afaccaa2c44aea3445e366`.
-Los commits posteriores de este reporte son sólo evidencia documental.
+HEAD funcional validado: `ace4311f17bada58e2c833d756907dee62339a6d`.
+El commit posterior de este reporte sólo actualiza evidencia documental.
 
 ## Migración y arquitectura de búsqueda
 
-La migración fue generada con Supabase CLI (`supabase migration new`) y es
-`supabase/migrations/20260831025526_phase_03_discovery.sql`. No se reescribieron
-las migraciones publicadas de Phase 01/02.
+Las migraciones fueron generadas con Supabase CLI (`supabase migration new`). La
+migración original es `supabase/migrations/20260831025526_phase_03_discovery.sql`
+y la migración incremental de auditoría es
+`supabase/migrations/20260831044750_phase_03_audit_hardening.sql`. No se
+reescribieron migraciones publicadas de Phase 01/02 ni la primera migración de
+Phase 03.
 
-El cliente anónimo sólo ejecuta el RPC acotado
-`public.search_discovery_services(...)`, con grants explícitos para `anon`,
+El cliente anónimo usa el RPC acotado
+`public.search_discovery_services_v2(...)`, con grants explícitos para `anon`,
 `authenticated` y `service_role`; no consulta tablas privadas ni recibe una
 vista de `service_areas`. La función es `SECURITY DEFINER`, fija
 `search_path = pg_catalog, public, extensions`, valida límites de paginación,
-precio, coordenadas, radio y orden, y devuelve como máximo 24 resultados por
-página.
+precio, coordenadas, radio y orden, devuelve como máximo 24 resultados por
+página y agrega `has_more` mediante una fila adicional acotada. El RPC
+publicado anterior se conserva como wrapper seguro sin el campo de paginación;
+ambos terminan en el read model corregido.
 
 La elegibilidad se aplica dentro del RPC:
 
@@ -62,8 +69,11 @@ normalización controlada de acentos/ñ. La aplicación usa el mismo criterio pa
 URL y geolocalización, pero la búsqueda no depende de JavaScript.
 
 El índice generado `services.search_document` usa PostgreSQL FTS `simple` con
-pesos de título/descripción. El índice GIN trigram cubre la concatenación
-normalizada para tolerancia acotada a typos. Skills, categorías, tags y
+pesos de título/descripción. La auditoría agregó la columna generada almacenada
+`services.search_text_normalized` y reconstruyó
+`services_search_text_trgm_idx` sobre esa misma expresión; el predicado fuzzy
+usa el operador indexable `OPERATOR(extensions.%)` sobre la columna almacenada.
+Skills, categorías, tags y
 `skill_synonyms` se combinan con coincidencias exactas y fuzzy. El catálogo
 controlado agrega `electricista` y los sinónimos requeridos para
 `arreglar pc`, `pc se apaga`, `clases ingles` e `instalar camara`; el seed
@@ -73,7 +83,9 @@ sintético publica ejemplos reales de catálogo, sin reviews ni jobs falsos.
 
 El ranking V1 es determinístico y explicable: relevancia textual acotada,
 coincidencia exacta de skill/categoría, tag, sinónimo y un bonus pequeño por
-distancia. No usa ratings, trabajos completados ni boosts pagos. La salida
+distancia. La migración de auditoría suma `0.04` sólo a providers creados en
+los últimos 30 días; es un pequeño mecanismo de exposición aislado, no domina
+la relevancia, no aleatoriza y no usa ratings/jobs. No hay boosts pagos. La salida
 ordena por recomendados, cercanía o precio ascendente/descendente, con slugs
 como desempate estable. La función de ranking portable se prueba en
 `packages/domain/src/discovery.test.ts`; queda preparada para sumar reputación
@@ -81,16 +93,25 @@ real en Phase 07 sin cambiar el contrato de descubrimiento.
 
 `/buscar` mantiene estado en la URL y expone filtros de modalidad (Todos,
 Presencial, Remoto), categoría, skill, radio, rango de precio, acepta ofertas y
-modelo de precio. La semántica `BOTH` participa en Presencial y Remoto. Las
-zonas manuales son centroides gruesos de catálogo, no coordenadas de usuarios.
-La geolocalización del navegador sólo se solicita después de una acción
-explícita y se envía al endpoint same-origin sin persistirla públicamente. Sin
-ubicación, los resultados remotos y la búsqueda general siguen funcionando.
+modelo de precio. La URL usa ARS en unidades mayores (por ejemplo
+`min=8000&max=10000`), mientras que `DiscoveryFilters` y el RPC usan minor
+units (`800000`/`1000000`). El endpoint de geolocalización valida el contrato
+interno sin volver a convertir los importes. Las formas vuelven a renderizar
+valores humanos. La navegación `Anterior`/`Siguiente` es URL-addressable,
+conserva los filtros públicos y sólo se muestra cuando `has_more` lo demuestra.
 
-El lateral PostGIS usa `ST_DWithin` sobre `service_areas.center`, respeta
-`is_active`, retorna la menor distancia de las áreas activas y conserva el
-índice GiST existente. Se cubren radio interior/exterior, múltiples áreas,
-área inactiva, servicios remotos y ausencia de coordenadas en el payload.
+La semántica `BOTH` participa en Presencial y Remoto. Las zonas manuales son
+centroides gruesos de catálogo, no coordenadas de usuarios. La geolocalización
+del navegador sólo se solicita después de una acción explícita y se envía al
+endpoint same-origin sin persistirla públicamente. Sin ubicación, los resultados
+remotos y la búsqueda general siguen funcionando.
+
+El lateral PostGIS usa dos predicados `ST_DWithin` sobre `service_areas.center`:
+la distancia debe estar dentro del radio solicitado por el cliente y dentro de
+`service_areas.radius_meters`; sólo considera áreas activas, retorna la menor
+distancia segura y conserva el GiST existente. Esto cubre los casos
+20 km/5 km/25 km (excluido), 4 km/5 km/10 km (incluido) y 8 km/10 km/5 km
+(excluido), además de múltiples áreas, áreas inactivas y servicios remotos.
 
 ## Rutas públicas, favoritos y SEO
 
@@ -101,37 +122,46 @@ component. La homepage no fuerza autenticación e incluye búsqueda, zonas,
 categorías, remoto y CTA de provider.
 
 `provider_favorites` tiene PK compuesta `(user_id, provider_user_id)`, RLS
-owner-only y grants explícitos. Sus RPCs autenticados agregan/quitan sin
-duplicados y listan únicamente providers públicos. Un visitante anónimo que
+owner-only y grants explícitos. Desde la auditoría `authenticated` conserva
+únicamente SELECT; no tiene INSERT/UPDATE/DELETE ni policies de escritura.
+Sus RPCs autenticados agregan/quitan sin duplicados y sólo aceptan providers
+ACTIVE no pausados, con `auth.uid()` validado dentro de la función
+`SECURITY DEFINER`. Un visitante anónimo que
 guarda un provider vuelve a `/login` con un return path validado; no existen
 favoritos de jobs.
 
-Homepage, categorías, providers y servicios tienen metadata pública, canonical
-y OpenGraph. `sitemap.xml` sólo enumera catálogo y proyecciones públicas
-activas; `robots.txt` bloquea account/provider/api/auth. No se generan claims de
-rating, verificación o disponibilidad.
+La metadata raíz configura `metadataBase` con `getPublicSiteUrl()`, por lo que
+canonical y OpenGraph relativos de home, categorías, providers y servicios se
+resuelven contra el origen público configurado. `sitemap.xml` y `robots.txt`
+usan el mismo helper; `/buscar` es `noindex, follow` para no indexar una
+combinatoria ilimitada de query strings. No se generan claims de rating,
+verificación o disponibilidad.
 
 No se agregó mapa: las listas son primarias y no había un provider de mapas que
 aportara valor sin introducir arquitectura, coordenadas o peso innecesarios.
 
 ## Pruebas y evidencia
 
-La suite pgTAP `supabase/tests/phase-03-discovery.sql` comprueba grants y
+La suite pgTAP `supabase/tests/phase-03-discovery.sql` (43 assertions) comprueba grants y
 ausencias deliberadas, EXECUTE público acotado, RLS de favoritos, contrato sin
 coordenadas/privados, normalización, ejemplos de búsqueda, elegibilidad,
-modalidades, FTS/sinónimos/tags, fuzzy, filtros, PostGIS y paginación. Se
+modalidades, FTS/sinónimos/tags, fuzzy/index almacenado, filtros, ambos radios,
+PostGIS y paginación `has_more`. Se
 conservan todas las suites Phase 01/02.
 
 `apps/web/scripts/phase-03-discovery-runtime.mjs` crea usuarios y fixtures
 sintéticos, prueba búsquedas mediante Supabase client, radius, remote,
-eligibilidad, aislamiento de favoritos, self-activation y ausencia de campos
-privados; limpia al finalizar. El job de Ubuntu levanta Supabase local con
-Docker, hace reset desde cero, ejecuta pgTAP, ambos scripts, reset con seed y
+eligibilidad, los tres casos de cobertura propia y cliente, paginación,
+aislamiento de favoritos (activo/pausado/inactivo/anónimo/direct write),
+self-activation y ausencia de campos privados; limpia al finalizar. El job de
+Ubuntu levanta Supabase local con Docker, hace reset desde cero, ejecuta pgTAP,
+ambos scripts, una comprobación EXPLAIN del índice trigram, reset con seed y
 Playwright desktop/Pixel 5. No usa credenciales de Supabase Cloud.
 
-Playwright cubre home, búsqueda, filtros URL-addressable, categoría, apertura
-de provider/servicio y flujo de favorito anónimo en viewport móvil Pixel 5.
-Las pruebas de dominio cubren normalización, filtros acotados, ranking,
+Playwright cubre home, búsqueda, filtros URL-addressable con ARS mayor,
+paginación, categoría, apertura de provider/servicio y flujo de favorito anónimo
+en viewport desktop y Pixel 5. Las pruebas de dominio cubren normalización,
+conversión mayor→minor sin doble conversión, filtros acotados, ranking,
 ubicaciones manuales y formato de dinero existente.
 
 ## Validation gates
@@ -141,16 +171,17 @@ ubicaciones manuales y formato de dinero existente.
 | Install frozen                      | PASS      | `pnpm install --frozen-lockfile` local y CI                                                    |
 | Lint                                | PASS      | `pnpm lint` local y job `validate`                                                             |
 | Typecheck                           | PASS      | `pnpm typecheck` local y job `validate`                                                        |
-| Unit tests                          | PASS      | `pnpm test`: 11 files, 27 tests                                                                |
+| Unit tests                          | PASS      | `pnpm test`: 11 files, 30 tests                                                                |
 | Production build                    | PASS      | `pnpm build` local y job `validate`                                                            |
 | Format check                        | PASS      | `pnpm format:check` local y job `validate`                                                     |
 | `git diff --check`                  | PASS      | ejecución local y job `validate`                                                               |
 | Supabase migration/reset local      | NOT RUN   | Docker no está instalado en este Windows                                                       |
 | pgTAP local                         | NOT RUN   | requiere Docker/Postgres local                                                                 |
 | Runtime RLS/Storage/search local    | NOT RUN   | requiere Docker/Postgres/Auth/Storage local                                                    |
-| Supabase reset/pgTAP/runtime remoto | PASS      | run `33355719126`, Ubuntu/Docker, reset limpio y seed sintético                                |
-| Browser E2E desktop/Pixel 5 remoto  | PASS      | run `33355719126`, journeys Phase 02 + Phase 03                                                |
-| GitHub Actions remoto               | PASS      | [run 33355719126](https://github.com/gabsvm/changas/actions/runs/33355719126), ambos jobs PASS |
+| Supabase reset/pgTAP/runtime remoto | PASS      | run `33359111198`, Ubuntu/Docker, reset limpio, 43 pgTAP, runtime y seed sintético             |
+| EXPLAIN fuzzy index remoto          | PASS      | run `33359111198`, `services_search_text_trgm_idx` verificado con `enable_seqscan=off`         |
+| Browser E2E desktop/Pixel 5 remoto  | PASS      | run `33359111198`, journeys Phase 03 en ambos proyectos                                        |
+| GitHub Actions remoto               | PASS      | [run 33359111198](https://github.com/gabsvm/changas/actions/runs/33359111198), ambos jobs PASS |
 
 ## Causa de fallos CI durante la implementación
 
@@ -169,6 +200,13 @@ ubicaciones manuales y formato de dinero existente.
   enlace visible y al contenido del artículo.
 - Run `33355056275`: el reporte nuevo no estaba formateado; se ejecutó
   Prettier y se volvió a publicar.
+- Run `33358870104`: la nueva evidencia EXPLAIN pasó por `db query` dos
+  sentencias (`SET` + `EXPLAIN`) en un prepared statement, que Supabase CLI
+  rechazó con `cannot insert multiple commands into a prepared statement`.
+  Se corrigió ejecutando un único bloque `DO` que configura la sesión, captura
+  el plan y falla si no aparece el índice; no se modificó el SQL de búsqueda.
+- Run `33359111198`: PASS final de validate y supabase-integration después de
+  esa corrección, incluyendo reset, pgTAP, runtime, EXPLAIN y E2E desktop/Pixel 5.
 
 La annotation informativa de GitHub sobre actions internas que apuntan a Node
 20 no cambia el runtime del proyecto: `package.json`, lockfile, `@types/node`,
