@@ -61,8 +61,8 @@ on conflict (skill_id, normalized_phrase) do nothing;
 
 create or replace function public.search_discovery_services(
   query_text text default null,
-  category_slug text default null,
-  skill_slug text default null,
+  category_filter text default null,
+  skill_filter text default null,
   modality_filter public.service_modality default null,
   min_price bigint default null,
   max_price bigint default null,
@@ -243,8 +243,8 @@ begin
       and not pp.marketplace_paused
       and s.is_published
       and not s.is_paused
-      and (category_slug is null or c.slug = category_slug)
-      and (skill_slug is null or sk.slug = skill_slug)
+      and (category_filter is null or c.slug = category_filter)
+      and (skill_filter is null or sk.slug = skill_filter)
       and (modality_filter is null
         or (modality_filter = 'IN_PERSON' and s.modality in ('IN_PERSON', 'BOTH'))
         or (modality_filter = 'REMOTE' and s.modality in ('REMOTE', 'BOTH')))

@@ -51,7 +51,7 @@ export async function searchDiscovery(
     args.accepts_offers_filter = input.filters.acceptsOffers;
   }
   if (input.filters.categorySlug)
-    args.category_slug = input.filters.categorySlug;
+    args.category_filter = input.filters.categorySlug;
   if (input.filters.maxPrice !== null) args.max_price = input.filters.maxPrice;
   if (input.filters.minPrice !== null) args.min_price = input.filters.minPrice;
   const modality = rpcModality(input.filters.modality);
@@ -64,7 +64,7 @@ export async function searchDiscovery(
   if (input.filters.radiusMeters !== null) {
     args.radius_meters = input.filters.radiusMeters;
   }
-  if (input.filters.skillSlug) args.skill_slug = input.filters.skillSlug;
+  if (input.filters.skillSlug) args.skill_filter = input.filters.skillSlug;
 
   const { data, error } = await supabase.rpc("search_discovery_services", args);
 

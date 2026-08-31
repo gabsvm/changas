@@ -668,7 +668,7 @@ export type Database = {
       search_discovery_services: {
         Args: {
           accepts_offers_filter?: boolean;
-          category_slug?: string;
+          category_filter?: string;
           max_price?: number;
           min_price?: number;
           modality_filter?: ServiceModalityType;
@@ -679,7 +679,7 @@ export type Database = {
           price_model_filter?: PriceModelType;
           query_text?: string;
           radius_meters?: number;
-          skill_slug?: string;
+          skill_filter?: string;
           sort_key?: string;
         };
         Returns: DiscoveryServiceRow[];
