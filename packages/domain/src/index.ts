@@ -56,3 +56,8 @@ export {
   type MessageCursor,
   type MessageKind,
 } from "./conversations";
+export {
+  detectContactLeakage,
+  type LeakageSignal,
+  type LeakageSignalType,
+} from "./contact-leakage";
