@@ -175,6 +175,133 @@ try {
     "Outsider can read conversation context.",
   );
 
+  const initialText = await client.rpc("send_conversation_text", {
+    target_conversation_id: conversationId,
+    message_body: "Mensaje inicial de runtime",
+    message_nonce: crypto.randomUUID(),
+  });
+  assert(
+    !initialText.error && initialText.data,
+    `Client could not send initial text: ${initialText.error?.message ?? "unknown"}`,
+  );
+
+  const blocked = await client.rpc("block_user_for_conversation", {
+    target_conversation_id: conversationId,
+    target_user_id: users.provider.id,
+  });
+  assert(
+    !blocked.error && blocked.data === users.provider.id,
+    `Client could not block provider: ${blocked.error?.message ?? "unknown"}`,
+  );
+
+  const blockState = await client.rpc("get_my_conversation_block_state", {
+    target_conversation_id: conversationId,
+  });
+  assert(
+    !blockState.error && blockState.data === users.provider.id,
+    "Caller cannot read their own conversation block state.",
+  );
+
+  const blockedSend = await provider.rpc("send_conversation_text", {
+    target_conversation_id: conversationId,
+    message_body: "Este mensaje debe fallar mientras existe el bloqueo",
+    message_nonce: crypto.randomUUID(),
+  });
+  assert(Boolean(blockedSend.error), "Blocked participant can still send text.");
+
+  const historyWhileBlocked = await client.rpc("list_conversation_messages", {
+    target_conversation_id: conversationId,
+    page_size: 50,
+    before_created_at: null,
+    before_id: null,
+  });
+  assert(
+    !historyWhileBlocked.error &&
+      historyWhileBlocked.data?.some(
+        (row) => row.message_id === initialText.data,
+      ),
+    "Blocking removed or hid the contractual message history.",
+  );
+
+  const unblocked = await client.rpc("unblock_user", {
+    target_conversation_id: conversationId,
+    target_user_id: users.provider.id,
+  });
+  assert(
+    !unblocked.error && unblocked.data === users.provider.id,
+    `Client could not unblock provider: ${unblocked.error?.message ?? "unknown"}`,
+  );
+
+  const restoredSend = await provider.rpc("send_conversation_text", {
+    target_conversation_id: conversationId,
+    message_body: "Envío restaurado luego del desbloqueo",
+    message_nonce: crypto.randomUUID(),
+  });
+  assert(
+    !restoredSend.error && restoredSend.data,
+    "Unblocking did not restore participant messaging.",
+  );
+
+  const participantReport = await client.rpc("report_conversation", {
+    target_conversation_id: conversationId,
+    report_category: "SCAM",
+    report_reason: "Fixture de seguridad Phase 04",
+  });
+  assert(
+    !participantReport.error && participantReport.data,
+    `Participant report failed: ${participantReport.error?.message ?? "unknown"}`,
+  );
+
+  const outsiderReport = await outsider.rpc("report_conversation", {
+    target_conversation_id: conversationId,
+    report_category: "SCAM",
+    report_reason: "Outsider must not report this conversation",
+  });
+  assert(Boolean(outsiderReport.error), "Outsider can report another conversation.");
+
+  const warning = await client.rpc("record_conversation_moderation_warning", {
+    target_conversation_id: conversationId,
+    signal_types: ["EMAIL", "EXTERNAL_CONTACT_REQUEST"],
+  });
+  assert(
+    !warning.error && warning.data,
+    `Moderation warning audit failed: ${warning.error?.message ?? "unknown"}`,
+  );
+
+  const warningRow = await admin
+    .from("conversation_moderation_events")
+    .select("event_type,metadata")
+    .eq("id", warning.data)
+    .single();
+  assert(
+    !warningRow.error &&
+      warningRow.data?.event_type === "CONTACT_LEAKAGE_WARNING",
+    "Moderation warning event was not persisted.",
+  );
+  const serializedWarning = JSON.stringify(warningRow.data?.metadata ?? {});
+  assert(
+    serializedWarning.includes("EMAIL") &&
+      serializedWarning.includes("EXTERNAL_CONTACT_REQUEST"),
+    "Moderation warning did not preserve signal types.",
+  );
+  assert(
+    !serializedWarning.includes("example.com") &&
+      !serializedWarning.includes("Mensaje inicial"),
+    "Moderation warning metadata unexpectedly stores raw message text.",
+  );
+
+  const outsiderWarning = await outsider.rpc(
+    "record_conversation_moderation_warning",
+    {
+      target_conversation_id: conversationId,
+      signal_types: ["EMAIL"],
+    },
+  );
+  assert(
+    Boolean(outsiderWarning.error),
+    "Outsider can create moderation events for another conversation.",
+  );
+
   const nonce = crypto.randomUUID();
   const message = await client.rpc("create_conversation_attachment_message", {
     target_conversation_id: conversationId,
