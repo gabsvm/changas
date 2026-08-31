@@ -147,6 +147,8 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run mobile web smoke tests
+        env:
+          PLAYWRIGHT_REUSE_EXISTING_SERVER: "true"
         run: pnpm test:e2e
 
       - name: Stop local Supabase
