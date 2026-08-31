@@ -190,7 +190,7 @@ select
   500000,
   'ARS',
   'UNSCHEDULED',
-  true
+  false
 from public.skills s
 where s.slug = 'instalacion-camaras';
 
@@ -294,6 +294,9 @@ select ok(
 update public.provider_profiles
 set status = 'ACTIVE'
 where public_slug = 'pgtap-discovery-b';
+update public.services
+set is_published = true
+where public_slug = 'pgtap-inactive-area';
 select ok(
   exists (
     select 1
