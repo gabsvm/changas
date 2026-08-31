@@ -216,10 +216,12 @@ Las limitaciones locales quedan explícitas por Docker ausente. El runtime
 reproducible remoto y el CI final quedaron verdes; no se agregan afirmaciones
 de reputación, disponibilidad o verificación que Phase 03 no pueda probar.
 
-## Final audit hardening (working tree)
+## Final audit hardening — final evidence
 
 Esta segunda corrección permanece exclusivamente en `codex/phase-03-discovery`
-y parte del HEAD auditado `dd8874ab6dcec555cf70aca6e6894068f4a4caf3`. Se agregó
+y partió del HEAD auditado `dd8874ab6dcec555cf70aca6e6894068f4a4caf3`. El
+HEAD final es `cabc192bc92bb16c20e4a0781b02f7e3f8cc5103`, con commits de esta
+corrección `b976f47`, `6a16b2d`, `3406c4e` y `cabc192`. Se agregó
 la migración nueva `20260831155937_phase_03_final_audit_fix.sql`; no se
 reescribieron migraciones publicadas.
 
@@ -257,5 +259,11 @@ La suite local de Vitest queda en 13 archivos y 35 tests PASS; lint, typecheck,
 build y format check también pasan. El intento de Supabase local sigue NOT RUN
 porque este Windows no tiene Docker ni Podman. El reset limpio, pgTAP (45
 assertions), runtime RLS/Storage/discovery, EXPLAIN y Playwright desktop/Pixel 5
-quedan sujetos al nuevo run de GitHub Actions después del push; el número de
-run y el HEAD definitivo deben actualizarse aquí con evidencia real.
+quedaron PASS en el nuevo run remoto `33413855281`: [GitHub Actions CI
+33413855281](https://github.com/gabsvm/changas/actions/runs/33413855281). El
+runtime probó privacidad del contrato público, elegibilidad/radios, favoritos,
+RLS y Storage; EXPLAIN verificó el camino trigram; los 24 journeys Playwright
+pasaron (12 desktop y 12 Pixel 5), incluyendo geolocalización mockeada,
+paginación next/previous y ausencia de coordenadas en URL. Lighthouse mobile
+contra el build de producción obtuvo performance 66 para `/` y 94 para
+`/buscar`, ambos sobre el umbral CI 0,45.
