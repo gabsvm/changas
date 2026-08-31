@@ -43,6 +43,28 @@ async function createTestUser(): Promise<{
   return { id: body.id, email, password };
 }
 
+async function deleteTestConversations(clientUserId: string): Promise<void> {
+  if (!supabaseUrl || !serviceRoleKey) return;
+
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/conversations?client_user_id=eq.${encodeURIComponent(clientUserId)}`,
+    {
+      method: "DELETE",
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+        Prefer: "return=minimal",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Could not delete Phase 04 E2E conversations: ${response.status} ${await response.text()}`,
+    );
+  }
+}
+
 async function deleteTestUser(id: string): Promise<void> {
   if (!supabaseUrl || !serviceRoleKey) return;
 
@@ -59,6 +81,11 @@ async function deleteTestUser(id: string): Promise<void> {
       `Could not delete Phase 04 E2E user: ${response.status} ${await response.text()}`,
     );
   }
+}
+
+async function cleanupTestUser(id: string): Promise<void> {
+  await deleteTestConversations(id);
+  await deleteTestUser(id);
 }
 
 test.describe("Phase 04 contextual conversations", () => {
@@ -127,7 +154,7 @@ test.describe("Phase 04 contextual conversations", () => {
         page.getByRole("link", { name: /Demo Proveedor/ }).first(),
       ).toBeVisible();
     } finally {
-      await deleteTestUser(user.id);
+      await cleanupTestUser(user.id);
     }
   });
 });
