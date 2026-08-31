@@ -124,17 +124,19 @@ set search_path = pg_catalog, public
 as $$
 declare
   normalized_count integer;
+  request_user_id uuid := auth.uid();
   request_role text := coalesce(auth.role(), current_setting('request.jwt.claim.role', true), '');
 begin
-  if request_role = 'authenticated'
-     and not exists (
+  if request_user_id is not null then
+    if not exists (
        select 1
        from public.services
        where id = target_service_id
-         and provider_user_id = auth.uid()
-     ) then
-    raise exception 'service does not belong to the authenticated provider'
-      using errcode = '42501';
+         and provider_user_id = request_user_id
+    ) then
+      raise exception 'service does not belong to the authenticated provider'
+        using errcode = '42501';
+    end if;
   elsif request_role <> 'service_role'
         and session_user not in ('postgres', 'service_role') then
     raise exception 'service tag replacement is restricted to provider or server roles'
