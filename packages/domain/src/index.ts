@@ -61,3 +61,7 @@ export {
   type LeakageSignal,
   type LeakageSignalType,
 } from "./contact-leakage";
+export {
+  assessOutgoingMessage,
+  type OutgoingMessageAssessment,
+} from "./outgoing-message";
