@@ -533,7 +533,13 @@ export type DiscoveryServiceRow = {
   currency_code: string;
   price_unit: string | null;
   accepts_offers: boolean;
-  distance_meters: number | null;
+  distance_bucket:
+    | "UNDER_2_KM"
+    | "KM_2_TO_5"
+    | "KM_5_TO_10"
+    | "KM_10_TO_25"
+    | "OVER_25_KM"
+    | null;
   relevance: number;
   has_more: boolean;
 };
@@ -666,26 +672,7 @@ export type Database = {
         Args: { input: string };
         Returns: string;
       };
-      search_discovery_services: {
-        Args: {
-          accepts_offers_filter?: boolean;
-          category_filter?: string;
-          max_price?: number;
-          min_price?: number;
-          modality_filter?: ServiceModalityType;
-          origin_lat?: number;
-          origin_lng?: number;
-          page_number?: number;
-          page_size?: number;
-          price_model_filter?: PriceModelType;
-          query_text?: string;
-          radius_meters?: number;
-          skill_filter?: string;
-          sort_key?: string;
-        };
-        Returns: Omit<DiscoveryServiceRow, "has_more">[];
-      };
-      search_discovery_services_v2: {
+      search_discovery_services_v3: {
         Args: {
           accepts_offers_filter?: boolean;
           category_filter?: string;

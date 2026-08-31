@@ -215,3 +215,47 @@ La annotation informativa de GitHub sobre actions internas que apuntan a Node
 Las limitaciones locales quedan explícitas por Docker ausente. El runtime
 reproducible remoto y el CI final quedaron verdes; no se agregan afirmaciones
 de reputación, disponibilidad o verificación que Phase 03 no pueda probar.
+
+## Final audit hardening (working tree)
+
+Esta segunda corrección permanece exclusivamente en `codex/phase-03-discovery`
+y parte del HEAD auditado `dd8874ab6dcec555cf70aca6e6894068f4a4caf3`. Se agregó
+la migración nueva `20260831155937_phase_03_final_audit_fix.sql`; no se
+reescribieron migraciones publicadas.
+
+- La búsqueda pública usa `service_areas.public_search_center`, una celda
+  aproximada de 0,01 grados (~1,1 km), mantenida por trigger desde el centro
+  preciso privado. El centro exacto sólo permanece para workflows owner/admin.
+  El contrato público cambió de `distance_meters` a buckets
+  `UNDER_2_KM`, `KM_2_TO_5`, `KM_5_TO_10`, `KM_10_TO_25` y `OVER_25_KM`.
+  La RPC interna conserva metros sólo dentro de la función revocada; la RPC
+  pública `search_discovery_services_v3` no expone coordenadas ni distancia
+  entera.
+- La semántica de radio sigue exigiendo área activa, radio propio y radio del
+  cliente; `BOTH` no requiere geografía cuando se consulta como remoto. El
+  default de producto para GPS/manual con ubicación es 10 km; el máximo SQL
+  defensivo sigue siendo 100 km.
+- `Buscar cerca mío` ahora es un modo explícito en memoria: reinicia página,
+  conserva filtros y coordenadas sólo en el componente, usa `/api/discovery`
+  para anterior/siguiente, consume `hasMore` y oculta la paginación SSR. No
+  coloca coordenadas en URL ni storage.
+- Los avatares externos no se renderizan: sólo se acepta un path first-party
+  `/api/avatar/` en el origen de `getPublicSiteUrl()`; el resto usa iniciales.
+  Los errores de discovery y favorite son accionables y no muestran errores
+  crudos de Supabase.
+- Sitemap usa rangos paginados de Data API y divide resultados en chunks de
+  50.000 URLs. Se agregó `adjustedRating`, utility puro ponderado con prior,
+  sin usar ratings en discovery ni crear reviews tempranas.
+- Se agregó auditoría Lighthouse mobile para `/` y `/buscar` en CI con umbral
+  no flaky de performance 0,45, sin dependencia en el bundle de producción.
+  La prueba Playwright agrega geolocalización mockeada, paginación GPS y
+  ausencia de coordenadas en URL.
+
+## Evidence for final audit hardening
+
+La suite local de Vitest queda en 13 archivos y 35 tests PASS; lint, typecheck,
+build y format check también pasan. El intento de Supabase local sigue NOT RUN
+porque este Windows no tiene Docker ni Podman. El reset limpio, pgTAP (45
+assertions), runtime RLS/Storage/discovery, EXPLAIN y Playwright desktop/Pixel 5
+quedan sujetos al nuevo run de GitHub Actions después del push; el número de
+run y el HEAD definitivo deben actualizarse aquí con evidencia real.

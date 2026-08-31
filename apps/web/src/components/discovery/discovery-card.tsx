@@ -1,8 +1,13 @@
 import Link from "next/link";
 
-import { formatServicePrice } from "@changas/domain";
+import {
+  distanceBucketLabels,
+  formatServicePrice,
+  type DistanceBucket,
+} from "@changas/domain";
 
 import type { DiscoveryServiceRow } from "@/lib/supabase/database.types";
+import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 
 const modalityLabels = {
   BOTH: "Presencial o remoto",
@@ -23,7 +28,7 @@ export function DiscoveryCard({ row }: { row: DiscoveryServiceRow }) {
   return (
     <article className="border-ink/10 rounded-2xl border bg-white/75 p-5 shadow-[0_12px_32px_rgba(22,56,50,0.06)]">
       <div className="flex items-start gap-3">
-        {row.provider_avatar_url ? (
+        {isTrustedPublicAvatarUrl(row.provider_avatar_url) ? (
           // Public profile avatars are optional and come from the safe RPC projection.
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -81,11 +86,9 @@ export function DiscoveryCard({ row }: { row: DiscoveryServiceRow }) {
         {row.accepts_offers ? (
           <span className="text-ink/60">Acepta ofertas</span>
         ) : null}
-        {row.distance_meters !== null ? (
+        {row.distance_bucket !== null ? (
           <span className="text-ink/60">
-            {row.distance_meters < 1000
-              ? row.distance_meters + " m aprox."
-              : (row.distance_meters / 1000).toFixed(1) + " km aprox."}
+            {distanceBucketLabels[row.distance_bucket as DistanceBucket]}
           </span>
         ) : null}
       </div>

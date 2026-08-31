@@ -105,7 +105,13 @@ export default async function CategoryPage({
               "Explorá servicios publicados en esta categoría."}
           </p>
           <div className="mt-8">
-            <DiscoveryResults initialRows={rows} query="" filters={filters} />
+            <DiscoveryResults
+              enableNearby={false}
+              initialHasMore={hasMore}
+              initialRows={rows}
+              query=""
+              filters={filters}
+            />
             <DiscoveryPagination
               previousHref={
                 filters.page > 1

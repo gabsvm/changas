@@ -335,7 +335,7 @@ try {
   ];
   for (const query of requiredQueries) {
     const { data, error } = await anonymous.rpc(
-      "search_discovery_services_v2",
+      "search_discovery_services_v3",
       {
         query_text: query,
         page_number: 1,
@@ -352,7 +352,7 @@ try {
     );
   }
 
-  const filtered = await anonymous.rpc("search_discovery_services_v2", {
+  const filtered = await anonymous.rpc("search_discovery_services_v3", {
     skill_filter: "ingles-conversacional",
     price_model_filter: "HOURLY",
     min_price: 100000,
@@ -369,7 +369,7 @@ try {
     "Combined category/skill, price, and offer filters did not narrow results.",
   );
 
-  const inside = await anonymous.rpc("search_discovery_services_v2", {
+  const inside = await anonymous.rpc("search_discovery_services_v3", {
     query_text: "electricista",
     modality_filter: "IN_PERSON",
     origin_lat: -34.58,
@@ -395,11 +395,11 @@ try {
     "Discovery leaked private or exact location fields.",
   );
   assert(
-    inside.data.every((row) => Number.isInteger(row.distance_meters)),
+    inside.data.every((row) => typeof row.distance_bucket === "string"),
     "Radius result did not include safe approximate distance.",
   );
 
-  const outside = await anonymous.rpc("search_discovery_services_v2", {
+  const outside = await anonymous.rpc("search_discovery_services_v3", {
     query_text: "electricista",
     modality_filter: "IN_PERSON",
     origin_lat: -34.8,
@@ -417,7 +417,7 @@ try {
   );
 
   const coverageOutsideProviderRadius = await anonymous.rpc(
-    "search_discovery_services_v2",
+    "search_discovery_services_v3",
     {
       query_text: "cobertura",
       modality_filter: "IN_PERSON",
@@ -443,7 +443,7 @@ try {
     })
     .eq("id", coverageArea.data.id);
   assert(!coverageAreaInsideBothRadii.error, "Could not update coverage area.");
-  const coverageInside = await anonymous.rpc("search_discovery_services_v2", {
+  const coverageInside = await anonymous.rpc("search_discovery_services_v3", {
     query_text: "cobertura",
     modality_filter: "IN_PERSON",
     origin_lat: -34.58,
@@ -471,7 +471,7 @@ try {
     "Could not update client-radius coverage area.",
   );
   const coverageOutsideClientRadius = await anonymous.rpc(
-    "search_discovery_services_v2",
+    "search_discovery_services_v3",
     {
       query_text: "cobertura",
       modality_filter: "IN_PERSON",
@@ -490,7 +490,7 @@ try {
     "Client discovery radius was not enforced independently.",
   );
 
-  const remote = await anonymous.rpc("search_discovery_services_v2", {
+  const remote = await anonymous.rpc("search_discovery_services_v3", {
     query_text: "clases ingles",
     modality_filter: "REMOTE",
     origin_lat: -34.8,
@@ -507,7 +507,7 @@ try {
     "Remote service was disadvantaged by physical radius.",
   );
 
-  const inactiveArea = await anonymous.rpc("search_discovery_services_v2", {
+  const inactiveArea = await anonymous.rpc("search_discovery_services_v3", {
     query_text: "cámara",
     modality_filter: "IN_PERSON",
     origin_lat: -34.58,
@@ -524,7 +524,7 @@ try {
     "Inactive service area was used for discovery.",
   );
 
-  const firstPage = await anonymous.rpc("search_discovery_services_v2", {
+  const firstPage = await anonymous.rpc("search_discovery_services_v3", {
     page_number: 1,
     page_size: 1,
   });

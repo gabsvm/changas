@@ -1,6 +1,6 @@
 begin;
 
-select plan(43);
+select plan(45);
 
 select ok(
   to_regprocedure('public.normalize_search_text(text)') is not null,
@@ -12,25 +12,25 @@ select is(
   'normalization handles Spanish case, accents, and whitespace'
 );
 select ok(
-  to_regprocedure('public.search_discovery_services(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)') is not null,
+  to_regprocedure('public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)') is not null,
   'discovery has one bounded server-side RPC'
 );
 select ok(
-  to_regprocedure('public.search_discovery_services_v2(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)') is not null,
+  to_regprocedure('public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)') is not null,
   'discovery v2 exposes the paginated audit-hardened contract'
 );
 select ok(
-  has_function_privilege('anon', 'public.search_discovery_services(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE'),
+  has_function_privilege('anon', 'public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE'),
   'anon can execute only the safe discovery RPC'
 );
 select ok(
-  has_function_privilege('authenticated', 'public.search_discovery_services(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE'),
+  has_function_privilege('authenticated', 'public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE'),
   'authenticated can execute the safe discovery RPC'
 );
 select ok(
-  has_function_privilege('anon', 'public.search_discovery_services_v2(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE')
-    and has_function_privilege('authenticated', 'public.search_discovery_services_v2(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE')
-    and not has_function_privilege('public', 'public.search_discovery_services_v2(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE'),
+  has_function_privilege('anon', 'public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE')
+    and has_function_privilege('authenticated', 'public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE')
+    and not has_function_privilege('public', 'public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)', 'EXECUTE'),
   'v2 grants execution only to explicit API roles'
 );
 select ok(
@@ -40,7 +40,7 @@ select ok(
     cross join lateral aclexplode(
       coalesce(routines.proacl, acldefault('f', routines.proowner))
     ) as grants
-    where routines.oid = to_regprocedure('public.search_discovery_services(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
+    where routines.oid = to_regprocedure('public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
       and grants.grantee = 0
       and grants.privilege_type = 'EXECUTE'
   ),
@@ -111,6 +111,15 @@ select ok(
   'radius matching retains the service-area geography GiST index'
 );
 select ok(
+  to_regclass('public.service_areas_public_search_center_gist_idx') is not null
+    and exists (
+      select 1 from information_schema.columns
+      where table_schema = 'public' and table_name = 'service_areas'
+        and column_name = 'public_search_center'
+    ),
+  'public discovery has a separate coarse geography and GiST index'
+);
+select ok(
   exists (
     select 1
     from information_schema.columns
@@ -122,24 +131,33 @@ select ok(
 );
 select ok(
   pg_get_function_result(
-    to_regprocedure('public.search_discovery_services(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
+    to_regprocedure('public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
   ) not like '%center%'
     and pg_get_function_result(
-      to_regprocedure('public.search_discovery_services(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
+      to_regprocedure('public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
     ) not like '%private_phone%'
     and pg_get_function_result(
-      to_regprocedure('public.search_discovery_services(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
+      to_regprocedure('public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
     ) not like '%dni%',
   'discovery result type excludes exact coordinates and private identity fields'
 );
+select ok(
+  pg_get_function_result(
+    to_regprocedure('public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
+  ) like '%distance_bucket%'
+    and pg_get_function_result(
+      to_regprocedure('public.search_discovery_services_v3(text,text,text,public.service_modality,bigint,bigint,boolean,public.price_model,numeric,numeric,integer,text,integer,integer)')
+    ) not like '%distance_meters%',
+  'public discovery exposes only coarse distance buckets'
+);
 select throws_ok(
-  $$select * from public.search_discovery_services(null, null, null, null, null, null, null, null, 91, 0, null, 'recommended', 1, 24)$$,
+  $$select * from public.search_discovery_services_v3(null, null, null, null, null, null, null, null, 91, 0, null, 'recommended', 1, 24)$$,
   '22023',
   null,
   'invalid discovery latitude is rejected'
 );
 select throws_ok(
-  $$select * from public.search_discovery_services(null, null, null, null, null, null, null, null, 0, null, null, 'recommended', 1, 24)$$,
+  $$select * from public.search_discovery_services_v3(null, null, null, null, null, null, null, null, 0, null, null, 'recommended', 1, 24)$$,
   '22023',
   null,
   'incomplete discovery point is rejected'
@@ -253,29 +271,29 @@ values
   ('03300000-0000-4000-8000-000000000003', 'Cobertura variable', extensions.st_setsrid(extensions.st_makepoint(-58.43, -34.76), 4326)::extensions.geography, 5000, true);
 
 select ok(
-  exists (select 1 from public.search_discovery_services('electricista', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
+  exists (select 1 from public.search_discovery_services_v3('electricista', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
   'electricista returns a controlled catalog result'
 );
 select ok(
-  exists (select 1 from public.search_discovery_services('arreglar pc', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
+  exists (select 1 from public.search_discovery_services_v3('arreglar pc', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
   'arreglar pc resolves through a curated synonym'
 );
 select ok(
-  exists (select 1 from public.search_discovery_services('pc se apaga', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
+  exists (select 1 from public.search_discovery_services_v3('pc se apaga', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
   'pc se apaga resolves through a curated synonym'
 );
 select ok(
-  exists (select 1 from public.search_discovery_services('clases ingles', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
+  exists (select 1 from public.search_discovery_services_v3('clases ingles', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
   'clases ingles resolves through a curated synonym'
 );
 select ok(
-  exists (select 1 from public.search_discovery_services('instalar camara', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
+  exists (select 1 from public.search_discovery_services_v3('instalar camara', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)),
   'instalar camara resolves through tags and synonyms'
 );
 select ok(
   not exists (
     select 1
-    from public.search_discovery_services(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24) result
+    from public.search_discovery_services_v3(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24) result
     where result.provider_slug = 'pgtap-discovery-b'
   ),
   'public search excludes no-longer eligible provider data'
@@ -287,7 +305,7 @@ where public_slug = 'pgtap-pc';
 select ok(
   not exists (
     select 1
-    from public.search_discovery_services('arreglar pc', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)
+    from public.search_discovery_services_v3('arreglar pc', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)
   ),
   'paused services are excluded'
 );
@@ -299,7 +317,7 @@ where slug = 'electricista';
 select ok(
   not exists (
     select 1
-    from public.search_discovery_services('electricista', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)
+    from public.search_discovery_services_v3('electricista', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24)
   ),
   'inactive skills are excluded'
 );
@@ -308,7 +326,7 @@ update public.skills set is_active = true where slug = 'electricista';
 select ok(
   exists (
     select 1
-    from public.search_discovery_services(null, null, null, 'REMOTE'::public.service_modality, null, null, null, null, -34.8, -58.8, 1000, 'recommended', 1, 24)
+    from public.search_discovery_services_v3(null, null, null, 'REMOTE'::public.service_modality, null, null, null, null, -34.8, -58.8, 1000, 'recommended', 1, 24)
     where service_slug in ('pgtap-pc', 'pgtap-ingles', 'pgtap-camara')
   ),
   'remote mode includes remote and BOTH offerings without a location dependency'
@@ -316,7 +334,7 @@ select ok(
 select ok(
   not exists (
     select 1
-    from public.search_discovery_services(null, null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.8, -58.8, 1000, 'recommended', 1, 24)
+    from public.search_discovery_services_v3(null, null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.8, -58.8, 1000, 'recommended', 1, 24)
     where service_slug in ('pgtap-pc', 'pgtap-ingles')
   ),
   'in-person mode excludes remote-only offerings outside a radius'
@@ -324,16 +342,16 @@ select ok(
 select ok(
   exists (
     select 1
-    from public.search_discovery_services('electricista', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 1000, 'nearest', 1, 24)
+    from public.search_discovery_services_v3('electricista', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 1000, 'nearest', 1, 24)
     where service_slug = 'pgtap-electricista'
-      and distance_meters < 1000
+      and distance_bucket < 1000
   ),
   'inside-radius matching returns approximate distance'
 );
 select ok(
   not exists (
     select 1
-    from public.search_discovery_services('electricista', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.8, -58.8, 1000, 'nearest', 1, 24)
+    from public.search_discovery_services_v3('electricista', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.8, -58.8, 1000, 'nearest', 1, 24)
     where service_slug = 'pgtap-electricista'
   ),
   'outside-radius matching excludes in-person offerings'
@@ -341,7 +359,7 @@ select ok(
 select ok(
   not exists (
     select 1
-    from public.search_discovery_services('cobertura', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 25000, 'nearest', 1, 24)
+    from public.search_discovery_services_v3('cobertura', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 25000, 'nearest', 1, 24)
     where service_slug = 'pgtap-cobertura'
   ),
   'provider coverage radius excludes a center inside the client radius but outside the provider radius'
@@ -353,7 +371,7 @@ where provider_user_id = '03300000-0000-4000-8000-000000000003';
 select ok(
   exists (
     select 1
-    from public.search_discovery_services('cobertura', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 10000, 'nearest', 1, 24)
+    from public.search_discovery_services_v3('cobertura', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 10000, 'nearest', 1, 24)
     where service_slug = 'pgtap-cobertura'
   ),
   'provider coverage radius allows a point inside both provider and client radii'
@@ -365,7 +383,7 @@ where provider_user_id = '03300000-0000-4000-8000-000000000003';
 select ok(
   not exists (
     select 1
-    from public.search_discovery_services('cobertura', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 5000, 'nearest', 1, 24)
+    from public.search_discovery_services_v3('cobertura', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 5000, 'nearest', 1, 24)
     where service_slug = 'pgtap-cobertura'
   ),
   'client discovery radius remains an independent upper bound'
@@ -379,13 +397,13 @@ where public_slug = 'pgtap-inactive-area';
 select ok(
   exists (
     select 1
-    from public.search_discovery_services('instalar camara', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 1000, 'nearest', 1, 24)
+    from public.search_discovery_services_v3('instalar camara', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 1000, 'nearest', 1, 24)
     where service_slug = 'pgtap-camara'
-      and distance_meters < 1000
+      and distance_bucket < 1000
   )
   and not exists (
     select 1
-    from public.search_discovery_services('instalar camara', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 1000, 'nearest', 1, 24)
+    from public.search_discovery_services_v3('instalar camara', null, null, 'IN_PERSON'::public.service_modality, null, null, null, null, -34.58, -58.43, 1000, 'nearest', 1, 24)
     where service_slug = 'pgtap-inactive-area'
   ),
   'multiple areas use an active area and ignore an inactive area'
@@ -393,7 +411,7 @@ select ok(
 select ok(
   not exists (
     select 1
-    from public.search_discovery_services('instalar camara', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24) result
+    from public.search_discovery_services_v3('instalar camara', null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 24) result
     where to_jsonb(result) ? 'center'
       or to_jsonb(result) ? 'service_area_center'
   ),
@@ -402,24 +420,24 @@ select ok(
 select ok(
   exists (
     select 1
-    from public.search_discovery_services(null, null, null, null, 150000, 350000, true, null, null, null, null, 'price-asc', 1, 24)
+    from public.search_discovery_services_v3(null, null, null, null, 150000, 350000, true, null, null, null, null, 'price-asc', 1, 24)
     where price_amount between 150000 and 350000
   ),
   'price and accepts-offers filters constrain eligible results'
 );
 select ok(
-  (select count(*) from public.search_discovery_services(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 2)) = 2,
+  (select count(*) from public.search_discovery_services_v3(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 2)) = 2,
   'discovery pagination enforces the requested bounded page size'
 );
 select ok(
   exists (
     select 1
-    from public.search_discovery_services_v2(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 2)
+    from public.search_discovery_services_v3(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 1, 2)
     where has_more
   )
   and not exists (
     select 1
-    from public.search_discovery_services_v2(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 3, 2)
+    from public.search_discovery_services_v3(null, null, null, null, null, null, null, null, null, null, null, 'recommended', 3, 2)
     where has_more
   ),
   'v2 pagination exposes has_more without returning an extra row'

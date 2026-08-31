@@ -42,10 +42,13 @@ export async function generateMetadata({
 
 export default async function PublicProviderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
+  const pageSearchParams = await searchParams;
   const supabase = await createClient();
   const { data: provider } = await supabase
     .from("public_provider_profiles")
@@ -131,6 +134,11 @@ export default async function PublicProviderPage({
           </span>
         </header>
         <section className="border-ink/10 mt-10 rounded-[2rem] border bg-white/70 p-7 shadow-[0_24px_80px_rgba(22,56,50,0.08)] sm:p-10">
+          {pageSearchParams.favoriteError ? (
+            <p className="text-terracotta mb-5 text-sm" role="alert">
+              No pudimos actualizar el proveedor guardado. Intentá nuevamente.
+            </p>
+          ) : null}
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-terracotta text-xs font-semibold tracking-[0.18em] uppercase">

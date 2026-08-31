@@ -25,10 +25,19 @@ export async function toggleProviderFavorite(
     redirect("/login?next=" + encodeURIComponent(returnPath));
   }
 
-  await supabase.rpc("set_provider_favorite", {
+  const { error } = await supabase.rpc("set_provider_favorite", {
     should_favorite: shouldFavorite,
     target_provider_slug: providerSlug,
   });
+  if (error) {
+    const separator = returnPath.includes("?") ? "&" : "?";
+    redirect(
+      returnPath +
+        separator +
+        "favoriteError=" +
+        encodeURIComponent("No pudimos actualizar el proveedor guardado."),
+    );
+  }
   revalidatePath(returnPath);
   revalidatePath("/account/favorites");
   redirect(returnPath);

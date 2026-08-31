@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
-import type { DiscoveryFilters } from "@changas/domain";
+import { minorUnitsToMajorInput, type DiscoveryFilters } from "@changas/domain";
 
 import type { DiscoveryServiceRow } from "@/lib/supabase/database.types";
 
@@ -26,20 +27,96 @@ function isDiscoveryRow(value: unknown): value is DiscoveryServiceRow {
   );
 }
 
+function searchHref(
+  query: string,
+  filters: DiscoveryFilters,
+  page: number,
+): string {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (filters.categorySlug) params.set("category", filters.categorySlug);
+  if (filters.skillSlug) params.set("skill", filters.skillSlug);
+  if (filters.locationSlug) params.set("location", filters.locationSlug);
+  if (filters.modality === "IN_PERSON") params.set("mode", "presencial");
+  if (filters.modality === "REMOTE") params.set("mode", "remoto");
+  if (filters.minPrice !== null)
+    params.set("min", minorUnitsToMajorInput(filters.minPrice));
+  if (filters.maxPrice !== null)
+    params.set("max", minorUnitsToMajorInput(filters.maxPrice));
+  if (filters.radiusMeters !== null)
+    params.set("radius", String(filters.radiusMeters));
+  if (filters.acceptsOffers === true) params.set("offers", "true");
+  if (filters.priceModel) params.set("priceModel", filters.priceModel);
+  if (filters.sort !== "recommended") params.set("sort", filters.sort);
+  if (filters.pageSize !== 24) params.set("pageSize", String(filters.pageSize));
+  if (page > 1) params.set("page", String(page));
+  const queryString = params.toString();
+  return queryString ? "/buscar?" + queryString : "/buscar";
+}
+
 export function DiscoveryResults({
   initialRows,
+  initialHasMore = false,
+  initialError = null,
   query,
   filters,
+  enableNearby = true,
 }: {
   initialRows: DiscoveryServiceRow[];
+  initialHasMore?: boolean;
+  initialError?: string | null;
   query: string;
   filters: DiscoveryFilters;
+  enableNearby?: boolean;
 }) {
   const [rows, setRows] = useState(initialRows);
+  const [hasMore, setHasMore] = useState(initialHasMore);
   const [nearbyLoading, setNearbyLoading] = useState(false);
   const [nearbyError, setNearbyError] = useState<string | null>(null);
+  const [gpsMode, setGpsMode] = useState(false);
+  const [gpsPage, setGpsPage] = useState(1);
+  const [gpsPoint, setGpsPoint] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
-  async function searchNearby() {
+  async function fetchNearbyPage(
+    page: number,
+    point: { latitude: number; longitude: number },
+  ) {
+    setNearbyLoading(true);
+    setNearbyError(null);
+    try {
+      const response = await fetch("/api/discovery", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          query,
+          filters: { ...filters, page },
+          latitude: point.latitude,
+          longitude: point.longitude,
+        }),
+      });
+      const payload: unknown = await response.json();
+      if (!response.ok || !payload || typeof payload !== "object") {
+        throw new Error("No pudimos cargar los resultados cerca tuyo.");
+      }
+      const candidate = (payload as { rows?: unknown }).rows;
+      const nextRows = Array.isArray(candidate)
+        ? candidate.filter(isDiscoveryRow)
+        : [];
+      setRows(nextRows);
+      setHasMore((payload as { hasMore?: unknown }).hasMore === true);
+      setGpsPage(page);
+      setGpsMode(true);
+    } catch {
+      setNearbyError("No pudimos cargar los resultados cerca tuyo.");
+    } finally {
+      setNearbyLoading(false);
+    }
+  }
+
+  function searchNearby() {
     if (!navigator.geolocation) {
       setNearbyError("Tu navegador no ofrece geolocalización.");
       return;
@@ -47,35 +124,13 @@ export function DiscoveryResults({
     setNearbyLoading(true);
     setNearbyError(null);
     navigator.geolocation.getCurrentPosition(
-      async ({ coords }) => {
-        try {
-          const response = await fetch("/api/discovery", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              query,
-              filters,
-              latitude: coords.latitude,
-              longitude: coords.longitude,
-            }),
-          });
-          const payload: unknown = await response.json();
-          if (!response.ok || !payload || typeof payload !== "object") {
-            throw new Error("No pudimos actualizar la búsqueda.");
-          }
-          const candidate = (payload as { rows?: unknown }).rows;
-          setRows(
-            Array.isArray(candidate) ? candidate.filter(isDiscoveryRow) : [],
-          );
-        } catch (error) {
-          setNearbyError(
-            error instanceof Error
-              ? error.message
-              : "No pudimos actualizar la búsqueda.",
-          );
-        } finally {
-          setNearbyLoading(false);
-        }
+      ({ coords }) => {
+        const point = {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        };
+        setGpsPoint(point);
+        void fetchNearbyPage(1, point);
       },
       () => {
         setNearbyError(
@@ -87,26 +142,30 @@ export function DiscoveryResults({
     );
   }
 
+  const displayError = initialError
+    ? "No pudimos cargar los resultados."
+    : nearbyError;
   return (
     <section aria-live="polite" aria-label="Resultados de búsqueda">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-ink/60 text-sm">
-          {rows.length === 0
-            ? "No encontramos servicios con esos criterios."
-            : rows.length + " resultado" + (rows.length === 1 ? "" : "s")}
+          {displayError
+            ? displayError
+            : rows.length === 0
+              ? "No encontramos servicios con esos criterios."
+              : rows.length + " resultado" + (rows.length === 1 ? "" : "s")}
         </p>
-        <button
-          className="button-secondary"
-          type="button"
-          onClick={searchNearby}
-          disabled={nearbyLoading}
-        >
-          {nearbyLoading ? "Buscando cerca…" : "Buscar cerca mío"}
-        </button>
+        {enableNearby ? (
+          <button
+            className="button-secondary"
+            type="button"
+            onClick={searchNearby}
+            disabled={nearbyLoading}
+          >
+            {nearbyLoading ? "Buscando cerca…" : "Buscar cerca mío"}
+          </button>
+        ) : null}
       </div>
-      {nearbyError ? (
-        <p className="text-terracotta mt-3 text-sm">{nearbyError}</p>
-      ) : null}
       {rows.length ? (
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {rows.map((row) => (
@@ -116,7 +175,7 @@ export function DiscoveryResults({
             />
           ))}
         </div>
-      ) : (
+      ) : !displayError ? (
         <div className="border-ink/10 mt-5 rounded-2xl border border-dashed bg-white/45 p-8 text-center">
           <p className="font-display text-2xl font-semibold">
             Probá otra búsqueda
@@ -125,7 +184,60 @@ export function DiscoveryResults({
             También podés explorar una categoría o elegir servicios remotos.
           </p>
         </div>
-      )}
+      ) : null}
+      {enableNearby && gpsMode && gpsPoint ? (
+        <nav
+          aria-label="Paginación de resultados cercanos"
+          className="mt-8 flex items-center justify-between gap-4"
+        >
+          {gpsPage > 1 ? (
+            <button
+              className="button-secondary"
+              type="button"
+              onClick={() => void fetchNearbyPage(gpsPage - 1, gpsPoint)}
+              disabled={nearbyLoading}
+            >
+              Anterior
+            </button>
+          ) : (
+            <span />
+          )}
+          {hasMore ? (
+            <button
+              className="button-secondary"
+              type="button"
+              onClick={() => void fetchNearbyPage(gpsPage + 1, gpsPoint)}
+              disabled={nearbyLoading}
+            >
+              Siguiente
+            </button>
+          ) : null}
+        </nav>
+      ) : enableNearby ? (
+        <nav
+          aria-label="Paginación de resultados"
+          className="mt-8 flex items-center justify-between gap-4"
+        >
+          {filters.page > 1 ? (
+            <Link
+              className="button-secondary"
+              href={searchHref(query, filters, filters.page - 1)}
+            >
+              Anterior
+            </Link>
+          ) : (
+            <span />
+          )}
+          {hasMore ? (
+            <Link
+              className="button-secondary"
+              href={searchHref(query, filters, filters.page + 1)}
+            >
+              Siguiente
+            </Link>
+          ) : null}
+        </nav>
+      ) : null}
     </section>
   );
 }

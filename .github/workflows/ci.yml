@@ -135,6 +135,14 @@ jobs:
       - name: Build web app for browser smoke tests
         run: pnpm build
 
+      - name: Run mobile Lighthouse smoke audit
+        run: |
+          nohup pnpm --filter @changas/web start > "$RUNNER_TEMP/changas-web.log" 2>&1 &
+          pnpm exec playwright install --with-deps chromium
+          pnpm dlx lighthouse@12.8.2 http://127.0.0.1:3000/ --only-categories=performance --form-factor=mobile --chrome-flags="--headless --no-sandbox" --output=json --output-path="$RUNNER_TEMP/home-lighthouse.json"
+          pnpm dlx lighthouse@12.8.2 http://127.0.0.1:3000/buscar --only-categories=performance --form-factor=mobile --chrome-flags="--headless --no-sandbox" --output=json --output-path="$RUNNER_TEMP/search-lighthouse.json"
+          node apps/web/scripts/check-mobile-performance.mjs "$RUNNER_TEMP/home-lighthouse.json" "$RUNNER_TEMP/search-lighthouse.json"
+
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 

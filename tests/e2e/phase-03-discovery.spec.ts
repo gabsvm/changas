@@ -111,4 +111,60 @@ test.describe("Phase 03 public discovery", () => {
     await page.getByRole("button", { name: "Guardar proveedor" }).click();
     await expect(page).toHaveURL(/\/login\?next=.*%2Fp%2Fdemo-proveedor/);
   });
+
+  test("GPS discovery paginates in memory without putting coordinates in URL", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["geolocation"]);
+    await context.setGeolocation({ latitude: -34.58, longitude: -58.43 });
+    let requestedPage = 0;
+    await page.route("**/api/discovery", async (route) => {
+      requestedPage = (await route.request().postDataJSON()).filters.page;
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          hasMore: requestedPage === 1,
+          rows: [
+            {
+              provider_display_name: "GPS Provider",
+              provider_avatar_url: null,
+              provider_slug: "gps-provider",
+              provider_zone: "Palermo",
+              service_title: "Servicio GPS " + requestedPage,
+              service_slug: "gps-service-" + requestedPage,
+              category_slug: "tecnologia",
+              category_name: "Tecnología",
+              skill_slug: "soporte-tecnico-remoto",
+              skill_name: "Soporte técnico remoto",
+              modality: "BOTH",
+              price_model: "FIXED",
+              price_amount: 900000,
+              currency_code: "ARS",
+              price_unit: null,
+              accepts_offers: false,
+              distance_bucket: "KM_2_TO_5",
+              relevance: 1,
+              has_more: requestedPage === 1,
+            },
+          ],
+        }),
+      });
+    });
+    await page.goto("/buscar?category=tecnologia&pageSize=1");
+    await page.getByRole("button", { name: "Buscar cerca mío" }).click();
+    await expect(
+      page.getByRole("heading", { name: /Servicio GPS 1/ }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Siguiente" }).click();
+    await expect(
+      page.getByRole("heading", { name: /Servicio GPS 2/ }),
+    ).toBeVisible();
+    expect(requestedPage).toBe(2);
+    expect(page.url()).not.toContain("34.58");
+    await page.getByRole("button", { name: "Anterior" }).click();
+    await expect(
+      page.getByRole("heading", { name: /Servicio GPS 1/ }),
+    ).toBeVisible();
+  });
 });

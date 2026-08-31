@@ -6,8 +6,14 @@ import {
   parseDiscoveryFiltersFromInternal,
   rankDiscoveryResult,
 } from "./discovery";
+import { adjustedRating as adjustedRatingPublic } from "./discovery-public";
 
 describe("discovery domain helpers", () => {
+  it("computes a bounded statistically adjusted rating placeholder", () => {
+    expect(adjustedRatingPublic(5, 1, 3, 10)).toBeCloseTo(3.1818, 4);
+    expect(() => adjustedRatingPublic(6, 1, 3, 10)).toThrow();
+    expect(() => adjustedRatingPublic(4, -1, 3, 10)).toThrow();
+  });
   it("normalizes Spanish search text deterministically", () => {
     expect(normalizeDiscoveryQuery("  ClÁSES   de Inglés ")).toBe(
       "clases de ingles",

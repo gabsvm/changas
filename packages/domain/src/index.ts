@@ -41,3 +41,8 @@ export {
   manualLocations,
   type ManualLocation,
 } from "./location";
+export {
+  adjustedRating,
+  distanceBucketLabels,
+  type DistanceBucket,
+} from "./discovery-public";

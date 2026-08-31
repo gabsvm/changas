@@ -42,7 +42,7 @@ export async function searchDiscovery(
   const manualLocation = getManualLocation(input.filters.locationSlug);
   const latitude = input.latitude ?? manualLocation?.latitude ?? null;
   const longitude = input.longitude ?? manualLocation?.longitude ?? null;
-  const args: Database["public"]["Functions"]["search_discovery_services_v2"]["Args"] =
+  const args: Database["public"]["Functions"]["search_discovery_services_v3"]["Args"] =
     {
       page_number: input.filters.page,
       page_size: input.filters.pageSize,
@@ -67,11 +67,13 @@ export async function searchDiscovery(
   if (input.query) args.query_text = input.query;
   if (input.filters.radiusMeters !== null) {
     args.radius_meters = input.filters.radiusMeters;
+  } else if (latitude !== null && longitude !== null) {
+    args.radius_meters = 10_000;
   }
   if (input.filters.skillSlug) args.skill_filter = input.filters.skillSlug;
 
   const { data, error } = await supabase.rpc(
-    "search_discovery_services_v2",
+    "search_discovery_services_v3",
     args,
   );
 
