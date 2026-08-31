@@ -175,11 +175,13 @@ update public.services
 set title = 'B intenta modificar A'
 where provider_user_id = '03000000-0000-4000-8000-000000000001'
   and public_slug = 'soporte-pc';
+set local role postgres;
 select is(
   (select title from public.services where provider_user_id = '03000000-0000-4000-8000-000000000001' and public_slug = 'soporte-pc'),
   'Soporte PC A actualizado',
   'provider B cannot modify provider A service'
 );
+set local role authenticated;
 select is(
   (select count(*)::integer from public.services where provider_user_id = '03000000-0000-4000-8000-000000000001'),
   0,
@@ -188,7 +190,7 @@ select is(
 
 select throws_ok(
   $$insert into public.certifications (provider_user_id, title, evidence_path, evidence_mime_type, evidence_file_size_bytes)
-    values ('03000000-0000-4000-8000-000000000002', 'Ruta ajena', '03000000-0000-4000-8000-000000000001/evidence.pdf', 'application/pdf', 12)$$,
+    values ('03000000-0000-4000-8000-000000000001', 'Proveedor ajeno', '03000000-0000-4000-8000-000000000001/evidence.pdf', 'application/pdf', 12)$$,
   '42501', null, 'provider B cannot insert provider A certification through RLS'
 );
 
@@ -205,8 +207,8 @@ select throws_ok(
 );
 insert into public.portfolio_items (provider_user_id, title, media_path, media_mime_type, media_file_size_bytes, is_public)
 values ('03000000-0000-4000-8000-000000000001', 'Media pública', '03000000-0000-4000-8000-000000000001/public.png', 'image/png', 12, true);
-insert into public.portfolio_items (provider_user_id, title, media_path, media_mime_type, media_file_size_bytes, is_public)
-values ('03000000-0000-4000-8000-000000000001', 'Media privada', '03000000-0000-4000-8000-000000000001/private.png', 'image/png', 12, false);
+insert into public.portfolio_items (provider_user_id, title, is_public)
+values ('03000000-0000-4000-8000-000000000001', 'Media privada', false);
 
 set local role anon;
 select is(
