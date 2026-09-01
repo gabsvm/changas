@@ -69,3 +69,21 @@ export {
   mergeConversationMessages,
   type MergeableConversationMessage,
 } from "./realtime-messages";
+export {
+  canActorTransitionProposal,
+  canTransitionProposal,
+  proposalKinds,
+  proposalStatuses,
+  type ProposalActorRole,
+  type ProposalKind,
+  type ProposalStatus,
+} from "./proposals";
+export {
+  FakePaymentProvider,
+  paymentStatuses,
+  type FakePaymentOutcome,
+  type PaymentProvider,
+  type PaymentRecord,
+  type PaymentRequest,
+  type PaymentStatus,
+} from "./payments";
