@@ -34,37 +34,31 @@ describe("proposal state machine", () => {
     expect(canTransitionProposal("REJECTED", "ACCEPTED")).toBe(false);
   });
 
-  it(
-    "allows either participant to accept only terms authored by the other participant",
-    () => {
-      expect(
-        canActorTransitionProposal({
-          actorRole: "CLIENT",
-          actorIsAuthor: false,
-          from: "OPEN",
-          to: "ACCEPTED",
-        }),
-      ).toBe(true);
-      expect(
-        canActorTransitionProposal({
-          actorRole: "PROVIDER",
-          actorIsAuthor: false,
-          from: "OPEN",
-          to: "ACCEPTED",
-        }),
-      ).toBe(true);
-      expect(
-        canActorTransitionProposal({
-          actorRole: "PROVIDER",
-          actorIsAuthor: true,
-          from: "OPEN",
-          to: "ACCEPTED",
-        }),
-      ).toBe(false);
-    },
-  );
-
-  it("keeps withdrawal author-only", () => {
+  it("keeps acceptance counterparty-only and withdrawal author-only", () => {
+    expect(
+      canActorTransitionProposal({
+        actorRole: "CLIENT",
+        actorIsAuthor: false,
+        from: "OPEN",
+        to: "ACCEPTED",
+      }),
+    ).toBe(true);
+    expect(
+      canActorTransitionProposal({
+        actorRole: "PROVIDER",
+        actorIsAuthor: false,
+        from: "OPEN",
+        to: "ACCEPTED",
+      }),
+    ).toBe(true);
+    expect(
+      canActorTransitionProposal({
+        actorRole: "PROVIDER",
+        actorIsAuthor: true,
+        from: "OPEN",
+        to: "ACCEPTED",
+      }),
+    ).toBe(false);
     expect(
       canActorTransitionProposal({
         actorRole: "CLIENT",
