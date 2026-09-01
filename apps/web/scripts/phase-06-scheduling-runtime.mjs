@@ -142,14 +142,17 @@ assert(
   `Provider could not create recurring availability: ${rule.error?.message ?? "unknown"}`,
 );
 
-const invalidTimezone = await provider.rpc("upsert_provider_availability_rule", {
-  target_rule_id: null,
-  rule_weekday: 1,
-  rule_start_time: "14:00:00",
-  rule_end_time: "18:00:00",
-  rule_timezone: "Not/A_Timezone",
-  rule_is_active: true,
-});
+const invalidTimezone = await provider.rpc(
+  "upsert_provider_availability_rule",
+  {
+    target_rule_id: null,
+    rule_weekday: 1,
+    rule_start_time: "14:00:00",
+    rule_end_time: "18:00:00",
+    rule_timezone: "Not/A_Timezone",
+    rule_is_active: true,
+  },
+);
 assert(Boolean(invalidTimezone.error), "Invalid timezone was accepted.");
 
 const block = await provider.rpc("create_provider_availability_block", {
@@ -275,7 +278,10 @@ const blockedHold = await clientA.rpc("hold_proposal_slot", {
   hold_nonce: crypto.randomUUID(),
   ttl_seconds: 600,
 });
-assert(Boolean(blockedHold.error), "Availability exception did not block a hold.");
+assert(
+  Boolean(blockedHold.error),
+  "Availability exception did not block a hold.",
+);
 
 const outsideRuleProposal = await createAwaitingProposal(
   clientA,
@@ -308,7 +314,10 @@ const expiringHold = await clientA.rpc("hold_proposal_slot", {
   hold_nonce: expiringNonce,
   ttl_seconds: 60,
 });
-assert(!expiringHold.error && expiringHold.data, "Could not create expiring hold.");
+assert(
+  !expiringHold.error && expiringHold.data,
+  "Could not create expiring hold.",
+);
 assert(
   !(
     await admin
@@ -360,7 +369,9 @@ const [raceA, raceB] = await Promise.all([
 const raceSuccesses = [raceA, raceB].filter(
   (result) => !result.error && result.data,
 ).length;
-const raceFailures = [raceA, raceB].filter((result) => Boolean(result.error)).length;
+const raceFailures = [raceA, raceB].filter((result) =>
+  Boolean(result.error),
+).length;
 assert(
   raceSuccesses === 1 && raceFailures === 1,
   `Concurrent overlapping holds were not serialized safely: successes=${raceSuccesses}, failures=${raceFailures}`,
