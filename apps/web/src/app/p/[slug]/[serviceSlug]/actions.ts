@@ -19,12 +19,12 @@ export async function startServiceConversation(
     redirect("/buscar");
   }
 
+  let conversationId: string;
   try {
-    const conversationId = await startConversationFromService(
+    conversationId = await startConversationFromService(
       providerSlug,
       serviceSlug,
     );
-    redirect(`/messages/${conversationId}`);
   } catch (error) {
     if (
       error instanceof ConversationServerError &&
@@ -35,4 +35,6 @@ export async function startServiceConversation(
     }
     throw error;
   }
+
+  redirect(`/messages/${conversationId}`);
 }
