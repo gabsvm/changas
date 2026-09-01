@@ -1,6 +1,7 @@
 import type {
   CurrencyCode,
   PaymentRecord,
+  PaymentStatus,
   ProposalKind,
   ProposalStatus,
   ScheduleType,
@@ -128,13 +129,15 @@ type ProposalRpcClient = {
   ): Promise<{ data: ProposalStatus | null; error: RpcError }>;
 };
 
-type FakePaymentRpcClient = {
+type PaymentResultRpcClient = {
   rpc(
-    name: "apply_fake_payment_result",
+    name: "apply_payment_result",
     args: {
       target_proposal_id: string;
       payment_nonce: string;
-      payment_outcome: FakePaymentOutcome;
+      payment_provider_name: string;
+      payment_provider_reference: string;
+      payment_result_status: PaymentStatus;
       actor_client_user_id: string;
     },
   ): Promise<{ data: FakePaymentResult[] | null; error: RpcError }>;
@@ -357,6 +360,7 @@ export async function respondToProposal(
 }
 
 export async function simulateFakeProposalPayment(
+  conversationId: string,
   proposalId: string,
   paymentNonce: string,
   outcome: FakePaymentOutcome,
@@ -368,13 +372,44 @@ export async function simulateFakeProposalPayment(
     );
   }
 
-  const { userId } = await getRpcClient();
+  const { rpc, userId } = await getRpcClient();
+  const { data: proposals, error: proposalListError } = await rpc.rpc(
+    "list_conversation_proposals",
+    { target_conversation_id: conversationId },
+  );
+  if (proposalListError) throw proposalError(proposalListError);
+
+  const proposal = (proposals ?? [])
+    .map(normalizeProposalSummary)
+    .find((candidate) => candidate.proposal_id === proposalId);
+  if (!proposal) {
+    throw new ProposalServerError(
+      "NOT_FOUND",
+      "No encontramos la propuesta solicitada.",
+    );
+  }
+  if (proposal.price_amount === null || proposal.price_amount <= 0) {
+    throw new ProposalServerError(
+      "CONFLICT",
+      "La propuesta no tiene un monto válido para pagar.",
+    );
+  }
+
+  const payment = await createFakePaymentRecord({
+    paymentNonce,
+    amountMinor: proposal.price_amount,
+    currencyCode: proposal.currency_code,
+    outcome,
+  });
+
   const { createAdminClient } = await import("@/lib/supabase/admin");
-  const admin = createAdminClient() as unknown as FakePaymentRpcClient;
-  const { data, error } = await admin.rpc("apply_fake_payment_result", {
+  const admin = createAdminClient() as unknown as PaymentResultRpcClient;
+  const { data, error } = await admin.rpc("apply_payment_result", {
     target_proposal_id: proposalId,
     payment_nonce: paymentNonce,
-    payment_outcome: outcome,
+    payment_provider_name: "FAKE",
+    payment_provider_reference: payment.id,
+    payment_result_status: payment.status,
     actor_client_user_id: userId,
   });
 
