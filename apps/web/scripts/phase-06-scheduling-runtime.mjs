@@ -203,6 +203,33 @@ async function createAwaitingProposal(client, suffix, startsAt, endsAt) {
   return proposal.data;
 }
 
+async function applyPaymentResult({ proposalId, nonce, status, actorUserId, suffix }) {
+  const result = await admin.rpc("apply_payment_result", {
+    target_proposal_id: proposalId,
+    payment_nonce: nonce,
+    payment_provider_name: "RUNTIME",
+    payment_provider_reference: `schedule-${suffix}-${crypto.randomUUID()}`,
+    payment_result_status: status,
+    actor_client_user_id: actorUserId,
+  });
+  assert(
+    !result.error && result.data?.[0],
+    `Payment ${suffix} failed: ${result.error?.message ?? "unknown"}`,
+  );
+  return result.data[0];
+}
+
+async function readHold(proposalId, nonce) {
+  const hold = await admin
+    .from("provider_slot_holds")
+    .select("id,released_at")
+    .eq("proposal_id", proposalId)
+    .eq("request_nonce", nonce)
+    .single();
+  assert(!hold.error && hold.data?.id, `Could not read hold: ${hold.error?.message}`);
+  return hold.data;
+}
+
 const proposalA = await createAwaitingProposal(
   clientA,
   "hold-a",
@@ -357,15 +384,17 @@ const raceProposalB = await createAwaitingProposal(
   "2026-09-07T17:00:00.000Z",
   "2026-09-07T17:30:00.000Z",
 );
+const raceNonceA = crypto.randomUUID();
+const raceNonceB = crypto.randomUUID();
 const [raceA, raceB] = await Promise.all([
   clientA.rpc("hold_proposal_slot", {
     target_proposal_id: raceProposalA,
-    hold_nonce: crypto.randomUUID(),
+    hold_nonce: raceNonceA,
     ttl_seconds: 600,
   }),
   clientB.rpc("hold_proposal_slot", {
     target_proposal_id: raceProposalB,
-    hold_nonce: crypto.randomUUID(),
+    hold_nonce: raceNonceB,
     ttl_seconds: 600,
   }),
 ]);
@@ -378,6 +407,139 @@ const raceFailures = [raceA, raceB].filter((result) =>
 assert(
   raceSuccesses === 1 && raceFailures === 1,
   `Concurrent overlapping holds were not serialized safely: successes=${raceSuccesses}, failures=${raceFailures}`,
+);
+if (!raceA.error) {
+  await clientA.rpc("release_proposal_slot_hold", {
+    target_proposal_id: raceProposalA,
+    hold_nonce: raceNonceA,
+  });
+} else {
+  await clientB.rpc("release_proposal_slot_hold", {
+    target_proposal_id: raceProposalB,
+    hold_nonce: raceNonceB,
+  });
+}
+
+const pendingProposal = await createAwaitingProposal(
+  clientA,
+  "payment-pending",
+  "2026-09-07T14:30:00.000Z",
+  "2026-09-07T15:00:00.000Z",
+);
+const pendingNonce = crypto.randomUUID();
+const pendingHold = await clientA.rpc("hold_proposal_slot", {
+  target_proposal_id: pendingProposal,
+  hold_nonce: pendingNonce,
+  ttl_seconds: 600,
+});
+assert(!pendingHold.error && pendingHold.data, "Could not create pending payment hold.");
+const pendingPayment = await applyPaymentResult({
+  proposalId: pendingProposal,
+  nonce: pendingNonce,
+  status: "PENDING",
+  actorUserId: users.clientA.id,
+  suffix: "pending",
+});
+assert(
+  pendingPayment.resulting_proposal_status === "AWAITING_PAYMENT",
+  "Pending payment changed proposal out of AWAITING_PAYMENT.",
+);
+assert(
+  (await readHold(pendingProposal, pendingNonce)).released_at === null,
+  "Pending payment released its temporary slot hold.",
+);
+await clientA.rpc("release_proposal_slot_hold", {
+  target_proposal_id: pendingProposal,
+  hold_nonce: pendingNonce,
+});
+
+const failedProposal = await createAwaitingProposal(
+  clientB,
+  "payment-failed",
+  "2026-09-07T16:30:00.000Z",
+  "2026-09-07T17:00:00.000Z",
+);
+const failedNonce = crypto.randomUUID();
+const failedHold = await clientB.rpc("hold_proposal_slot", {
+  target_proposal_id: failedProposal,
+  hold_nonce: failedNonce,
+  ttl_seconds: 600,
+});
+assert(!failedHold.error && failedHold.data, "Could not create failed payment hold.");
+const failedPayment = await applyPaymentResult({
+  proposalId: failedProposal,
+  nonce: failedNonce,
+  status: "FAILED",
+  actorUserId: users.clientB.id,
+  suffix: "failed",
+});
+assert(
+  failedPayment.resulting_proposal_status === "PAYMENT_FAILED",
+  "Failed payment did not move proposal to PAYMENT_FAILED.",
+);
+assert(
+  (await readHold(failedProposal, failedNonce)).released_at !== null,
+  "Failed payment retained its temporary slot hold.",
+);
+
+const freedAfterFailureProposal = await createAwaitingProposal(
+  clientA,
+  "payment-failed-freed",
+  "2026-09-07T16:30:00.000Z",
+  "2026-09-07T17:00:00.000Z",
+);
+const freedAfterFailureNonce = crypto.randomUUID();
+const freedAfterFailure = await clientA.rpc("hold_proposal_slot", {
+  target_proposal_id: freedAfterFailureProposal,
+  hold_nonce: freedAfterFailureNonce,
+  ttl_seconds: 600,
+});
+assert(
+  !freedAfterFailure.error && freedAfterFailure.data,
+  "Failed payment did not free the provider slot for another proposal.",
+);
+await clientA.rpc("release_proposal_slot_hold", {
+  target_proposal_id: freedAfterFailureProposal,
+  hold_nonce: freedAfterFailureNonce,
+});
+
+const successProposal = await createAwaitingProposal(
+  clientA,
+  "payment-success",
+  "2026-09-07T17:30:00.000Z",
+  "2026-09-07T18:00:00.000Z",
+);
+const successNonce = crypto.randomUUID();
+const successHold = await clientA.rpc("hold_proposal_slot", {
+  target_proposal_id: successProposal,
+  hold_nonce: successNonce,
+  ttl_seconds: 600,
+});
+assert(!successHold.error && successHold.data, "Could not create successful payment hold.");
+const successfulPayment = await applyPaymentResult({
+  proposalId: successProposal,
+  nonce: successNonce,
+  status: "SUCCEEDED",
+  actorUserId: users.clientA.id,
+  suffix: "success",
+});
+assert(
+  successfulPayment.resulting_proposal_status === "PAID" &&
+    successfulPayment.confirmed_job_id,
+  "Successful payment did not confirm a Job.",
+);
+assert(
+  (await readHold(successProposal, successNonce)).released_at !== null,
+  "Successful payment did not consume its temporary slot hold.",
+);
+const consumedEvent = await admin
+  .from("proposal_events")
+  .select("id")
+  .eq("proposal_id", successProposal)
+  .eq("event_type", "PAYMENT_SLOT_CONSUMED");
+assert(
+  !consumedEvent.error && consumedEvent.data?.length === 1,
+  "Successful fixed-slot payment did not audit hold consumption exactly once.",
 );
 
 console.log("Phase 06 scheduling/hold runtime security checks: PASS");
