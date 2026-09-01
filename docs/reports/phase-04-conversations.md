@@ -3,8 +3,8 @@
 ## Estado final
 
 **Rama:** `codex/phase-04-conversations`  
-**FINAL HEAD SHA:** `389d7c18740509f12dbbf11f34828bd8ee90f05e`  
-**CI RUN ID:** `33534888959`  
+**FINAL HEAD SHA:** `9a2cc174d8165cf36d4df9c2c77a9a3b683cfca2`  
+**CI RUN ID:** `33535527873`  
 **validate:** `success`  
 **supabase-integration:** `success`  
 **Playwright total y resultado:** 32 tests passed (Chromium desktop + Pixel 5 mobile-web)  
