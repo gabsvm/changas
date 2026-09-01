@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 
-import { ConversationThreadTextProbe } from "@/components/conversations/conversation-thread-text-probe";
+import { ConversationThread } from "@/components/conversations/conversation-thread";
 import { listConversationAttachments } from "@/lib/conversations/attachments";
 import { listConversationMessages } from "@/lib/conversations/messages";
 import {
@@ -13,8 +13,6 @@ import { createClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 async function loadThreadData(conversationId: string) {
-  console.info("[phase04-thread] load:start");
-
   try {
     const [context, messages, blockedUserId] = await Promise.all([
       getConversationContext(conversationId),
@@ -22,27 +20,14 @@ async function loadThreadData(conversationId: string) {
       getMyConversationBlockState(conversationId),
     ]);
 
-    console.info("[phase04-thread] load:rpc-complete", {
-      hasContext: Boolean(context),
-      messageCount: messages.length,
-      hasBlockedUser: Boolean(blockedUserId),
-    });
-
     if (!context) notFound();
 
     const attachments = await listConversationAttachments(
       messages.map((message) => message.message_id),
     );
 
-    console.info("[phase04-thread] load:complete", {
-      messageCount: messages.length,
-      attachmentCount: attachments.length,
-    });
-
     return { context, messages, blockedUserId, attachments };
   } catch (error) {
-    console.error("[phase04-thread] load:error", error);
-
     if (
       error instanceof ConversationServerError &&
       (error.code === "FORBIDDEN" || error.code === "NOT_FOUND")
@@ -58,17 +43,11 @@ export default async function ConversationPage({
 }: {
   params: Promise<{ conversationId: string }>;
 }) {
-  console.info("[phase04-thread] page:start");
-
   const { conversationId } = await params;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  console.info("[phase04-thread] page:auth-complete", {
-    hasUser: Boolean(user),
-  });
 
   if (!user) {
     redirect(
@@ -85,27 +64,25 @@ export default async function ConversationPage({
   const peerName = currentUserIsClient
     ? context.provider_display_name
     : context.client_display_name;
+  const threadVersion = `${messages.at(-1)?.message_id ?? "empty"}:${attachments.length}:${blockedUserId ?? "none"}`;
   const initialTextNonce = crypto.randomUUID();
-
-  console.info("[phase04-thread] page:props-ready", {
-    currentUserIsClient,
-    hasPeerName: peerName.length > 0,
-    hasServiceTitle: context.service_title.length > 0,
-    messageCount: messages.length,
-    attachmentCount: attachments.length,
-    initiallyBlockedByMe: blockedUserId === peerUserId,
-    hasTextNonce: initialTextNonce.length > 0,
-  });
+  const initialAttachmentNonce = crypto.randomUUID();
 
   return (
     <section className="py-4 sm:py-6">
-      <ConversationThreadTextProbe
+      <ConversationThread
+        key={threadVersion}
         conversationId={conversationId}
+        currentUserId={user.id}
         peerUserId={peerUserId}
         peerName={peerName}
         serviceTitle={context.service_title}
-        initialTextNonce={initialTextNonce}
+        providerHref={`/p/${context.provider_slug}/${context.service_slug}`}
+        initialMessages={messages}
+        initialAttachments={attachments}
         initiallyBlockedByMe={blockedUserId === peerUserId}
+        initialTextNonce={initialTextNonce}
+        initialAttachmentNonce={initialAttachmentNonce}
       />
     </section>
   );
