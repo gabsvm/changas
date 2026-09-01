@@ -131,11 +131,11 @@ assert(
 
 const rule = await provider.rpc("upsert_provider_availability_rule", {
   target_rule_id: null,
-  rule_weekday: 1,
-  rule_start_time: "14:00:00",
-  rule_end_time: "18:00:00",
-  rule_timezone: "UTC",
-  rule_is_active: true,
+  requested_weekday: 1,
+  requested_start_time: "14:00:00",
+  requested_end_time: "18:00:00",
+  requested_timezone: "UTC",
+  requested_is_active: true,
 });
 assert(
   !rule.error && rule.data,
@@ -146,19 +146,19 @@ const invalidTimezone = await provider.rpc(
   "upsert_provider_availability_rule",
   {
     target_rule_id: null,
-    rule_weekday: 1,
-    rule_start_time: "14:00:00",
-    rule_end_time: "18:00:00",
-    rule_timezone: "Not/A_Timezone",
-    rule_is_active: true,
+    requested_weekday: 1,
+    requested_start_time: "14:00:00",
+    requested_end_time: "18:00:00",
+    requested_timezone: "Not/A_Timezone",
+    requested_is_active: true,
   },
 );
 assert(Boolean(invalidTimezone.error), "Invalid timezone was accepted.");
 
 const block = await provider.rpc("create_provider_availability_block", {
-  block_starts_at: "2026-09-07T16:00:00.000Z",
-  block_ends_at: "2026-09-07T16:30:00.000Z",
-  block_reason: "Turno personal",
+  requested_starts_at: "2026-09-07T16:00:00.000Z",
+  requested_ends_at: "2026-09-07T16:30:00.000Z",
+  requested_reason: "Turno personal",
 });
 assert(
   !block.error && block.data,
