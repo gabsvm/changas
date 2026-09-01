@@ -9,7 +9,7 @@
 **supabase-integration:** `success`  
 **Playwright total y resultado:** 32 tests passed (Chromium desktop + Pixel 5 mobile-web)  
 **pgTAP total:** 15 test files, 252 tests passed  
-**Lighthouse scores:** Home performance: 92 | Search performance: 93  
+**Lighthouse scores:** Home performance: 92 | Search performance: 93
 
 Phase 04 queda finalizada, auditada y cerrada de acuerdo con `CHANGAS_MASTER_PLAN.md` y `docs/superpowers/plans/2026-08-31-phase-04-conversations.md`. No se inició Phase 05 y no se introdujeron tablas, endpoints, propuestas, jobs, pagos, reputación ni administración.
 
@@ -73,6 +73,7 @@ Durante la fase se diagnosticó un fallo en el test E2E del hilo de conversació
 La función de configuración de cliente `getPublicSupabaseEnv()` en `packages/config/src/public.ts` utilizaba acceso indexado `process.env[name]`. En compilación de navegador / Next.js bundler, las variables `NEXT_PUBLIC_*` sólo son sustituidas estáticamente cuando se accede mediante expresión de miembro literal (`process.env.NEXT_PUBLIC_*`). Al evaluar `process.env[name]` en el cliente resultaba `undefined`, lanzando un error en la inicialización del cliente de Supabase durante la hidratación del `ConversationThread`, lo que abortaba el stream RSC.
 
 **Solución aplicada:**
+
 1. En `packages/config/src/public.ts`, se normalizó el acceso a `process.env.NEXT_PUBLIC_SUPABASE_URL` y `process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` de forma directa y tipada.
 2. Se restauró el componente `ConversationThread` completo con todos sus submódulos (historial, TextComposer con advertencia de leakage, AttachmentComposer, ReportForm, bloqueo/desbloqueo y Realtime).
 3. Se limpiaron todos los logs e instrumentaciones de diagnóstico temporales.
