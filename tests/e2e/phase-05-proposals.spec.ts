@@ -108,11 +108,18 @@ test.describe("Phase 05 structured proposals", () => {
       await expect(page).toHaveURL(/\/messages\/[0-9a-f-]{36}$/i);
 
       await page.getByText("Proponer un acuerdo", { exact: true }).click();
-      await page.getByLabel("Tipo").selectOption("DIRECT_BOOKING");
-      await page
+      const proposalForm = page.locator("form").filter({
+        has: page.getByRole("button", { name: "Enviar propuesta" }),
+      });
+      await proposalForm
+        .locator('select[name="kind"]')
+        .selectOption("DIRECT_BOOKING");
+      await proposalForm
         .getByLabel("Alcance")
         .fill("Diagnóstico remoto reservado desde el smoke de Phase 05.");
-      await page.getByRole("button", { name: "Enviar propuesta" }).click();
+      await proposalForm
+        .getByRole("button", { name: "Enviar propuesta" })
+        .click();
 
       await expect(
         page.getByText("Propuesta creada.", { exact: true }),
