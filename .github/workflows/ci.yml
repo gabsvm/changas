@@ -42,11 +42,6 @@ jobs:
       - name: Production build
         run: pnpm build
 
-      - name: Show Phase 05 runtime Prettier diff
-        run: |
-          pnpm exec prettier apps/web/scripts/phase-05-proposals-runtime.mjs > "$RUNNER_TEMP/phase05-runtime-prettier.mjs"
-          diff -u apps/web/scripts/phase-05-proposals-runtime.mjs "$RUNNER_TEMP/phase05-runtime-prettier.mjs" || true
-
       - name: Format check
         run: pnpm format:check
 
