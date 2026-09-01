@@ -242,7 +242,10 @@ const jobs = await admin
   .select("id,accepted_proposal_version_id,payment_attempt_id,status")
   .eq("conversation_id", conversationId);
 assert(!jobs.error, `Could not inspect Phase 05 jobs: ${jobs.error?.message}`);
-assert(jobs.data?.length === 1, "Successful payment produced more than one job.");
+assert(
+  jobs.data?.length === 1,
+  "Successful payment produced more than one job.",
+);
 assert(
   jobs.data[0].id === firstPayment.confirmed_job_id &&
     jobs.data[0].status === "CONFIRMED",
@@ -262,8 +265,7 @@ const providerList = await provider.rpc("list_conversation_proposals", {
   target_conversation_id: conversationId,
 });
 assert(
-  !providerList.error &&
-    providerList.data?.[0]?.proposal_status === "PAID",
+  !providerList.error && providerList.data?.[0]?.proposal_status === "PAID",
   "Provider cannot observe the final PAID proposal state.",
 );
 

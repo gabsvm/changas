@@ -53,7 +53,8 @@ function optionalPrice(formData: FormData): number | null {
 
 function proposalKind(formData: FormData): ProposalKind {
   const value = stringField(formData, "kind") as ProposalKind;
-  if (!proposalKinds.includes(value)) throw new Error("Tipo de propuesta inválido.");
+  if (!proposalKinds.includes(value))
+    throw new Error("Tipo de propuesta inválido.");
   return value;
 }
 

@@ -91,7 +91,7 @@ export function ProposalCard({
         </span>
       </div>
 
-      <p className="text-ink/70 mt-3 whitespace-pre-wrap text-sm leading-6">
+      <p className="text-ink/70 mt-3 text-sm leading-6 whitespace-pre-wrap">
         {proposal.scope_text}
       </p>
 
@@ -101,10 +101,7 @@ export function ProposalCard({
           <dd className="mt-1 font-bold">
             {proposal.price_amount === null
               ? "A cotizar"
-              : formatMinorUnits(
-                  proposal.price_amount,
-                  proposal.currency_code,
-                )}
+              : formatMinorUnits(proposal.price_amount, proposal.currency_code)}
           </dd>
         </div>
         <div className="bg-canvas rounded-xl p-3">
@@ -129,8 +126,16 @@ export function ProposalCard({
         <div className="mt-4 flex flex-wrap gap-2">
           {canAccept ? (
             <form action={respondProposalAction}>
-              <input type="hidden" name="conversationId" value={conversationId} />
-              <input type="hidden" name="proposalId" value={proposal.proposal_id} />
+              <input
+                type="hidden"
+                name="conversationId"
+                value={conversationId}
+              />
+              <input
+                type="hidden"
+                name="proposalId"
+                value={proposal.proposal_id}
+              />
               <input type="hidden" name="action" value="ACCEPT" />
               <button className="bg-ink rounded-full px-4 py-2 text-xs font-bold text-white">
                 Aceptar
@@ -139,8 +144,16 @@ export function ProposalCard({
           ) : null}
           {!ownTerms ? (
             <form action={respondProposalAction}>
-              <input type="hidden" name="conversationId" value={conversationId} />
-              <input type="hidden" name="proposalId" value={proposal.proposal_id} />
+              <input
+                type="hidden"
+                name="conversationId"
+                value={conversationId}
+              />
+              <input
+                type="hidden"
+                name="proposalId"
+                value={proposal.proposal_id}
+              />
               <input type="hidden" name="action" value="REJECT" />
               <button className="border-ink/10 rounded-full border px-4 py-2 text-xs font-bold">
                 Rechazar
@@ -148,8 +161,16 @@ export function ProposalCard({
             </form>
           ) : (
             <form action={respondProposalAction}>
-              <input type="hidden" name="conversationId" value={conversationId} />
-              <input type="hidden" name="proposalId" value={proposal.proposal_id} />
+              <input
+                type="hidden"
+                name="conversationId"
+                value={conversationId}
+              />
+              <input
+                type="hidden"
+                name="proposalId"
+                value={proposal.proposal_id}
+              />
               <input type="hidden" name="action" value="WITHDRAW" />
               <button className="border-ink/10 rounded-full border px-4 py-2 text-xs font-bold">
                 Retirar
@@ -168,7 +189,11 @@ export function ProposalCard({
           </summary>
           <form action={revisionAction} className="mt-3 space-y-2">
             <input type="hidden" name="conversationId" value={conversationId} />
-            <input type="hidden" name="proposalId" value={proposal.proposal_id} />
+            <input
+              type="hidden"
+              name="proposalId"
+              value={proposal.proposal_id}
+            />
             <input type="hidden" name="kind" value={counterKind} />
             <textarea
               name="scope"
@@ -214,8 +239,16 @@ export function ProposalCard({
           <div className="mt-2 flex flex-wrap gap-2">
             {(["SUCCESS", "PENDING", "FAILURE"] as const).map((outcome) => (
               <form key={outcome} action={fakePaymentAction}>
-                <input type="hidden" name="conversationId" value={conversationId} />
-                <input type="hidden" name="proposalId" value={proposal.proposal_id} />
+                <input
+                  type="hidden"
+                  name="conversationId"
+                  value={conversationId}
+                />
+                <input
+                  type="hidden"
+                  name="proposalId"
+                  value={proposal.proposal_id}
+                />
                 <input type="hidden" name="outcome" value={outcome} />
                 <button className="border-moss/20 rounded-full border bg-white px-3 py-1.5 text-[11px] font-bold">
                   {outcome === "SUCCESS"

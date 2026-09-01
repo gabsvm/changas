@@ -32,12 +32,16 @@ export function ProposalComposer({
           Tipo
           <select
             name="kind"
-            defaultValue={currentUserIsClient ? "QUOTE_REQUEST" : "PROVIDER_QUOTE"}
+            defaultValue={
+              currentUserIsClient ? "QUOTE_REQUEST" : "PROVIDER_QUOTE"
+            }
             className="border-ink/10 text-ink mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm"
           >
             {currentUserIsClient ? (
               <>
-                <option value="DIRECT_BOOKING">Reserva al precio publicado</option>
+                <option value="DIRECT_BOOKING">
+                  Reserva al precio publicado
+                </option>
                 <option value="QUOTE_REQUEST">Solicitar cotización</option>
                 <option value="CLIENT_OFFER">Hacer una oferta</option>
               </>

@@ -14,11 +14,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 
 export type ProposalErrorCode =
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "CONFLICT"
-  | "TRANSIENT";
+  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
 
 export class ProposalServerError extends Error {
   constructor(
@@ -151,7 +147,9 @@ function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID_PATTERN.test(value);
 }
 
-export function mapProposalRpcErrorCode(code?: string | null): ProposalErrorCode {
+export function mapProposalRpcErrorCode(
+  code?: string | null,
+): ProposalErrorCode {
   switch (code) {
     case "42501":
       return "FORBIDDEN";

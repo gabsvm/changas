@@ -36,9 +36,9 @@ async function loadThreadData(conversationId: string) {
     return { context, messages, blockedUserId, attachments, proposals };
   } catch (error) {
     if (
-      ((error instanceof ConversationServerError ||
+      (error instanceof ConversationServerError ||
         error instanceof ProposalServerError) &&
-        (error.code === "FORBIDDEN" || error.code === "NOT_FOUND"))
+      (error.code === "FORBIDDEN" || error.code === "NOT_FOUND")
     ) {
       notFound();
     }
@@ -85,7 +85,10 @@ export default async function ConversationPage({
           currentUserIsClient={currentUserIsClient}
         />
         {proposals.length > 0 ? (
-          <section className="space-y-3" aria-label="Propuestas de la conversación">
+          <section
+            className="space-y-3"
+            aria-label="Propuestas de la conversación"
+          >
             {proposals.map((proposal) => (
               <ProposalCard
                 key={`${proposal.proposal_id}:${proposal.current_version_id}:${proposal.proposal_status}`}
