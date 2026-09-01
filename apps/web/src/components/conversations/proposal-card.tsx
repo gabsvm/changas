@@ -68,10 +68,9 @@ export function ProposalCard({
   const priced = proposal.price_amount !== null;
   const canAccept =
     proposal.proposal_status === "OPEN" &&
-    !ownTerms &&
-    priced &&
-    ((currentUserIsClient && proposal.authored_by_user_id === providerUserId) ||
-      (currentUserIsProvider && proposal.authored_by_user_id === clientUserId));
+    currentUserIsClient &&
+    proposal.authored_by_user_id === providerUserId &&
+    priced;
   const canCounter = proposal.proposal_status === "OPEN" && !ownTerms;
   const counterKind: ProposalKind =
     proposal.proposal_kind === "QUOTE_REQUEST" && currentUserIsProvider
