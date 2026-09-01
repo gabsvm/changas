@@ -114,7 +114,10 @@ type ProposalRpcClient = {
   ): Promise<{ data: string | null; error: RpcError }>;
   rpc(
     name: "respond_to_proposal",
-    args: { target_proposal_id: string; response_action: ProposalResponseAction },
+    args: {
+      target_proposal_id: string;
+      response_action: ProposalResponseAction;
+    },
   ): Promise<{ data: ProposalStatus | null; error: RpcError }>;
 };
 
@@ -138,8 +141,10 @@ function isNullableString(value: unknown): value is string | null {
 }
 
 function isDateLike(value: unknown): value is string | null {
-  return value === null ||
-    (typeof value === "string" && Number.isFinite(Date.parse(value)));
+  return (
+    value === null ||
+    (typeof value === "string" && Number.isFinite(Date.parse(value)))
+  );
 }
 
 function isUuid(value: unknown): value is string {
@@ -194,10 +199,7 @@ export function normalizeProposalSummary(value: unknown): ProposalSummary {
     typeof row.service_title !== "string" ||
     !serviceModalities.includes(row.modality as ServiceModality) ||
     typeof row.scope_text !== "string" ||
-    !(
-      price === null ||
-      (Number.isSafeInteger(price) && Number(price) > 0)
-    ) ||
+    !(price === null || (Number.isSafeInteger(price) && Number(price) > 0)) ||
     typeof row.currency_code !== "string" ||
     !/^[A-Z]{3}$/.test(row.currency_code) ||
     !scheduleTypes.includes(row.schedule_type as ScheduleType) ||
@@ -344,8 +346,7 @@ export async function simulateFakeProposalPayment(
     !result ||
     !proposalStatuses.includes(result.resulting_proposal_status) ||
     !(
-      result.payment_attempt_id === null ||
-      isUuid(result.payment_attempt_id)
+      result.payment_attempt_id === null || isUuid(result.payment_attempt_id)
     ) ||
     !(result.confirmed_job_id === null || isUuid(result.confirmed_job_id))
   ) {
