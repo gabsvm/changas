@@ -132,6 +132,9 @@ jobs:
       - name: Run Phase 04 conversation runtime security checks
         run: node apps/web/scripts/phase-04-conversations-runtime.mjs
 
+      - name: Run Phase 05 proposal/payment runtime security checks
+        run: node apps/web/scripts/phase-05-proposals-runtime.mjs
+
       - name: Reset local database with synthetic seed
         run: pnpm dlx supabase@2.116.0 db reset --local
 
