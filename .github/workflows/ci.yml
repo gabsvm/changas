@@ -42,6 +42,11 @@ jobs:
       - name: Production build
         run: pnpm build
 
+      - name: Show Phase 05 Prettier diff
+        run: |
+          pnpm exec prettier tests/e2e/phase-05-proposals.spec.ts > "$RUNNER_TEMP/phase05-prettier.ts"
+          diff -u tests/e2e/phase-05-proposals.spec.ts "$RUNNER_TEMP/phase05-prettier.ts" || true
+
       - name: Format check
         run: pnpm format:check
 
