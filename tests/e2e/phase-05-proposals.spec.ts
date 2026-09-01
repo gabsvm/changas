@@ -89,56 +89,55 @@ async function cleanupTestUser(id: string): Promise<void> {
 }
 
 test.describe("Phase 05 structured proposals", () => {
-  test(
-    "client can create a fixed-price booking and production hides fake payment controls",
-    async ({ page }) => {
-      const user = await createTestUser();
+  test("client can create a fixed-price booking and production hides fake payment controls", async ({
+    page,
+  }) => {
+    const user = await createTestUser();
 
-      try {
-        await page.goto("/login");
-        await page.getByLabel("Correo electrónico").fill(user.email);
-        await page.getByLabel("Contraseña").fill(user.password);
-        await page.getByRole("button", { name: "Iniciar sesión" }).click();
-        await expect(page).toHaveURL(/\/account$/);
+    try {
+      await page.goto("/login");
+      await page.getByLabel("Correo electrónico").fill(user.email);
+      await page.getByLabel("Contraseña").fill(user.password);
+      await page.getByRole("button", { name: "Iniciar sesión" }).click();
+      await expect(page).toHaveURL(/\/account$/);
 
-        await page.goto("/p/demo-proveedor/demo-revision-pc");
-        await page
-          .getByRole("button", { name: "Consultar por este servicio" })
-          .click();
-        await expect(page).toHaveURL(/\/messages\/[0-9a-f-]{36}$/i);
+      await page.goto("/p/demo-proveedor/demo-revision-pc");
+      await page
+        .getByRole("button", { name: "Consultar por este servicio" })
+        .click();
+      await expect(page).toHaveURL(/\/messages\/[0-9a-f-]{36}$/i);
 
-        await page.getByText("Proponer un acuerdo", { exact: true }).click();
-        await page.getByLabel("Tipo").selectOption("DIRECT_BOOKING");
-        await page
-          .getByLabel("Alcance")
-          .fill("Diagnóstico remoto reservado desde el smoke de Phase 05.");
-        await page.getByRole("button", { name: "Enviar propuesta" }).click();
+      await page.getByText("Proponer un acuerdo", { exact: true }).click();
+      await page.getByLabel("Tipo").selectOption("DIRECT_BOOKING");
+      await page
+        .getByLabel("Alcance")
+        .fill("Diagnóstico remoto reservado desde el smoke de Phase 05.");
+      await page.getByRole("button", { name: "Enviar propuesta" }).click();
 
-        await expect(
-          page.getByText("Propuesta creada.", { exact: true }),
-        ).toBeVisible();
-        await expect(
-          page.getByText("Reserva directa · v1", { exact: true }),
-        ).toBeVisible();
-        await expect(
-          page.getByText("Esperando pago", { exact: true }),
-        ).toBeVisible();
-        await expect(
-          page.getByText(
-            "Diagnóstico remoto reservado desde el smoke de Phase 05.",
-            { exact: true },
-          ),
-        ).toBeVisible();
+      await expect(
+        page.getByText("Propuesta creada.", { exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByText("Reserva directa · v1", { exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByText("Esperando pago", { exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByText(
+          "Diagnóstico remoto reservado desde el smoke de Phase 05.",
+          { exact: true },
+        ),
+      ).toBeVisible();
 
-        await expect(
-          page.getByText("Pago simulado · solo desarrollo", { exact: true }),
-        ).toHaveCount(0);
-        await expect(
-          page.getByRole("button", { name: "Simular aprobado" }),
-        ).toHaveCount(0);
-      } finally {
-        await cleanupTestUser(user.id);
-      }
-    },
-  );
+      await expect(
+        page.getByText("Pago simulado · solo desarrollo", { exact: true }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole("button", { name: "Simular aprobado" }),
+      ).toHaveCount(0);
+    } finally {
+      await cleanupTestUser(user.id);
+    }
+  });
 });
