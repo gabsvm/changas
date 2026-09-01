@@ -175,6 +175,17 @@ function proposalError(error: RpcError): ProposalServerError {
   return new ProposalServerError(code, messages[code]);
 }
 
+export function normalizeProposalRevisionId(value: string | null): string {
+  if (value === null) {
+    throw new ProposalServerError(
+      "CONFLICT",
+      "La propuesta venció y ya no puede modificarse.",
+    );
+  }
+  if (!isUuid(value)) throw proposalError(null);
+  return value;
+}
+
 export function normalizeProposalSummary(value: unknown): ProposalSummary {
   if (!value || typeof value !== "object") {
     throw new Error("Invalid proposal summary");
@@ -297,8 +308,7 @@ export async function reviseConversationProposal(
   });
 
   if (error) throw proposalError(error);
-  if (!data || !isUuid(data)) throw proposalError(null);
-  return data;
+  return normalizeProposalRevisionId(data);
 }
 
 export async function respondToProposal(
