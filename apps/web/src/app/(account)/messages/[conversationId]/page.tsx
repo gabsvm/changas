@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 
+import { ConversationThreadTextProbe } from "@/components/conversations/conversation-thread-text-probe";
 import { listConversationAttachments } from "@/lib/conversations/attachments";
 import { listConversationMessages } from "@/lib/conversations/messages";
 import {
@@ -84,6 +85,7 @@ export default async function ConversationPage({
   const peerName = currentUserIsClient
     ? context.provider_display_name
     : context.client_display_name;
+  const initialTextNonce = crypto.randomUUID();
 
   console.info("[phase04-thread] page:props-ready", {
     currentUserIsClient,
@@ -92,19 +94,17 @@ export default async function ConversationPage({
     messageCount: messages.length,
     attachmentCount: attachments.length,
     initiallyBlockedByMe: blockedUserId === peerUserId,
+    hasTextNonce: initialTextNonce.length > 0,
   });
 
   return (
     <section className="py-4 sm:py-6">
-      <div className="border-ink/10 mx-auto w-full max-w-4xl rounded-[1.75rem] border bg-white/70 p-6">
-        <p className="font-semibold">{peerName}</p>
-        <p className="text-ink/60 text-sm">{context.service_title}</p>
-        <p className="text-ink/50 mt-4 text-xs">
-          Diagnóstico de frontera del hilo · {messages.length} mensajes ·{" "}
-          {attachments.length} adjuntos ·{" "}
-          {blockedUserId === peerUserId ? "bloqueado" : "activo"}
-        </p>
-      </div>
+      <ConversationThreadTextProbe
+        conversationId={conversationId}
+        peerName={peerName}
+        serviceTitle={context.service_title}
+        initialTextNonce={initialTextNonce}
+      />
     </section>
   );
 }
