@@ -1,15 +1,15 @@
-﻿# Phase 04 — Conversations and realtime
+# Phase 04 — Conversations and realtime
 
 ## Estado final
 
 **Rama:** `codex/phase-04-conversations`  
-**FINAL HEAD SHA:** `f07582d23a28e94ebcf6e26ac78e992d5252bd69`  
-**CI RUN ID:** `33470457562`  
+**FINAL HEAD SHA:** `389d7c18740509f12dbbf11f34828bd8ee90f05e`  
+**CI RUN ID:** `33534888959`  
 **validate:** `success`  
 **supabase-integration:** `success`  
 **Playwright total y resultado:** 32 tests passed (Chromium desktop + Pixel 5 mobile-web)  
 **pgTAP total:** 15 test files, 252 tests passed  
-**Lighthouse scores:** Home performance: 92 | Search performance: 93
+**Lighthouse scores:** Home performance: 98 | Search performance: 99
 
 Phase 04 queda finalizada, auditada y cerrada de acuerdo con `CHANGAS_MASTER_PLAN.md` y `docs/superpowers/plans/2026-08-31-phase-04-conversations.md`. No se inició Phase 05 y no se introdujeron tablas, endpoints, propuestas, jobs, pagos, reputación ni administración.
 
