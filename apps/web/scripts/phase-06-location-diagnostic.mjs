@@ -28,20 +28,30 @@ async function makeUser(user) {
     password,
     email_confirm: true,
   });
-  assert(!created.error && created.data.user, `create user: ${created.error?.message}`);
+  assert(
+    !created.error && created.data.user,
+    `create user: ${created.error?.message}`,
+  );
   user.id = created.data.user.id;
 
   const client = createClient(supabaseUrl, anonKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
-  const signedIn = await client.auth.signInWithPassword({ email: user.email, password });
+  const signedIn = await client.auth.signInWithPassword({
+    email: user.email,
+    password,
+  });
   assert(!signedIn.error, `sign in: ${signedIn.error?.message}`);
   return client;
 }
 
 const client = await makeUser(users.client);
 const provider = await makeUser(users.provider);
-const skill = await admin.from("skills").select("id").eq("slug", "reparacion-pc").single();
+const skill = await admin
+  .from("skills")
+  .select("id")
+  .eq("slug", "reparacion-pc")
+  .single();
 assert(!skill.error && skill.data?.id, "missing skill");
 
 const providerSlug = `phase06-location-provider-${runId}`;
@@ -86,13 +96,19 @@ const service = await admin
   })
   .select("id")
   .single();
-assert(!service.error && service.data?.id, `service failed: ${service.error?.message}`);
+assert(
+  !service.error && service.data?.id,
+  `service failed: ${service.error?.message}`,
+);
 
 const conversation = await client.rpc("start_service_conversation", {
   target_provider_slug: providerSlug,
   target_service_slug: serviceSlug,
 });
-assert(!conversation.error && conversation.data, `conversation: ${conversation.error?.message}`);
+assert(
+  !conversation.error && conversation.data,
+  `conversation: ${conversation.error?.message}`,
+);
 const proposal = await client.rpc("create_conversation_proposal", {
   target_conversation_id: conversation.data,
   requested_kind: "DIRECT_BOOKING",
@@ -103,7 +119,10 @@ const proposal = await client.rpc("create_conversation_proposal", {
   proposed_deadline_at: null,
   proposal_expires_at: null,
 });
-assert(!proposal.error && proposal.data, `proposal: ${proposal.error?.message}`);
+assert(
+  !proposal.error && proposal.data,
+  `proposal: ${proposal.error?.message}`,
+);
 const paid = await admin.rpc("apply_fake_payment_result", {
   target_proposal_id: proposal.data,
   payment_nonce: crypto.randomUUID(),
@@ -122,24 +141,61 @@ const write = await client.rpc("set_job_exact_location", {
 });
 assert(!write.error, `location write: ${write.error?.message}`);
 
-const [adminJob, adminLocation, clientLocation, providerLocation, clientDetail, providerDetail] =
-  await Promise.all([
-    admin.from("jobs").select("id,status,client_user_id,provider_user_id").eq("id", jobId).single(),
-    admin.from("job_private_locations").select("*").eq("job_id", jobId).maybeSingle(),
-    client.from("job_private_locations").select("*").eq("job_id", jobId).maybeSingle(),
-    provider.from("job_private_locations").select("*").eq("job_id", jobId).maybeSingle(),
-    client.rpc("get_job_detail", { target_job_id: jobId }),
-    provider.rpc("get_job_detail", { target_job_id: jobId }),
-  ]);
+const [
+  adminJob,
+  adminLocation,
+  clientLocation,
+  providerLocation,
+  clientDetail,
+  providerDetail,
+] = await Promise.all([
+  admin
+    .from("jobs")
+    .select("id,status,client_user_id,provider_user_id")
+    .eq("id", jobId)
+    .single(),
+  admin
+    .from("job_private_locations")
+    .select("*")
+    .eq("job_id", jobId)
+    .maybeSingle(),
+  client
+    .from("job_private_locations")
+    .select("*")
+    .eq("job_id", jobId)
+    .maybeSingle(),
+  provider
+    .from("job_private_locations")
+    .select("*")
+    .eq("job_id", jobId)
+    .maybeSingle(),
+  client.rpc("get_job_detail", { target_job_id: jobId }),
+  provider.rpc("get_job_detail", { target_job_id: jobId }),
+]);
 
 const diagnostic = {
   expectedProviderId: users.provider.id,
   adminJob: { data: adminJob.data, error: adminJob.error?.message ?? null },
-  adminLocation: { data: adminLocation.data, error: adminLocation.error?.message ?? null },
-  clientLocation: { data: clientLocation.data, error: clientLocation.error?.message ?? null },
-  providerLocation: { data: providerLocation.data, error: providerLocation.error?.message ?? null },
-  clientDetail: { data: clientDetail.data, error: clientDetail.error?.message ?? null },
-  providerDetail: { data: providerDetail.data, error: providerDetail.error?.message ?? null },
+  adminLocation: {
+    data: adminLocation.data,
+    error: adminLocation.error?.message ?? null,
+  },
+  clientLocation: {
+    data: clientLocation.data,
+    error: clientLocation.error?.message ?? null,
+  },
+  providerLocation: {
+    data: providerLocation.data,
+    error: providerLocation.error?.message ?? null,
+  },
+  clientDetail: {
+    data: clientDetail.data,
+    error: clientDetail.error?.message ?? null,
+  },
+  providerDetail: {
+    data: providerDetail.data,
+    error: providerDetail.error?.message ?? null,
+  },
 };
 
 console.log("PHASE06_LOCATION_DIAGNOSTIC", JSON.stringify(diagnostic));
