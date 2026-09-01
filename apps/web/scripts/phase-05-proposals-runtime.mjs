@@ -165,6 +165,80 @@ assert(
   "Provider can create a client-only direct booking.",
 );
 
+const clientOffer = await client.rpc("create_conversation_proposal", {
+  target_conversation_id: conversationId,
+  requested_kind: "CLIENT_OFFER",
+  scope_text: "Oferta del cliente que el proveedor puede aceptar",
+  proposed_price_amount: 99000,
+  proposed_schedule_start_at: null,
+  proposed_schedule_end_at: null,
+  proposed_deadline_at: null,
+  proposal_expires_at: null,
+});
+assert(
+  !clientOffer.error && clientOffer.data,
+  `Client offer failed: ${clientOffer.error?.message ?? "unknown"}`,
+);
+
+const providerAcceptedOffer = await provider.rpc("respond_to_proposal", {
+  target_proposal_id: clientOffer.data,
+  response_action: "ACCEPT",
+});
+assert(
+  !providerAcceptedOffer.error &&
+    providerAcceptedOffer.data === "AWAITING_PAYMENT",
+  `Provider could not accept client-authored terms: ${providerAcceptedOffer.error?.message ?? providerAcceptedOffer.data ?? "unknown"}`,
+);
+
+const expiringOffer = await client.rpc("create_conversation_proposal", {
+  target_conversation_id: conversationId,
+  requested_kind: "CLIENT_OFFER",
+  scope_text: "Oferta destinada a validar expiración persistente",
+  proposed_price_amount: 100000,
+  proposed_schedule_start_at: null,
+  proposed_schedule_end_at: null,
+  proposed_deadline_at: null,
+  proposal_expires_at: new Date(Date.now() + 60_000).toISOString(),
+});
+assert(
+  !expiringOffer.error && expiringOffer.data,
+  `Expiring client offer failed: ${expiringOffer.error?.message ?? "unknown"}`,
+);
+
+const forcedPastExpiry = await admin
+  .from("proposals")
+  .update({ expires_at: new Date(Date.now() - 60_000).toISOString() })
+  .eq("id", expiringOffer.data);
+assert(
+  !forcedPastExpiry.error,
+  `Could not force proposal expiry: ${forcedPastExpiry.error?.message ?? "unknown"}`,
+);
+
+const expiredRevision = await client.rpc("revise_conversation_proposal", {
+  target_proposal_id: expiringOffer.data,
+  requested_kind: "CLIENT_OFFER",
+  scope_text: "Esta revisión no debe reabrir una propuesta vencida",
+  proposed_price_amount: 101000,
+  proposed_schedule_start_at: null,
+  proposed_schedule_end_at: null,
+  proposed_deadline_at: null,
+  proposal_expires_at: null,
+});
+assert(
+  !expiredRevision.error && expiredRevision.data === null,
+  `Expired proposal revision must persist EXPIRED without rolling back: ${expiredRevision.error?.message ?? expiredRevision.data ?? "unknown"}`,
+);
+
+const expiredProposal = await admin
+  .from("proposals")
+  .select("status")
+  .eq("id", expiringOffer.data)
+  .single();
+assert(
+  !expiredProposal.error && expiredProposal.data?.status === "EXPIRED",
+  `Expired proposal status was not persisted: ${expiredProposal.error?.message ?? expiredProposal.data?.status ?? "unknown"}`,
+);
+
 const booking = await client.rpc("create_conversation_proposal", {
   target_conversation_id: conversationId,
   requested_kind: "DIRECT_BOOKING",
@@ -185,10 +259,13 @@ const clientList = await client.rpc("list_conversation_proposals", {
   target_conversation_id: conversationId,
 });
 assert(
-  !clientList.error && clientList.data?.length === 1,
-  "Client cannot read the created proposal.",
+  !clientList.error && clientList.data?.length === 3,
+  "Client cannot read all created proposals.",
 );
-const proposalRow = clientList.data[0];
+const proposalRow = clientList.data.find(
+  (proposal) => proposal.proposal_id === proposalId,
+);
+assert(proposalRow, "Direct booking is missing from proposal list.");
 assert(
   proposalRow.proposal_status === "AWAITING_PAYMENT",
   `Direct booking status should be AWAITING_PAYMENT, got ${proposalRow.proposal_status}.`,
@@ -264,8 +341,11 @@ assert(
 const providerList = await provider.rpc("list_conversation_proposals", {
   target_conversation_id: conversationId,
 });
+const providerPaidProposal = providerList.data?.find(
+  (proposal) => proposal.proposal_id === proposalId,
+);
 assert(
-  !providerList.error && providerList.data?.[0]?.proposal_status === "PAID",
+  !providerList.error && providerPaidProposal?.proposal_status === "PAID",
   "Provider cannot observe the final PAID proposal state.",
 );
 
