@@ -1,8 +1,5 @@
 import type { CurrencyCode, PaymentRecord } from "@changas/domain";
-import {
-  FakePaymentProvider,
-  supportedCurrencyCodes,
-} from "@changas/domain";
+import { FakePaymentProvider, supportedCurrencyCodes } from "@changas/domain";
 
 export type FakeAdditionalPaymentOutcome = "SUCCESS" | "PENDING" | "FAILURE";
 
