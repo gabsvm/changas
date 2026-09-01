@@ -42,11 +42,8 @@ jobs:
       - name: Production build
         run: pnpm build
 
-      - name: Format diagnostic
-        run: |
-          pnpm exec prettier --write tests/e2e/phase-06-jobs.spec.ts
-          git diff -- tests/e2e/phase-06-jobs.spec.ts
-          exit 1
+      - name: Format check
+        run: pnpm format:check
 
       - name: Diff check
         run: git diff --check
