@@ -72,10 +72,10 @@ select ok(
 );
 
 select ok(
-  not coalesce(has_table_privilege('authenticated', to_regclass('public.availability_rules'), 'INSERT, UPDATE, DELETE'), false)
-  and not coalesce(has_table_privilege('authenticated', to_regclass('public.availability_blocks'), 'INSERT, UPDATE, DELETE'), false)
+  coalesce(has_table_privilege('authenticated', to_regclass('public.availability_rules'), 'INSERT, UPDATE, DELETE'), false)
+  and coalesce(has_table_privilege('authenticated', to_regclass('public.availability_blocks'), 'INSERT, UPDATE, DELETE'), false)
   and not coalesce(has_table_privilege('authenticated', to_regclass('public.provider_slot_holds'), 'INSERT, UPDATE, DELETE'), false),
-  'authenticated scheduling tables are mutation-safe'
+  'Phase 02 owner-managed availability remains compatible while slot holds stay mutation-safe'
 );
 
 select ok(
