@@ -166,6 +166,43 @@ async function createPaidJob(client, clientUser, suffix, startAt, endAt) {
   return { conversationId: started.data, proposalId: proposal.data, paid };
 }
 
+async function requestAcceptedScopeChange(jobId, scopeText, amountMinor) {
+  const requested = await provider.rpc("request_job_scope_change", {
+    target_job_id: jobId,
+    new_scope_text: scopeText,
+    additional_amount_minor: amountMinor,
+  });
+  assert(
+    !requested.error && requested.data,
+    `Scope change request failed: ${requested.error?.message ?? "unknown"}`,
+  );
+  const accepted = await clientA.rpc("respond_job_scope_change", {
+    target_scope_change_id: requested.data,
+    response_action: "ACCEPT",
+  });
+  assert(
+    !accepted.error && accepted.data === "AWAITING_PAYMENT",
+    "Price-increasing scope change bypassed additional payment state.",
+  );
+  return requested.data;
+}
+
+async function applyAdditionalPayment({
+  scopeChangeId,
+  nonce,
+  providerReference,
+  status,
+}) {
+  return admin.rpc("apply_additional_payment_result", {
+    target_scope_change_id: scopeChangeId,
+    payment_nonce: nonce,
+    payment_provider_name: "RUNTIME",
+    payment_provider_reference: providerReference,
+    payment_result_status: status,
+    actor_client_user_id: users.clientA.id,
+  });
+}
+
 const first = await createPaidJob(
   clientA,
   users.clientA,
@@ -245,6 +282,30 @@ assert(
   !acceptedReschedule.error && acceptedReschedule.data === "ACCEPTED",
   `Reschedule acceptance failed: ${acceptedReschedule.error?.message ?? "unknown"}`,
 );
+
+const rejectedReschedule = await provider.rpc("request_job_reschedule", {
+  target_job_id: jobId,
+  requested_schedule_type: "FIXED_SLOT",
+  requested_starts_at: "2026-09-05T16:00:00.000Z",
+  requested_ends_at: "2026-09-05T17:00:00.000Z",
+  requested_deadline_at: null,
+  requested_duration_minutes: 60,
+  request_reason: "Segunda alternativa del proveedor",
+});
+assert(
+  !rejectedReschedule.error && rejectedReschedule.data,
+  "Provider could not request a second reschedule.",
+);
+const rejectedRescheduleResponse = await clientA.rpc("respond_job_reschedule", {
+  target_request_id: rejectedReschedule.data,
+  response_action: "REJECT",
+});
+assert(
+  !rejectedRescheduleResponse.error &&
+    rejectedRescheduleResponse.data === "REJECTED",
+  "Client could not reject a reschedule request.",
+);
+
 const scheduleHistory = await admin
   .from("job_schedule_versions")
   .select("id,version_number")
@@ -253,27 +314,27 @@ assert(
   !scheduleHistory.error && scheduleHistory.data?.length === 2,
   "Accepted reschedule did not preserve schedule history.",
 );
-
-const scopeChange = await provider.rpc("request_job_scope_change", {
+const rescheduleHistory = await clientA.rpc("list_job_reschedule_requests", {
   target_job_id: jobId,
-  new_scope_text:
-    "Diagnóstico más limpieza interna y recambio preventivo del cooler.",
-  additional_amount_minor: 50000,
 });
 assert(
-  !scopeChange.error && scopeChange.data,
-  `Scope change request failed: ${scopeChange.error?.message ?? "unknown"}`,
+  !rescheduleHistory.error &&
+    rescheduleHistory.data?.some(
+      (request) => request.request_status === "ACCEPTED",
+    ) &&
+    rescheduleHistory.data?.some(
+      (request) => request.request_status === "REJECTED",
+    ),
+  "Reschedule history did not preserve accepted and rejected requests.",
 );
-const acceptedScope = await clientA.rpc("respond_job_scope_change", {
-  target_scope_change_id: scopeChange.data,
-  response_action: "ACCEPT",
-});
-assert(
-  !acceptedScope.error && acceptedScope.data === "AWAITING_PAYMENT",
-  "Price-increasing scope change bypassed additional payment state.",
+
+const scopeChange = await requestAcceptedScopeChange(
+  jobId,
+  "Diagnóstico más limpieza interna y recambio preventivo del cooler.",
+  50000,
 );
 const additional = await admin.rpc("apply_fake_additional_payment_result", {
-  target_scope_change_id: scopeChange.data,
+  target_scope_change_id: scopeChange,
   payment_nonce: crypto.randomUUID(),
   payment_outcome: "SUCCESS",
   actor_client_user_id: users.clientA.id,
@@ -282,6 +343,112 @@ assert(
   !additional.error &&
     additional.data?.[0]?.resulting_scope_change_status === "PAID",
   `Additional fake payment failed: ${additional.error?.message ?? "unknown"}`,
+);
+
+const retryScopeChange = await requestAcceptedScopeChange(
+  jobId,
+  "Segundo adicional para validar pending, failure y retry.",
+  30000,
+);
+const pendingNonce = crypto.randomUUID();
+const pendingReference = `additional-pending-${crypto.randomUUID()}`;
+const pendingAdditional = await applyAdditionalPayment({
+  scopeChangeId: retryScopeChange,
+  nonce: pendingNonce,
+  providerReference: pendingReference,
+  status: "PENDING",
+});
+assert(
+  !pendingAdditional.error &&
+    pendingAdditional.data?.[0]?.resulting_scope_change_status ===
+      "AWAITING_PAYMENT",
+  "Generic additional PENDING did not retain AWAITING_PAYMENT.",
+);
+const duplicatePending = await applyAdditionalPayment({
+  scopeChangeId: retryScopeChange,
+  nonce: pendingNonce,
+  providerReference: pendingReference,
+  status: "PENDING",
+});
+assert(
+  !duplicatePending.error &&
+    duplicatePending.data?.[0]?.payment_attempt_id ===
+      pendingAdditional.data?.[0]?.payment_attempt_id,
+  "Duplicate additional payment nonce created a different attempt.",
+);
+const failedAdditional = await applyAdditionalPayment({
+  scopeChangeId: retryScopeChange,
+  nonce: crypto.randomUUID(),
+  providerReference: `additional-failed-${crypto.randomUUID()}`,
+  status: "FAILED",
+});
+assert(
+  !failedAdditional.error &&
+    failedAdditional.data?.[0]?.resulting_scope_change_status ===
+      "PAYMENT_FAILED",
+  "Generic additional FAILURE did not enter PAYMENT_FAILED.",
+);
+const retryAdditional = await applyAdditionalPayment({
+  scopeChangeId: retryScopeChange,
+  nonce: crypto.randomUUID(),
+  providerReference: `additional-retry-${crypto.randomUUID()}`,
+  status: "SUCCEEDED",
+});
+assert(
+  !retryAdditional.error &&
+    retryAdditional.data?.[0]?.resulting_scope_change_status === "PAID",
+  "New-nonce additional payment retry did not recover to PAID.",
+);
+
+const concurrentScopeChange = await requestAcceptedScopeChange(
+  jobId,
+  "Tercer adicional para validar callbacks concurrentes idempotentes.",
+  20000,
+);
+const concurrentNonce = crypto.randomUUID();
+const concurrentReference = `additional-race-${crypto.randomUUID()}`;
+const [concurrentA, concurrentB] = await Promise.all([
+  applyAdditionalPayment({
+    scopeChangeId: concurrentScopeChange,
+    nonce: concurrentNonce,
+    providerReference: concurrentReference,
+    status: "SUCCEEDED",
+  }),
+  applyAdditionalPayment({
+    scopeChangeId: concurrentScopeChange,
+    nonce: concurrentNonce,
+    providerReference: concurrentReference,
+    status: "SUCCEEDED",
+  }),
+]);
+assert(
+  !concurrentA.error &&
+    !concurrentB.error &&
+    concurrentA.data?.[0]?.payment_attempt_id ===
+      concurrentB.data?.[0]?.payment_attempt_id &&
+    concurrentA.data?.[0]?.resulting_scope_change_status === "PAID" &&
+    concurrentB.data?.[0]?.resulting_scope_change_status === "PAID",
+  "Concurrent duplicate additional payment callbacks were not idempotent.",
+);
+const concurrentAttempts = await admin
+  .from("job_additional_payment_attempts")
+  .select("id")
+  .eq("scope_change_id", concurrentScopeChange);
+assert(
+  !concurrentAttempts.error && concurrentAttempts.data?.length === 1,
+  "Concurrent duplicate callbacks persisted more than one additional payment attempt.",
+);
+const additionalSuccessEvents = await admin
+  .from("job_events")
+  .select("metadata")
+  .eq("job_id", jobId)
+  .eq("event_type", "ADDITIONAL_PAYMENT_SUCCEEDED");
+const concurrentSuccessEvents = (additionalSuccessEvents.data ?? []).filter(
+  (event) => event.metadata?.scope_change_id === concurrentScopeChange,
+);
+assert(
+  !additionalSuccessEvents.error && concurrentSuccessEvents.length === 1,
+  "Concurrent duplicate callbacks emitted duplicate success events.",
 );
 
 const illegalClientStart = await clientA.rpc("transition_job_status", {
@@ -312,6 +479,16 @@ assert(
   !completionRequest.error && completionRequest.data === "COMPLETION_REQUESTED",
   "Provider could not request completion.",
 );
+const illegalProviderCompletion = await provider.rpc("transition_job_status", {
+  target_job_id: jobId,
+  expected_status: "COMPLETION_REQUESTED",
+  requested_status: "COMPLETED",
+  transition_reason: null,
+});
+assert(
+  Boolean(illegalProviderCompletion.error),
+  "Provider can confirm their own completion request.",
+);
 const completed = await clientA.rpc("transition_job_status", {
   target_job_id: jobId,
   expected_status: "COMPLETION_REQUESTED",
@@ -332,6 +509,80 @@ assert(
   "Provider retained exact address through the participant read model after completion.",
 );
 
+const cancelledFixture = await createPaidJob(
+  clientB,
+  users.clientB,
+  "cancelled",
+  "2026-09-06T14:00:00.000Z",
+  "2026-09-06T15:00:00.000Z",
+);
+const cancelledJobId = cancelledFixture.paid.data?.[0]?.confirmed_job_id;
+assert(
+  !cancelledFixture.paid.error && cancelledJobId,
+  "Could not create cancellation audit fixture.",
+);
+const cancellationReason = "El cliente canceló antes de la visita acordada.";
+const cancelled = await clientB.rpc("transition_job_status", {
+  target_job_id: cancelledJobId,
+  expected_status: "CONFIRMED",
+  requested_status: "CANCELLED",
+  transition_reason: cancellationReason,
+});
+assert(
+  !cancelled.error && cancelled.data === "CANCELLED",
+  "Client could not cancel a confirmed Job with a reason.",
+);
+const cancellationEvents = await clientB.rpc("list_job_events", {
+  target_job_id: cancelledJobId,
+  limit_count: 200,
+});
+const cancellationEvent = cancellationEvents.data?.find(
+  (event) => event.to_status === "CANCELLED",
+);
+assert(
+  !cancellationEvents.error &&
+    cancellationEvent?.actor_user_id === users.clientB.id &&
+    cancellationEvent?.reason === cancellationReason,
+  "Cancellation audit did not preserve actor and reason.",
+);
+
+const noShowFixture = await createPaidJob(
+  clientA,
+  users.clientA,
+  "no-show",
+  "2026-09-06T15:00:00.000Z",
+  "2026-09-06T16:00:00.000Z",
+);
+const noShowJobId = noShowFixture.paid.data?.[0]?.confirmed_job_id;
+assert(
+  !noShowFixture.paid.error && noShowJobId,
+  "Could not create no-show audit fixture.",
+);
+const noShowReason = "El cliente no se presentó en el horario confirmado.";
+const noShow = await provider.rpc("transition_job_status", {
+  target_job_id: noShowJobId,
+  expected_status: "CONFIRMED",
+  requested_status: "NO_SHOW",
+  transition_reason: noShowReason,
+});
+assert(
+  !noShow.error && noShow.data === "NO_SHOW",
+  "Provider could not record a confirmed Job no-show.",
+);
+const noShowEvents = await provider.rpc("list_job_events", {
+  target_job_id: noShowJobId,
+  limit_count: 200,
+});
+const noShowEvent = noShowEvents.data?.find(
+  (event) => event.to_status === "NO_SHOW",
+);
+assert(
+  !noShowEvents.error &&
+    noShowEvent?.actor_user_id === users.provider.id &&
+    noShowEvent?.reason === noShowReason,
+  "No-show audit did not preserve actor and reason.",
+);
+
 const events = await clientA.rpc("list_job_events", {
   target_job_id: jobId,
   limit_count: 200,
@@ -340,6 +591,10 @@ assert(
   !events.error &&
     events.data?.some((event) => event.event_type === "RESCHEDULE_ACCEPTED"),
   "Job event history lost accepted reschedule.",
+);
+assert(
+  events.data?.some((event) => event.event_type === "RESCHEDULE_REJECTED"),
+  "Job event history lost rejected reschedule.",
 );
 assert(
   events.data?.some((event) => event.event_type === "SCOPE_CHANGE_ACCEPTED"),
