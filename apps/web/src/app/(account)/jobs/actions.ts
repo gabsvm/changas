@@ -57,15 +57,23 @@ export async function transitionJobAction(formData: FormData): Promise<void> {
   if (!jobStatuses.includes(expected) || !jobStatuses.includes(requested)) {
     throw new Error("Estado inválido.");
   }
-  await transitionJob(jobId, expected, requested, stringField(formData, "reason"));
+  await transitionJob(
+    jobId,
+    expected,
+    requested,
+    stringField(formData, "reason"),
+  );
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");
 }
 
-export async function requestRescheduleAction(formData: FormData): Promise<void> {
+export async function requestRescheduleAction(
+  formData: FormData,
+): Promise<void> {
   const jobId = uuidField(formData, "jobId");
   const scheduleType = stringField(formData, "scheduleType") as ScheduleType;
-  if (!scheduleTypes.includes(scheduleType)) throw new Error("Agenda inválida.");
+  if (!scheduleTypes.includes(scheduleType))
+    throw new Error("Agenda inválida.");
 
   await requestJobReschedule({
     jobId,
@@ -79,17 +87,22 @@ export async function requestRescheduleAction(formData: FormData): Promise<void>
   revalidatePath(`/jobs/${jobId}`);
 }
 
-export async function respondRescheduleAction(formData: FormData): Promise<void> {
+export async function respondRescheduleAction(
+  formData: FormData,
+): Promise<void> {
   const jobId = uuidField(formData, "jobId");
   const requestId = uuidField(formData, "requestId");
   const action = stringField(formData, "action");
-  if (action !== "ACCEPT" && action !== "REJECT") throw new Error("Acción inválida.");
+  if (action !== "ACCEPT" && action !== "REJECT")
+    throw new Error("Acción inválida.");
   await respondJobReschedule(requestId, action);
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");
 }
 
-export async function requestScopeChangeAction(formData: FormData): Promise<void> {
+export async function requestScopeChangeAction(
+  formData: FormData,
+): Promise<void> {
   const jobId = uuidField(formData, "jobId");
   const scope = stringField(formData, "scope");
   if (scope.length < 3) throw new Error("Describí el nuevo alcance.");
@@ -99,17 +112,23 @@ export async function requestScopeChangeAction(formData: FormData): Promise<void
   revalidatePath(`/jobs/${jobId}`);
 }
 
-export async function respondScopeChangeAction(formData: FormData): Promise<void> {
+export async function respondScopeChangeAction(
+  formData: FormData,
+): Promise<void> {
   const jobId = uuidField(formData, "jobId");
   const scopeChangeId = uuidField(formData, "scopeChangeId");
   const action = stringField(formData, "action");
-  if (action !== "ACCEPT" && action !== "REJECT") throw new Error("Acción inválida.");
+  if (action !== "ACCEPT" && action !== "REJECT")
+    throw new Error("Acción inválida.");
   await respondJobScopeChange(scopeChangeId, action);
   revalidatePath(`/jobs/${jobId}`);
 }
 
-export async function fakeAdditionalPaymentAction(formData: FormData): Promise<void> {
-  if (process.env.NODE_ENV === "production") throw new Error("No disponible en producción.");
+export async function fakeAdditionalPaymentAction(
+  formData: FormData,
+): Promise<void> {
+  if (process.env.NODE_ENV === "production")
+    throw new Error("No disponible en producción.");
   const jobId = uuidField(formData, "jobId");
   const scopeChangeId = uuidField(formData, "scopeChangeId");
   const nonce = stringField(formData, "paymentNonce") || crypto.randomUUID();

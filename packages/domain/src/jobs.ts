@@ -81,7 +81,9 @@ export function isStructurallyValidJobSchedule(
     case "UNSCHEDULED":
       return !schedule.startsAt && !schedule.endsAt && !schedule.deadlineAt;
     case "DEADLINE":
-      return Boolean(schedule.deadlineAt) && !schedule.startsAt && !schedule.endsAt;
+      return (
+        Boolean(schedule.deadlineAt) && !schedule.startsAt && !schedule.endsAt
+      );
     case "FIXED_SLOT":
     case "FLEXIBLE_WINDOW":
       return (

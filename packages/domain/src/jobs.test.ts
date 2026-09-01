@@ -8,8 +8,12 @@ import {
 
 describe("job lifecycle", () => {
   it("keeps execution and completion actor-specific", () => {
-    expect(canActorTransitionJob("CONFIRMED", "IN_PROGRESS", "PROVIDER")).toBe(true);
-    expect(canActorTransitionJob("CONFIRMED", "IN_PROGRESS", "CLIENT")).toBe(false);
+    expect(canActorTransitionJob("CONFIRMED", "IN_PROGRESS", "PROVIDER")).toBe(
+      true,
+    );
+    expect(canActorTransitionJob("CONFIRMED", "IN_PROGRESS", "CLIENT")).toBe(
+      false,
+    );
     expect(
       canActorTransitionJob("IN_PROGRESS", "COMPLETION_REQUESTED", "PROVIDER"),
     ).toBe(true);

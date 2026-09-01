@@ -2,7 +2,9 @@ import Link from "next/link";
 
 import { listMyUpcomingJobs } from "@/lib/jobs/server";
 
-function scheduleLabel(job: Awaited<ReturnType<typeof listMyUpcomingJobs>>[number]) {
+function scheduleLabel(
+  job: Awaited<ReturnType<typeof listMyUpcomingJobs>>[number],
+) {
   if (job.starts_at) {
     return new Intl.DateTimeFormat("es-AR", {
       dateStyle: "medium",
@@ -28,15 +30,19 @@ export default async function JobsPage() {
           Mis trabajos
         </h1>
         <p className="text-ink/60 mt-2 max-w-xl text-sm leading-6">
-          Acá aparecen los trabajos confirmados, en curso o pendientes de cierre.
+          Acá aparecen los trabajos confirmados, en curso o pendientes de
+          cierre.
         </p>
       </header>
 
       {jobs.length === 0 ? (
         <section className="border-ink/10 rounded-3xl border bg-white/70 p-6 text-center sm:p-10">
-          <h2 className="font-display text-2xl font-semibold">Todavía no hay trabajos activos</h2>
+          <h2 className="font-display text-2xl font-semibold">
+            Todavía no hay trabajos activos
+          </h2>
           <p className="text-ink/60 mx-auto mt-2 max-w-md text-sm leading-6">
-            Cuando una propuesta quede aceptada y el pago correspondiente se confirme, aparecerá acá.
+            Cuando una propuesta quede aceptada y el pago correspondiente se
+            confirme, aparecerá acá.
           </p>
           <Link href="/buscar" className="button-primary mt-5 inline-flex">
             Explorar servicios
@@ -53,7 +59,9 @@ export default async function JobsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{job.service_title}</p>
-                  <p className="text-ink/55 mt-1 truncate text-sm">{job.counterparty_name}</p>
+                  <p className="text-ink/55 mt-1 truncate text-sm">
+                    {job.counterparty_name}
+                  </p>
                 </div>
                 <span className="bg-moss/10 text-moss rounded-full px-3 py-1 text-[11px] font-bold">
                   {job.job_status.replaceAll("_", " ")}

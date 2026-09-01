@@ -7,11 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export type JobErrorCode =
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "CONFLICT"
-  | "TRANSIENT";
+  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
 
 export class JobServerError extends Error {
   constructor(
@@ -121,7 +117,10 @@ function isUuid(value: unknown): value is string {
 function mapError(code?: string | null): JobServerError {
   switch (code) {
     case "42501":
-      return new JobServerError("FORBIDDEN", "No tenés permiso para esa acción.");
+      return new JobServerError(
+        "FORBIDDEN",
+        "No tenés permiso para esa acción.",
+      );
     case "P0002":
       return new JobServerError("NOT_FOUND", "No encontramos ese trabajo.");
     case "22023":
@@ -155,7 +154,8 @@ async function authenticatedClient() {
 }
 
 function requireRows<T>(value: unknown): T[] {
-  if (!Array.isArray(value)) throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  if (!Array.isArray(value))
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
   return value as T[];
 }
 
@@ -175,7 +175,8 @@ export async function listMyUpcomingJobs(limit = 20): Promise<UpcomingJob[]> {
 }
 
 export async function getJobDetail(jobId: string): Promise<JobDetail> {
-  if (!isUuid(jobId)) throw new JobServerError("NOT_FOUND", "Trabajo inválido.");
+  if (!isUuid(jobId))
+    throw new JobServerError("NOT_FOUND", "Trabajo inválido.");
   const { supabase } = await authenticatedClient();
   const { data, error } = await supabase.rpc("get_job_detail", {
     target_job_id: jobId,
@@ -260,7 +261,8 @@ export async function requestJobReschedule(input: {
     request_reason: input.reason?.trim() || null,
   });
   if (error) throw mapError(error.code);
-  if (!isUuid(data)) throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  if (!isUuid(data))
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
   return data;
 }
 
@@ -288,7 +290,8 @@ export async function requestJobScopeChange(
     additional_amount_minor: additionalAmountMinor,
   });
   if (error) throw mapError(error.code);
-  if (!isUuid(data)) throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  if (!isUuid(data))
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
   return data;
 }
 
@@ -328,7 +331,10 @@ export async function applyFakeAdditionalPayment(input: {
   outcome: "SUCCESS" | "PENDING" | "FAILURE";
 }): Promise<void> {
   if (process.env.NODE_ENV === "production") {
-    throw new JobServerError("FORBIDDEN", "Los pagos de prueba no están disponibles en producción.");
+    throw new JobServerError(
+      "FORBIDDEN",
+      "Los pagos de prueba no están disponibles en producción.",
+    );
   }
   const { user } = await authenticatedClient();
   const admin = createAdminClient() as unknown as JobsRpcClient;
