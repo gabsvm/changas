@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  useActionState,
   useCallback,
   useEffect,
   useMemo,
@@ -27,8 +26,6 @@ import {
   loadOlderMessages,
   markConversationReadAction,
   setConversationBlocked,
-  submitConversationReport,
-  type ReportConversationState,
 } from "@/app/(account)/messages/thread-actions";
 import type { ConversationAttachmentSummary } from "@/lib/conversations/attachments";
 import type { ConversationMessage } from "@/lib/conversations/messages";
@@ -39,10 +36,6 @@ const textInitialState: SendTextMessageState = {
   message: "",
 };
 const attachmentInitialState: AttachmentActionState = { status: "idle" };
-const reportInitialState: ReportConversationState = {
-  status: "IDLE",
-  message: "",
-};
 
 type RealtimeMessageRow = {
   id?: unknown;
@@ -225,7 +218,11 @@ export function ConversationThread({
               >
                 {blockedByMe ? "Desbloquear persona" : "Bloquear persona"}
               </button>
-              <ReportForm conversationId={conversationId} />
+              <div className="border-ink/10 mt-1 border-t pt-1">
+                <span className="text-ink/55 block px-3 py-2 text-sm font-semibold">
+                  Reportar conversación
+                </span>
+              </div>
             </div>
           </details>
         </div>
@@ -564,61 +561,6 @@ function AttachmentComposer({
         </p>
       ) : null}
     </form>
-  );
-}
-
-function ReportForm({ conversationId }: { conversationId: string }) {
-  const [state, action, pending] = useActionState(
-    submitConversationReport,
-    reportInitialState,
-  );
-
-  return (
-    <details className="border-ink/10 mt-1 border-t pt-1">
-      <summary className="hover:bg-ink/5 cursor-pointer rounded-xl px-3 py-2 text-sm font-semibold">
-        Reportar conversación
-      </summary>
-      <form action={action} className="space-y-2 p-2">
-        <input type="hidden" name="conversationId" value={conversationId} />
-        <select
-          name="category"
-          required
-          defaultValue=""
-          className="border-ink/10 w-full rounded-xl border bg-white px-3 py-2 text-xs"
-        >
-          <option value="" disabled>
-            Elegí un motivo
-          </option>
-          <option value="HARASSMENT">Acoso o maltrato</option>
-          <option value="SCAM">Posible estafa</option>
-          <option value="OFF_PLATFORM">Intento de sacar la operación</option>
-          <option value="OTHER">Otro</option>
-        </select>
-        <textarea
-          name="reason"
-          maxLength={2000}
-          rows={3}
-          placeholder="Detalle opcional"
-          className="border-ink/10 w-full resize-none rounded-xl border bg-white px-3 py-2 text-xs"
-        />
-        <button
-          type="submit"
-          disabled={pending}
-          className="bg-terracotta w-full rounded-full px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
-        >
-          {pending ? "Enviando…" : "Enviar reporte"}
-        </button>
-        {state.message ? (
-          <p
-            className={`text-[11px] leading-4 ${
-              state.status === "SUCCESS" ? "text-moss" : "text-terracotta"
-            }`}
-          >
-            {state.message}
-          </p>
-        ) : null}
-      </form>
-    </details>
   );
 }
 
