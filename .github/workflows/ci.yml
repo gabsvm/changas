@@ -42,11 +42,8 @@ jobs:
       - name: Production build
         run: pnpm build
 
-      - name: Format diagnostic
-        run: |
-          pnpm exec prettier --write apps/web/scripts/phase-06-scheduling-integrity-runtime.mjs
-          git diff -- apps/web/scripts/phase-06-scheduling-integrity-runtime.mjs
-          exit 1
+      - name: Format check
+        run: pnpm format:check
 
       - name: Diff check
         run: git diff --check
