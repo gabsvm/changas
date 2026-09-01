@@ -127,6 +127,21 @@ type ProposalRpcClient = {
       response_action: ProposalResponseAction;
     },
   ): Promise<{ data: ProposalStatus | null; error: RpcError }>;
+  rpc(
+    name: "hold_proposal_slot",
+    args: {
+      target_proposal_id: string;
+      hold_nonce: string;
+      ttl_seconds: number;
+    },
+  ): Promise<{ data: string | null; error: RpcError }>;
+  rpc(
+    name: "release_proposal_slot_hold",
+    args: {
+      target_proposal_id: string;
+      hold_nonce: string;
+    },
+  ): Promise<{ data: null; error: RpcError }>;
 };
 
 type PaymentResultRpcClient = {
@@ -189,6 +204,7 @@ export function mapProposalRpcErrorCode(
     case "P0002":
       return "NOT_FOUND";
     case "22023":
+    case "23P01":
     case "23505":
       return "CONFLICT";
     default:
@@ -395,35 +411,55 @@ export async function simulateFakeProposalPayment(
     );
   }
 
-  const payment = await createFakePaymentRecord({
-    paymentNonce,
-    amountMinor: proposal.price_amount,
-    currencyCode: proposal.currency_code,
-    outcome,
-  });
-
-  const { createAdminClient } = await import("@/lib/supabase/admin");
-  const admin = createAdminClient() as unknown as PaymentResultRpcClient;
-  const { data, error } = await admin.rpc("apply_payment_result", {
-    target_proposal_id: proposalId,
-    payment_nonce: paymentNonce,
-    payment_provider_name: "FAKE",
-    payment_provider_reference: payment.id,
-    payment_result_status: payment.status,
-    actor_client_user_id: userId,
-  });
-
-  if (error) throw proposalError(error);
-  const result = data?.[0];
-  if (
-    !result ||
-    !proposalStatuses.includes(result.resulting_proposal_status) ||
-    !(
-      result.payment_attempt_id === null || isUuid(result.payment_attempt_id)
-    ) ||
-    !(result.confirmed_job_id === null || isUuid(result.confirmed_job_id))
-  ) {
-    throw proposalError(null);
+  const needsFixedSlotHold = proposal.schedule_type === "FIXED_SLOT";
+  if (needsFixedSlotHold) {
+    const { error: holdError } = await rpc.rpc("hold_proposal_slot", {
+      target_proposal_id: proposalId,
+      hold_nonce: paymentNonce,
+      ttl_seconds: 600,
+    });
+    if (holdError) throw proposalError(holdError);
   }
-  return result;
+
+  try {
+    const payment = await createFakePaymentRecord({
+      paymentNonce,
+      amountMinor: proposal.price_amount,
+      currencyCode: proposal.currency_code,
+      outcome,
+    });
+
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const admin = createAdminClient() as unknown as PaymentResultRpcClient;
+    const { data, error } = await admin.rpc("apply_payment_result", {
+      target_proposal_id: proposalId,
+      payment_nonce: paymentNonce,
+      payment_provider_name: "FAKE",
+      payment_provider_reference: payment.id,
+      payment_result_status: payment.status,
+      actor_client_user_id: userId,
+    });
+
+    if (error) throw proposalError(error);
+    const result = data?.[0];
+    if (
+      !result ||
+      !proposalStatuses.includes(result.resulting_proposal_status) ||
+      !(
+        result.payment_attempt_id === null || isUuid(result.payment_attempt_id)
+      ) ||
+      !(result.confirmed_job_id === null || isUuid(result.confirmed_job_id))
+    ) {
+      throw proposalError(null);
+    }
+    return result;
+  } catch (error) {
+    if (needsFixedSlotHold) {
+      await rpc.rpc("release_proposal_slot_hold", {
+        target_proposal_id: proposalId,
+        hold_nonce: paymentNonce,
+      });
+    }
+    throw error;
+  }
 }
