@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  createFakePaymentRecord,
   mapProposalRpcErrorCode,
   normalizeProposalRevisionId,
   normalizeProposalSummary,
@@ -65,5 +66,22 @@ describe("proposal server contract", () => {
       expect((error as ProposalServerError).code).toBe("CONFLICT");
       expect((error as ProposalServerError).message).toContain("venció");
     }
+  });
+
+  it("routes fake outcomes through the PaymentProvider abstraction", async () => {
+    const payment = await createFakePaymentRecord({
+      paymentNonce: "05520000-0000-4000-8000-000000000001",
+      amountMinor: 1250000,
+      currencyCode: "ARS",
+      outcome: "PENDING",
+    });
+
+    expect(payment).toMatchObject({
+      idempotencyKey: "05520000-0000-4000-8000-000000000001",
+      amountMinor: 1250000,
+      currencyCode: "ARS",
+      status: "PENDING",
+    });
+    expect(payment.id).toMatch(/^fakepay_[0-9a-f]{8}$/);
   });
 });
