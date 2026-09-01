@@ -407,7 +407,9 @@ assert(
 
 const acceptedSnapshot = await admin
   .from("proposal_versions")
-  .select("service_title_snapshot,service_description_snapshot,scope_snapshot,price_amount")
+  .select(
+    "service_title_snapshot,service_description_snapshot,scope_snapshot,price_amount",
+  )
   .eq("id", paidProposal.accepted_version_id)
   .single();
 assert(
@@ -476,7 +478,8 @@ const repeatedPendingCallback = await applyFakePayment(
   "SUCCESS",
 );
 assert(
-  repeatedPendingCallback.payment_attempt_id === pendingPayment.payment_attempt_id &&
+  repeatedPendingCallback.payment_attempt_id ===
+    pendingPayment.payment_attempt_id &&
     repeatedPendingCallback.resulting_proposal_status === "AWAITING_PAYMENT" &&
     repeatedPendingCallback.confirmed_job_id === null,
   "Reusing an idempotency nonce changed a previously recorded pending result.",
