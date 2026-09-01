@@ -161,9 +161,7 @@ function isUuid(value: unknown): value is string {
 export async function createFakePaymentRecord(
   input: FakePaymentRecordInput,
 ): Promise<PaymentRecord> {
-  if (
-    !supportedCurrencyCodes.includes(input.currencyCode as CurrencyCode)
-  ) {
+  if (!supportedCurrencyCodes.includes(input.currencyCode as CurrencyCode)) {
     throw new ProposalServerError(
       "CONFLICT",
       "La moneda de la propuesta no está soportada para el pago.",
