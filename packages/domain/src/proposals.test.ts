@@ -27,7 +27,9 @@ describe("proposal state machine", () => {
     expect(canTransitionProposal("OPEN", "EXPIRED")).toBe(true);
     expect(canTransitionProposal("ACCEPTED", "AWAITING_PAYMENT")).toBe(true);
     expect(canTransitionProposal("AWAITING_PAYMENT", "PAID")).toBe(true);
-    expect(canTransitionProposal("AWAITING_PAYMENT", "PAYMENT_FAILED")).toBe(true);
+    expect(canTransitionProposal("AWAITING_PAYMENT", "PAYMENT_FAILED")).toBe(
+      true,
+    );
     expect(canTransitionProposal("PAID", "OPEN")).toBe(false);
     expect(canTransitionProposal("REJECTED", "ACCEPTED")).toBe(false);
   });
