@@ -202,7 +202,10 @@ const remoteWrite = await client.rpc("set_job_exact_location", {
   lng: -58.3816,
   notes: "Debe rechazarse",
 });
-assert(Boolean(remoteWrite.error), "REMOTE job accepted an exact on-site location.");
+assert(
+  Boolean(remoteWrite.error),
+  "REMOTE job accepted an exact on-site location.",
+);
 
 const remoteLegacyLocation = await admin.from("job_private_locations").upsert({
   job_id: remoteJobId,
