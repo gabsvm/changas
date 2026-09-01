@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   mapProposalRpcErrorCode,
+  normalizeProposalRevisionId,
   normalizeProposalSummary,
+  ProposalServerError,
   type ProposalSummary,
 } from "./server";
 
@@ -49,5 +51,19 @@ describe("proposal server contract", () => {
     expect(() =>
       normalizeProposalSummary({ ...rawSummary, price_amount: -1 }),
     ).toThrow("Invalid proposal summary");
+  });
+
+  it("classifies a committed expiry during revision as a conflict", () => {
+    const validRevisionId = "05510000-0000-4000-8000-000000000003";
+    expect(normalizeProposalRevisionId(validRevisionId)).toBe(validRevisionId);
+
+    try {
+      normalizeProposalRevisionId(null);
+      throw new Error("Expected proposal expiry conflict");
+    } catch (error) {
+      expect(error).toBeInstanceOf(ProposalServerError);
+      expect((error as ProposalServerError).code).toBe("CONFLICT");
+      expect((error as ProposalServerError).message).toContain("venció");
+    }
   });
 });
