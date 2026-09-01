@@ -8,11 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export type JobErrorCode =
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "CONFLICT"
-  | "TRANSIENT";
+  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
 
 export class JobServerError extends Error {
   constructor(
@@ -349,13 +345,19 @@ export async function applyFakeAdditionalPayment(input: {
     (change) => change.scope_change_id === input.scopeChangeId,
   );
   if (!targetChange) {
-    throw new JobServerError("NOT_FOUND", "No encontramos ese cambio de alcance.");
+    throw new JobServerError(
+      "NOT_FOUND",
+      "No encontramos ese cambio de alcance.",
+    );
   }
   if (
     targetChange.change_status !== "AWAITING_PAYMENT" &&
     targetChange.change_status !== "PAYMENT_FAILED"
   ) {
-    throw new JobServerError("CONFLICT", "El cambio de alcance ya no admite pago.");
+    throw new JobServerError(
+      "CONFLICT",
+      "El cambio de alcance ya no admite pago.",
+    );
   }
 
   const payment = await createFakeAdditionalPaymentRecord({
