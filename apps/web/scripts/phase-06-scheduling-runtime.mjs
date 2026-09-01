@@ -203,7 +203,13 @@ async function createAwaitingProposal(client, suffix, startsAt, endsAt) {
   return proposal.data;
 }
 
-async function applyPaymentResult({ proposalId, nonce, status, actorUserId, suffix }) {
+async function applyPaymentResult({
+  proposalId,
+  nonce,
+  status,
+  actorUserId,
+  suffix,
+}) {
   const result = await admin.rpc("apply_payment_result", {
     target_proposal_id: proposalId,
     payment_nonce: nonce,
@@ -226,7 +232,10 @@ async function readHold(proposalId, nonce) {
     .eq("proposal_id", proposalId)
     .eq("request_nonce", nonce)
     .single();
-  assert(!hold.error && hold.data?.id, `Could not read hold: ${hold.error?.message}`);
+  assert(
+    !hold.error && hold.data?.id,
+    `Could not read hold: ${hold.error?.message}`,
+  );
   return hold.data;
 }
 
@@ -432,7 +441,10 @@ const pendingHold = await clientA.rpc("hold_proposal_slot", {
   hold_nonce: pendingNonce,
   ttl_seconds: 600,
 });
-assert(!pendingHold.error && pendingHold.data, "Could not create pending payment hold.");
+assert(
+  !pendingHold.error && pendingHold.data,
+  "Could not create pending payment hold.",
+);
 const pendingPayment = await applyPaymentResult({
   proposalId: pendingProposal,
   nonce: pendingNonce,
@@ -465,7 +477,10 @@ const failedHold = await clientB.rpc("hold_proposal_slot", {
   hold_nonce: failedNonce,
   ttl_seconds: 600,
 });
-assert(!failedHold.error && failedHold.data, "Could not create failed payment hold.");
+assert(
+  !failedHold.error && failedHold.data,
+  "Could not create failed payment hold.",
+);
 const failedPayment = await applyPaymentResult({
   proposalId: failedProposal,
   nonce: failedNonce,
@@ -515,7 +530,10 @@ const successHold = await clientA.rpc("hold_proposal_slot", {
   hold_nonce: successNonce,
   ttl_seconds: 600,
 });
-assert(!successHold.error && successHold.data, "Could not create successful payment hold.");
+assert(
+  !successHold.error && successHold.data,
+  "Could not create successful payment hold.",
+);
 const successfulPayment = await applyPaymentResult({
   proposalId: successProposal,
   nonce: successNonce,
