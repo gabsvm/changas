@@ -50,7 +50,7 @@ export function canActorTransitionProposal(input: {
 }): boolean {
   if (!canTransitionProposal(input.from, input.to)) return false;
 
-  if (input.to === "ACCEPTED") return input.actorRole === "CLIENT";
+  if (input.to === "ACCEPTED") return !input.actorIsAuthor;
   if (input.to === "WITHDRAWN") return input.actorIsAuthor;
   if (input.to === "REJECTED") return !input.actorIsAuthor;
 

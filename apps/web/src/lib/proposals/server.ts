@@ -1,14 +1,19 @@
 import type {
+  CurrencyCode,
+  PaymentRecord,
+  PaymentStatus,
   ProposalKind,
   ProposalStatus,
   ScheduleType,
   ServiceModality,
 } from "@changas/domain";
 import {
+  FakePaymentProvider,
   proposalKinds,
   proposalStatuses,
   scheduleTypes,
   serviceModalities,
+  supportedCurrencyCodes,
 } from "@changas/domain";
 
 import { createClient } from "@/lib/supabase/server";
@@ -75,6 +80,13 @@ export type FakePaymentResult = {
   confirmed_job_id: string | null;
 };
 
+export type FakePaymentRecordInput = {
+  paymentNonce: string;
+  amountMinor: number;
+  currencyCode: string;
+  outcome: FakePaymentOutcome;
+};
+
 type RpcError = { code?: string | null } | null;
 
 type ProposalRpcClient = {
@@ -117,13 +129,15 @@ type ProposalRpcClient = {
   ): Promise<{ data: ProposalStatus | null; error: RpcError }>;
 };
 
-type FakePaymentRpcClient = {
+type PaymentResultRpcClient = {
   rpc(
-    name: "apply_fake_payment_result",
+    name: "apply_payment_result",
     args: {
       target_proposal_id: string;
       payment_nonce: string;
-      payment_outcome: FakePaymentOutcome;
+      payment_provider_name: string;
+      payment_provider_reference: string;
+      payment_result_status: PaymentStatus;
       actor_client_user_id: string;
     },
   ): Promise<{ data: FakePaymentResult[] | null; error: RpcError }>;
@@ -145,6 +159,25 @@ function isDateLike(value: unknown): value is string | null {
 
 function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID_PATTERN.test(value);
+}
+
+export async function createFakePaymentRecord(
+  input: FakePaymentRecordInput,
+): Promise<PaymentRecord> {
+  if (!supportedCurrencyCodes.includes(input.currencyCode as CurrencyCode)) {
+    throw new ProposalServerError(
+      "CONFLICT",
+      "La moneda de la propuesta no está soportada para el pago.",
+    );
+  }
+
+  const provider = new FakePaymentProvider();
+  return provider.createPayment({
+    idempotencyKey: input.paymentNonce,
+    amountMinor: input.amountMinor,
+    currencyCode: input.currencyCode as CurrencyCode,
+    outcome: input.outcome,
+  });
 }
 
 export function mapProposalRpcErrorCode(
@@ -173,6 +206,17 @@ function proposalError(error: RpcError): ProposalServerError {
     TRANSIENT: "No pudimos completar la acción. Intentá nuevamente.",
   };
   return new ProposalServerError(code, messages[code]);
+}
+
+export function normalizeProposalRevisionId(value: string | null): string {
+  if (value === null) {
+    throw new ProposalServerError(
+      "CONFLICT",
+      "La propuesta venció y ya no puede modificarse.",
+    );
+  }
+  if (!isUuid(value)) throw proposalError(null);
+  return value;
 }
 
 export function normalizeProposalSummary(value: unknown): ProposalSummary {
@@ -297,8 +341,7 @@ export async function reviseConversationProposal(
   });
 
   if (error) throw proposalError(error);
-  if (!data || !isUuid(data)) throw proposalError(null);
-  return data;
+  return normalizeProposalRevisionId(data);
 }
 
 export async function respondToProposal(
@@ -317,6 +360,7 @@ export async function respondToProposal(
 }
 
 export async function simulateFakeProposalPayment(
+  conversationId: string,
   proposalId: string,
   paymentNonce: string,
   outcome: FakePaymentOutcome,
@@ -328,13 +372,44 @@ export async function simulateFakeProposalPayment(
     );
   }
 
-  const { userId } = await getRpcClient();
+  const { rpc, userId } = await getRpcClient();
+  const { data: proposals, error: proposalListError } = await rpc.rpc(
+    "list_conversation_proposals",
+    { target_conversation_id: conversationId },
+  );
+  if (proposalListError) throw proposalError(proposalListError);
+
+  const proposal = (proposals ?? [])
+    .map(normalizeProposalSummary)
+    .find((candidate) => candidate.proposal_id === proposalId);
+  if (!proposal) {
+    throw new ProposalServerError(
+      "NOT_FOUND",
+      "No encontramos la propuesta solicitada.",
+    );
+  }
+  if (proposal.price_amount === null || proposal.price_amount <= 0) {
+    throw new ProposalServerError(
+      "CONFLICT",
+      "La propuesta no tiene un monto válido para pagar.",
+    );
+  }
+
+  const payment = await createFakePaymentRecord({
+    paymentNonce,
+    amountMinor: proposal.price_amount,
+    currencyCode: proposal.currency_code,
+    outcome,
+  });
+
   const { createAdminClient } = await import("@/lib/supabase/admin");
-  const admin = createAdminClient() as unknown as FakePaymentRpcClient;
-  const { data, error } = await admin.rpc("apply_fake_payment_result", {
+  const admin = createAdminClient() as unknown as PaymentResultRpcClient;
+  const { data, error } = await admin.rpc("apply_payment_result", {
     target_proposal_id: proposalId,
     payment_nonce: paymentNonce,
-    payment_outcome: outcome,
+    payment_provider_name: "FAKE",
+    payment_provider_reference: payment.id,
+    payment_result_status: payment.status,
     actor_client_user_id: userId,
   });
 

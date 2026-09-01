@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import {
+  canActorTransitionProposal,
   formatMinorUnits,
   minorUnitsToMajorInput,
   type ProposalKind,
@@ -67,10 +68,13 @@ export function ProposalCard({
   );
   const priced = proposal.price_amount !== null;
   const canAccept =
-    proposal.proposal_status === "OPEN" &&
-    currentUserIsClient &&
-    proposal.authored_by_user_id === providerUserId &&
-    priced;
+    priced &&
+    canActorTransitionProposal({
+      actorRole: currentUserIsClient ? "CLIENT" : "PROVIDER",
+      actorIsAuthor: ownTerms,
+      from: proposal.proposal_status,
+      to: "ACCEPTED",
+    });
   const canCounter = proposal.proposal_status === "OPEN" && !ownTerms;
   const counterKind: ProposalKind =
     proposal.proposal_kind === "QUOTE_REQUEST" && currentUserIsProvider
