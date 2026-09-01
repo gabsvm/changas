@@ -37,6 +37,12 @@ const statusLabels: Record<ProposalSummary["proposal_status"], string> = {
   PAID: "Pagada · trabajo confirmado",
 };
 
+const expiresFormatter = new Intl.DateTimeFormat("es-AR", {
+  dateStyle: "short",
+  timeStyle: "short",
+  timeZone: "America/Argentina/Buenos_Aires",
+});
+
 export function ProposalCard({
   proposal,
   conversationId,
@@ -116,7 +122,7 @@ export function ProposalCard({
 
       {proposal.expires_at ? (
         <p className="text-ink/45 mt-3 text-[11px]">
-          Vigente hasta {new Date(proposal.expires_at).toLocaleString("es-AR")}
+          Vigente hasta {expiresFormatter.format(new Date(proposal.expires_at))}
         </p>
       ) : null}
 
@@ -203,15 +209,16 @@ export function ProposalCard({
       currentUserIsClient &&
       allowFakePayments ? (
         <div className="border-moss/20 bg-moss/5 mt-4 rounded-xl border p-3">
-          <p className="text-moss text-xs font-bold">Pago simulado · solo desarrollo</p>
+          <p className="text-moss text-xs font-bold">
+            Pago simulado · solo desarrollo
+          </p>
           <div className="mt-2 flex flex-wrap gap-2">
             {(["SUCCESS", "PENDING", "FAILURE"] as const).map((outcome) => (
               <form key={outcome} action={fakePaymentAction}>
                 <input type="hidden" name="conversationId" value={conversationId} />
                 <input type="hidden" name="proposalId" value={proposal.proposal_id} />
-                <input type="hidden" name="paymentNonce" value={crypto.randomUUID()} />
                 <input type="hidden" name="outcome" value={outcome} />
-                <button className="border-moss/20 bg-white rounded-full border px-3 py-1.5 text-[11px] font-bold">
+                <button className="border-moss/20 rounded-full border bg-white px-3 py-1.5 text-[11px] font-bold">
                   {outcome === "SUCCESS"
                     ? "Simular aprobado"
                     : outcome === "PENDING"
