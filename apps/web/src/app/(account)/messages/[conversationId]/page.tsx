@@ -101,9 +101,11 @@ export default async function ConversationPage({
     <section className="py-4 sm:py-6">
       <ConversationThreadTextProbe
         conversationId={conversationId}
+        peerUserId={peerUserId}
         peerName={peerName}
         serviceTitle={context.service_title}
         initialTextNonce={initialTextNonce}
+        initiallyBlockedByMe={blockedUserId === peerUserId}
       />
     </section>
   );
