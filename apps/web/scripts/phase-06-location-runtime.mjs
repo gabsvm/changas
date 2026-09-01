@@ -220,6 +220,15 @@ assert(
   `Could not create remote legacy location fixture: ${remoteLegacyLocation.error?.message}`,
 );
 
+const remoteDirectLocation = await provider
+  .from("job_private_locations")
+  .select("exact_address,latitude,longitude,access_notes")
+  .eq("job_id", remoteJobId);
+assert(
+  !remoteDirectLocation.error && remoteDirectLocation.data?.length === 0,
+  "REMOTE job leaked an exact location through direct RLS table access.",
+);
+
 const remoteProviderDetail = await provider.rpc("get_job_detail", {
   target_job_id: remoteJobId,
 });
