@@ -79,7 +79,10 @@ export class FakePaymentProvider implements PaymentProvider {
     return { ...record };
   }
 
-  async refund(paymentId: string, amountMinor?: number): Promise<PaymentRecord> {
+  async refund(
+    paymentId: string,
+    amountMinor?: number,
+  ): Promise<PaymentRecord> {
     const payment = await this.getPaymentStatus(paymentId);
     if (payment.status !== "SUCCEEDED") {
       throw new Error("Only succeeded payments can be refunded.");
