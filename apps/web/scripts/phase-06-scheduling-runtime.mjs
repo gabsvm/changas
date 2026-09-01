@@ -322,7 +322,10 @@ assert(
   !(
     await admin
       .from("provider_slot_holds")
-      .update({ expires_at: "2026-09-01T00:00:00.000Z" })
+      .update({
+        created_at: "2026-08-31T23:58:00.000Z",
+        expires_at: "2026-08-31T23:59:00.000Z",
+      })
       .eq("id", expiringHold.data)
   ).error,
   "Could not expire hold fixture.",
