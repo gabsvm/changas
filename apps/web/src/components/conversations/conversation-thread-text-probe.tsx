@@ -1,14 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useTransition,
-  type FormEvent,
-} from "react";
+import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 
 import {
   sendTextMessage,
@@ -37,9 +29,6 @@ export function ConversationThreadTextProbe({
   initialTextNonce: string;
   initiallyBlockedByMe: boolean;
 }) {
-  const router = useRouter();
-  const refreshThread = useCallback(() => router.refresh(), [router]);
-  const connectedOnce = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
   const nonceRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState(initialState);
@@ -50,29 +39,8 @@ export function ConversationThreadTextProbe({
   const [changingBlock, startBlockTransition] = useTransition();
 
   useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`conversation:${conversationId}:messages`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        () => undefined,
-      )
-      .subscribe((status) => {
-        if (status !== "SUBSCRIBED") return;
-        if (connectedOnce.current) refreshThread();
-        connectedOnce.current = true;
-      });
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [conversationId, refreshThread]);
+    createClient();
+  }, []);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
