@@ -72,16 +72,16 @@ select ok(
 );
 
 select ok(
-  not coalesce(has_table_privilege('authenticated', 'public.availability_rules', 'INSERT, UPDATE, DELETE'), false)
-  and not coalesce(has_table_privilege('authenticated', 'public.availability_blocks', 'INSERT, UPDATE, DELETE'), false)
-  and not coalesce(has_table_privilege('authenticated', 'public.provider_slot_holds', 'INSERT, UPDATE, DELETE'), false),
+  not coalesce(has_table_privilege('authenticated', to_regclass('public.availability_rules'), 'INSERT, UPDATE, DELETE'), false)
+  and not coalesce(has_table_privilege('authenticated', to_regclass('public.availability_blocks'), 'INSERT, UPDATE, DELETE'), false)
+  and not coalesce(has_table_privilege('authenticated', to_regclass('public.provider_slot_holds'), 'INSERT, UPDATE, DELETE'), false),
   'authenticated scheduling tables are mutation-safe'
 );
 
 select ok(
-  not coalesce(has_table_privilege('anon', 'public.availability_rules', 'SELECT'), false)
-  and not coalesce(has_table_privilege('anon', 'public.availability_blocks', 'SELECT'), false)
-  and not coalesce(has_table_privilege('anon', 'public.provider_slot_holds', 'SELECT'), false),
+  not coalesce(has_table_privilege('anon', to_regclass('public.availability_rules'), 'SELECT'), false)
+  and not coalesce(has_table_privilege('anon', to_regclass('public.availability_blocks'), 'SELECT'), false)
+  and not coalesce(has_table_privilege('anon', to_regclass('public.provider_slot_holds'), 'SELECT'), false),
   'anonymous users cannot inspect provider scheduling internals'
 );
 
