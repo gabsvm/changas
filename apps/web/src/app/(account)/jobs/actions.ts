@@ -137,7 +137,12 @@ export async function fakeAdditionalPaymentAction(
   if (outcome !== "SUCCESS" && outcome !== "PENDING" && outcome !== "FAILURE") {
     throw new Error("Resultado inválido.");
   }
-  await applyFakeAdditionalPayment({ scopeChangeId, nonce, outcome });
+  await applyFakeAdditionalPayment({
+    jobId,
+    scopeChangeId,
+    nonce,
+    outcome,
+  });
   revalidatePath(`/jobs/${jobId}`);
 }
 
