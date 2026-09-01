@@ -1,6 +1,6 @@
 begin;
 
-select plan(18);
+select plan(19);
 
 select ok(to_regclass('public.proposals') is not null, 'proposals table exists');
 select ok(to_regclass('public.proposal_versions') is not null, 'proposal versions table exists');
