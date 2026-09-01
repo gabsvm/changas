@@ -144,6 +144,6 @@ export async function fakePaymentAction(formData: FormData): Promise<void> {
   if (!["SUCCESS", "PENDING", "FAILURE"].includes(outcome)) {
     throw new Error("Resultado de pago inválido.");
   }
-  await simulateFakeProposalPayment(proposalId, nonce, outcome);
+  await simulateFakeProposalPayment(conversationId, proposalId, nonce, outcome);
   revalidatePath(`/messages/${conversationId}`);
 }
