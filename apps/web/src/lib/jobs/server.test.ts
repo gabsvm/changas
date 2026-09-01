@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createFakeAdditionalPaymentRecord } from "./server";
+import { createFakeAdditionalPaymentRecord } from "./payment-adapter";
 
 describe("job payment adapter", () => {
   it("routes fake scope-change charges through PaymentProvider", async () => {
