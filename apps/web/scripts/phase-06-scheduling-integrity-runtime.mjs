@@ -62,7 +62,10 @@ const skill = await admin
   .select("id")
   .eq("slug", "reparacion-pc")
   .single();
-assert(!skill.error && skill.data?.id, "Scheduling integrity skill is missing.");
+assert(
+  !skill.error && skill.data?.id,
+  "Scheduling integrity skill is missing.",
+);
 
 const providerSlug = `phase06-integrity-provider-${runId}`;
 const serviceSlug = `phase06-integrity-service-${runId}`;
@@ -198,7 +201,10 @@ const blocked = await provider.rpc("create_provider_availability_block", {
   requested_ends_at: "2026-09-07T15:30:00.000Z",
   requested_reason: "Blocked before payment",
 });
-assert(!blocked.error, `Could not create integrity block: ${blocked.error?.message}`);
+assert(
+  !blocked.error,
+  `Could not create integrity block: ${blocked.error?.message}`,
+);
 
 const blockedProposal = await createProposal(
   clientA,
@@ -278,7 +284,9 @@ const acceptedBlockedReschedule = await provider.rpc("respond_job_reschedule", {
   response_action: "ACCEPT",
 });
 if (!acceptedBlockedReschedule.error) {
-  violations.push("Reschedule acceptance ignored an availability exception block");
+  violations.push(
+    "Reschedule acceptance ignored an availability exception block",
+  );
 }
 
 assert(
