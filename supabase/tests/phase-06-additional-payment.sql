@@ -3,13 +3,9 @@ begin;
 select plan(4);
 
 select ok(
-  exists (
-    select 1
-    from pg_proc p
-    join pg_namespace n on n.oid = p.pronamespace
-    where n.nspname = 'public'
-      and p.proname = 'apply_additional_payment_result'
-  ),
+  to_regprocedure(
+    'public.apply_additional_payment_result(uuid,uuid,text,text,public.payment_status,uuid)'
+  ) is not null,
   'generic additional payment result RPC exists'
 );
 
@@ -17,7 +13,9 @@ select ok(
   coalesce(
     has_function_privilege(
       'service_role',
-      'public.apply_additional_payment_result(uuid,uuid,text,text,public.payment_status,uuid)',
+      to_regprocedure(
+        'public.apply_additional_payment_result(uuid,uuid,text,text,public.payment_status,uuid)'
+      ),
       'EXECUTE'
     ),
     false
@@ -29,7 +27,9 @@ select ok(
   not coalesce(
     has_function_privilege(
       'authenticated',
-      'public.apply_additional_payment_result(uuid,uuid,text,text,public.payment_status,uuid)',
+      to_regprocedure(
+        'public.apply_additional_payment_result(uuid,uuid,text,text,public.payment_status,uuid)'
+      ),
       'EXECUTE'
     ),
     false
