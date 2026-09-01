@@ -25,7 +25,7 @@ TypeScript, Vitest, pgTAP, Playwright.
 - Fake payment actions are local/dev/test only and must not be exposed in
   production.
 - Conversation membership never implies permission to accept on behalf of the
-  client.
+  counterparty; only the counterparty to the author of the current terms can accept.
 - Economic state changes only through server-authoritative RPCs.
 - Accepted proposal terms remain immutable and auditable after service edits.
 - Duplicate acceptance/payment callbacks must be idempotent.
@@ -47,12 +47,12 @@ TypeScript, Vitest, pgTAP, Playwright.
 - Produces proposal kinds/statuses, transition guards, `PaymentProvider`,
   `FakePaymentProvider`, and deterministic fake outcomes.
 
-- [ ] Write failing tests for legal/illegal proposal transitions and actor
+- [x] Write failing tests for legal/illegal proposal transitions and actor
       permissions.
-- [ ] Run CI and confirm domain tests fail because implementation does not
+- [x] Run CI and confirm domain tests fail because implementation does not
       exist.
-- [ ] Implement the minimal domain state machine and fake payment provider.
-- [ ] Re-run CI and require the domain tests to pass.
+- [x] Implement the minimal domain state machine and fake payment provider.
+- [x] Re-run CI and require the domain tests to pass.
 
 ### Task 2: Proposal/version/payment/job persistence
 
@@ -67,11 +67,11 @@ TypeScript, Vitest, pgTAP, Playwright.
   `jobs`, audit events, participant-only reads, and RPCs for
   create/revise/transition/payment.
 
-- [ ] Add pgTAP tests first for ownership, immutability, legal transitions and
+- [x] Add pgTAP tests first for ownership, immutability, legal transitions and
       payment idempotency.
-- [ ] Confirm pgTAP is red before migration exists.
-- [ ] Implement schema, grants, RLS, constraints and transactional RPCs.
-- [ ] Require pgTAP green.
+- [x] Confirm pgTAP is red before migration exists.
+- [x] Implement schema, grants, RLS, constraints and transactional RPCs.
+- [x] Require pgTAP green.
 
 ### Task 3: Conversation proposal server layer
 
@@ -86,9 +86,9 @@ TypeScript, Vitest, pgTAP, Playwright.
 - Produces list/create/revise/respond/pay server functions consumed by the
   thread UI.
 
-- [ ] Write failing parsing/authorization/error-mapping tests.
-- [ ] Implement typed RPC wrappers and server actions.
-- [ ] Run unit tests and typecheck.
+- [x] Write failing parsing/authorization/error-mapping tests.
+- [x] Implement typed RPC wrappers and server actions.
+- [x] Run unit tests and typecheck.
 
 ### Task 4: Proposal cards and composer inside conversation
 
@@ -105,11 +105,11 @@ TypeScript, Vitest, pgTAP, Playwright.
 - Renders structured proposal history and role-appropriate controls without
   parsing informal chat as economic truth.
 
-- [ ] Load proposal summaries alongside conversation data.
-- [ ] Render versioned cards and legal actions only.
-- [ ] Add dev-only fake success/pending/failure controls while
+- [x] Load proposal summaries alongside conversation data.
+- [x] Render versioned cards and legal actions only.
+- [x] Add dev-only fake success/pending/failure controls while
       `NODE_ENV !== 'production'`.
-- [ ] Preserve current chat/attachments/realtime behavior.
+- [x] Preserve current chat/attachments/realtime behavior.
 
 ### Task 5: Runtime and browser verification
 
@@ -121,11 +121,11 @@ TypeScript, Vitest, pgTAP, Playwright.
 
 **Interfaces:**
 
-- Proves cross-user denial, client-only acceptance, immutable snapshots, fake
+- Proves cross-user denial, counterparty-only acceptance, immutable snapshots, fake
   payment outcomes and duplicate callback idempotency.
 
-- [ ] Add runtime checks to CI after Supabase reset.
-- [ ] Add browser smoke coverage for proposal card/accept/fake-pay flow.
-- [ ] Run full CI: lint, typecheck, unit, build, format, pgTAP, Phase 03/04/05
+- [x] Add runtime checks to CI after Supabase reset.
+- [x] Add browser smoke coverage for proposal card/accept/fake-pay flow.
+- [x] Run full CI: lint, typecheck, unit, build, format, pgTAP, Phase 03/04/05
       runtime, Lighthouse and Playwright.
-- [ ] Stop after Phase 05.
+- [x] Stop after Phase 05.
