@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const supabaseUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey =
@@ -19,6 +19,14 @@ function adminHeaders(extra?: Record<string, string>) {
     "Content-Type": "application/json",
     ...extra,
   };
+}
+
+async function expectNoHorizontalOverflow(page: Page) {
+  const dimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
 }
 
 async function createTestUser(): Promise<{
@@ -143,7 +151,7 @@ async function createAwaitingAdditionalPayment(jobId: string) {
 }
 
 test.describe("Phase 06 Jobs", () => {
-  test("confirmed Job keeps contractual snapshot and production hides fake additional-payment controls", async ({
+  test("confirmed Job keeps contractual snapshot, actor controls and production payment isolation", async ({
     page,
   }) => {
     const user = await createTestUser();
@@ -185,6 +193,7 @@ test.describe("Phase 06 Jobs", () => {
       page.getByRole("heading", { name: "Mis trabajos" }),
     ).toBeVisible();
     await expect(page.getByText("CONFIRMED", { exact: true })).toBeVisible();
+    await expectNoHorizontalOverflow(page);
 
     await page.locator(`a[href="/jobs/${jobId}"]`).click();
     await expect(page).toHaveURL(new RegExp(`/jobs/${jobId}$`));
@@ -193,6 +202,15 @@ test.describe("Phase 06 Jobs", () => {
       page.getByText("Alcance congelado", { exact: true }),
     ).toBeVisible();
     await expect(page.getByText(scope, { exact: true })).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
+    await expect(
+      page.getByRole("button", { name: "Iniciar trabajo" }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "Proponer cambio" }),
+    ).toHaveCount(0);
+
     await expect(
       page.getByText(
         "Adicional sintético para verificar producción sin controles fake.",
