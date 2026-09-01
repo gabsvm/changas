@@ -135,6 +135,9 @@ jobs:
       - name: Run Phase 05 proposal/payment runtime security checks
         run: node apps/web/scripts/phase-05-proposals-runtime.mjs
 
+      - name: Run Phase 06 scheduling/hold runtime security checks
+        run: node apps/web/scripts/phase-06-scheduling-runtime.mjs
+
       - name: Diagnose Phase 06 exact-location visibility
         run: node apps/web/scripts/phase-06-location-diagnostic.mjs
 
