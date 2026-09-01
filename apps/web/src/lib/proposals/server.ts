@@ -1,14 +1,18 @@
 import type {
+  CurrencyCode,
+  PaymentRecord,
   ProposalKind,
   ProposalStatus,
   ScheduleType,
   ServiceModality,
 } from "@changas/domain";
 import {
+  FakePaymentProvider,
   proposalKinds,
   proposalStatuses,
   scheduleTypes,
   serviceModalities,
+  supportedCurrencyCodes,
 } from "@changas/domain";
 
 import { createClient } from "@/lib/supabase/server";
@@ -73,6 +77,13 @@ export type FakePaymentResult = {
   payment_attempt_id: string | null;
   resulting_proposal_status: ProposalStatus;
   confirmed_job_id: string | null;
+};
+
+export type FakePaymentRecordInput = {
+  paymentNonce: string;
+  amountMinor: number;
+  currencyCode: string;
+  outcome: FakePaymentOutcome;
 };
 
 type RpcError = { code?: string | null } | null;
@@ -145,6 +156,27 @@ function isDateLike(value: unknown): value is string | null {
 
 function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID_PATTERN.test(value);
+}
+
+export async function createFakePaymentRecord(
+  input: FakePaymentRecordInput,
+): Promise<PaymentRecord> {
+  if (
+    !supportedCurrencyCodes.includes(input.currencyCode as CurrencyCode)
+  ) {
+    throw new ProposalServerError(
+      "CONFLICT",
+      "La moneda de la propuesta no está soportada para el pago.",
+    );
+  }
+
+  const provider = new FakePaymentProvider();
+  return provider.createPayment({
+    idempotencyKey: input.paymentNonce,
+    amountMinor: input.amountMinor,
+    currencyCode: input.currencyCode as CurrencyCode,
+    outcome: input.outcome,
+  });
 }
 
 export function mapProposalRpcErrorCode(
