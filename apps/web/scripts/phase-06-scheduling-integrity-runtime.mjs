@@ -114,11 +114,11 @@ assert(
 
 const rule = await provider.rpc("upsert_provider_availability_rule", {
   target_rule_id: null,
-  rule_weekday: 1,
-  rule_start_time: "14:00:00",
-  rule_end_time: "18:00:00",
-  rule_timezone: "UTC",
-  rule_is_active: true,
+  requested_weekday: 1,
+  requested_start_time: "14:00:00",
+  requested_end_time: "18:00:00",
+  requested_timezone: "UTC",
+  requested_is_active: true,
 });
 assert(!rule.error, `Could not create integrity rule: ${rule.error?.message}`);
 
@@ -194,9 +194,9 @@ if (!competingPayment.error) {
 }
 
 const blocked = await provider.rpc("create_provider_availability_block", {
-  block_starts_at: "2026-09-07T15:00:00.000Z",
-  block_ends_at: "2026-09-07T15:30:00.000Z",
-  block_reason: "Blocked before payment",
+  requested_starts_at: "2026-09-07T15:00:00.000Z",
+  requested_ends_at: "2026-09-07T15:30:00.000Z",
+  requested_reason: "Blocked before payment",
 });
 assert(!blocked.error, `Could not create integrity block: ${blocked.error?.message}`);
 
@@ -250,9 +250,9 @@ assert(
 const rescheduleBlock = await provider.rpc(
   "create_provider_availability_block",
   {
-    block_starts_at: "2026-09-07T17:00:00.000Z",
-    block_ends_at: "2026-09-07T17:30:00.000Z",
-    block_reason: "Blocked before reschedule acceptance",
+    requested_starts_at: "2026-09-07T17:00:00.000Z",
+    requested_ends_at: "2026-09-07T17:30:00.000Z",
+    requested_reason: "Blocked before reschedule acceptance",
   },
 );
 assert(
