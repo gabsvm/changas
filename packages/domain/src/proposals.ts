@@ -22,7 +22,9 @@ export const proposalStatuses = [
 export type ProposalStatus = (typeof proposalStatuses)[number];
 export type ProposalActorRole = "CLIENT" | "PROVIDER";
 
-const legalTransitions: Readonly<Record<ProposalStatus, readonly ProposalStatus[]>> = {
+const legalTransitions: Readonly<
+  Record<ProposalStatus, readonly ProposalStatus[]>
+> = {
   OPEN: ["ACCEPTED", "REJECTED", "WITHDRAWN", "EXPIRED"],
   ACCEPTED: ["AWAITING_PAYMENT"],
   REJECTED: [],
