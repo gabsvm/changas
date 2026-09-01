@@ -134,7 +134,11 @@ export async function fakePaymentAction(formData: FormData): Promise<void> {
 
   const conversationId = requiredUuid(formData, "conversationId");
   const proposalId = requiredUuid(formData, "proposalId");
-  const nonce = requiredUuid(formData, "paymentNonce");
+  const submittedNonce = stringField(formData, "paymentNonce");
+  const nonce = submittedNonce || crypto.randomUUID();
+  if (!UUID_PATTERN.test(nonce)) {
+    throw new Error("Identificador de pago inválido.");
+  }
   const outcome = stringField(formData, "outcome") as FakePaymentOutcome;
   if (!["SUCCESS", "PENDING", "FAILURE"].includes(outcome)) {
     throw new Error("Resultado de pago inválido.");
