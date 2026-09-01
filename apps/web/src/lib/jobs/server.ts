@@ -3,11 +3,16 @@ import "server-only";
 import type { JobStatus, ScheduleType } from "@changas/domain";
 import { jobStatuses, scheduleTypes } from "@changas/domain";
 
+import { createFakeAdditionalPaymentRecord } from "@/lib/jobs/payment-adapter";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export type JobErrorCode =
-  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "TRANSIENT";
 
 export class JobServerError extends Error {
   constructor(
@@ -326,6 +331,7 @@ export async function setJobExactLocation(input: {
 }
 
 export async function applyFakeAdditionalPayment(input: {
+  jobId: string;
   scopeChangeId: string;
   nonce: string;
   outcome: "SUCCESS" | "PENDING" | "FAILURE";
@@ -336,12 +342,36 @@ export async function applyFakeAdditionalPayment(input: {
       "Los pagos de prueba no están disponibles en producción.",
     );
   }
+
   const { user } = await authenticatedClient();
+  const scopeChanges = await listJobScopeChanges(input.jobId);
+  const targetChange = scopeChanges.find(
+    (change) => change.scope_change_id === input.scopeChangeId,
+  );
+  if (!targetChange) {
+    throw new JobServerError("NOT_FOUND", "No encontramos ese cambio de alcance.");
+  }
+  if (
+    targetChange.change_status !== "AWAITING_PAYMENT" &&
+    targetChange.change_status !== "PAYMENT_FAILED"
+  ) {
+    throw new JobServerError("CONFLICT", "El cambio de alcance ya no admite pago.");
+  }
+
+  const payment = await createFakeAdditionalPaymentRecord({
+    paymentNonce: input.nonce,
+    amountMinor: targetChange.additional_amount_minor,
+    currencyCode: targetChange.currency_code,
+    outcome: input.outcome,
+  });
+
   const admin = createAdminClient() as unknown as JobsRpcClient;
-  const { error } = await admin.rpc("apply_fake_additional_payment_result", {
+  const { error } = await admin.rpc("apply_additional_payment_result", {
     target_scope_change_id: input.scopeChangeId,
     payment_nonce: input.nonce,
-    payment_outcome: input.outcome,
+    payment_provider_name: "FAKE",
+    payment_provider_reference: payment.id,
+    payment_result_status: payment.status,
     actor_client_user_id: user.id,
   });
   if (error) throw mapError(error.code);
