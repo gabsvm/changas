@@ -217,26 +217,26 @@ const nonceA = crypto.randomUUID();
 const heldA = await clientA.rpc("hold_proposal_slot", {
   target_proposal_id: proposalA,
   hold_nonce: nonceA,
-  requested_ttl_seconds: 600,
+  ttl_seconds: 600,
 });
 assert(
-  !heldA.error && heldA.data?.[0]?.hold_id,
+  !heldA.error && heldA.data,
   `First slot hold failed: ${heldA.error?.message ?? "unknown"}`,
 );
 const heldAAgain = await clientA.rpc("hold_proposal_slot", {
   target_proposal_id: proposalA,
   hold_nonce: nonceA,
-  requested_ttl_seconds: 600,
+  ttl_seconds: 600,
 });
 assert(
-  !heldAAgain.error && heldAAgain.data?.[0]?.hold_id === heldA.data[0].hold_id,
+  !heldAAgain.error && heldAAgain.data === heldA.data,
   "Slot hold idempotency changed the hold identity.",
 );
 
 const conflictingHold = await clientB.rpc("hold_proposal_slot", {
   target_proposal_id: proposalB,
   hold_nonce: crypto.randomUUID(),
-  requested_ttl_seconds: 600,
+  ttl_seconds: 600,
 });
 assert(Boolean(conflictingHold.error), "Overlapping active hold was accepted.");
 
@@ -244,16 +244,19 @@ const releaseA = await clientA.rpc("release_proposal_slot_hold", {
   target_proposal_id: proposalA,
   hold_nonce: nonceA,
 });
-assert(!releaseA.error, `Hold release failed: ${releaseA.error?.message ?? "unknown"}`);
+assert(
+  !releaseA.error,
+  `Hold release failed: ${releaseA.error?.message ?? "unknown"}`,
+);
 
 const nonceB = crypto.randomUUID();
 const heldBAfterRelease = await clientB.rpc("hold_proposal_slot", {
   target_proposal_id: proposalB,
   hold_nonce: nonceB,
-  requested_ttl_seconds: 600,
+  ttl_seconds: 600,
 });
 assert(
-  !heldBAfterRelease.error && heldBAfterRelease.data?.[0]?.hold_id,
+  !heldBAfterRelease.error && heldBAfterRelease.data,
   "Released hold continued blocking the provider slot.",
 );
 await clientB.rpc("release_proposal_slot_hold", {
@@ -270,7 +273,7 @@ const blockedProposal = await createAwaitingProposal(
 const blockedHold = await clientA.rpc("hold_proposal_slot", {
   target_proposal_id: blockedProposal,
   hold_nonce: crypto.randomUUID(),
-  requested_ttl_seconds: 600,
+  ttl_seconds: 600,
 });
 assert(Boolean(blockedHold.error), "Availability exception did not block a hold.");
 
@@ -283,7 +286,7 @@ const outsideRuleProposal = await createAwaitingProposal(
 const outsideRuleHold = await clientA.rpc("hold_proposal_slot", {
   target_proposal_id: outsideRuleProposal,
   hold_nonce: crypto.randomUUID(),
-  requested_ttl_seconds: 600,
+  ttl_seconds: 600,
 });
 assert(Boolean(outsideRuleHold.error), "Out-of-rule slot received a hold.");
 
@@ -303,30 +306,31 @@ const expiringNonce = crypto.randomUUID();
 const expiringHold = await clientA.rpc("hold_proposal_slot", {
   target_proposal_id: expiringA,
   hold_nonce: expiringNonce,
-  requested_ttl_seconds: 60,
+  ttl_seconds: 60,
 });
-assert(!expiringHold.error, "Could not create expiring hold.");
+assert(!expiringHold.error && expiringHold.data, "Could not create expiring hold.");
 assert(
   !(
     await admin
       .from("provider_slot_holds")
       .update({ expires_at: "2026-09-01T00:00:00.000Z" })
-      .eq("id", expiringHold.data[0].hold_id)
+      .eq("id", expiringHold.data)
   ).error,
   "Could not expire hold fixture.",
 );
+const afterExpiryNonce = crypto.randomUUID();
 const afterExpiry = await clientB.rpc("hold_proposal_slot", {
   target_proposal_id: expiringB,
-  hold_nonce: crypto.randomUUID(),
-  requested_ttl_seconds: 600,
+  hold_nonce: afterExpiryNonce,
+  ttl_seconds: 600,
 });
 assert(
-  !afterExpiry.error && afterExpiry.data?.[0]?.hold_id,
+  !afterExpiry.error && afterExpiry.data,
   "Expired hold continued blocking the provider slot.",
 );
 await clientB.rpc("release_proposal_slot_hold", {
   target_proposal_id: expiringB,
-  hold_nonce: afterExpiry.data[0].request_nonce,
+  hold_nonce: afterExpiryNonce,
 });
 
 const raceProposalA = await createAwaitingProposal(
@@ -345,16 +349,16 @@ const [raceA, raceB] = await Promise.all([
   clientA.rpc("hold_proposal_slot", {
     target_proposal_id: raceProposalA,
     hold_nonce: crypto.randomUUID(),
-    requested_ttl_seconds: 600,
+    ttl_seconds: 600,
   }),
   clientB.rpc("hold_proposal_slot", {
     target_proposal_id: raceProposalB,
     hold_nonce: crypto.randomUUID(),
-    requested_ttl_seconds: 600,
+    ttl_seconds: 600,
   }),
 ]);
 const raceSuccesses = [raceA, raceB].filter(
-  (result) => !result.error && result.data?.[0]?.hold_id,
+  (result) => !result.error && result.data,
 ).length;
 const raceFailures = [raceA, raceB].filter((result) => Boolean(result.error)).length;
 assert(
