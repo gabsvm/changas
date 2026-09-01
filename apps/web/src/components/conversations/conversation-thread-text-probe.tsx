@@ -1,6 +1,11 @@
 "use client";
 
-import { useRef, useState, useTransition, type FormEvent } from "react";
+import {
+  useRef,
+  useState,
+  useTransition,
+  type FormEvent,
+} from "react";
 
 import {
   sendTextMessage,
@@ -70,13 +75,20 @@ export function ConversationThreadTextProbe({
 
       <div className="mt-6 space-y-2">
         {sentMessages.map((message) => (
-          <p key={message} className="bg-ink rounded-2xl px-4 py-3 text-sm text-white">
+          <p
+            key={message}
+            className="bg-ink rounded-2xl px-4 py-3 text-sm text-white"
+          >
             {message}
           </p>
         ))}
       </div>
 
-      <form ref={formRef} onSubmit={submit} className="relative mt-6 flex items-end gap-2">
+      <form
+        ref={formRef}
+        onSubmit={submit}
+        className="relative mt-6 flex items-end gap-2"
+      >
         <input type="hidden" name="conversationId" value={conversationId} />
         <input
           ref={nonceRef}
@@ -105,7 +117,9 @@ export function ConversationThreadTextProbe({
             <p className="text-terracotta text-sm font-semibold">
               Revisá antes de enviar
             </p>
-            <p className="text-ink/65 mt-1 text-xs leading-5">{state.message}</p>
+            <p className="text-ink/65 mt-1 text-xs leading-5">
+              {state.message}
+            </p>
             <div className="mt-3 flex gap-2">
               <button
                 type="submit"
