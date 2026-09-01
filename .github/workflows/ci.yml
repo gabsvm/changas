@@ -70,9 +70,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Diagnostic Next 16.2 runtime
-        run: pnpm --filter @changas/web add next@16.2.10 eslint-config-next@16.2.10 --lockfile=false --ignore-scripts
-
       - name: Start local Supabase
         # Edge Functions are out of Phase 02 scope and the runner's health
         # check can fail independently of Postgres/Auth/Storage integration.
