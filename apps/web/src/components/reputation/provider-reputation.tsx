@@ -35,7 +35,10 @@ export async function ProviderReputation({
             <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
               Reputación verificada
             </p>
-            <h2 id="reputation-title" className="font-display mt-2 text-3xl font-semibold">
+            <h2
+              id="reputation-title"
+              className="font-display mt-2 text-3xl font-semibold"
+            >
               {summary.review_count > 0 && summary.rating_average !== null
                 ? `★ ${summary.rating_average.toFixed(1)} de 5`
                 : "Nuevo proveedor"}
@@ -47,9 +50,18 @@ export async function ProviderReputation({
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
-            <Metric label="Completados" value={String(summary.completed_jobs)} />
-            <Metric label="Finalización" value={percent(summary.completion_rate)} />
-            <Metric label="Cancelación" value={percent(summary.cancellation_rate)} />
+            <Metric
+              label="Completados"
+              value={String(summary.completed_jobs)}
+            />
+            <Metric
+              label="Finalización"
+              value={percent(summary.completion_rate)}
+            />
+            <Metric
+              label="Cancelación"
+              value={percent(summary.cancellation_rate)}
+            />
             <Metric label="Ausencias" value={percent(summary.no_show_rate)} />
           </div>
         </div>
@@ -100,7 +112,9 @@ export async function ProviderReputation({
       </div>
 
       <div className="border-ink/10 rounded-3xl border bg-white/55 p-5 sm:p-6">
-        <h2 className="font-display text-2xl font-semibold">Reseñas verificadas</h2>
+        <h2 className="font-display text-2xl font-semibold">
+          Reseñas verificadas
+        </h2>
         {reviews.length > 0 ? (
           <div className="mt-4 space-y-4">
             {reviews.map((review) => (
@@ -110,8 +124,13 @@ export async function ProviderReputation({
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className="font-semibold">{review.reviewer_display_name}</p>
-                    <p className="text-terracotta text-sm" aria-label={`${review.rating} de 5 estrellas`}>
+                    <p className="font-semibold">
+                      {review.reviewer_display_name}
+                    </p>
+                    <p
+                      className="text-terracotta text-sm"
+                      aria-label={`${review.rating} de 5 estrellas`}
+                    >
                       {stars(review.rating)}
                     </p>
                   </div>
@@ -139,7 +158,8 @@ export async function ProviderReputation({
           </div>
         ) : (
           <p className="text-ink/55 mt-3 text-sm">
-            Las primeras reseñas aparecerán después de trabajos completados y confirmados por clientes.
+            Las primeras reseñas aparecerán después de trabajos completados y
+            confirmados por clientes.
           </p>
         )}
       </div>
