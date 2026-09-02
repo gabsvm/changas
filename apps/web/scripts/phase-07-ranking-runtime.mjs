@@ -91,7 +91,8 @@ const category = await admin
   .insert({
     slug: categorySlug,
     name: `Phase 07 ranking ${compactRunId.slice(0, 8)}`,
-    description: "Categoría sintética para aislar el ranking reputacional Phase 07.",
+    description:
+      "Categoría sintética para aislar el ranking reputacional Phase 07.",
     is_active: true,
   })
   .select("id")
@@ -106,7 +107,8 @@ const skill = await admin
     category_id: category.data.id,
     slug: skillSlug,
     name: `Skill ranking ${compactRunId.slice(0, 8)}`,
-    description: "Skill sintética para comparar señales reputacionales homogéneas.",
+    description:
+      "Skill sintética para comparar señales reputacionales homogéneas.",
     is_active: true,
   })
   .select("id")
@@ -281,7 +283,11 @@ for (let index = 0; index < 2; index += 1) {
   await completeJob(ops, jobId);
   opsCompletedJobs.push(jobId);
 }
-await reviewJob(opsCompletedJobs[0], 4, "Cuatro estrellas para fijar un prior no perfecto.");
+await reviewJob(
+  opsCompletedJobs[0],
+  4,
+  "Cuatro estrellas para fijar un prior no perfecto.",
+);
 
 const cancelledJob = await createPaidJob(ops, "ops-cancelled");
 const cancelled = await client.rpc("transition_job_status", {
@@ -388,7 +394,10 @@ assert(
   "Anonymous safe review read lost verified service/skill/category context.",
 );
 const rawReviews = await anonymous.from("reviews").select("id");
-assert(Boolean(rawReviews.error), "Anonymous caller can read the raw reviews table.");
+assert(
+  Boolean(rawReviews.error),
+  "Anonymous caller can read the raw reviews table.",
+);
 
 async function discovery(sortKey) {
   return anonymous.rpc("search_discovery_services_v4", {
@@ -415,14 +424,18 @@ assert(
 const mostCompleted = await discovery("most-completed");
 assert(
   !mostCompleted.error &&
-    mostCompleted.data?.map((row) => row.provider_slug).slice(0, 3).join(",") ===
+    mostCompleted.data
+      ?.map((row) => row.provider_slug)
+      .slice(0, 3)
+      .join(",") ===
       [high.providerSlug, ops.providerSlug, low.providerSlug].join(","),
   `most-completed order is wrong: ${JSON.stringify(mostCompleted.data)}`,
 );
 
 const recommended = await discovery("recommended");
 assert(
-  !recommended.error && recommended.data?.[0]?.provider_slug === high.providerSlug,
+  !recommended.error &&
+    recommended.data?.[0]?.provider_slug === high.providerSlug,
   `recommended ranking ignored verified reputation history: ${JSON.stringify(recommended.data)}`,
 );
 
