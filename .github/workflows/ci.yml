@@ -42,8 +42,11 @@ jobs:
       - name: Production build
         run: pnpm build
 
-      - name: Format check
-        run: pnpm format:check
+      - name: Capture Phase 07 web reputation Prettier diff
+        run: |
+          pnpm exec prettier --write apps/web/src/app/buscar/page.tsx apps/web/src/components/discovery/discovery-card.tsx apps/web/src/components/discovery/discovery-results.tsx apps/web/src/components/reputation/provider-reputation.tsx apps/web/src/lib/discovery/server.ts
+          git diff -- apps/web/src/app/buscar/page.tsx apps/web/src/components/discovery/discovery-card.tsx apps/web/src/components/discovery/discovery-results.tsx apps/web/src/components/reputation/provider-reputation.tsx apps/web/src/lib/discovery/server.ts
+          exit 1
 
       - name: Diff check
         run: git diff --check
