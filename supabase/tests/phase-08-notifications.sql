@@ -1,6 +1,6 @@
 begin;
 
-select plan(24);
+select plan(26);
 
 select ok(to_regclass('public.notifications') is not null, 'notifications table exists');
 select ok(to_regclass('public.notification_preferences') is not null, 'notification preferences table exists');
