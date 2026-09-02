@@ -397,13 +397,30 @@ export default async function JobPage({
                     <p className="mt-2 text-sm leading-6 whitespace-pre-wrap">
                       {change.scope_snapshot}
                     </p>
-                    <p className="text-moss mt-2 text-sm font-bold">
-                      Adicional:{" "}
-                      {formatMinorUnits(
-                        change.additional_amount_minor,
-                        change.currency_code as "ARS",
-                      )}
-                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                      <span className="text-ink/60">
+                        Total actual:{" "}
+                        {formatMinorUnits(
+                          detail.base_price_amount,
+                          detail.currency_code as "ARS",
+                        )}
+                      </span>
+                      <span className="text-moss font-semibold">
+                        Adicional:{" "}
+                        {formatMinorUnits(
+                          change.additional_amount_minor,
+                          change.currency_code as "ARS",
+                        )}
+                      </span>
+                      <span className="text-ink font-bold">
+                        Nuevo total:{" "}
+                        {formatMinorUnits(
+                          detail.base_price_amount +
+                            change.additional_amount_minor,
+                          detail.currency_code as "ARS",
+                        )}
+                      </span>
+                    </div>
                     {isClient && change.change_status === "OPEN" ? (
                       <form
                         action={respondScopeChangeAction}
