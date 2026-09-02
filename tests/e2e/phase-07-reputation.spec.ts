@@ -67,9 +67,13 @@ async function proposalIds(clientUserId: string): Promise<string[]> {
     { headers: adminHeaders() },
   );
   if (!response.ok) {
-    throw new Error(`Could not query Phase 07 proposals: ${await response.text()}`);
+    throw new Error(
+      `Could not query Phase 07 proposals: ${await response.text()}`,
+    );
   }
-  return ((await response.json()) as Array<{ id: string }>).map((row) => row.id);
+  return ((await response.json()) as Array<{ id: string }>).map(
+    (row) => row.id,
+  );
 }
 
 async function confirmProposal(
@@ -94,7 +98,9 @@ async function confirmProposal(
     },
   );
   if (!response.ok) {
-    throw new Error(`Could not confirm Phase 07 proposal: ${await response.text()}`);
+    throw new Error(
+      `Could not confirm Phase 07 proposal: ${await response.text()}`,
+    );
   }
   const rows = (await response.json()) as Array<{ confirmed_job_id?: string }>;
   if (!rows[0]?.confirmed_job_id) {
@@ -105,13 +111,18 @@ async function confirmProposal(
 
 async function markJobCompleted(jobId: string) {
   const config = requireAdminConfig();
-  const response = await fetch(`${config.supabaseUrl}/rest/v1/jobs?id=eq.${jobId}`, {
-    method: "PATCH",
-    headers: adminHeaders({ Prefer: "return=minimal" }),
-    body: JSON.stringify({ status: "COMPLETED" }),
-  });
+  const response = await fetch(
+    `${config.supabaseUrl}/rest/v1/jobs?id=eq.${jobId}`,
+    {
+      method: "PATCH",
+      headers: adminHeaders({ Prefer: "return=minimal" }),
+      body: JSON.stringify({ status: "COMPLETED" }),
+    },
+  );
   if (!response.ok) {
-    throw new Error(`Could not complete Phase 07 Job fixture: ${await response.text()}`);
+    throw new Error(
+      `Could not complete Phase 07 Job fixture: ${await response.text()}`,
+    );
   }
 }
 
@@ -138,12 +149,18 @@ test.describe("Phase 07 reputation", () => {
     const proposalForm = page.locator("form").filter({
       has: page.getByRole("button", { name: "Enviar propuesta" }),
     });
-    await proposalForm.locator('select[name="kind"]').selectOption("DIRECT_BOOKING");
+    await proposalForm
+      .locator('select[name="kind"]')
+      .selectOption("DIRECT_BOOKING");
     await proposalForm
       .getByLabel("Alcance")
       .fill("Trabajo E2E para reputación Phase 07");
-    await proposalForm.getByRole("button", { name: "Enviar propuesta" }).click();
-    await expect(page.getByText("Propuesta creada.", { exact: true })).toBeVisible();
+    await proposalForm
+      .getByRole("button", { name: "Enviar propuesta" })
+      .click();
+    await expect(
+      page.getByText("Propuesta creada.", { exact: true }),
+    ).toBeVisible();
 
     const initialProposals = await proposalIds(user.id);
     expect(initialProposals).toHaveLength(1);
@@ -155,8 +172,12 @@ test.describe("Phase 07 reputation", () => {
     await expect(
       page.getByRole("heading", { name: "Reseña del trabajo" }),
     ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Volver a contratar" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Publicar reseña" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Volver a contratar" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Publicar reseña" }),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
 
     await page.getByLabel("Calificación general").selectOption("5");
@@ -167,8 +188,12 @@ test.describe("Phase 07 reputation", () => {
     await page.getByRole("button", { name: "Publicar reseña" }).click();
 
     await expect(page.getByText(reviewText, { exact: true })).toBeVisible();
-    await expect(page.getByText("Reseña verificada de este Job", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Publicar reseña" })).toHaveCount(0);
+    await expect(
+      page.getByText("Reseña verificada de este Job", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Publicar reseña" }),
+    ).toHaveCount(0);
     await expectNoHorizontalOverflow(page);
 
     await page.getByRole("button", { name: "Volver a contratar" }).click();
@@ -184,7 +209,9 @@ test.describe("Phase 07 reputation", () => {
     await expect(
       page.getByRole("heading", { name: "Proveedores guardados" }),
     ).toBeVisible();
-    await expect(page.getByText("Proveedor guardado", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("Proveedor guardado", { exact: true }),
+    ).toBeVisible();
     await expect(page.getByText(/reseñas?/)).toBeVisible();
     await expect(page.getByText(/completados/)).toBeVisible();
     await expect(page.getByText(/finalización/)).toBeVisible();
