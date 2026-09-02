@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { formatServicePrice } from "@changas/domain";
 
+import { ProviderReputation } from "@/components/reputation/provider-reputation";
 import { toggleProviderFavorite } from "@/lib/favorites/actions";
 import { createClient } from "@/lib/supabase/server";
 
@@ -186,6 +187,8 @@ export default async function PublicProviderPage({
             </p>
           ) : null}
         </section>
+
+        <ProviderReputation providerSlug={provider.public_slug} />
 
         <section className="mt-6 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="space-y-6">
