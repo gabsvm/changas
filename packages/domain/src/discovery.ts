@@ -7,7 +7,12 @@ import {
 import { parseMajorAmountToMinor } from "./money";
 
 export type DiscoverySort =
-  "recommended" | "nearest" | "price-asc" | "price-desc";
+  | "recommended"
+  | "nearest"
+  | "price-asc"
+  | "price-desc"
+  | "best-rated"
+  | "most-completed";
 
 export type DiscoveryFilters = {
   modality: ServiceModality | null;
@@ -32,6 +37,11 @@ export type DiscoveryRankingSignals = {
   synonymMatch: boolean;
   distanceMeters: number | null;
   newProviderExposure?: boolean;
+  adjustedRating?: number | null;
+  reviewCount?: number;
+  completedJobs?: number;
+  completionRate?: number | null;
+  repeatClientCount?: number;
 };
 
 const MAX_PAGE_SIZE = 24;
@@ -43,6 +53,8 @@ const SORTS: DiscoverySort[] = [
   "nearest",
   "price-asc",
   "price-desc",
+  "best-rated",
+  "most-completed",
 ];
 
 export function normalizeDiscoveryQuery(input: string): string {
@@ -93,6 +105,32 @@ function parsePriceModel(value: string | undefined): PriceModel | null {
   return priceModels.includes(normalized as PriceModel)
     ? (normalized as PriceModel)
     : null;
+}
+
+function boundedNumber(value: number | null | undefined, max: number): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(max, value));
+}
+
+function reputationBonus(signals: DiscoveryRankingSignals): number {
+  const reviewCount = Math.floor(boundedNumber(signals.reviewCount, 10_000));
+  const rating =
+    reviewCount > 0 &&
+    typeof signals.adjustedRating === "number" &&
+    Number.isFinite(signals.adjustedRating)
+      ? Math.max(1, Math.min(5, signals.adjustedRating))
+      : null;
+  const ratingBonus = rating === null ? 0 : ((rating - 1) / 4) * 0.18;
+  const completedBonus =
+    Math.min(boundedNumber(signals.completedJobs, 1_000), 20) / 20 * 0.12;
+  const completionBonus =
+    signals.completionRate === null || signals.completionRate === undefined
+      ? 0
+      : boundedNumber(signals.completionRate, 1) * 0.08;
+  const repeatBonus =
+    Math.min(boundedNumber(signals.repeatClientCount, 1_000), 10) / 10 * 0.04;
+
+  return ratingBonus + completedBonus + completionBonus + repeatBonus;
 }
 
 export function parseDiscoveryFilters(
@@ -203,6 +241,7 @@ export function rankDiscoveryResult(signals: DiscoveryRankingSignals): number {
       (signals.tagMatch ? 0.15 : 0) +
       (signals.synonymMatch ? 0.2 : 0) +
       distanceBonus +
+      reputationBonus(signals) +
       (signals.newProviderExposure ? 0.04 : 0)
     ).toFixed(6),
   );
