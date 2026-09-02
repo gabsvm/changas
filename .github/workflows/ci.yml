@@ -42,11 +42,8 @@ jobs:
       - name: Production build
         run: pnpm build
 
-      - name: Capture Phase 07 runtime Prettier diff
-        run: |
-          pnpm exec prettier --write apps/web/scripts/phase-07-reputation-runtime.mjs
-          git diff -- apps/web/scripts/phase-07-reputation-runtime.mjs
-          exit 1
+      - name: Format check
+        run: pnpm format:check
 
       - name: Diff check
         run: git diff --check
