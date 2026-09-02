@@ -10,7 +10,9 @@ import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
 import { DiscoveryCard } from "./discovery-card";
 
 function nullableFiniteNumber(value: unknown): boolean {
-  return value === null || (typeof value === "number" && Number.isFinite(value));
+  return (
+    value === null || (typeof value === "number" && Number.isFinite(value))
+  );
 }
 
 function isDiscoveryRow(
