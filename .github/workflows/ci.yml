@@ -42,8 +42,11 @@ jobs:
       - name: Production build
         run: pnpm build
 
-      - name: Format check
-        run: pnpm format:check
+      - name: Capture Phase 07 runtime Prettier diff
+        run: |
+          pnpm exec prettier --write apps/web/scripts/phase-07-reputation-runtime.mjs
+          git diff -- apps/web/scripts/phase-07-reputation-runtime.mjs
+          exit 1
 
       - name: Diff check
         run: git diff --check
@@ -144,7 +147,7 @@ jobs:
       - name: Run Phase 06 jobs runtime security checks
         run: node apps/web/scripts/phase-06-jobs-runtime.mjs
 
-      - name: Run Phase 07 verified review runtime security checks
+      - name: Run Phase 07 reputation runtime security checks
         run: node apps/web/scripts/phase-07-reputation-runtime.mjs
 
       - name: Reset local database with synthetic seed
