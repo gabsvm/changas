@@ -5,13 +5,19 @@ import { useState } from "react";
 
 import { minorUnitsToMajorInput, type DiscoveryFilters } from "@changas/domain";
 
-import type { DiscoveryServiceRow } from "@/lib/supabase/database.types";
+import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
 
 import { DiscoveryCard } from "./discovery-card";
 
-function isDiscoveryRow(value: unknown): value is DiscoveryServiceRow {
+function nullableFiniteNumber(value: unknown): boolean {
+  return value === null || (typeof value === "number" && Number.isFinite(value));
+}
+
+function isDiscoveryRow(
+  value: unknown,
+): value is ReputationDiscoveryServiceRow {
   if (!value || typeof value !== "object") return false;
-  const row = value as Partial<DiscoveryServiceRow>;
+  const row = value as Partial<ReputationDiscoveryServiceRow>;
   return (
     typeof row.provider_display_name === "string" &&
     typeof row.provider_slug === "string" &&
@@ -23,6 +29,15 @@ function isDiscoveryRow(value: unknown): value is DiscoveryServiceRow {
     typeof row.price_model === "string" &&
     typeof row.currency_code === "string" &&
     typeof row.accepts_offers === "boolean" &&
+    nullableFiniteNumber(row.rating_average) &&
+    nullableFiniteNumber(row.adjusted_rating) &&
+    typeof row.review_count === "number" &&
+    Number.isFinite(row.review_count) &&
+    typeof row.completed_jobs === "number" &&
+    Number.isFinite(row.completed_jobs) &&
+    nullableFiniteNumber(row.completion_rate) &&
+    typeof row.repeat_client_count === "number" &&
+    Number.isFinite(row.repeat_client_count) &&
     typeof row.has_more === "boolean"
   );
 }
@@ -62,7 +77,7 @@ export function DiscoveryResults({
   filters,
   enableNearby = true,
 }: {
-  initialRows: DiscoveryServiceRow[];
+  initialRows: ReputationDiscoveryServiceRow[];
   initialHasMore?: boolean;
   initialError?: string | null;
   query: string;
