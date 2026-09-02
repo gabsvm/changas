@@ -88,7 +88,8 @@ const alphaUpdated = await alpha.rpc("update_my_notification_preferences", {
   requested_promotional_enabled: false,
 });
 assert(
-  !alphaUpdated.error && alphaUpdated.data?.[0]?.push_actionable_enabled === true,
+  !alphaUpdated.error &&
+    alphaUpdated.data?.[0]?.push_actionable_enabled === true,
   `Could not update notification preferences: ${alphaUpdated.error?.message ?? "unknown"}`,
 );
 
@@ -266,7 +267,8 @@ assert(
 );
 assert(
   claimed.data.some(
-    (row) => row.channel === "EMAIL" && row.recipient_email === users.alpha.email,
+    (row) =>
+      row.channel === "EMAIL" && row.recipient_email === users.alpha.email,
   ),
   "Email delivery claim is missing the recipient email.",
 );
