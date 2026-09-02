@@ -57,9 +57,9 @@ describe("discovery domain helpers", () => {
     expect(parseDiscoveryFilters({ sort: "most-completed" }).sort).toBe(
       "most-completed",
     );
-    expect(
-      parseDiscoveryFiltersFromInternal({ sort: "best-rated" }).sort,
-    ).toBe("best-rated");
+    expect(parseDiscoveryFiltersFromInternal({ sort: "best-rated" }).sort).toBe(
+      "best-rated",
+    );
   });
 
   it("keeps internal geolocation filters in minor units without converting twice", () => {
@@ -179,9 +179,7 @@ describe("discovery domain helpers", () => {
       repeatClientCount: 80,
     } as Parameters<typeof rankDiscoveryResult>[0]);
 
-    expect(strongTextWeakReputation).toBeGreaterThan(
-      weakTextStrongReputation,
-    );
+    expect(strongTextWeakReputation).toBeGreaterThan(weakTextStrongReputation);
   });
 
   it("keeps the new-provider exposure signal modest and subordinate to relevance", () => {
