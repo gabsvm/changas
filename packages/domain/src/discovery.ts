@@ -122,13 +122,13 @@ function reputationBonus(signals: DiscoveryRankingSignals): number {
       : null;
   const ratingBonus = rating === null ? 0 : ((rating - 1) / 4) * 0.18;
   const completedBonus =
-    Math.min(boundedNumber(signals.completedJobs, 1_000), 20) / 20 * 0.12;
+    (Math.min(boundedNumber(signals.completedJobs, 1_000), 20) / 20) * 0.12;
   const completionBonus =
     signals.completionRate === null || signals.completionRate === undefined
       ? 0
       : boundedNumber(signals.completionRate, 1) * 0.08;
   const repeatBonus =
-    Math.min(boundedNumber(signals.repeatClientCount, 1_000), 10) / 10 * 0.04;
+    (Math.min(boundedNumber(signals.repeatClientCount, 1_000), 10) / 10) * 0.04;
 
   return ratingBonus + completedBonus + completionBonus + repeatBonus;
 }
