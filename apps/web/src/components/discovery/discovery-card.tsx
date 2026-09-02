@@ -6,8 +6,8 @@ import {
   type DistanceBucket,
 } from "@changas/domain";
 
-import type { DiscoveryServiceRow } from "@/lib/supabase/database.types";
 import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
+import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
 
 const modalityLabels = {
   BOTH: "Presencial o remoto",
@@ -24,7 +24,14 @@ function initials(value: string): string {
     .toUpperCase();
 }
 
-export function DiscoveryCard({ row }: { row: DiscoveryServiceRow }) {
+export function DiscoveryCard({
+  row,
+}: {
+  row: ReputationDiscoveryServiceRow;
+}) {
+  const completionPercent =
+    row.completion_rate === null ? null : Math.round(row.completion_rate * 100);
+
   return (
     <article className="border-ink/10 rounded-2xl border bg-white/75 p-5 shadow-[0_12px_32px_rgba(22,56,50,0.06)]">
       <div className="flex items-start gap-3">
@@ -51,11 +58,21 @@ export function DiscoveryCard({ row }: { row: DiscoveryServiceRow }) {
           >
             {row.provider_display_name}
           </Link>
-          {row.provider_zone ? (
-            <p className="text-ink/50 mt-1 text-xs">
-              Zona aproximada: {row.provider_zone}
-            </p>
-          ) : null}
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+            {row.review_count > 0 && row.rating_average !== null ? (
+              <span className="text-ink font-semibold">
+                ★ {row.rating_average.toFixed(1)} · {row.review_count}{" "}
+                {row.review_count === 1 ? "reseña" : "reseñas"}
+              </span>
+            ) : (
+              <span className="text-terracotta font-semibold">
+                Nuevo proveedor
+              </span>
+            )}
+            {row.provider_zone ? (
+              <span className="text-ink/50">{row.provider_zone}</span>
+            ) : null}
+          </div>
         </div>
         <span className="bg-moss/10 text-moss rounded-full px-2.5 py-1 text-xs font-semibold">
           {modalityLabels[row.modality]}
@@ -73,6 +90,22 @@ export function DiscoveryCard({ row }: { row: DiscoveryServiceRow }) {
           {row.service_title}
         </h3>
       </Link>
+
+      <div className="mt-4 flex flex-wrap gap-2 text-xs">
+        <span className="bg-canvas rounded-full px-2.5 py-1 font-semibold">
+          {row.completed_jobs} completados
+        </span>
+        {completionPercent !== null && row.completed_jobs > 0 ? (
+          <span className="bg-canvas rounded-full px-2.5 py-1 font-semibold">
+            {completionPercent}% finalización
+          </span>
+        ) : null}
+        {row.repeat_client_count > 0 ? (
+          <span className="bg-canvas rounded-full px-2.5 py-1 font-semibold">
+            {row.repeat_client_count} clientes recurrentes
+          </span>
+        ) : null}
+      </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
         <span className="font-semibold">
