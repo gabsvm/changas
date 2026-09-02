@@ -292,7 +292,10 @@ assert(
 const providerRehire = await provider.rpc("create_rehire_proposal", {
   target_job_id: original.jobId,
 });
-assert(Boolean(providerRehire.error), "Provider can rehire themselves from a Job.");
+assert(
+  Boolean(providerRehire.error),
+  "Provider can rehire themselves from a Job.",
+);
 const outsiderRehire = await outsider.rpc("create_rehire_proposal", {
   target_job_id: original.jobId,
 });
@@ -363,7 +366,8 @@ assert(
       originalVersionBefore.data.service_title_snapshot &&
     originalVersionAfter.data?.service_description_snapshot ===
       originalVersionBefore.data.service_description_snapshot &&
-    originalVersionAfter.data?.price_amount === originalVersionBefore.data.price_amount,
+    originalVersionAfter.data?.price_amount ===
+      originalVersionBefore.data.price_amount,
   "Rehire changed the immutable historical proposal version.",
 );
 
@@ -435,7 +439,9 @@ assert(
   `Could not favorite provider: ${favorited.error?.message ?? "unknown"}`,
 );
 const favorites = await client.rpc("list_my_favorite_providers_v2");
-const favorite = favorites.data?.find((row) => row.provider_slug === providerSlug);
+const favorite = favorites.data?.find(
+  (row) => row.provider_slug === providerSlug,
+);
 assert(
   !favorites.error &&
     favorite?.rating_average === 5 &&
@@ -467,7 +473,10 @@ const otherService = await admin
   })
   .select("id")
   .single();
-assert(!otherService.error && otherService.data?.id, "Could not create second service.");
+assert(
+  !otherService.error && otherService.data?.id,
+  "Could not create second service.",
+);
 const secondConversation = await client.rpc("start_service_conversation", {
   target_provider_slug: providerSlug,
   target_service_slug: otherServiceSlug,
