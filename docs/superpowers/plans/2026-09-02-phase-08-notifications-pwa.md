@@ -29,12 +29,14 @@
 ### Task 1: Notification authority, preferences and delivery outbox
 
 **Files:**
+
 - Create: `supabase/tests/phase-08-notifications.sql`
 - Create: `supabase/migrations/20260902160000_phase_08_notifications.sql`
 - Create: `apps/web/scripts/phase-08-notifications-runtime.mjs`
 - Modify: `.github/workflows/ci.yml`
 
 **Interfaces:**
+
 - Produces `notifications`, `notification_preferences`, `push_subscriptions`, `notification_delivery_outbox`.
 - Produces RPCs `list_my_notifications`, `get_my_notification_unread_count`, `mark_notification_read`, `mark_all_notifications_read`, `get_my_notification_preferences`, `update_my_notification_preferences`, `upsert_push_subscription`, `delete_push_subscription`.
 - Produces private helper `enqueue_user_notification(...)` and delivery-claim/result RPCs for privileged server use.
@@ -70,11 +72,13 @@ Commit only after clean reset + pgTAP + runtime pass.
 ### Task 2: Meaningful domain-event routing and safe copy
 
 **Files:**
+
 - Create: `supabase/tests/phase-08-notification-routing.sql`
 - Create: `supabase/migrations/20260902161000_phase_08_notification_routing.sql`
 - Extend: `apps/web/scripts/phase-08-notifications-runtime.mjs`
 
 **Interfaces:**
+
 - Consumes Phase 04 `messages`, Phase 05 proposal/payment events, Phase 06 job events, Phase 07 reviews and existing provider verification state.
 - Produces deterministic notification routing with dedupe key `(recipient_id, source_event_type, source_event_id, kind)`.
 
@@ -113,6 +117,7 @@ Runtime must verify message body text never appears in notification/outbox paylo
 ### Task 3: Server-only delivery adapters — Web Push and Resend
 
 **Files:**
+
 - Modify: `apps/web/package.json`, `pnpm-lock.yaml` to add `web-push` plus types if required.
 - Modify: `.env.example`
 - Create: `apps/web/src/lib/notifications/types.ts`
@@ -159,6 +164,7 @@ Claim a bounded batch using a privileged RPC with lock/lease semantics; record s
 ### Task 4: Notification center, unread badge, preferences and push opt-in UX
 
 **Files:**
+
 - Create: `apps/web/src/lib/notifications/server.ts`
 - Create: `apps/web/src/app/(account)/notifications/page.tsx`
 - Create: `apps/web/src/app/(account)/notifications/actions.ts`
@@ -170,6 +176,7 @@ Claim a bounded batch using a privileged RPC with lock/lease semantics; record s
 - Modify: `apps/web/src/app/(account)/account/settings/page.tsx`
 
 **Interfaces:**
+
 - Notification center is server-rendered from owner-safe RPCs.
 - Push opt-in client calls Notification API only after a button click, registers SW, subscribes with VAPID public key, then posts subscription through a Server Action/RPC.
 
@@ -194,6 +201,7 @@ Denied state explains that in-app notifications still work; unsupported iOS/brow
 ### Task 5: PWA install, offline/error shell and safe service-worker updates
 
 **Files:**
+
 - Modify: `apps/web/src/app/manifest.ts`
 - Modify: `apps/web/public/sw.js`
 - Modify: `apps/web/src/components/pwa/service-worker-register.tsx`
@@ -203,6 +211,7 @@ Denied state explains that in-app notifications still work; unsupported iOS/brow
 - Add PWA unit/E2E coverage.
 
 **Interfaces:**
+
 - SW caches versioned static assets and `/offline` shell only.
 - Navigation/API/authenticated requests remain network-first and are never served from stale private caches.
 - Push handler consumes only already-safe payload fields and notification click focuses/navigates to same-origin allowlisted URL.
@@ -232,12 +241,14 @@ Keep existing Changas visual identity; placeholders are acceptable only if clear
 ### Task 6: Job reminders and delivery policy runtime
 
 **Files:**
+
 - Create: `supabase/migrations/20260902162000_phase_08_job_reminders.sql`
 - Create: `supabase/tests/phase-08-reminders.sql`
 - Create: `apps/web/scripts/phase-08-delivery-policy-runtime.mjs`
 - Modify CI.
 
 **Interfaces:**
+
 - Produces an idempotent RPC that materializes due reminders for upcoming scheduled Jobs without background GPS or recurring bookings.
 - Dispatcher may call reminder materialization before claiming outbox.
 
@@ -258,6 +269,7 @@ Prove trivial message => in-app only; proposal/job/review/verification => config
 ### Task 7: Browser E2E, mobile limitations, final report and STOP
 
 **Files:**
+
 - Create: `tests/e2e/phase-08-notifications-pwa.spec.ts`
 - Modify: Playwright config only if a capability-specific project is justified.
 - Create: `docs/reports/phase-08-notifications.md`
