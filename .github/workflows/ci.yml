@@ -42,8 +42,11 @@ jobs:
       - name: Production build
         run: pnpm build
 
-      - name: Format check
-        run: pnpm format:check
+      - name: Capture Phase 07 Prettier diff
+        run: |
+          pnpm exec prettier --write docs/superpowers/plans/2026-09-01-phase-07-reputation.md packages/domain/src/discovery.test.ts packages/domain/src/discovery.ts
+          git diff -- docs/superpowers/plans/2026-09-01-phase-07-reputation.md packages/domain/src/discovery.test.ts packages/domain/src/discovery.ts
+          exit 1
 
       - name: Diff check
         run: git diff --check
