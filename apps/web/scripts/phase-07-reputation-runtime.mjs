@@ -283,9 +283,18 @@ const providerMutation = await provider
   .from("reviews")
   .update({ rating: 5 })
   .eq("id", reviewId);
-assert(Boolean(providerMutation.error), "Provider directly changed a client review.");
-const providerDelete = await provider.from("reviews").delete().eq("id", reviewId);
-assert(Boolean(providerDelete.error), "Provider directly deleted a client review.");
+assert(
+  Boolean(providerMutation.error),
+  "Provider directly changed a client review.",
+);
+const providerDelete = await provider
+  .from("reviews")
+  .delete()
+  .eq("id", reviewId);
+assert(
+  Boolean(providerDelete.error),
+  "Provider directly deleted a client review.",
+);
 
 const firstReply = await provider.rpc("upsert_provider_review_reply", {
   target_review_id: reviewId,
@@ -324,7 +333,10 @@ const authorReport = await client.rpc("report_review", {
   requested_reason: "OTHER",
   requested_details: "No debo reportar mi propia reseña.",
 });
-assert(Boolean(authorReport.error), "Review author could report their own review.");
+assert(
+  Boolean(authorReport.error),
+  "Review author could report their own review.",
+);
 
 const outsiderReport = await outsider.rpc("report_review", {
   target_review_id: reviewId,
@@ -370,6 +382,9 @@ const anonymous = createClient(supabaseUrl, anonKey, {
   },
 });
 const anonymousReports = await anonymous.from("review_reports").select("id");
-assert(Boolean(anonymousReports.error), "Anonymous user can query review reports.");
+assert(
+  Boolean(anonymousReports.error),
+  "Anonymous user can query review reports.",
+);
 
 console.log("Phase 07 verified review runtime authority checks: PASS");
