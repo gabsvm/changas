@@ -8,10 +8,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
 import type { ReputationDiscoveryServiceRow } from "./types";
-import type {
-  Database,
-  ServiceModalityType,
-} from "../supabase/database.types";
+import type { Database, ServiceModalityType } from "../supabase/database.types";
 
 export type DiscoverySearchInput = {
   query: string;
@@ -108,7 +105,9 @@ export function isValidCoordinate(
 }
 
 function nullableFiniteNumber(value: unknown): boolean {
-  return value === null || (typeof value === "number" && Number.isFinite(value));
+  return (
+    value === null || (typeof value === "number" && Number.isFinite(value))
+  );
 }
 
 export function safeDiscoveryRows(
