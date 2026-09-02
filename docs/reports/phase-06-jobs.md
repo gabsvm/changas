@@ -1,4 +1,4 @@
-﻿# Phase 06 — Jobs
+# Phase 06 — Jobs
 
 ## Estado final
 
@@ -6,14 +6,14 @@
 **Rama:** `codex/phase-06-jobs`  
 **Base canónica aprobada (Phase 05):** `4ef03e67041fa80eb80a490adff5eeae17b8f9e9`  
 **Functional HEAD SHA:** `3e2639d4ac1baac57c46e36a37329cca8c3afcf5`  
-**Final/Approval HEAD SHA:** (será confirmado en commit final)  
-**CI RUN ID:** `33578349764`  
+**Final/Approval HEAD SHA:** `fd98490a61ef763fb4e9c7041490214a1faee971`  
+**CI RUN ID:** `33578965225`  
 **validate:** `success`  
 **supabase-integration:** `success`  
 **Playwright total y resultado:** 36 tests passed (18 Desktop Chromium + 18 Pixel 5 mobile-web)  
 **pgTAP total:** 20 test files, 316 tests passed  
 **Vitest total:** 26 test files, 72 tests passed  
-**Lighthouse mobile scores:** Home performance: 85 | Search performance: 91
+**Lighthouse mobile scores:** Home performance: 88 | Search performance: 93
 
 Phase 06 queda formalmente completada, verificada y auditada de acuerdo con `CHANGAS_MASTER_PLAN.md` (Phase 06, §14, §15, §21) y `docs/superpowers/plans/2026-09-01-phase-06-jobs.md`. No se adelantaron funcionalidades de Phase 07 (reviews/reputación) ni proveedores de pago reales (Phase 11).
 
