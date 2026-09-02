@@ -124,7 +124,10 @@ export async function JobReputationPanel({
         <article className="bg-canvas mt-5 rounded-2xl p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-terracotta font-semibold" aria-label={`${state.rating} de 5 estrellas`}>
+              <p
+                className="text-terracotta font-semibold"
+                aria-label={`${state.rating} de 5 estrellas`}
+              >
                 {stars(state.rating)}
               </p>
               <p className="text-ink/50 mt-1 text-xs">
@@ -174,14 +177,20 @@ export async function JobReputationPanel({
                   />
                 </label>
                 <button className="button-secondary w-fit" type="submit">
-                  {state.provider_reply ? "Actualizar respuesta" : "Responder reseña"}
+                  {state.provider_reply
+                    ? "Actualizar respuesta"
+                    : "Responder reseña"}
                 </button>
               </form>
 
               {!state.reported_by_caller ? (
                 <form action={reportJobReviewAction} className="grid gap-2">
                   <input type="hidden" name="jobId" value={jobId} />
-                  <input type="hidden" name="reviewId" value={state.review_id} />
+                  <input
+                    type="hidden"
+                    name="reviewId"
+                    value={state.review_id}
+                  />
                   <label className="text-sm font-semibold">
                     Reportar reseña
                     <select
@@ -189,10 +198,14 @@ export async function JobReputationPanel({
                       defaultValue="OTHER"
                       className="border-ink/10 mt-1 block h-11 w-full rounded-xl border bg-white px-3 font-normal"
                     >
-                      <option value="IRRELEVANT_CONTENT">Contenido irrelevante</option>
+                      <option value="IRRELEVANT_CONTENT">
+                        Contenido irrelevante
+                      </option>
                       <option value="INSULTS">Insultos</option>
                       <option value="THREATS">Amenazas</option>
-                      <option value="PRIVATE_INFORMATION">Información privada</option>
+                      <option value="PRIVATE_INFORMATION">
+                        Información privada
+                      </option>
                       <option value="DISCRIMINATION">Discriminación</option>
                       <option value="EXTORTION">Extorsión</option>
                       <option value="ABUSE">Abuso</option>

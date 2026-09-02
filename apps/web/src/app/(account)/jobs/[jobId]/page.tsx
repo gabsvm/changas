@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { formatMinorUnits, type JobStatus } from "@changas/domain";
 
+import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
 import {
   fakeAdditionalPaymentAction,
   requestRescheduleAction,
@@ -152,6 +153,13 @@ export default async function JobPage({
           </p>
         </div>
       </section>
+
+      <JobReputationPanel
+        jobId={jobId}
+        status={detail.job_status}
+        isClient={isClient}
+        isProvider={isProvider}
+      />
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
         <div className="space-y-5">

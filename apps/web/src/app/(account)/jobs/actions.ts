@@ -218,9 +218,7 @@ export async function replyToJobReviewAction(
   revalidatePath(`/jobs/${jobId}`);
 }
 
-export async function reportJobReviewAction(
-  formData: FormData,
-): Promise<void> {
+export async function reportJobReviewAction(formData: FormData): Promise<void> {
   const jobId = uuidField(formData, "jobId");
   const reviewId = uuidField(formData, "reviewId");
   const reason = stringField(formData, "reason") as ReviewReportReason;

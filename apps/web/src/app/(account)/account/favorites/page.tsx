@@ -19,21 +19,19 @@ export default async function FavoritesPage() {
   const { data: favorites } = await (
     supabase as unknown as {
       rpc(name: "list_my_favorite_providers_v2"): Promise<{
-        data:
-          | Array<{
-              provider_slug: string;
-              display_name: string;
-              avatar_url: string | null;
-              public_zone: string | null;
-              public_headline: string | null;
-              bio: string | null;
-              rating_average: number | null;
-              review_count: number;
-              completed_jobs: number;
-              completion_rate: number | null;
-              repeat_client_count: number;
-            }>
-          | null;
+        data: Array<{
+          provider_slug: string;
+          display_name: string;
+          avatar_url: string | null;
+          public_zone: string | null;
+          public_headline: string | null;
+          bio: string | null;
+          rating_average: number | null;
+          review_count: number;
+          completed_jobs: number;
+          completion_rate: number | null;
+          repeat_client_count: number;
+        }> | null;
         error: unknown;
       }>;
     }
@@ -79,12 +77,15 @@ export default async function FavoritesPage() {
               </p>
               <div className="text-ink/55 mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                 <span>
-                  {provider.review_count} {provider.review_count === 1 ? "reseña" : "reseñas"}
+                  {provider.review_count}{" "}
+                  {provider.review_count === 1 ? "reseña" : "reseñas"}
                 </span>
                 <span>{provider.completed_jobs} completados</span>
                 <span>{percent(provider.completion_rate)} finalización</span>
                 {provider.repeat_client_count > 0 ? (
-                  <span>{provider.repeat_client_count} clientes recurrentes</span>
+                  <span>
+                    {provider.repeat_client_count} clientes recurrentes
+                  </span>
                 ) : null}
               </div>
               {provider.public_zone ? (

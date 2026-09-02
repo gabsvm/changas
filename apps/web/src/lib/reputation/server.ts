@@ -97,7 +97,10 @@ export type CreateJobReviewInput = {
 };
 
 type ReputationRpcClient = {
-  rpc(name: string, args?: Record<string, unknown>): Promise<{
+  rpc(
+    name: string,
+    args?: Record<string, unknown>,
+  ): Promise<{
     data: unknown;
     error: { message?: string | null } | null;
   }>;
@@ -117,7 +120,8 @@ async function mutation<T>(
   args: Record<string, unknown>,
 ): Promise<T> {
   const { data, error } = await rpcClient(client).rpc(name, args);
-  if (error) throw new Error(error.message ?? "No pudimos completar la acción.");
+  if (error)
+    throw new Error(error.message ?? "No pudimos completar la acción.");
   return data as T;
 }
 
@@ -212,9 +216,12 @@ export async function createRehireProposal(
   client: SupabaseClient<Database>,
   jobId: string,
 ): Promise<RehireProposalResult> {
-  const { data, error } = await rpcClient(client).rpc("create_rehire_proposal", {
-    target_job_id: jobId,
-  });
+  const { data, error } = await rpcClient(client).rpc(
+    "create_rehire_proposal",
+    {
+      target_job_id: jobId,
+    },
+  );
   if (error) throw new Error(error.message ?? "No pudimos volver a contratar.");
   const result = rows<RehireProposalResult>(data)[0];
   if (!result) throw new Error("No pudimos crear la nueva propuesta.");
