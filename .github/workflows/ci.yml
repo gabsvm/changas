@@ -1,22 +1,20 @@
-name: Phase 07 formatting one-shot
+name: CI
 
 on:
   push:
-    branches:
-      - codex/phase-07-reputation
+    branches: ["**"]
+  pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  format-rehire-runtime:
+  validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: codex/phase-07-reputation
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -32,15 +30,157 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Format and commit runtime
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Production build
+        run: pnpm build
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Diff check
+        run: git diff --check
+
+  supabase-integration:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start local Supabase
+        run: pnpm dlx supabase@2.116.0 start --exclude edge-runtime
+
+      - name: Reset local database
+        run: pnpm dlx supabase@2.116.0 db reset --local --no-seed
+
+      - name: Run pgTAP security tests
+        run: pnpm dlx supabase@2.116.0 test db --local
+
+      - name: Verify discovery fuzzy index path
         run: |
-          pnpm exec prettier --write apps/web/scripts/phase-07-rehire-runtime.mjs
-          if git diff --quiet -- apps/web/scripts/phase-07-rehire-runtime.mjs; then
-            echo "Runtime already formatted."
-            exit 0
+          plan=$(pnpm dlx supabase@2.116.0 db query --local 'do $$
+          declare
+            plan_line text;
+            used_index boolean := false;
+          begin
+            perform set_config($setting$enable_seqscan$setting$, $value$off$value$, true);
+            for plan_line in execute $query$
+              explain (costs off)
+              select id
+              from public.services
+              where search_text_normalized operator(extensions.%) $q$electricista$q$
+            $query$ loop
+              raise notice $notice$%$notice$, plan_line;
+              if plan_line like $pattern$%services_search_text_trgm_idx%$pattern$ then
+                used_index := true;
+              end if;
+            end loop;
+            if not used_index then
+              raise exception $error$discovery trigram index was not used$error$;
+            end if;
+          end $$;')
+          printf '%s\n' "$plan"
+
+      - name: Export local Supabase credentials
+        shell: bash
+        run: |
+          pnpm dlx supabase@2.116.0 status -o env > "$RUNNER_TEMP/supabase.env"
+          set -a
+          source "$RUNNER_TEMP/supabase.env"
+          set +a
+          {
+            echo "API_URL=$API_URL"
+            echo "ANON_KEY=$ANON_KEY"
+            echo "SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+
+      - name: Run client and Storage security checks
+        run: node apps/web/scripts/supabase-runtime-security.mjs
+
+      - name: Run Phase 03 discovery runtime security checks
+        run: node apps/web/scripts/phase-03-discovery-runtime.mjs
+
+      - name: Run Phase 04 conversation runtime security checks
+        run: node apps/web/scripts/phase-04-conversations-runtime.mjs
+
+      - name: Run Phase 05 proposal/payment runtime security checks
+        run: node apps/web/scripts/phase-05-proposals-runtime.mjs
+
+      - name: Run Phase 06 scheduling/hold runtime security checks
+        run: node apps/web/scripts/phase-06-scheduling-runtime.mjs
+
+      - name: Run Phase 06 transactional scheduling integrity checks
+        run: node apps/web/scripts/phase-06-scheduling-integrity-runtime.mjs
+
+      - name: Run Phase 06 exact-location runtime security checks
+        run: node apps/web/scripts/phase-06-location-runtime.mjs
+
+      - name: Run Phase 06 jobs runtime security checks
+        run: node apps/web/scripts/phase-06-jobs-runtime.mjs
+
+      - name: Run Phase 07 reputation runtime security checks
+        run: node apps/web/scripts/phase-07-reputation-runtime.mjs
+
+      - name: Run Phase 07 reputation ranking runtime checks
+        run: node apps/web/scripts/phase-07-ranking-runtime.mjs
+
+      - name: Run Phase 07 rehire/account reputation runtime checks
+        run: node apps/web/scripts/phase-07-rehire-runtime.mjs
+
+      - name: Reset local database with synthetic seed
+        run: pnpm dlx supabase@2.116.0 db reset --local
+
+      - name: Build web app for browser smoke tests
+        run: pnpm build
+
+      - name: Run mobile Lighthouse smoke audit
+        run: |
+          nohup pnpm --filter @changas/web start > "$RUNNER_TEMP/changas-web.log" 2>&1 &
+          pnpm exec playwright install --with-deps chromium
+          pnpm dlx lighthouse@12.8.2 http://127.0.0.1:3000/ --only-categories=performance --form-factor=mobile --chrome-flags="--headless --no-sandbox" --output=json --output-path="$RUNNER_TEMP/home-lighthouse.json"
+          pnpm dlx lighthouse@12.8.2 http://127.0.0.1:3000/buscar --only-categories=performance --form-factor=mobile --chrome-flags="--headless --no-sandbox" --output=json --output-path="$RUNNER_TEMP/search-lighthouse.json"
+          node apps/web/scripts/check-mobile-performance.mjs "$RUNNER_TEMP/home-lighthouse.json" "$RUNNER_TEMP/search-lighthouse.json"
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run mobile web smoke tests
+        env:
+          PLAYWRIGHT_REUSE_EXISTING_SERVER: "true"
+        run: |
+          if ! pnpm test:e2e; then
+            echo "::group::Next.js browser smoke server log"
+            cat "$RUNNER_TEMP/changas-web.log" || true
+            echo "::endgroup::"
+            exit 1
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/web/scripts/phase-07-rehire-runtime.mjs
-          git commit -m "style(phase07): format rehire runtime"
-          git push origin HEAD:codex/phase-07-reputation
+
+      - name: Stop local Supabase
+        if: always()
+        run: pnpm dlx supabase@2.116.0 stop
