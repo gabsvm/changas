@@ -24,11 +24,7 @@ function initials(value: string): string {
     .toUpperCase();
 }
 
-export function DiscoveryCard({
-  row,
-}: {
-  row: ReputationDiscoveryServiceRow;
-}) {
+export function DiscoveryCard({ row }: { row: ReputationDiscoveryServiceRow }) {
   const completionPercent =
     row.completion_rate === null ? null : Math.round(row.completion_rate * 100);
 
