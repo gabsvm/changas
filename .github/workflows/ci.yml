@@ -156,6 +156,9 @@ jobs:
       - name: Run Phase 08 notification runtime security checks
         run: node apps/web/scripts/phase-08-notifications-runtime.mjs
 
+      - name: Run Phase 09 admin runtime security checks
+        run: node apps/web/scripts/phase-09-admin-runtime.mjs
+
       - name: Reset local database with synthetic seed
         run: pnpm dlx supabase@2.116.0 db reset --local
 
