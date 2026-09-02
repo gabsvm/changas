@@ -31,57 +31,62 @@
 ### Task 1: Domain reputation and ranking contracts
 
 **Files:**
+
 - Modify: `packages/domain/src/discovery.ts`
 - Modify: `packages/domain/src/discovery.test.ts`
-- Create: `packages/domain/src/reputation.ts`
-- Create: `packages/domain/src/reputation.test.ts`
-- Modify: `packages/domain/src/index.ts`
+- Reuse: `packages/domain/src/discovery-public.ts` Bayesian `adjustedRating(...)` helper rather than duplicating the formula.
 
 **Interfaces:**
-- Produces `ReviewRating`, `ReviewDimensions`, `ProviderReputationSignals`, `adjustedRating(...)`, and reputation-aware `DiscoveryRankingSignals`.
-- `adjustedRating(averageRating, reviewCount)` uses a bounded Bayesian prior (`priorMean = 4.2`, `priorWeight = 8`) only when `reviewCount > 0`; no-reviews returns `null`.
+
+- Extends `DiscoveryRankingSignals` with bounded reputation/completion/repeat-client inputs.
+- Reuses `adjustedRating(observedAverage, observedCount, priorAverage, priorWeight)` with Phase 07 constants (`priorMean = 4.2`, `priorWeight = 8`) when provider metrics are calculated.
 - `rankDiscoveryResult` keeps text/skill/category/distance relevance dominant and adds bounded reputation/completion/repeat/new-provider bonuses.
 
-- [ ] **Step 1: Write failing unit tests**
+- [x] **Step 1: Write failing unit tests**
 
 Add tests proving:
 
 ```ts
-expect(adjustedRating(5, 2)).toBeLessThan(adjustedRating(4.9, 400)!)
-expect(adjustedRating(0, 0)).toBeNull()
-expect(rankDiscoveryResult(strongTextWeakReputation)).toBeGreaterThan(rankDiscoveryResult(weakTextStrongReputation))
-expect(rankDiscoveryResult(newProviderSignals)).toBeGreaterThan(rankDiscoveryResult({ ...newProviderSignals, newProviderExposure: false }))
+expect(adjustedRating(5, 2, 4.2, 8)).toBeLessThan(
+  adjustedRating(4.9, 400, 4.2, 8),
+);
+expect(rankDiscoveryResult(strongTextWeakReputation)).toBeGreaterThan(
+  rankDiscoveryResult(weakTextStrongReputation),
+);
+expect(rankDiscoveryResult(newProviderSignals)).toBeGreaterThan(
+  rankDiscoveryResult({ ...newProviderSignals, newProviderExposure: false }),
+);
 ```
 
 Also extend filter/sort tests for `best-rated` and `most-completed`.
 
-- [ ] **Step 2: Run targeted tests and verify RED**
+- [x] **Step 2: Run targeted tests and verify RED**
 
-Run: `pnpm test -- packages/domain/src/reputation.test.ts packages/domain/src/discovery.test.ts`
+Evidence: CI `33580540626` failed exactly because `best-rated` fell back to `recommended` and reputation inputs did not affect ranking.
 
-Expected: FAIL because reputation contracts/new sorts do not exist.
-
-- [ ] **Step 3: Implement minimal domain contracts**
+- [x] **Step 3: Implement minimal domain contracts**
 
 Use pure TypeScript only; no React dependency. Rating/count/completion inputs are clamped defensively. Reputation bonuses remain bounded and cannot outweigh a major text/skill relevance difference.
 
-- [ ] **Step 4: Run targeted tests and verify GREEN**
+- [x] **Step 4: Run targeted tests and verify GREEN**
 
-Run the same Vitest command; expected PASS.
+Evidence: the implementation commit passed all 26 Vitest files / 75 tests before the separate formatting gate.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
-Commit message: `feat(phase07): add reputation ranking domain contracts`.
+Commit: `44d67dd893cce2d282d434400341e20f4bfc0a19` (`feat(phase07): add reputation ranking domain contracts`).
 
 ---
 
 ### Task 2: Verified review schema, eligibility and anti-manipulation
 
 **Files:**
+
 - Create: `supabase/migrations/20260901230000_phase_07_reviews.sql`
 - Create: `supabase/tests/phase-07-reviews.sql`
 
 **Interfaces:**
+
 - Tables: `reviews`, `review_replies`, `review_reports`.
 - RPCs: `create_job_review`, `upsert_provider_review_reply`, `report_review`.
 - Public review row permanently stores `job_id`, `service_id`, `skill_id`, `reviewer_user_id`, `provider_user_id`, `rating`, optional dimensions, text, and immutable service/skill snapshots.
@@ -132,10 +137,12 @@ Commit message: `feat(phase07): add verified review authority`.
 ### Task 3: Reputation aggregates and contextual public read models
 
 **Files:**
+
 - Create: `supabase/migrations/20260901231000_phase_07_reputation_metrics.sql`
 - Extend: `supabase/tests/phase-07-reviews.sql`
 
 **Interfaces:**
+
 - Table: `provider_reputation_metrics` (internal aggregate cache, no public direct write).
 - Functions/views: `refresh_provider_reputation_metrics`, `public_provider_reputation`, `public_provider_skill_reputation`, `public_service_reputation`, `list_public_provider_reviews`.
 - Metrics: completed jobs, cancelled jobs, no-show jobs, completion rate, cancellation rate, no-show rate, review count, average rating, adjusted rating, repeat-client count.
@@ -178,6 +185,7 @@ Commit message: `feat(phase07): aggregate provider reputation metrics`.
 ### Task 4: Discovery ranking update and new-provider exposure
 
 **Files:**
+
 - Create: `supabase/migrations/20260901232000_phase_07_discovery_ranking.sql`
 - Modify: `apps/web/src/lib/discovery/server.ts`
 - Modify: `apps/web/src/lib/supabase/database.types.ts`
@@ -186,6 +194,7 @@ Commit message: `feat(phase07): aggregate provider reputation metrics`.
 - Extend: `apps/web/scripts/phase-03-discovery-runtime.mjs` only where backward compatibility needs coverage; otherwise use Phase 07 runtime.
 
 **Interfaces:**
+
 - Public RPC remains `search_discovery_services_v3` unless changing the return shape requires a versioned `v4`; never silently break an older signature used by browser code.
 - Result rows add understandable signals: `rating_average`, `review_count`, `completed_jobs`.
 - Sort keys add `best-rated` and `most-completed`.
@@ -224,6 +233,7 @@ Commit message: `feat(phase07): rank discovery with verified reputation`.
 ### Task 5: Public reviews, provider reply/report UI, and favorites polish
 
 **Files:**
+
 - Create: `apps/web/src/lib/reputation/server.ts`
 - Create: `apps/web/src/lib/reputation/actions.ts`
 - Create focused reputation UI components under `apps/web/src/components/reputation/` if needed.
@@ -234,6 +244,7 @@ Commit message: `feat(phase07): rank discovery with verified reputation`.
 - Add/extend Vitest tests for normalization/action guards.
 
 **Interfaces:**
+
 - Provider page: overall rating/count, completed jobs, repeat clients, contextual skill summaries, paged recent verified reviews and provider replies.
 - Service page: service-specific rating/count/reviews.
 - Favorites list: avatar/headline plus verified rating/count/completed-jobs summary.
@@ -265,6 +276,7 @@ Commit message: `feat(phase07): surface verified provider reviews`.
 ### Task 6: Review-from-completed-Job and repeat hiring
 
 **Files:**
+
 - Create or extend migration: `supabase/migrations/20260901233000_phase_07_rehire.sql`
 - Modify: `apps/web/src/app/(account)/jobs/[jobId]/page.tsx`
 - Modify: `apps/web/src/app/(account)/jobs/actions.ts`
@@ -273,6 +285,7 @@ Commit message: `feat(phase07): surface verified provider reviews`.
 - Create: `supabase/tests/phase-07-rehire.sql`
 
 **Interfaces:**
+
 - Completed client Job shows `Dejar reseña` if no review exists.
 - Completed client Job shows `Contratar nuevamente` form.
 - Rehire reuses the existing service conversation safely but creates a brand-new Proposal using current Service terms via existing proposal authority.
@@ -313,11 +326,13 @@ Commit message: `feat(phase07): add verified review and rehire flows`.
 ### Task 7: Phase 07 runtime, E2E and CI gates
 
 **Files:**
+
 - Create: `apps/web/scripts/phase-07-reputation-runtime.mjs`
 - Create: `tests/e2e/phase-07-reputation.spec.ts`
 - Modify: `.github/workflows/ci.yml`
 
 **Interfaces:**
+
 - Runtime executes after Phase 06 Jobs runtime and before synthetic seed browser reset.
 - Playwright automatically runs Desktop Chrome + Pixel 5 through existing config.
 
@@ -346,6 +361,7 @@ Commit message: `test(phase07): cover reputation and rehire end to end`.
 ### Task 8: Final Phase 07 report and verification
 
 **Files:**
+
 - Create: `docs/reports/phase-07-reputation.md`
 
 - [ ] **Step 1: Audit against every Phase 07 Master Plan task/acceptance criterion**
