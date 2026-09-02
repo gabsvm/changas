@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import {
   jobStatuses,
@@ -19,9 +20,28 @@ import {
   setJobExactLocation,
   transitionJob,
 } from "@/lib/jobs/server";
+import {
+  createJobReview,
+  createRehireProposal,
+  reportReview,
+  upsertProviderReviewReply,
+  type ReviewReportReason,
+} from "@/lib/reputation/server";
+import { createClient } from "@/lib/supabase/server";
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const reviewReportReasons: ReviewReportReason[] = [
+  "THREATS",
+  "INSULTS",
+  "PRIVATE_INFORMATION",
+  "DISCRIMINATION",
+  "IRRELEVANT_CONTENT",
+  "EXTORTION",
+  "ABUSE",
+  "OTHER",
+];
 
 function stringField(formData: FormData, name: string): string {
   const value = formData.get(name);
@@ -47,6 +67,20 @@ function optionalNumber(formData: FormData, name: string): number | null {
   if (!value) return null;
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed)) throw new Error("Número inválido.");
+  return parsed;
+}
+
+function ratingField(
+  formData: FormData,
+  name: string,
+  required = false,
+): number | null {
+  const value = stringField(formData, name);
+  if (!value && !required) return null;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 5) {
+    throw new Error("La calificación debe estar entre 1 y 5.");
+  }
   return parsed;
 }
 
@@ -156,4 +190,58 @@ export async function setJobLocationAction(formData: FormData): Promise<void> {
     notes: stringField(formData, "notes") || null,
   });
   revalidatePath(`/jobs/${jobId}`);
+}
+
+export async function createJobReviewAction(formData: FormData): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const supabase = await createClient();
+  await createJobReview(supabase, {
+    jobId,
+    rating: ratingField(formData, "rating", true)!,
+    reviewText: stringField(formData, "reviewText") || null,
+    qualityRating: ratingField(formData, "qualityRating"),
+    punctualityRating: ratingField(formData, "punctualityRating"),
+    communicationRating: ratingField(formData, "communicationRating"),
+  });
+  revalidatePath(`/jobs/${jobId}`);
+}
+
+export async function replyToJobReviewAction(
+  formData: FormData,
+): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const reviewId = uuidField(formData, "reviewId");
+  const replyText = stringField(formData, "replyText");
+  if (replyText.length < 2) throw new Error("Escribí una respuesta válida.");
+  const supabase = await createClient();
+  await upsertProviderReviewReply(supabase, reviewId, replyText);
+  revalidatePath(`/jobs/${jobId}`);
+}
+
+export async function reportJobReviewAction(
+  formData: FormData,
+): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const reviewId = uuidField(formData, "reviewId");
+  const reason = stringField(formData, "reason") as ReviewReportReason;
+  if (!reviewReportReasons.includes(reason)) {
+    throw new Error("Motivo de reporte inválido.");
+  }
+  const supabase = await createClient();
+  await reportReview(
+    supabase,
+    reviewId,
+    reason,
+    stringField(formData, "details") || null,
+  );
+  revalidatePath(`/jobs/${jobId}`);
+}
+
+export async function rehireJobAction(formData: FormData): Promise<never> {
+  const jobId = uuidField(formData, "jobId");
+  const supabase = await createClient();
+  const result = await createRehireProposal(supabase, jobId);
+  revalidatePath("/jobs");
+  revalidatePath("/messages");
+  redirect(`/messages/${result.conversation_id}`);
 }
