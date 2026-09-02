@@ -14,6 +14,7 @@ describe("discovery domain helpers", () => {
     expect(() => adjustedRatingPublic(6, 1, 3, 10)).toThrow();
     expect(() => adjustedRatingPublic(4, -1, 3, 10)).toThrow();
   });
+
   it("normalizes Spanish search text deterministically", () => {
     expect(normalizeDiscoveryQuery("  ClÁSES   de Inglés ")).toBe(
       "clases de ingles",
@@ -47,6 +48,18 @@ describe("discovery domain helpers", () => {
       locationSlug: null,
       radiusMeters: null,
     });
+  });
+
+  it("accepts reputation-aware discovery sorts", () => {
+    expect(parseDiscoveryFilters({ sort: "best-rated" }).sort).toBe(
+      "best-rated",
+    );
+    expect(parseDiscoveryFilters({ sort: "most-completed" }).sort).toBe(
+      "most-completed",
+    );
+    expect(
+      parseDiscoveryFiltersFromInternal({ sort: "best-rated" }).sort,
+    ).toBe("best-rated");
   });
 
   it("keeps internal geolocation filters in minor units without converting twice", () => {
@@ -106,6 +119,69 @@ describe("discovery domain helpers", () => {
         distanceMeters: null,
       }),
     ).toBe(0);
+  });
+
+  it("uses verified reputation as a bounded recommended-ranking signal", () => {
+    const baseSignals = {
+      textRelevance: 0.6,
+      exactSkillMatch: false,
+      exactCategoryMatch: false,
+      tagMatch: false,
+      synonymMatch: false,
+      distanceMeters: null,
+    };
+
+    const lowConfidencePerfect = rankDiscoveryResult({
+      ...baseSignals,
+      adjustedRating: adjustedRatingPublic(5, 2, 4.2, 8),
+      reviewCount: 2,
+      completedJobs: 2,
+      completionRate: 1,
+      repeatClientCount: 0,
+    } as Parameters<typeof rankDiscoveryResult>[0]);
+    const establishedExcellent = rankDiscoveryResult({
+      ...baseSignals,
+      adjustedRating: adjustedRatingPublic(4.9, 400, 4.2, 8),
+      reviewCount: 400,
+      completedJobs: 400,
+      completionRate: 0.99,
+      repeatClientCount: 80,
+    } as Parameters<typeof rankDiscoveryResult>[0]);
+
+    expect(establishedExcellent).toBeGreaterThan(lowConfidencePerfect);
+  });
+
+  it("keeps reputation subordinate to a materially stronger service match", () => {
+    const strongTextWeakReputation = rankDiscoveryResult({
+      textRelevance: 0.9,
+      exactSkillMatch: true,
+      exactCategoryMatch: false,
+      tagMatch: false,
+      synonymMatch: false,
+      distanceMeters: null,
+      adjustedRating: adjustedRatingPublic(3.8, 3, 4.2, 8),
+      reviewCount: 3,
+      completedJobs: 3,
+      completionRate: 0.75,
+      repeatClientCount: 0,
+    } as Parameters<typeof rankDiscoveryResult>[0]);
+    const weakTextStrongReputation = rankDiscoveryResult({
+      textRelevance: 0.3,
+      exactSkillMatch: false,
+      exactCategoryMatch: false,
+      tagMatch: false,
+      synonymMatch: false,
+      distanceMeters: null,
+      adjustedRating: adjustedRatingPublic(4.9, 400, 4.2, 8),
+      reviewCount: 400,
+      completedJobs: 400,
+      completionRate: 0.99,
+      repeatClientCount: 80,
+    } as Parameters<typeof rankDiscoveryResult>[0]);
+
+    expect(strongTextWeakReputation).toBeGreaterThan(
+      weakTextStrongReputation,
+    );
   });
 
   it("keeps the new-provider exposure signal modest and subordinate to relevance", () => {
