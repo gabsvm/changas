@@ -201,7 +201,9 @@ export default async function SearchPage({
                 >
                   <option value="recommended">Recomendados</option>
                   <option value="best-rated">Mejor calificados</option>
-                  <option value="most-completed">Más trabajos completados</option>
+                  <option value="most-completed">
+                    Más trabajos completados
+                  </option>
                   <option value="nearest">Más cercanos</option>
                   <option value="price-asc">Precio menor</option>
                   <option value="price-desc">Precio mayor</option>
