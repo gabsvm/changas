@@ -144,6 +144,9 @@ jobs:
       - name: Run Phase 06 jobs runtime security checks
         run: node apps/web/scripts/phase-06-jobs-runtime.mjs
 
+      - name: Run Phase 07 verified review runtime security checks
+        run: node apps/web/scripts/phase-07-reputation-runtime.mjs
+
       - name: Reset local database with synthetic seed
         run: pnpm dlx supabase@2.116.0 db reset --local
 
