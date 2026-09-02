@@ -204,7 +204,9 @@ test.describe("Phase 07 reputation", () => {
 
     await page.goto("/p/demo-proveedor");
     await page.getByRole("button", { name: "Guardar proveedor" }).click();
-    await expect(page).toHaveURL(/\/p\/demo-proveedor$/);
+    await expect(
+      page.getByRole("button", { name: "Quitar guardado" }),
+    ).toBeVisible();
     await page.goto("/account/favorites");
     await expect(
       page.getByRole("heading", { name: "Proveedores guardados" }),
