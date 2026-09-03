@@ -51,14 +51,13 @@ export function PushOptIn({
     const permission = notificationSupported
       ? Notification.permission
       : "default";
+    const nextCapability = resolvePushCapability({
+      notificationSupported,
+      serviceWorkerSupported,
+      permission,
+    });
 
-    setCapability(
-      resolvePushCapability({
-        notificationSupported,
-        serviceWorkerSupported,
-        permission,
-      }),
-    );
+    queueMicrotask(() => setCapability(nextCapability));
 
     if (!notificationSupported || !serviceWorkerSupported) return;
 
@@ -201,7 +200,10 @@ export function PushOptIn({
       ) : null}
 
       {message ? (
-        <p className="bg-moss/10 text-moss mt-4 rounded-xl px-4 py-3 text-sm" role="status">
+        <p
+          className="bg-moss/10 text-moss mt-4 rounded-xl px-4 py-3 text-sm"
+          role="status"
+        >
           {message}
         </p>
       ) : null}
@@ -221,7 +223,9 @@ export function PushOptIn({
             className="button-primary disabled:cursor-wait disabled:opacity-60"
             type="button"
             onClick={enablePush}
-            disabled={pending || capability === "unsupported" || capability === "denied"}
+            disabled={
+              pending || capability === "unsupported" || capability === "denied"
+            }
           >
             {pending ? "Activando…" : "Activar notificaciones push"}
           </button>
