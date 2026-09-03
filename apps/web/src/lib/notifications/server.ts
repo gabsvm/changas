@@ -1,5 +1,9 @@
 import "server-only";
 
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import type { Database } from "@/lib/supabase/database.types";
+
 import { sanitizeNotificationActionUrl } from "./templates";
 import type { NotificationKind } from "./types";
 
@@ -34,9 +38,11 @@ export type BrowserPushSubscription = {
 };
 
 type RpcError = { message?: string | null } | null;
-type RpcResponse = Promise<{ data: unknown; error: RpcError }>;
 type NotificationRpcClient = {
-  rpc(name: string, args?: Record<string, unknown>): RpcResponse;
+  rpc(
+    name: string,
+    args?: Record<string, unknown>,
+  ): Promise<{ data: unknown; error: RpcError }>;
 };
 
 type NotificationRow = {
@@ -60,6 +66,10 @@ type NotificationPreferenceRow = {
   promotional_enabled: boolean;
   updated_at: string;
 };
+
+function rpcClient(client: SupabaseClient<Database>): NotificationRpcClient {
+  return client as unknown as NotificationRpcClient;
+}
 
 function asNotificationItem(row: NotificationRow): NotificationItem {
   return {
@@ -97,9 +107,9 @@ function firstRow<T>(data: unknown): T | null {
 }
 
 export async function listNotifications(
-  client: NotificationRpcClient,
+  client: SupabaseClient<Database>,
 ): Promise<NotificationItem[]> {
-  const { data, error } = await client.rpc("list_my_notifications", {
+  const { data, error } = await rpcClient(client).rpc("list_my_notifications", {
     page_size: 30,
     before_created_at: null,
     before_id: null,
@@ -115,9 +125,11 @@ export async function listNotifications(
 }
 
 export async function getUnreadNotificationCount(
-  client: NotificationRpcClient,
+  client: SupabaseClient<Database>,
 ): Promise<number> {
-  const { data, error } = await client.rpc("get_my_notification_unread_count");
+  const { data, error } = await rpcClient(client).rpc(
+    "get_my_notification_unread_count",
+  );
 
   if (error) {
     return 0;
@@ -128,12 +140,13 @@ export async function getUnreadNotificationCount(
 }
 
 export async function markNotificationRead(
-  client: NotificationRpcClient,
+  client: SupabaseClient<Database>,
   notificationId: string,
 ): Promise<boolean> {
-  const { data, error } = await client.rpc("mark_notification_read", {
-    target_notification_id: notificationId,
-  });
+  const { data, error } = await rpcClient(client).rpc(
+    "mark_notification_read",
+    { target_notification_id: notificationId },
+  );
 
   if (error) {
     throw new Error("No pudimos marcar la notificación como leída.");
@@ -143,9 +156,11 @@ export async function markNotificationRead(
 }
 
 export async function markAllNotificationsRead(
-  client: NotificationRpcClient,
+  client: SupabaseClient<Database>,
 ): Promise<number> {
-  const { data, error } = await client.rpc("mark_all_notifications_read");
+  const { data, error } = await rpcClient(client).rpc(
+    "mark_all_notifications_read",
+  );
 
   if (error) {
     throw new Error("No pudimos marcar tus notificaciones como leídas.");
@@ -156,9 +171,11 @@ export async function markAllNotificationsRead(
 }
 
 export async function getNotificationPreferences(
-  client: NotificationRpcClient,
+  client: SupabaseClient<Database>,
 ): Promise<NotificationPreferences> {
-  const { data, error } = await client.rpc("get_my_notification_preferences");
+  const { data, error } = await rpcClient(client).rpc(
+    "get_my_notification_preferences",
+  );
   const row = firstRow<NotificationPreferenceRow>(data);
 
   if (error || !row) {
@@ -169,10 +186,10 @@ export async function getNotificationPreferences(
 }
 
 export async function updateNotificationPreferences(
-  client: NotificationRpcClient,
+  client: SupabaseClient<Database>,
   preferences: Omit<NotificationPreferences, "updatedAt">,
 ): Promise<NotificationPreferences> {
-  const { data, error } = await client.rpc(
+  const { data, error } = await rpcClient(client).rpc(
     "update_my_notification_preferences",
     {
       requested_push_actionable_enabled: preferences.pushActionableEnabled,
@@ -194,15 +211,18 @@ export async function updateNotificationPreferences(
 }
 
 export async function upsertPushSubscription(
-  client: NotificationRpcClient,
+  client: SupabaseClient<Database>,
   subscription: BrowserPushSubscription,
 ): Promise<string> {
-  const { data, error } = await client.rpc("upsert_push_subscription", {
-    subscription_endpoint: subscription.endpoint,
-    subscription_p256dh: subscription.p256dh,
-    subscription_auth: subscription.auth,
-    subscription_user_agent: subscription.userAgent,
-  });
+  const { data, error } = await rpcClient(client).rpc(
+    "upsert_push_subscription",
+    {
+      subscription_endpoint: subscription.endpoint,
+      subscription_p256dh: subscription.p256dh,
+      subscription_auth: subscription.auth,
+      subscription_user_agent: subscription.userAgent,
+    },
+  );
 
   if (error || typeof data !== "string") {
     throw new Error("No pudimos guardar las notificaciones push.");
@@ -212,12 +232,13 @@ export async function upsertPushSubscription(
 }
 
 export async function deletePushSubscription(
-  client: NotificationRpcClient,
+  client: SupabaseClient<Database>,
   endpoint: string,
 ): Promise<boolean> {
-  const { data, error } = await client.rpc("delete_push_subscription", {
-    subscription_endpoint: endpoint,
-  });
+  const { data, error } = await rpcClient(client).rpc(
+    "delete_push_subscription",
+    { subscription_endpoint: endpoint },
+  );
 
   if (error) {
     throw new Error("No pudimos desactivar las notificaciones push.");
