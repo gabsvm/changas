@@ -362,16 +362,16 @@ const selfReview = await admin.rpc("decide_provider_identity_review", {
   requested_decision: "APPROVE",
   requested_reason: "Verificación propia no permitida",
 });
-assert(Boolean(selfReview.error), "Admin provider can approve their own identity.");
-
-const rejectWithoutReason = await admin.rpc(
-  "decide_provider_identity_review",
-  {
-    target_provider_user_id: users.outsider.id,
-    requested_decision: "REJECT",
-    requested_reason: null,
-  },
+assert(
+  Boolean(selfReview.error),
+  "Admin provider can approve their own identity.",
 );
+
+const rejectWithoutReason = await admin.rpc("decide_provider_identity_review", {
+  target_provider_user_id: users.outsider.id,
+  requested_decision: "REJECT",
+  requested_reason: null,
+});
 assert(
   Boolean(rejectWithoutReason.error),
   "Identity rejection succeeds without a reason.",
