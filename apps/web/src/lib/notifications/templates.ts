@@ -20,10 +20,13 @@ export function sanitizeNotificationActionUrl(actionUrl: string): string {
   }
 
   const allowed = SAFE_ACTION_ROOTS.some(
-    (root) => parsed.pathname === root || parsed.pathname.startsWith(`${root}/`),
+    (root) =>
+      parsed.pathname === root || parsed.pathname.startsWith(`${root}/`),
   );
 
-  return allowed ? `${parsed.pathname}${parsed.search}${parsed.hash}` : DEFAULT_ACTION_URL;
+  return allowed
+    ? `${parsed.pathname}${parsed.search}${parsed.hash}`
+    : DEFAULT_ACTION_URL;
 }
 
 function escapeHtml(value: string): string {
