@@ -481,7 +481,10 @@ const memberCatalogMutation = await member.rpc("admin_create_category", {
   requested_description: "Unauthorized runtime mutation",
   requested_sort_order: 900,
 });
-assert(Boolean(memberCatalogMutation.error), "Normal member can mutate the catalog.");
+assert(
+  Boolean(memberCatalogMutation.error),
+  "Normal member can mutate the catalog.",
+);
 
 const categoryCreated = await admin.rpc("admin_create_category", {
   requested_slug: catalogSlug,
@@ -534,7 +537,8 @@ const runtimeService = await service
     skill_id: skillId,
     public_slug: serviceSlug,
     title: `Runtime Service ${runId}`,
-    description: "Runtime service used to verify reversible Phase 09 moderation behavior.",
+    description:
+      "Runtime service used to verify reversible Phase 09 moderation behavior.",
     modality: "REMOTE",
     price_model: "FIXED",
     price_amount: 1000,
@@ -576,7 +580,10 @@ async function discoverRuntimeService() {
   return result.data?.some((row) => row.service_slug === serviceSlug) ?? false;
 }
 
-assert(await discoverRuntimeService(), "Active runtime catalog service is not discoverable.");
+assert(
+  await discoverRuntimeService(),
+  "Active runtime catalog service is not discoverable.",
+);
 
 const categoryDisabled = await admin.rpc("admin_update_category", {
   target_category_id: categoryId,
@@ -590,7 +597,10 @@ assert(
   !categoryDisabled.error,
   `Admin could not deactivate runtime category: ${categoryDisabled.error?.message ?? "unknown"}`,
 );
-assert(!(await discoverRuntimeService()), "Inactive category remains publicly discoverable.");
+assert(
+  !(await discoverRuntimeService()),
+  "Inactive category remains publicly discoverable.",
+);
 
 const categoryRestored = await admin.rpc("admin_update_category", {
   target_category_id: categoryId,
@@ -618,7 +628,10 @@ assert(
   !skillDisabled.error,
   `Admin could not deactivate runtime skill: ${skillDisabled.error?.message ?? "unknown"}`,
 );
-assert(!(await discoverRuntimeService()), "Inactive skill remains publicly discoverable.");
+assert(
+  !(await discoverRuntimeService()),
+  "Inactive skill remains publicly discoverable.",
+);
 
 const skillRestored = await admin.rpc("admin_update_skill", {
   target_skill_id: skillId,
@@ -633,17 +646,26 @@ assert(
   !skillRestored.error,
   `Admin could not reactivate runtime skill: ${skillRestored.error?.message ?? "unknown"}`,
 );
-assert(await discoverRuntimeService(), "Reactivated catalog service did not return to discovery.");
+assert(
+  await discoverRuntimeService(),
+  "Reactivated catalog service did not return to discovery.",
+);
 
 const deleteUsedSkill = await admin.rpc("admin_delete_skill", {
   target_skill_id: skillId,
 });
-assert(Boolean(deleteUsedSkill.error), "Admin can delete a skill used by marketplace history.");
+assert(
+  Boolean(deleteUsedSkill.error),
+  "Admin can delete a skill used by marketplace history.",
+);
 
 const deleteUsedCategory = await admin.rpc("admin_delete_category", {
   target_category_id: categoryId,
 });
-assert(Boolean(deleteUsedCategory.error), "Admin can delete a category used by marketplace history.");
+assert(
+  Boolean(deleteUsedCategory.error),
+  "Admin can delete a category used by marketplace history.",
+);
 
 const serviceDisabled = await admin.rpc("admin_set_service_moderation", {
   target_service_id: serviceId,
@@ -664,13 +686,19 @@ assert(
   !disabledState.error && disabledState.data?.is_paused === true,
   "Moderation disable did not force the service pause state.",
 );
-assert(!(await discoverRuntimeService()), "Disabled service remains publicly discoverable.");
+assert(
+  !(await discoverRuntimeService()),
+  "Disabled service remains publicly discoverable.",
+);
 
 const memberBypass = await member
   .from("services")
   .update({ is_paused: false })
   .eq("id", serviceId);
-assert(Boolean(memberBypass.error), "Provider can bypass a moderation disable by unpausing the service.");
+assert(
+  Boolean(memberBypass.error),
+  "Provider can bypass a moderation disable by unpausing the service.",
+);
 
 const serviceStillDisabled = await service
   .from("services")
@@ -701,7 +729,10 @@ assert(
   !restoredState.error && restoredState.data?.is_paused === false,
   "Moderation restore did not recover the provider pause snapshot.",
 );
-assert(await discoverRuntimeService(), "Restored service did not return to public discovery.");
+assert(
+  await discoverRuntimeService(),
+  "Restored service did not return to public discovery.",
+);
 
 const synonymDeleted = await admin.rpc("admin_delete_skill_synonym", {
   target_synonym_id: synonymId,
@@ -741,7 +772,8 @@ const expectedAuditCounts = new Map([
 ]);
 for (const [actionType, expectedCount] of expectedAuditCounts) {
   const actualCount =
-    mutationAudit.data?.filter((row) => row.action_type === actionType).length ?? 0;
+    mutationAudit.data?.filter((row) => row.action_type === actionType)
+      .length ?? 0;
   assert(
     actualCount === expectedCount,
     `Audit event count for ${actionType} was ${actualCount}, expected ${expectedCount}.`,
