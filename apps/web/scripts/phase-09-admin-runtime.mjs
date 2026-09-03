@@ -530,6 +530,17 @@ assert(
   `Admin could not update runtime synonym: ${synonymUpdated.error?.message ?? "unknown"}`,
 );
 
+const providerSkill = await service.from("provider_skills").insert({
+  provider_user_id: users.member.id,
+  skill_id: skillId,
+  sort_order: 0,
+  is_featured: true,
+});
+assert(
+  !providerSkill.error,
+  `Could not associate runtime skill to provider: ${providerSkill.error?.message ?? "unknown"}`,
+);
+
 const runtimeService = await service
   .from("services")
   .insert({
