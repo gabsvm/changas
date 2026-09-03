@@ -111,11 +111,15 @@ export function buildResendRequest({
   email: TransactionalEmail;
 }): { url: string; init: RequestInit } {
   const absoluteActionUrl = new URL(email.actionUrl, origin).toString();
-  const text = email.text.replace(email.actionUrl, absoluteActionUrl);
-  const html = email.html.replace(
-    `href="${email.actionUrl}"`,
-    `href="${absoluteActionUrl}"`,
-  );
+  const text = email.text.includes(email.actionUrl)
+    ? email.text.replace(email.actionUrl, absoluteActionUrl)
+    : `${email.text}\n\n${absoluteActionUrl}`;
+  const html = email.html.includes(`href="${email.actionUrl}"`)
+    ? email.html.replace(
+        `href="${email.actionUrl}"`,
+        `href="${absoluteActionUrl}"`,
+      )
+    : `${email.html}<p><a href="${absoluteActionUrl}">Abrir en Changas</a></p>`;
 
   return {
     url: "https://api.resend.com/emails",
