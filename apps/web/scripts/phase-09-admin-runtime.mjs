@@ -568,7 +568,7 @@ assert(
 const serviceId = runtimeService.data.id;
 
 async function discoverRuntimeService() {
-  const result = await anonymous.rpc("search_discovery_services", {
+  const result = await anonymous.rpc("search_discovery_services_v4", {
     query_text: null,
     category_filter: catalogSlug,
     skill_filter: skillSlug,
