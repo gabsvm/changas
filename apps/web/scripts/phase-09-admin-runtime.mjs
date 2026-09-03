@@ -469,6 +469,285 @@ assert(
   `Identity review audit evidence is incomplete: ${identityAudit.error?.message ?? "unknown"}`,
 );
 
+const catalogSlug = `runtime-${runId}`;
+const skillSlug = `runtime-skill-${runId}`;
+const serviceSlug = `runtime-service-${runId}`;
+const categoryName = `Runtime ${runId}`;
+const skillName = `Runtime Skill ${runId}`;
+
+const memberCatalogMutation = await member.rpc("admin_create_category", {
+  requested_slug: `blocked-${runId}`,
+  requested_name: `Blocked ${runId}`,
+  requested_description: "Unauthorized runtime mutation",
+  requested_sort_order: 900,
+});
+assert(Boolean(memberCatalogMutation.error), "Normal member can mutate the catalog.");
+
+const categoryCreated = await admin.rpc("admin_create_category", {
+  requested_slug: catalogSlug,
+  requested_name: categoryName,
+  requested_description: "Phase 09 runtime catalog category",
+  requested_sort_order: 900,
+});
+assert(
+  !categoryCreated.error && Boolean(categoryCreated.data),
+  `Admin could not create runtime category: ${categoryCreated.error?.message ?? "unknown"}`,
+);
+const categoryId = categoryCreated.data;
+
+const skillCreated = await admin.rpc("admin_create_skill", {
+  target_category_id: categoryId,
+  requested_slug: skillSlug,
+  requested_name: skillName,
+  requested_description: "Phase 09 runtime catalog skill",
+  requested_sort_order: 900,
+});
+assert(
+  !skillCreated.error && Boolean(skillCreated.data),
+  `Admin could not create runtime skill: ${skillCreated.error?.message ?? "unknown"}`,
+);
+const skillId = skillCreated.data;
+
+const synonymCreated = await admin.rpc("admin_create_skill_synonym", {
+  target_skill_id: skillId,
+  requested_phrase: `runtime helper ${runId}`,
+});
+assert(
+  !synonymCreated.error && Boolean(synonymCreated.data),
+  `Admin could not create runtime synonym: ${synonymCreated.error?.message ?? "unknown"}`,
+);
+const synonymId = synonymCreated.data;
+
+const synonymUpdated = await admin.rpc("admin_update_skill_synonym", {
+  target_synonym_id: synonymId,
+  requested_phrase: `runtime specialist ${runId}`,
+});
+assert(
+  !synonymUpdated.error,
+  `Admin could not update runtime synonym: ${synonymUpdated.error?.message ?? "unknown"}`,
+);
+
+const runtimeService = await service
+  .from("services")
+  .insert({
+    provider_user_id: users.member.id,
+    skill_id: skillId,
+    public_slug: serviceSlug,
+    title: `Runtime Service ${runId}`,
+    description: "Runtime service used to verify reversible Phase 09 moderation behavior.",
+    modality: "REMOTE",
+    price_model: "FIXED",
+    price_amount: 1000,
+    currency_code: "ARS",
+    accepts_offers: false,
+    schedule_type: "UNSCHEDULED",
+    is_published: true,
+    is_paused: false,
+  })
+  .select("id")
+  .single();
+assert(
+  !runtimeService.error && runtimeService.data?.id,
+  `Could not create runtime service: ${runtimeService.error?.message ?? "unknown"}`,
+);
+const serviceId = runtimeService.data.id;
+
+async function discoverRuntimeService() {
+  const result = await anonymous.rpc("search_discovery_services", {
+    query_text: null,
+    category_filter: catalogSlug,
+    skill_filter: skillSlug,
+    modality_filter: null,
+    min_price: null,
+    max_price: null,
+    accepts_offers_filter: null,
+    price_model_filter: null,
+    origin_lat: null,
+    origin_lng: null,
+    radius_meters: null,
+    sort_key: "recommended",
+    page_number: 1,
+    page_size: 24,
+  });
+  assert(
+    !result.error,
+    `Public discovery failed during catalog moderation runtime: ${result.error?.message ?? "unknown"}`,
+  );
+  return result.data?.some((row) => row.service_slug === serviceSlug) ?? false;
+}
+
+assert(await discoverRuntimeService(), "Active runtime catalog service is not discoverable.");
+
+const categoryDisabled = await admin.rpc("admin_update_category", {
+  target_category_id: categoryId,
+  requested_slug: catalogSlug,
+  requested_name: categoryName,
+  requested_description: "Phase 09 runtime catalog category",
+  requested_sort_order: 900,
+  requested_is_active: false,
+});
+assert(
+  !categoryDisabled.error,
+  `Admin could not deactivate runtime category: ${categoryDisabled.error?.message ?? "unknown"}`,
+);
+assert(!(await discoverRuntimeService()), "Inactive category remains publicly discoverable.");
+
+const categoryRestored = await admin.rpc("admin_update_category", {
+  target_category_id: categoryId,
+  requested_slug: catalogSlug,
+  requested_name: categoryName,
+  requested_description: "Phase 09 runtime catalog category",
+  requested_sort_order: 900,
+  requested_is_active: true,
+});
+assert(
+  !categoryRestored.error,
+  `Admin could not reactivate runtime category: ${categoryRestored.error?.message ?? "unknown"}`,
+);
+
+const skillDisabled = await admin.rpc("admin_update_skill", {
+  target_skill_id: skillId,
+  target_category_id: categoryId,
+  requested_slug: skillSlug,
+  requested_name: skillName,
+  requested_description: "Phase 09 runtime catalog skill",
+  requested_sort_order: 900,
+  requested_is_active: false,
+});
+assert(
+  !skillDisabled.error,
+  `Admin could not deactivate runtime skill: ${skillDisabled.error?.message ?? "unknown"}`,
+);
+assert(!(await discoverRuntimeService()), "Inactive skill remains publicly discoverable.");
+
+const skillRestored = await admin.rpc("admin_update_skill", {
+  target_skill_id: skillId,
+  target_category_id: categoryId,
+  requested_slug: skillSlug,
+  requested_name: skillName,
+  requested_description: "Phase 09 runtime catalog skill",
+  requested_sort_order: 900,
+  requested_is_active: true,
+});
+assert(
+  !skillRestored.error,
+  `Admin could not reactivate runtime skill: ${skillRestored.error?.message ?? "unknown"}`,
+);
+assert(await discoverRuntimeService(), "Reactivated catalog service did not return to discovery.");
+
+const deleteUsedSkill = await admin.rpc("admin_delete_skill", {
+  target_skill_id: skillId,
+});
+assert(Boolean(deleteUsedSkill.error), "Admin can delete a skill used by marketplace history.");
+
+const deleteUsedCategory = await admin.rpc("admin_delete_category", {
+  target_category_id: categoryId,
+});
+assert(Boolean(deleteUsedCategory.error), "Admin can delete a category used by marketplace history.");
+
+const serviceDisabled = await admin.rpc("admin_set_service_moderation", {
+  target_service_id: serviceId,
+  requested_state: "DISABLED",
+  requested_reason: "Runtime policy disable",
+});
+assert(
+  !serviceDisabled.error,
+  `Admin could not disable runtime service: ${serviceDisabled.error?.message ?? "unknown"}`,
+);
+
+const disabledState = await service
+  .from("services")
+  .select("is_paused")
+  .eq("id", serviceId)
+  .single();
+assert(
+  !disabledState.error && disabledState.data?.is_paused === true,
+  "Moderation disable did not force the service pause state.",
+);
+assert(!(await discoverRuntimeService()), "Disabled service remains publicly discoverable.");
+
+const memberBypass = await member
+  .from("services")
+  .update({ is_paused: false })
+  .eq("id", serviceId);
+assert(Boolean(memberBypass.error), "Provider can bypass a moderation disable by unpausing the service.");
+
+const serviceStillDisabled = await service
+  .from("services")
+  .select("is_paused")
+  .eq("id", serviceId)
+  .single();
+assert(
+  !serviceStillDisabled.error && serviceStillDisabled.data?.is_paused === true,
+  "Provider bypass attempt changed the disabled service state.",
+);
+
+const serviceRestored = await admin.rpc("admin_set_service_moderation", {
+  target_service_id: serviceId,
+  requested_state: "CLEAR",
+  requested_reason: null,
+});
+assert(
+  !serviceRestored.error,
+  `Admin could not restore runtime service: ${serviceRestored.error?.message ?? "unknown"}`,
+);
+
+const restoredState = await service
+  .from("services")
+  .select("is_paused")
+  .eq("id", serviceId)
+  .single();
+assert(
+  !restoredState.error && restoredState.data?.is_paused === false,
+  "Moderation restore did not recover the provider pause snapshot.",
+);
+assert(await discoverRuntimeService(), "Restored service did not return to public discovery.");
+
+const synonymDeleted = await admin.rpc("admin_delete_skill_synonym", {
+  target_synonym_id: synonymId,
+});
+assert(
+  !synonymDeleted.error,
+  `Admin could not delete unused runtime synonym: ${synonymDeleted.error?.message ?? "unknown"}`,
+);
+
+const mutationAudit = await service
+  .from("admin_audit_events")
+  .select("action_type,target_id")
+  .eq("actor_user_id", users.admin.id)
+  .in("action_type", [
+    "CATALOG_CATEGORY_CREATED",
+    "CATALOG_CATEGORY_UPDATED",
+    "CATALOG_SKILL_CREATED",
+    "CATALOG_SKILL_UPDATED",
+    "CATALOG_SYNONYM_CREATED",
+    "CATALOG_SYNONYM_UPDATED",
+    "CATALOG_SYNONYM_DELETED",
+    "SERVICE_MODERATION_SET",
+  ]);
+assert(
+  !mutationAudit.error,
+  `Could not inspect catalog moderation audit evidence: ${mutationAudit.error?.message ?? "unknown"}`,
+);
+const expectedAuditCounts = new Map([
+  ["CATALOG_CATEGORY_CREATED", 1],
+  ["CATALOG_CATEGORY_UPDATED", 2],
+  ["CATALOG_SKILL_CREATED", 1],
+  ["CATALOG_SKILL_UPDATED", 2],
+  ["CATALOG_SYNONYM_CREATED", 1],
+  ["CATALOG_SYNONYM_UPDATED", 1],
+  ["CATALOG_SYNONYM_DELETED", 1],
+  ["SERVICE_MODERATION_SET", 2],
+]);
+for (const [actionType, expectedCount] of expectedAuditCounts) {
+  const actualCount =
+    mutationAudit.data?.filter((row) => row.action_type === actionType).length ?? 0;
+  assert(
+    actualCount === expectedCount,
+    `Audit event count for ${actionType} was ${actualCount}, expected ${expectedCount}.`,
+  );
+}
+
 console.log(
-  "Phase 09 admin runtime checks passed: RBAC, audit isolation, identity queue/decisions and private document boundaries are server-enforced.",
+  "Phase 09 admin runtime checks passed: RBAC, audit isolation, identity review, catalog CRUD and reversible service moderation are server-enforced.",
 );
