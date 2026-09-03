@@ -43,9 +43,7 @@ type IdentitySessionClient = {
       error: RpcError;
     }>;
   };
-  rpc(
-    name: "is_current_user_admin",
-  ): RpcResult<boolean>;
+  rpc(name: "is_current_user_admin"): RpcResult<boolean>;
   rpc(
     name: "list_admin_identity_queue",
     args: { page_size: number; page_offset: number },
@@ -65,11 +63,7 @@ type IdentitySessionClient = {
 };
 
 export type AdminIdentityErrorCode =
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "CONFLICT"
-  | "TRANSIENT";
+  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
 
 export class AdminIdentityError extends Error {
   constructor(
