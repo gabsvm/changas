@@ -209,13 +209,18 @@ export async function listAdminProviders(searchText = "") {
 }
 
 export async function getAdminProviderDetail(providerUserId: string) {
-  const rows = await adminRpc<AdminProviderDetail[]>("get_admin_provider_detail", {
-    target_provider_user_id: providerUserId,
-  });
+  const rows = await adminRpc<AdminProviderDetail[]>(
+    "get_admin_provider_detail",
+    {
+      target_provider_user_id: providerUserId,
+    },
+  );
   return rows[0] ?? null;
 }
 
-export async function listAdminReports(status: "OPEN" | "RESOLVED" | null = null) {
+export async function listAdminReports(
+  status: "OPEN" | "RESOLVED" | null = null,
+) {
   return adminRpc<AdminReportRow[]>("list_admin_reports", {
     requested_status: status,
     page_size: 50,

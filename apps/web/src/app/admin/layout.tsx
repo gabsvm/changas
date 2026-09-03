@@ -14,7 +14,11 @@ const navigation = [
   ["/admin/audit", "Auditoría"],
 ] as const;
 
-export default async function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   await requireAdminPage();
 
   return (
@@ -23,14 +27,22 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Changas</p>
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase">
+                Changas
+              </p>
               <h1 className="text-xl font-bold">Administración</h1>
             </div>
-            <Link className="text-sm font-semibold text-slate-600 hover:text-slate-950" href="/">
+            <Link
+              className="text-sm font-semibold text-slate-600 hover:text-slate-950"
+              href="/"
+            >
               Volver al sitio
             </Link>
           </div>
-          <nav className="mt-4 flex gap-2 overflow-x-auto pb-1" aria-label="Administración">
+          <nav
+            className="mt-4 flex gap-2 overflow-x-auto pb-1"
+            aria-label="Administración"
+          >
             {navigation.map(([href, label]) => (
               <Link
                 className="shrink-0 rounded-full border border-slate-200 px-3 py-2 text-sm font-medium hover:bg-slate-100"

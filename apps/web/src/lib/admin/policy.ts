@@ -14,11 +14,7 @@ export function classifyAdminAccess(
 }
 
 export type AdminUiErrorCode =
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "CONFLICT"
-  | "TRANSIENT";
+  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
 
 export class AdminUiError extends Error {
   constructor(
@@ -38,7 +34,10 @@ export function mapAdminRpcError(error: AdminRpcError): AdminUiError {
         "No tenés permisos administrativos para realizar esta operación.",
       );
     case "P0002":
-      return new AdminUiError("NOT_FOUND", "No encontramos el registro solicitado.");
+      return new AdminUiError(
+        "NOT_FOUND",
+        "No encontramos el registro solicitado.",
+      );
     case "22023":
     case "23505":
     case "23514":
