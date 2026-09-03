@@ -1,6 +1,6 @@
 begin;
 
-select plan(22);
+select plan(24);
 
 select ok(to_regclass('public.moderation_cases') is not null, 'moderation cases table exists');
 select ok(to_regclass('public.account_restrictions') is not null, 'account restrictions table exists');
