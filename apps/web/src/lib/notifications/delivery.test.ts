@@ -40,8 +40,9 @@ describe("notification delivery", () => {
     expect(authorization).toMatch(/^vapid t=[^,]+, k=/);
     const jwt = authorization.match(/^vapid t=([^,]+),/)?.[1];
     expect(jwt).toBeTruthy();
-    const [, payload] = jwt!.split(".");
-    const claims = decodeBase64UrlJson(payload);
+    const payload = jwt?.split(".")[1];
+    expect(payload).toBeTruthy();
+    const claims = decodeBase64UrlJson(payload!);
 
     expect(claims.aud).toBe("https://push.example.test");
     expect(claims.sub).toBe("mailto:notifications@changas.test");
