@@ -32,9 +32,9 @@ describe("notification templates", () => {
     expect(sanitizeNotificationActionUrl("/messages/abc")).toBe(
       "/messages/abc",
     );
-    expect(sanitizeNotificationActionUrl("https://evil.example/jobs/abc")).toBe(
-      "/account/notifications",
-    );
+    expect(
+      sanitizeNotificationActionUrl("https://evil.example/jobs/abc"),
+    ).toBe("/account/notifications");
     expect(sanitizeNotificationActionUrl("/admin")).toBe(
       "/account/notifications",
     );
