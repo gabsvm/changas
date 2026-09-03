@@ -77,7 +77,10 @@ async function setPreferences(client, overrides = {}) {
     requested_promotional_enabled: false,
     ...overrides,
   };
-  const result = await client.rpc("update_my_notification_preferences", requested);
+  const result = await client.rpc(
+    "update_my_notification_preferences",
+    requested,
+  );
   assert(
     !result.error && result.data?.length === 1,
     `Could not update notification preferences: ${result.error?.message ?? "unknown"}`,
@@ -142,7 +145,13 @@ async function createPaidJob(client, suffix, startHour) {
   };
 }
 
-async function transition(client, jobId, expectedStatus, requestedStatus, reason = null) {
+async function transition(
+  client,
+  jobId,
+  expectedStatus,
+  requestedStatus,
+  reason = null,
+) {
   const result = await client.rpc("transition_job_status", {
     target_job_id: jobId,
     expected_status: expectedStatus,
@@ -289,12 +298,7 @@ await transition(
   "IN_PROGRESS",
   "COMPLETION_REQUESTED",
 );
-await transition(
-  client,
-  completed.jobId,
-  "COMPLETION_REQUESTED",
-  "COMPLETED",
-);
+await transition(client, completed.jobId, "COMPLETION_REQUESTED", "COMPLETED");
 
 const privateAddress = `Av. Privada ${runId} 1234, CABA`;
 const exactLocation = await client.rpc("set_job_exact_location", {
@@ -475,12 +479,7 @@ assert(
   !removedSubscription.error && removedSubscription.data === true,
   `Could not remove client push subscription: ${removedSubscription.error?.message ?? "unknown"}`,
 );
-await transition(
-  provider,
-  noSubscriptionJob.jobId,
-  "CONFIRMED",
-  "IN_PROGRESS",
-);
+await transition(provider, noSubscriptionJob.jobId, "CONFIRMED", "IN_PROGRESS");
 const noSubscriptionNotifications = await notificationsFor({
   kind: "JOB",
   source_event_type: "JOB_STATUS_CHANGED:IN_PROGRESS",
@@ -557,9 +556,7 @@ assert(
   verificationNotifications.length === 1,
   "Provider verification change did not create exactly one safe notification.",
 );
-const verificationOutbox = await channelsFor([
-  verificationNotifications[0].id,
-]);
+const verificationOutbox = await channelsFor([verificationNotifications[0].id]);
 assert(
   JSON.stringify(sortedChannels(verificationOutbox)) ===
     JSON.stringify(["EMAIL", "PUSH"]),
