@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import { getPublicSiteUrl } from "@changas/config/public";
+import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 
 import "./globals.css";
@@ -40,6 +41,7 @@ export default function RootLayout({
           Ir al contenido principal
         </a>
         <ServiceWorkerRegister />
+        <InstallPrompt />
         {children}
       </body>
     </html>
