@@ -112,9 +112,7 @@ test.describe("Phase 08 notifications and PWA", () => {
       expect(approveProvider.ok).toBeTruthy();
 
       await login(page, user);
-      await expect(
-        page.getByLabel("1 notificaciones sin leer"),
-      ).toBeVisible();
+      await expect(page.getByLabel("1 notificaciones sin leer")).toBeVisible();
       await expectNoHorizontalOverflow(page);
 
       await page.getByRole("link", { name: /Notificaciones/ }).click();
@@ -194,11 +192,15 @@ test.describe("Phase 08 notifications and PWA", () => {
 
       await page.goto("/jobs");
       await expect(page).toHaveURL(/\/jobs$/);
-      await expect(page.getByRole("link", { name: "Notificaciones" })).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "Notificaciones" }),
+      ).toBeVisible();
 
       await page.goto("/messages");
       await expect(page).toHaveURL(/\/messages$/);
-      await expect(page.getByRole("link", { name: "Notificaciones" })).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "Notificaciones" }),
+      ).toBeVisible();
       await expectNoHorizontalOverflow(page);
     } finally {
       await deleteTestUser(user.id);
@@ -227,7 +229,9 @@ test.describe("Phase 08 notifications and PWA", () => {
           if (!("serviceWorker" in navigator)) return false;
           const registration = await navigator.serviceWorker.getRegistration();
           const worker =
-            registration?.active ?? registration?.waiting ?? registration?.installing;
+            registration?.active ??
+            registration?.waiting ??
+            registration?.installing;
           return worker?.scriptURL.endsWith("/sw.js") ?? false;
         }),
       )
@@ -240,7 +244,9 @@ test.describe("Phase 08 notifications and PWA", () => {
       }),
     ).toBeVisible();
     await expect(
-      page.getByText(/No mostramos trabajos, pagos, mensajes ni datos privados/),
+      page.getByText(
+        /No mostramos trabajos, pagos, mensajes ni datos privados/,
+      ),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
