@@ -64,9 +64,9 @@ describe("notification delivery", () => {
   });
 
   it("uses a bearer secret for the internal dispatcher", () => {
-    expect(isAuthorizedDispatchRequest("Bearer phase08-secret", "phase08-secret")).toBe(
-      true,
-    );
+    expect(
+      isAuthorizedDispatchRequest("Bearer phase08-secret", "phase08-secret"),
+    ).toBe(true);
     expect(isAuthorizedDispatchRequest("Bearer wrong", "phase08-secret")).toBe(
       false,
     );
@@ -93,7 +93,10 @@ describe("notification delivery", () => {
       Authorization: "Bearer re_test",
       "Content-Type": "application/json",
     });
-    const payload = JSON.parse(request.init.body as string) as Record<string, unknown>;
+    const payload = JSON.parse(request.init.body as string) as Record<
+      string,
+      unknown
+    >;
     expect(payload.to).toEqual(["persona@example.test"]);
     expect(payload.text).toContain("https://changas.test/jobs/abc");
   });

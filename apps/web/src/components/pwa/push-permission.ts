@@ -1,8 +1,4 @@
-export type PushCapability =
-  | "unsupported"
-  | "default"
-  | "granted"
-  | "denied";
+export type PushCapability = "unsupported" | "default" | "granted" | "denied";
 
 export type PushCapabilityInput = {
   notificationSupported: boolean;
