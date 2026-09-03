@@ -1,0 +1,43 @@
+name: Phase09 runtime fixture probe
+
+on:
+  push:
+    branches:
+      - codex/phase09-runtime-fixture-probe
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Add provider skill fixture
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('apps/web/scripts/phase-09-admin-runtime.mjs')
+          text = path.read_text()
+          marker = 'const runtimeService = await service\n'
+          replacement = '''const providerSkill = await service.from("provider_skills").insert({\n  provider_user_id: users.member.id,\n  skill_id: skillId,\n  sort_order: 0,\n  is_featured: true,\n});\nassert(\n  !providerSkill.error,\n  `Could not associate runtime skill to provider: ${providerSkill.error?.message ?? "unknown"}`,\n);\n\nconst runtimeService = await service\n'''
+          if marker not in text:
+              raise SystemExit('runtime service marker not found')
+          path.write_text(text.replace(marker, replacement, 1))
+          PY
+      - run: pnpm exec prettier --write apps/web/scripts/phase-09-admin-runtime.mjs
+      - name: Commit fixture fix
+        run: |
+          git config user.name "gabsvm"
+          git config user.email "53277787+gabsvm@users.noreply.github.com"
+          git add apps/web/scripts/phase-09-admin-runtime.mjs
+          git commit -m "test(phase09): satisfy provider skill fixture integrity"
+          git push
