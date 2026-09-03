@@ -1,0 +1,43 @@
+name: Phase09 discovery runtime probe
+
+on:
+  push:
+    branches:
+      - codex/phase09-discovery-runtime-probe
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Use current discovery RPC in Phase09 runtime
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('apps/web/scripts/phase-09-admin-runtime.mjs')
+          text = path.read_text()
+          old = 'anonymous.rpc("search_discovery_services", {'
+          new = 'anonymous.rpc("search_discovery_services_v4", {'
+          if text.count(old) != 1:
+              raise SystemExit(f'expected one legacy discovery RPC call, found {text.count(old)}')
+          path.write_text(text.replace(old, new, 1))
+          PY
+      - run: pnpm exec prettier --write apps/web/scripts/phase-09-admin-runtime.mjs
+      - name: Commit runtime fix
+        run: |
+          git config user.name "gabsvm"
+          git config user.email "53277787+gabsvm@users.noreply.github.com"
+          git add apps/web/scripts/phase-09-admin-runtime.mjs
+          git commit -m "test(phase09): use current discovery runtime RPC"
+          git push
