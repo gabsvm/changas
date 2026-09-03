@@ -67,6 +67,19 @@ const [alpha, beta] = await Promise.all([
   signIn(users.beta),
 ]);
 
+// Earlier phase runtime scripts now create legitimate domain events which Phase 08
+// routes into this shared local outbox. Clear only the delivery queue so the lease
+// assertions below exercise rows created by this runtime instead of relying on a
+// globally empty database.
+const isolatedOutbox = await admin
+  .from("notification_delivery_outbox")
+  .delete()
+  .gte("created_at", "1970-01-01T00:00:00.000Z");
+assert(
+  !isolatedOutbox.error,
+  `Could not isolate Phase 08 delivery runtime: ${isolatedOutbox.error?.message ?? "unknown"}`,
+);
+
 const alphaDefaults = await alpha.rpc("get_my_notification_preferences");
 assert(
   !alphaDefaults.error && alphaDefaults.data?.length === 1,
