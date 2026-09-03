@@ -96,7 +96,10 @@ describe("Phase 08 notification server boundary", () => {
     expect(client.rpc).toHaveBeenNthCalledWith(1, "mark_notification_read", {
       target_notification_id: notificationId,
     });
-    expect(client.rpc).toHaveBeenNthCalledWith(2, "mark_all_notifications_read");
+    expect(client.rpc).toHaveBeenNthCalledWith(
+      2,
+      "mark_all_notifications_read",
+    );
   });
 
   it("updates all preference flags through the dedicated RPC", async () => {

@@ -29,9 +29,7 @@ describe("Phase 08 notification center UI contract", () => {
   });
 
   it("keeps permission prompting behind an explicit push-enable action", () => {
-    const control = source(
-      "apps/web/src/components/pwa/push-opt-in.tsx",
-    );
+    const control = source("apps/web/src/components/pwa/push-opt-in.tsx");
 
     expect(control).toContain("enablePush");
     expect(control).toContain("Notification.requestPermission()");

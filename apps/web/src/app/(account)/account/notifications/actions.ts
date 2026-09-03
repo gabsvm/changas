@@ -74,13 +74,9 @@ export async function updateNotificationPreferencesAction(
   }
 }
 
-type PushActionResult =
-  | { ok: true }
-  | { ok: false; error: string };
+type PushActionResult = { ok: true } | { ok: false; error: string };
 
-function validPushSubscription(
-  subscription: BrowserPushSubscription,
-): boolean {
+function validPushSubscription(subscription: BrowserPushSubscription): boolean {
   if (!subscription.endpoint.startsWith("https://")) return false;
   if (subscription.endpoint.length < 8 || subscription.endpoint.length > 4096) {
     return false;

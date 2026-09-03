@@ -108,12 +108,17 @@ export default async function NotificationCenterPage() {
                         {item.title}
                       </h2>
                     </div>
-                    <time className="text-ink/45 text-xs" dateTime={item.createdAt}>
+                    <time
+                      className="text-ink/45 text-xs"
+                      dateTime={item.createdAt}
+                    >
                       {dateFormatter.format(new Date(item.createdAt))}
                     </time>
                   </div>
 
-                  <p className="text-ink/70 mt-3 text-sm leading-6">{item.body}</p>
+                  <p className="text-ink/70 mt-3 text-sm leading-6">
+                    {item.body}
+                  </p>
 
                   <div className="mt-5 flex flex-wrap items-center gap-4">
                     <Link
@@ -124,7 +129,11 @@ export default async function NotificationCenterPage() {
                     </Link>
                     {item.unread ? (
                       <form action={markNotificationReadAction}>
-                        <input type="hidden" name="notificationId" value={item.id} />
+                        <input
+                          type="hidden"
+                          name="notificationId"
+                          value={item.id}
+                        />
                         <button
                           className="text-ink/65 text-sm font-semibold underline underline-offset-4"
                           type="submit"

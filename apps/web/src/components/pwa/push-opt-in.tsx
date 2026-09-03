@@ -61,12 +61,14 @@ export function PushOptIn({
 
     if (!notificationSupported || !serviceWorkerSupported) return;
 
-    void navigator.serviceWorker.getRegistration().then(async (registration) => {
-      const subscription = await registration?.pushManager.getSubscription();
-      if (!subscription && initialEnabled) {
-        setEnabled(false);
-      }
-    });
+    void navigator.serviceWorker
+      .getRegistration()
+      .then(async (registration) => {
+        const subscription = await registration?.pushManager.getSubscription();
+        if (!subscription && initialEnabled) {
+          setEnabled(false);
+        }
+      });
   }, [initialEnabled]);
 
   async function enablePush() {
@@ -133,7 +135,9 @@ export function PushOptIn({
       setEnabled(true);
       setMessage("Notificaciones push activadas en este dispositivo.");
     } catch {
-      setMessage("No pudimos activar las notificaciones push en este dispositivo.");
+      setMessage(
+        "No pudimos activar las notificaciones push en este dispositivo.",
+      );
     } finally {
       setPending(false);
     }
@@ -186,8 +190,8 @@ export function PushOptIn({
       {capability === "unsupported" ? (
         <p className="bg-ink/5 text-ink/70 mt-4 rounded-xl px-4 py-3 text-sm leading-5">
           Este navegador no ofrece Web Push en este contexto. En iPhone o iPad,
-          instalá Changas en la pantalla de inicio cuando el navegador lo requiera.
-          Las notificaciones dentro de la app siguen disponibles.
+          instalá Changas en la pantalla de inicio cuando el navegador lo
+          requiera. Las notificaciones dentro de la app siguen disponibles.
         </p>
       ) : null}
 
