@@ -11,9 +11,8 @@ function isStandalone(): boolean {
   const displayModeStandalone = window.matchMedia(
     "(display-mode: standalone)",
   ).matches;
-  const iosStandalone = (
-    navigator as Navigator & { standalone?: boolean }
-  ).standalone;
+  const iosStandalone = (navigator as Navigator & { standalone?: boolean })
+    .standalone;
   // navigator.standalone is the iOS homescreen signal Safari exposes.
   return displayModeStandalone || iosStandalone === true;
 }
