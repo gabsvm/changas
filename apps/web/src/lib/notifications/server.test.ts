@@ -3,10 +3,14 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import {
+  deletePushSubscription,
   getNotificationPreferences,
   getUnreadNotificationCount,
   listNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
   updateNotificationPreferences,
+  upsertPushSubscription,
 } from "./server";
 
 function rpcClient(
@@ -77,6 +81,24 @@ describe("Phase 08 notification server boundary", () => {
     });
   });
 
+  it("marks one and all notifications read through dedicated RPCs", async () => {
+    const client = rpcClient((name) => {
+      if (name === "mark_notification_read") return true;
+      if (name === "mark_all_notifications_read") return 4;
+      return null;
+    });
+    const notificationId = "11111111-1111-4111-8111-111111111111";
+
+    await expect(
+      markNotificationRead(client as never, notificationId),
+    ).resolves.toBe(true);
+    await expect(markAllNotificationsRead(client as never)).resolves.toBe(4);
+    expect(client.rpc).toHaveBeenNthCalledWith(1, "mark_notification_read", {
+      target_notification_id: notificationId,
+    });
+    expect(client.rpc).toHaveBeenNthCalledWith(2, "mark_all_notifications_read");
+  });
+
   it("updates all preference flags through the dedicated RPC", async () => {
     const client = rpcClient(() => [
       {
@@ -110,6 +132,41 @@ describe("Phase 08 notification server boundary", () => {
         requested_promotional_enabled: false,
       },
     );
+  });
+
+  it("persists and removes browser push subscriptions only through RPCs", async () => {
+    const client = rpcClient((name) => {
+      if (name === "upsert_push_subscription") {
+        return "33333333-3333-4333-8333-333333333333";
+      }
+      if (name === "delete_push_subscription") return true;
+      return null;
+    });
+
+    await expect(
+      upsertPushSubscription(client as never, {
+        endpoint: "https://push.example.test/subscription/123",
+        p256dh: "p256dh-key",
+        auth: "auth-key",
+        userAgent: "test-browser",
+      }),
+    ).resolves.toBe("33333333-3333-4333-8333-333333333333");
+    await expect(
+      deletePushSubscription(
+        client as never,
+        "https://push.example.test/subscription/123",
+      ),
+    ).resolves.toBe(true);
+
+    expect(client.rpc).toHaveBeenNthCalledWith(1, "upsert_push_subscription", {
+      subscription_endpoint: "https://push.example.test/subscription/123",
+      subscription_p256dh: "p256dh-key",
+      subscription_auth: "auth-key",
+      subscription_user_agent: "test-browser",
+    });
+    expect(client.rpc).toHaveBeenNthCalledWith(2, "delete_push_subscription", {
+      subscription_endpoint: "https://push.example.test/subscription/123",
+    });
   });
 
   it("does not surface raw database errors", async () => {
