@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function ServiceWorkerRegister() {
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(
     null,
   );
+  const reloadOnControllerChange = useRef(false);
 
   useEffect(() => {
     if (
@@ -39,7 +40,11 @@ export function ServiceWorkerRegister() {
       });
     });
 
-    const handleControllerChange = () => window.location.reload();
+    const handleControllerChange = () => {
+      if (reloadOnControllerChange.current) {
+        window.location.reload();
+      }
+    };
     navigator.serviceWorker.addEventListener(
       "controllerchange",
       handleControllerChange,
@@ -65,7 +70,10 @@ export function ServiceWorkerRegister() {
       <button
         className="rounded-full bg-white px-4 py-2 font-semibold text-[#163832]"
         type="button"
-        onClick={() => waitingWorker.postMessage({ type: "SKIP_WAITING" })}
+        onClick={() => {
+          reloadOnControllerChange.current = true;
+          waitingWorker.postMessage({ type: "SKIP_WAITING" });
+        }}
       >
         Actualizar
       </button>
