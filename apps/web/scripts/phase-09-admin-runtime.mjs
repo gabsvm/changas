@@ -159,7 +159,10 @@ const memberProviders = await member.rpc("list_admin_providers", {
   page_size: 50,
   page_offset: 0,
 });
-assert(Boolean(memberProviders.error), "Normal member can list admin providers.");
+assert(
+  Boolean(memberProviders.error),
+  "Normal member can list admin providers.",
+);
 
 const adminProviderDetail = await admin.rpc("get_admin_provider_detail", {
   target_provider_user_id: users.member.id,
