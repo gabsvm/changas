@@ -1,12 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceRoleKey = process.env.SERVICE_ROLE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+const serviceRoleKey =
+  process.env.SERVICE_ROLE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 type TestUser = { id: string; email: string; password: string };
 
 function requireAdminConfig() {
-  if (!apiUrl || !serviceRoleKey) throw new Error("Phase 09 E2E requires local Supabase admin credentials.");
+  if (!apiUrl || !serviceRoleKey)
+    throw new Error("Phase 09 E2E requires local Supabase admin credentials.");
   return { apiUrl, serviceRoleKey };
 }
 
@@ -30,19 +32,30 @@ async function createTestUser(label: string): Promise<TestUser> {
   const password = `Phase09-${suffix}-Password!`;
   const response = await adminRequest("/auth/v1/admin/users", {
     method: "POST",
-    body: JSON.stringify({ email, password, email_confirm: true, user_metadata: { display_name: label } }),
+    body: JSON.stringify({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { display_name: label },
+    }),
   });
-  if (!response.ok) throw new Error(`Could not create Phase 09 E2E user: ${response.status} ${await response.text()}`);
+  if (!response.ok)
+    throw new Error(
+      `Could not create Phase 09 E2E user: ${response.status} ${await response.text()}`,
+    );
   const body = (await response.json()) as { id?: string };
   if (!body.id) throw new Error("Phase 09 E2E user response has no id.");
   return { id: body.id, email, password };
 }
 
 async function promoteAdmin(userId: string) {
-  const response = await adminRequest(`/rest/v1/user_roles?user_id=eq.${userId}`, {
-    method: "PATCH",
-    body: JSON.stringify({ role: "admin" }),
-  });
+  const response = await adminRequest(
+    `/rest/v1/user_roles?user_id=eq.${userId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ role: "admin" }),
+    },
+  );
   expect(response.ok).toBeTruthy();
 }
 
@@ -58,28 +71,45 @@ async function createIdentityCase(provider: TestUser) {
   const slug = `phase09-identity-${crypto.randomUUID()}`.toLowerCase();
   const providerResponse = await adminRequest("/rest/v1/provider_profiles", {
     method: "POST",
-    body: JSON.stringify({ user_id: provider.id, status: "IDENTITY_PENDING", onboarding_step: 4, public_slug: slug }),
+    body: JSON.stringify({
+      user_id: provider.id,
+      status: "IDENTITY_PENDING",
+      onboarding_step: 4,
+      public_slug: slug,
+    }),
   });
   expect(providerResponse.ok).toBeTruthy();
 
   const path = `${provider.id}/phase09-${crypto.randomUUID()}.png`;
-  const image = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl7j9sAAAAASUVORK5CYII=", "base64");
+  const image = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl7j9sAAAAASUVORK5CYII=",
+    "base64",
+  );
   const config = requireAdminConfig();
-  const upload = await fetch(`${config.apiUrl}/storage/v1/object/identity-documents/${path}`, {
-    method: "POST",
-    headers: {
-      apikey: config.serviceRoleKey,
-      Authorization: `Bearer ${config.serviceRoleKey}`,
-      "Content-Type": "image/png",
-      "x-upsert": "true",
+  const upload = await fetch(
+    `${config.apiUrl}/storage/v1/object/identity-documents/${path}`,
+    {
+      method: "POST",
+      headers: {
+        apikey: config.serviceRoleKey,
+        Authorization: `Bearer ${config.serviceRoleKey}`,
+        "Content-Type": "image/png",
+        "x-upsert": "true",
+      },
+      body: image,
     },
-    body: image,
-  });
+  );
   expect(upload.ok).toBeTruthy();
 
   const documentResponse = await adminRequest("/rest/v1/provider_documents", {
     method: "POST",
-    body: JSON.stringify({ user_id: provider.id, document_type: "DNI_FRONT", storage_path: path, mime_type: "image/png", file_size_bytes: image.length }),
+    body: JSON.stringify({
+      user_id: provider.id,
+      document_type: "DNI_FRONT",
+      storage_path: path,
+      mime_type: "image/png",
+      file_size_bytes: image.length,
+    }),
   });
   expect(documentResponse.ok).toBeTruthy();
   const documents = (await documentResponse.json()) as Array<{ id: string }>;
@@ -88,40 +118,59 @@ async function createIdentityCase(provider: TestUser) {
 }
 
 test.describe("Phase 09 admin trust and safety", () => {
-  test("normal authenticated account cannot use the admin surface", async ({ page }) => {
+  test("normal authenticated account cannot use the admin surface", async ({
+    page,
+  }) => {
     const member = await createTestUser("Usuario normal Phase 09");
     await login(page, member, "/account");
     const response = await page.goto("/admin");
     expect(response?.status()).toBe(404);
-    await expect(page.getByRole("heading", { name: "Administración" })).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { name: "Administración" }),
+    ).toHaveCount(0);
   });
 
-  test("admin reviews identity evidence, decides the case and sees the audit trail", async ({ page }) => {
+  test("admin reviews identity evidence, decides the case and sees the audit trail", async ({
+    page,
+  }) => {
     const admin = await createTestUser("Admin Phase 09");
     const provider = await createTestUser("Prestador Identity Phase 09");
     await promoteAdmin(admin.id);
     const documentId = await createIdentityCase(provider);
 
     await login(page, admin, `/admin/identity?provider=${provider.id}`);
-    await expect(page.getByRole("heading", { name: "Revisión de identidad" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Revisión de identidad" }),
+    ).toBeVisible();
     await expect(page.getByText("IDENTITY_PENDING")).toBeVisible();
 
-    const signedResponse = await page.request.get(`/api/admin/identity-documents/${documentId}`, { maxRedirects: 0 });
+    const signedResponse = await page.request.get(
+      `/api/admin/identity-documents/${documentId}`,
+      { maxRedirects: 0 },
+    );
     expect(signedResponse.status()).toBe(302);
-    expect(signedResponse.headers().location).toContain("/storage/v1/object/sign/identity-documents/");
+    expect(signedResponse.headers().location).toContain(
+      "/storage/v1/object/sign/identity-documents/",
+    );
 
     await page.getByRole("button", { name: "Aprobar identidad" }).click();
     await expect(page.getByText("ACTIVE")).toBeVisible();
 
-    const providerState = await adminRequest(`/rest/v1/provider_profiles?user_id=eq.${provider.id}&select=status`);
-    const providerRows = (await providerState.json()) as Array<{ status: string }>;
+    const providerState = await adminRequest(
+      `/rest/v1/provider_profiles?user_id=eq.${provider.id}&select=status`,
+    );
+    const providerRows = (await providerState.json()) as Array<{
+      status: string;
+    }>;
     expect(providerRows[0]?.status).toBe("ACTIVE");
 
     await page.goto("/admin/audit");
     await expect(page.getByText("IDENTITY_REVIEW_APPROVED")).toBeVisible();
   });
 
-  test("admin resolves a report and disables then restores a marketplace service", async ({ page }) => {
+  test("admin resolves a report and disables then restores a marketplace service", async ({
+    page,
+  }) => {
     const admin = await createTestUser("Admin Moderación Phase 09");
     const client = await createTestUser("Cliente Reporte Phase 09");
     await promoteAdmin(admin.id);
@@ -133,43 +182,74 @@ test.describe("Phase 09 admin trust and safety", () => {
 
     let response = await adminRequest("/rest/v1/conversations", {
       method: "POST",
-      body: JSON.stringify({ id: conversationId, service_id: serviceId, client_user_id: client.id, provider_user_id: providerId }),
+      body: JSON.stringify({
+        id: conversationId,
+        service_id: serviceId,
+        client_user_id: client.id,
+        provider_user_id: providerId,
+      }),
     });
     expect(response.ok).toBeTruthy();
     response = await adminRequest("/rest/v1/conversation_participants", {
       method: "POST",
       body: JSON.stringify([
         { conversation_id: conversationId, user_id: client.id, role: "CLIENT" },
-        { conversation_id: conversationId, user_id: providerId, role: "PROVIDER" },
+        {
+          conversation_id: conversationId,
+          user_id: providerId,
+          role: "PROVIDER",
+        },
       ]),
     });
     expect(response.ok).toBeTruthy();
     response = await adminRequest("/rest/v1/conversation_reports", {
       method: "POST",
-      body: JSON.stringify({ id: reportId, conversation_id: conversationId, reporter_user_id: client.id, category: "ABUSE", reason: "Reporte E2E Phase 09" }),
+      body: JSON.stringify({
+        id: reportId,
+        conversation_id: conversationId,
+        reporter_user_id: client.id,
+        category: "ABUSE",
+        reason: "Reporte E2E Phase 09",
+      }),
     });
     expect(response.ok).toBeTruthy();
 
     await login(page, admin, "/admin/reports");
     const reportCard = page.locator("article").filter({ hasText: reportId });
     await expect(reportCard).toContainText("Reporte E2E Phase 09");
-    await reportCard.getByPlaceholder("Resolución del caso").fill("Caso resuelto desde E2E.");
+    await reportCard
+      .getByPlaceholder("Resolución del caso")
+      .fill("Caso resuelto desde E2E.");
     await reportCard.getByRole("button", { name: "Resolver reporte" }).click();
     await expect(page.getByText("Caso resuelto desde E2E.")).toBeVisible();
 
     await page.goto("/admin/catalog");
-    const serviceCard = page.locator("article").filter({ hasText: "Revisión de PC a distancia" });
-    const disableForm = serviceCard.locator("form").filter({ has: page.locator('input[name="state"][value="DISABLED"]') });
-    await disableForm.getByPlaceholder("Motivo").fill("Moderación E2E Phase 09");
+    const serviceCard = page
+      .locator("article")
+      .filter({ hasText: "Revisión de PC a distancia" });
+    const disableForm = serviceCard
+      .locator("form")
+      .filter({ has: page.locator('input[name="state"][value="DISABLED"]') });
+    await disableForm
+      .getByPlaceholder("Motivo")
+      .fill("Moderación E2E Phase 09");
     await disableForm.getByRole("button", { name: "Deshabilitar" }).click();
 
-    let serviceState = await adminRequest(`/rest/v1/services?id=eq.${serviceId}&select=is_paused`);
-    let serviceRows = (await serviceState.json()) as Array<{ is_paused: boolean }>;
+    let serviceState = await adminRequest(
+      `/rest/v1/services?id=eq.${serviceId}&select=is_paused`,
+    );
+    let serviceRows = (await serviceState.json()) as Array<{
+      is_paused: boolean;
+    }>;
     expect(serviceRows[0]?.is_paused).toBe(true);
 
-    const refreshedCard = page.locator("article").filter({ hasText: "Revisión de PC a distancia" });
+    const refreshedCard = page
+      .locator("article")
+      .filter({ hasText: "Revisión de PC a distancia" });
     await refreshedCard.getByRole("button", { name: "Restaurar" }).click();
-    serviceState = await adminRequest(`/rest/v1/services?id=eq.${serviceId}&select=is_paused`);
+    serviceState = await adminRequest(
+      `/rest/v1/services?id=eq.${serviceId}&select=is_paused`,
+    );
     serviceRows = (await serviceState.json()) as Array<{ is_paused: boolean }>;
     expect(serviceRows[0]?.is_paused).toBe(false);
   });
