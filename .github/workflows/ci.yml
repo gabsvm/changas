@@ -5,7 +5,7 @@ on:
     branches: ["codex/phase-08-format-probe"]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   probe:
@@ -28,7 +28,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Format delivery runtime
+      - name: Format and persist delivery runtime
+        shell: bash
         run: |
           pnpm exec prettier --write apps/web/scripts/phase-08-delivery-policy-runtime.mjs
-          git diff --no-ext-diff --unified=3 -- apps/web/scripts/phase-08-delivery-policy-runtime.mjs
+          if git diff --quiet -- apps/web/scripts/phase-08-delivery-policy-runtime.mjs; then
+            echo "Runtime already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/scripts/phase-08-delivery-policy-runtime.mjs
+          git commit -m "style(phase08): format delivery policy runtime"
+          git push origin HEAD:codex/phase-08-format-probe
