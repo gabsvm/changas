@@ -29,12 +29,14 @@
 ### Task 1: Admin RBAC, audit authority and read models
 
 **Files:**
+
 - Create: `supabase/tests/phase-09-admin-rbac.sql`
 - Create: `supabase/migrations/20260902170000_phase_09_admin_core.sql`
 - Create: `apps/web/scripts/phase-09-admin-runtime.mjs`
 - Modify: `.github/workflows/ci.yml`
 
 **Interfaces:**
+
 - Produces `public.admin_audit_events`.
 - Produces `public.is_current_user_admin()`, private `public.require_admin()`, `public.list_admin_users(...)`, `public.get_admin_user_detail(uuid)`, `public.list_admin_providers(...)`, `public.get_admin_provider_detail(uuid)`, `public.list_admin_jobs(...)`, `public.get_admin_job_detail(uuid)`, `public.list_admin_audit_events(...)`.
 
@@ -61,6 +63,7 @@ Create synthetic users through service role; promote exactly one to admin. Prove
 ### Task 2: Manual identity verification and private evidence access
 
 **Files:**
+
 - Create: `supabase/tests/phase-09-identity-review.sql`
 - Create: `supabase/migrations/20260902171000_phase_09_identity_review.sql`
 - Create: `apps/web/src/lib/admin/identity.ts`
@@ -68,6 +71,7 @@ Create synthetic users through service role; promote exactly one to admin. Prove
 - Extend: `apps/web/scripts/phase-09-admin-runtime.mjs`
 
 **Interfaces:**
+
 - Produces `provider_identity_reviews` with immutable decision history.
 - Produces `list_admin_identity_queue`, `get_admin_identity_case`, `decide_provider_identity_review`.
 - Signed document route accepts a provider-document id, verifies current admin server-side, then creates a short-lived signed URL for that exact private object.
@@ -93,11 +97,13 @@ Normal user cannot read another provider document or review queue. Admin can ins
 ### Task 3: Catalog CRUD and service moderation
 
 **Files:**
+
 - Create: `supabase/tests/phase-09-catalog-moderation.sql`
 - Create: `supabase/migrations/20260902172000_phase_09_catalog_moderation.sql`
 - Extend: `apps/web/scripts/phase-09-admin-runtime.mjs`
 
 **Interfaces:**
+
 - Produces admin RPCs for category/skill/synonym CRUD using existing normalized schema.
 - Produces `service_moderation_state` and `admin_set_service_moderation(uuid,text,text)`.
 
@@ -122,11 +128,13 @@ Non-admin calls fail. Admin changes are reflected in public discovery behavior a
 ### Task 4: Reports, review moderation, user/provider restrictions and suspension
 
 **Files:**
+
 - Create: `supabase/tests/phase-09-trust-safety.sql`
 - Create: `supabase/migrations/20260902173000_phase_09_trust_safety.sql`
 - Extend: `apps/web/scripts/phase-09-admin-runtime.mjs`
 
 **Interfaces:**
+
 - Produces a unified admin report queue over `conversation_reports` and `review_reports`.
 - Produces `moderation_cases` / moderation decisions without deleting source reports.
 - Produces `account_restrictions` with reversible active/revoked history.
@@ -153,6 +161,7 @@ Prove normal users cannot inspect reports, provider cannot remove a bad review, 
 ### Task 5: Admin server layer and UI
 
 **Files:**
+
 - Create: `apps/web/src/lib/admin/server.ts`
 - Create: `apps/web/src/app/admin/layout.tsx`
 - Create: `apps/web/src/app/admin/page.tsx`
@@ -167,6 +176,7 @@ Prove normal users cannot inspect reports, provider cannot remove a bad review, 
 - Add focused unit tests for server guard/error mapping.
 
 **Interfaces:**
+
 - `requireAdminPage()` redirects authenticated non-admins away only as UX; database RPC guards remain authoritative.
 - Server actions call admin RPCs and revalidate affected admin/public pages.
 
@@ -191,6 +201,7 @@ Translate RPC/Postgres errors into actionable admin copy; never show secrets or 
 ### Task 6: E2E, security audit, report and STOP
 
 **Files:**
+
 - Create: `tests/e2e/phase-09-admin-trust.spec.ts`
 - Create: `docs/reports/phase-09-admin-trust.md`
 - Modify CI only for Phase 09 runtime/E2E steps.
