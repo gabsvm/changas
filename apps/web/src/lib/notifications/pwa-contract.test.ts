@@ -25,6 +25,20 @@ describe("Phase 08 PWA contract", () => {
     expect(worker).toContain("event.respondWith(fetch(request)");
   });
 
+  it("reloads only after the user explicitly accepts a waiting service worker", () => {
+    const register = readFileSync(
+      join(
+        process.cwd(),
+        "apps/web/src/components/pwa/service-worker-register.tsx",
+      ),
+      "utf8",
+    );
+
+    expect(register).toContain("reloadOnControllerChange.current = true");
+    expect(register).toContain("if (reloadOnControllerChange.current)");
+    expect(register).toContain('postMessage({ type: "SKIP_WAITING" })');
+  });
+
   it("handles push and notification clicks without embedding private payload copy", () => {
     const worker = readFileSync(
       join(process.cwd(), "apps/web/public/sw.js"),
