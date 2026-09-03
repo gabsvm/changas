@@ -26,6 +26,13 @@ export type NotificationPreferences = {
   updatedAt: string;
 };
 
+export type BrowserPushSubscription = {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  userAgent: string | null;
+};
+
 type RpcError = { message?: string | null } | null;
 type RpcResponse = Promise<{ data: unknown; error: RpcError }>;
 type NotificationRpcClient = {
@@ -120,6 +127,34 @@ export async function getUnreadNotificationCount(
   return Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
 }
 
+export async function markNotificationRead(
+  client: NotificationRpcClient,
+  notificationId: string,
+): Promise<boolean> {
+  const { data, error } = await client.rpc("mark_notification_read", {
+    target_notification_id: notificationId,
+  });
+
+  if (error) {
+    throw new Error("No pudimos marcar la notificación como leída.");
+  }
+
+  return data === true;
+}
+
+export async function markAllNotificationsRead(
+  client: NotificationRpcClient,
+): Promise<number> {
+  const { data, error } = await client.rpc("mark_all_notifications_read");
+
+  if (error) {
+    throw new Error("No pudimos marcar tus notificaciones como leídas.");
+  }
+
+  const count = Number(data ?? 0);
+  return Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
+}
+
 export async function getNotificationPreferences(
   client: NotificationRpcClient,
 ): Promise<NotificationPreferences> {
@@ -156,4 +191,37 @@ export async function updateNotificationPreferences(
   }
 
   return asPreferences(row);
+}
+
+export async function upsertPushSubscription(
+  client: NotificationRpcClient,
+  subscription: BrowserPushSubscription,
+): Promise<string> {
+  const { data, error } = await client.rpc("upsert_push_subscription", {
+    subscription_endpoint: subscription.endpoint,
+    subscription_p256dh: subscription.p256dh,
+    subscription_auth: subscription.auth,
+    subscription_user_agent: subscription.userAgent,
+  });
+
+  if (error || typeof data !== "string") {
+    throw new Error("No pudimos guardar las notificaciones push.");
+  }
+
+  return data;
+}
+
+export async function deletePushSubscription(
+  client: NotificationRpcClient,
+  endpoint: string,
+): Promise<boolean> {
+  const { data, error } = await client.rpc("delete_push_subscription", {
+    subscription_endpoint: endpoint,
+  });
+
+  if (error) {
+    throw new Error("No pudimos desactivar las notificaciones push.");
+  }
+
+  return data === true;
 }
