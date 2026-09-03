@@ -9,7 +9,9 @@ import {
   updateNotificationPreferences,
 } from "./server";
 
-function rpcClient(handler: (name: string, args?: Record<string, unknown>) => unknown) {
+function rpcClient(
+  handler: (name: string, args?: Record<string, unknown>) => unknown,
+) {
   return {
     rpc: vi.fn().mockImplementation(async (name, args) => ({
       data: handler(name, args),
@@ -66,7 +68,9 @@ describe("Phase 08 notification server boundary", () => {
     });
 
     await expect(getUnreadNotificationCount(client as never)).resolves.toBe(3);
-    await expect(getNotificationPreferences(client as never)).resolves.toMatchObject({
+    await expect(
+      getNotificationPreferences(client as never),
+    ).resolves.toMatchObject({
       pushActionableEnabled: false,
       emailImportantEnabled: true,
       promotionalEnabled: false,
@@ -95,14 +99,17 @@ describe("Phase 08 notification server boundary", () => {
       promotionalEnabled: false,
     });
 
-    expect(client.rpc).toHaveBeenCalledWith("update_my_notification_preferences", {
-      requested_push_actionable_enabled: true,
-      requested_email_important_enabled: true,
-      requested_job_reminders_enabled: false,
-      requested_proposal_alerts_enabled: true,
-      requested_verification_alerts_enabled: false,
-      requested_promotional_enabled: false,
-    });
+    expect(client.rpc).toHaveBeenCalledWith(
+      "update_my_notification_preferences",
+      {
+        requested_push_actionable_enabled: true,
+        requested_email_important_enabled: true,
+        requested_job_reminders_enabled: false,
+        requested_proposal_alerts_enabled: true,
+        requested_verification_alerts_enabled: false,
+        requested_promotional_enabled: false,
+      },
+    );
   });
 
   it("does not surface raw database errors", async () => {

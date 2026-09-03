@@ -25,19 +25,16 @@ describe("Phase 08 PWA contract", () => {
     expect(worker).toContain("event.respondWith(fetch(request)");
   });
 
-  it(
-    "handles push and notification clicks without embedding private payload copy",
-    () => {
-      const worker = readFileSync(
-        join(process.cwd(), "apps/web/public/sw.js"),
-        "utf8",
-      );
+  it("handles push and notification clicks without embedding private payload copy", () => {
+    const worker = readFileSync(
+      join(process.cwd(), "apps/web/public/sw.js"),
+      "utf8",
+    );
 
-      expect(worker).toContain('addEventListener("push"');
-      expect(worker).toContain('addEventListener("notificationclick"');
-      expect(worker).toContain("Tenés una actualización importante.");
-      expect(worker).not.toContain("event.data.text");
-      expect(worker).not.toContain("event.data.json");
-    },
-  );
+    expect(worker).toContain('addEventListener("push"');
+    expect(worker).toContain('addEventListener("notificationclick"');
+    expect(worker).toContain("Tenés una actualización importante.");
+    expect(worker).not.toContain("event.data.text");
+    expect(worker).not.toContain("event.data.json");
+  });
 });

@@ -1,8 +1,4 @@
-import {
-  createPrivateKey,
-  sign,
-  timingSafeEqual,
-} from "node:crypto";
+import { createPrivateKey, sign, timingSafeEqual } from "node:crypto";
 
 import type { DeliveryResult, TransactionalEmail } from "./types";
 
@@ -96,7 +92,9 @@ export function isAuthorizedDispatchRequest(
   const provided = Buffer.from(providedSecret, "utf8");
   const expected = Buffer.from(expectedSecret, "utf8");
 
-  return provided.length === expected.length && timingSafeEqual(provided, expected);
+  return (
+    provided.length === expected.length && timingSafeEqual(provided, expected)
+  );
 }
 
 export function buildResendRequest({

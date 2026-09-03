@@ -2,10 +2,7 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 
-import {
-  buildSafePushMessage,
-  buildTransactionalEmail,
-} from "./templates";
+import { buildSafePushMessage, buildTransactionalEmail } from "./templates";
 import {
   createResendEmailProviderFromEnv,
   createWebPushProviderFromEnv,
@@ -78,16 +75,21 @@ async function recordResult(
   delivery: ClaimedDelivery,
   result: DeliveryResult,
 ): Promise<void> {
-  const { data, error } = await admin.rpc("record_notification_delivery_result", {
-    target_delivery_id: delivery.deliveryId,
-    target_lease_token: delivery.leaseToken,
-    delivery_succeeded: result.ok,
-    delivery_retryable: result.retryable,
-    delivery_error_code: result.errorCode,
-  });
+  const { data, error } = await admin.rpc(
+    "record_notification_delivery_result",
+    {
+      target_delivery_id: delivery.deliveryId,
+      target_lease_token: delivery.leaseToken,
+      delivery_succeeded: result.ok,
+      delivery_retryable: result.retryable,
+      delivery_error_code: result.errorCode,
+    },
+  );
 
   if (error || data !== true) {
-    throw new Error(error?.message ?? "Could not record notification delivery.");
+    throw new Error(
+      error?.message ?? "Could not record notification delivery.",
+    );
   }
 }
 
@@ -110,7 +112,9 @@ async function removeStalePushEndpoint(
     .eq("endpoint", delivery.endpoint);
 
   if (error) {
-    throw new Error(error.message ?? "Could not delete stale push subscription.");
+    throw new Error(
+      error.message ?? "Could not delete stale push subscription.",
+    );
   }
 }
 

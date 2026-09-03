@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 
 export function ServiceWorkerRegister() {
-  const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
+  const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(
+    null,
+  );
 
   useEffect(() => {
     if (

@@ -14,9 +14,9 @@ export default function OfflinePage() {
           Changas necesita internet para mostrar datos actualizados.
         </h1>
         <p className="text-ink/65 mt-5 text-sm leading-6">
-          No mostramos trabajos, pagos, mensajes ni datos privados desde una copia
-          vieja. Cuando vuelva la conexión, recargá para continuar con información
-          vigente.
+          No mostramos trabajos, pagos, mensajes ni datos privados desde una
+          copia vieja. Cuando vuelva la conexión, recargá para continuar con
+          información vigente.
         </p>
         <Link className="button-primary mt-8" href="/">
           Volver al inicio

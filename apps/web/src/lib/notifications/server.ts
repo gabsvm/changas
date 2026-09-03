@@ -71,7 +71,9 @@ function asNotificationItem(row: NotificationRow): NotificationItem {
   };
 }
 
-function asPreferences(row: NotificationPreferenceRow): NotificationPreferences {
+function asPreferences(
+  row: NotificationPreferenceRow,
+): NotificationPreferences {
   return {
     pushActionableEnabled: row.push_actionable_enabled,
     emailImportantEnabled: row.email_important_enabled,
@@ -135,14 +137,18 @@ export async function updateNotificationPreferences(
   client: NotificationRpcClient,
   preferences: Omit<NotificationPreferences, "updatedAt">,
 ): Promise<NotificationPreferences> {
-  const { data, error } = await client.rpc("update_my_notification_preferences", {
-    requested_push_actionable_enabled: preferences.pushActionableEnabled,
-    requested_email_important_enabled: preferences.emailImportantEnabled,
-    requested_job_reminders_enabled: preferences.jobRemindersEnabled,
-    requested_proposal_alerts_enabled: preferences.proposalAlertsEnabled,
-    requested_verification_alerts_enabled: preferences.verificationAlertsEnabled,
-    requested_promotional_enabled: preferences.promotionalEnabled,
-  });
+  const { data, error } = await client.rpc(
+    "update_my_notification_preferences",
+    {
+      requested_push_actionable_enabled: preferences.pushActionableEnabled,
+      requested_email_important_enabled: preferences.emailImportantEnabled,
+      requested_job_reminders_enabled: preferences.jobRemindersEnabled,
+      requested_proposal_alerts_enabled: preferences.proposalAlertsEnabled,
+      requested_verification_alerts_enabled:
+        preferences.verificationAlertsEnabled,
+      requested_promotional_enabled: preferences.promotionalEnabled,
+    },
+  );
   const row = firstRow<NotificationPreferenceRow>(data);
 
   if (error || !row) {

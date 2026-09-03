@@ -105,8 +105,9 @@ self.addEventListener("notificationclick", (event) => {
   const actionUrl = safeActionUrl(event.notification.data?.actionUrl);
 
   event.waitUntil(
-    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(
-      async (windows) => {
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then(async (windows) => {
         const matching = windows.find((client) => {
           try {
             return new URL(client.url).pathname === actionUrl;
@@ -121,7 +122,6 @@ self.addEventListener("notificationclick", (event) => {
         }
 
         await self.clients.openWindow(actionUrl);
-      },
-    ),
+      }),
   );
 });
