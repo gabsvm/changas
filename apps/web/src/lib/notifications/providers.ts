@@ -22,9 +22,9 @@ export class WebPushProvider implements PushProvider {
 
   constructor(
     private readonly config: {
-      publicKey?: string;
-      privateKey?: string;
-      subject?: string;
+      publicKey: string | undefined;
+      privateKey: string | undefined;
+      subject: string | undefined;
     },
   ) {
     this.available = Boolean(
@@ -67,9 +67,9 @@ export class ResendEmailProvider implements EmailProvider {
 
   constructor(
     private readonly config: {
-      apiKey?: string;
-      from?: string;
-      origin?: string;
+      apiKey: string | undefined;
+      from: string | undefined;
+      origin: string | undefined;
     },
   ) {
     this.available = Boolean(config.apiKey && config.from && config.origin);
@@ -98,7 +98,8 @@ export class ResendEmailProvider implements EmailProvider {
 
 export function createWebPushProviderFromEnv(): WebPushProvider {
   return new WebPushProvider({
-    publicKey: process.env.VAPID_PUBLIC_KEY ?? process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+    publicKey:
+      process.env.VAPID_PUBLIC_KEY ?? process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
     privateKey: process.env.VAPID_PRIVATE_KEY,
     subject: process.env.VAPID_SUBJECT,
   });
