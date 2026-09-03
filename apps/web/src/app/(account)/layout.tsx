@@ -1,8 +1,17 @@
 import Link from "next/link";
 
-export default function AccountLayout({
+import { getUnreadNotificationCount } from "@/lib/notifications/server";
+import { createClient } from "@/lib/supabase/server";
+
+export default async function AccountLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const unreadCount = user ? await getUnreadNotificationCount(supabase) : 0;
+
   return (
     <main
       id="main-content"
@@ -28,6 +37,20 @@ export default function AccountLayout({
           >
             <Link className="underline underline-offset-4" href="/messages">
               Mensajes
+            </Link>
+            <Link
+              className="flex items-center gap-2 underline underline-offset-4"
+              href="/account/notifications"
+            >
+              Notificaciones
+              {unreadCount > 0 ? (
+                <span
+                  className="bg-terracotta min-w-5 rounded-full px-1.5 py-0.5 text-center text-[0.65rem] font-bold leading-4 text-white no-underline"
+                  aria-label={`${unreadCount} notificaciones sin leer`}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              ) : null}
             </Link>
             <Link className="underline underline-offset-4" href="/account">
               Cuenta
