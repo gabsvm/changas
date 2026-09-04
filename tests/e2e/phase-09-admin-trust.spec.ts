@@ -278,7 +278,9 @@ test.describe("Phase 09 admin trust and safety", () => {
       .locator("article")
       .filter({ hasText: "phase09 alias e2e" });
     await expect(synonymCard).toBeVisible();
-    await synonymCard.locator('input[name="phrase"]').fill("phase09 alias actualizado");
+    await synonymCard
+      .locator('input[name="phrase"]')
+      .fill("phase09 alias actualizado");
     await synonymCard.getByRole("button", { name: "Actualizar" }).click();
     synonymCard = page
       .locator("article")

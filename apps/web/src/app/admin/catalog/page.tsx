@@ -253,7 +253,10 @@ export default async function AdminCatalogPage() {
                 <summary className="cursor-pointer text-sm font-semibold">
                   Editar categoría
                 </summary>
-                <form action={updateCategoryStateAction} className="mt-2 grid gap-2">
+                <form
+                  action={updateCategoryStateAction}
+                  className="mt-2 grid gap-2"
+                >
                   <input
                     type="hidden"
                     name="categoryId"
@@ -349,7 +352,11 @@ export default async function AdminCatalogPage() {
 
                 {skill.service_count === 0 ? (
                   <form action={deleteSkillAction}>
-                    <input type="hidden" name="skillId" value={skill.skill_id} />
+                    <input
+                      type="hidden"
+                      name="skillId"
+                      value={skill.skill_id}
+                    />
                     <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
                       Eliminar
                     </button>
@@ -361,7 +368,10 @@ export default async function AdminCatalogPage() {
                 <summary className="cursor-pointer text-sm font-semibold">
                   Editar skill
                 </summary>
-                <form action={updateSkillStateAction} className="mt-2 grid gap-2">
+                <form
+                  action={updateSkillStateAction}
+                  className="mt-2 grid gap-2"
+                >
                   <input type="hidden" name="skillId" value={skill.skill_id} />
                   <input
                     type="hidden"
@@ -427,7 +437,10 @@ export default async function AdminCatalogPage() {
               <p className="text-xs text-slate-500">
                 {synonym.skill_name} · {synonym.normalized_phrase}
               </p>
-              <form action={updateSkillSynonymAction} className="mt-3 grid gap-2">
+              <form
+                action={updateSkillSynonymAction}
+                className="mt-3 grid gap-2"
+              >
                 <input
                   type="hidden"
                   name="synonymId"
