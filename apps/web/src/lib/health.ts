@@ -8,8 +8,8 @@ export type HealthPayload = {
 };
 
 type HealthRuntime = {
-  revision?: string;
-  environment?: string;
+  revision?: string | undefined;
+  environment?: string | undefined;
 };
 
 function normalizeEnvironment(
