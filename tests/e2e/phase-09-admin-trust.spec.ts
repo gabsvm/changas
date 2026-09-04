@@ -64,7 +64,9 @@ async function login(page: Page, user: TestUser, next = "/admin") {
   await page.getByLabel("Correo electrónico").fill(user.email);
   await page.getByLabel("Contraseña").fill(user.password);
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
-  await expect(page).toHaveURL(new RegExp(`${next.replaceAll("/", "\\/")}`));
+  await expect(page).toHaveURL(
+    (url) => `${url.pathname}${url.search}` === next,
+  );
 }
 
 async function createIdentityCase(provider: TestUser) {
@@ -165,7 +167,12 @@ test.describe("Phase 09 admin trust and safety", () => {
     expect(providerRows[0]?.status).toBe("ACTIVE");
 
     await page.goto("/admin/audit");
-    await expect(page.getByText("IDENTITY_REVIEW_APPROVED")).toBeVisible();
+    const auditCard = page
+      .locator("article")
+      .filter({ hasText: provider.id })
+      .filter({ hasText: "IDENTITY_REVIEW_APPROVED" })
+      .first();
+    await expect(auditCard).toBeVisible();
   });
 
   test("admin resolves a report and disables then restores a marketplace service", async ({
@@ -179,6 +186,7 @@ test.describe("Phase 09 admin trust and safety", () => {
     const reportId = crypto.randomUUID();
     const providerId = "23000000-0000-4000-8000-000000000001";
     const serviceId = "24000000-0000-4000-8000-000000000001";
+    const resolution = `Caso resuelto E2E ${reportId}.`;
 
     let response = await adminRequest("/rest/v1/conversations", {
       method: "POST",
@@ -209,30 +217,33 @@ test.describe("Phase 09 admin trust and safety", () => {
         conversation_id: conversationId,
         reporter_user_id: client.id,
         category: "ABUSE",
-        reason: "Reporte E2E Phase 09",
+        reason: `Reporte E2E Phase 09 ${reportId}`,
       }),
     });
     expect(response.ok).toBeTruthy();
 
     await login(page, admin, "/admin/reports");
-    const reportCard = page.locator("article").filter({ hasText: reportId });
-    await expect(reportCard).toContainText("Reporte E2E Phase 09");
-    await reportCard
-      .getByPlaceholder("Resolución del caso")
-      .fill("Caso resuelto desde E2E.");
+    let reportCard = page.locator("article").filter({ hasText: reportId });
+    await expect(reportCard).toContainText(`Reporte E2E Phase 09 ${reportId}`);
+    await reportCard.getByPlaceholder("Resolución del caso").fill(resolution);
     await reportCard.getByRole("button", { name: "Resolver reporte" }).click();
-    await expect(page.getByText("Caso resuelto desde E2E.")).toBeVisible();
+    reportCard = page.locator("article").filter({ hasText: reportId });
+    await expect(reportCard).toContainText(resolution);
 
     await page.goto("/admin/catalog");
-    const serviceCard = page
-      .locator("article")
-      .filter({ hasText: "Revisión de PC a distancia" });
+    await expect(
+      page.getByRole("heading", { name: "Catálogo y servicios" }),
+    ).toBeVisible();
+    const serviceCard = page.locator(
+      `article:has(input[name="serviceId"][value="${serviceId}"]):has(input[name="state"][value="DISABLED"])`,
+    );
+    await expect(serviceCard).toHaveCount(1);
     const disableForm = serviceCard
-      .locator("form")
-      .filter({ has: page.locator('input[name="state"][value="DISABLED"]') });
+      .getByRole("button", { name: "Deshabilitar" })
+      .locator("xpath=ancestor::form");
     await disableForm
       .getByPlaceholder("Motivo")
-      .fill("Moderación E2E Phase 09");
+      .fill(`Moderación E2E Phase 09 ${reportId}`);
     await disableForm.getByRole("button", { name: "Deshabilitar" }).click();
 
     let serviceState = await adminRequest(
@@ -243,9 +254,9 @@ test.describe("Phase 09 admin trust and safety", () => {
     }>;
     expect(serviceRows[0]?.is_paused).toBe(true);
 
-    const refreshedCard = page
-      .locator("article")
-      .filter({ hasText: "Revisión de PC a distancia" });
+    const refreshedCard = page.locator(
+      `article:has(input[name="serviceId"][value="${serviceId}"]):has(input[name="state"][value="CLEAR"])`,
+    );
     await refreshedCard.getByRole("button", { name: "Restaurar" }).click();
     serviceState = await adminRequest(
       `/rest/v1/services?id=eq.${serviceId}&select=is_paused`,
@@ -258,62 +269,73 @@ test.describe("Phase 09 admin trust and safety", () => {
     page,
   }) => {
     const admin = await createTestUser("Admin Taxonomía Phase 09");
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const synonymInitial = `phase09 alias ${suffix}`;
+    const synonymUpdated = `phase09 alias actualizado ${suffix}`;
+    const tagInitial = `phase09 tag ${suffix}`;
+    const tagUpdated = `phase09 tag actualizado ${suffix}`;
+
     await promoteAdmin(admin.id);
     await login(page, admin, "/admin/catalog");
+    await expect(
+      page.getByRole("heading", { name: "Catálogo y servicios" }),
+    ).toBeVisible();
 
-    const synonymCreateForm = page.locator("form").filter({
-      hasText: "Nuevo sinónimo",
-    });
+    const synonymCreateForm = page
+      .getByRole("button", { name: "Crear sinónimo" })
+      .locator("xpath=ancestor::form");
     await synonymCreateForm.locator('select[name="skillId"]').selectOption({
       index: 0,
     });
     await synonymCreateForm
       .getByPlaceholder("Frase equivalente")
-      .fill("phase09 alias e2e");
+      .fill(synonymInitial);
     await synonymCreateForm
       .getByRole("button", { name: "Crear sinónimo" })
       .click();
 
     let synonymCard = page
       .locator("article")
-      .filter({ hasText: "phase09 alias e2e" });
-    await expect(synonymCard).toBeVisible();
-    await synonymCard
-      .locator('input[name="phrase"]')
-      .fill("phase09 alias actualizado");
+      .filter({ hasText: synonymInitial });
+    await expect(synonymCard).toHaveCount(1);
+    await synonymCard.locator('input[name="phrase"]').fill(synonymUpdated);
     await synonymCard.getByRole("button", { name: "Actualizar" }).click();
-    synonymCard = page
-      .locator("article")
-      .filter({ hasText: "phase09 alias actualizado" });
-    await expect(synonymCard).toBeVisible();
+    synonymCard = page.locator("article").filter({ hasText: synonymUpdated });
+    await expect(synonymCard).toHaveCount(1);
     await synonymCard.getByRole("button", { name: "Eliminar" }).click();
-    await expect(page.getByText("phase09 alias actualizado")).toHaveCount(0);
+    await expect(
+      page.locator("article").filter({ hasText: synonymUpdated }),
+    ).toHaveCount(0);
 
-    const tagCreateForm = page.locator("form").filter({ hasText: "Nuevo tag" });
+    const tagCreateForm = page
+      .getByRole("button", { name: "Crear tag" })
+      .locator("xpath=ancestor::form");
     await tagCreateForm.locator('select[name="serviceId"]').selectOption({
       index: 0,
     });
-    await tagCreateForm
-      .getByPlaceholder("Tag de búsqueda")
-      .fill("phase09 tag e2e");
+    await tagCreateForm.getByPlaceholder("Tag de búsqueda").fill(tagInitial);
     await tagCreateForm.getByRole("button", { name: "Crear tag" }).click();
 
-    let tagCard = page
-      .locator("article")
-      .filter({ hasText: "phase09 tag e2e" });
-    await expect(tagCard).toBeVisible();
-    await tagCard.locator('input[name="tag"]').fill("phase09 tag actualizado");
+    let tagCard = page.locator("article").filter({ hasText: tagInitial });
+    await expect(tagCard).toHaveCount(1);
+    await tagCard.locator('input[name="tag"]').fill(tagUpdated);
     await tagCard.getByRole("button", { name: "Actualizar" }).click();
-    tagCard = page
-      .locator("article")
-      .filter({ hasText: "phase09 tag actualizado" });
-    await expect(tagCard).toBeVisible();
+    tagCard = page.locator("article").filter({ hasText: tagUpdated });
+    await expect(tagCard).toHaveCount(1);
     await tagCard.getByRole("button", { name: "Eliminar" }).click();
-    await expect(page.getByText("phase09 tag actualizado")).toHaveCount(0);
+    await expect(
+      page.locator("article").filter({ hasText: tagUpdated }),
+    ).toHaveCount(0);
 
     await page.goto("/admin/audit");
-    await expect(page.getByText("CATALOG_TAG_CREATED")).toBeVisible();
-    await expect(page.getByText("CATALOG_TAG_UPDATED")).toBeVisible();
-    await expect(page.getByText("CATALOG_TAG_DELETED")).toBeVisible();
+    await expect(
+      page.getByText("CATALOG_TAG_CREATED", { exact: true }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText("CATALOG_TAG_UPDATED", { exact: true }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText("CATALOG_TAG_DELETED", { exact: true }).first(),
+    ).toBeVisible();
   });
 });
