@@ -1,11 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
+
+import { reportClientError, type ClientError } from "@/lib/observability";
+
 export default function Error({
+  error,
   reset,
 }: Readonly<{
-  error: Error & { digest?: string };
+  error: ClientError;
   reset: () => void;
 }>) {
+  useEffect(() => {
+    reportClientError("route", error);
+  }, [error]);
+
   return (
     <main className="bg-canvas text-ink grid min-h-screen place-items-center px-6 text-center">
       <div className="max-w-md">
@@ -18,6 +27,11 @@ export default function Error({
         <p className="text-ink/65 mt-4">
           Podés intentar cargar esta vista nuevamente.
         </p>
+        {error.digest ? (
+          <p className="text-ink/55 mt-3 text-xs" data-testid="error-reference">
+            Referencia: {error.digest}
+          </p>
+        ) : null}
         <button
           className="button-primary mt-7"
           onClick={() => reset()}

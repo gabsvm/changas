@@ -3,11 +3,28 @@ import { describe, expect, it } from "vitest";
 import { getHealthPayload } from "./health";
 
 describe("getHealthPayload", () => {
-  it("returns the stable service health shape with the supplied timestamp", () => {
-    expect(getHealthPayload("2026-08-29T00:00:00.000Z")).toEqual({
+  it("returns a safe liveness shape with bounded deployment metadata", () => {
+    expect(
+      getHealthPayload("2026-09-04T00:00:00.000Z", {
+        revision: "1234567890abcdef",
+        environment: "preview",
+      }),
+    ).toEqual({
       status: "ok",
       service: "changas-web",
-      timestamp: "2026-08-29T00:00:00.000Z",
+      mode: "liveness",
+      timestamp: "2026-09-04T00:00:00.000Z",
+      revision: "1234567890ab",
+      environment: "preview",
     });
+  });
+
+  it("does not echo arbitrary environment values", () => {
+    expect(
+      getHealthPayload("2026-09-04T00:00:00.000Z", {
+        revision: undefined,
+        environment: "secret-environment-name",
+      }).environment,
+    ).toBe("unknown");
   });
 });

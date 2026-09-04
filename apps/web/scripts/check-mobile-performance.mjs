@@ -1,14 +1,31 @@
 import fs from "node:fs";
 
-const MINIMUM_MOBILE_PERFORMANCE = 0.6;
+const minimums = {
+  performance: 0.6,
+  accessibility: 0.85,
+  "best-practices": 0.85,
+  seo: 0.9,
+};
 
-for (const path of process.argv.slice(2)) {
+const paths = process.argv.slice(2);
+if (paths.length === 0) {
+  throw new Error("At least one Lighthouse JSON report is required.");
+}
+
+for (const path of paths) {
   const report = JSON.parse(fs.readFileSync(path, "utf8"));
-  const score = report.categories?.performance?.score ?? 0;
-  if (score < MINIMUM_MOBILE_PERFORMANCE) {
-    throw new Error(
-      `${path} performance score ${score} is below ${MINIMUM_MOBILE_PERFORMANCE}`,
-    );
+  const summary = [];
+
+  for (const [category, minimum] of Object.entries(minimums)) {
+    const score = report.categories?.[category]?.score;
+    if (typeof score !== "number") {
+      throw new Error(`${path} is missing Lighthouse category ${category}`);
+    }
+    if (score < minimum) {
+      throw new Error(`${path} ${category} score ${score} is below ${minimum}`);
+    }
+    summary.push(`${category} ${Math.round(score * 100)}`);
   }
-  console.log(`${path}: performance ${Math.round(score * 100)}`);
+
+  console.log(`${path}: ${summary.join(", ")}`);
 }

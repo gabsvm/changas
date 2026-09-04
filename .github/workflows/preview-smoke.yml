@@ -1,0 +1,35 @@
+name: Vercel Preview Smoke
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-smoke-${{ github.event.deployment.id }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment_status.environment_url != '' &&
+      github.event.deployment.ref != 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout deployed revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+
+      - name: Smoke Vercel preview
+        env:
+          PREVIEW_URL: ${{ github.event.deployment_status.environment_url }}
+        run: node apps/web/scripts/phase-10-preview-smoke.mjs
