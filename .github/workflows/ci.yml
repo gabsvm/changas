@@ -43,7 +43,10 @@ jobs:
         run: pnpm build
 
       - name: Format check
-        run: pnpm format:check
+        run: |
+          pnpm exec prettier --write tests/e2e/phase-09-admin-trust.spec.ts
+          git diff -- tests/e2e/phase-09-admin-trust.spec.ts
+          exit 1
 
       - name: Diff check
         run: git diff --check
