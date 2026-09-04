@@ -170,6 +170,14 @@ export type AdminSkillRow = {
   service_count: number;
 };
 
+export type AdminSkillSynonymRow = {
+  synonym_id: string;
+  skill_id: string;
+  skill_name: string;
+  phrase: string;
+  normalized_phrase: string;
+};
+
 export type AdminServiceRow = {
   service_id: string;
   provider_user_id: string;
@@ -182,6 +190,14 @@ export type AdminServiceRow = {
   moderation_state: "CLEAR" | "FLAGGED" | "DISABLED";
   moderation_reason: string | null;
   updated_at: string;
+};
+
+export type AdminServiceTagRow = {
+  service_id: string;
+  service_title: string;
+  provider_display_name: string | null;
+  tag: string;
+  normalized_tag: string;
 };
 
 export async function listAdminUsers(searchText = "") {
@@ -254,10 +270,22 @@ export async function listAdminSkills(categoryId: string | null = null) {
   });
 }
 
+export async function listAdminSkillSynonyms(skillId: string | null = null) {
+  return adminRpc<AdminSkillSynonymRow[]>("list_admin_skill_synonyms", {
+    target_skill_id: skillId,
+  });
+}
+
 export async function listAdminServices(searchText = "") {
   return adminRpc<AdminServiceRow[]>("list_admin_services", {
     search_text: searchText.trim() || null,
     page_size: 50,
     page_offset: 0,
+  });
+}
+
+export async function listAdminServiceTags(serviceId: string | null = null) {
+  return adminRpc<AdminServiceTagRow[]>("list_admin_service_tags", {
+    target_service_id: serviceId,
   });
 }

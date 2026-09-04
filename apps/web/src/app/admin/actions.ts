@@ -123,6 +123,15 @@ export async function updateCategoryStateAction(formData: FormData) {
   revalidatePath("/buscar");
 }
 
+export async function deleteCategoryAction(formData: FormData) {
+  await adminRpc("admin_delete_category", {
+    target_category_id: requiredText(formData, "categoryId"),
+  });
+  revalidatePath("/admin/catalog");
+  revalidatePath("/buscar");
+  revalidatePath("/admin/audit");
+}
+
 export async function createSkillAction(formData: FormData) {
   await adminRpc("admin_create_skill", {
     target_category_id: requiredText(formData, "categoryId"),
@@ -146,4 +155,73 @@ export async function updateSkillStateAction(formData: FormData) {
   });
   revalidatePath("/admin/catalog");
   revalidatePath("/buscar");
+}
+
+export async function deleteSkillAction(formData: FormData) {
+  await adminRpc("admin_delete_skill", {
+    target_skill_id: requiredText(formData, "skillId"),
+  });
+  revalidatePath("/admin/catalog");
+  revalidatePath("/buscar");
+  revalidatePath("/admin/audit");
+}
+
+export async function createSkillSynonymAction(formData: FormData) {
+  await adminRpc("admin_create_skill_synonym", {
+    target_skill_id: requiredText(formData, "skillId"),
+    requested_phrase: requiredText(formData, "phrase"),
+  });
+  revalidatePath("/admin/catalog");
+  revalidatePath("/buscar");
+  revalidatePath("/admin/audit");
+}
+
+export async function updateSkillSynonymAction(formData: FormData) {
+  await adminRpc("admin_update_skill_synonym", {
+    target_synonym_id: requiredText(formData, "synonymId"),
+    requested_phrase: requiredText(formData, "phrase"),
+  });
+  revalidatePath("/admin/catalog");
+  revalidatePath("/buscar");
+  revalidatePath("/admin/audit");
+}
+
+export async function deleteSkillSynonymAction(formData: FormData) {
+  await adminRpc("admin_delete_skill_synonym", {
+    target_synonym_id: requiredText(formData, "synonymId"),
+  });
+  revalidatePath("/admin/catalog");
+  revalidatePath("/buscar");
+  revalidatePath("/admin/audit");
+}
+
+export async function createServiceTagAction(formData: FormData) {
+  await adminRpc("admin_create_service_tag", {
+    target_service_id: requiredText(formData, "serviceId"),
+    requested_tag: requiredText(formData, "tag"),
+  });
+  revalidatePath("/admin/catalog");
+  revalidatePath("/buscar");
+  revalidatePath("/admin/audit");
+}
+
+export async function updateServiceTagAction(formData: FormData) {
+  await adminRpc("admin_update_service_tag", {
+    target_service_id: requiredText(formData, "serviceId"),
+    target_normalized_tag: requiredText(formData, "normalizedTag"),
+    requested_tag: requiredText(formData, "tag"),
+  });
+  revalidatePath("/admin/catalog");
+  revalidatePath("/buscar");
+  revalidatePath("/admin/audit");
+}
+
+export async function deleteServiceTagAction(formData: FormData) {
+  await adminRpc("admin_delete_service_tag", {
+    target_service_id: requiredText(formData, "serviceId"),
+    target_normalized_tag: requiredText(formData, "normalizedTag"),
+  });
+  revalidatePath("/admin/catalog");
+  revalidatePath("/buscar");
+  revalidatePath("/admin/audit");
 }

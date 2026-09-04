@@ -253,4 +253,65 @@ test.describe("Phase 09 admin trust and safety", () => {
     serviceRows = (await serviceState.json()) as Array<{ is_paused: boolean }>;
     expect(serviceRows[0]?.is_paused).toBe(false);
   });
+
+  test("admin manages synonym and service tag CRUD from the catalog", async ({
+    page,
+  }) => {
+    const admin = await createTestUser("Admin Taxonomía Phase 09");
+    await promoteAdmin(admin.id);
+    await login(page, admin, "/admin/catalog");
+
+    const synonymCreateForm = page.locator("form").filter({
+      hasText: "Nuevo sinónimo",
+    });
+    await synonymCreateForm.locator('select[name="skillId"]').selectOption({
+      index: 0,
+    });
+    await synonymCreateForm
+      .getByPlaceholder("Frase equivalente")
+      .fill("phase09 alias e2e");
+    await synonymCreateForm
+      .getByRole("button", { name: "Crear sinónimo" })
+      .click();
+
+    let synonymCard = page
+      .locator("article")
+      .filter({ hasText: "phase09 alias e2e" });
+    await expect(synonymCard).toBeVisible();
+    await synonymCard.locator('input[name="phrase"]').fill("phase09 alias actualizado");
+    await synonymCard.getByRole("button", { name: "Actualizar" }).click();
+    synonymCard = page
+      .locator("article")
+      .filter({ hasText: "phase09 alias actualizado" });
+    await expect(synonymCard).toBeVisible();
+    await synonymCard.getByRole("button", { name: "Eliminar" }).click();
+    await expect(page.getByText("phase09 alias actualizado")).toHaveCount(0);
+
+    const tagCreateForm = page.locator("form").filter({ hasText: "Nuevo tag" });
+    await tagCreateForm.locator('select[name="serviceId"]').selectOption({
+      index: 0,
+    });
+    await tagCreateForm
+      .getByPlaceholder("Tag de búsqueda")
+      .fill("phase09 tag e2e");
+    await tagCreateForm.getByRole("button", { name: "Crear tag" }).click();
+
+    let tagCard = page
+      .locator("article")
+      .filter({ hasText: "phase09 tag e2e" });
+    await expect(tagCard).toBeVisible();
+    await tagCard.locator('input[name="tag"]').fill("phase09 tag actualizado");
+    await tagCard.getByRole("button", { name: "Actualizar" }).click();
+    tagCard = page
+      .locator("article")
+      .filter({ hasText: "phase09 tag actualizado" });
+    await expect(tagCard).toBeVisible();
+    await tagCard.getByRole("button", { name: "Eliminar" }).click();
+    await expect(page.getByText("phase09 tag actualizado")).toHaveCount(0);
+
+    await page.goto("/admin/audit");
+    await expect(page.getByText("CATALOG_TAG_CREATED")).toBeVisible();
+    await expect(page.getByText("CATALOG_TAG_UPDATED")).toBeVisible();
+    await expect(page.getByText("CATALOG_TAG_DELETED")).toBeVisible();
+  });
 });

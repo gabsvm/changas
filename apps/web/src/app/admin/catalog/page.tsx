@@ -1,21 +1,33 @@
 import {
   createCategoryAction,
+  createServiceTagAction,
   createSkillAction,
+  createSkillSynonymAction,
+  deleteCategoryAction,
+  deleteServiceTagAction,
+  deleteSkillAction,
+  deleteSkillSynonymAction,
   setServiceModerationAction,
   updateCategoryStateAction,
+  updateServiceTagAction,
   updateSkillStateAction,
+  updateSkillSynonymAction,
 } from "@/app/admin/actions";
 import {
   listAdminCategories,
   listAdminServices,
+  listAdminServiceTags,
   listAdminSkills,
+  listAdminSkillSynonyms,
 } from "@/lib/admin/server";
 
 export default async function AdminCatalogPage() {
-  const [categories, skills, services] = await Promise.all([
+  const [categories, skills, services, synonyms, tags] = await Promise.all([
     listAdminCategories(),
     listAdminSkills(),
     listAdminServices(),
+    listAdminSkillSynonyms(),
+    listAdminServiceTags(),
   ]);
 
   return (
@@ -26,6 +38,7 @@ export default async function AdminCatalogPage() {
           CRUD administrativo con desactivación reversible como camino normal.
         </p>
       </div>
+
       <div className="grid gap-4 lg:grid-cols-2">
         <form
           action={createCategoryAction}
@@ -61,6 +74,7 @@ export default async function AdminCatalogPage() {
             </button>
           </div>
         </form>
+
         <form
           action={createSkillAction}
           className="rounded-2xl border border-slate-200 bg-white p-4"
@@ -107,6 +121,71 @@ export default async function AdminCatalogPage() {
           </div>
         </form>
       </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <form
+          action={createSkillSynonymAction}
+          className="rounded-2xl border border-slate-200 bg-white p-4"
+        >
+          <h3 className="font-bold">Nuevo sinónimo</h3>
+          <div className="mt-3 grid gap-2">
+            <select
+              className="rounded-lg border border-slate-300 px-3 py-2"
+              name="skillId"
+              required
+            >
+              {skills.map((skill) => (
+                <option value={skill.skill_id} key={skill.skill_id}>
+                  {skill.name}
+                </option>
+              ))}
+            </select>
+            <input
+              className="rounded-lg border border-slate-300 px-3 py-2"
+              name="phrase"
+              required
+              minLength={2}
+              maxLength={120}
+              placeholder="Frase equivalente"
+            />
+            <button className="rounded-lg bg-slate-950 px-3 py-2 font-semibold text-white">
+              Crear sinónimo
+            </button>
+          </div>
+        </form>
+
+        <form
+          action={createServiceTagAction}
+          className="rounded-2xl border border-slate-200 bg-white p-4"
+        >
+          <h3 className="font-bold">Nuevo tag</h3>
+          <div className="mt-3 grid gap-2">
+            <select
+              className="rounded-lg border border-slate-300 px-3 py-2"
+              name="serviceId"
+              required
+            >
+              {services.map((service) => (
+                <option value={service.service_id} key={service.service_id}>
+                  {service.service_title}
+                </option>
+              ))}
+            </select>
+            <input
+              className="rounded-lg border border-slate-300 px-3 py-2"
+              name="tag"
+              required
+              minLength={2}
+              maxLength={80}
+              placeholder="Tag de búsqueda"
+            />
+            <button className="rounded-lg bg-slate-950 px-3 py-2 font-semibold text-white">
+              Crear tag
+            </button>
+          </div>
+        </form>
+      </div>
+
       <div>
         <h3 className="mb-3 text-lg font-bold">Categorías</h3>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -126,37 +205,98 @@ export default async function AdminCatalogPage() {
                   {category.is_active ? "ACTIVA" : "INACTIVA"}
                 </span>
               </div>
-              <form action={updateCategoryStateAction} className="mt-3">
-                <input
-                  type="hidden"
-                  name="categoryId"
-                  value={category.category_id}
-                />
-                <input type="hidden" name="slug" value={category.slug} />
-                <input type="hidden" name="name" value={category.name} />
-                <input
-                  type="hidden"
-                  name="description"
-                  value={category.description ?? ""}
-                />
-                <input
-                  type="hidden"
-                  name="sortOrder"
-                  value={category.sort_order}
-                />
-                <input
-                  type="hidden"
-                  name="nextActive"
-                  value={String(!category.is_active)}
-                />
-                <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
-                  {category.is_active ? "Desactivar" : "Reactivar"}
-                </button>
-              </form>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <form action={updateCategoryStateAction}>
+                  <input
+                    type="hidden"
+                    name="categoryId"
+                    value={category.category_id}
+                  />
+                  <input type="hidden" name="slug" value={category.slug} />
+                  <input type="hidden" name="name" value={category.name} />
+                  <input
+                    type="hidden"
+                    name="description"
+                    value={category.description ?? ""}
+                  />
+                  <input
+                    type="hidden"
+                    name="sortOrder"
+                    value={category.sort_order}
+                  />
+                  <input
+                    type="hidden"
+                    name="nextActive"
+                    value={String(!category.is_active)}
+                  />
+                  <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
+                    {category.is_active ? "Desactivar" : "Reactivar"}
+                  </button>
+                </form>
+
+                {category.skill_count === 0 ? (
+                  <form action={deleteCategoryAction}>
+                    <input
+                      type="hidden"
+                      name="categoryId"
+                      value={category.category_id}
+                    />
+                    <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
+                      Eliminar
+                    </button>
+                  </form>
+                ) : null}
+              </div>
+
+              <details className="mt-3">
+                <summary className="cursor-pointer text-sm font-semibold">
+                  Editar categoría
+                </summary>
+                <form action={updateCategoryStateAction} className="mt-2 grid gap-2">
+                  <input
+                    type="hidden"
+                    name="categoryId"
+                    value={category.category_id}
+                  />
+                  <input
+                    type="hidden"
+                    name="nextActive"
+                    value={String(category.is_active)}
+                  />
+                  <input
+                    className="rounded-lg border border-slate-300 px-3 py-2"
+                    name="name"
+                    required
+                    defaultValue={category.name}
+                  />
+                  <input
+                    className="rounded-lg border border-slate-300 px-3 py-2"
+                    name="slug"
+                    required
+                    defaultValue={category.slug}
+                  />
+                  <input
+                    className="rounded-lg border border-slate-300 px-3 py-2"
+                    name="description"
+                    defaultValue={category.description ?? ""}
+                  />
+                  <input
+                    className="rounded-lg border border-slate-300 px-3 py-2"
+                    name="sortOrder"
+                    type="number"
+                    defaultValue={category.sort_order}
+                  />
+                  <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
+                    Guardar cambios
+                  </button>
+                </form>
+              </details>
             </article>
           ))}
         </div>
       </div>
+
       <div>
         <h3 className="mb-3 text-lg font-bold">Skills</h3>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -176,38 +316,197 @@ export default async function AdminCatalogPage() {
                   {skill.is_active ? "ACTIVA" : "INACTIVA"}
                 </span>
               </div>
-              <form action={updateSkillStateAction} className="mt-3">
-                <input type="hidden" name="skillId" value={skill.skill_id} />
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <form action={updateSkillStateAction}>
+                  <input type="hidden" name="skillId" value={skill.skill_id} />
+                  <input
+                    type="hidden"
+                    name="categoryId"
+                    value={skill.category_id}
+                  />
+                  <input type="hidden" name="slug" value={skill.slug} />
+                  <input type="hidden" name="name" value={skill.name} />
+                  <input
+                    type="hidden"
+                    name="description"
+                    value={skill.description ?? ""}
+                  />
+                  <input
+                    type="hidden"
+                    name="sortOrder"
+                    value={skill.sort_order}
+                  />
+                  <input
+                    type="hidden"
+                    name="nextActive"
+                    value={String(!skill.is_active)}
+                  />
+                  <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
+                    {skill.is_active ? "Desactivar" : "Reactivar"}
+                  </button>
+                </form>
+
+                {skill.service_count === 0 ? (
+                  <form action={deleteSkillAction}>
+                    <input type="hidden" name="skillId" value={skill.skill_id} />
+                    <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
+                      Eliminar
+                    </button>
+                  </form>
+                ) : null}
+              </div>
+
+              <details className="mt-3">
+                <summary className="cursor-pointer text-sm font-semibold">
+                  Editar skill
+                </summary>
+                <form action={updateSkillStateAction} className="mt-2 grid gap-2">
+                  <input type="hidden" name="skillId" value={skill.skill_id} />
+                  <input
+                    type="hidden"
+                    name="nextActive"
+                    value={String(skill.is_active)}
+                  />
+                  <select
+                    className="rounded-lg border border-slate-300 px-3 py-2"
+                    name="categoryId"
+                    defaultValue={skill.category_id}
+                  >
+                    {categories.map((category) => (
+                      <option
+                        value={category.category_id}
+                        key={category.category_id}
+                      >
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    className="rounded-lg border border-slate-300 px-3 py-2"
+                    name="name"
+                    required
+                    defaultValue={skill.name}
+                  />
+                  <input
+                    className="rounded-lg border border-slate-300 px-3 py-2"
+                    name="slug"
+                    required
+                    defaultValue={skill.slug}
+                  />
+                  <input
+                    className="rounded-lg border border-slate-300 px-3 py-2"
+                    name="description"
+                    defaultValue={skill.description ?? ""}
+                  />
+                  <input
+                    className="rounded-lg border border-slate-300 px-3 py-2"
+                    name="sortOrder"
+                    type="number"
+                    defaultValue={skill.sort_order}
+                  />
+                  <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
+                    Guardar cambios
+                  </button>
+                </form>
+              </details>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-3 text-lg font-bold">Sinónimos</h3>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {synonyms.map((synonym) => (
+            <article
+              className="rounded-xl border border-slate-200 bg-white p-4"
+              key={synonym.synonym_id}
+            >
+              <p className="font-semibold">{synonym.phrase}</p>
+              <p className="text-xs text-slate-500">
+                {synonym.skill_name} · {synonym.normalized_phrase}
+              </p>
+              <form action={updateSkillSynonymAction} className="mt-3 grid gap-2">
                 <input
                   type="hidden"
-                  name="categoryId"
-                  value={skill.category_id}
+                  name="synonymId"
+                  value={synonym.synonym_id}
                 />
-                <input type="hidden" name="slug" value={skill.slug} />
-                <input type="hidden" name="name" value={skill.name} />
                 <input
-                  type="hidden"
-                  name="description"
-                  value={skill.description ?? ""}
-                />
-                <input
-                  type="hidden"
-                  name="sortOrder"
-                  value={skill.sort_order}
-                />
-                <input
-                  type="hidden"
-                  name="nextActive"
-                  value={String(!skill.is_active)}
+                  className="rounded-lg border border-slate-300 px-3 py-2"
+                  name="phrase"
+                  required
+                  minLength={2}
+                  maxLength={120}
+                  defaultValue={synonym.phrase}
                 />
                 <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
-                  {skill.is_active ? "Desactivar" : "Reactivar"}
+                  Actualizar
+                </button>
+              </form>
+              <form action={deleteSkillSynonymAction} className="mt-2">
+                <input
+                  type="hidden"
+                  name="synonymId"
+                  value={synonym.synonym_id}
+                />
+                <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
+                  Eliminar
                 </button>
               </form>
             </article>
           ))}
         </div>
       </div>
+
+      <div>
+        <h3 className="mb-3 text-lg font-bold">Tags de servicios</h3>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {tags.map((tag) => (
+            <article
+              className="rounded-xl border border-slate-200 bg-white p-4"
+              key={`${tag.service_id}:${tag.normalized_tag}`}
+            >
+              <p className="font-semibold">{tag.tag}</p>
+              <p className="text-xs text-slate-500">
+                {tag.service_title} · {tag.normalized_tag}
+              </p>
+              <form action={updateServiceTagAction} className="mt-3 grid gap-2">
+                <input type="hidden" name="serviceId" value={tag.service_id} />
+                <input
+                  type="hidden"
+                  name="normalizedTag"
+                  value={tag.normalized_tag}
+                />
+                <input
+                  className="rounded-lg border border-slate-300 px-3 py-2"
+                  name="tag"
+                  required
+                  minLength={2}
+                  maxLength={80}
+                  defaultValue={tag.tag}
+                />
+                <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
+                  Actualizar
+                </button>
+              </form>
+              <form action={deleteServiceTagAction} className="mt-2">
+                <input type="hidden" name="serviceId" value={tag.service_id} />
+                <input
+                  type="hidden"
+                  name="normalizedTag"
+                  value={tag.normalized_tag}
+                />
+                <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">
+                  Eliminar
+                </button>
+              </form>
+            </article>
+          ))}
+        </div>
+      </div>
+
       <div>
         <h3 className="mb-3 text-lg font-bold">Moderación de servicios</h3>
         <div className="space-y-3">
