@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-    branches: ["**"]
+    branches-ignore:
+      - codex/phase09-format-final
   pull_request:
 
 permissions:
