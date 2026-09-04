@@ -15,7 +15,7 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Buscar servicios",
   description: "Explorá servicios y habilidades publicados en Changas.",
-  robots: { index: false, follow: true },
+  alternates: { canonical: "/buscar" },
 };
 
 export const dynamic = "force-dynamic";
