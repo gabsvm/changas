@@ -119,6 +119,53 @@ async function createIdentityCase(provider: TestUser) {
   return documents[0]!.id;
 }
 
+async function createModerationService(provider: TestUser) {
+  const skillResponse = await adminRequest(
+    "/rest/v1/skills?select=id&is_active=eq.true&order=sort_order.asc&limit=1",
+  );
+  expect(skillResponse.ok).toBeTruthy();
+  const skills = (await skillResponse.json()) as Array<{ id: string }>;
+  const skillId = skills[0]?.id;
+  if (!skillId) throw new Error("Phase 09 E2E requires an active seeded skill.");
+
+  const suffix = crypto.randomUUID().replaceAll("-", "");
+  const providerResponse = await adminRequest("/rest/v1/provider_profiles", {
+    method: "POST",
+    body: JSON.stringify({
+      user_id: provider.id,
+      status: "ACTIVE",
+      onboarding_step: 4,
+      public_slug: `phase09-moderation-${suffix}`,
+      marketplace_paused: false,
+      availability_paused: false,
+    }),
+  });
+  expect(providerResponse.ok).toBeTruthy();
+
+  const serviceId = crypto.randomUUID();
+  const serviceResponse = await adminRequest("/rest/v1/services", {
+    method: "POST",
+    body: JSON.stringify({
+      id: serviceId,
+      provider_user_id: provider.id,
+      skill_id: skillId,
+      public_slug: `phase09-service-${suffix}`,
+      title: `Servicio aislado Phase 09 ${suffix.slice(0, 8)}`,
+      description:
+        "Servicio sintético aislado para validar moderación administrativa sin alterar el catálogo demo compartido.",
+      modality: "REMOTE",
+      price_model: "FIXED",
+      price_amount: 15000,
+      schedule_type: "UNSCHEDULED",
+      is_published: false,
+      is_paused: false,
+    }),
+  });
+  expect(serviceResponse.ok).toBeTruthy();
+
+  return serviceId;
+}
+
 test.describe("Phase 09 admin trust and safety", () => {
   test("normal authenticated account cannot use the admin surface", async ({
     page,
@@ -144,7 +191,13 @@ test.describe("Phase 09 admin trust and safety", () => {
     await expect(
       page.getByRole("heading", { name: "Revisión de identidad" }),
     ).toBeVisible();
-    await expect(page.getByText("IDENTITY_PENDING")).toBeVisible();
+    const identityCard = page.locator(
+      `article:has(input[name="providerUserId"][value="${provider.id}"])`,
+    );
+    await expect(identityCard).toHaveCount(1);
+    await expect(
+      identityCard.getByText("IDENTITY_PENDING", { exact: true }),
+    ).toBeVisible();
 
     const signedResponse = await page.request.get(
       `/api/admin/identity-documents/${documentId}`,
@@ -155,8 +208,10 @@ test.describe("Phase 09 admin trust and safety", () => {
       "/storage/v1/object/sign/identity-documents/",
     );
 
-    await page.getByRole("button", { name: "Aprobar identidad" }).click();
-    await expect(page.getByText("ACTIVE")).toBeVisible();
+    await identityCard
+      .getByRole("button", { name: "Aprobar identidad" })
+      .click();
+    await expect(identityCard.getByText("ACTIVE", { exact: true })).toBeVisible();
 
     const providerState = await adminRequest(
       `/rest/v1/provider_profiles?user_id=eq.${provider.id}&select=status`,
@@ -175,17 +230,17 @@ test.describe("Phase 09 admin trust and safety", () => {
     await expect(auditCard).toBeVisible();
   });
 
-  test("admin resolves a report and disables then restores a marketplace service", async ({
+  test("admin resolves a report and disables then restores an isolated marketplace service", async ({
     page,
   }) => {
     const admin = await createTestUser("Admin Moderación Phase 09");
     const client = await createTestUser("Cliente Reporte Phase 09");
+    const provider = await createTestUser("Prestador Moderación Phase 09");
     await promoteAdmin(admin.id);
 
+    const serviceId = await createModerationService(provider);
     const conversationId = crypto.randomUUID();
     const reportId = crypto.randomUUID();
-    const providerId = "23000000-0000-4000-8000-000000000001";
-    const serviceId = "24000000-0000-4000-8000-000000000001";
     const resolution = `Caso resuelto E2E ${reportId}.`;
 
     let response = await adminRequest("/rest/v1/conversations", {
@@ -194,7 +249,7 @@ test.describe("Phase 09 admin trust and safety", () => {
         id: conversationId,
         service_id: serviceId,
         client_user_id: client.id,
-        provider_user_id: providerId,
+        provider_user_id: provider.id,
       }),
     });
     expect(response.ok).toBeTruthy();
@@ -204,7 +259,7 @@ test.describe("Phase 09 admin trust and safety", () => {
         { conversation_id: conversationId, user_id: client.id, role: "CLIENT" },
         {
           conversation_id: conversationId,
-          user_id: providerId,
+          user_id: provider.id,
           role: "PROVIDER",
         },
       ]),
@@ -235,9 +290,11 @@ test.describe("Phase 09 admin trust and safety", () => {
       page.getByRole("heading", { name: "Catálogo y servicios" }),
     ).toBeVisible();
     const serviceCard = page.locator(
-      `article:has(input[name="serviceId"][value="${serviceId}"]):has(input[name="state"][value="DISABLED"])`,
+      `article:has(input[name="serviceId"][value="${serviceId}"])`,
     );
     await expect(serviceCard).toHaveCount(1);
+    await expect(serviceCard.getByText("CLEAR", { exact: true })).toBeVisible();
+
     const disableForm = serviceCard
       .getByRole("button", { name: "Deshabilitar" })
       .locator("xpath=ancestor::form");
@@ -245,6 +302,9 @@ test.describe("Phase 09 admin trust and safety", () => {
       .getByPlaceholder("Motivo")
       .fill(`Moderación E2E Phase 09 ${reportId}`);
     await disableForm.getByRole("button", { name: "Deshabilitar" }).click();
+    await expect(
+      serviceCard.getByText("DISABLED", { exact: true }),
+    ).toBeVisible();
 
     let serviceState = await adminRequest(
       `/rest/v1/services?id=eq.${serviceId}&select=is_paused`,
@@ -254,10 +314,8 @@ test.describe("Phase 09 admin trust and safety", () => {
     }>;
     expect(serviceRows[0]?.is_paused).toBe(true);
 
-    const refreshedCard = page.locator(
-      `article:has(input[name="serviceId"][value="${serviceId}"]):has(input[name="state"][value="CLEAR"])`,
-    );
-    await refreshedCard.getByRole("button", { name: "Restaurar" }).click();
+    await serviceCard.getByRole("button", { name: "Restaurar" }).click();
+    await expect(serviceCard.getByText("CLEAR", { exact: true })).toBeVisible();
     serviceState = await adminRequest(
       `/rest/v1/services?id=eq.${serviceId}&select=is_paused`,
     );
