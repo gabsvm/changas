@@ -1,0 +1,76 @@
+name: Phase 10 SEO Probe
+
+on:
+  push:
+    branches:
+      - codex/phase10-seo-probe
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Start and seed local Supabase
+        run: |
+          pnpm dlx supabase@2.116.0 start --exclude edge-runtime
+          pnpm dlx supabase@2.116.0 db reset --local
+          pnpm dlx supabase@2.116.0 status -o env > "$RUNNER_TEMP/supabase.env"
+          set -a
+          source "$RUNNER_TEMP/supabase.env"
+          set +a
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY"
+          } >> "$GITHUB_ENV"
+      - name: Build and start web
+        run: |
+          pnpm build
+          nohup pnpm --filter @changas/web start > "$RUNNER_TEMP/changas-web.log" 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/health > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/changas-web.log" || true
+          exit 1
+      - name: Run Lighthouse SEO diagnostic
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          pnpm dlx lighthouse@12.8.2 http://127.0.0.1:3000/buscar --only-categories=seo --form-factor=mobile --chrome-flags="--headless --no-sandbox" --output=json --output-path="$RUNNER_TEMP/search-lighthouse.json"
+          node --input-type=module - "$RUNNER_TEMP/search-lighthouse.json" <<'NODE'
+          import fs from "node:fs";
+          const path = process.argv[2];
+          const report = JSON.parse(fs.readFileSync(path, "utf8"));
+          console.log(`SEO SCORE ${report.categories?.seo?.score}`);
+          const refs = report.categories?.seo?.auditRefs ?? [];
+          for (const ref of refs) {
+            const audit = report.audits?.[ref.id];
+            if (!audit || audit.score === 1 || audit.score === null) continue;
+            console.log(JSON.stringify({
+              id: ref.id,
+              weight: ref.weight,
+              score: audit.score,
+              scoreDisplayMode: audit.scoreDisplayMode,
+              title: audit.title,
+              description: audit.description,
+              displayValue: audit.displayValue ?? null,
+              details: audit.details ?? null,
+            }, null, 2));
+          }
+          NODE
+      - name: Stop Supabase
+        if: always()
+        run: pnpm dlx supabase@2.116.0 stop
