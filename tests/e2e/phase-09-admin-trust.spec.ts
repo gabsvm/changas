@@ -143,6 +143,15 @@ async function createModerationService(provider: TestUser) {
   });
   expect(providerResponse.ok).toBeTruthy();
 
+  const providerSkillResponse = await adminRequest("/rest/v1/provider_skills", {
+    method: "POST",
+    body: JSON.stringify({
+      provider_user_id: provider.id,
+      skill_id: skillId,
+    }),
+  });
+  expect(providerSkillResponse.ok).toBeTruthy();
+
   const serviceId = crypto.randomUUID();
   const serviceResponse = await adminRequest("/rest/v1/services", {
     method: "POST",
