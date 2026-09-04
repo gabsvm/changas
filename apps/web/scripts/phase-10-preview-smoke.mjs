@@ -1,6 +1,8 @@
 const rawBaseUrl = process.env.PREVIEW_URL;
 if (!rawBaseUrl) {
-  throw new Error("PREVIEW_URL is required for the Phase 10 preview smoke test.");
+  throw new Error(
+    "PREVIEW_URL is required for the Phase 10 preview smoke test.",
+  );
 }
 
 const baseUrl = new URL(rawBaseUrl);
@@ -28,7 +30,9 @@ for (const route of routes) {
       payload?.service !== "changas-web" ||
       payload?.mode !== "liveness"
     ) {
-      throw new Error(`/health returned an invalid liveness payload: ${JSON.stringify(payload)}`);
+      throw new Error(
+        `/health returned an invalid liveness payload: ${JSON.stringify(payload)}`,
+      );
     }
   } else {
     const body = await response.text();

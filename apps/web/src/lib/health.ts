@@ -15,7 +15,11 @@ type HealthRuntime = {
 function normalizeEnvironment(
   value: string | undefined,
 ): HealthPayload["environment"] {
-  if (value === "production" || value === "preview" || value === "development") {
+  if (
+    value === "production" ||
+    value === "preview" ||
+    value === "development"
+  ) {
     return value;
   }
   return "unknown";

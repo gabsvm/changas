@@ -8,7 +8,9 @@ describe("buildClientErrorEvent", () => {
       digest: "abc123",
     });
 
-    expect(buildClientErrorEvent("route", error, "2026-09-04T00:00:00.000Z")).toEqual({
+    expect(
+      buildClientErrorEvent("route", error, "2026-09-04T00:00:00.000Z"),
+    ).toEqual({
       level: "error",
       event: "ui_error",
       scope: "route",

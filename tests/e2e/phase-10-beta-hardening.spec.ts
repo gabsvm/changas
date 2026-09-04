@@ -5,7 +5,9 @@ async function expectNoHorizontalOverflow(page: Page) {
     clientWidth: document.documentElement.clientWidth,
     scrollWidth: document.documentElement.scrollWidth,
   }));
-  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(
+    dimensions.clientWidth + 1,
+  );
 }
 
 async function expectPublicPageBasics(page: Page) {
@@ -31,9 +33,18 @@ test.describe("Phase 10 beta hardening", () => {
       mode: "liveness",
     });
     expect(Object.keys(body).sort()).toEqual(
-      ["environment", "mode", "revision", "service", "status", "timestamp"].sort(),
+      [
+        "environment",
+        "mode",
+        "revision",
+        "service",
+        "status",
+        "timestamp",
+      ].sort(),
     );
-    expect(JSON.stringify(body)).not.toMatch(/service[_-]?role|password|secret|token/i);
+    expect(JSON.stringify(body)).not.toMatch(
+      /service[_-]?role|password|secret|token/i,
+    );
   });
 
   test("critical public marketplace pages keep semantic/mobile invariants", async ({
@@ -61,7 +72,9 @@ test.describe("Phase 10 beta hardening", () => {
     ).toBeEnabled();
 
     await page.keyboard.press("Tab");
-    const activeTag = await page.evaluate(() => document.activeElement?.tagName);
+    const activeTag = await page.evaluate(
+      () => document.activeElement?.tagName,
+    );
     expect(activeTag).not.toBe("BODY");
     await expectNoHorizontalOverflow(page);
   });
