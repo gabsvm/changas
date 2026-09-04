@@ -134,10 +134,10 @@ select ok(
     join pg_class t on t.oid = c.conrelid
     join pg_namespace n on n.oid = t.relnamespace
     where n.nspname = 'public'
-      and t.relname = 'jobs'
+      and t.relname = 'provider_booking_slots'
       and c.contype = 'x'
   ),
-  'jobs keep a database exclusion constraint for provider schedule overlap'
+  'provider booking slots keep a database exclusion constraint for provider schedule overlap'
 );
 
 select ok(
