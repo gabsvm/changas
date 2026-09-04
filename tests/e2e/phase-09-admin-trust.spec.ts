@@ -126,7 +126,8 @@ async function createModerationService(provider: TestUser) {
   expect(skillResponse.ok).toBeTruthy();
   const skills = (await skillResponse.json()) as Array<{ id: string }>;
   const skillId = skills[0]?.id;
-  if (!skillId) throw new Error("Phase 09 E2E requires an active seeded skill.");
+  if (!skillId)
+    throw new Error("Phase 09 E2E requires an active seeded skill.");
 
   const suffix = crypto.randomUUID().replaceAll("-", "");
   const providerResponse = await adminRequest("/rest/v1/provider_profiles", {
@@ -211,7 +212,9 @@ test.describe("Phase 09 admin trust and safety", () => {
     await identityCard
       .getByRole("button", { name: "Aprobar identidad" })
       .click();
-    await expect(identityCard.getByText("ACTIVE", { exact: true })).toBeVisible();
+    await expect(
+      identityCard.getByText("ACTIVE", { exact: true }),
+    ).toBeVisible();
 
     const providerState = await adminRequest(
       `/rest/v1/provider_profiles?user_id=eq.${provider.id}&select=status`,
@@ -230,98 +233,103 @@ test.describe("Phase 09 admin trust and safety", () => {
     await expect(auditCard).toBeVisible();
   });
 
-  test("admin resolves a report and disables then restores an isolated marketplace service", async ({
-    page,
-  }) => {
-    const admin = await createTestUser("Admin Moderación Phase 09");
-    const client = await createTestUser("Cliente Reporte Phase 09");
-    const provider = await createTestUser("Prestador Moderación Phase 09");
-    await promoteAdmin(admin.id);
+  test(
+    "admin resolves a report and disables then restores an isolated marketplace service",
+    async ({ page }) => {
+      const admin = await createTestUser("Admin Moderación Phase 09");
+      const client = await createTestUser("Cliente Reporte Phase 09");
+      const provider = await createTestUser("Prestador Moderación Phase 09");
+      await promoteAdmin(admin.id);
 
-    const serviceId = await createModerationService(provider);
-    const conversationId = crypto.randomUUID();
-    const reportId = crypto.randomUUID();
-    const resolution = `Caso resuelto E2E ${reportId}.`;
+      const serviceId = await createModerationService(provider);
+      const conversationId = crypto.randomUUID();
+      const reportId = crypto.randomUUID();
+      const resolution = `Caso resuelto E2E ${reportId}.`;
 
-    let response = await adminRequest("/rest/v1/conversations", {
-      method: "POST",
-      body: JSON.stringify({
-        id: conversationId,
-        service_id: serviceId,
-        client_user_id: client.id,
-        provider_user_id: provider.id,
-      }),
-    });
-    expect(response.ok).toBeTruthy();
-    response = await adminRequest("/rest/v1/conversation_participants", {
-      method: "POST",
-      body: JSON.stringify([
-        { conversation_id: conversationId, user_id: client.id, role: "CLIENT" },
-        {
+      let response = await adminRequest("/rest/v1/conversations", {
+        method: "POST",
+        body: JSON.stringify({
+          id: conversationId,
+          service_id: serviceId,
+          client_user_id: client.id,
+          provider_user_id: provider.id,
+        }),
+      });
+      expect(response.ok).toBeTruthy();
+      response = await adminRequest("/rest/v1/conversation_participants", {
+        method: "POST",
+        body: JSON.stringify([
+          { conversation_id: conversationId, user_id: client.id, role: "CLIENT" },
+          {
+            conversation_id: conversationId,
+            user_id: provider.id,
+            role: "PROVIDER",
+          },
+        ]),
+      });
+      expect(response.ok).toBeTruthy();
+      response = await adminRequest("/rest/v1/conversation_reports", {
+        method: "POST",
+        body: JSON.stringify({
+          id: reportId,
           conversation_id: conversationId,
-          user_id: provider.id,
-          role: "PROVIDER",
-        },
-      ]),
-    });
-    expect(response.ok).toBeTruthy();
-    response = await adminRequest("/rest/v1/conversation_reports", {
-      method: "POST",
-      body: JSON.stringify({
-        id: reportId,
-        conversation_id: conversationId,
-        reporter_user_id: client.id,
-        category: "ABUSE",
-        reason: `Reporte E2E Phase 09 ${reportId}`,
-      }),
-    });
-    expect(response.ok).toBeTruthy();
+          reporter_user_id: client.id,
+          category: "ABUSE",
+          reason: `Reporte E2E Phase 09 ${reportId}`,
+        }),
+      });
+      expect(response.ok).toBeTruthy();
 
-    await login(page, admin, "/admin/reports");
-    let reportCard = page.locator("article").filter({ hasText: reportId });
-    await expect(reportCard).toContainText(`Reporte E2E Phase 09 ${reportId}`);
-    await reportCard.getByPlaceholder("Resolución del caso").fill(resolution);
-    await reportCard.getByRole("button", { name: "Resolver reporte" }).click();
-    reportCard = page.locator("article").filter({ hasText: reportId });
-    await expect(reportCard).toContainText(resolution);
+      await login(page, admin, "/admin/reports");
+      let reportCard = page.locator("article").filter({ hasText: reportId });
+      await expect(reportCard).toContainText(`Reporte E2E Phase 09 ${reportId}`);
+      await reportCard.getByPlaceholder("Resolución del caso").fill(resolution);
+      await reportCard.getByRole("button", { name: "Resolver reporte" }).click();
+      reportCard = page.locator("article").filter({ hasText: reportId });
+      await expect(reportCard).toContainText(resolution);
 
-    await page.goto("/admin/catalog");
-    await expect(
-      page.getByRole("heading", { name: "Catálogo y servicios" }),
-    ).toBeVisible();
-    const serviceCard = page.locator(
-      `article:has(input[name="serviceId"][value="${serviceId}"])`,
-    );
-    await expect(serviceCard).toHaveCount(1);
-    await expect(serviceCard.getByText("CLEAR", { exact: true })).toBeVisible();
+      await page.goto("/admin/catalog");
+      await expect(
+        page.getByRole("heading", { name: "Catálogo y servicios" }),
+      ).toBeVisible();
+      const serviceCard = page.locator(
+        `article:has(input[name="serviceId"][value="${serviceId}"])`,
+      );
+      await expect(serviceCard).toHaveCount(1);
+      await expect(
+        serviceCard.getByText("CLEAR", { exact: true }),
+      ).toBeVisible();
 
-    const disableForm = serviceCard
-      .getByRole("button", { name: "Deshabilitar" })
-      .locator("xpath=ancestor::form");
-    await disableForm
-      .getByPlaceholder("Motivo")
-      .fill(`Moderación E2E Phase 09 ${reportId}`);
-    await disableForm.getByRole("button", { name: "Deshabilitar" }).click();
-    await expect(
-      serviceCard.getByText("DISABLED", { exact: true }),
-    ).toBeVisible();
+      const disableForm = serviceCard
+        .getByRole("button", { name: "Deshabilitar" })
+        .locator("xpath=ancestor::form");
+      await disableForm
+        .getByPlaceholder("Motivo")
+        .fill(`Moderación E2E Phase 09 ${reportId}`);
+      await disableForm.getByRole("button", { name: "Deshabilitar" }).click();
+      await expect(
+        serviceCard.getByText("DISABLED", { exact: true }),
+      ).toBeVisible();
 
-    let serviceState = await adminRequest(
-      `/rest/v1/services?id=eq.${serviceId}&select=is_paused`,
-    );
-    let serviceRows = (await serviceState.json()) as Array<{
-      is_paused: boolean;
-    }>;
-    expect(serviceRows[0]?.is_paused).toBe(true);
+      let serviceState = await adminRequest(
+        `/rest/v1/services?id=eq.${serviceId}&select=is_paused`,
+      );
+      let serviceRows = (await serviceState.json()) as Array<{
+        is_paused: boolean;
+      }>;
+      expect(serviceRows[0]?.is_paused).toBe(true);
 
-    await serviceCard.getByRole("button", { name: "Restaurar" }).click();
-    await expect(serviceCard.getByText("CLEAR", { exact: true })).toBeVisible();
-    serviceState = await adminRequest(
-      `/rest/v1/services?id=eq.${serviceId}&select=is_paused`,
-    );
-    serviceRows = (await serviceState.json()) as Array<{ is_paused: boolean }>;
-    expect(serviceRows[0]?.is_paused).toBe(false);
-  });
+      await serviceCard.getByRole("button", { name: "Restaurar" }).click();
+      await expect(
+        serviceCard.getByText("CLEAR", { exact: true }),
+      ).toBeVisible();
+      serviceState = await adminRequest(
+        `/rest/v1/services?id=eq.${serviceId}&select=is_paused`,
+      );
+      serviceRows = (await serviceState.json()) as Array<{ is_paused: boolean }>;
+      expect(serviceRows[0]?.is_paused).toBe(false);
+    },
+  );
 
   test("admin manages synonym and service tag CRUD from the catalog", async ({
     page,
