@@ -7,7 +7,7 @@
 **Rama histórica preservada:** `codex/phase-09-admin-trust` en `8df3d21681bce42ee642439689ea5090e1a87242`  
 **Base aprobada (Phase 08):** `133dfd58a078916ad123fdc84cd08d87ef20d141`  
 **Checkpoint histórico Admin Core/RBAC:** `2bfcb77df440da59da1711bed8f3b081eb43ff42` — CI `33656903776` GREEN  
-**Implementation HEAD previo al cierre:** `b25d83104201275d9b80f69547e5567c20fc7e38`
+**Implementation HEAD funcional verificado:** `c88892887b49a33e5fd9c4a2370e37f64736923a` — CI `33837374708` GREEN
 
 Phase 09 queda implementada contra el alcance y los criterios de aceptación de `CHANGAS_MASTER_PLAN.md` y `docs/superpowers/plans/2026-09-02-phase-09-admin-trust.md`.
 
@@ -100,11 +100,12 @@ La aprobación formal exige que el commit que contiene este reporte complete su 
 17. **Tablas administrativas acotadas/paginadas**
     - RPCs de usuarios, prestadores, servicios, jobs, reportes y auditoría usan límites explícitos.
     - Las superficies de catálogo/taxonomía están controladas por el volumen acotado del catálogo V1 y por RPCs admin-only.
+    - Los read models operativos de catálogo y servicios exigen `require_admin()` y validan los límites de paginación del listado de servicios.
 
 18. **E2E administrativo**
     - Usuario normal no accede a `/admin`.
     - Admin revisa evidencia de identidad, aprueba el caso y verifica auditoría.
-    - Admin resuelve reporte, deshabilita y restaura servicio.
+    - Admin resuelve reporte, deshabilita y restaura un servicio sintético aislado.
     - Admin ejecuta CRUD de sinónimos y tags desde el panel y verifica eventos de auditoría de tags.
 
 ---
@@ -130,6 +131,14 @@ La aprobación formal exige que el commit que contiene este reporte complete su 
   - lectura admin de sinónimos/tags;
   - CRUD administrativo de service tags;
   - grants restringidos y auditoría de tags.
+- `supabase/migrations/20260902174000_phase_09_trust_safety_runtime_fix.sql`
+  - elimina la ambigüedad PL/pgSQL entre parámetros de los RPCs y `account_restrictions.target_user_id`;
+  - preserva la API publicada de restricción/restauración y sus eventos de auditoría;
+  - mantiene restauración reversible del estado previo del prestador.
+- `supabase/migrations/20260902174500_phase_09_catalog_read_models.sql`
+  - agrega read models operativos para categorías, skills y servicios del catálogo admin;
+  - exige `require_admin()` en cada entrypoint;
+  - valida paginación del listado de servicios y mantiene ejecución fuera de `anon`/`public`.
 
 ---
 
@@ -167,6 +176,7 @@ El panel consume RPCs server-side y mantiene las operaciones sensibles fuera de 
 - Reviews ocultas se filtran de reputación y lecturas públicas sin mutar el texto original.
 - Mensajes moderados preservan evidencia en lugar de destruirla.
 - Restricciones y deshabilitación de servicios tienen guards de base de datos para impedir bypass desde clientes normales.
+- Los read models de catálogo agregados para el cierre se mantienen admin-guarded y no abren acceso anónimo.
 
 ---
 
@@ -179,19 +189,41 @@ El panel consume RPCs server-side y mantiene las operaciones sensibles fuera de 
 - `supabase/tests/phase-09-catalog-moderation.sql`
 - `supabase/tests/phase-09-trust-safety.sql`
 - `supabase/tests/phase-09-catalog-taxonomy-admin.sql`
+- `supabase/tests/phase-09-catalog-read-models.sql`
 
 El contrato de Trust & Safety contiene 24 assertions; el contador pgTAP fue corregido a `plan(24)` después de comprobar que las 24 assertions funcionales pasaban.
+
+La verificación funcional de cierre en `c88892887b49a33e5fd9c4a2370e37f64736923a`, CI `33837374708`, ejecutó **33 archivos / 492 assertions pgTAP**, con `Result: PASS`.
 
 ### Runtime
 
 - `apps/web/scripts/phase-09-admin-runtime.mjs`
 - `apps/web/scripts/phase-09-trust-safety-runtime.mjs`
 
+En CI `33837374708` ambos runtimes finalizaron `PASS`. El runtime de Admin confirmó RBAC, aislamiento de auditoría, identity review, catalog CRUD y moderación reversible de servicios bajo autoridad de servidor; Trust & Safety también completó sus checks sin fallos.
+
 ### Browser E2E
 
 - `tests/e2e/phase-09-admin-trust.spec.ts`
 
 Los journeys cubren denegación a usuario normal, revisión de identidad, resolución de reportes, moderación reversible de servicio y CRUD operativo de sinónimos/tags.
+
+Durante el cierre se eliminó contaminación entre proyectos E2E: el journey de moderación dejó de reutilizar estado demo compartido y pasó a crear un fixture dedicado. El último fallo residual se reprodujo aisladamente como PostgreSQL `23503` sobre `services_provider_skill_fk`; el fixture creaba `provider_profiles` y `services` pero omitía la relación obligatoria en `provider_skills`. El fixture final respeta explícitamente `provider_profiles → provider_skills → services` antes de ejecutar la moderación.
+
+CI `33837374708` verificó el resultado completo en Chromium y `mobile-web`: **52/52 tests Playwright PASS**. El caso de reporte + deshabilitación/restauración del servicio aislado pasó en ambos proyectos.
+
+### Build, formato y performance
+
+En el mismo CI funcional de cierre:
+
+- lint: PASS;
+- typecheck: PASS;
+- unit tests: PASS;
+- production build: PASS;
+- Prettier/format check: PASS;
+- `git diff --check`: PASS;
+- Lighthouse mobile home: **72**;
+- Lighthouse mobile `/buscar`: **76**.
 
 ---
 
@@ -223,7 +255,8 @@ No se incorporó trabajo de Phase 10 durante esta recuperación/cierre.
 - [x] Moderación reversible de mensajes preservando evidencia.
 - [x] Auditoría de acciones sensibles.
 - [x] Límites/paginación en read models administrativos de alto volumen.
-- [x] E2E administrativo.
+- [x] E2E administrativo aislado y reproducible.
+- [x] CI funcional de implementación completamente GREEN antes del reporte final.
 - [x] Phase 10 no iniciada.
 
 **Estado de implementación:** `PASS`.  
