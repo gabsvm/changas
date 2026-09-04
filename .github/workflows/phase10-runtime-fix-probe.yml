@@ -1,0 +1,107 @@
+name: Phase 10 Runtime Fix Probe
+
+on:
+  push:
+    branches:
+      - codex/phase10-runtime-fix-probe
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Apply exact Phase 10 runtime corrections
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('apps/web/scripts/phase-10-beta-runtime.mjs')
+          source = path.read_text()
+
+          old_rehire = '''const rehire = await client.rpc("create_rehire_proposal", {
+            target_job_id: remoteJobId,
+          });
+          assert(
+            !rehire.error &&
+              rehire.data?.[0]?.proposal_id &&
+              rehire.data[0].proposal_id !== remoteProposalId &&
+              rehire.data[0].proposal_status === "AWAITING_PAYMENT",
+            `Journey A rehire failed: ${rehire.error?.message ?? JSON.stringify(rehire.data)}`,
+          );'''
+          new_rehire = '''const rehire = await client.rpc("create_rehire_proposal", {
+            target_job_id: remoteJobId,
+          });
+          const rehireRow = rehire.data?.[0];
+          assert(
+            !rehire.error &&
+              rehireRow?.proposal_id &&
+              rehireRow.proposal_id !== remoteProposalId &&
+              rehireRow.proposal_kind === "QUOTE_REQUEST" &&
+              rehireRow.proposal_status === "OPEN",
+            `Journey A fixed-slot rehire failed: ${rehire.error?.message ?? JSON.stringify(rehire.data)}`,
+          );'''
+          if old_rehire not in source:
+              raise SystemExit('rehire assertion block not found')
+          source = source.replace(old_rehire, new_rehire, 1)
+
+          old_conflict = '''const firstConflictPaid = await fakePay(firstConflictProposal, users.client.id);
+          assert(
+            !firstConflictPaid.error && firstConflictPaid.data?.[0]?.confirmed_job_id,
+            "Journey C first conflict booking did not confirm.",
+          );'''
+          new_conflict = '''const firstConflictPaid = await fakePay(firstConflictProposal, users.client.id);
+          const invalidReviewJobId = firstConflictPaid.data?.[0]?.confirmed_job_id;
+          assert(
+            !firstConflictPaid.error && invalidReviewJobId,
+            "Journey C first conflict booking did not confirm.",
+          );'''
+          if old_conflict not in source:
+              raise SystemExit('conflict fixture block not found')
+          source = source.replace(old_conflict, new_conflict, 1)
+
+          old_after_conflict = '''assert(
+            Boolean(secondConflictPaid.error),
+            "Journey C double-booking attempt created a second confirmed Job.",
+          );
+
+          const cancelWindow = fixedWindow(14, 10);'''
+          new_after_conflict = '''assert(
+            Boolean(secondConflictPaid.error),
+            "Journey C double-booking attempt created a second confirmed Job.",
+          );
+          await completeJob(remoteProvider, client, invalidReviewJobId);
+
+          const cancelWindow = fixedWindow(14, 10);'''
+          if old_after_conflict not in source:
+              raise SystemExit('post-conflict block not found')
+          source = source.replace(old_after_conflict, new_after_conflict, 1)
+
+          old_invalid_target = '  target_job_id: remoteJobId,\n  requested_rating: 6,'
+          new_invalid_target = '  target_job_id: invalidReviewJobId,\n  requested_rating: 6,'
+          if old_invalid_target not in source:
+              raise SystemExit('invalid review target not found')
+          source = source.replace(old_invalid_target, new_invalid_target, 1)
+
+          path.write_text(source)
+          PY
+          pnpm exec prettier --write apps/web/scripts/phase-10-beta-runtime.mjs
+          git diff --check
+      - name: Commit runtime correction
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/scripts/phase-10-beta-runtime.mjs
+          git commit -m "fix(phase10): align rehire and invalid-review journeys"
+          git push origin HEAD:codex/phase10-runtime-fix-probe
