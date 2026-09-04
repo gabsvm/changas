@@ -408,12 +408,14 @@ await createReview(
 const rehire = await client.rpc("create_rehire_proposal", {
   target_job_id: remoteJobId,
 });
+const rehireRow = rehire.data?.[0];
 assert(
   !rehire.error &&
-    rehire.data?.[0]?.proposal_id &&
-    rehire.data[0].proposal_id !== remoteProposalId &&
-    rehire.data[0].proposal_status === "AWAITING_PAYMENT",
-  `Journey A rehire failed: ${rehire.error?.message ?? JSON.stringify(rehire.data)}`,
+    rehireRow?.proposal_id &&
+    rehireRow.proposal_id !== remoteProposalId &&
+    rehireRow.proposal_kind === "QUOTE_REQUEST" &&
+    rehireRow.proposal_status === "OPEN",
+  `Journey A fixed-slot rehire failed: ${rehire.error?.message ?? JSON.stringify(rehire.data)}`,
 );
 step("Journey A PASS");
 
@@ -785,8 +787,9 @@ const secondConflictProposal = await createDirectBooking(
   conflictWindow,
 );
 const firstConflictPaid = await fakePay(firstConflictProposal, users.client.id);
+const invalidReviewJobId = firstConflictPaid.data?.[0]?.confirmed_job_id;
 assert(
-  !firstConflictPaid.error && firstConflictPaid.data?.[0]?.confirmed_job_id,
+  !firstConflictPaid.error && invalidReviewJobId,
   "Journey C first conflict booking did not confirm.",
 );
 const secondConflictPaid = await fakePay(
@@ -797,6 +800,7 @@ assert(
   Boolean(secondConflictPaid.error),
   "Journey C double-booking attempt created a second confirmed Job.",
 );
+await completeJob(remoteProvider, client, invalidReviewJobId);
 
 const cancelWindow = fixedWindow(14, 10);
 const cancelProposal = await createDirectBooking(
@@ -844,7 +848,7 @@ assert(
 );
 
 const invalidReview = await client.rpc("create_job_review", {
-  target_job_id: remoteJobId,
+  target_job_id: invalidReviewJobId,
   requested_rating: 6,
   requested_review_text: "Rating inválido Phase 10",
   requested_quality_rating: null,
