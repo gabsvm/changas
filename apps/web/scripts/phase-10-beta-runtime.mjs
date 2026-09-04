@@ -11,10 +11,18 @@ if (!supabaseUrl || !anonKey || !serviceRoleKey) {
 }
 
 const service = createClient(supabaseUrl, serviceRoleKey, {
-  auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+    detectSessionInUrl: false,
+  },
 });
 const anonymous = createClient(supabaseUrl, anonKey, {
-  auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+    detectSessionInUrl: false,
+  },
 });
 
 const runId = crypto.randomUUID();
@@ -44,19 +52,29 @@ async function createUser(user) {
     email_confirm: true,
     user_metadata: { display_name: user.email.split("@")[0] },
   });
-  assert(!error && data.user, `Could not create ${user.email}: ${error?.message ?? "unknown"}`);
+  assert(
+    !error && data.user,
+    `Could not create ${user.email}: ${error?.message ?? "unknown"}`,
+  );
   user.id = data.user.id;
 }
 
 async function signIn(user) {
   const client = createClient(supabaseUrl, anonKey, {
-    auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
   });
   const { data, error } = await client.auth.signInWithPassword({
     email: user.email,
     password,
   });
-  assert(!error && data.session, `Could not sign in ${user.email}: ${error?.message ?? "unknown"}`);
+  assert(
+    !error && data.session,
+    `Could not sign in ${user.email}: ${error?.message ?? "unknown"}`,
+  );
   return client;
 }
 
@@ -68,12 +86,25 @@ function fixedWindow(daysFromNow, hour = 14) {
 }
 
 async function getSkill(slug) {
-  const result = await service.from("skills").select("id").eq("slug", slug).single();
-  assert(!result.error && result.data?.id, `Missing Phase 10 catalog skill ${slug}`);
+  const result = await service
+    .from("skills")
+    .select("id")
+    .eq("slug", slug)
+    .single();
+  assert(
+    !result.error && result.data?.id,
+    `Missing Phase 10 catalog skill ${slug}`,
+  );
   return result.data.id;
 }
 
-async function onboardAndVerifyProvider({ user, client, admin, slug, headline }) {
+async function onboardAndVerifyProvider({
+  user,
+  client,
+  admin,
+  slug,
+  headline,
+}) {
   step(`provider onboarding ${slug}`);
   let result = await client.from("provider_profiles").insert({
     user_id: user.id,
@@ -82,22 +113,32 @@ async function onboardAndVerifyProvider({ user, client, admin, slug, headline })
     public_slug: slug,
     public_headline: headline,
   });
-  assert(!result.error, `Provider onboarding start failed: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error,
+    `Provider onboarding start failed: ${result.error?.message ?? "unknown"}`,
+  );
 
   result = await client
     .from("provider_profiles")
     .update({ onboarding_step: 4 })
     .eq("user_id", user.id);
-  assert(!result.error, `Provider onboarding progress failed: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error,
+    `Provider onboarding progress failed: ${result.error?.message ?? "unknown"}`,
+  );
 
   const bytes = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
   const documentPath = `${user.id}/${crypto.randomUUID()}-phase10.jpg`;
-  const upload = await client.storage.from("identity-documents").upload(
-    documentPath,
-    new Blob([bytes], { type: "image/jpeg" }),
-    { contentType: "image/jpeg", upsert: false },
+  const upload = await client.storage
+    .from("identity-documents")
+    .upload(documentPath, new Blob([bytes], { type: "image/jpeg" }), {
+      contentType: "image/jpeg",
+      upsert: false,
+    });
+  assert(
+    !upload.error,
+    `Identity upload failed: ${upload.error?.message ?? "unknown"}`,
   );
-  assert(!upload.error, `Identity upload failed: ${upload.error?.message ?? "unknown"}`);
 
   result = await client.from("provider_documents").insert({
     user_id: user.id,
@@ -106,20 +147,29 @@ async function onboardAndVerifyProvider({ user, client, admin, slug, headline })
     mime_type: "image/jpeg",
     file_size_bytes: bytes.byteLength,
   });
-  assert(!result.error, `Identity metadata failed: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error,
+    `Identity metadata failed: ${result.error?.message ?? "unknown"}`,
+  );
 
   result = await client
     .from("provider_profiles")
     .update({ status: "IDENTITY_PENDING" })
     .eq("user_id", user.id);
-  assert(!result.error, `Identity submission failed: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error,
+    `Identity submission failed: ${result.error?.message ?? "unknown"}`,
+  );
 
   const decision = await admin.rpc("decide_provider_identity_review", {
     target_provider_user_id: user.id,
     requested_decision: "APPROVE",
     requested_reason: "Phase 10 beta journey verification",
   });
-  assert(!decision.error && decision.data, `Identity approval failed: ${decision.error?.message ?? "unknown"}`);
+  assert(
+    !decision.error && decision.data,
+    `Identity approval failed: ${decision.error?.message ?? "unknown"}`,
+  );
 
   const state = await service
     .from("provider_profiles")
@@ -127,7 +177,9 @@ async function onboardAndVerifyProvider({ user, client, admin, slug, headline })
     .eq("user_id", user.id)
     .single();
   assert(
-    !state.error && state.data?.status === "ACTIVE" && state.data.onboarding_step === 4,
+    !state.error &&
+      state.data?.status === "ACTIVE" &&
+      state.data.onboarding_step === 4,
     `Provider did not become ACTIVE after admin verification: ${JSON.stringify(state.data)}`,
   );
   return documentPath;
@@ -139,12 +191,22 @@ async function attachSkill(providerClient, providerUserId, skillId) {
     skill_id: skillId,
     is_featured: true,
   });
-  assert(!result.error, `Could not attach provider skill: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error,
+    `Could not attach provider skill: ${result.error?.message ?? "unknown"}`,
+  );
 }
 
 async function createService(providerClient, payload) {
-  const result = await providerClient.from("services").insert(payload).select("id").single();
-  assert(!result.error && result.data?.id, `Could not publish service: ${result.error?.message ?? "unknown"}`);
+  const result = await providerClient
+    .from("services")
+    .insert(payload)
+    .select("id")
+    .single();
+  assert(
+    !result.error && result.data?.id,
+    `Could not publish service: ${result.error?.message ?? "unknown"}`,
+  );
   return result.data.id;
 }
 
@@ -153,7 +215,10 @@ async function startConversation(client, providerSlug, serviceSlug) {
     target_provider_slug: providerSlug,
     target_service_slug: serviceSlug,
   });
-  assert(!result.error && result.data, `Could not start conversation: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error && result.data,
+    `Could not start conversation: ${result.error?.message ?? "unknown"}`,
+  );
   return result.data;
 }
 
@@ -178,7 +243,10 @@ async function createDirectBooking(client, conversationId, scope, window) {
     proposed_deadline_at: null,
     proposal_expires_at: null,
   });
-  assert(!result.error && result.data, `Direct booking failed: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error && result.data,
+    `Direct booking failed: ${result.error?.message ?? "unknown"}`,
+  );
   return result.data;
 }
 
@@ -189,7 +257,10 @@ async function completeJob(provider, client, jobId) {
     requested_status: "IN_PROGRESS",
     transition_reason: null,
   });
-  assert(!result.error && result.data === "IN_PROGRESS", `Job start failed: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error && result.data === "IN_PROGRESS",
+    `Job start failed: ${result.error?.message ?? "unknown"}`,
+  );
 
   result = await provider.rpc("transition_job_status", {
     target_job_id: jobId,
@@ -208,7 +279,10 @@ async function completeJob(provider, client, jobId) {
     requested_status: "COMPLETED",
     transition_reason: null,
   });
-  assert(!result.error && result.data === "COMPLETED", `Job completion failed: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error && result.data === "COMPLETED",
+    `Job completion failed: ${result.error?.message ?? "unknown"}`,
+  );
 }
 
 async function createReview(client, jobId, text) {
@@ -220,22 +294,32 @@ async function createReview(client, jobId, text) {
     requested_punctuality_rating: 5,
     requested_communication_rating: 5,
   });
-  assert(!result.error && result.data, `Review failed: ${result.error?.message ?? "unknown"}`);
+  assert(
+    !result.error && result.data,
+    `Review failed: ${result.error?.message ?? "unknown"}`,
+  );
   return result.data;
 }
 
 await Promise.all(Object.values(users).map(createUser));
-const [admin, client, rival, remoteProvider, localProvider, outsider] = await Promise.all([
-  signIn(users.admin),
-  signIn(users.client),
-  signIn(users.rival),
-  signIn(users.remoteProvider),
-  signIn(users.localProvider),
-  signIn(users.outsider),
-]);
+const [admin, client, rival, remoteProvider, localProvider, outsider] =
+  await Promise.all([
+    signIn(users.admin),
+    signIn(users.client),
+    signIn(users.rival),
+    signIn(users.remoteProvider),
+    signIn(users.localProvider),
+    signIn(users.outsider),
+  ]);
 
-let result = await service.from("user_roles").update({ role: "admin" }).eq("user_id", users.admin.id);
-assert(!result.error, `Could not promote Phase 10 admin: ${result.error?.message ?? "unknown"}`);
+let result = await service
+  .from("user_roles")
+  .update({ role: "admin" })
+  .eq("user_id", users.admin.id);
+assert(
+  !result.error,
+  `Could not promote Phase 10 admin: ${result.error?.message ?? "unknown"}`,
+);
 
 const remoteSlug = `phase10-remote-${compactRunId}`;
 const localSlug = `phase10-local-${compactRunId}`;
@@ -268,7 +352,8 @@ const remoteServiceId = await createService(remoteProvider, {
   skill_id: englishSkill,
   public_slug: remoteServiceSlug,
   title: "Inglés conversacional remoto Phase 10",
-  description: "Clase remota individual de inglés conversacional para validar el journey integral de beta.",
+  description:
+    "Clase remota individual de inglés conversacional para validar el journey integral de beta.",
   modality: "REMOTE",
   price_model: "FIXED",
   price_amount: 85000,
@@ -287,11 +372,16 @@ let discovery = await anonymous.rpc("search_discovery_services_v3", {
   page_size: 24,
 });
 assert(
-  !discovery.error && discovery.data?.some((row) => row.service_slug === remoteServiceSlug),
+  !discovery.error &&
+    discovery.data?.some((row) => row.service_slug === remoteServiceSlug),
   `Journey A service was not discoverable: ${discovery.error?.message ?? "missing result"}`,
 );
 
-const remoteConversationId = await startConversation(client, remoteSlug, remoteServiceSlug);
+const remoteConversationId = await startConversation(
+  client,
+  remoteSlug,
+  remoteServiceSlug,
+);
 const remoteWindow = fixedWindow(3, 14);
 const remoteProposalId = await createDirectBooking(
   client,
@@ -309,9 +399,15 @@ assert(
 );
 const remoteJobId = remotePayment.confirmed_job_id;
 await completeJob(remoteProvider, client, remoteJobId);
-await createReview(client, remoteJobId, "Excelente clase remota. Journey A verificado.");
+await createReview(
+  client,
+  remoteJobId,
+  "Excelente clase remota. Journey A verificado.",
+);
 
-const rehire = await client.rpc("create_rehire_proposal", { target_job_id: remoteJobId });
+const rehire = await client.rpc("create_rehire_proposal", {
+  target_job_id: remoteJobId,
+});
 assert(
   !rehire.error &&
     rehire.data?.[0]?.proposal_id &&
@@ -328,7 +424,8 @@ const localServiceId = await createService(localProvider, {
   skill_id: electricianSkill,
   public_slug: localServiceSlug,
   title: "Electricista a domicilio Phase 10",
-  description: "Diagnóstico e intervención eléctrica presencial con cotización, agenda y alcance acordado.",
+  description:
+    "Diagnóstico e intervención eléctrica presencial con cotización, agenda y alcance acordado.",
   modality: "IN_PERSON",
   price_model: "QUOTE",
   price_amount: null,
@@ -347,7 +444,10 @@ result = await localProvider.from("service_areas").insert({
   radius_meters: 8000,
   is_active: true,
 });
-assert(!result.error, `Could not create Journey B service area: ${result.error?.message ?? "unknown"}`);
+assert(
+  !result.error,
+  `Could not create Journey B service area: ${result.error?.message ?? "unknown"}`,
+);
 
 discovery = await anonymous.rpc("search_discovery_services_v3", {
   query_text: "electricista",
@@ -359,25 +459,40 @@ discovery = await anonymous.rpc("search_discovery_services_v3", {
   page_size: 24,
 });
 assert(
-  !discovery.error && discovery.data?.some((row) => row.service_slug === localServiceSlug),
+  !discovery.error &&
+    discovery.data?.some((row) => row.service_slug === localServiceSlug),
   `Journey B radius discovery failed: ${discovery.error?.message ?? "missing result"}`,
 );
 
-const localConversationId = await startConversation(client, localSlug, localServiceSlug);
-const attachmentMessage = await client.rpc("create_conversation_attachment_message", {
-  target_conversation_id: localConversationId,
-  attachment_kind: "IMAGE",
-  message_nonce: crypto.randomUUID(),
-});
-assert(!attachmentMessage.error && attachmentMessage.data, `Attachment message failed: ${attachmentMessage.error?.message ?? "unknown"}`);
+const localConversationId = await startConversation(
+  client,
+  localSlug,
+  localServiceSlug,
+);
+const attachmentMessage = await client.rpc(
+  "create_conversation_attachment_message",
+  {
+    target_conversation_id: localConversationId,
+    attachment_kind: "IMAGE",
+    message_nonce: crypto.randomUUID(),
+  },
+);
+assert(
+  !attachmentMessage.error && attachmentMessage.data,
+  `Attachment message failed: ${attachmentMessage.error?.message ?? "unknown"}`,
+);
 const photoBytes = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
 const photoPath = `${localConversationId}/${attachmentMessage.data}/${crypto.randomUUID()}/tablero.jpg`;
-const photoUpload = await client.storage.from("conversation-attachments").upload(
-  photoPath,
-  new Blob([photoBytes], { type: "image/jpeg" }),
-  { contentType: "image/jpeg", upsert: false },
+const photoUpload = await client.storage
+  .from("conversation-attachments")
+  .upload(photoPath, new Blob([photoBytes], { type: "image/jpeg" }), {
+    contentType: "image/jpeg",
+    upsert: false,
+  });
+assert(
+  !photoUpload.error,
+  `Journey B photo upload failed: ${photoUpload.error?.message ?? "unknown"}`,
 );
-assert(!photoUpload.error, `Journey B photo upload failed: ${photoUpload.error?.message ?? "unknown"}`);
 const registeredPhoto = await client.rpc("register_conversation_attachment", {
   target_message_id: attachmentMessage.data,
   object_path: photoPath,
@@ -385,10 +500,18 @@ const registeredPhoto = await client.rpc("register_conversation_attachment", {
   attachment_size_bytes: photoBytes.byteLength,
   attachment_original_name: "tablero.jpg",
 });
-assert(!registeredPhoto.error && registeredPhoto.data, `Journey B photo registration failed: ${registeredPhoto.error?.message ?? "unknown"}`);
+assert(
+  !registeredPhoto.error && registeredPhoto.data,
+  `Journey B photo registration failed: ${registeredPhoto.error?.message ?? "unknown"}`,
+);
 
-const outsiderAttachment = await outsider.storage.from("conversation-attachments").download(photoPath);
-assert(Boolean(outsiderAttachment.error), "Journey C: outsider can read Journey B private attachment.");
+const outsiderAttachment = await outsider.storage
+  .from("conversation-attachments")
+  .download(photoPath);
+assert(
+  Boolean(outsiderAttachment.error),
+  "Journey C: outsider can read Journey B private attachment.",
+);
 
 const quoteWindow = fixedWindow(5, 13);
 const providerQuote = await localProvider.rpc("create_conversation_proposal", {
@@ -401,7 +524,10 @@ const providerQuote = await localProvider.rpc("create_conversation_proposal", {
   proposed_deadline_at: null,
   proposal_expires_at: null,
 });
-assert(!providerQuote.error && providerQuote.data, `Provider quote failed: ${providerQuote.error?.message ?? "unknown"}`);
+assert(
+  !providerQuote.error && providerQuote.data,
+  `Provider quote failed: ${providerQuote.error?.message ?? "unknown"}`,
+);
 
 const counteroffer = await client.rpc("revise_conversation_proposal", {
   target_proposal_id: providerQuote.data,
@@ -413,7 +539,10 @@ const counteroffer = await client.rpc("revise_conversation_proposal", {
   proposed_deadline_at: null,
   proposal_expires_at: null,
 });
-assert(!counteroffer.error && counteroffer.data, `Client counteroffer failed: ${counteroffer.error?.message ?? "unknown"}`);
+assert(
+  !counteroffer.error && counteroffer.data,
+  `Client counteroffer failed: ${counteroffer.error?.message ?? "unknown"}`,
+);
 
 const acceptedCounter = await localProvider.rpc("respond_to_proposal", {
   target_proposal_id: providerQuote.data,
@@ -427,7 +556,9 @@ assert(
 const localPaid = await fakePay(providerQuote.data, users.client.id);
 const localPayment = localPaid.data?.[0];
 assert(
-  !localPaid.error && localPayment?.resulting_proposal_status === "PAID" && localPayment.confirmed_job_id,
+  !localPaid.error &&
+    localPayment?.resulting_proposal_status === "PAID" &&
+    localPayment.confirmed_job_id,
   `Journey B fake payment failed: ${localPaid.error?.message ?? "unknown"}`,
 );
 const localJobId = localPayment.confirmed_job_id;
@@ -439,10 +570,16 @@ const exactLocation = await client.rpc("set_job_exact_location", {
   lng: -58.3816,
   notes: "Timbre Phase 10",
 });
-assert(!exactLocation.error, `Could not set Journey B location: ${exactLocation.error?.message ?? "unknown"}`);
-const providerJobDetail = await localProvider.rpc("get_job_detail", { target_job_id: localJobId });
 assert(
-  !providerJobDetail.error && providerJobDetail.data?.[0]?.exact_address === "Av. Corrientes 1234, CABA",
+  !exactLocation.error,
+  `Could not set Journey B location: ${exactLocation.error?.message ?? "unknown"}`,
+);
+const providerJobDetail = await localProvider.rpc("get_job_detail", {
+  target_job_id: localJobId,
+});
+assert(
+  !providerJobDetail.error &&
+    providerJobDetail.data?.[0]?.exact_address === "Av. Corrientes 1234, CABA",
   "Journey B exact location was not released to the confirmed provider.",
 );
 
@@ -456,7 +593,10 @@ const reschedule = await client.rpc("request_job_reschedule", {
   requested_duration_minutes: 60,
   request_reason: "Cambio coordinado en Phase 10",
 });
-assert(!reschedule.error && reschedule.data, `Journey B reschedule failed: ${reschedule.error?.message ?? "unknown"}`);
+assert(
+  !reschedule.error && reschedule.data,
+  `Journey B reschedule failed: ${reschedule.error?.message ?? "unknown"}`,
+);
 const rescheduleAccepted = await localProvider.rpc("respond_job_reschedule", {
   target_request_id: reschedule.data,
   response_action: "ACCEPT",
@@ -472,14 +612,21 @@ result = await localProvider.rpc("transition_job_status", {
   requested_status: "IN_PROGRESS",
   transition_reason: null,
 });
-assert(!result.error && result.data === "IN_PROGRESS", `Journey B job start failed: ${result.error?.message ?? "unknown"}`);
+assert(
+  !result.error && result.data === "IN_PROGRESS",
+  `Journey B job start failed: ${result.error?.message ?? "unknown"}`,
+);
 
 const scopeChange = await localProvider.rpc("request_job_scope_change", {
   target_job_id: localJobId,
-  new_scope_text: "Reparación del circuito más reemplazo preventivo de una térmica dañada.",
+  new_scope_text:
+    "Reparación del circuito más reemplazo preventivo de una térmica dañada.",
   additional_amount_minor: 45000,
 });
-assert(!scopeChange.error && scopeChange.data, `Journey B scope increase failed: ${scopeChange.error?.message ?? "unknown"}`);
+assert(
+  !scopeChange.error && scopeChange.data,
+  `Journey B scope increase failed: ${scopeChange.error?.message ?? "unknown"}`,
+);
 const scopeAccepted = await client.rpc("respond_job_scope_change", {
   target_scope_change_id: scopeChange.data,
   response_action: "ACCEPT",
@@ -488,14 +635,18 @@ assert(
   !scopeAccepted.error && scopeAccepted.data === "AWAITING_PAYMENT",
   `Journey B scope acceptance failed: ${scopeAccepted.error?.message ?? "unknown"}`,
 );
-const additionalPaid = await service.rpc("apply_fake_additional_payment_result", {
-  target_scope_change_id: scopeChange.data,
-  payment_nonce: crypto.randomUUID(),
-  payment_outcome: "SUCCESS",
-  actor_client_user_id: users.client.id,
-});
+const additionalPaid = await service.rpc(
+  "apply_fake_additional_payment_result",
+  {
+    target_scope_change_id: scopeChange.data,
+    payment_nonce: crypto.randomUUID(),
+    payment_outcome: "SUCCESS",
+    actor_client_user_id: users.client.id,
+  },
+);
 assert(
-  !additionalPaid.error && additionalPaid.data?.[0]?.resulting_scope_change_status === "PAID",
+  !additionalPaid.error &&
+    additionalPaid.data?.[0]?.resulting_scope_change_status === "PAID",
   `Journey B additional fake payment failed: ${additionalPaid.error?.message ?? "unknown"}`,
 );
 
@@ -505,30 +656,55 @@ result = await localProvider.rpc("transition_job_status", {
   requested_status: "COMPLETION_REQUESTED",
   transition_reason: null,
 });
-assert(!result.error && result.data === "COMPLETION_REQUESTED", `Journey B completion request failed: ${result.error?.message ?? "unknown"}`);
+assert(
+  !result.error && result.data === "COMPLETION_REQUESTED",
+  `Journey B completion request failed: ${result.error?.message ?? "unknown"}`,
+);
 result = await client.rpc("transition_job_status", {
   target_job_id: localJobId,
   expected_status: "COMPLETION_REQUESTED",
   requested_status: "COMPLETED",
   transition_reason: null,
 });
-assert(!result.error && result.data === "COMPLETED", `Journey B completion failed: ${result.error?.message ?? "unknown"}`);
-await createReview(client, localJobId, "Trabajo presencial resuelto. Journey B verificado.");
+assert(
+  !result.error && result.data === "COMPLETED",
+  `Journey B completion failed: ${result.error?.message ?? "unknown"}`,
+);
+await createReview(
+  client,
+  localJobId,
+  "Trabajo presencial resuelto. Journey B verificado.",
+);
 step("Journey B PASS");
 
 // Journey C — required negative paths and concurrency/idempotency boundaries.
 step("Journey C failure matrix");
-const unauthorizedJob = await outsider.rpc("get_job_detail", { target_job_id: localJobId });
-assert(Boolean(unauthorizedJob.error), "Journey C: outsider can inspect another user's Job.");
-const unauthorizedConversation = await outsider.rpc("list_conversation_messages", {
-  target_conversation_id: localConversationId,
-  page_size: 20,
-  before_created_at: null,
-  before_id: null,
+const unauthorizedJob = await outsider.rpc("get_job_detail", {
+  target_job_id: localJobId,
 });
-assert(Boolean(unauthorizedConversation.error), "Journey C: outsider can inspect private messages.");
+assert(
+  Boolean(unauthorizedJob.error),
+  "Journey C: outsider can inspect another user's Job.",
+);
+const unauthorizedConversation = await outsider.rpc(
+  "list_conversation_messages",
+  {
+    target_conversation_id: localConversationId,
+    page_size: 20,
+    before_created_at: null,
+    before_id: null,
+  },
+);
+assert(
+  Boolean(unauthorizedConversation.error),
+  "Journey C: outsider can inspect private messages.",
+);
 
-const failureConversation = await startConversation(rival, remoteSlug, remoteServiceSlug);
+const failureConversation = await startConversation(
+  rival,
+  remoteSlug,
+  remoteServiceSlug,
+);
 const failureWindow = fixedWindow(9, 12);
 const failureProposal = await createDirectBooking(
   rival,
@@ -554,13 +730,25 @@ const raceOffer = await client.rpc("create_conversation_proposal", {
   proposed_deadline_at: null,
   proposal_expires_at: null,
 });
-assert(!raceOffer.error && raceOffer.data, `Could not create proposal race fixture: ${raceOffer.error?.message ?? "unknown"}`);
+assert(
+  !raceOffer.error && raceOffer.data,
+  `Could not create proposal race fixture: ${raceOffer.error?.message ?? "unknown"}`,
+);
 const [raceA, raceB] = await Promise.all([
-  localProvider.rpc("respond_to_proposal", { target_proposal_id: raceOffer.data, response_action: "ACCEPT" }),
-  localProvider.rpc("respond_to_proposal", { target_proposal_id: raceOffer.data, response_action: "ACCEPT" }),
+  localProvider.rpc("respond_to_proposal", {
+    target_proposal_id: raceOffer.data,
+    response_action: "ACCEPT",
+  }),
+  localProvider.rpc("respond_to_proposal", {
+    target_proposal_id: raceOffer.data,
+    response_action: "ACCEPT",
+  }),
 ]);
 assert(
-  !raceA.error && !raceB.error && raceA.data === "AWAITING_PAYMENT" && raceB.data === "AWAITING_PAYMENT",
+  !raceA.error &&
+    !raceB.error &&
+    raceA.data === "AWAITING_PAYMENT" &&
+    raceB.data === "AWAITING_PAYMENT",
   "Journey C proposal acceptance is not idempotent under concurrency.",
 );
 const raceEvents = await service
@@ -568,10 +756,21 @@ const raceEvents = await service
   .select("id")
   .eq("proposal_id", raceOffer.data)
   .eq("event_type", "PROPOSAL_ACCEPTED");
-assert(!raceEvents.error && raceEvents.data?.length === 1, "Journey C proposal race emitted duplicate acceptance events.");
+assert(
+  !raceEvents.error && raceEvents.data?.length === 1,
+  "Journey C proposal race emitted duplicate acceptance events.",
+);
 
-const firstConflictConversation = await startConversation(client, remoteSlug, remoteServiceSlug);
-const secondConflictConversation = await startConversation(rival, remoteSlug, remoteServiceSlug);
+const firstConflictConversation = await startConversation(
+  client,
+  remoteSlug,
+  remoteServiceSlug,
+);
+const secondConflictConversation = await startConversation(
+  rival,
+  remoteSlug,
+  remoteServiceSlug,
+);
 const conflictWindow = fixedWindow(12, 16);
 const firstConflictProposal = await createDirectBooking(
   client,
@@ -586,25 +785,50 @@ const secondConflictProposal = await createDirectBooking(
   conflictWindow,
 );
 const firstConflictPaid = await fakePay(firstConflictProposal, users.client.id);
-assert(!firstConflictPaid.error && firstConflictPaid.data?.[0]?.confirmed_job_id, "Journey C first conflict booking did not confirm.");
-const secondConflictPaid = await fakePay(secondConflictProposal, users.rival.id);
-assert(Boolean(secondConflictPaid.error), "Journey C double-booking attempt created a second confirmed Job.");
+assert(
+  !firstConflictPaid.error && firstConflictPaid.data?.[0]?.confirmed_job_id,
+  "Journey C first conflict booking did not confirm.",
+);
+const secondConflictPaid = await fakePay(
+  secondConflictProposal,
+  users.rival.id,
+);
+assert(
+  Boolean(secondConflictPaid.error),
+  "Journey C double-booking attempt created a second confirmed Job.",
+);
 
 const cancelWindow = fixedWindow(14, 10);
-const cancelProposal = await createDirectBooking(client, firstConflictConversation, "Trabajo cancelable Phase 10", cancelWindow);
+const cancelProposal = await createDirectBooking(
+  client,
+  firstConflictConversation,
+  "Trabajo cancelable Phase 10",
+  cancelWindow,
+);
 const cancelPaid = await fakePay(cancelProposal, users.client.id);
 const cancelJobId = cancelPaid.data?.[0]?.confirmed_job_id;
-assert(!cancelPaid.error && cancelJobId, "Could not create cancellation fixture.");
+assert(
+  !cancelPaid.error && cancelJobId,
+  "Could not create cancellation fixture.",
+);
 const cancelled = await client.rpc("transition_job_status", {
   target_job_id: cancelJobId,
   expected_status: "CONFIRMED",
   requested_status: "CANCELLED",
   transition_reason: "Cancelación requerida por Journey C",
 });
-assert(!cancelled.error && cancelled.data === "CANCELLED", "Journey C cancellation transition failed.");
+assert(
+  !cancelled.error && cancelled.data === "CANCELLED",
+  "Journey C cancellation transition failed.",
+);
 
 const noShowWindow = fixedWindow(15, 10);
-const noShowProposal = await createDirectBooking(client, firstConflictConversation, "Trabajo no-show Phase 10", noShowWindow);
+const noShowProposal = await createDirectBooking(
+  client,
+  firstConflictConversation,
+  "Trabajo no-show Phase 10",
+  noShowWindow,
+);
 const noShowPaid = await fakePay(noShowProposal, users.client.id);
 const noShowJobId = noShowPaid.data?.[0]?.confirmed_job_id;
 assert(!noShowPaid.error && noShowJobId, "Could not create no-show fixture.");
@@ -614,7 +838,10 @@ const noShow = await remoteProvider.rpc("transition_job_status", {
   requested_status: "NO_SHOW",
   transition_reason: "No-show requerido por Journey C",
 });
-assert(!noShow.error && noShow.data === "NO_SHOW", "Journey C no-show transition failed.");
+assert(
+  !noShow.error && noShow.data === "NO_SHOW",
+  "Journey C no-show transition failed.",
+);
 
 const invalidReview = await client.rpc("create_job_review", {
   target_job_id: remoteJobId,
@@ -624,7 +851,10 @@ const invalidReview = await client.rpc("create_job_review", {
   requested_punctuality_rating: null,
   requested_communication_rating: null,
 });
-assert(Boolean(invalidReview.error), "Journey C accepted an invalid review rating.");
+assert(
+  Boolean(invalidReview.error),
+  "Journey C accepted an invalid review rating.",
+);
 
 const expiringOffer = await client.rpc("create_conversation_proposal", {
   target_conversation_id: localConversationId,
@@ -636,12 +866,18 @@ const expiringOffer = await client.rpc("create_conversation_proposal", {
   proposed_deadline_at: null,
   proposal_expires_at: new Date(Date.now() + 60_000).toISOString(),
 });
-assert(!expiringOffer.error && expiringOffer.data, `Could not create expiring proposal: ${expiringOffer.error?.message ?? "unknown"}`);
+assert(
+  !expiringOffer.error && expiringOffer.data,
+  `Could not create expiring proposal: ${expiringOffer.error?.message ?? "unknown"}`,
+);
 result = await service
   .from("proposals")
   .update({ expires_at: new Date(Date.now() - 60_000).toISOString() })
   .eq("id", expiringOffer.data);
-assert(!result.error, `Could not force proposal expiry: ${result.error?.message ?? "unknown"}`);
+assert(
+  !result.error,
+  `Could not force proposal expiry: ${result.error?.message ?? "unknown"}`,
+);
 const expiredRevision = await client.rpc("revise_conversation_proposal", {
   target_proposal_id: expiringOffer.data,
   requested_kind: "CLIENT_OFFER",
@@ -652,43 +888,74 @@ const expiredRevision = await client.rpc("revise_conversation_proposal", {
   proposed_deadline_at: null,
   proposal_expires_at: null,
 });
-assert(!expiredRevision.error && expiredRevision.data === null, "Journey C expired proposal was reopened.");
-const expiredRow = await service.from("proposals").select("status").eq("id", expiringOffer.data).single();
-assert(!expiredRow.error && expiredRow.data?.status === "EXPIRED", "Journey C expiry was not persisted.");
+assert(
+  !expiredRevision.error && expiredRevision.data === null,
+  "Journey C expired proposal was reopened.",
+);
+const expiredRow = await service
+  .from("proposals")
+  .select("status")
+  .eq("id", expiringOffer.data)
+  .single();
+assert(
+  !expiredRow.error && expiredRow.data?.status === "EXPIRED",
+  "Journey C expiry was not persisted.",
+);
 
 const suspended = await admin.rpc("admin_set_account_restriction", {
   target_user_id: users.localProvider.id,
   requested_kind: "SUSPENDED",
   requested_reason: "Phase 10 suspension failure matrix",
 });
-assert(!suspended.error && suspended.data, `Journey C suspension failed: ${suspended.error?.message ?? "unknown"}`);
+assert(
+  !suspended.error && suspended.data,
+  `Journey C suspension failed: ${suspended.error?.message ?? "unknown"}`,
+);
 const suspendedWrite = await localProvider
   .from("services")
   .update({ title: "Cambio no autorizado durante suspensión" })
   .eq("id", localServiceId);
-assert(Boolean(suspendedWrite.error), "Journey C suspended provider can mutate marketplace data.");
+assert(
+  Boolean(suspendedWrite.error),
+  "Journey C suspended provider can mutate marketplace data.",
+);
 const restored = await admin.rpc("admin_restore_account", {
   target_user_id: users.localProvider.id,
   requested_reason: "Phase 10 suspension fixture restored",
 });
-assert(!restored.error, `Journey C restore failed: ${restored.error?.message ?? "unknown"}`);
+assert(
+  !restored.error,
+  `Journey C restore failed: ${restored.error?.message ?? "unknown"}`,
+);
 step("Journey C PASS");
 
 // Final runtime invariants: fake money only and no exact-address retention after completion.
-const remoteAttempts = await service.from("payment_attempts").select("provider_name").eq("proposal_id", remoteProposalId);
+const remoteAttempts = await service
+  .from("payment_attempts")
+  .select("provider_name")
+  .eq("proposal_id", remoteProposalId);
 assert(
-  !remoteAttempts.error && remoteAttempts.data?.every((attempt) => attempt.provider_name === "FAKE"),
+  !remoteAttempts.error &&
+    remoteAttempts.data?.every((attempt) => attempt.provider_name === "FAKE"),
   "Phase 10 runtime crossed the fake-payment boundary.",
 );
-const localAfterCompletion = await localProvider.rpc("get_job_detail", { target_job_id: localJobId });
+const localAfterCompletion = await localProvider.rpc("get_job_detail", {
+  target_job_id: localJobId,
+});
 assert(
-  !localAfterCompletion.error && localAfterCompletion.data?.[0]?.exact_address === null,
+  !localAfterCompletion.error &&
+    localAfterCompletion.data?.[0]?.exact_address === null,
   "Exact address remained visible to provider after Journey B completion.",
 );
 
 // Keep local DB disposable, but explicitly remove uploaded objects so repeated manual runs do not accumulate blobs.
 await service.storage.from("conversation-attachments").remove([photoPath]);
-await service.storage.from("identity-documents").remove([remoteDocumentPath, localDocumentPath]);
+await service.storage
+  .from("identity-documents")
+  .remove([remoteDocumentPath, localDocumentPath]);
 
-assert(remoteServiceId && localServiceId, "Phase 10 service fixtures disappeared unexpectedly.");
+assert(
+  remoteServiceId && localServiceId,
+  "Phase 10 service fixtures disappeared unexpectedly.",
+);
 console.log("Phase 10 beta runtime Journeys A + B + C: PASS");

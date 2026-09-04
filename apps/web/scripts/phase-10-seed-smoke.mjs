@@ -3,7 +3,9 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.API_URL;
 const anonKey = process.env.ANON_KEY;
 if (!supabaseUrl || !anonKey) {
-  throw new Error("API_URL and ANON_KEY are required for Phase 10 seed smoke checks.");
+  throw new Error(
+    "API_URL and ANON_KEY are required for Phase 10 seed smoke checks.",
+  );
 }
 
 const client = createClient(supabaseUrl, anonKey, {
