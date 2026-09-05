@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { ProviderPaymentAccount } from "@/components/payments/provider-payment-account";
 import { MarketplaceManagement } from "@/components/provider/marketplace-management";
+import { getProviderPaymentAccountState } from "@/lib/payments/server";
 import { createClient } from "@/lib/supabase/server";
 
 import {
@@ -29,7 +31,15 @@ import { saveServiceTransactional } from "../../service-actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProviderMarketplaceManagePage() {
+type ProviderManagePageProps = {
+  searchParams?: Promise<{
+    payment_account?: string | string[];
+  }>;
+};
+
+export default async function ProviderMarketplaceManagePage({
+  searchParams = Promise.resolve({}),
+}: ProviderManagePageProps = {}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -147,6 +157,16 @@ export default async function ProviderMarketplaceManagePage() {
     );
   }
 
+  const [paymentAccount, resolvedSearchParams] = await Promise.all([
+    getProviderPaymentAccountState(),
+    searchParams,
+  ]);
+  const paymentParam = resolvedSearchParams.payment_account;
+  const paymentFeedback =
+    paymentParam === "connected" || paymentParam === "oauth_error"
+      ? paymentParam
+      : null;
+
   const categoryNames = new Map(
     (categories ?? []).map((category) => [category.id, category.name]),
   );
@@ -201,6 +221,13 @@ export default async function ProviderMarketplaceManagePage() {
             Ver perfil público ↗
           </Link>
         </div>
+      </div>
+
+      <div className="mt-10">
+        <ProviderPaymentAccount
+          account={paymentAccount}
+          feedback={paymentFeedback}
+        />
       </div>
 
       <div className="mt-10">
