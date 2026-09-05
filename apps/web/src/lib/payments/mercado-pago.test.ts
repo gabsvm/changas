@@ -12,7 +12,10 @@ const jsonResponse = (body: unknown, status = 200) =>
   });
 
 const createFetchQueue = (...responses: Response[]) => {
-  const requests: Array<{ input: RequestInfo | URL; init?: RequestInit }> = [];
+  const requests: Array<{
+    input: RequestInfo | URL;
+    init: RequestInit | undefined;
+  }> = [];
   let index = 0;
   const fetchImpl: typeof fetch = async (input, init) => {
     requests.push({ input, init });
