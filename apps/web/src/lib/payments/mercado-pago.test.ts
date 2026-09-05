@@ -65,8 +65,11 @@ describe("Phase 11 Mercado Pago provider adapter", () => {
     expect(String(queue.requests[0]?.input)).not.toContain(
       "phase11-client-secret",
     );
-    const body = JSON.parse(String(queue.requests[0]?.init?.body));
-    expect(body).toMatchObject({
+    expect(queue.requests[0]?.init?.headers).toMatchObject({
+      "Content-Type": "application/x-www-form-urlencoded",
+    });
+    const body = new URLSearchParams(String(queue.requests[0]?.init?.body));
+    expect(Object.fromEntries(body)).toMatchObject({
       client_id: "phase11-client-id",
       client_secret: "phase11-client-secret",
       code: "authorization-code-1",
@@ -93,8 +96,8 @@ describe("Phase 11 Mercado Pago provider adapter", () => {
     });
 
     expect(result.refreshToken).toBe("TG-refresh-2-rotated");
-    const body = JSON.parse(String(queue.requests[0]?.init?.body));
-    expect(body).toMatchObject({
+    const body = new URLSearchParams(String(queue.requests[0]?.init?.body));
+    expect(Object.fromEntries(body)).toMatchObject({
       client_id: "phase11-client-id",
       client_secret: "phase11-client-secret",
       grant_type: "refresh_token",
