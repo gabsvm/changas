@@ -43,7 +43,9 @@ describe("Phase 11 payment server environment", () => {
     "CHANGAS_MARKETPLACE_FEE_BPS",
     "MERCADO_PAGO_MODE",
   ])("rejects missing %s", (name) => {
-    expect(() => parsePaymentServerEnv(validEnv({ [name]: undefined }))).toThrow();
+    expect(() =>
+      parsePaymentServerEnv(validEnv({ [name]: undefined })),
+    ).toThrow();
   });
 
   it("requires the token encryption key to decode to exactly 32 bytes", () => {
@@ -71,11 +73,15 @@ describe("Phase 11 payment server environment", () => {
   it("requires an independent OAuth state secret with at least 32 decoded bytes", () => {
     expect(() =>
       parsePaymentServerEnv(
-        validEnv({ PAYMENT_OAUTH_STATE_SECRET: Buffer.alloc(31).toString("base64") }),
+        validEnv({
+          PAYMENT_OAUTH_STATE_SECRET: Buffer.alloc(31).toString("base64"),
+        }),
       ),
     ).toThrow();
     expect(() =>
-      parsePaymentServerEnv(validEnv({ PAYMENT_OAUTH_STATE_SECRET: "not-base64!!!" })),
+      parsePaymentServerEnv(
+        validEnv({ PAYMENT_OAUTH_STATE_SECRET: "not-base64!!!" }),
+      ),
     ).toThrow();
   });
 
@@ -102,9 +108,9 @@ describe("Phase 11 payment server environment", () => {
   );
 
   it("accepts live mode syntactically but rejects unknown provider modes", () => {
-    expect(parsePaymentServerEnv(validEnv({ MERCADO_PAGO_MODE: "live" })).providerMode).toBe(
-      "live",
-    );
+    expect(
+      parsePaymentServerEnv(validEnv({ MERCADO_PAGO_MODE: "live" })).providerMode,
+    ).toBe("live");
     expect(() =>
       parsePaymentServerEnv(validEnv({ MERCADO_PAGO_MODE: "sandbox" })),
     ).toThrow();

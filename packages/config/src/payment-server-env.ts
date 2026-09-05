@@ -22,7 +22,11 @@ function requireValue(source: PaymentServerEnvSource, name: string): string {
 }
 
 function decodeCanonicalBase64(value: string, label: string): Buffer {
-  if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value)) {
+  if (
+    !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(
+      value,
+    )
+  ) {
     throw new Error(`${label} must be canonical base64.`);
   }
 
@@ -41,17 +45,25 @@ function parseSafeInteger(value: string, label: string): number {
   return parsed;
 }
 
-export function parsePaymentServerEnv(source: PaymentServerEnvSource): PaymentServerEnv {
+export function parsePaymentServerEnv(
+  source: PaymentServerEnvSource,
+): PaymentServerEnv {
   const clientId = requireValue(source, "MERCADO_PAGO_CLIENT_ID");
   const clientSecret = requireValue(source, "MERCADO_PAGO_CLIENT_SECRET");
   const webhookSecret = requireValue(source, "MERCADO_PAGO_WEBHOOK_SECRET");
-  const tokenEncryptionKey = requireValue(source, "PAYMENT_TOKEN_ENCRYPTION_KEY_V1");
+  const tokenEncryptionKey = requireValue(
+    source,
+    "PAYMENT_TOKEN_ENCRYPTION_KEY_V1",
+  );
   const tokenEncryptionKeyVersionValue = requireValue(
     source,
     "PAYMENT_TOKEN_ENCRYPTION_KEY_VERSION",
   );
   const oauthStateSecret = requireValue(source, "PAYMENT_OAUTH_STATE_SECRET");
-  const marketplaceFeeBpsValue = requireValue(source, "CHANGAS_MARKETPLACE_FEE_BPS");
+  const marketplaceFeeBpsValue = requireValue(
+    source,
+    "CHANGAS_MARKETPLACE_FEE_BPS",
+  );
   const providerModeValue = requireValue(source, "MERCADO_PAGO_MODE");
 
   const tokenKeyBytes = decodeCanonicalBase64(
@@ -59,7 +71,9 @@ export function parsePaymentServerEnv(source: PaymentServerEnvSource): PaymentSe
     "PAYMENT_TOKEN_ENCRYPTION_KEY_V1",
   );
   if (tokenKeyBytes.length !== 32) {
-    throw new Error("PAYMENT_TOKEN_ENCRYPTION_KEY_V1 must decode to exactly 32 bytes.");
+    throw new Error(
+      "PAYMENT_TOKEN_ENCRYPTION_KEY_V1 must decode to exactly 32 bytes.",
+    );
   }
 
   const oauthStateSecretBytes = decodeCanonicalBase64(
@@ -67,7 +81,9 @@ export function parsePaymentServerEnv(source: PaymentServerEnvSource): PaymentSe
     "PAYMENT_OAUTH_STATE_SECRET",
   );
   if (oauthStateSecretBytes.length < 32) {
-    throw new Error("PAYMENT_OAUTH_STATE_SECRET must decode to at least 32 bytes.");
+    throw new Error(
+      "PAYMENT_OAUTH_STATE_SECRET must decode to at least 32 bytes.",
+    );
   }
 
   const tokenEncryptionKeyVersion = parseSafeInteger(
