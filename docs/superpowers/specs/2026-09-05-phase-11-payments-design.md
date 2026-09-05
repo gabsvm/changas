@@ -49,8 +49,13 @@ Recommended conceptual interface:
 
 ```ts
 export interface MarketplacePaymentProvider {
-  createCheckoutSession(input: CreateCheckoutSessionInput): Promise<CheckoutSession>;
-  fetchPayment(paymentId: string, sellerAccount: SellerPaymentAccount): Promise<ProviderPaymentSnapshot>;
+  createCheckoutSession(
+    input: CreateCheckoutSessionInput,
+  ): Promise<CheckoutSession>;
+  fetchPayment(
+    paymentId: string,
+    sellerAccount: SellerPaymentAccount,
+  ): Promise<ProviderPaymentSnapshot>;
   refund(input: RefundRequest): Promise<ProviderRefundSnapshot>;
   verifyWebhook(input: ProviderWebhookInput): Promise<VerifiedProviderEvent>;
 }

@@ -18,7 +18,9 @@ export function calculateMarketplaceFeeMinor(
 ): number {
   assertPositiveSafeInteger(grossMinor, "Gross amount");
   if (!Number.isInteger(feeBps) || feeBps < 0 || feeBps > 10_000) {
-    throw new Error("Marketplace fee basis points must be an integer between 0 and 10000.");
+    throw new Error(
+      "Marketplace fee basis points must be an integer between 0 and 10000.",
+    );
   }
 
   return Number((BigInt(grossMinor) * BigInt(feeBps)) / 10_000n);
@@ -49,7 +51,10 @@ export function assertValidRefundAmount(
     throw new Error("Already-refunded amount cannot exceed original amount.");
   }
 
-  if (BigInt(alreadyRefundedMinor) + BigInt(requestedMinor) > BigInt(originalMinor)) {
+  if (
+    BigInt(alreadyRefundedMinor) + BigInt(requestedMinor) >
+    BigInt(originalMinor)
+  ) {
     throw new Error("Requested refund exceeds remaining refundable amount.");
   }
 }

@@ -18,7 +18,9 @@ describe("Phase 11 financial rules", () => {
   it("rejects invalid fee inputs and unsafe monetary values", () => {
     expect(() => calculateMarketplaceFeeMinor(0, 1_000)).toThrow();
     expect(() => calculateMarketplaceFeeMinor(-1, 1_000)).toThrow();
-    expect(() => calculateMarketplaceFeeMinor(Number.MAX_SAFE_INTEGER + 1, 1_000)).toThrow();
+    expect(() =>
+      calculateMarketplaceFeeMinor(Number.MAX_SAFE_INTEGER + 1, 1_000),
+    ).toThrow();
     expect(() => calculateMarketplaceFeeMinor(10_000, -1)).toThrow();
     expect(() => calculateMarketplaceFeeMinor(10_000, 10_001)).toThrow();
     expect(() => calculateMarketplaceFeeMinor(10_000, 100.5)).toThrow();
@@ -50,7 +52,10 @@ describe("Phase 11 financial rules", () => {
     ["SUCCEEDED", "PENDING", false],
     ["FAILED", "PENDING", false],
     ["REFUNDED", "SUCCEEDED", false],
-  ])("allows only monotonic payment transition %s -> %s = %s", (from, to, expected) => {
-    expect(canTransitionPaymentStatus(from, to)).toBe(expected);
-  });
+  ])(
+    "allows only monotonic payment transition %s -> %s = %s",
+    (from, to, expected) => {
+      expect(canTransitionPaymentStatus(from, to)).toBe(expected);
+    },
+  );
 });

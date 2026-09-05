@@ -31,6 +31,7 @@
 ## File Structure
 
 ### Domain and configuration
+
 - Modify `packages/domain/src/payments.ts` — marketplace-facing payment protocol types/status normalization contracts while retaining fake provider.
 - Create `packages/domain/src/payment-finance.ts` — pure commission/refund/monotonic-state helpers.
 - Create `packages/domain/src/payment-finance.test.ts` — pure financial behavior tests.
@@ -39,6 +40,7 @@
 - Modify `.env.example` — names only, no secrets.
 
 ### Web payment subsystem
+
 - Create `apps/web/src/lib/payments/types.ts` — provider-neutral checkout/event/refund DTOs.
 - Create `apps/web/src/lib/payments/crypto.ts` — AES-256-GCM token encryption/decryption.
 - Create `apps/web/src/lib/payments/crypto.test.ts`.
@@ -50,6 +52,7 @@
 - Create `apps/web/src/lib/payments/server.test.ts`.
 
 ### Routes/UI
+
 - Create `apps/web/src/app/api/payments/mercado-pago/oauth/start/route.ts`.
 - Create `apps/web/src/app/api/payments/mercado-pago/oauth/callback/route.ts`.
 - Create `apps/web/src/app/api/payments/mercado-pago/webhook/route.ts`.
@@ -62,6 +65,7 @@
 - Modify `apps/web/src/app/admin/layout.tsx` — admin navigation entry if existing pattern requires it.
 
 ### Database
+
 - Create `supabase/migrations/20260905xxxx00_phase_11_payment_accounts_checkout.sql`.
 - Create `supabase/migrations/20260905xxxx10_phase_11_payment_events_ledger.sql`.
 - Create `supabase/migrations/20260905xxxx20_phase_11_payment_reconciliation.sql`.
@@ -71,6 +75,7 @@
 - Create `supabase/tests/phase-11-refunds-ledger.sql`.
 
 ### Runtime/E2E/docs
+
 - Create `apps/web/scripts/phase-11-payments-runtime.mjs`.
 - Create `tests/e2e/phase-11-payments.spec.ts`.
 - Modify `.github/workflows/ci.yml` — add Phase 11 runtime gate after schema is available.
@@ -81,11 +86,13 @@
 ### Task 1: Pure financial rules and monotonic state helpers
 
 **Files:**
+
 - Create: `packages/domain/src/payment-finance.ts`
 - Create: `packages/domain/src/payment-finance.test.ts`
 - Modify: `packages/domain/src/index.ts`
 
 **Interfaces:**
+
 - Produces: `calculateMarketplaceFeeMinor(grossMinor: number, feeBps: number): number`
 - Produces: `calculateProviderExpectedNetMinor(grossMinor: number, marketplaceFeeMinor: number): number`
 - Produces: `assertValidRefundAmount(originalMinor: number, alreadyRefundedMinor: number, requestedMinor: number): void`
@@ -101,11 +108,13 @@
 ### Task 2: Server payment configuration contract
 
 **Files:**
+
 - Modify: `packages/config/src/server.ts`
 - Modify: `.env.example`
 - Test: create `packages/config/src/server.test.ts` if package test discovery supports it; otherwise cover via existing config consumers in web tests.
 
 **Interfaces:**
+
 - Produces: `getPaymentServerEnv()` returning validated `clientId`, `clientSecret`, `webhookSecret`, `tokenEncryptionKey`, `tokenEncryptionKeyVersion`, `marketplaceFeeBps`, `providerMode`.
 
 - [ ] **Step 1: Write failing tests** for missing secrets, invalid 32-byte encryption key material, invalid fee BPS (<0 or >10000), invalid key version, and test/live provider mode parsing.
@@ -117,12 +126,14 @@
 ### Task 3: Token encryption and OAuth state security
 
 **Files:**
+
 - Create: `apps/web/src/lib/payments/crypto.ts`
 - Create: `apps/web/src/lib/payments/crypto.test.ts`
 - Create: `apps/web/src/lib/payments/oauth-state.ts`
 - Create: `apps/web/src/lib/payments/oauth-state.test.ts`
 
 **Interfaces:**
+
 - Produces: `encryptPaymentToken(plaintext, key, keyVersion)` -> ciphertext envelope `{ciphertext, iv, authTag, keyVersion}`.
 - Produces: `decryptPaymentToken(envelope, key)`.
 - Produces: `createOAuthState({providerUserId, returnPath}, secret, now)`.
@@ -136,11 +147,13 @@
 ### Task 4: Phase 11 database schema, RLS, and immutable ledger
 
 **Files:**
+
 - Create: `supabase/migrations/20260905xxxx00_phase_11_payment_accounts_checkout.sql`
 - Create: `supabase/migrations/20260905xxxx10_phase_11_payment_events_ledger.sql`
 - Create: `supabase/tests/phase-11-payments-schema.sql`
 
 **Interfaces:**
+
 - Produces tables: `payment_provider_accounts`, `payment_checkout_sessions`, `payment_provider_events`, `financial_ledger_entries`.
 - Produces safe read RPC/view for providers to read only connection state/non-sensitive references.
 - Produces service-role-only insert/update functions for sensitive payment account/token data and event/ledger mutation.
@@ -153,10 +166,12 @@
 ### Task 5: Authoritative payment reconciliation RPC
 
 **Files:**
+
 - Create: `supabase/migrations/20260905xxxx20_phase_11_payment_reconciliation.sql`
 - Create: `supabase/tests/phase-11-payment-reconciliation.sql`
 
 **Interfaces:**
+
 - Produces `public.reconcile_provider_payment(target_checkout_session_id uuid, provider_payment_reference text, provider_status public.payment_status, provider_amount_minor bigint, provider_currency_code text, provider_account_reference text, provider_event_key text)` returning payment attempt / resulting proposal or scope-change state / job ID.
 - Derives client/provider/amount/currency from durable checkout/session rows; caller does not supply actor authority.
 
@@ -169,11 +184,13 @@
 ### Task 6: Mercado Pago provider adapter
 
 **Files:**
+
 - Create: `apps/web/src/lib/payments/types.ts`
 - Create: `apps/web/src/lib/payments/mercado-pago.ts`
 - Create: `apps/web/src/lib/payments/mercado-pago.test.ts`
 
 **Interfaces:**
+
 - Produces `MercadoPagoPaymentProvider` methods: `exchangeOAuthCode`, `refreshOAuthToken`, `createCheckoutSession`, `fetchPayment`, `refund`, `verifyWebhook`.
 - Uses injectable `fetch` for tests; production default is global server fetch.
 
@@ -185,6 +202,7 @@
 ### Task 7: Seller OAuth connection flow
 
 **Files:**
+
 - Create: `apps/web/src/lib/payments/server.ts`
 - Create: `apps/web/src/lib/payments/server.test.ts`
 - Create: `apps/web/src/app/api/payments/mercado-pago/oauth/start/route.ts`
@@ -193,6 +211,7 @@
 - Modify: `apps/web/src/app/(provider)/provider/manage/page.tsx`
 
 **Interfaces:**
+
 - Produces provider action/read methods `getProviderPaymentAccountState()`, `buildMercadoPagoOAuthRedirect()`, `completeMercadoPagoOAuthCallback()`.
 
 - [ ] **Step 1: RED server/route tests** for authenticated provider requirement, state binding, tampered/expired state rejection, code exchange, encrypted token persistence, refresh-token replacement, disconnected/re-auth state, and no token material in returned UI state.
@@ -203,6 +222,7 @@
 ### Task 8: Real checkout creation and redirect-only return pages
 
 **Files:**
+
 - Extend: `apps/web/src/lib/payments/server.ts`
 - Extend test: `apps/web/src/lib/payments/server.test.ts`
 - Modify payment trigger paths in proposal/job actions where current fake payment is user-invoked.
@@ -211,6 +231,7 @@
 - Create: `apps/web/src/app/payments/return/failure/page.tsx`
 
 **Interfaces:**
+
 - Produces `createProposalCheckout(proposalId, requestNonce)` and `createScopeChangeCheckout(scopeChangeId, requestNonce)` returning checkout URL/session ID.
 
 - [ ] **Step 1: RED tests** proving amount/currency come from accepted durable snapshot, seller must be connected, commission uses Task 1 helpers, nonce replay reuses local session, and return pages have zero calls capable of financial mutation.
@@ -222,11 +243,13 @@
 ### Task 9: Signed webhook endpoint and authoritative reconciliation
 
 **Files:**
+
 - Create: `apps/web/src/app/api/payments/mercado-pago/webhook/route.ts`
 - Extend: `apps/web/src/lib/payments/server.ts`
 - Extend: `apps/web/src/lib/payments/server.test.ts`
 
 **Interfaces:**
+
 - Produces `processMercadoPagoWebhook(requestMetadata)` which verifies signature, persists receipt idempotently, refetches payment with correct seller context, validates snapshot, invokes `reconcile_provider_payment`, and records processing status.
 
 - [ ] **Step 1: RED tests** for invalid signature no-mutation, duplicate delivery safety, seller-context lookup, authoritative provider fetch, wrong amount/currency/seller rejection, approved success, pending, rejected failure, and replay safety.
@@ -237,12 +260,14 @@
 ### Task 10: Refunds, settlement snapshots, and reconciliation runs
 
 **Files:**
+
 - Create: `supabase/migrations/20260905xxxx30_phase_11_refunds_settlements.sql`
 - Create: `supabase/tests/phase-11-refunds-ledger.sql`
 - Extend: `apps/web/src/lib/payments/server.ts`
 - Extend: `apps/web/src/lib/payments/server.test.ts`
 
 **Interfaces:**
+
 - Produces tables `payment_refunds`, `payment_settlements`, `payment_reconciliation_runs`.
 - Produces server methods `requestPaymentRefund`, `reconcileRefund`, `runPaymentReconciliation`.
 
@@ -254,12 +279,14 @@
 ### Task 11: Admin visibility and reconciliation UX
 
 **Files:**
+
 - Create: `apps/web/src/app/admin/payments/page.tsx`
 - Modify: `apps/web/src/app/admin/layout.tsx`
 - Extend: `apps/web/src/lib/payments/server.ts`
 - Test: `apps/web/src/lib/payments/server.test.ts` and `tests/e2e/phase-11-payments.spec.ts`
 
 **Interfaces:**
+
 - Admin read model shows local/provider status, gross, marketplace fee, provider net/fee when known, refund state, provider references, mismatch flag, last reconciliation timestamp.
 
 - [ ] **Step 1: RED unit/E2E tests** proving non-admin denial, admin safe fields, no credential/token leakage, mismatch visibility, and reconciliation action RBAC.
@@ -270,12 +297,14 @@
 ### Task 12: Phase 11 runtime gate, CI, and report
 
 **Files:**
+
 - Create: `apps/web/scripts/phase-11-payments-runtime.mjs`
 - Create: `tests/e2e/phase-11-payments.spec.ts` (extend if created earlier)
 - Modify: `.github/workflows/ci.yml`
 - Create: `docs/reports/phase-11-payments.md`
 
 **Interfaces:**
+
 - Runtime gate proves fake provider remains green plus mocked/approved provider lifecycle: checkout, signed webhook, duplicate event, pending->success/failure, redirect spoof, additional charge, full/partial refund, ledger, reconciliation/admin visibility.
 
 - [ ] **Step 1: RED runtime test** added to CI before implementation wiring, expecting failure until Phase 11 behavior exists.
@@ -290,6 +319,7 @@
 ## Self-Review
 
 ### Spec coverage
+
 - Provider choice/adapter: Tasks 6-9.
 - Payment creation: Task 8.
 - Webhook validation/persistence/idempotency: Tasks 4, 6, 9.
@@ -307,7 +337,9 @@
 - No production secrets: Tasks 2, 12.
 
 ### Placeholder scan
+
 No `TBD`, `TODO`, `implement later`, or undefined behavioral steps remain. Timestamp suffixes in migration filenames are intentionally represented as `xxxx` only in this planning document; implementation must choose unique monotonic `20260905HHMMSS` timestamps before creating files.
 
 ### Type consistency
+
 The plan uses one provider-neutral orchestration boundary, one Mercado Pago adapter, integer `amountMinor`/`feeBps`, durable checkout IDs, and service-role reconciliation throughout. Redirect pages never own financial mutation authority.
