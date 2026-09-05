@@ -224,8 +224,8 @@ export class MercadoPagoPaymentProvider {
       `${MERCADO_PAGO_API}/oauth/token`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(body).toString(),
       },
       "AUTH_REQUIRED",
     );
