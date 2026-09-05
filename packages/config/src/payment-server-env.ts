@@ -16,7 +16,9 @@ type PaymentServerEnvSource = Record<string, string | undefined>;
 function requireValue(source: PaymentServerEnvSource, name: string): string {
   const value = source[name]?.trim();
   if (!value) {
-    throw new Error(`Missing required payment server environment variable: ${name}`);
+    throw new Error(
+      `Missing required payment server environment variable: ${name}`,
+    );
   }
   return value;
 }

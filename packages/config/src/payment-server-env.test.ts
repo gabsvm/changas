@@ -109,7 +109,8 @@ describe("Phase 11 payment server environment", () => {
 
   it("accepts live mode syntactically but rejects unknown provider modes", () => {
     expect(
-      parsePaymentServerEnv(validEnv({ MERCADO_PAGO_MODE: "live" })).providerMode,
+      parsePaymentServerEnv(validEnv({ MERCADO_PAGO_MODE: "live" }))
+        .providerMode,
     ).toBe("live");
     expect(() =>
       parsePaymentServerEnv(validEnv({ MERCADO_PAGO_MODE: "sandbox" })),
