@@ -196,7 +196,9 @@ export class MercadoPagoPaymentProvider {
     this.fetchImpl = options.fetchImpl ?? fetch;
   }
 
-  async exchangeOAuthCode(input: OAuthExchangeInput): Promise<OAuthCredentials> {
+  async exchangeOAuthCode(
+    input: OAuthExchangeInput,
+  ): Promise<OAuthCredentials> {
     return this.exchangeOAuthToken({
       client_id: this.clientId,
       client_secret: this.clientSecret,
@@ -459,8 +461,7 @@ export class MercadoPagoPaymentProvider {
 
     const manifestParts: string[] = [];
     if (input.dataId) manifestParts.push(`id:${input.dataId}`);
-    if (input.xRequestId)
-      manifestParts.push(`request-id:${input.xRequestId}`);
+    if (input.xRequestId) manifestParts.push(`request-id:${input.xRequestId}`);
     manifestParts.push(`ts:${timestamp}`);
     const manifest = `${manifestParts.join(";")};`;
 
@@ -470,8 +471,7 @@ export class MercadoPagoPaymentProvider {
     const expected = Buffer.from(expectedHash, "hex");
     const received = Buffer.from(providedHash, "hex");
     return (
-      expected.length === received.length &&
-      timingSafeEqual(expected, received)
+      expected.length === received.length && timingSafeEqual(expected, received)
     );
   }
 
