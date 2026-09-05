@@ -1,8 +1,5 @@
 export type ProviderPaymentStatus =
-  | "PENDING"
-  | "SUCCEEDED"
-  | "FAILED"
-  | "REFUNDED";
+  "PENDING" | "SUCCEEDED" | "FAILED" | "REFUNDED";
 
 export type PaymentProviderErrorCode =
   | "AUTH_REQUIRED"

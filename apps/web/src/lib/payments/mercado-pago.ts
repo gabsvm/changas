@@ -23,7 +23,10 @@ export class MercadoPagoProviderError extends Error {
     message: string,
     options: { httpStatus?: number; cause?: unknown } = {},
   ) {
-    super(message, options.cause === undefined ? undefined : { cause: options.cause });
+    super(
+      message,
+      options.cause === undefined ? undefined : { cause: options.cause },
+    );
     this.name = "MercadoPagoProviderError";
     this.code = code;
     this.httpStatus = options.httpStatus;
@@ -234,7 +237,10 @@ export class MercadoPagoPaymentProvider {
 
     const accessToken = requireString(payload.access_token, "access_token");
     const refreshToken = requireString(payload.refresh_token, "refresh_token");
-    const expiresInSeconds = requireFiniteNumber(payload.expires_in, "expires_in");
+    const expiresInSeconds = requireFiniteNumber(
+      payload.expires_in,
+      "expires_in",
+    );
     if (!Number.isSafeInteger(expiresInSeconds) || expiresInSeconds <= 0) {
       throw new MercadoPagoProviderError(
         "INVALID_PROVIDER_STATE",
@@ -246,7 +252,10 @@ export class MercadoPagoPaymentProvider {
       accessToken,
       refreshToken,
       expiresInSeconds,
-      providerAccountReference: requireProviderReference(payload.user_id, "user_id"),
+      providerAccountReference: requireProviderReference(
+        payload.user_id,
+        "user_id",
+      ),
       scope: getOptionalString(payload.scope),
     };
   }
@@ -256,7 +265,10 @@ export class MercadoPagoPaymentProvider {
   ): Promise<CheckoutSessionResult> {
     assertMinorAmount(input.amountMinor, "amountMinor");
     assertMinorAmount(input.marketplaceFeeMinor, "marketplaceFeeMinor");
-    if (input.amountMinor <= 0 || input.marketplaceFeeMinor > input.amountMinor) {
+    if (
+      input.amountMinor <= 0 ||
+      input.marketplaceFeeMinor > input.amountMinor
+    ) {
       throw new MercadoPagoProviderError(
         "INTERNAL_ERROR",
         "Checkout economics are invalid",
@@ -338,7 +350,10 @@ export class MercadoPagoPaymentProvider {
           "Mercado Pago transaction_details is malformed",
         );
       }
-      if (transactionDetails.net_received_amount !== null && transactionDetails.net_received_amount !== undefined) {
+      if (
+        transactionDetails.net_received_amount !== null &&
+        transactionDetails.net_received_amount !== undefined
+      ) {
         providerNetReceivedMinor = providerMajorToMinor(
           transactionDetails.net_received_amount,
           "transaction_details.net_received_amount",
@@ -351,7 +366,10 @@ export class MercadoPagoPaymentProvider {
       status: normalizePaymentStatus(rawStatus),
       rawStatus,
       statusDetail: getOptionalString(payload.status_detail),
-      amountMinor: providerMajorToMinor(payload.transaction_amount, "transaction_amount"),
+      amountMinor: providerMajorToMinor(
+        payload.transaction_amount,
+        "transaction_amount",
+      ),
       refundedAmountMinor: providerMajorToMinor(
         payload.transaction_amount_refunded ?? 0,
         "transaction_amount_refunded",
@@ -392,7 +410,9 @@ export class MercadoPagoPaymentProvider {
     }
 
     const payload = await this.requestJson(
-      `${MERCADO_PAGO_API}/v1/payments/${encodeURIComponent(input.paymentId)}/refunds`,
+      `${MERCADO_PAGO_API}/v1/payments/${encodeURIComponent(
+        input.paymentId,
+      )}/refunds`,
       init,
       "REFUND_REJECTED",
     );
@@ -429,13 +449,18 @@ export class MercadoPagoPaymentProvider {
 
     const timestamp = parts.get("ts");
     const providedHash = parts.get("v1");
-    if (!timestamp || !providedHash || !/^[a-fA-F0-9]{64}$/.test(providedHash)) {
+    if (
+      !timestamp ||
+      !providedHash ||
+      !/^[a-fA-F0-9]{64}$/.test(providedHash)
+    ) {
       return false;
     }
 
     const manifestParts: string[] = [];
     if (input.dataId) manifestParts.push(`id:${input.dataId}`);
-    if (input.xRequestId) manifestParts.push(`request-id:${input.xRequestId}`);
+    if (input.xRequestId)
+      manifestParts.push(`request-id:${input.xRequestId}`);
     manifestParts.push(`ts:${timestamp}`);
     const manifest = `${manifestParts.join(";")};`;
 
@@ -444,7 +469,10 @@ export class MercadoPagoPaymentProvider {
       .digest("hex");
     const expected = Buffer.from(expectedHash, "hex");
     const received = Buffer.from(providedHash, "hex");
-    return expected.length === received.length && timingSafeEqual(expected, received);
+    return (
+      expected.length === received.length &&
+      timingSafeEqual(expected, received)
+    );
   }
 
   private async requestJson(
