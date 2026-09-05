@@ -48,7 +48,10 @@ export function ProviderPaymentAccount({
       </div>
 
       {feedback === "connected" ? (
-        <p className="bg-moss/10 text-moss mt-5 rounded-xl px-4 py-3 text-sm" role="status">
+        <p
+          className="bg-moss/10 text-moss mt-5 rounded-xl px-4 py-3 text-sm"
+          role="status"
+        >
           Cuenta de Mercado Pago vinculada correctamente.
         </p>
       ) : null}

@@ -21,10 +21,7 @@ const OAUTH_CALLBACK_PATH = "/api/payments/mercado-pago/oauth/callback";
 const PROVIDER_RETURN_PATH = "/provider/manage";
 
 type PaymentProviderAccountStatus =
-  | "CONNECTED"
-  | "REAUTH_REQUIRED"
-  | "DISCONNECTED"
-  | "SUSPENDED";
+  "CONNECTED" | "REAUTH_REQUIRED" | "DISCONNECTED" | "SUSPENDED";
 
 export type ProviderPaymentAccountState = {
   providerName: typeof MERCADO_PAGO_PROVIDER;
@@ -86,10 +83,7 @@ type RpcResult = {
 };
 
 type RpcClient = {
-  rpc: (
-    name: string,
-    args?: Record<string, unknown>,
-  ) => PromiseLike<RpcResult>;
+  rpc: (name: string, args?: Record<string, unknown>) => PromiseLike<RpcResult>;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
