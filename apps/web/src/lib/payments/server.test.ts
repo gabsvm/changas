@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 import { decryptPaymentToken } from "./crypto";
 import { createOAuthState, verifyOAuthState } from "./oauth-state";
 import { createPaymentServer, PaymentServerError } from "./server";
