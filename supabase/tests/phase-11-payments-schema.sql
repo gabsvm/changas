@@ -1,6 +1,6 @@
 begin;
 
-select plan(23);
+select plan(25);
 
 select has_table('public', 'payment_provider_accounts', 'payment provider accounts table exists');
 select has_table('public', 'payment_checkout_sessions', 'payment checkout sessions table exists');
