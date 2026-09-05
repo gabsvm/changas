@@ -1,13 +1,24 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { decryptPaymentToken } from "./crypto";
+import { decryptPaymentToken, encryptPaymentToken } from "./crypto";
 import { createOAuthState, verifyOAuthState } from "./oauth-state";
 import { createPaymentServer, PaymentServerError } from "./server";
 
 const PROVIDER_USER_ID = "71100000-0000-4000-8000-000000000001";
 const OTHER_PROVIDER_USER_ID = "71100000-0000-4000-8000-000000000002";
+const CLIENT_USER_ID = "71100000-0000-4000-8000-000000000003";
+const PROPOSAL_ID = "71120000-0000-4000-8000-000000000001";
+const ACCEPTED_VERSION_ID = "71130000-0000-4000-8000-000000000001";
+const SCOPE_CHANGE_ID = "71140000-0000-4000-8000-000000000001";
+const JOB_ID = "71150000-0000-4000-8000-000000000001";
+const PAYMENT_ACCOUNT_ID = "71160000-0000-4000-8000-000000000001";
+const CHECKOUT_ID = "71170000-0000-4000-8000-000000000001";
+const PROPOSAL_NONCE = "71180000-0000-4000-8000-000000000001";
+const SCOPE_NONCE = "71180000-0000-4000-8000-000000000002";
 const NOW = Date.UTC(2026, 8, 5, 21, 45, 0);
 const TOKEN_KEY = Buffer.alloc(32, 7).toString("base64");
 const STATE_SECRET = Buffer.alloc(32, 9).toString("base64");
@@ -298,5 +309,294 @@ describe("Phase 11 seller OAuth payment server", () => {
       tokenExpiresAt: null,
       updatedAt: null,
     });
+  });
+});
+
+type CheckoutRow = {
+  id: string;
+  requestNonce: string;
+  purpose: "PROPOSAL" | "SCOPE_CHANGE";
+  targetId: string;
+  clientUserId: string;
+  providerUserId: string;
+  paymentProviderAccountId: string;
+  providerName: "MERCADO_PAGO";
+  externalReference: string;
+  amountMinor: number;
+  marketplaceFeeMinor: number;
+  providerNetExpectedMinor: number;
+  currencyCode: string;
+  status: "CREATED" | "REDIRECT_READY";
+  providerCheckoutReference: string | null;
+  checkoutUrl: string | null;
+};
+
+function makeCheckoutServer(
+  overrides: {
+    currentUserId?: string | null;
+    proposalSnapshot?: Record<string, unknown> | null;
+    scopeSnapshot?: Record<string, unknown> | null;
+    providerAccount?: Record<string, unknown> | null;
+    existingCheckout?: CheckoutRow | null;
+  } = {},
+) {
+  const createdRows: CheckoutRow[] = [];
+  const finalizedRows: Array<{
+    checkoutId: string;
+    providerCheckoutReference: string;
+    checkoutUrl: string;
+  }> = [];
+  const createCheckoutSession = vi.fn(async () => ({
+    providerCheckoutReference: "pref-phase11-001",
+    checkoutUrl:
+      "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pref-phase11-001",
+    sandboxCheckoutUrl: null,
+  }));
+  const accessToken = encryptPaymentToken(
+    "APP_USR-seller-access",
+    TOKEN_KEY,
+    paymentEnv.tokenEncryptionKeyVersion,
+  );
+
+  const proposalSnapshot =
+    overrides.proposalSnapshot === undefined
+      ? {
+          proposalId: PROPOSAL_ID,
+          acceptedVersionId: ACCEPTED_VERSION_ID,
+          clientUserId: CLIENT_USER_ID,
+          providerUserId: PROVIDER_USER_ID,
+          status: "AWAITING_PAYMENT",
+          serviceTitle: "Instalación eléctrica",
+          scopeSnapshot: "Instalación y revisión del tablero",
+          amountMinor: 125000,
+          currencyCode: "ARS",
+        }
+      : overrides.proposalSnapshot;
+  const scopeSnapshot =
+    overrides.scopeSnapshot === undefined
+      ? {
+          scopeChangeId: SCOPE_CHANGE_ID,
+          jobId: JOB_ID,
+          clientUserId: CLIENT_USER_ID,
+          providerUserId: PROVIDER_USER_ID,
+          status: "AWAITING_PAYMENT",
+          serviceTitle: "Instalación eléctrica",
+          scopeSnapshot: "Agregar dos tomas nuevas",
+          amountMinor: 25000,
+          currencyCode: "ARS",
+        }
+      : overrides.scopeSnapshot;
+  const providerAccount =
+    overrides.providerAccount === undefined
+      ? {
+          id: PAYMENT_ACCOUNT_ID,
+          providerUserId: PROVIDER_USER_ID,
+          providerName: "MERCADO_PAGO",
+          providerAccountReference: "123456",
+          status: "CONNECTED",
+          accessToken,
+          encryptionKeyVersion: 1,
+        }
+      : overrides.providerAccount;
+
+  const server = createPaymentServer({
+    now: () => NOW,
+    siteUrl: "https://changas.test",
+    paymentEnv,
+    getCurrentUser: async () => {
+      const id =
+        overrides.currentUserId === undefined
+          ? CLIENT_USER_ID
+          : overrides.currentUserId;
+      return id ? { id } : null;
+    },
+    hasProviderProfile: async () => false,
+    getAccountState: async () => null,
+    upsertAccount: async () => undefined,
+    loadProposalCheckoutSnapshot: async () => proposalSnapshot,
+    loadScopeChangeCheckoutSnapshot: async () => scopeSnapshot,
+    loadConnectedProviderAccount: async () => providerAccount,
+    findCheckoutByNonce: async () => overrides.existingCheckout ?? null,
+    createCheckoutRecord: async (input: CheckoutRow) => {
+      const row = { ...input, id: CHECKOUT_ID };
+      createdRows.push(row);
+      return row;
+    },
+    markCheckoutRedirectReady: async (input: {
+      checkoutId: string;
+      providerCheckoutReference: string;
+      checkoutUrl: string;
+    }) => {
+      finalizedRows.push(input);
+    },
+    paymentProvider: {
+      exchangeOAuthCode: async () => {
+        throw new Error("OAuth exchange is not part of checkout creation");
+      },
+      createCheckoutSession,
+    },
+  });
+
+  return { server, createdRows, finalizedRows, createCheckoutSession };
+}
+
+describe("Phase 11 durable real checkout creation", () => {
+  it("creates a proposal checkout exclusively from the accepted durable snapshot and Task 1 commission helpers", async () => {
+    const { server, createdRows, finalizedRows, createCheckoutSession } =
+      makeCheckoutServer();
+
+    const result = await server.createProposalCheckout(
+      PROPOSAL_ID,
+      PROPOSAL_NONCE,
+    );
+
+    expect(createCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accessToken: "APP_USR-seller-access",
+        title: "Instalación eléctrica",
+        description: "Instalación y revisión del tablero",
+        amountMinor: 125000,
+        currencyCode: "ARS",
+        marketplaceFeeMinor: 12500,
+        externalReference: `changas:checkout:${PROPOSAL_NONCE}`,
+        notificationUrl:
+          "https://changas.test/api/payments/mercado-pago/webhook",
+        backUrls: {
+          success: "https://changas.test/payments/return/success",
+          pending: "https://changas.test/payments/return/pending",
+          failure: "https://changas.test/payments/return/failure",
+        },
+        idempotencyKey: PROPOSAL_NONCE,
+      }),
+    );
+    expect(createdRows[0]).toMatchObject({
+      purpose: "PROPOSAL",
+      targetId: PROPOSAL_ID,
+      clientUserId: CLIENT_USER_ID,
+      providerUserId: PROVIDER_USER_ID,
+      amountMinor: 125000,
+      marketplaceFeeMinor: 12500,
+      providerNetExpectedMinor: 112500,
+      currencyCode: "ARS",
+      status: "CREATED",
+    });
+    expect(finalizedRows).toEqual([
+      {
+        checkoutId: CHECKOUT_ID,
+        providerCheckoutReference: "pref-phase11-001",
+        checkoutUrl:
+          "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pref-phase11-001",
+      },
+    ]);
+    expect(result).toEqual({
+      checkoutSessionId: CHECKOUT_ID,
+      checkoutUrl:
+        "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pref-phase11-001",
+    });
+  });
+
+  it("creates additional-scope checkout from the accepted scope-change snapshot, never caller-supplied money", async () => {
+    const { server, createdRows, createCheckoutSession } = makeCheckoutServer();
+
+    await server.createScopeChangeCheckout(SCOPE_CHANGE_ID, SCOPE_NONCE);
+
+    expect(createCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amountMinor: 25000,
+        currencyCode: "ARS",
+        marketplaceFeeMinor: 2500,
+        idempotencyKey: SCOPE_NONCE,
+      }),
+    );
+    expect(createdRows[0]).toMatchObject({
+      purpose: "SCOPE_CHANGE",
+      targetId: SCOPE_CHANGE_ID,
+      amountMinor: 25000,
+      marketplaceFeeMinor: 2500,
+      providerNetExpectedMinor: 22500,
+      currencyCode: "ARS",
+    });
+  });
+
+  it("requires the authenticated client to own the payable snapshot and the seller to be connected", async () => {
+    const wrongClient = makeCheckoutServer({ currentUserId: OTHER_PROVIDER_USER_ID });
+    await expectPaymentError(
+      () =>
+        wrongClient.server.createProposalCheckout(PROPOSAL_ID, PROPOSAL_NONCE),
+      "FORBIDDEN",
+    );
+
+    const disconnected = makeCheckoutServer({
+      providerAccount: {
+        id: PAYMENT_ACCOUNT_ID,
+        providerUserId: PROVIDER_USER_ID,
+        providerName: "MERCADO_PAGO",
+        providerAccountReference: "123456",
+        status: "REAUTH_REQUIRED",
+      },
+    });
+    await expectPaymentError(
+      () =>
+        disconnected.server.createProposalCheckout(PROPOSAL_ID, PROPOSAL_NONCE),
+      "SELLER_NOT_CONNECTED",
+    );
+  });
+
+  it("reuses an existing redirect-ready session for the same nonce without another provider preference", async () => {
+    const existingCheckout: CheckoutRow = {
+      id: CHECKOUT_ID,
+      requestNonce: PROPOSAL_NONCE,
+      purpose: "PROPOSAL",
+      targetId: PROPOSAL_ID,
+      clientUserId: CLIENT_USER_ID,
+      providerUserId: PROVIDER_USER_ID,
+      paymentProviderAccountId: PAYMENT_ACCOUNT_ID,
+      providerName: "MERCADO_PAGO",
+      externalReference: `changas:checkout:${PROPOSAL_NONCE}`,
+      amountMinor: 125000,
+      marketplaceFeeMinor: 12500,
+      providerNetExpectedMinor: 112500,
+      currencyCode: "ARS",
+      status: "REDIRECT_READY",
+      providerCheckoutReference: "pref-existing",
+      checkoutUrl:
+        "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pref-existing",
+    };
+    const { server, createdRows, createCheckoutSession } = makeCheckoutServer({
+      existingCheckout,
+    });
+
+    const result = await server.createProposalCheckout(
+      PROPOSAL_ID,
+      PROPOSAL_NONCE,
+    );
+
+    expect(result).toEqual({
+      checkoutSessionId: CHECKOUT_ID,
+      checkoutUrl: existingCheckout.checkoutUrl,
+    });
+    expect(createdRows).toHaveLength(0);
+    expect(createCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it("keeps hosted-checkout return pages display-only with no financial mutation imports", () => {
+    for (const outcome of ["success", "pending", "failure"] as const) {
+      const source = readFileSync(
+        join(
+          process.cwd(),
+          `apps/web/src/app/payments/return/${outcome}/page.tsx`,
+        ),
+        "utf8",
+      );
+
+      expect(source).not.toContain("reconcile_provider_payment");
+      expect(source).not.toContain("apply_payment_result");
+      expect(source).not.toContain("apply_additional_payment_result");
+      expect(source).not.toContain("processMercadoPagoWebhook");
+      expect(source).not.toContain("createProposalCheckout");
+      expect(source).not.toContain("createScopeChangeCheckout");
+      expect(source).not.toContain("providerPaymentReference");
+      expect(source).not.toContain("payment_id");
+    }
   });
 });
