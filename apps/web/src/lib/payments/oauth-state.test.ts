@@ -46,7 +46,9 @@ describe("Phase 11 Mercado Pago OAuth state", () => {
     const [payload, signature] = state.split(".");
     const tamperedPayload = `${payload?.slice(0, -1)}A.${signature}`;
 
-    expect(() => verifyOAuthState(tamperedPayload, SECRET, NOW + 1_000)).toThrow();
+    expect(() =>
+      verifyOAuthState(tamperedPayload, SECRET, NOW + 1_000),
+    ).toThrow();
     expect(() => verifyOAuthState(state, OTHER_SECRET, NOW + 1_000)).toThrow();
   });
 
@@ -60,7 +62,9 @@ describe("Phase 11 Mercado Pago OAuth state", () => {
       NOW,
     );
 
-    expect(() => verifyOAuthState(state, SECRET, NOW + 10 * 60_000 + 1)).toThrow();
+    expect(() =>
+      verifyOAuthState(state, SECRET, NOW + 10 * 60_000 + 1),
+    ).toThrow();
     expect(() => verifyOAuthState(state, SECRET, NOW - 60_001)).toThrow();
   });
 

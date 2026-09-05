@@ -1,8 +1,4 @@
-import {
-  createCipheriv,
-  createDecipheriv,
-  randomBytes,
-} from "node:crypto";
+import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 
 export type PaymentTokenEnvelope = {
   ciphertext: string;
@@ -30,14 +26,18 @@ function decodeCanonicalBase64(value: string, label: string): Buffer {
 function decodeEncryptionKey(key: string): Buffer {
   const decoded = decodeCanonicalBase64(key, "Payment token encryption key");
   if (decoded.length !== 32) {
-    throw new Error("Payment token encryption key must decode to exactly 32 bytes.");
+    throw new Error(
+      "Payment token encryption key must decode to exactly 32 bytes.",
+    );
   }
   return decoded;
 }
 
 function assertKeyVersion(keyVersion: number): void {
   if (!Number.isSafeInteger(keyVersion) || keyVersion < 1) {
-    throw new Error("Payment token encryption key version must be a positive safe integer.");
+    throw new Error(
+      "Payment token encryption key version must be a positive safe integer.",
+    );
   }
 }
 
@@ -87,7 +87,9 @@ export function decryptPaymentToken(
     throw new Error("Payment token IV must be exactly 12 bytes.");
   }
   if (authTag.length !== 16) {
-    throw new Error("Payment token authentication tag must be exactly 16 bytes.");
+    throw new Error(
+      "Payment token authentication tag must be exactly 16 bytes.",
+    );
   }
   if (ciphertext.length === 0) {
     throw new Error("Payment token ciphertext must not be empty.");

@@ -44,9 +44,17 @@ describe("Phase 11 payment token encryption", () => {
     const encrypted = encryptPaymentToken("seller-token", KEY, 1);
 
     expect(() => decryptPaymentToken(encrypted, WRONG_KEY)).toThrow();
-    expect(() => decryptPaymentToken({ ...encrypted, iv: "not-base64!!!" }, KEY)).toThrow();
+    expect(() =>
+      decryptPaymentToken({ ...encrypted, iv: "not-base64!!!" }, KEY),
+    ).toThrow();
     expect(() => encryptPaymentToken("", KEY, 1)).toThrow();
-    expect(() => encryptPaymentToken("seller-token", Buffer.alloc(31).toString("base64"), 1)).toThrow();
+    expect(() =>
+      encryptPaymentToken(
+        "seller-token",
+        Buffer.alloc(31).toString("base64"),
+        1,
+      ),
+    ).toThrow();
     expect(() => encryptPaymentToken("seller-token", KEY, 0)).toThrow();
   });
 });

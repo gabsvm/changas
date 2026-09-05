@@ -1,8 +1,4 @@
-import {
-  createHmac,
-  randomBytes,
-  timingSafeEqual,
-} from "node:crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 const OAUTH_STATE_TTL_MS = 10 * 60_000;
 const MAX_FUTURE_SKEW_MS = 60_000;
@@ -35,7 +31,9 @@ function decodeSigningSecret(secret: string): Buffer {
 
   const decoded = Buffer.from(secret, "base64");
   if (decoded.toString("base64") !== secret || decoded.length < 32) {
-    throw new Error("OAuth state signing secret must decode to at least 32 bytes.");
+    throw new Error(
+      "OAuth state signing secret must decode to at least 32 bytes.",
+    );
   }
   return decoded;
 }
@@ -54,7 +52,9 @@ function assertSafeReturnPath(returnPath: string): void {
     returnPath.includes("\\") ||
     /[\u0000-\u001f\u007f]/.test(returnPath)
   ) {
-    throw new Error("OAuth state return path must be a safe local application path.");
+    throw new Error(
+      "OAuth state return path must be a safe local application path.",
+    );
   }
 }
 
@@ -100,7 +100,9 @@ export function verifyOAuthState(
   now = Date.now(),
 ): VerifiedOAuthState {
   if (!Number.isSafeInteger(now) || now < 0) {
-    throw new Error("OAuth state verification time must be a non-negative safe integer.");
+    throw new Error(
+      "OAuth state verification time must be a non-negative safe integer.",
+    );
   }
   const parts = state.split(".");
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
@@ -127,7 +129,9 @@ export function verifyOAuthState(
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8"));
+    parsed = JSON.parse(
+      Buffer.from(encodedPayload, "base64url").toString("utf8"),
+    );
   } catch {
     throw new Error("OAuth state payload is invalid.");
   }
