@@ -17,10 +17,7 @@ import type {
 const MERCADO_PAGO_PROVIDER = "MERCADO_PAGO" as const;
 
 type ProviderEventProcessingStatus =
-  | "RECEIVED"
-  | "IGNORED"
-  | "PROCESSED"
-  | "FAILED";
+  "RECEIVED" | "IGNORED" | "PROCESSED" | "FAILED";
 
 type ConnectedSellerAccount = {
   id: string;
@@ -62,7 +59,10 @@ type ReconcileProviderPaymentInput = {
   checkoutSessionId: string;
   providerName: typeof MERCADO_PAGO_PROVIDER;
   providerPaymentReference: string;
-  providerStatus: Extract<ProviderPaymentStatus, "PENDING" | "SUCCEEDED" | "FAILED">;
+  providerStatus: Extract<
+    ProviderPaymentStatus,
+    "PENDING" | "SUCCEEDED" | "FAILED"
+  >;
   providerAmountMinor: number;
   providerCurrencyCode: string;
   providerAccountReference: string;
@@ -96,7 +96,9 @@ type PaymentWebhookDependencies = {
     providerAccountReference: string,
   ): Promise<unknown>;
   findCheckoutByExternalReference(externalReference: string): Promise<unknown>;
-  reconcileProviderPayment(input: ReconcileProviderPaymentInput): Promise<unknown>;
+  reconcileProviderPayment(
+    input: ReconcileProviderPaymentInput,
+  ): Promise<unknown>;
 };
 
 export type PaymentWebhookErrorCode =
@@ -499,12 +501,15 @@ async function updateProviderEventProcessing(
   input: EventProcessingUpdate,
 ): Promise<void> {
   const admin = createAdminClient() as unknown as RpcClient;
-  const { error } = await admin.rpc("update_payment_provider_event_processing", {
-    target_event_id: input.eventId,
-    target_processing_status: input.status,
-    target_failure_code: input.failureCode ?? null,
-    target_failure_message: input.failureMessage ?? null,
-  });
+  const { error } = await admin.rpc(
+    "update_payment_provider_event_processing",
+    {
+      target_event_id: input.eventId,
+      target_processing_status: input.status,
+      target_failure_code: input.failureCode ?? null,
+      target_failure_message: input.failureMessage ?? null,
+    },
+  );
   if (error) {
     throw new PaymentWebhookError(
       "PERSISTENCE_ERROR",
@@ -605,10 +610,11 @@ async function reconcileProviderPayment(
 }
 
 let defaultProcessor:
-  | ReturnType<typeof createPaymentWebhookProcessor>
-  | undefined;
+  ReturnType<typeof createPaymentWebhookProcessor> | undefined;
 
-export async function processMercadoPagoWebhook(input: MercadoPagoWebhookInput) {
+export async function processMercadoPagoWebhook(
+  input: MercadoPagoWebhookInput,
+) {
   if (!defaultProcessor) {
     const env = getPaymentServerEnv();
     const provider = new MercadoPagoPaymentProvider({
