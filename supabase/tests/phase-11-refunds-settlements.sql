@@ -252,15 +252,15 @@ select ok(
   (select count(*) = 3 from public.financial_ledger_entries ledger
    join public.payment_refunds refund on refund.id = ledger.refund_id
    where refund.request_nonce = '12000000-0000-4000-8000-000000000101')
-  and (select coalesce(sum(amount_minor), 0) = 25000 from public.financial_ledger_entries ledger
+  and (select coalesce(sum(ledger.amount_minor), 0) = 25000 from public.financial_ledger_entries ledger
        join public.payment_refunds refund on refund.id = ledger.refund_id
        where refund.request_nonce = '12000000-0000-4000-8000-000000000101'
          and ledger.entry_type = 'REFUND')
-  and (select coalesce(sum(amount_minor), 0) = 2500 from public.financial_ledger_entries ledger
+  and (select coalesce(sum(ledger.amount_minor), 0) = 2500 from public.financial_ledger_entries ledger
        join public.payment_refunds refund on refund.id = ledger.refund_id
        where refund.request_nonce = '12000000-0000-4000-8000-000000000101'
          and ledger.entry_type = 'MARKETPLACE_FEE_REVERSAL')
-  and (select coalesce(sum(amount_minor), 0) = 22500 from public.financial_ledger_entries ledger
+  and (select coalesce(sum(ledger.amount_minor), 0) = 22500 from public.financial_ledger_entries ledger
        join public.payment_refunds refund on refund.id = ledger.refund_id
        where refund.request_nonce = '12000000-0000-4000-8000-000000000101'
          and ledger.entry_type = 'PROVIDER_NET_REVERSAL'),
@@ -349,15 +349,15 @@ select lives_ok(
 select ok(
   (select status::text = 'REFUNDED' from public.payment_attempts
    where proposal_id = '12000000-0000-4000-8000-000000000030')
-  and (select coalesce(sum(amount_minor), 0) = 100000 from public.financial_ledger_entries ledger
+  and (select coalesce(sum(ledger.amount_minor), 0) = 100000 from public.financial_ledger_entries ledger
        join public.payment_refunds refund on refund.id = ledger.refund_id
        where ledger.entry_type = 'REFUND'
          and refund.payment_attempt_id = (select id from public.payment_attempts where proposal_id = '12000000-0000-4000-8000-000000000030'))
-  and (select coalesce(sum(amount_minor), 0) = 10000 from public.financial_ledger_entries ledger
+  and (select coalesce(sum(ledger.amount_minor), 0) = 10000 from public.financial_ledger_entries ledger
        join public.payment_refunds refund on refund.id = ledger.refund_id
        where ledger.entry_type = 'MARKETPLACE_FEE_REVERSAL'
          and refund.payment_attempt_id = (select id from public.payment_attempts where proposal_id = '12000000-0000-4000-8000-000000000030'))
-  and (select coalesce(sum(amount_minor), 0) = 90000 from public.financial_ledger_entries ledger
+  and (select coalesce(sum(ledger.amount_minor), 0) = 90000 from public.financial_ledger_entries ledger
        join public.payment_refunds refund on refund.id = ledger.refund_id
        where ledger.entry_type = 'PROVIDER_NET_REVERSAL'
          and refund.payment_attempt_id = (select id from public.payment_attempts where proposal_id = '12000000-0000-4000-8000-000000000030')),
