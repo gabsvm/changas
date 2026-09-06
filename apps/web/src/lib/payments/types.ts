@@ -30,7 +30,7 @@ export type CheckoutSessionInput = {
   title: string;
   description?: string;
   amountMinor: number;
-  currencyCode: "ARS";
+  currencyCode: string;
   marketplaceFeeMinor: number;
   externalReference: string;
   notificationUrl: string;
