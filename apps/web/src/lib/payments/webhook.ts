@@ -317,7 +317,6 @@ export function createPaymentWebhookProcessor(
         "Mercado Pago webhook data.id is required",
       );
     }
-
     if (
       !dependencies.paymentProvider.verifyWebhook({
         xSignature: input.xSignature,
@@ -446,10 +445,15 @@ type RpcClient = {
   rpc(name: string, args?: Record<string, unknown>): PromiseLike<RpcResult>;
 };
 
+type TableResult = {
+  data: Record<string, unknown> | null;
+  error: { message?: string; code?: string } | null;
+};
+
 type TableSelectQuery = {
   select(columns: string): TableSelectQuery;
   eq(column: string, value: unknown): TableSelectQuery;
-  maybeSingle(): PromiseLike<RpcResult>;
+  maybeSingle(): PromiseLike<TableResult>;
 };
 
 type TableClient = {
@@ -504,7 +508,19 @@ async function getProviderEventProcessingStatus(
       error,
     );
   }
-  return data.processing_status;
+  const processingStatus = data.processing_status;
+  if (
+    processingStatus !== "RECEIVED" &&
+    processingStatus !== "IGNORED" &&
+    processingStatus !== "PROCESSED" &&
+    processingStatus !== "FAILED"
+  ) {
+    throw new PaymentWebhookError(
+      "PERSISTENCE_ERROR",
+      "Stored Mercado Pago provider event status is malformed",
+    );
+  }
+  return processingStatus;
 }
 
 async function updateProviderEventProcessing(
