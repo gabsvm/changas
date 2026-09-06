@@ -376,7 +376,8 @@ export function createPaymentRefundServer(
       );
     }
 
-    const amountMinor = requestedAmountMinor ?? snapshot.refundableRemainingMinor;
+    const amountMinor =
+      requestedAmountMinor ?? snapshot.refundableRemainingMinor;
     if (
       !Number.isSafeInteger(amountMinor) ||
       amountMinor <= 0 ||
@@ -402,9 +403,8 @@ export function createPaymentRefundServer(
           )
         : normalizeRefund(existingRaw);
 
-    const tokenEncryptionKey = resolveValue(
-      dependencies.paymentEnv,
-    ).tokenEncryptionKey;
+    const tokenEncryptionKey =
+      resolveValue(dependencies.paymentEnv).tokenEncryptionKey;
     const accessToken = decryptPaymentToken(
       snapshot.accessToken,
       tokenEncryptionKey,
