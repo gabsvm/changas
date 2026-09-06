@@ -284,8 +284,7 @@ export async function runAuthoritativePaymentReconciliation(
           await callRpc("reconcile_provider_payment", {
             target_checkout_session_id: candidate.checkoutSessionId,
             payment_provider_name: candidate.providerName,
-            payment_provider_reference:
-              authoritative.providerPaymentReference,
+            payment_provider_reference: authoritative.providerPaymentReference,
             payment_result_status: authoritative.status,
             payment_amount_minor: authoritative.amountMinor,
             payment_currency_code: authoritative.currencyCode,
