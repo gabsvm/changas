@@ -262,7 +262,10 @@ function normalizeSnapshot(
       value.providerAccountReference,
       "providerAccountReference",
     ),
-    accessToken: normalizeTokenEnvelope(value.accessToken, encryptionKeyVersion),
+    accessToken: normalizeTokenEnvelope(
+      value.accessToken,
+      encryptionKeyVersion,
+    ),
     encryptionKeyVersion,
   };
 }
