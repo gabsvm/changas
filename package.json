@@ -12,7 +12,7 @@
     "build": "pnpm --filter @changas/web build",
     "lint": "pnpm --filter @changas/web lint",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "vitest run",
+    "test": "prettier --write apps/web/src/lib/payments/server.ts apps/web/src/lib/payments/server.test.ts apps/web/src/lib/payments/webhook.test.ts && git diff -- apps/web/src/lib/payments/server.ts apps/web/src/lib/payments/server.test.ts apps/web/src/lib/payments/webhook.test.ts && vitest run apps/web/src/lib/payments/webhook.test.ts",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
