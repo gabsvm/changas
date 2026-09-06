@@ -13,7 +13,8 @@ const PAYMENT_ACCOUNT_ID = "72210000-0000-4000-8000-000000000001";
 const CHECKOUT_ID = "72220000-0000-4000-8000-000000000001";
 const EVENT_ID = "72230000-0000-4000-8000-000000000001";
 const PAYMENT_ID = "987654321";
-const EXTERNAL_REFERENCE = "changas:checkout:72240000-0000-4000-8000-000000000001";
+const EXTERNAL_REFERENCE =
+  "changas:checkout:72240000-0000-4000-8000-000000000001";
 
 const paymentEnv = {
   clientId: "phase11-client-id",
@@ -60,19 +61,20 @@ function makeWebhookServer(
   } = {},
 ) {
   const verifyWebhook = vi.fn(() => overrides.signatureValid ?? true);
-  const fetchPayment = vi.fn(async () =>
-    overrides.payment ?? {
-      providerPaymentReference: PAYMENT_ID,
-      status: "SUCCEEDED",
-      rawStatus: "approved",
-      statusDetail: "accredited",
-      amountMinor: 125000,
-      refundedAmountMinor: 0,
-      currencyCode: "ARS",
-      providerAccountReference: "123456",
-      externalReference: EXTERNAL_REFERENCE,
-      providerNetReceivedMinor: 112500,
-    },
+  const fetchPayment = vi.fn(
+    async () =>
+      overrides.payment ?? {
+        providerPaymentReference: PAYMENT_ID,
+        status: "SUCCEEDED",
+        rawStatus: "approved",
+        statusDetail: "accredited",
+        amountMinor: 125000,
+        refundedAmountMinor: 0,
+        currencyCode: "ARS",
+        providerAccountReference: "123456",
+        externalReference: EXTERNAL_REFERENCE,
+        providerNetReceivedMinor: 112500,
+      },
   );
   const accessToken = encryptPaymentToken(
     "APP_USR-seller-webhook-token",
@@ -92,30 +94,31 @@ function makeWebhookServer(
         }
       : overrides.seller,
   );
-  const findCheckoutByExternalReference = vi.fn(async () =>
-    overrides.checkout ?? {
-      id: CHECKOUT_ID,
-      requestNonce: "72240000-0000-4000-8000-000000000001",
-      purpose: "PROPOSAL",
-      targetId: "72250000-0000-4000-8000-000000000001",
-      clientUserId: CLIENT_USER_ID,
-      providerUserId: PROVIDER_USER_ID,
-      paymentProviderAccountId: PAYMENT_ACCOUNT_ID,
-      providerName: "MERCADO_PAGO",
-      externalReference: EXTERNAL_REFERENCE,
-      amountMinor: 125000,
-      marketplaceFeeMinor: 12500,
-      providerNetExpectedMinor: 112500,
-      currencyCode: "ARS",
-      status: "REDIRECT_READY",
-      providerCheckoutReference: "pref-001",
-      checkoutUrl:
-        "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pref-001",
-    },
+  const findCheckoutByExternalReference = vi.fn(
+    async () =>
+      overrides.checkout ?? {
+        id: CHECKOUT_ID,
+        requestNonce: "72240000-0000-4000-8000-000000000001",
+        purpose: "PROPOSAL",
+        targetId: "72250000-0000-4000-8000-000000000001",
+        clientUserId: CLIENT_USER_ID,
+        providerUserId: PROVIDER_USER_ID,
+        paymentProviderAccountId: PAYMENT_ACCOUNT_ID,
+        providerName: "MERCADO_PAGO",
+        externalReference: EXTERNAL_REFERENCE,
+        amountMinor: 125000,
+        marketplaceFeeMinor: 12500,
+        providerNetExpectedMinor: 112500,
+        currencyCode: "ARS",
+        status: "REDIRECT_READY",
+        providerCheckoutReference: "pref-001",
+        checkoutUrl:
+          "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pref-001",
+      },
   );
   const recordProviderEvent = vi.fn(async () => EVENT_ID);
-  const getProviderEventProcessingStatus = vi.fn(async () =>
-    overrides.eventProcessingStatus ?? "RECEIVED",
+  const getProviderEventProcessingStatus = vi.fn(
+    async () => overrides.eventProcessingStatus ?? "RECEIVED",
   );
   const updateProviderEventProcessing = vi.fn(async () => undefined);
   const reconcileProviderPayment = vi.fn(async () => ({

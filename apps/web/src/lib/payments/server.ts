@@ -43,11 +43,7 @@ type PaymentProviderAccountStatus =
 
 type CheckoutPurpose = "PROPOSAL" | "SCOPE_CHANGE";
 type CheckoutStatus =
-  | "CREATED"
-  | "REDIRECT_READY"
-  | "COMPLETED"
-  | "EXPIRED"
-  | "FAILED";
+  "CREATED" | "REDIRECT_READY" | "COMPLETED" | "EXPIRED" | "FAILED";
 
 export type ProviderPaymentAccountState = {
   providerName: typeof MERCADO_PAGO_PROVIDER;
@@ -220,11 +216,7 @@ function requireNullableString(value: unknown, field: string): string | null {
 }
 
 function requirePositiveSafeInteger(value: unknown, field: string): number {
-  if (
-    typeof value !== "number" ||
-    !Number.isSafeInteger(value) ||
-    value <= 0
-  ) {
+  if (typeof value !== "number" || !Number.isSafeInteger(value) || value <= 0) {
     throw new PaymentServerError(
       "INVALID_PROVIDER_STATE",
       `Invalid positive integer field: ${field}`,
@@ -234,11 +226,7 @@ function requirePositiveSafeInteger(value: unknown, field: string): number {
 }
 
 function requireNonNegativeSafeInteger(value: unknown, field: string): number {
-  if (
-    typeof value !== "number" ||
-    !Number.isSafeInteger(value) ||
-    value < 0
-  ) {
+  if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) {
     throw new PaymentServerError(
       "INVALID_PROVIDER_STATE",
       `Invalid non-negative integer field: ${field}`,
@@ -385,7 +373,10 @@ function normalizeCheckoutSnapshot(
 
   const status = requireNonEmptyString(value.status, "status");
   if (status !== "AWAITING_PAYMENT" && status !== "PAYMENT_FAILED") {
-    throw new PaymentServerError("FORBIDDEN", "Economic snapshot is not payable");
+    throw new PaymentServerError(
+      "FORBIDDEN",
+      "Economic snapshot is not payable",
+    );
   }
 
   return {
@@ -403,7 +394,9 @@ function normalizeCheckoutSnapshot(
   };
 }
 
-function normalizeProviderCheckoutAccount(value: unknown): ConnectedProviderAccount {
+function normalizeProviderCheckoutAccount(
+  value: unknown,
+): ConnectedProviderAccount {
   if (!isRecord(value) || value.status !== "CONNECTED") {
     throw new PaymentServerError(
       "SELLER_NOT_CONNECTED",
@@ -433,7 +426,10 @@ function normalizeProviderCheckoutAccount(value: unknown): ConnectedProviderAcco
     ciphertext: requireNonEmptyString(rawEnvelope.ciphertext, "ciphertext"),
     iv: requireNonEmptyString(rawEnvelope.iv, "iv"),
     authTag: requireNonEmptyString(rawEnvelope.authTag, "authTag"),
-    keyVersion: requirePositiveSafeInteger(rawEnvelope.keyVersion, "keyVersion"),
+    keyVersion: requirePositiveSafeInteger(
+      rawEnvelope.keyVersion,
+      "keyVersion",
+    ),
   };
   if (envelope.keyVersion !== keyVersion) {
     throw new PaymentServerError(
@@ -872,9 +868,8 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
           await checkoutDependencies.createCheckoutRecord(input),
         );
       } catch (error) {
-        const raced = await checkoutDependencies.findCheckoutByNonce(
-          requestNonce,
-        );
+        const raced =
+          await checkoutDependencies.findCheckoutByNonce(requestNonce);
         if (raced === null || raced === undefined) throw error;
         checkout = normalizeCheckoutRecord(raced);
         if (
@@ -1036,7 +1031,10 @@ async function loadProposalCheckoutSnapshot(
     .eq("id", proposalId)
     .maybeSingle();
   if (proposalResult.error) {
-    throwDatabaseError("Unable to load proposal checkout snapshot", proposalResult.error);
+    throwDatabaseError(
+      "Unable to load proposal checkout snapshot",
+      proposalResult.error,
+    );
   }
   if (!isRecord(proposalResult.data)) {
     throw new PaymentServerError("NOT_FOUND", "Proposal was not found");
@@ -1054,7 +1052,10 @@ async function loadProposalCheckoutSnapshot(
     .eq("id", acceptedVersionId)
     .maybeSingle();
   if (versionResult.error) {
-    throwDatabaseError("Unable to load accepted proposal version", versionResult.error);
+    throwDatabaseError(
+      "Unable to load accepted proposal version",
+      versionResult.error,
+    );
   }
   if (!isRecord(versionResult.data)) {
     throw new PaymentServerError(
@@ -1108,7 +1109,10 @@ async function loadScopeChangeCheckoutSnapshot(
     .eq("id", scopeChangeId)
     .maybeSingle();
   if (changeResult.error) {
-    throwDatabaseError("Unable to load scope-change checkout snapshot", changeResult.error);
+    throwDatabaseError(
+      "Unable to load scope-change checkout snapshot",
+      changeResult.error,
+    );
   }
   if (!isRecord(changeResult.data)) {
     throw new PaymentServerError("NOT_FOUND", "Scope change was not found");
@@ -1140,7 +1144,10 @@ async function loadScopeChangeCheckoutSnapshot(
     .eq("id", acceptedVersionId)
     .maybeSingle();
   if (versionResult.error) {
-    throwDatabaseError("Unable to load scope-change service snapshot", versionResult.error);
+    throwDatabaseError(
+      "Unable to load scope-change service snapshot",
+      versionResult.error,
+    );
   }
   if (!isRecord(versionResult.data)) {
     throw new PaymentServerError(
@@ -1294,8 +1301,7 @@ async function createCheckoutRecord(
       request_nonce: input.requestNonce,
       purpose: input.purpose,
       proposal_id: input.purpose === "PROPOSAL" ? input.targetId : null,
-      scope_change_id:
-        input.purpose === "SCOPE_CHANGE" ? input.targetId : null,
+      scope_change_id: input.purpose === "SCOPE_CHANGE" ? input.targetId : null,
       client_user_id: input.clientUserId,
       provider_user_id: input.providerUserId,
       payment_provider_account_id: input.paymentProviderAccountId,
@@ -1312,7 +1318,10 @@ async function createCheckoutRecord(
     .select("*")
     .single();
   if (result.error) {
-    throwDatabaseError("Unable to create durable checkout session", result.error);
+    throwDatabaseError(
+      "Unable to create durable checkout session",
+      result.error,
+    );
   }
   return mapCheckoutDatabaseRow(result.data);
 }

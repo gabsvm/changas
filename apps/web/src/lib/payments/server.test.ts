@@ -519,7 +519,9 @@ describe("Phase 11 durable real checkout creation", () => {
   });
 
   it("requires the authenticated client to own the payable snapshot and the seller to be connected", async () => {
-    const wrongClient = makeCheckoutServer({ currentUserId: OTHER_PROVIDER_USER_ID });
+    const wrongClient = makeCheckoutServer({
+      currentUserId: OTHER_PROVIDER_USER_ID,
+    });
     await expectPaymentError(
       () =>
         wrongClient.server.createProposalCheckout(PROPOSAL_ID, PROPOSAL_NONCE),
