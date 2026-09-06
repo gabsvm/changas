@@ -15,11 +15,13 @@ const files = [
 
 describe("Phase 11 formatter dump", () => {
   it("emits repository-exact Prettier output", async () => {
-    const config = (await resolveConfig(resolve(files[0]))) ?? {};
+    const config = (await resolveConfig(resolve(files[0]!))) ?? {};
     for (const file of files) {
       const source = await readFile(resolve(file), "utf8");
       const formatted = await format(source, { ...config, filepath: resolve(file) });
-      console.log(`PHASE11_FORMAT:${file}:${Buffer.from(formatted).toString("base64")}`);
+      console.log(
+        `PHASE11_FORMAT:${file}:${Buffer.from(formatted).toString("base64")}`,
+      );
     }
   });
 });
