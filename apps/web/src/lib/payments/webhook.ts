@@ -446,6 +446,16 @@ type RpcClient = {
   rpc(name: string, args?: Record<string, unknown>): PromiseLike<RpcResult>;
 };
 
+type TableSelectQuery = {
+  select(columns: string): TableSelectQuery;
+  eq(column: string, value: unknown): TableSelectQuery;
+  maybeSingle(): PromiseLike<RpcResult>;
+};
+
+type TableClient = {
+  from(table: string): TableSelectQuery;
+};
+
 function requireRpcString(data: unknown, operation: string): string {
   if (typeof data !== "string" || data.length === 0) {
     throw new PaymentWebhookError(
@@ -481,7 +491,7 @@ async function recordProviderEvent(input: ProviderEventInput): Promise<string> {
 async function getProviderEventProcessingStatus(
   eventId: string,
 ): Promise<ProviderEventProcessingStatus> {
-  const admin = createAdminClient();
+  const admin = createAdminClient() as unknown as TableClient;
   const { data, error } = await admin
     .from("payment_provider_events")
     .select("processing_status")
@@ -522,7 +532,7 @@ async function updateProviderEventProcessing(
 async function loadProviderAccountByReference(
   providerAccountReference: string,
 ): Promise<unknown> {
-  const admin = createAdminClient();
+  const admin = createAdminClient() as unknown as TableClient;
   const { data, error } = await admin
     .from("payment_provider_accounts")
     .select(
@@ -558,7 +568,7 @@ async function loadProviderAccountByReference(
 async function findCheckoutByExternalReference(
   externalReference: string,
 ): Promise<unknown> {
-  const admin = createAdminClient();
+  const admin = createAdminClient() as unknown as TableClient;
   const { data, error } = await admin
     .from("payment_checkout_sessions")
     .select(
