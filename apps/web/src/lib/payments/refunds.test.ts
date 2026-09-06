@@ -122,7 +122,10 @@ function makeRefundServer(
   return { server, refund, created, recorded, finishedRuns };
 }
 
-async function expectPaymentError(operation: () => Promise<unknown>, code: string) {
+async function expectPaymentError(
+  operation: () => Promise<unknown>,
+  code: string,
+) {
   const error = await operation().catch((caught: unknown) => caught);
   expect(error).toBeInstanceOf(PaymentServerError);
   expect(error).toMatchObject({ code });
