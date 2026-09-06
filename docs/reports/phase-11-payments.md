@@ -182,10 +182,17 @@ Both CI jobs, `validate` and `supabase-integration`, completed successfully.
 - No functional scope deviation in the Phase 11 implementation.
 - The acceptance item “real provider works in approved environment” cannot be claimed from the current externally misconfigured Vercel Preview or without approved Mercado Pago test credentials. This is explicitly recorded rather than masked with a code fallback.
 
+## Deployment follow-up — 2026-09-06
+
+- The required public Supabase variables were configured manually in Vercel after the original Phase 11 report was written.
+- A subsequent production redeploy was accidentally created from the historical `codex/phase-00-foundation` deployment (`4b37ce28...`), so Production served the Phase 00 Foundation page even though the Phase 11 branch and build were intact.
+- This documentation-only follow-up commit intentionally triggers a fresh Preview deployment from `codex/phase-11-payments` so the corrected Preview environment can be verified against the actual Phase 11 marketplace before any production promotion.
+- The validated functional code SHA remains `8fbdc9775eab09d84f37c264b4896d5d3b36d6e0`; this follow-up does not alter application code, schema or Phase 11 behavior.
+
 ## STOP
 
 Phase 11 implementation and repository CI are complete at validated code SHA `8fbdc9775eab09d84f37c264b4896d5d3b36d6e0`.
 
-External environment acceptance remains: configure Vercel Preview Supabase public variables and perform a controlled Mercado Pago approved-environment transaction/refund when credentials are available.
+External environment acceptance remains: verify the refreshed Vercel Preview with the configured Supabase public variables and perform a controlled Mercado Pago approved-environment transaction/refund when credentials are available.
 
 No Phase 12 work was started.
