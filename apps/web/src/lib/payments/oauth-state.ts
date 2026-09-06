@@ -38,6 +38,18 @@ function decodeSigningSecret(secret: string): Buffer {
   return decoded;
 }
 
+function decodeCanonicalBase64Url(value: string, field: string): Buffer {
+  if (!/^[A-Za-z0-9_-]+$/.test(value)) {
+    throw new Error(`OAuth state ${field} is malformed.`);
+  }
+
+  const decoded = Buffer.from(value, "base64url");
+  if (decoded.length === 0 || decoded.toString("base64url") !== value) {
+    throw new Error(`OAuth state ${field} is not canonical base64url.`);
+  }
+  return decoded;
+}
+
 function assertProviderUserId(providerUserId: string): void {
   if (!UUID_PATTERN.test(providerUserId)) {
     throw new Error("OAuth state provider user ID must be a UUID.");
@@ -110,16 +122,14 @@ export function verifyOAuthState(
   }
 
   const [encodedPayload, encodedSignature] = parts;
-  if (
-    !/^[A-Za-z0-9_-]+$/.test(encodedPayload) ||
-    !/^[A-Za-z0-9_-]+$/.test(encodedSignature)
-  ) {
-    throw new Error("OAuth state is malformed.");
-  }
+  const payloadBytes = decodeCanonicalBase64Url(encodedPayload, "payload");
+  const actualSignature = decodeCanonicalBase64Url(
+    encodedSignature,
+    "signature",
+  );
 
   const secretBytes = decodeSigningSecret(secret);
   const expectedSignature = sign(encodedPayload, secretBytes);
-  const actualSignature = Buffer.from(encodedSignature, "base64url");
   if (
     actualSignature.length !== expectedSignature.length ||
     !timingSafeEqual(actualSignature, expectedSignature)
@@ -129,9 +139,7 @@ export function verifyOAuthState(
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(
-      Buffer.from(encodedPayload, "base64url").toString("utf8"),
-    );
+    parsed = JSON.parse(payloadBytes.toString("utf8"));
   } catch {
     throw new Error("OAuth state payload is invalid.");
   }
