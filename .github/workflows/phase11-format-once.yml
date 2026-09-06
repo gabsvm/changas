@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   format-once:
-    if: github.event.head_commit.message == 'chore(phase11): run one-time formatter'
+    if: ${{ !contains(github.event.head_commit.message, '[skip format]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,5 +32,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add apps/web/src/lib/payments/server.ts apps/web/src/lib/payments/server.test.ts apps/web/src/lib/payments/webhook.test.ts apps/web/src/lib/payments/oauth-state.ts
-          git commit -m "style(phase11): format payment orchestration"
+          git commit -m "style(phase11): format payment orchestration [skip format]"
           git push origin HEAD:codex/phase-11-payments
