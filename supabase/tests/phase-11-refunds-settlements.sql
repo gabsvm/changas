@@ -1,6 +1,6 @@
 begin;
 
-select plan(24);
+select plan(29);
 
 select ok(
   to_regclass('public.payment_refunds') is not null
