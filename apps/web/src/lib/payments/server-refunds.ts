@@ -406,8 +406,9 @@ export function createPaymentRefundServer(
           )
         : normalizeRefund(existingRaw);
 
-    const tokenEncryptionKey =
-      resolveValue(dependencies.paymentEnv).tokenEncryptionKey;
+    const tokenEncryptionKey = resolveValue(
+      dependencies.paymentEnv,
+    ).tokenEncryptionKey;
     const accessToken = decryptPaymentToken(
       snapshot.accessToken,
       tokenEncryptionKey,
