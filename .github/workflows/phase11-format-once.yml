@@ -23,7 +23,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Format Phase 11 payment files
-        run: pnpm exec prettier --write apps/web/src/lib/payments/server.ts apps/web/src/lib/payments/server.test.ts apps/web/src/lib/payments/webhook.test.ts apps/web/src/lib/payments/oauth-state.ts
+        run: >-
+          pnpm exec prettier --write
+          apps/web/src/lib/payments/server.ts
+          apps/web/src/lib/payments/server.test.ts
+          apps/web/src/lib/payments/webhook.ts
+          apps/web/src/lib/payments/webhook.test.ts
+          apps/web/src/lib/payments/oauth-state.ts
+          apps/web/src/app/api/payments/mercado-pago/webhook/route.ts
       - name: Commit formatter output
         run: |
           if git diff --quiet; then
@@ -31,6 +38,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/web/src/lib/payments/server.ts apps/web/src/lib/payments/server.test.ts apps/web/src/lib/payments/webhook.test.ts apps/web/src/lib/payments/oauth-state.ts
+          git add apps/web/src/lib/payments/server.ts apps/web/src/lib/payments/server.test.ts apps/web/src/lib/payments/webhook.ts apps/web/src/lib/payments/webhook.test.ts apps/web/src/lib/payments/oauth-state.ts apps/web/src/app/api/payments/mercado-pago/webhook/route.ts
           git commit -m "style(phase11): format payment orchestration [skip format]"
           git push origin HEAD:codex/phase-11-payments

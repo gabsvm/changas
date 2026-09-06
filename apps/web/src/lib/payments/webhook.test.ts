@@ -3,10 +3,13 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import { encryptPaymentToken } from "./crypto";
-import { createPaymentServer, PaymentServerError } from "./server";
+import {
+  createPaymentWebhookProcessor,
+  PaymentWebhookError,
+  type MercadoPagoWebhookInput,
+} from "./webhook";
 
 const TOKEN_KEY = Buffer.alloc(32, 7).toString("base64");
-const STATE_SECRET = Buffer.alloc(32, 9).toString("base64");
 const CLIENT_USER_ID = "72200000-0000-4000-8000-000000000001";
 const PROVIDER_USER_ID = "72200000-0000-4000-8000-000000000002";
 const PAYMENT_ACCOUNT_ID = "72210000-0000-4000-8000-000000000001";
@@ -15,17 +18,6 @@ const EVENT_ID = "72230000-0000-4000-8000-000000000001";
 const PAYMENT_ID = "987654321";
 const EXTERNAL_REFERENCE =
   "changas:checkout:72240000-0000-4000-8000-000000000001";
-
-const paymentEnv = {
-  clientId: "phase11-client-id",
-  clientSecret: "phase11-client-secret",
-  webhookSecret: "phase11-webhook-secret",
-  tokenEncryptionKey: TOKEN_KEY,
-  tokenEncryptionKeyVersion: 1,
-  oauthStateSecret: STATE_SECRET,
-  marketplaceFeeBps: 1000,
-  providerMode: "test" as const,
-};
 
 const rawBody = JSON.stringify({
   id: 445566,
@@ -37,21 +29,7 @@ const rawBody = JSON.stringify({
   status: "approved",
 });
 
-type WebhookInput = {
-  xSignature: string | null;
-  xRequestId: string | null;
-  dataId: string | null;
-  rawBody: string;
-};
-
-type WebhookCapableServer = ReturnType<typeof createPaymentServer> & {
-  processMercadoPagoWebhook(input: WebhookInput): Promise<{
-    processed: boolean;
-    duplicate: boolean;
-  }>;
-};
-
-function makeWebhookServer(
+function makeWebhookProcessor(
   overrides: {
     signatureValid?: boolean;
     eventProcessingStatus?: "RECEIVED" | "PROCESSED" | "FAILED";
@@ -128,32 +106,24 @@ function makeWebhookServer(
   }));
 
   const dependencies = {
-    now: () => Date.UTC(2026, 8, 5, 22, 30, 0),
-    siteUrl: "https://changas.test",
-    paymentEnv,
-    getCurrentUser: async () => null,
-    hasProviderProfile: async () => false,
-    getAccountState: async () => null,
-    upsertAccount: async () => undefined,
+    paymentEnv: { tokenEncryptionKey: TOKEN_KEY },
+    paymentProvider: { verifyWebhook, fetchPayment },
     loadProviderAccountByReference,
     findCheckoutByExternalReference,
     recordProviderEvent,
     getProviderEventProcessingStatus,
     updateProviderEventProcessing,
     reconcileProviderPayment,
-    paymentProvider: {
-      exchangeOAuthCode: async () => ({}),
-      verifyWebhook,
-      fetchPayment,
-    },
   };
 
-  const server = createPaymentServer(
-    dependencies as unknown as Parameters<typeof createPaymentServer>[0],
-  ) as unknown as WebhookCapableServer;
+  const processMercadoPagoWebhook = createPaymentWebhookProcessor(
+    dependencies as unknown as Parameters<
+      typeof createPaymentWebhookProcessor
+    >[0],
+  );
 
   return {
-    server,
+    processMercadoPagoWebhook,
     verifyWebhook,
     fetchPayment,
     loadProviderAccountByReference,
@@ -165,7 +135,7 @@ function makeWebhookServer(
   };
 }
 
-const webhookInput: WebhookInput = {
+const webhookInput: MercadoPagoWebhookInput = {
   xSignature: "ts=1788658200,v1=deadbeef",
   xRequestId: "request-phase11-001",
   dataId: PAYMENT_ID,
@@ -177,16 +147,16 @@ async function expectPaymentError(
   code: string,
 ) {
   const error = await operation().catch((caught: unknown) => caught);
-  expect(error).toBeInstanceOf(PaymentServerError);
+  expect(error).toBeInstanceOf(PaymentWebhookError);
   expect(error).toMatchObject({ code });
 }
 
 describe("Phase 11 Mercado Pago webhook orchestration", () => {
   it("rejects an invalid signature before any durable mutation or provider fetch", async () => {
-    const deps = makeWebhookServer({ signatureValid: false });
+    const deps = makeWebhookProcessor({ signatureValid: false });
 
     await expectPaymentError(
-      () => deps.server.processMercadoPagoWebhook(webhookInput),
+      () => deps.processMercadoPagoWebhook(webhookInput),
       "INVALID_WEBHOOK_SIGNATURE",
     );
 
@@ -197,9 +167,9 @@ describe("Phase 11 Mercado Pago webhook orchestration", () => {
   });
 
   it("persists a verified receipt, refetches authoritative payment with seller OAuth, and reconciles success", async () => {
-    const deps = makeWebhookServer();
+    const deps = makeWebhookProcessor();
 
-    const result = await deps.server.processMercadoPagoWebhook(webhookInput);
+    const result = await deps.processMercadoPagoWebhook(webhookInput);
 
     expect(deps.verifyWebhook).toHaveBeenCalledWith({
       xSignature: webhookInput.xSignature,
@@ -238,9 +208,9 @@ describe("Phase 11 Mercado Pago webhook orchestration", () => {
   });
 
   it("short-circuits an already processed duplicate event without another provider fetch or financial reconciliation", async () => {
-    const deps = makeWebhookServer({ eventProcessingStatus: "PROCESSED" });
+    const deps = makeWebhookProcessor({ eventProcessingStatus: "PROCESSED" });
 
-    const result = await deps.server.processMercadoPagoWebhook(webhookInput);
+    const result = await deps.processMercadoPagoWebhook(webhookInput);
 
     expect(deps.recordProviderEvent).toHaveBeenCalledTimes(1);
     expect(deps.fetchPayment).not.toHaveBeenCalled();
@@ -254,7 +224,7 @@ describe("Phase 11 Mercado Pago webhook orchestration", () => {
   ] as const)(
     "uses authoritative provider status %s even when the incoming body claims approved",
     async (status, rawStatus) => {
-      const deps = makeWebhookServer({
+      const deps = makeWebhookProcessor({
         payment: {
           providerPaymentReference: PAYMENT_ID,
           status,
@@ -269,7 +239,7 @@ describe("Phase 11 Mercado Pago webhook orchestration", () => {
         },
       });
 
-      await deps.server.processMercadoPagoWebhook(webhookInput);
+      await deps.processMercadoPagoWebhook(webhookInput);
 
       expect(deps.reconcileProviderPayment).toHaveBeenCalledWith(
         expect.objectContaining({ providerStatus: status }),
@@ -285,7 +255,7 @@ describe("Phase 11 Mercado Pago webhook orchestration", () => {
   ])(
     "rejects authoritative %s mismatch and records the event as failed",
     async (_label, patch) => {
-      const deps = makeWebhookServer({
+      const deps = makeWebhookProcessor({
         payment: {
           providerPaymentReference: PAYMENT_ID,
           status: "SUCCEEDED",
@@ -302,7 +272,7 @@ describe("Phase 11 Mercado Pago webhook orchestration", () => {
       });
 
       await expectPaymentError(
-        () => deps.server.processMercadoPagoWebhook(webhookInput),
+        () => deps.processMercadoPagoWebhook(webhookInput),
         "RECONCILIATION_MISMATCH",
       );
 
