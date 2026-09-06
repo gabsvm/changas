@@ -175,6 +175,9 @@ jobs:
       - name: Run Phase 10 complete beta runtime journeys
         run: node apps/web/scripts/phase-10-beta-runtime.mjs
 
+      - name: Run Phase 11 payment runtime checks
+        run: node apps/web/scripts/phase-11-payments-runtime.mjs
+
       - name: Reset local database with synthetic seed
         run: pnpm dlx supabase@2.116.0 db reset --local
 
