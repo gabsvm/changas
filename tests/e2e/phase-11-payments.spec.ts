@@ -95,7 +95,9 @@ test.describe("Phase 11 payment administration", () => {
     await expect(
       page.getByRole("button", { name: "Conciliar Mercado Pago" }),
     ).toBeVisible();
-    await expect(page.getByText("Ejecuciones de conciliación")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Ejecuciones de conciliación" }),
+    ).toBeVisible();
 
     const body = await page.locator("body").innerText();
     expect(body).not.toContain("access_token");
