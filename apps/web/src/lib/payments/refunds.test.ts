@@ -3,7 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import { encryptPaymentToken } from "./crypto";
-import { createPaymentServer, PaymentServerError } from "./server";
+import { createPaymentRefundServer } from "./server-refunds";
+import { PaymentServerError } from "./server";
 
 const CLIENT_USER_ID = "73300000-0000-4000-8000-000000000001";
 const PROVIDER_USER_ID = "73300000-0000-4000-8000-000000000002";
@@ -11,25 +12,17 @@ const PAYMENT_ATTEMPT_ID = "73310000-0000-4000-8000-000000000001";
 const PAYMENT_ACCOUNT_ID = "73320000-0000-4000-8000-000000000001";
 const REFUND_ID = "73330000-0000-4000-8000-000000000001";
 const REFUND_NONCE = "73340000-0000-4000-8000-000000000001";
+const RUN_ID = "73350000-0000-4000-8000-000000000001";
 const TOKEN_KEY = Buffer.alloc(32, 7).toString("base64");
 
-const paymentEnv = {
-  clientId: "phase11-client-id",
-  clientSecret: "phase11-client-secret",
-  webhookSecret: "phase11-webhook-secret",
-  tokenEncryptionKey: TOKEN_KEY,
-  tokenEncryptionKeyVersion: 1,
-  oauthStateSecret: Buffer.alloc(32, 9).toString("base64"),
-  marketplaceFeeBps: 1000,
-  providerMode: "test" as const,
-};
-
-function makeRefundServer(overrides: {
-  currentUserId?: string | null;
-  refundableRemainingMinor?: number;
-  existingRefund?: Record<string, unknown> | null;
-  providerFailure?: Error;
-} = {}) {
+function makeRefundServer(
+  overrides: {
+    currentUserId?: string | null;
+    refundableRemainingMinor?: number;
+    existingRefund?: Record<string, unknown> | null;
+    providerFailure?: Error;
+  } = {},
+) {
   const accessToken = encryptPaymentToken(
     "APP_USR-seller-refund-access",
     TOKEN_KEY,
@@ -37,6 +30,7 @@ function makeRefundServer(overrides: {
   );
   const created: unknown[] = [];
   const recorded: unknown[] = [];
+  const finishedRuns: unknown[] = [];
   const refund = vi.fn(async (input: unknown) => {
     if (overrides.providerFailure) throw overrides.providerFailure;
     return {
@@ -47,10 +41,11 @@ function makeRefundServer(overrides: {
     };
   });
 
+  let durableRefund: Record<string, unknown> | null =
+    overrides.existingRefund ?? null;
+
   const dependencies = {
-    now: () => Date.UTC(2026, 8, 6, 3, 0, 0),
-    siteUrl: "https://changas.test",
-    paymentEnv,
+    paymentEnv: { tokenEncryptionKey: TOKEN_KEY },
     getCurrentUser: async () => {
       const id =
         overrides.currentUserId === undefined
@@ -58,9 +53,6 @@ function makeRefundServer(overrides: {
           : overrides.currentUserId;
       return id ? { id } : null;
     },
-    hasProviderProfile: async () => false,
-    getAccountState: async () => null,
-    upsertAccount: async () => undefined,
     loadPaymentRefundSnapshot: async () => ({
       paymentAttemptId: PAYMENT_ATTEMPT_ID,
       clientUserId: CLIENT_USER_ID,
@@ -76,31 +68,58 @@ function makeRefundServer(overrides: {
       accessToken,
       encryptionKeyVersion: 1,
     }),
-    findRefundByNonce: async () => overrides.existingRefund ?? null,
+    findRefundByNonce: async () => durableRefund,
     createRefundRecord: async (input: unknown) => {
       created.push(input);
-      return {
+      durableRefund = {
         ...(input as Record<string, unknown>),
         id: REFUND_ID,
-        status: "REQUESTED",
+        providerName: "MERCADO_PAGO",
+        providerPaymentReference: "payment-mp-001",
         providerRefundReference: null,
+        reasonCode: null,
       };
+      return durableRefund;
     },
     markRefundProviderResult: async (input: unknown) => {
       recorded.push(input);
+      const update = input as {
+        refundId: string;
+        providerRefundReference: string | null;
+        status: string;
+        reasonCode?: string | null;
+      };
+      durableRefund = {
+        ...(durableRefund ?? {
+          id: update.refundId,
+          paymentAttemptId: PAYMENT_ATTEMPT_ID,
+          requestNonce: REFUND_NONCE,
+          providerName: "MERCADO_PAGO",
+          providerPaymentReference: "payment-mp-001",
+          amountMinor: 100000,
+          currencyCode: "ARS",
+        }),
+        providerRefundReference: update.providerRefundReference,
+        status: update.status,
+        reasonCode: update.reasonCode ?? null,
+      };
+      return durableRefund;
     },
-    paymentProvider: {
-      exchangeOAuthCode: async () => {
-        throw new Error("not used");
-      },
-      refund,
+    startReconciliationRun: async () => RUN_ID,
+    finishReconciliationRun: async (input: unknown) => {
+      finishedRuns.push(input);
     },
+    performReconciliation: async () => ({
+      checkedCount: 3,
+      matchedCount: 2,
+      mismatchedCount: 1,
+      failedCount: 0,
+    }),
+    paymentProvider: { refund },
   };
 
-  const server = createPaymentServer(
-    dependencies as unknown as Parameters<typeof createPaymentServer>[0],
-  );
-  return { server, refund, created, recorded };
+  const server = createPaymentRefundServer(dependencies);
+  return { server, refund, created, recorded, finishedRuns };
 }
 
 async function expectPaymentError(operation: () => Promise<unknown>, code: string) {
@@ -110,7 +129,7 @@ async function expectPaymentError(operation: () => Promise<unknown>, code: strin
 }
 
 describe("Phase 11 refund orchestration", () => {
-  it("derives a full refund from durable refundable balance and calls Mercado Pago idempotently", async () => {
+  it("derives a full refund from durable refundable balance and keeps it pending after provider acknowledgement", async () => {
     const { server, refund, created, recorded } = makeRefundServer();
 
     const result = await server.requestPaymentRefund(
@@ -166,7 +185,7 @@ describe("Phase 11 refund orchestration", () => {
     expect(tooLarge.refund).not.toHaveBeenCalled();
   });
 
-  it("replays an existing refund nonce without calling Mercado Pago twice", async () => {
+  it("replays an existing non-requested refund nonce without calling Mercado Pago twice", async () => {
     const existing = {
       id: REFUND_ID,
       paymentAttemptId: PAYMENT_ATTEMPT_ID,
@@ -177,6 +196,7 @@ describe("Phase 11 refund orchestration", () => {
       amountMinor: 25000,
       currencyCode: "ARS",
       status: "PENDING",
+      reasonCode: null,
     };
     const { server, refund, created } = makeRefundServer({
       existingRefund: existing,
@@ -211,5 +231,44 @@ describe("Phase 11 refund orchestration", () => {
       status: "FAILED",
       reasonCode: "REFUND_REJECTED",
     });
+  });
+
+  it("only marks refund success through the explicit reconciliation boundary", async () => {
+    const { server } = makeRefundServer();
+    await server.requestPaymentRefund(PAYMENT_ATTEMPT_ID, REFUND_NONCE, 25000);
+
+    const reconciled = await server.reconcileRefund(REFUND_ID, {
+      status: "SUCCEEDED",
+      providerRefundReference: "refund-mp-001",
+      providerEventId: "73360000-0000-4000-8000-000000000001",
+    });
+
+    expect(reconciled).toMatchObject({
+      refundId: REFUND_ID,
+      amountMinor: 25000,
+      status: "SUCCEEDED",
+      providerRefundReference: "refund-mp-001",
+    });
+  });
+
+  it("records reconciliation-run counters once the scan finishes", async () => {
+    const { server, finishedRuns } = makeRefundServer();
+
+    expect(await server.runPaymentReconciliation()).toEqual({
+      runId: RUN_ID,
+      checkedCount: 3,
+      matchedCount: 2,
+      mismatchedCount: 1,
+      failedCount: 0,
+    });
+    expect(finishedRuns).toEqual([
+      {
+        runId: RUN_ID,
+        checkedCount: 3,
+        matchedCount: 2,
+        mismatchedCount: 1,
+        failedCount: 0,
+      },
+    ]);
   });
 });
