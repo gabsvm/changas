@@ -5,8 +5,8 @@ vi.mock("server-only", () => ({}));
 import {
   createPaymentAdminServer,
   createPaymentReceiptServer,
-  PaymentServerError,
-} from "./server";
+} from "./server-admin";
+import { PaymentServerError } from "./server";
 
 const ADMIN_USER_ID = "81100000-0000-4000-8000-000000000001";
 const CLIENT_USER_ID = "81100000-0000-4000-8000-000000000002";
