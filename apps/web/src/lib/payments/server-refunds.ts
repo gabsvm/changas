@@ -1,6 +1,9 @@
 import "server-only";
 
-import { getPaymentServerEnv, type PaymentServerEnv } from "@changas/config/server";
+import {
+  getPaymentServerEnv,
+  type PaymentServerEnv,
+} from "@changas/config/server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -74,7 +77,9 @@ type ReconciliationCounters = {
 };
 
 type RefundServerDependencies = {
-  paymentEnv: Pick<PaymentServerEnv, "tokenEncryptionKey"> | (() => Pick<PaymentServerEnv, "tokenEncryptionKey">);
+  paymentEnv:
+    | Pick<PaymentServerEnv, "tokenEncryptionKey">
+    | (() => Pick<PaymentServerEnv, "tokenEncryptionKey">);
   getCurrentUser: () => Promise<{ id: string } | null>;
   loadPaymentRefundSnapshot: (paymentAttemptId: string) => Promise<unknown>;
   findRefundByNonce: (requestNonce: string) => Promise<unknown>;
@@ -93,12 +98,18 @@ type RefundServerDependencies = {
     reasonCode?: string | null;
     providerEventId?: string | null;
   }) => Promise<unknown>;
-  startReconciliationRun?: (scope: PaymentReconciliationScope) => Promise<string>;
-  finishReconciliationRun?: (input: ReconciliationCounters & {
-    runId: string;
-    errorSummary?: string | null;
-  }) => Promise<void>;
-  performReconciliation?: (scope: PaymentReconciliationScope) => Promise<ReconciliationCounters>;
+  startReconciliationRun?: (
+    scope: PaymentReconciliationScope,
+  ) => Promise<string>;
+  finishReconciliationRun?: (
+    input: ReconciliationCounters & {
+      runId: string;
+      errorSummary?: string | null;
+    },
+  ) => Promise<void>;
+  performReconciliation?: (
+    scope: PaymentReconciliationScope,
+  ) => Promise<ReconciliationCounters>;
   paymentProvider: {
     refund(input: {
       accessToken: string;
@@ -172,7 +183,10 @@ function requireCurrency(value: unknown): string {
   return currency;
 }
 
-function normalizeTokenEnvelope(value: unknown, keyVersion: number): PaymentTokenEnvelope {
+function normalizeTokenEnvelope(
+  value: unknown,
+  keyVersion: number,
+): PaymentTokenEnvelope {
   if (!isRecord(value)) {
     throw new PaymentServerError(
       "INVALID_PROVIDER_STATE",
@@ -194,7 +208,10 @@ function normalizeTokenEnvelope(value: unknown, keyVersion: number): PaymentToke
   return envelope;
 }
 
-function normalizeSnapshot(value: unknown, paymentAttemptId: string): RefundablePaymentSnapshot {
+function normalizeSnapshot(
+  value: unknown,
+  paymentAttemptId: string,
+): RefundablePaymentSnapshot {
   if (!isRecord(value)) {
     throw new PaymentServerError("NOT_FOUND", "Payment attempt was not found");
   }
@@ -210,7 +227,10 @@ function normalizeSnapshot(value: unknown, paymentAttemptId: string): Refundable
       "Refund payment provider is unsupported",
     );
   }
-  if (value.paymentStatus !== "SUCCEEDED" && value.paymentStatus !== "REFUNDED") {
+  if (
+    value.paymentStatus !== "SUCCEEDED" &&
+    value.paymentStatus !== "REFUNDED"
+  ) {
     throw new PaymentServerError("CONFLICT", "Payment is not refundable");
   }
 
@@ -303,11 +323,17 @@ function publicRefund(record: RefundRecord): RefundResult {
 }
 
 function sanitizeError(error: unknown): string {
-  const message = error instanceof Error ? error.message : "payment reconciliation failed";
-  return message.replace(/\s+/g, " ").trim().slice(0, 1000) || "payment reconciliation failed";
+  const message =
+    error instanceof Error ? error.message : "payment reconciliation failed";
+  return (
+    message.replace(/\s+/g, " ").trim().slice(0, 1000) ||
+    "payment reconciliation failed"
+  );
 }
 
-export function createPaymentRefundServer(dependencies: RefundServerDependencies) {
+export function createPaymentRefundServer(
+  dependencies: RefundServerDependencies,
+) {
   async function requestPaymentRefund(
     paymentAttemptId: string,
     requestNonce: string,
@@ -315,7 +341,10 @@ export function createPaymentRefundServer(dependencies: RefundServerDependencies
   ): Promise<RefundResult> {
     const user = await dependencies.getCurrentUser();
     if (!user) {
-      throw new PaymentServerError("UNAUTHORIZED", "Authentication is required");
+      throw new PaymentServerError(
+        "UNAUTHORIZED",
+        "Authentication is required",
+      );
     }
     requireString(paymentAttemptId, "paymentAttemptId");
     requireString(requestNonce, "requestNonce");
@@ -325,7 +354,8 @@ export function createPaymentRefundServer(dependencies: RefundServerDependencies
       const existing = normalizeRefund(existingRaw);
       if (
         existing.paymentAttemptId !== paymentAttemptId ||
-        (requestedAmountMinor !== undefined && existing.amountMinor !== requestedAmountMinor)
+        (requestedAmountMinor !== undefined &&
+          existing.amountMinor !== requestedAmountMinor)
       ) {
         throw new PaymentServerError(
           "CONFLICT",
@@ -372,8 +402,13 @@ export function createPaymentRefundServer(dependencies: RefundServerDependencies
           )
         : normalizeRefund(existingRaw);
 
-    const tokenEncryptionKey = resolveValue(dependencies.paymentEnv).tokenEncryptionKey;
-    const accessToken = decryptPaymentToken(snapshot.accessToken, tokenEncryptionKey);
+    const tokenEncryptionKey = resolveValue(
+      dependencies.paymentEnv,
+    ).tokenEncryptionKey;
+    const accessToken = decryptPaymentToken(
+      snapshot.accessToken,
+      tokenEncryptionKey,
+    );
 
     try {
       const providerResult = await dependencies.paymentProvider.refund({
@@ -437,7 +472,10 @@ export function createPaymentRefundServer(dependencies: RefundServerDependencies
   async function runPaymentReconciliation(
     scope: PaymentReconciliationScope = {},
   ): Promise<ReconciliationCounters & { runId: string }> {
-    if (!dependencies.startReconciliationRun || !dependencies.finishReconciliationRun) {
+    if (
+      !dependencies.startReconciliationRun ||
+      !dependencies.finishReconciliationRun
+    ) {
       throw new PaymentServerError(
         "PERSISTENCE_ERROR",
         "Payment reconciliation persistence is unavailable",
@@ -447,7 +485,12 @@ export function createPaymentRefundServer(dependencies: RefundServerDependencies
     try {
       const counters = dependencies.performReconciliation
         ? await dependencies.performReconciliation(scope)
-        : { checkedCount: 0, matchedCount: 0, mismatchedCount: 0, failedCount: 0 };
+        : {
+            checkedCount: 0,
+            matchedCount: 0,
+            mismatchedCount: 0,
+            failedCount: 0,
+          };
       await dependencies.finishReconciliationRun({ runId, ...counters });
       return { runId, ...counters };
     } catch (error) {
@@ -474,7 +517,10 @@ async function getCurrentUser() {
   return user ? { id: user.id } : null;
 }
 
-async function callRpc(name: string, args?: Record<string, unknown>): Promise<unknown> {
+async function callRpc(
+  name: string,
+  args?: Record<string, unknown>,
+): Promise<unknown> {
   const admin = createAdminClient() as unknown as RpcClient;
   const { data, error } = await admin.rpc(name, args);
   if (error) {
@@ -541,7 +587,10 @@ async function startReconciliationRun(scope: PaymentReconciliationScope) {
 }
 
 async function finishReconciliationRun(
-  input: ReconciliationCounters & { runId: string; errorSummary?: string | null },
+  input: ReconciliationCounters & {
+    runId: string;
+    errorSummary?: string | null;
+  },
 ) {
   await callRpc("finish_payment_reconciliation_run", {
     target_run_id: input.runId,
@@ -553,7 +602,8 @@ async function finishReconciliationRun(
   });
 }
 
-let defaultRefundServer: ReturnType<typeof createPaymentRefundServer> | null = null;
+let defaultRefundServer: ReturnType<typeof createPaymentRefundServer> | null =
+  null;
 
 function getDefaultRefundServer() {
   if (defaultRefundServer) return defaultRefundServer;
