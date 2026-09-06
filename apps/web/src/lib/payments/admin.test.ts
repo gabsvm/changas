@@ -101,7 +101,10 @@ describe("Phase 11 admin payment visibility", () => {
     );
 
     const member = makeAdminServer({ admin: false });
-    await expectPaymentError(() => member.server.listAdminPayments(), "FORBIDDEN");
+    await expectPaymentError(
+      () => member.server.listAdminPayments(),
+      "FORBIDDEN",
+    );
     expect(member.runReconciliation).not.toHaveBeenCalled();
   });
 

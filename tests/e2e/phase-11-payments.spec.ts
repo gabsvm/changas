@@ -48,10 +48,13 @@ async function createUser(label: string): Promise<TestUser> {
 }
 
 async function promoteAdmin(userId: string) {
-  const response = await adminRequest(`/rest/v1/user_roles?user_id=eq.${userId}`, {
-    method: "PATCH",
-    body: JSON.stringify({ role: "admin" }),
-  });
+  const response = await adminRequest(
+    `/rest/v1/user_roles?user_id=eq.${userId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ role: "admin" }),
+    },
+  );
   expect(response.ok).toBeTruthy();
 }
 
@@ -60,7 +63,9 @@ async function login(page: Page, user: TestUser, next: string) {
   await page.getByLabel("Correo electrónico").fill(user.email);
   await page.getByLabel("Contraseña").fill(user.password);
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
-  await expect(page).toHaveURL((url) => `${url.pathname}${url.search}` === next);
+  await expect(page).toHaveURL(
+    (url) => `${url.pathname}${url.search}` === next,
+  );
 }
 
 test.describe("Phase 11 payment administration", () => {

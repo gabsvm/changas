@@ -180,15 +180,12 @@ function normalizeAdminPayment(value: unknown): AdminPaymentRow {
     settlementStatus: nullableString(
       pick(value, "settlementStatus", "settlement_status"),
     ),
-    refundStatus: nullableString(
-      pick(value, "refundStatus", "refund_status"),
-    ),
+    refundStatus: nullableString(pick(value, "refundStatus", "refund_status")),
     refundedMinor: integer(
       pick(value, "refundedMinor", "refunded_minor"),
       "refundedMinor",
     ),
-    mismatchFlag:
-      pick(value, "mismatchFlag", "mismatch_flag") === true,
+    mismatchFlag: pick(value, "mismatchFlag", "mismatch_flag") === true,
     lastReconciledAt: nullableString(
       pick(value, "lastReconciledAt", "last_reconciled_at"),
     ),
@@ -226,7 +223,10 @@ function normalizeRun(value: unknown): AdminReconciliationRun {
       "failedCount",
     ),
     status: requiredString(value.status, "status"),
-    startedAt: requiredString(pick(value, "startedAt", "started_at"), "startedAt"),
+    startedAt: requiredString(
+      pick(value, "startedAt", "started_at"),
+      "startedAt",
+    ),
     finishedAt: nullableString(pick(value, "finishedAt", "finished_at")),
     errorSummary: nullableString(pick(value, "errorSummary", "error_summary")),
   };
@@ -264,7 +264,10 @@ function normalizeReceipt(value: unknown): PaymentReceipt & {
       pick(value, "externalReference", "external_reference"),
       "externalReference",
     ),
-    amountMinor: integer(pick(value, "amountMinor", "amount_minor"), "amountMinor"),
+    amountMinor: integer(
+      pick(value, "amountMinor", "amount_minor"),
+      "amountMinor",
+    ),
     currencyCode: requiredString(
       pick(value, "currencyCode", "currency_code"),
       "currencyCode",
@@ -274,7 +277,10 @@ function normalizeReceipt(value: unknown): PaymentReceipt & {
       pick(value, "refundedMinor", "refunded_minor"),
       "refundedMinor",
     ),
-    createdAt: requiredString(pick(value, "createdAt", "created_at"), "createdAt"),
+    createdAt: requiredString(
+      pick(value, "createdAt", "created_at"),
+      "createdAt",
+    ),
   };
 }
 
@@ -333,9 +339,16 @@ export function createPaymentReceiptServer(dependencies: ReceiptDependencies) {
       user.id !== internal.clientUserId &&
       user.id !== internal.providerUserId
     ) {
-      throw new PaymentServerError("FORBIDDEN", "Payment receipt access denied");
+      throw new PaymentServerError(
+        "FORBIDDEN",
+        "Payment receipt access denied",
+      );
     }
-    const { clientUserId: _client, providerUserId: _provider, ...safe } = internal;
+    const {
+      clientUserId: _client,
+      providerUserId: _provider,
+      ...safe
+    } = internal;
     return safe;
   }
 

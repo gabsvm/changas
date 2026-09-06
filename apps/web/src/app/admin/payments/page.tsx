@@ -68,7 +68,7 @@ export default async function AdminPaymentsPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="font-semibold">{payment.providerName}</p>
-                  <p className="mt-1 break-all text-xs text-slate-500">
+                  <p className="mt-1 text-xs break-all text-slate-500">
                     Ref. {payment.providerReference}
                   </p>
                 </div>

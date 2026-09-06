@@ -69,7 +69,9 @@ function requireString(value: unknown, field: string): string {
 }
 
 function nullableString(value: unknown): string | null {
-  return value === null || value === undefined ? null : requireString(value, "id");
+  return value === null || value === undefined
+    ? null
+    : requireString(value, "id");
 }
 
 function requireNonNegativeInteger(value: unknown, field: string): number {
@@ -116,7 +118,11 @@ function normalizeCandidate(value: unknown): Candidate {
       pick(value, "paymentAttemptId", "payment_attempt_id"),
     ),
     additionalPaymentAttemptId: nullableString(
-      pick(value, "additionalPaymentAttemptId", "additional_payment_attempt_id"),
+      pick(
+        value,
+        "additionalPaymentAttemptId",
+        "additional_payment_attempt_id",
+      ),
     ),
     providerName,
     providerPaymentReference: requireString(
@@ -231,11 +237,14 @@ export async function runAuthoritativePaymentReconciliation(
   };
 
   try {
-    const rawCandidates = await callRpc("list_payment_reconciliation_candidates", {
-      reconciliation_provider_name: providerName,
-      reconciliation_range_start: scope.rangeStart ?? null,
-      reconciliation_range_end: scope.rangeEnd ?? null,
-    });
+    const rawCandidates = await callRpc(
+      "list_payment_reconciliation_candidates",
+      {
+        reconciliation_provider_name: providerName,
+        reconciliation_range_start: scope.rangeStart ?? null,
+        reconciliation_range_end: scope.rangeEnd ?? null,
+      },
+    );
     if (!Array.isArray(rawCandidates)) {
       throw new PaymentServerError(
         "PERSISTENCE_ERROR",
@@ -322,7 +331,9 @@ export async function runAuthoritativePaymentReconciliation(
       target_mismatched_count: counters.mismatchedCount,
       target_failed_count: counters.failedCount + 1,
       target_error_summary:
-        error instanceof Error ? error.message.slice(0, 1000) : "Reconciliation failed",
+        error instanceof Error
+          ? error.message.slice(0, 1000)
+          : "Reconciliation failed",
     });
     throw error;
   }
