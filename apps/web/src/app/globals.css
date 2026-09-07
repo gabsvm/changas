@@ -98,12 +98,13 @@ textarea {
   place-items: center;
   overflow: hidden;
   border-radius: 0.9rem;
-  background: linear-gradient(135deg, #ffc857 0%, #ff6b35 48%, #ff0a78 100%);
-  color: white;
-  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  font-size: 1.3rem;
-  font-weight: 900;
-  letter-spacing: -0.08em;
+  background-color: #ff6b35;
+  background-image: url("/icon.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: transparent;
+  font-size: 0;
   box-shadow: 0 9px 24px rgb(255 107 53 / 24%);
 }
 
