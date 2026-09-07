@@ -49,7 +49,7 @@ export default async function AccountLayout({
               Notificaciones
               {unreadCount > 0 ? (
                 <span
-                  className="bg-brand-pink min-w-5 rounded-full px-1.5 py-0.5 text-center text-[0.65rem] leading-4 font-bold text-white no-underline"
+                  className="bg-brand-pink-strong min-w-5 rounded-full px-1.5 py-0.5 text-center text-[0.65rem] leading-4 font-bold text-white no-underline"
                   aria-label={`${unreadCount} notificaciones sin leer`}
                 >
                   {unreadCount > 99 ? "99+" : unreadCount}
