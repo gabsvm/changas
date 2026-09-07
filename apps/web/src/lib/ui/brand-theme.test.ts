@@ -28,10 +28,8 @@ describe("Changas brand theme", () => {
     expect(globals).toContain("--color-warning: #9a6500");
   });
 
-  it("uses the Changas warm gradient in the brand mark", () => {
-    expect(globals).toContain(
-      "linear-gradient(135deg, #ffc857 0%, #ff6b35 48%, #ff0a78 100%)",
-    );
+  it("uses the branded icon artwork for compact wordmarks", () => {
+    expect(globals).toContain('background-image: url("/icon.svg")');
     expect(icon).toContain("#FFC857");
     expect(icon).toContain("#FF6B35");
     expect(icon).toContain("#FF0A78");
