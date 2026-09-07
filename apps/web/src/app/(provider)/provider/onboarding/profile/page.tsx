@@ -42,10 +42,10 @@ export default async function ProviderOnboardingProfilePage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Datos básicos" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-6 sm:pt-0">
-        <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
+        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
           Paso 1 de 4
         </p>
-        <h1 className="font-display mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+        <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
           Prepará tu perfil público
         </h1>
         <p className="text-ink/60 mt-3 text-sm leading-6">
@@ -54,7 +54,7 @@ export default async function ProviderOnboardingProfilePage() {
           automáticamente.
         </p>
 
-        <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-6">
+        <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:p-6">
           <PublicProfileForm
             action={saveProviderProfileStep}
             initialValues={{
