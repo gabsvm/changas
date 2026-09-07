@@ -65,8 +65,12 @@ async function expectNoHorizontalOverflow(page: Page) {
   );
 }
 
+async function getMobileNavigation(page: Page) {
+  return page.getByRole("navigation", { name: "Navegación principal" });
+}
+
 async function expectMobileNavigation(page: Page) {
-  const nav = page.getByRole("navigation", { name: "Navegación principal" });
+  const nav = await getMobileNavigation(page);
   await expect(nav).toBeVisible();
   await expect(
     nav.getByRole("link", { name: "Cuenta", exact: true }),
@@ -81,9 +85,27 @@ async function expectMobileNavigation(page: Page) {
   }
 }
 
+async function expectPrimaryActionAboveNavigation(page: Page, name: string) {
+  const action = page.getByRole("button", { name, exact: true });
+  await action.scrollIntoViewIfNeeded();
+
+  const [actionBox, navBox] = await Promise.all([
+    action.boundingBox(),
+    (await getMobileNavigation(page)).boundingBox(),
+  ]);
+
+  expect(actionBox).not.toBeNull();
+  expect(navBox).not.toBeNull();
+  expect((actionBox?.y ?? 0) + (actionBox?.height ?? 0)).toBeLessThanOrEqual(
+    (navBox?.y ?? 0) - 4,
+  );
+}
+
 async function expectMobileRoute(page: Page) {
   await expectNoHorizontalOverflow(page);
   await expectMobileNavigation(page);
+  await expect(page.locator("main h1")).toHaveCount(1);
+
   const back = page.getByRole("link", { name: "Volver" });
   await expect(back).toBeVisible();
   const box = await back.boundingBox();
@@ -115,6 +137,7 @@ for (const width of [320, 360, 390] as const) {
       page.getByRole("heading", { name: "Prepará tu perfil público" }),
     ).toBeVisible();
     await expectMobileRoute(page);
+    await expectPrimaryActionAboveNavigation(page, "Guardar datos básicos");
 
     await page.getByRole("button", { name: "Continuar con identidad" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/identity$/);
@@ -122,6 +145,7 @@ for (const width of [320, 360, 390] as const) {
       page.getByRole("heading", { name: "Confirmá tus datos privados" }),
     ).toBeVisible();
     await expectMobileRoute(page);
+    await expectPrimaryActionAboveNavigation(page, "Guardar identidad");
 
     await page
       .getByRole("button", { name: "Continuar con documentos" })
