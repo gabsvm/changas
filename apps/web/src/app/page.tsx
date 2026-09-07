@@ -140,24 +140,24 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="brand-gradient-surface relative overflow-hidden rounded-[2.15rem] p-7 text-white sm:p-9">
+          <div className="brand-gradient-surface text-ink relative overflow-hidden rounded-[2.15rem] p-7 sm:p-9">
             <div className="hero-orbit opacity-70" aria-hidden="true" />
-            <p className="relative text-xs font-bold tracking-[0.18em] text-white/75 uppercase">
+            <p className="text-ink/70 relative text-xs font-extrabold tracking-[0.18em] uppercase">
               Elegí cómo resolverlo
             </p>
-            <h2 className="font-display relative mt-4 max-w-sm text-4xl leading-tight font-extrabold tracking-[-0.035em]">
+            <h2 className="font-display relative mt-4 max-w-sm text-4xl leading-tight font-extrabold tracking-[-0.04em]">
               Una buena changa empieza con una búsqueda clara.
             </h2>
             <div className="relative mt-8 grid gap-3 text-sm">
-              <div className="rounded-2xl border border-white/15 bg-white/12 p-4 backdrop-blur-sm">
-                <p className="font-bold">Cerca tuyo</p>
-                <p className="mt-1 text-white/80">
+              <div className="border-ink/10 bg-white/75 rounded-2xl border p-4 backdrop-blur-sm">
+                <p className="font-extrabold">Cerca tuyo</p>
+                <p className="text-ink/65 mt-1">
                   Explorá por zona y radio aproximado, sin mostrar direcciones.
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/15 bg-white/12 p-4 backdrop-blur-sm">
-                <p className="font-bold">A distancia</p>
-                <p className="mt-1 text-white/80">
+              <div className="border-ink/10 bg-white/75 rounded-2xl border p-4 backdrop-blur-sm">
+                <p className="font-extrabold">A distancia</p>
+                <p className="text-ink/65 mt-1">
                   Las habilidades remotas están disponibles estés donde estés.
                 </p>
               </div>
