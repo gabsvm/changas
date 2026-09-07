@@ -108,7 +108,7 @@ function ConversationRow({
             {conversationPreview(conversation)}
           </p>
           {conversation.unread_count > 0 ? (
-            <span className="bg-brand-pink grid min-h-5 min-w-5 shrink-0 place-items-center rounded-full px-1.5 text-[10px] font-bold text-white shadow-[0_3px_10px_rgba(255,10,120,0.22)]">
+            <span className="bg-brand-pink-strong grid min-h-5 min-w-5 shrink-0 place-items-center rounded-full px-1.5 text-[10px] font-bold text-white shadow-[0_3px_10px_rgba(214,0,96,0.22)]">
               {conversation.unread_count > 99
                 ? "99+"
                 : conversation.unread_count}
