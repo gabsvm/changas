@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
 import { expect, test, type Page } from "@playwright/test";
 
 const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -45,6 +48,15 @@ async function createTestUser(width: number): Promise<TestUser> {
   if (!body.id)
     throw new Error("Mobile onboarding E2E user response has no id.");
   return { id: body.id, email, password };
+}
+
+async function loadSyntheticIdentityFixture() {
+  const fixturePath = path.resolve(
+    process.cwd(),
+    "apps/web/fixtures/synthetic-identity.png.b64",
+  );
+  const encoded = await readFile(fixturePath, "utf8");
+  return Buffer.from(encoded.trim(), "base64");
 }
 
 async function login(page: Page, user: TestUser) {
@@ -139,6 +151,16 @@ for (const width of [320, 360, 390] as const) {
     await expectMobileRoute(page);
     await expectPrimaryActionAboveNavigation(page, "Guardar datos básicos");
 
+    await page.getByLabel("Nombre visible").fill(`Profesional Mobile ${width}`);
+    await page.getByLabel("Zona aproximada").fill("Palermo, CABA");
+    await page
+      .getByLabel("Bio")
+      .fill("Trabajo con responsabilidad, puntualidad y referencias verificables.");
+    await page.getByRole("button", { name: "Guardar datos básicos" }).click();
+    await expect(page.getByRole("status")).toContainText(
+      "Perfil público actualizado.",
+    );
+
     await page.getByRole("button", { name: "Continuar con identidad" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/identity$/);
     await expect(
@@ -146,6 +168,18 @@ for (const width of [320, 360, 390] as const) {
     ).toBeVisible();
     await expectMobileRoute(page);
     await expectPrimaryActionAboveNavigation(page, "Guardar identidad privada");
+
+    await page.getByLabel("Nombre legal").fill("Profesional Mobile Test");
+    await page.getByLabel("Teléfono privado").fill("+54 11 5555 0101");
+    await page.getByLabel("Fecha de nacimiento").fill("1990-01-01");
+    await page.getByLabel("DNI").fill("30111222");
+    await page.getByLabel("Domicilio exacto").fill("Av. Test 1234, CABA");
+    await page
+      .getByRole("button", { name: "Guardar identidad privada" })
+      .click();
+    await expect(page.getByRole("status")).toContainText(
+      "Datos privados actualizados.",
+    );
 
     await page
       .getByRole("button", { name: "Continuar con documentos" })
@@ -156,12 +190,26 @@ for (const width of [320, 360, 390] as const) {
     ).toBeVisible();
     await expectMobileRoute(page);
 
+    const syntheticIdentity = await loadSyntheticIdentityFixture();
+    await page.locator('input[name="document"]').setInputFiles({
+      name: "synthetic-identity.png",
+      mimeType: "image/png",
+      buffer: syntheticIdentity,
+    });
+    await expect(
+      page.getByAltText("Vista previa del documento seleccionado"),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Subir documento privado" })
+      .click();
+    await expect(page.getByRole("list").getByText("DNI frente")).toBeVisible();
+
     await page.getByRole("button", { name: "Continuar a revisión" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/review$/);
     await expect(
       page.getByRole("heading", { name: "Revisá lo cargado" }),
     ).toBeVisible();
-    await expect(page.getByText("Revisar", { exact: true })).toHaveCount(3);
+    await expect(page.getByText("Completo", { exact: true })).toHaveCount(3);
     await expectMobileRoute(page);
   });
 }
