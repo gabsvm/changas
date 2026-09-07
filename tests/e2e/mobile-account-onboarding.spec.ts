@@ -175,6 +175,7 @@ for (const width of [320, 360, 390] as const) {
     await expect(page.getByAltText("Vista previa del documento seleccionado")).toBeVisible();
     await page.getByRole("button", { name: "Subir documento privado" }).click();
     await expect(page.getByRole("list").getByText("DNI frente")).toBeVisible();
+    await expectPrimaryActionAboveNavigation(page, "Continuar a revisión");
 
     await page.getByRole("button", { name: "Continuar a revisión" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/review$/);
