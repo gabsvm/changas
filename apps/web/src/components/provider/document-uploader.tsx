@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import type { ActionState } from "@/lib/forms/action-state";
@@ -27,6 +28,7 @@ export function DocumentUploader({
   action: ProviderAction;
   editable: boolean;
 }) {
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [documentType, setDocumentType] = useState("DNI_FRONT");
   const [selected, setSelected] = useState<SelectedFile | null>(null);
@@ -43,11 +45,8 @@ export function DocumentUploader({
   }, [selected]);
 
   useEffect(() => {
-    if (!state.success) return;
-    if (inputRef.current) inputRef.current.value = "";
-    setSelected(null);
-    setLocalError(null);
-  }, [state.success]);
+    if (state.success) router.refresh();
+  }, [router, state.success]);
 
   function openPicker(mode: "camera" | "file") {
     const input = inputRef.current;
@@ -135,7 +134,11 @@ export function DocumentUploader({
         su ruta nunca se muestra en la interfaz pública.
       </p>
 
-      <form action={formAction} encType="multipart/form-data" className="mt-6 space-y-5">
+      <form
+        action={formAction}
+        encType="multipart/form-data"
+        className="mt-6 space-y-5"
+      >
         <label className="block text-sm font-semibold">
           Tipo de documento
           <select
@@ -175,13 +178,17 @@ export function DocumentUploader({
               </div>
             ) : null}
             <div className="flex items-start gap-3 p-4">
-              <span className="bg-moss/10 text-moss grid h-10 w-10 shrink-0 place-items-center rounded-xl" aria-hidden="true">
+              <span
+                className="bg-moss/10 text-moss grid h-10 w-10 shrink-0 place-items-center rounded-xl"
+                aria-hidden="true"
+              >
                 {selected.file.type === "application/pdf" ? "PDF" : "IMG"}
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold">{selected.file.name}</p>
                 <p className="text-ink/50 mt-1 text-xs">
-                  {getDocumentTypeLabel(documentType)} · {formatFileSize(selected.file.size)}
+                  {getDocumentTypeLabel(documentType)} ·{" "}
+                  {formatFileSize(selected.file.size)}
                 </p>
               </div>
               <button
@@ -196,10 +203,24 @@ export function DocumentUploader({
           </div>
         ) : (
           <div className="border-ink/15 bg-canvas/55 rounded-2xl border border-dashed p-5 text-center">
-            <div className="bg-moss/8 text-moss mx-auto grid h-12 w-12 place-items-center rounded-2xl" aria-hidden="true">
+            <div
+              className="bg-moss/8 text-moss mx-auto grid h-12 w-12 place-items-center rounded-2xl"
+              aria-hidden="true"
+            >
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none">
-                <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M5 13.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <path
+                  d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5 13.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
             <p className="mt-3 text-sm font-bold">Elegí cómo cargarlo</p>
@@ -229,17 +250,27 @@ export function DocumentUploader({
         </div>
 
         {localError ? (
-          <p className="bg-danger/10 text-danger rounded-2xl px-4 py-3 text-sm" role="alert">
+          <p
+            className="bg-danger/10 text-danger rounded-2xl px-4 py-3 text-sm"
+            role="alert"
+          >
             {localError}
           </p>
         ) : null}
         {state.error ? (
-          <p className="bg-danger/10 text-danger rounded-2xl px-4 py-3 text-sm" role="alert">
+          <p
+            className="bg-danger/10 text-danger rounded-2xl px-4 py-3 text-sm"
+            role="alert"
+          >
             {state.error}
           </p>
         ) : null}
         {state.success ? (
-          <p className="bg-success/10 text-success rounded-2xl px-4 py-3 text-sm" role="status" aria-live="polite">
+          <p
+            className="bg-success/10 text-success rounded-2xl px-4 py-3 text-sm"
+            role="status"
+            aria-live="polite"
+          >
             {state.success}
           </p>
         ) : null}
@@ -247,7 +278,7 @@ export function DocumentUploader({
         <button
           className="button-primary w-full disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           type="submit"
-          disabled={pending || !selected}
+          disabled={pending || !selected || Boolean(state.success)}
         >
           {pending ? "Subiendo…" : "Subir documento privado"}
         </button>
