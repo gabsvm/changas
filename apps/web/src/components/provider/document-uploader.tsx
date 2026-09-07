@@ -100,10 +100,10 @@ export function DocumentUploader({
   if (!editable) {
     return (
       <section className="border-ink/10 bg-surface rounded-3xl border p-5 sm:p-6">
-        <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.14em] uppercase">
+        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
           Documentos privados
         </p>
-        <h2 className="font-display mt-2 text-2xl font-semibold">
+        <h2 className="font-display mt-2 text-2xl font-extrabold tracking-[-0.025em]">
           Carga temporalmente bloqueada
         </h2>
         <p className="text-ink/60 mt-2 text-sm leading-6">
@@ -115,17 +115,17 @@ export function DocumentUploader({
   }
 
   return (
-    <section className="border-ink/10 bg-surface rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-6">
+    <section className="border-ink/10 bg-surface rounded-3xl border p-5 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.14em] uppercase">
+          <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
             Privado
           </p>
-          <h2 className="font-display mt-2 text-2xl font-semibold">
+          <h2 className="font-display mt-2 text-2xl font-extrabold tracking-[-0.025em]">
             Subí un documento
           </h2>
         </div>
-        <span className="bg-moss/8 text-moss rounded-full px-3 py-1 text-[0.65rem] font-bold tracking-[0.08em] uppercase">
+        <span className="bg-moss/10 text-moss rounded-full px-3 py-1 text-[0.65rem] font-bold tracking-[0.08em] uppercase">
           Máx. 10 MiB
         </span>
       </div>
@@ -139,7 +139,7 @@ export function DocumentUploader({
         encType="multipart/form-data"
         className="mt-6 space-y-5"
       >
-        <label className="block text-sm font-semibold">
+        <label className="block text-sm font-bold">
           Tipo de documento
           <select
             className="border-ink/15 bg-surface focus:border-moss focus:ring-moss/20 mt-2 min-h-12 w-full rounded-2xl border px-4 py-3 text-sm outline-none focus:ring-2"
@@ -206,7 +206,7 @@ export function DocumentUploader({
         ) : (
           <div className="border-ink/15 bg-canvas/55 rounded-2xl border border-dashed p-5 text-center">
             <div
-              className="bg-moss/8 text-moss mx-auto grid h-12 w-12 place-items-center rounded-2xl"
+              className="bg-moss/10 text-moss mx-auto grid h-12 w-12 place-items-center rounded-2xl"
               aria-hidden="true"
             >
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none">
