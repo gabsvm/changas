@@ -126,9 +126,7 @@ async function expectMobileRoute(page: Page) {
 }
 
 for (const width of [320, 360, 390] as const) {
-  test(`mobile account and provider onboarding remain usable at ${width}px`, async ({
-    page,
-  }) => {
+  test(`mobile account and provider onboarding remain usable at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
     const user = await createTestUser(width);
     await login(page, user);
@@ -138,56 +136,34 @@ for (const width of [320, 360, 390] as const) {
     await page.getByRole("button", { name: "Empezar como proveedor" }).click();
 
     await expect(page).toHaveURL(/\/provider\/onboarding$/);
-    await expect(
-      page.getByRole("heading", { name: "Tu verificación" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Tu verificación" })).toBeVisible();
     await expectMobileRoute(page);
 
     await page.getByRole("link", { name: "Continuar verificación" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/profile$/);
-    await expect(
-      page.getByRole("heading", { name: "Prepará tu perfil público" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Prepará tu perfil público" })).toBeVisible();
     await expectMobileRoute(page);
-    await expectPrimaryActionAboveNavigation(page, "Guardar datos básicos");
 
     await page.getByLabel("Nombre visible").fill(`Profesional Mobile ${width}`);
-    await page.getByLabel("Zona aproximada").fill("Palermo, CABA");
-    await page
-      .getByLabel("Bio")
-      .fill("Trabajo con responsabilidad, puntualidad y referencias verificables.");
-    await page.getByRole("button", { name: "Guardar datos básicos" }).click();
-    await expect(page.getByRole("status")).toContainText(
-      "Perfil público actualizado.",
-    );
+    await page.getByLabel("Zona aproximada").fill("Zona de prueba");
+    await page.getByLabel("Bio").fill("Perfil sintético para validar el flujo mobile.");
+    await expectPrimaryActionAboveNavigation(page, "Guardar y continuar");
+    await page.getByRole("button", { name: "Guardar y continuar" }).click();
 
-    await page.getByRole("button", { name: "Continuar con identidad" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/identity$/);
-    await expect(
-      page.getByRole("heading", { name: "Confirmá tus datos privados" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Confirmá tus datos privados" })).toBeVisible();
     await expectMobileRoute(page);
-    await expectPrimaryActionAboveNavigation(page, "Guardar identidad privada");
 
-    await page.getByLabel("Nombre legal").fill("Profesional Mobile Test");
-    await page.getByLabel("Teléfono privado").fill("+54 11 5555 0101");
+    await page.getByLabel("Nombre legal").fill("Persona de prueba");
+    await page.getByLabel("Teléfono privado").fill("0000000000");
     await page.getByLabel("Fecha de nacimiento").fill("1990-01-01");
-    await page.getByLabel("DNI").fill("30111222");
-    await page.getByLabel("Domicilio exacto").fill("Av. Test 1234, CABA");
-    await page
-      .getByRole("button", { name: "Guardar identidad privada" })
-      .click();
-    await expect(page.getByRole("status")).toContainText(
-      "Datos privados actualizados.",
-    );
+    await page.getByLabel("DNI").fill("00000000");
+    await page.getByLabel("Domicilio exacto").fill("Domicilio sintético de prueba");
+    await expectPrimaryActionAboveNavigation(page, "Guardar y continuar");
+    await page.getByRole("button", { name: "Guardar y continuar" }).click();
 
-    await page
-      .getByRole("button", { name: "Continuar con documentos" })
-      .click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/documents$/);
-    await expect(
-      page.getByRole("heading", { name: "Documentos de identidad" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Documentos de identidad" })).toBeVisible();
     await expectMobileRoute(page);
 
     const syntheticIdentity = await loadSyntheticIdentityFixture();
@@ -196,19 +172,13 @@ for (const width of [320, 360, 390] as const) {
       mimeType: "image/png",
       buffer: syntheticIdentity,
     });
-    await expect(
-      page.getByAltText("Vista previa del documento seleccionado"),
-    ).toBeVisible();
-    await page
-      .getByRole("button", { name: "Subir documento privado" })
-      .click();
+    await expect(page.getByAltText("Vista previa del documento seleccionado")).toBeVisible();
+    await page.getByRole("button", { name: "Subir documento privado" }).click();
     await expect(page.getByRole("list").getByText("DNI frente")).toBeVisible();
 
     await page.getByRole("button", { name: "Continuar a revisión" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/review$/);
-    await expect(
-      page.getByRole("heading", { name: "Revisá lo cargado" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Revisá lo cargado" })).toBeVisible();
     await expect(page.getByText("Completo", { exact: true })).toHaveCount(3);
     await expectMobileRoute(page);
   });
