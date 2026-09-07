@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 
 import { parseDiscoveryFilters } from "@changas/domain";
 
+import { AuthenticatedBottomNav } from "@/components/ui/authenticated-bottom-nav";
 import { DiscoveryCard } from "@/components/discovery/discovery-card";
 import { LocationPicker } from "@/components/discovery/location-picker";
 import { searchDiscovery } from "@/lib/discovery/server";
+import { getUnreadNotificationCount } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -19,7 +21,14 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const filters = parseDiscoveryFilters({ pageSize: "6" });
   const supabase = await createClient();
-  const [{ data: categories }, discovery] = await Promise.all([
+  const [
+    {
+      data: { user },
+    },
+    { data: categories },
+    discovery,
+  ] = await Promise.all([
+    supabase.auth.getUser(),
     supabase
       .from("categories")
       .select("slug, name, description")
@@ -28,9 +37,15 @@ export default async function HomePage() {
       .limit(6),
     searchDiscovery({ query: "", filters }),
   ]);
+  const unreadCount = user ? await getUnreadNotificationCount(supabase) : 0;
 
   return (
-    <main id="main-content" className="bg-canvas text-ink min-h-screen">
+    <main
+      id="main-content"
+      className={`bg-canvas text-ink min-h-screen ${
+        user ? "mobile-content-with-nav" : ""
+      }`}
+    >
       <div className="mx-auto w-full max-w-7xl px-5 py-5 sm:px-8 lg:px-10">
         <header className="border-ink/10 flex items-center justify-between border-b pb-5">
           <Link
@@ -46,12 +61,21 @@ export default async function HomePage() {
             </span>
           </Link>
           <nav className="flex items-center gap-4 text-sm" aria-label="Acceso">
-            <Link
-              className="text-ink/65 underline underline-offset-4"
-              href="/login"
-            >
-              Ingresar
-            </Link>
+            {user ? (
+              <Link
+                className="text-ink/65 underline underline-offset-4"
+                href="/account"
+              >
+                Mi cuenta
+              </Link>
+            ) : (
+              <Link
+                className="text-ink/65 underline underline-offset-4"
+                href="/login"
+              >
+                Ingresar
+              </Link>
+            )}
             <Link
               className="button-secondary hidden sm:inline-flex"
               href="/provider/onboarding"
@@ -223,6 +247,7 @@ export default async function HomePage() {
           <span>Sin ratings ni promesas inventadas.</span>
         </footer>
       </div>
+      {user ? <AuthenticatedBottomNav unreadCount={unreadCount} /> : null}
     </main>
   );
 }
