@@ -50,10 +50,10 @@ export default async function ProviderOnboardingDocumentsPage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Documentos" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-3xl pt-6 sm:pt-0">
-        <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
+        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
           Paso 3 de 4
         </p>
-        <h1 className="font-display mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+        <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
           Documentos de identidad
         </h1>
         <p className="text-ink/60 mt-3 max-w-2xl text-sm leading-6">
@@ -80,10 +80,10 @@ export default async function ProviderOnboardingDocumentsPage() {
         <section className="mt-6">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.14em] uppercase">
+              <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
                 Recibidos
               </p>
-              <h2 className="font-display mt-1 text-2xl font-semibold">
+              <h2 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.025em]">
                 Tus documentos
               </h2>
             </div>
@@ -104,7 +104,7 @@ export default async function ProviderOnboardingDocumentsPage() {
               ))}
             </ul>
           ) : (
-            <p className="border-ink/10 bg-surface text-ink/55 mt-4 rounded-2xl border px-4 py-4 text-sm">
+            <p className="border-ink/10 bg-surface text-ink/55 mt-4 rounded-2xl border px-4 py-4 text-sm shadow-[0_8px_24px_rgba(32,33,36,0.025)]">
               Todavía no hay documentos registrados.
             </p>
           )}
