@@ -2,7 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { StartProviderForm } from "@/components/account/account-form";
+import { AccountMenuItem } from "@/components/ui/account-menu-item";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
+import { getNextOnboardingHref } from "@/lib/ui/onboarding";
+import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 
 import { startProviderOnboarding } from "../../(provider)/actions";
 
@@ -30,92 +35,145 @@ export default async function AccountPage() {
       .eq("user_id", user.id)
       .maybeSingle(),
   ]);
+
   const displayName =
-    profile?.display_name || user.email?.split("@")[0] || "tu cuenta";
+    profile?.display_name || user.email?.split("@")[0] || "Tu cuenta";
+  const initial = displayName.trim().charAt(0).toUpperCase() || "C";
+  const providerPresentation = provider
+    ? getProviderStatusPresentation(provider.status)
+    : null;
+  const canContinue =
+    provider?.status === "PROFILE_INCOMPLETE" ||
+    provider?.status === "IDENTITY_PENDING";
 
   return (
-    <section className="py-10 sm:py-14">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-terracotta text-xs font-semibold tracking-[0.18em] uppercase">
-            Mi cuenta
-          </p>
-          <h1 className="font-display mt-3 text-5xl leading-none font-semibold tracking-[-0.04em]">
-            Hola, {displayName}
-          </h1>
-          <p className="text-ink/65 mt-4 max-w-xl text-sm leading-6">
-            Gestioná tu perfil y, si querés, empezá a preparar tu identidad como
-            proveedor.
-          </p>
-        </div>
-        <Link className="button-secondary" href="/account/settings">
-          Editar configuración
-        </Link>
-      </div>
+    <section className="py-6 sm:py-14">
+      <div className="mx-auto max-w-3xl">
+        <header className="flex items-center gap-3 sm:items-end sm:justify-between">
+          <div className="bg-terracotta text-surface grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-lg font-bold shadow-sm">
+            {initial}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
+              Mi cuenta
+            </p>
+            <h1 className="font-display mt-0.5 truncate text-2xl font-semibold tracking-[-0.025em] sm:text-4xl">
+              {displayName}
+            </h1>
+            <p className="text-ink/55 mt-1 truncate text-xs sm:text-sm">
+              {user.email ?? "Cuenta de Changas"}
+            </p>
+          </div>
+        </header>
 
-      <div className="mt-10 grid gap-5 md:grid-cols-2">
-        <article className="border-ink/10 rounded-2xl border bg-white/65 p-5 sm:p-6">
-          <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
-            Presentación
-          </p>
-          <h2 className="font-display mt-2 text-2xl font-semibold">
-            Lo que otros podrán ver
-          </h2>
-          <dl className="mt-5 space-y-4 text-sm">
-            <div>
-              <dt className="text-ink/50">Nombre</dt>
-              <dd className="mt-1 font-semibold">
-                {profile?.display_name || "Sin completar"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-ink/50">Zona aproximada</dt>
-              <dd className="mt-1 font-semibold">
-                {profile?.public_zone || "Sin completar"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-ink/50">Bio</dt>
-              <dd className="text-ink/70 mt-1 leading-6">
-                {profile?.bio || "Todavía no agregaste una bio."}
-              </dd>
-            </div>
-          </dl>
-        </article>
-
-        <article className="border-ink/10 bg-moss rounded-2xl border p-5 text-white sm:p-6">
-          <p className="text-xs font-semibold tracking-[0.16em] text-white/65 uppercase">
-            Proveedor
-          </p>
-          <h2 className="font-display mt-2 text-2xl font-semibold">
-            Prepará tu identidad
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-white/75">
-            Guardá tu progreso y subí documentos privados para una revisión
-            manual posterior.
-          </p>
+        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.05)] sm:p-6">
           {provider ? (
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <span className="rounded-full bg-white/15 px-3 py-2 text-xs font-semibold tracking-[0.12em] uppercase">
-                {provider.status}
-              </span>
-              <Link
-                className="button-secondary border-white/25 bg-white/10 text-white hover:bg-white/20"
-                href={
-                  provider.status === "ACTIVE"
-                    ? "/provider/manage"
-                    : "/provider/onboarding"
-                }
-              >
-                {provider.status === "ACTIVE"
-                  ? "Gestionar marketplace"
-                  : `Continuar · paso ${provider.onboarding_step}/4`}
-              </Link>
-            </div>
+            <>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.14em] uppercase">
+                    Perfil de proveedor
+                  </p>
+                  <h2 className="font-display mt-1 text-2xl font-semibold">
+                    {provider.status === "ACTIVE"
+                      ? "Tu perfil está listo"
+                      : "Completá tu verificación"}
+                  </h2>
+                </div>
+                {providerPresentation ? (
+                  <StatusBadge
+                    label={providerPresentation.label}
+                    tone={providerPresentation.tone}
+                  />
+                ) : null}
+              </div>
+              <p className="text-ink/60 mt-2 text-sm leading-6">
+                {providerPresentation?.description}
+              </p>
+              {provider.status !== "ACTIVE" ? (
+                <div className="mt-5">
+                  <div className="mb-2 flex items-center justify-between text-xs font-semibold">
+                    <span>Progreso</span>
+                    <span className="text-ink/55">
+                      Paso {Math.min(4, Math.max(1, provider.onboarding_step))} de 4
+                    </span>
+                  </div>
+                  <ProgressBar
+                    value={(Math.min(4, Math.max(1, provider.onboarding_step)) / 4) * 100}
+                    label="Progreso de verificación"
+                  />
+                </div>
+              ) : null}
+              <div className="mt-5">
+                {provider.status === "ACTIVE" ? (
+                  <Link className="button-primary w-full sm:w-auto" href="/provider/manage">
+                    Gestionar servicios
+                  </Link>
+                ) : canContinue ? (
+                  <Link
+                    className="button-primary w-full sm:w-auto"
+                    href={getNextOnboardingHref(provider.onboarding_step)}
+                  >
+                    Continuar verificación
+                  </Link>
+                ) : (
+                  <Link
+                    className="button-secondary w-full sm:w-auto"
+                    href="/provider/onboarding"
+                  >
+                    Ver estado
+                  </Link>
+                )}
+              </div>
+            </>
           ) : (
-            <StartProviderForm action={startProviderOnboarding} />
+            <>
+              <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.14em] uppercase">
+                Ofrecer servicios
+              </p>
+              <h2 className="font-display mt-1 text-2xl font-semibold">
+                ¿Querés trabajar con Changas?
+              </h2>
+              <p className="text-ink/60 mt-2 text-sm leading-6">
+                Prepará tu perfil de proveedor cuando quieras. Tu cuenta sigue sirviendo también para contratar.
+              </p>
+              <StartProviderForm action={startProviderOnboarding} />
+            </>
           )}
-        </article>
+        </section>
+
+        <section className="border-ink/10 bg-surface mt-5 overflow-hidden rounded-3xl border px-4 shadow-[0_8px_24px_rgba(22,56,50,0.04)] sm:px-5">
+          <AccountMenuItem
+            href="/account/profile"
+            icon="profile"
+            title="Perfil público"
+            description="Nombre, zona y presentación"
+          />
+          <AccountMenuItem
+            href="/account/identity"
+            icon="identity"
+            title="Identidad privada"
+            description="Datos legales que no se publican"
+          />
+          <AccountMenuItem
+            href="/account/favorites"
+            icon="saved"
+            title="Guardados"
+            description="Profesionales y servicios que marcaste"
+          />
+          <AccountMenuItem
+            href="/account/notifications"
+            icon="activity"
+            title="Actividad y notificaciones"
+            description="Novedades y preferencias de avisos"
+          />
+          <AccountMenuItem
+            href="/account/settings"
+            icon="settings"
+            title="Configuración"
+            description="Preferencias de cuenta y sesión"
+          />
+        </section>
       </div>
     </section>
   );
