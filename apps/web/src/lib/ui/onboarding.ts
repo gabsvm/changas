@@ -1,8 +1,4 @@
-export type OnboardingStepId =
-  | "profile"
-  | "identity"
-  | "documents"
-  | "review";
+export type OnboardingStepId = "profile" | "identity" | "documents" | "review";
 
 export type OnboardingStepState = "complete" | "current" | "pending";
 
