@@ -40,7 +40,7 @@ function FormStatus({ state }: { state: ActionState }) {
   );
 }
 
-function HiddenFormFields({ fields }: { fields?: HiddenFields }) {
+function HiddenFormFields({ fields }: { fields: HiddenFields | undefined }) {
   if (!fields) return null;
 
   return Object.entries(fields).map(([name, value]) => (
