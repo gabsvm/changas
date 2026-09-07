@@ -1,0 +1,76 @@
+name: Mobile format one-shot
+
+on:
+  push:
+    branches:
+      - codex/mobile-premium-redesign
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: codex/mobile-premium-redesign
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format mobile redesign files
+        run: |
+          pnpm exec prettier --write \
+            'apps/web/src/app/(account)/account/page.tsx' \
+            'apps/web/src/app/(account)/account/settings/page.tsx' \
+            'apps/web/src/app/(provider)/provider/onboarding/identity/page.tsx' \
+            'apps/web/src/app/(provider)/provider/onboarding/page.tsx' \
+            'apps/web/src/app/(provider)/provider/onboarding/profile/page.tsx' \
+            'apps/web/src/app/(provider)/provider/onboarding/review/page.tsx' \
+            'apps/web/src/components/account/account-form.tsx' \
+            'apps/web/src/components/provider/document-uploader.tsx' \
+            'apps/web/src/components/provider/onboarding-step-card.tsx' \
+            'apps/web/src/components/ui/account-menu-item.tsx' \
+            'apps/web/src/components/ui/authenticated-bottom-nav.tsx' \
+            'apps/web/src/components/ui/privacy-notice.tsx'
+          git diff --check
+
+      - name: Commit canonical formatting
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            'apps/web/src/app/(account)/account/page.tsx' \
+            'apps/web/src/app/(account)/account/settings/page.tsx' \
+            'apps/web/src/app/(provider)/provider/onboarding/identity/page.tsx' \
+            'apps/web/src/app/(provider)/provider/onboarding/page.tsx' \
+            'apps/web/src/app/(provider)/provider/onboarding/profile/page.tsx' \
+            'apps/web/src/app/(provider)/provider/onboarding/review/page.tsx' \
+            'apps/web/src/components/account/account-form.tsx' \
+            'apps/web/src/components/provider/document-uploader.tsx' \
+            'apps/web/src/components/provider/onboarding-step-card.tsx' \
+            'apps/web/src/components/ui/account-menu-item.tsx' \
+            'apps/web/src/components/ui/authenticated-bottom-nav.tsx' \
+            'apps/web/src/components/ui/privacy-notice.tsx'
+          if git diff --cached --quiet; then
+            echo 'No formatting changes to commit.'
+          else
+            git commit -m 'style(ui): format mobile redesign'
+            git push origin HEAD:codex/mobile-premium-redesign
+          fi
