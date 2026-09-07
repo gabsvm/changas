@@ -1,14 +1,11 @@
 import { canSelfManageProviderStatus } from "@changas/domain";
 import { redirect } from "next/navigation";
 
-import { updatePublicProfile } from "@/app/(account)/actions";
 import { PublicProfileForm } from "@/components/account/account-form";
-import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { createClient } from "@/lib/supabase/server";
-import { getNextOnboardingHref } from "@/lib/ui/onboarding";
 
-import { saveProviderOnboarding } from "../../../actions";
+import { saveProviderProfileStep } from "../../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -59,29 +56,22 @@ export default async function ProviderOnboardingProfilePage() {
 
         <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-6">
           <PublicProfileForm
-            action={updatePublicProfile}
+            action={saveProviderProfileStep}
             initialValues={{
               displayName: profile?.display_name ?? "",
               publicZone: profile?.public_zone ?? "",
               bio: profile?.bio ?? "",
               avatarUrl: profile?.avatar_url ?? "",
             }}
-            submitLabel="Guardar datos básicos"
+            submitLabel="Guardar y continuar"
+            hiddenFields={{ step: String(nextStep) }}
           />
         </div>
 
-        <div className="border-ink/10 mt-5 border-t pt-5">
-          <p className="text-ink/55 mb-3 text-xs leading-5">
-            Cuando hayas guardado los cambios, avanzá al siguiente paso. Si ya
-            habías avanzado antes, conservamos tu progreso más alto.
-          </p>
-          <OnboardingAdvanceForm
-            action={saveProviderOnboarding}
-            nextStep={nextStep}
-            nextHref={getNextOnboardingHref(nextStep)}
-            label="Continuar con identidad"
-          />
-        </div>
+        <p className="text-ink/50 mt-4 text-xs leading-5">
+          Al continuar guardamos estos cambios y conservamos cualquier progreso
+          más avanzado que ya tuviera tu verificación.
+        </p>
       </div>
     </section>
   );
