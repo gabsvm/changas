@@ -1,15 +1,12 @@
 import { canSelfManageProviderStatus } from "@changas/domain";
 import { redirect } from "next/navigation";
 
-import { updatePrivateIdentity } from "@/app/(account)/actions";
 import { PrivateIdentityForm } from "@/components/account/account-form";
-import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { PrivacyNotice } from "@/components/ui/privacy-notice";
 import { createClient } from "@/lib/supabase/server";
-import { getNextOnboardingHref } from "@/lib/ui/onboarding";
 
-import { saveProviderOnboarding } from "../../../actions";
+import { saveProviderIdentityStep } from "../../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -68,7 +65,7 @@ export default async function ProviderOnboardingIdentityPage() {
 
         <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-6">
           <PrivateIdentityForm
-            action={updatePrivateIdentity}
+            action={saveProviderIdentityStep}
             initialValues={{
               legalName: privateProfile?.legal_name ?? "",
               privatePhone: privateProfile?.private_phone ?? "",
@@ -76,21 +73,15 @@ export default async function ProviderOnboardingIdentityPage() {
               exactAddress: privateProfile?.exact_address ?? "",
               dniNumber: privateProfile?.dni_number ?? "",
             }}
-            submitLabel="Guardar identidad privada"
+            submitLabel="Guardar y continuar"
+            hiddenFields={{ step: String(nextStep) }}
           />
         </div>
 
-        <div className="border-ink/10 mt-5 border-t pt-5">
-          <p className="text-ink/55 mb-3 text-xs leading-5">
-            Guardá primero tus datos y después continuá con los documentos.
-          </p>
-          <OnboardingAdvanceForm
-            action={saveProviderOnboarding}
-            nextStep={nextStep}
-            nextHref={getNextOnboardingHref(nextStep)}
-            label="Continuar con documentos"
-          />
-        </div>
+        <p className="text-ink/50 mt-4 text-xs leading-5">
+          Al continuar guardamos tus datos privados y avanzamos directamente a
+          la carga de documentos, sin pasos intermedios innecesarios.
+        </p>
       </div>
     </section>
   );
