@@ -128,7 +128,7 @@ export function AuthenticatedBottomNav({
 
   return (
     <nav
-      className="mobile-safe-bottom border-ink/10 bg-surface/95 fixed inset-x-0 bottom-0 z-50 border-t px-2 pt-2 shadow-[0_-8px_24px_rgba(22,56,50,0.06)] backdrop-blur-xl sm:hidden"
+      className="mobile-safe-bottom border-ink/10 bg-surface/95 fixed inset-x-0 bottom-0 z-50 border-t px-2 pt-2 shadow-[0_-10px_30px_rgba(32,33,36,0.06)] backdrop-blur-xl sm:hidden"
       aria-label="Navegación principal"
     >
       <div className="mx-auto grid max-w-md grid-cols-4 gap-1">
@@ -139,17 +139,17 @@ export function AuthenticatedBottomNav({
               key={item.key}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-[0.68rem] font-semibold transition-colors ${
+              className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-[0.68rem] font-bold transition-colors ${
                 active
-                  ? "bg-moss/10 text-moss"
-                  : "text-ink/55 hover:bg-ink/5 hover:text-ink"
+                  ? "bg-terracotta/10 text-terracotta"
+                  : "text-ink/55 hover:bg-moss/5 hover:text-moss"
               }`}
             >
               <span className="relative">
                 <NavIcon name={item.icon} />
                 {item.key === "activity" && unreadCount > 0 ? (
                   <span
-                    className="bg-terracotta absolute -top-2 -right-2 min-w-4 rounded-full px-1 text-center text-[0.6rem] leading-4 font-bold text-white"
+                    className="bg-brand-pink absolute -top-2 -right-2 min-w-4 rounded-full px-1 text-center text-[0.6rem] leading-4 font-bold text-white shadow-[0_3px_10px_rgba(255,10,120,0.25)]"
                     aria-label={`${unreadCount} notificaciones sin leer`}
                   >
                     {unreadCount > 99 ? "99+" : unreadCount}
