@@ -47,15 +47,15 @@ export default async function NotificationCenterPage() {
       <div className="pt-6 sm:pt-0">
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div className="max-w-2xl">
-            <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
               Actividad
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-3">
-              <h1 className="font-display text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+              <h1 className="font-display text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
                 Notificaciones
               </h1>
               {unreadCount > 0 ? (
-                <span className="bg-terracotta/10 text-terracotta rounded-full px-3 py-1 text-xs font-bold">
+                <span className="bg-brand-orange/12 text-terracotta rounded-full px-3 py-1 text-xs font-extrabold">
                   {unreadCount} sin leer
                 </span>
               ) : null}
@@ -82,14 +82,14 @@ export default async function NotificationCenterPage() {
         <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(20rem,0.7fr)] lg:gap-10">
           <div>
             {notifications.length === 0 ? (
-              <div className="border-ink/10 bg-surface rounded-3xl border p-6 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-8">
+              <div className="border-ink/10 bg-surface rounded-3xl border p-6 shadow-[0_12px_32px_rgba(32,33,36,0.04)] sm:p-8">
                 <span
-                  className="bg-moss/8 text-moss grid h-12 w-12 place-items-center rounded-2xl"
+                  className="bg-brand-yellow/24 text-ink grid h-12 w-12 place-items-center rounded-2xl font-extrabold"
                   aria-hidden="true"
                 >
                   ✓
                 </span>
-                <h2 className="font-display mt-4 text-2xl font-semibold">
+                <h2 className="font-display mt-4 text-2xl font-extrabold tracking-[-0.025em]">
                   Estás al día
                 </h2>
                 <p className="text-ink/60 mt-2 text-sm leading-6">
@@ -102,16 +102,16 @@ export default async function NotificationCenterPage() {
                 {notifications.map((item) => (
                   <li
                     key={item.id}
-                    className={`rounded-3xl border p-5 shadow-[0_8px_24px_rgba(22,56,50,0.03)] sm:p-6 ${
+                    className={`rounded-3xl border p-5 shadow-[0_8px_24px_rgba(32,33,36,0.035)] sm:p-6 ${
                       item.unread
-                        ? "border-moss/25 bg-moss/5"
+                        ? "border-moss/20 bg-moss/[0.045]"
                         : "border-ink/10 bg-surface"
                     }`}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.12em] uppercase">
+                          <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.12em] uppercase">
                             {getNotificationKindLabel(item.kind)}
                           </p>
                           {item.unread ? (
@@ -120,7 +120,7 @@ export default async function NotificationCenterPage() {
                             </span>
                           ) : null}
                         </div>
-                        <h2 className="font-display mt-2 text-xl font-semibold sm:text-2xl">
+                        <h2 className="font-display mt-2 text-xl font-extrabold tracking-[-0.02em] sm:text-2xl">
                           {item.title}
                         </h2>
                       </div>
@@ -151,7 +151,7 @@ export default async function NotificationCenterPage() {
                             value={item.id}
                           />
                           <button
-                            className="hover:bg-ink/5 text-ink/65 min-h-12 w-full rounded-2xl px-4 text-sm font-semibold sm:w-auto"
+                            className="hover:bg-moss/5 hover:text-moss text-ink/65 min-h-12 w-full rounded-2xl px-4 text-sm font-bold sm:w-auto"
                             type="submit"
                           >
                             Marcar como leída
@@ -171,11 +171,11 @@ export default async function NotificationCenterPage() {
               initialEnabled={preferences.pushActionableEnabled}
             />
 
-            <section className="border-ink/10 bg-surface rounded-3xl border p-5 shadow-[0_8px_24px_rgba(22,56,50,0.03)] sm:p-6">
-              <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.14em] uppercase">
+            <section className="border-ink/10 bg-surface rounded-3xl border p-5 shadow-[0_10px_28px_rgba(32,33,36,0.04)] sm:p-6">
+              <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
                 Preferencias
               </p>
-              <h2 className="font-display mt-2 text-2xl font-semibold">
+              <h2 className="font-display mt-2 text-2xl font-extrabold tracking-[-0.025em]">
                 Qué querés recibir
               </h2>
               <p className="text-ink/60 mt-2 mb-5 text-sm leading-6">
