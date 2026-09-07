@@ -6,11 +6,12 @@
   --color-surface-muted: #fff1e8;
   --color-ink: #202124;
   --color-moss: #2563eb;
-  --color-terracotta: #ff6b35;
+  --color-brand-orange: #ff6b35;
+  --color-terracotta: #c84010;
   --color-brand-yellow: #ffc857;
   --color-brand-pink: #ff0a78;
   --color-success: #2f7d4a;
-  --color-warning: #ffc857;
+  --color-warning: #9a6500;
   --color-danger: #c93c32;
   --font-display: "Trebuchet MS", Arial, Helvetica, sans-serif;
   --font-sans: Arial, Helvetica, sans-serif;
@@ -112,7 +113,7 @@ textarea {
 }
 
 .brand-kicker {
-  color: #ff6b35;
+  color: #c84010;
 }
 
 .brand-info-link {
@@ -139,7 +140,7 @@ textarea {
 
 .button-primary {
   background: #ff6b35;
-  color: white;
+  color: #202124;
   box-shadow: 0 10px 24px rgb(255 107 53 / 22%);
 }
 
