@@ -2,9 +2,14 @@
 
 @theme {
   --color-canvas: #f5f1e9;
+  --color-surface: #fffcf7;
+  --color-surface-muted: #f0ece4;
   --color-ink: #163832;
   --color-moss: #285943;
   --color-terracotta: #b86145;
+  --color-success: #3f7556;
+  --color-warning: #a56b2a;
+  --color-danger: #a94f43;
   --font-display: Georgia, Cambria, "Times New Roman", serif;
   --font-sans: Arial, Helvetica, sans-serif;
 }
@@ -12,6 +17,10 @@
 :root {
   color-scheme: light;
   background: #f5f1e9;
+  --border-soft: rgb(22 56 50 / 12%);
+  --text-muted: rgb(22 56 50 / 62%);
+  --surface-elevated: #fffcf7;
+  --surface-muted: #f0ece4;
 }
 
 * {
@@ -33,11 +42,23 @@ a {
   text-decoration: none;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid #285943;
+  outline-offset: 3px;
+}
+
 .skip-link {
   position: fixed;
   top: 0.75rem;
   left: 0.75rem;
-  z-index: 50;
+  z-index: 60;
   transform: translateY(-200%);
   border-radius: 999px;
   background: #163832;
@@ -53,10 +74,10 @@ a {
 
 .brand-mark {
   display: grid;
-  height: 2.25rem;
-  width: 2.25rem;
+  height: 2.5rem;
+  width: 2.5rem;
   place-items: center;
-  border-radius: 0.75rem;
+  border-radius: 0.875rem;
   background: #b86145;
   color: #fffaf2;
   font-family: Georgia, Cambria, "Times New Roman", serif;
@@ -67,43 +88,62 @@ a {
 .button-primary,
 .button-secondary {
   display: inline-flex;
-  min-height: 2.875rem;
+  min-height: 3.25rem;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  gap: 0.5rem;
+  border-radius: 1rem;
   padding: 0.75rem 1.25rem;
   font-size: 0.875rem;
   font-weight: 700;
+  line-height: 1.25rem;
   transition:
-    transform 150ms ease,
     box-shadow 150ms ease,
-    background-color 150ms ease;
+    background-color 150ms ease,
+    border-color 150ms ease;
 }
 
 .button-primary {
   background: #163832;
   color: white;
-  box-shadow: 0 10px 24px rgb(22 56 50 / 15%);
+  box-shadow: 0 8px 20px rgb(22 56 50 / 14%);
 }
 
 .button-secondary {
   border: 1px solid rgb(22 56 50 / 16%);
-  background: rgb(255 255 255 / 45%);
+  background: rgb(255 252 247 / 72%);
   color: #163832;
 }
 
-.button-primary:hover,
-.button-secondary:hover {
-  transform: translateY(-2px);
+.button-primary:disabled,
+.button-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .button-primary:hover {
   background: #285943;
-  box-shadow: 0 14px 28px rgb(22 56 50 / 18%);
+  box-shadow: 0 10px 24px rgb(22 56 50 / 17%);
 }
 
 .button-secondary:hover {
-  background: rgb(255 255 255 / 80%);
+  background: #fffcf7;
+  border-color: rgb(22 56 50 / 24%);
+}
+
+.mobile-safe-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+.mobile-content-with-nav {
+  padding-bottom: calc(5.75rem + env(safe-area-inset-bottom));
+}
+
+.mobile-sticky-surface {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  background: rgb(245 241 233 / 94%);
+  border-top: 1px solid var(--border-soft);
+  backdrop-filter: blur(14px);
 }
 
 .hero-orbit {
@@ -134,4 +174,35 @@ a {
   border-radius: 999px;
   background: #72a47e;
   box-shadow: 0 0 0 4px rgb(114 164 126 / 15%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button-primary,
+  .button-secondary {
+    transition:
+      transform 150ms ease,
+      box-shadow 150ms ease,
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  .button-primary:hover,
+  .button-secondary:hover {
+    transform: translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
