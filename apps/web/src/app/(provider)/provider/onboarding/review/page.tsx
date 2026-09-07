@@ -25,12 +25,12 @@ function CompletionRow({
   return (
     <Link
       href={href}
-      className="border-ink/10 flex min-h-14 items-center justify-between gap-4 border-b py-3 last:border-b-0"
+      className="border-ink/10 hover:bg-moss/5 flex min-h-14 items-center justify-between gap-4 border-b py-3 transition-colors last:border-b-0"
     >
-      <span className="text-sm font-semibold">{label}</span>
+      <span className="text-sm font-bold">{label}</span>
       <span
         className={`rounded-full px-2.5 py-1 text-[0.65rem] font-bold tracking-[0.06em] uppercase ${
-          complete ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
+          complete ? "bg-success/10 text-success" : "bg-brand-yellow/18 text-warning"
         }`}
       >
         {complete ? "Completo" : "Revisar"}
@@ -104,10 +104,10 @@ export default async function ProviderOnboardingReviewPage() {
       <div className="mx-auto max-w-3xl pt-6 sm:pt-0">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
               Paso 4 de 4
             </p>
-            <h1 className="font-display mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+            <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
               Revisá lo cargado
             </h1>
           </div>
@@ -120,7 +120,7 @@ export default async function ProviderOnboardingReviewPage() {
           revisión correspondiente.
         </p>
 
-        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border px-5 py-2 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:px-6">
+        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border px-5 py-2 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:px-6">
           <CompletionRow
             label="Perfil público"
             complete={publicComplete}
@@ -141,10 +141,10 @@ export default async function ProviderOnboardingReviewPage() {
         <section className="mt-6">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.14em] uppercase">
+              <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
                 Documentos privados
               </p>
-              <h2 className="font-display mt-1 text-2xl font-semibold">
+              <h2 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.025em]">
                 Archivos recibidos
               </h2>
             </div>
