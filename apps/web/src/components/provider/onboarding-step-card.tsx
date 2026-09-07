@@ -19,9 +19,9 @@ export function OnboardingStepCard({
     <>
       <div className="flex items-start justify-between gap-3">
         <span
-          className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-xs font-bold ${
+          className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-xs font-extrabold ${
             step.state === "current"
-              ? "bg-moss text-white"
+              ? "bg-brand-orange text-ink"
               : step.state === "complete"
                 ? "bg-success/12 text-success"
                 : "bg-ink/7 text-ink/45"
@@ -33,7 +33,7 @@ export function OnboardingStepCard({
         <span
           className={`rounded-full px-2.5 py-1 text-[0.65rem] font-bold tracking-[0.08em] uppercase ${
             step.state === "current"
-              ? "bg-moss/10 text-moss"
+              ? "bg-brand-orange/12 text-terracotta"
               : step.state === "complete"
                 ? "bg-success/10 text-success"
                 : "bg-ink/5 text-ink/45"
@@ -42,7 +42,9 @@ export function OnboardingStepCard({
           {stateCopy[step.state]}
         </span>
       </div>
-      <h2 className="font-display mt-4 text-xl font-semibold">{step.title}</h2>
+      <h2 className="font-display mt-4 text-xl font-extrabold tracking-[-0.02em]">
+        {step.title}
+      </h2>
       <p className="text-ink/55 mt-1.5 text-sm leading-6">{step.description}</p>
       {!disabled ? (
         <span className="text-moss mt-4 inline-flex items-center gap-1 text-sm font-bold">
@@ -53,8 +55,8 @@ export function OnboardingStepCard({
     </>
   );
 
-  const className = `border-ink/10 bg-surface block rounded-3xl border p-5 shadow-[0_8px_24px_rgba(22,56,50,0.035)] ${
-    step.state === "current" ? "ring-moss/20 ring-2" : ""
+  const className = `border-ink/10 bg-surface block rounded-3xl border p-5 shadow-[0_8px_24px_rgba(32,33,36,0.035)] ${
+    step.state === "current" ? "ring-brand-orange/20 ring-2" : ""
   }`;
 
   if (disabled) {
