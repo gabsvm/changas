@@ -18,7 +18,7 @@ export function ProgressBar({
         aria-valuenow={Math.round(safeValue)}
       >
         <div
-          className="bg-moss h-full rounded-full transition-[width] duration-300 motion-reduce:transition-none"
+          className="bg-brand-orange h-full rounded-full transition-[width] duration-300 motion-reduce:transition-none"
           style={{ width: `${safeValue}%` }}
         />
       </div>
