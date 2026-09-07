@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 
+import { StickyActionBar } from "@/components/ui/sticky-action-bar";
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
 
@@ -130,7 +131,7 @@ export function PublicProfileForm({
 
       <FormStatus state={state} />
 
-      <div className="mobile-sticky-surface sticky bottom-0 z-20 -mx-5 px-5 pt-3 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+      <StickyActionBar>
         <button
           className="button-primary w-full sm:w-auto"
           type="submit"
@@ -138,7 +139,7 @@ export function PublicProfileForm({
         >
           {pending ? "Guardando…" : submitLabel}
         </button>
-      </div>
+      </StickyActionBar>
     </form>
   );
 }
@@ -227,7 +228,7 @@ export function PrivateIdentityForm({
 
       <FormStatus state={state} />
 
-      <div className="mobile-sticky-surface sticky bottom-0 z-20 -mx-5 px-5 pt-3 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+      <StickyActionBar>
         <button
           className="button-primary w-full sm:w-auto"
           type="submit"
@@ -235,7 +236,7 @@ export function PrivateIdentityForm({
         >
           {pending ? "Guardando…" : submitLabel}
         </button>
-      </div>
+      </StickyActionBar>
     </form>
   );
 }
