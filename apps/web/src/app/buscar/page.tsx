@@ -69,6 +69,9 @@ export default async function SearchPage({
         ? "remoto"
         : "todos";
 
+  const controlClass =
+    "border-ink/15 focus:border-moss focus:ring-moss/15 mt-1 min-h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none focus:ring-2";
+
   return (
     <main
       id="main-content"
@@ -84,10 +87,12 @@ export default async function SearchPage({
             <span className="brand-mark" aria-hidden="true">
               C
             </span>
-            <span className="font-display text-xl font-semibold">Changas</span>
+            <span className="font-display text-xl font-extrabold tracking-[-0.035em]">
+              Changas
+            </span>
           </Link>
           <Link
-            className="text-ink/65 text-sm underline underline-offset-4"
+            className="text-ink/65 text-sm underline decoration-terracotta/35 underline-offset-4 transition hover:text-terracotta"
             href="/login"
           >
             Ingresar
@@ -95,29 +100,29 @@ export default async function SearchPage({
         </header>
 
         <section className="py-10 sm:py-14">
-          <p className="text-terracotta text-xs font-semibold tracking-[0.18em] uppercase">
+          <p className="text-terracotta text-xs font-extrabold tracking-[0.18em] uppercase">
             Descubrimiento público
           </p>
-          <h1 className="font-display mt-3 text-5xl leading-none font-semibold tracking-[-0.04em]">
+          <h1 className="font-display mt-3 text-4xl leading-[1.02] font-extrabold tracking-[-0.05em] sm:text-5xl">
             {query ? "Resultados para “" + query + "”" : "Todos los servicios"}
           </h1>
           <form
             action="/buscar"
-            className="border-ink/10 mt-8 grid gap-4 rounded-2xl border bg-white/70 p-4 sm:grid-cols-[1fr_auto_auto] sm:items-end"
+            className="border-ink/10 bg-surface mt-8 grid gap-4 rounded-[1.6rem] border p-4 shadow-[0_14px_38px_rgba(32,33,36,0.05)] sm:grid-cols-[1fr_auto_auto] sm:items-end sm:p-5"
           >
             <div>
               <label
-                className="text-ink/65 text-sm font-semibold"
+                className="text-ink/65 text-sm font-bold"
                 htmlFor="search-query"
               >
                 ¿Qué necesitás?
               </label>
               <input
-                className="border-ink/15 focus:border-terracotta focus:ring-terracotta/30 mt-2 min-h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none focus:ring-2"
+                className="border-ink/15 focus:border-moss focus:ring-moss/15 mt-2 min-h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none focus:ring-2"
                 defaultValue={query}
                 id="search-query"
                 name="q"
-                placeholder="Ej. instalar camara"
+                placeholder="Ej. instalar cámara"
                 type="search"
               />
             </div>
@@ -127,14 +132,11 @@ export default async function SearchPage({
             </button>
             <div className="border-ink/10 grid gap-3 border-t pt-4 sm:col-span-3 sm:grid-cols-4 lg:grid-cols-6">
               <div>
-                <label
-                  className="text-ink/65 text-xs font-semibold"
-                  htmlFor="search-category"
-                >
+                <label className="text-ink/65 text-xs font-bold" htmlFor="search-category">
                   Categoría
                 </label>
                 <select
-                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  className={controlClass}
                   defaultValue={filters.categorySlug ?? ""}
                   id="search-category"
                   name="category"
@@ -148,14 +150,11 @@ export default async function SearchPage({
                 </select>
               </div>
               <div>
-                <label
-                  className="text-ink/65 text-xs font-semibold"
-                  htmlFor="search-skill"
-                >
+                <label className="text-ink/65 text-xs font-bold" htmlFor="search-skill">
                   Habilidad
                 </label>
                 <select
-                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  className={controlClass}
                   defaultValue={filters.skillSlug ?? ""}
                   id="search-skill"
                   name="skill"
@@ -169,14 +168,11 @@ export default async function SearchPage({
                 </select>
               </div>
               <div>
-                <label
-                  className="text-ink/65 text-xs font-semibold"
-                  htmlFor="search-mode"
-                >
+                <label className="text-ink/65 text-xs font-bold" htmlFor="search-mode">
                   Modalidad
                 </label>
                 <select
-                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  className={controlClass}
                   defaultValue={modeValue}
                   id="search-mode"
                   name="mode"
@@ -187,23 +183,18 @@ export default async function SearchPage({
                 </select>
               </div>
               <div>
-                <label
-                  className="text-ink/65 text-xs font-semibold"
-                  htmlFor="search-sort"
-                >
+                <label className="text-ink/65 text-xs font-bold" htmlFor="search-sort">
                   Ordenar
                 </label>
                 <select
-                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  className={controlClass}
                   defaultValue={filters.sort}
                   id="search-sort"
                   name="sort"
                 >
                   <option value="recommended">Recomendados</option>
                   <option value="best-rated">Mejor calificados</option>
-                  <option value="most-completed">
-                    Más trabajos completados
-                  </option>
+                  <option value="most-completed">Más trabajos completados</option>
                   <option value="nearest">Más cercanos</option>
                   <option value="price-asc">Precio menor</option>
                   <option value="price-desc">Precio mayor</option>
@@ -211,13 +202,13 @@ export default async function SearchPage({
               </div>
               <div>
                 <label
-                  className="text-ink/65 text-xs font-semibold"
+                  className="text-ink/65 text-xs font-bold"
                   htmlFor="search-price-model"
                 >
                   Modelo de precio
                 </label>
                 <select
-                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  className={controlClass}
                   defaultValue={filters.priceModel ?? ""}
                   id="search-price-model"
                   name="priceModel"
@@ -231,14 +222,11 @@ export default async function SearchPage({
                 </select>
               </div>
               <div>
-                <label
-                  className="text-ink/65 text-xs font-semibold"
-                  htmlFor="search-min"
-                >
+                <label className="text-ink/65 text-xs font-bold" htmlFor="search-min">
                   Precio desde
                 </label>
                 <input
-                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  className={controlClass}
                   defaultValue={minorUnitsToMajorInput(filters.minPrice)}
                   id="search-min"
                   min="0.01"
@@ -249,14 +237,11 @@ export default async function SearchPage({
                 />
               </div>
               <div>
-                <label
-                  className="text-ink/65 text-xs font-semibold"
-                  htmlFor="search-max"
-                >
+                <label className="text-ink/65 text-xs font-bold" htmlFor="search-max">
                   Precio hasta
                 </label>
                 <input
-                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  className={controlClass}
                   defaultValue={minorUnitsToMajorInput(filters.maxPrice)}
                   id="search-max"
                   min="0.01"
@@ -267,14 +252,11 @@ export default async function SearchPage({
                 />
               </div>
               <div>
-                <label
-                  className="text-ink/65 text-xs font-semibold"
-                  htmlFor="search-radius"
-                >
+                <label className="text-ink/65 text-xs font-bold" htmlFor="search-radius">
                   Radio
                 </label>
                 <select
-                  className="border-ink/15 mt-1 min-h-10 w-full rounded-lg border bg-white px-2 text-sm"
+                  className={controlClass}
                   defaultValue={String(filters.radiusMeters ?? "")}
                   id="search-radius"
                   name="radius"
@@ -286,18 +268,16 @@ export default async function SearchPage({
                 </select>
               </div>
               <div className="flex items-end gap-3">
-                <div className="flex min-h-10 items-center gap-2">
+                <div className="flex min-h-11 items-center gap-2 rounded-xl px-1">
                   <input
+                    className="accent-terracotta h-4 w-4"
                     defaultChecked={filters.acceptsOffers === true}
                     id="search-offers"
                     name="offers"
                     type="checkbox"
                     value="true"
                   />
-                  <label
-                    className="text-ink/65 text-xs font-semibold"
-                    htmlFor="search-offers"
-                  >
+                  <label className="text-ink/65 text-xs font-bold" htmlFor="search-offers">
                     Acepta ofertas
                   </label>
                 </div>
