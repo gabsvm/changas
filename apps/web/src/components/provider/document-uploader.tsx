@@ -18,7 +18,7 @@ type ProviderAction = (
 
 type SelectedFile = {
   file: File;
-  previewUrl?: string;
+  previewUrl: string | null;
 };
 
 export function DocumentUploader({
@@ -93,7 +93,7 @@ export function DocumentUploader({
       file,
       previewUrl: file.type.startsWith("image/")
         ? URL.createObjectURL(file)
-        : undefined,
+        : null,
     });
   }
 
@@ -193,7 +193,7 @@ export function DocumentUploader({
               </div>
               <button
                 type="button"
-                className="text-danger min-h-10 shrink-0 px-2 text-xs font-bold"
+                className="text-danger min-h-12 shrink-0 px-3 text-xs font-bold"
                 onClick={clearSelection}
                 disabled={pending}
               >
