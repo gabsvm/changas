@@ -8,6 +8,7 @@ const serviceRoleKey =
   process.env.SERVICE_ROLE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 type TestUser = { id: string; email: string; password: string };
+type MobileNavLabel = "Inicio" | "Mensajes" | "Actividad" | "Cuenta";
 
 function requireAdminConfig() {
   if (!apiUrl || !serviceRoleKey) {
@@ -81,11 +82,14 @@ async function getMobileNavigation(page: Page) {
   return page.getByRole("navigation", { name: "Navegación principal" });
 }
 
-async function expectMobileNavigation(page: Page) {
+async function expectMobileNavigation(
+  page: Page,
+  activeLabel: MobileNavLabel = "Cuenta",
+) {
   const nav = await getMobileNavigation(page);
   await expect(nav).toBeVisible();
   await expect(
-    nav.getByRole("link", { name: "Cuenta", exact: true }),
+    nav.getByRole("link", { name: activeLabel, exact: true }),
   ).toHaveAttribute("aria-current", "page");
 
   const navTargets = nav.getByRole("link");
@@ -133,6 +137,20 @@ for (const width of [320, 360, 390] as const) {
 
     await expectNoHorizontalOverflow(page);
     await expectMobileNavigation(page);
+
+    await (await getMobileNavigation(page))
+      .getByRole("link", { name: "Inicio", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/$/);
+    await expectMobileNavigation(page, "Inicio");
+    await expect(page.getByRole("link", { name: "Ingresar" })).toHaveCount(0);
+
+    await (await getMobileNavigation(page))
+      .getByRole("link", { name: "Cuenta", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/account$/);
+    await expectMobileNavigation(page);
+
     await page.getByRole("button", { name: "Empezar como proveedor" }).click();
 
     await expect(page).toHaveURL(/\/provider\/onboarding$/);
