@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AuthenticatedBottomNav } from "@/components/ui/authenticated-bottom-nav";
 import { getUnreadNotificationCount } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -15,10 +16,10 @@ export default async function AccountLayout({
   return (
     <main
       id="main-content"
-      className="bg-canvas text-ink min-h-screen px-5 py-5 sm:px-8"
+      className="bg-canvas text-ink mobile-content-with-nav min-h-screen px-5 sm:px-8 sm:py-5"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <header className="border-ink/10 flex flex-wrap items-center justify-between gap-4 border-b pb-5">
+        <header className="border-ink/10 hidden items-center justify-between gap-4 border-b pb-5 sm:flex">
           <Link
             className="flex items-center gap-3"
             href="/"
@@ -32,7 +33,7 @@ export default async function AccountLayout({
             </span>
           </Link>
           <nav
-            className="flex flex-wrap items-center justify-end gap-4 text-sm"
+            className="flex items-center justify-end gap-4 text-sm"
             aria-label="Cuenta"
           >
             <Link className="underline underline-offset-4" href="/messages">
@@ -71,6 +72,7 @@ export default async function AccountLayout({
         </header>
         {children}
       </div>
+      {user ? <AuthenticatedBottomNav unreadCount={unreadCount} /> : null}
     </main>
   );
 }
