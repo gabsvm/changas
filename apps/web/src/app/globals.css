@@ -180,7 +180,7 @@ textarea {
   right: -1rem;
   height: 11rem;
   width: 11rem;
-  border: 1px solid rgb(255 255 255 / 35%);
+  border: 1px solid rgb(32 33 36 / 15%);
   border-radius: 999px;
 }
 
@@ -191,8 +191,8 @@ textarea {
   height: 0.75rem;
   width: 0.75rem;
   border-radius: 999px;
-  background: #ffc857;
-  box-shadow: 0 0 0 5px rgb(255 255 255 / 14%);
+  background: #fff9f3;
+  box-shadow: 0 0 0 5px rgb(32 33 36 / 10%);
   content: "";
 }
 
