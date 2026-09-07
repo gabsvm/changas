@@ -70,7 +70,7 @@ export default async function ProviderOnboardingDocumentsPage() {
 
         <div className="mt-6">
           <DocumentUploader
-            key={`document-uploader-${Date.now()}`}
+            key={`document-uploader-${receivedDocuments.length}`}
             action={uploadIdentityDocument}
             editable={editable}
           />
