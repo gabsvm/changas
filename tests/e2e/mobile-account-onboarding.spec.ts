@@ -8,7 +8,9 @@ type TestUser = { id: string; email: string; password: string };
 
 function requireAdminConfig() {
   if (!apiUrl || !serviceRoleKey) {
-    throw new Error("Mobile onboarding E2E requires local Supabase admin credentials.");
+    throw new Error(
+      "Mobile onboarding E2E requires local Supabase admin credentials.",
+    );
   }
   return { apiUrl, serviceRoleKey };
 }
@@ -40,7 +42,8 @@ async function createTestUser(width: number): Promise<TestUser> {
   }
 
   const body = (await response.json()) as { id?: string };
-  if (!body.id) throw new Error("Mobile onboarding E2E user response has no id.");
+  if (!body.id)
+    throw new Error("Mobile onboarding E2E user response has no id.");
   return { id: body.id, email, password };
 }
 
@@ -57,7 +60,9 @@ async function expectNoHorizontalOverflow(page: Page) {
     clientWidth: document.documentElement.clientWidth,
     scrollWidth: document.documentElement.scrollWidth,
   }));
-  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(
+    dimensions.clientWidth + 1,
+  );
 }
 
 async function expectMobileNavigation(page: Page) {
@@ -104,18 +109,14 @@ for (const width of [320, 360, 390] as const) {
     ).toBeVisible();
     await expectMobileRoute(page);
 
-    await page
-      .getByRole("link", { name: "Continuar verificación" })
-      .click();
+    await page.getByRole("link", { name: "Continuar verificación" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/profile$/);
     await expect(
       page.getByRole("heading", { name: "Prepará tu perfil público" }),
     ).toBeVisible();
     await expectMobileRoute(page);
 
-    await page
-      .getByRole("button", { name: "Continuar con identidad" })
-      .click();
+    await page.getByRole("button", { name: "Continuar con identidad" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/identity$/);
     await expect(
       page.getByRole("heading", { name: "Confirmá tus datos privados" }),
@@ -131,9 +132,7 @@ for (const width of [320, 360, 390] as const) {
     ).toBeVisible();
     await expectMobileRoute(page);
 
-    await page
-      .getByRole("button", { name: "Continuar a revisión" })
-      .click();
+    await page.getByRole("button", { name: "Continuar a revisión" }).click();
     await expect(page).toHaveURL(/\/provider\/onboarding\/review$/);
     await expect(
       page.getByRole("heading", { name: "Revisá lo cargado" }),
