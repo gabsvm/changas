@@ -59,11 +59,14 @@ export function AuthForm({
   const modeCopy = copy[mode];
 
   return (
-    <div className="border-ink/10 w-full max-w-md rounded-[2rem] border bg-white/75 p-6 shadow-[0_24px_80px_rgba(22,56,50,0.12)] sm:p-8">
-      <p className="text-terracotta text-xs font-semibold tracking-[0.18em] uppercase">
+    <div className="border-ink/10 bg-surface w-full max-w-md rounded-[2rem] border p-6 shadow-[0_24px_70px_rgba(32,33,36,0.08)] sm:p-8">
+      <div className="bg-brand-yellow/20 text-ink mb-5 grid h-11 w-11 place-items-center rounded-2xl font-extrabold">
+        C
+      </div>
+      <p className="text-terracotta text-xs font-extrabold tracking-[0.18em] uppercase">
         Cuenta Changas
       </p>
-      <h1 className="font-display mt-3 text-4xl leading-tight font-semibold tracking-[-0.03em]">
+      <h1 className="font-display mt-3 text-4xl leading-tight font-extrabold tracking-[-0.04em]">
         {modeCopy.title}
       </h1>
       <p className="text-ink/65 mt-3 text-sm leading-6">
@@ -74,7 +77,7 @@ export function AuthForm({
         <input type="hidden" name="next" value={nextPath} />
 
         {mode === "signup" ? (
-          <label className="block text-sm font-semibold">
+          <label className="block text-sm font-bold">
             Nombre visible
             <input
               className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
@@ -88,7 +91,7 @@ export function AuthForm({
         ) : null}
 
         {mode !== "update" ? (
-          <label className="block text-sm font-semibold">
+          <label className="block text-sm font-bold">
             Correo electrónico
             <input
               className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
@@ -101,7 +104,7 @@ export function AuthForm({
         ) : null}
 
         {mode === "login" || mode === "signup" || mode === "update" ? (
-          <label className="block text-sm font-semibold">
+          <label className="block text-sm font-bold">
             Contraseña
             <input
               className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
@@ -118,7 +121,7 @@ export function AuthForm({
         ) : null}
 
         {mode === "signup" || mode === "update" ? (
-          <label className="block text-sm font-semibold">
+          <label className="block text-sm font-bold">
             Repetí la contraseña
             <input
               className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
@@ -134,7 +137,7 @@ export function AuthForm({
 
         {state.error ? (
           <p
-            className="bg-terracotta/10 text-terracotta rounded-xl px-4 py-3 text-sm leading-6"
+            className="bg-danger/10 text-danger rounded-xl px-4 py-3 text-sm leading-6"
             role="alert"
           >
             {state.error}
@@ -142,7 +145,7 @@ export function AuthForm({
         ) : null}
         {state.success ? (
           <p
-            className="bg-moss/10 text-moss rounded-xl px-4 py-3 text-sm leading-6"
+            className="bg-success/10 text-success rounded-xl px-4 py-3 text-sm leading-6"
             role="status"
             aria-live="polite"
           >
@@ -176,11 +179,14 @@ export function AuthForm({
       >
         {mode === "login" ? (
           <>
-            <Link className="underline underline-offset-4" href="/sign-up">
+            <Link
+              className="text-moss font-semibold underline decoration-moss/30 underline-offset-4"
+              href="/sign-up"
+            >
               Crear cuenta
             </Link>
             <Link
-              className="underline underline-offset-4"
+              className="hover:text-moss underline decoration-ink/20 underline-offset-4 transition-colors"
               href="/forgot-password"
             >
               Olvidé mi contraseña
@@ -188,17 +194,26 @@ export function AuthForm({
           </>
         ) : null}
         {mode === "signup" ? (
-          <Link className="underline underline-offset-4" href="/login">
+          <Link
+            className="text-moss font-semibold underline decoration-moss/30 underline-offset-4"
+            href="/login"
+          >
             Ya tengo una cuenta
           </Link>
         ) : null}
         {mode === "reset" ? (
-          <Link className="underline underline-offset-4" href="/login">
+          <Link
+            className="text-moss font-semibold underline decoration-moss/30 underline-offset-4"
+            href="/login"
+          >
             Volver a iniciar sesión
           </Link>
         ) : null}
         {mode === "update" ? (
-          <Link className="underline underline-offset-4" href="/login">
+          <Link
+            className="text-moss font-semibold underline decoration-moss/30 underline-offset-4"
+            href="/login"
+          >
             Volver a iniciar sesión
           </Link>
         ) : null}
