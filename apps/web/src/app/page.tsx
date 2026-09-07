@@ -56,21 +56,21 @@ export default async function HomePage() {
             <span className="brand-mark" aria-hidden="true">
               C
             </span>
-            <span className="font-display text-xl font-semibold tracking-tight">
+            <span className="font-display text-xl font-extrabold tracking-[-0.035em]">
               Changas
             </span>
           </Link>
           <nav className="flex items-center gap-4 text-sm" aria-label="Acceso">
             {user ? (
               <Link
-                className="text-ink/65 underline underline-offset-4"
+                className="text-ink/65 underline decoration-terracotta/40 underline-offset-4 transition hover:text-terracotta"
                 href="/account"
               >
                 Mi cuenta
               </Link>
             ) : (
               <Link
-                className="text-ink/65 underline underline-offset-4"
+                className="text-ink/65 underline decoration-terracotta/40 underline-offset-4 transition hover:text-terracotta"
                 href="/login"
               >
                 Ingresar
@@ -87,10 +87,10 @@ export default async function HomePage() {
 
         <section className="grid gap-10 py-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-20">
           <div className="max-w-3xl">
-            <p className="text-terracotta text-sm font-semibold tracking-[0.2em] uppercase">
+            <p className="text-terracotta text-sm font-extrabold tracking-[0.18em] uppercase">
               Servicios reales, sin vueltas
             </p>
-            <h1 className="font-display mt-5 text-5xl leading-[0.98] font-semibold tracking-[-0.04em] sm:text-7xl">
+            <h1 className="font-display mt-5 text-5xl leading-[0.98] font-extrabold tracking-[-0.055em] sm:text-7xl">
               ¿Qué necesitás?
             </h1>
             <p className="text-ink/70 mt-6 max-w-xl text-lg leading-8">
@@ -100,17 +100,17 @@ export default async function HomePage() {
 
             <form
               action="/buscar"
-              className="border-ink/10 mt-8 rounded-[1.5rem] border bg-white/80 p-4 shadow-[0_20px_60px_rgba(22,56,50,0.1)] sm:p-5"
+              className="border-ink/10 bg-surface mt-8 rounded-[1.6rem] border p-4 shadow-[0_20px_60px_rgba(255,107,53,0.10)] sm:p-5"
             >
               <label
-                className="text-ink/65 text-sm font-semibold"
+                className="text-ink/65 text-sm font-bold"
                 htmlFor="home-query"
               >
                 Buscá por servicio o habilidad
               </label>
               <div className="mt-2 flex flex-col gap-3 sm:flex-row">
                 <input
-                  className="border-ink/15 placeholder:text-ink/40 focus:border-terracotta focus:ring-terracotta/30 min-h-12 flex-1 rounded-xl border bg-white px-4 text-base outline-none focus:ring-2"
+                  className="border-ink/15 placeholder:text-ink/40 focus:border-moss focus:ring-moss/20 min-h-12 flex-1 rounded-xl border bg-white px-4 text-base outline-none focus:ring-2"
                   id="home-query"
                   name="q"
                   placeholder="Ej. electricista, arreglar pc…"
@@ -126,13 +126,13 @@ export default async function HomePage() {
             </form>
             <div className="mt-4 flex flex-wrap gap-3 text-sm">
               <Link
-                className="text-moss font-semibold underline underline-offset-4"
+                className="text-moss font-bold underline decoration-moss/30 underline-offset-4"
                 href="/buscar?mode=remoto"
               >
                 Ver servicios remotos
               </Link>
               <Link
-                className="text-ink/65 underline underline-offset-4"
+                className="text-ink/65 underline decoration-terracotta/35 underline-offset-4"
                 href="/provider/onboarding"
               >
                 Publicar como proveedor
@@ -140,24 +140,24 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="bg-moss relative overflow-hidden rounded-[2rem] p-7 text-white shadow-[0_24px_80px_rgba(22,56,50,0.16)] sm:p-9">
-            <div className="hero-orbit opacity-40" aria-hidden="true" />
-            <p className="relative text-xs font-semibold tracking-[0.18em] text-white/65 uppercase">
+          <div className="brand-gradient-surface relative overflow-hidden rounded-[2.15rem] p-7 text-white sm:p-9">
+            <div className="hero-orbit opacity-70" aria-hidden="true" />
+            <p className="relative text-xs font-bold tracking-[0.18em] text-white/75 uppercase">
               Elegí cómo resolverlo
             </p>
-            <h2 className="font-display relative mt-4 max-w-sm text-4xl leading-tight font-semibold">
+            <h2 className="font-display relative mt-4 max-w-sm text-4xl leading-tight font-extrabold tracking-[-0.035em]">
               Una buena changa empieza con una búsqueda clara.
             </h2>
             <div className="relative mt-8 grid gap-3 text-sm">
-              <div className="rounded-2xl bg-white/10 p-4">
-                <p className="font-semibold">Cerca tuyo</p>
-                <p className="mt-1 text-white/70">
+              <div className="rounded-2xl border border-white/15 bg-white/12 p-4 backdrop-blur-sm">
+                <p className="font-bold">Cerca tuyo</p>
+                <p className="mt-1 text-white/80">
                   Explorá por zona y radio aproximado, sin mostrar direcciones.
                 </p>
               </div>
-              <div className="rounded-2xl bg-white/10 p-4">
-                <p className="font-semibold">A distancia</p>
-                <p className="mt-1 text-white/70">
+              <div className="rounded-2xl border border-white/15 bg-white/12 p-4 backdrop-blur-sm">
+                <p className="font-bold">A distancia</p>
+                <p className="mt-1 text-white/80">
                   Las habilidades remotas están disponibles estés donde estés.
                 </p>
               </div>
@@ -171,18 +171,18 @@ export default async function HomePage() {
         >
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
+              <p className="text-terracotta text-xs font-extrabold tracking-[0.16em] uppercase">
                 Explorá
               </p>
               <h2
                 id="categories-title"
-                className="font-display mt-2 text-3xl font-semibold"
+                className="font-display mt-2 text-3xl font-extrabold tracking-[-0.035em]"
               >
                 Categorías para empezar
               </h2>
             </div>
             <Link
-              className="text-moss text-sm font-semibold underline underline-offset-4"
+              className="text-moss text-sm font-bold underline decoration-moss/30 underline-offset-4"
               href="/buscar"
             >
               Ver todo
@@ -191,11 +191,11 @@ export default async function HomePage() {
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {(categories ?? []).map((category) => (
               <Link
-                className="border-ink/10 rounded-2xl border bg-white/60 p-5 transition hover:-translate-y-0.5 hover:bg-white"
+                className="border-ink/10 bg-surface/85 hover:border-terracotta/25 hover:bg-surface rounded-2xl border p-5 shadow-[0_8px_24px_rgba(32,33,36,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(255,107,53,0.10)]"
                 href={"/categoria/" + category.slug}
                 key={category.slug}
               >
-                <h3 className="font-display text-2xl font-semibold">
+                <h3 className="font-display text-2xl font-extrabold tracking-[-0.03em]">
                   {category.name}
                 </h3>
                 <p className="text-ink/60 mt-2 text-sm leading-6">
@@ -209,18 +209,18 @@ export default async function HomePage() {
         <section className="py-10" aria-labelledby="nearby-title">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
+              <p className="text-terracotta text-xs font-extrabold tracking-[0.16em] uppercase">
                 Para descubrir
               </p>
               <h2
                 id="nearby-title"
-                className="font-display mt-2 text-3xl font-semibold"
+                className="font-display mt-2 text-3xl font-extrabold tracking-[-0.035em]"
               >
                 Servicios publicados
               </h2>
             </div>
             <Link
-              className="text-moss text-sm font-semibold underline underline-offset-4"
+              className="text-moss text-sm font-bold underline decoration-moss/30 underline-offset-4"
               href="/buscar"
             >
               Buscar más
