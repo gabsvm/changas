@@ -36,18 +36,21 @@ export default async function ProviderOnboardingPage() {
       <section className="pb-6 sm:py-14">
         <MobileAppBar title="Ser proveedor" backHref="/account" />
         <div className="mx-auto max-w-2xl pt-6 sm:pt-0">
-          <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
+          <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
             Proveedor
           </p>
-          <h1 className="font-display mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+          <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
             Empezá tu verificación
           </h1>
           <p className="text-ink/60 mt-3 text-sm leading-6">
             Vamos a crear un espacio privado para guardar tu progreso. Esto no
             publica servicios ni activa tu perfil automáticamente.
           </p>
-          <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-6">
-            <h2 className="font-display text-2xl font-semibold">
+          <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_12px_34px_rgba(32,33,36,0.045)] sm:p-6">
+            <div className="bg-brand-yellow/22 text-ink grid h-11 w-11 place-items-center rounded-2xl font-extrabold">
+              4
+            </div>
+            <h2 className="font-display mt-4 text-2xl font-extrabold tracking-[-0.025em]">
               Cuatro pasos, sin apuro
             </h2>
             <p className="text-ink/60 mt-2 text-sm leading-6">
@@ -85,10 +88,10 @@ export default async function ProviderOnboardingPage() {
       <div className="mx-auto max-w-3xl pt-6 sm:pt-0">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
               Perfil de proveedor
             </p>
-            <h1 className="font-display mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+            <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
               Tu verificación
             </h1>
           </div>
@@ -100,8 +103,8 @@ export default async function ProviderOnboardingPage() {
           convierte tu perfil en activo sin revisión.
         </p>
 
-        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-6">
-          <div className="flex items-center justify-between gap-4 text-xs font-semibold">
+        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_12px_34px_rgba(32,33,36,0.045)] sm:p-6">
+          <div className="flex items-center justify-between gap-4 text-xs font-bold">
             <span>Progreso guardado</span>
             <span className="text-ink/50">
               Paso {current?.number ?? 1} de 4
@@ -129,7 +132,7 @@ export default async function ProviderOnboardingPage() {
         </div>
 
         {!editable && provider.status !== "ACTIVE" ? (
-          <p className="bg-warning/10 text-warning mt-5 rounded-2xl px-4 py-3 text-sm leading-6">
+          <p className="bg-brand-yellow/18 text-warning mt-5 rounded-2xl border border-brand-yellow/25 px-4 py-3 text-sm leading-6">
             Mientras el perfil está en revisión o requiere intervención, los
             pasos de edición quedan bloqueados desde tu cuenta.
           </p>
