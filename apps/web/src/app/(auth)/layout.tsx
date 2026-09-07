@@ -18,16 +18,24 @@ export default function AuthLayout({
             <span className="brand-mark" aria-hidden="true">
               C
             </span>
-            <span className="font-display text-xl font-semibold tracking-tight">
+            <span className="font-display text-xl font-extrabold tracking-[-0.035em]">
               Changas
             </span>
           </Link>
-          <span className="text-ink/50 text-xs font-semibold tracking-[0.16em] uppercase">
+          <span className="text-terracotta text-xs font-extrabold tracking-[0.16em] uppercase">
             Cuenta
           </span>
         </header>
-        <div className="flex flex-1 items-center justify-center py-12">
-          {children}
+        <div className="relative flex flex-1 items-center justify-center overflow-hidden py-12">
+          <div
+            className="bg-brand-yellow/20 pointer-events-none absolute -top-20 -right-24 h-56 w-56 rounded-full blur-3xl"
+            aria-hidden="true"
+          />
+          <div
+            className="bg-brand-orange/10 pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full blur-3xl"
+            aria-hidden="true"
+          />
+          <div className="relative z-10 w-full">{children}</div>
         </div>
       </div>
     </main>
