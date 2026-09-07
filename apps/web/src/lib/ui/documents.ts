@@ -17,8 +17,7 @@ export function getDocumentTypeLabel(type: string): string {
 }
 
 export type IdentityFileValidation =
-  | { valid: true }
-  | { valid: false; reason: string };
+  { valid: true } | { valid: false; reason: string };
 
 export function validateIdentityFileMetadata(input: {
   type: string;
