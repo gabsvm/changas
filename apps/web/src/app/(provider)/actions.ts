@@ -4,6 +4,10 @@ import { canSelfManageProviderStatus } from "@changas/domain";
 import { identityDocumentSchema } from "@changas/validation";
 import { redirect } from "next/navigation";
 
+import {
+  updatePrivateIdentity,
+  updatePublicProfile,
+} from "@/app/(account)/actions";
 import type { ActionState } from "@/lib/forms/action-state";
 import { getFormString } from "@/lib/forms/form-data";
 import { createClient } from "@/lib/supabase/server";
@@ -110,6 +114,32 @@ export async function saveProviderOnboarding(
   return error
     ? { error: "No pudimos guardar el progreso." }
     : { success: "Progreso guardado." };
+}
+
+export async function saveProviderProfileStep(
+  previousState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const profileResult = await updatePublicProfile(previousState, formData);
+  if (profileResult.error) return profileResult;
+
+  const progressResult = await saveProviderOnboarding(previousState, formData);
+  if (progressResult.error) return progressResult;
+
+  redirect("/provider/onboarding/identity");
+}
+
+export async function saveProviderIdentityStep(
+  previousState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const identityResult = await updatePrivateIdentity(previousState, formData);
+  if (identityResult.error) return identityResult;
+
+  const progressResult = await saveProviderOnboarding(previousState, formData);
+  if (progressResult.error) return progressResult;
+
+  redirect("/provider/onboarding/documents");
 }
 
 export async function uploadIdentityDocument(
