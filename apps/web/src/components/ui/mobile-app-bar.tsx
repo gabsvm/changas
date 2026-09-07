@@ -36,9 +36,9 @@ export function MobileAppBar({
           </Link>
         ) : null}
       </div>
-      <h1 className="min-w-0 flex-1 truncate text-center text-base font-bold">
+      <p className="min-w-0 flex-1 truncate text-center text-base font-bold">
         {title}
-      </h1>
+      </p>
       <div className="flex w-12 shrink-0 justify-end">{trailing}</div>
     </header>
   );
