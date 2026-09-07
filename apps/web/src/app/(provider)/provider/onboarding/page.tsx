@@ -1,18 +1,20 @@
+import { canSelfManageProviderStatus } from "@changas/domain";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { StartProviderForm } from "@/components/account/account-form";
-import {
-  IdentityDocumentForm,
-  OnboardingForm,
-} from "@/components/provider/onboarding-form";
+import { OnboardingStepCard } from "@/components/provider/onboarding-step-card";
+import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
-
 import {
-  saveProviderOnboarding,
-  startProviderOnboarding,
-  uploadIdentityDocument,
-} from "../../actions";
+  getNextOnboardingHref,
+  getOnboardingSteps,
+} from "@/lib/ui/onboarding";
+import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
+
+import { startProviderOnboarding } from "../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -26,119 +28,113 @@ export default async function ProviderOnboardingPage() {
     redirect("/login?next=/provider/onboarding");
   }
 
-  const [{ data: provider }, { data: documents }] = await Promise.all([
-    supabase
-      .from("provider_profiles")
-      .select("status, onboarding_step")
-      .eq("user_id", user.id)
-      .maybeSingle(),
-    supabase
-      .from("provider_documents")
-      .select("document_type, created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false }),
-  ]);
-  const receivedDocuments = documents ?? [];
+  const { data: provider } = await supabase
+    .from("provider_profiles")
+    .select("status, onboarding_step")
+    .eq("user_id", user.id)
+    .maybeSingle();
 
   if (!provider) {
     return (
-      <section className="py-10 sm:py-14">
-        <Link
-          className="text-ink/60 text-sm underline underline-offset-4"
-          href="/account"
-        >
-          ← Volver a mi cuenta
-        </Link>
-        <div className="border-ink/10 mt-10 max-w-2xl rounded-2xl border bg-white/65 p-6 sm:p-8">
-          <p className="text-terracotta text-xs font-semibold tracking-[0.18em] uppercase">
+      <section className="pb-6 sm:py-14">
+        <MobileAppBar title="Ser proveedor" backHref="/account" />
+        <div className="mx-auto max-w-2xl pt-6 sm:pt-0">
+          <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
             Proveedor
           </p>
-          <h1 className="font-display mt-3 text-5xl leading-none font-semibold tracking-[-0.04em]">
-            Empezá tu onboarding
+          <h1 className="font-display mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+            Empezá tu verificación
           </h1>
-          <p className="text-ink/65 mt-4 text-sm leading-6">
-            Primero creamos un espacio privado para guardar tu progreso. Todavía
-            no se publica un servicio ni se activa tu cuenta de proveedor.
+          <p className="text-ink/60 mt-3 text-sm leading-6">
+            Vamos a crear un espacio privado para guardar tu progreso. Esto no
+            publica servicios ni activa tu perfil automáticamente.
           </p>
-          <StartProviderForm action={startProviderOnboarding} />
+          <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-6">
+            <h2 className="font-display text-2xl font-semibold">
+              Cuatro pasos, sin apuro
+            </h2>
+            <p className="text-ink/60 mt-2 text-sm leading-6">
+              Completá tus datos, identidad y documentos. Podés salir y volver
+              cuando quieras; la aprobación final sigue siendo manual.
+            </p>
+            <StartProviderForm action={startProviderOnboarding} />
+          </div>
         </div>
       </section>
     );
   }
 
-  const editable =
-    provider.status === "PROFILE_INCOMPLETE" ||
-    provider.status === "IDENTITY_PENDING";
+  const editable = canSelfManageProviderStatus(provider.status);
+  const steps = getOnboardingSteps(provider.onboarding_step);
+  const current = steps.find((step) => step.state === "current") ?? steps[0];
+  const presentation = getProviderStatusPresentation(provider.status);
+  const progress = ((current?.number ?? 1) / 4) * 100;
+  const primaryHref =
+    provider.status === "ACTIVE"
+      ? "/provider/manage"
+      : editable
+        ? getNextOnboardingHref(provider.onboarding_step)
+        : "/account";
+  const primaryLabel =
+    provider.status === "ACTIVE"
+      ? "Gestionar servicios"
+      : editable
+        ? "Continuar verificación"
+        : "Volver a mi cuenta";
 
   return (
-    <section className="py-10 sm:py-14">
-      <Link
-        className="text-ink/60 text-sm underline underline-offset-4"
-        href="/account"
-      >
-        ← Volver a mi cuenta
-      </Link>
-      <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-terracotta text-xs font-semibold tracking-[0.18em] uppercase">
-            Proveedor
-          </p>
-          <h1 className="font-display mt-3 text-5xl leading-none font-semibold tracking-[-0.04em]">
-            Tu identidad, paso a paso
-          </h1>
+    <section className="pb-6 sm:py-14">
+      <MobileAppBar title="Verificación" backHref="/account" />
+      <div className="mx-auto max-w-3xl pt-6 sm:pt-0">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
+              Perfil de proveedor
+            </p>
+            <h1 className="font-display mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+              Tu verificación
+            </h1>
+          </div>
+          <StatusBadge label={presentation.label} tone={presentation.tone} />
         </div>
-        <div className="bg-moss/10 text-moss rounded-full px-4 py-2 text-xs font-semibold tracking-[0.12em] uppercase">
-          {provider.status}
-        </div>
-      </div>
-      <p className="text-ink/65 mt-5 max-w-2xl text-sm leading-6">
-        El estado es informativo y la aprobación se hará manualmente en una
-        etapa posterior. No podés convertirlo en ACTIVE desde tu cuenta.
-      </p>
 
-      <div className="mt-10 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-        <OnboardingForm
-          action={saveProviderOnboarding}
-          currentStep={provider.onboarding_step}
-          editable={editable}
-        />
-        <IdentityDocumentForm
-          action={uploadIdentityDocument}
-          editable={editable}
-        />
-      </div>
-
-      <section className="border-ink/10 mt-5 rounded-2xl border bg-white/50 p-5 sm:p-6">
-        <h2 className="font-display text-2xl font-semibold">
-          Documentos recibidos
-        </h2>
-        <p className="text-ink/60 mt-2 text-sm leading-6">
-          Solo mostramos el tipo y la fecha. La ruta y el contenido permanecen
-          privados.
+        <p className="text-ink/60 mt-3 max-w-2xl text-sm leading-6">
+          {presentation.description} El avance se guarda de forma privada y no
+          convierte tu perfil en activo sin revisión.
         </p>
-        {receivedDocuments.length > 0 ? (
-          <ul className="mt-5 grid gap-3 sm:grid-cols-3">
-            {receivedDocuments.map((document) => (
-              <li
-                className="border-ink/10 rounded-xl border bg-white/70 px-4 py-3 text-sm"
-                key={`${document.document_type}-${document.created_at}`}
-              >
-                <span className="block font-semibold">
-                  {document.document_type}
-                </span>
-                <span className="text-ink/55 mt-1 block text-xs">
-                  Recibido{" "}
-                  {new Date(document.created_at).toLocaleDateString("es-AR")}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-ink/55 mt-5 text-sm">
-            Todavía no subiste documentos.
+
+        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-6">
+          <div className="flex items-center justify-between gap-4 text-xs font-semibold">
+            <span>Progreso guardado</span>
+            <span className="text-ink/50">
+              Paso {current?.number ?? 1} de 4
+            </span>
+          </div>
+          <div className="mt-3">
+            <ProgressBar value={progress} label="Progreso de verificación" />
+          </div>
+          <Link className="button-primary mt-5 w-full sm:w-auto" href={primaryHref}>
+            {primaryLabel}
+          </Link>
+        </section>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          {steps.map((step) => (
+            <OnboardingStepCard
+              key={step.id}
+              step={step}
+              disabled={!editable && step.id !== "review"}
+            />
+          ))}
+        </div>
+
+        {!editable && provider.status !== "ACTIVE" ? (
+          <p className="bg-warning/10 text-warning mt-5 rounded-2xl px-4 py-3 text-sm leading-6">
+            Mientras el perfil está en revisión o requiere intervención, los
+            pasos de edición quedan bloqueados desde tu cuenta.
           </p>
-        )}
-      </section>
+        ) : null}
+      </div>
     </section>
   );
 }
