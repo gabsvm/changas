@@ -11,6 +11,8 @@ type AccountAction = (
   formData: FormData,
 ) => Promise<ActionState>;
 
+type HiddenFields = Record<string, string>;
+
 const inputClass =
   "border-ink/15 bg-surface focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-2xl border px-4 py-3.5 text-sm font-normal outline-none focus:ring-2";
 
@@ -38,6 +40,14 @@ function FormStatus({ state }: { state: ActionState }) {
   );
 }
 
+function HiddenFormFields({ fields }: { fields?: HiddenFields }) {
+  if (!fields) return null;
+
+  return Object.entries(fields).map(([name, value]) => (
+    <input key={name} type="hidden" name={name} value={value} />
+  ));
+}
+
 export type PublicProfileInitialValues = {
   displayName: string;
   publicZone: string;
@@ -49,10 +59,12 @@ export function PublicProfileForm({
   action,
   initialValues,
   submitLabel = "Guardar cambios",
+  hiddenFields,
 }: {
   action: AccountAction;
   initialValues: PublicProfileInitialValues;
   submitLabel?: string;
+  hiddenFields?: HiddenFields;
 }) {
   const [state, formAction, pending] = useActionState(
     action,
@@ -62,6 +74,8 @@ export function PublicProfileForm({
 
   return (
     <form action={formAction} className="space-y-5">
+      <HiddenFormFields fields={hiddenFields} />
+
       <label className="block text-sm font-semibold">
         Nombre visible
         <input
@@ -112,22 +126,30 @@ export function PublicProfileForm({
         </span>
       </label>
 
-      <label className="block text-sm font-semibold">
-        URL de foto
-        <input
-          className={inputClass}
-          name="avatarUrl"
-          type="url"
-          defaultValue={initialValues.avatarUrl}
-          maxLength={2048}
-          inputMode="url"
-          placeholder="https://…"
-        />
-        <span className="text-ink/50 mt-1.5 block text-xs leading-5 font-normal">
-          Por ahora usamos una URL. La carga directa de avatar queda fuera de
-          este rediseño.
-        </span>
-      </label>
+      <details className="border-ink/10 bg-canvas/45 rounded-2xl border">
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold marker:content-none">
+          Foto de perfil por URL
+          <span className="text-ink/45 text-xs font-normal">Opcional</span>
+        </summary>
+        <div className="border-ink/10 border-t px-4 pb-4">
+          <label className="mt-4 block text-sm font-semibold">
+            URL de foto
+            <input
+              className={inputClass}
+              name="avatarUrl"
+              type="url"
+              defaultValue={initialValues.avatarUrl}
+              maxLength={2048}
+              inputMode="url"
+              placeholder="https://…"
+            />
+            <span className="text-ink/50 mt-1.5 block text-xs leading-5 font-normal">
+              La carga directa de avatar queda fuera de este rediseño. Si ya
+              usás una imagen alojada, podés mantener su URL acá.
+            </span>
+          </label>
+        </div>
+      </details>
 
       <FormStatus state={state} />
 
@@ -156,10 +178,12 @@ export function PrivateIdentityForm({
   action,
   initialValues,
   submitLabel = "Guardar datos privados",
+  hiddenFields,
 }: {
   action: AccountAction;
   initialValues: PrivateIdentityInitialValues;
   submitLabel?: string;
+  hiddenFields?: HiddenFields;
 }) {
   const [state, formAction, pending] = useActionState(
     action,
@@ -168,6 +192,8 @@ export function PrivateIdentityForm({
 
   return (
     <form action={formAction} className="space-y-5">
+      <HiddenFormFields fields={hiddenFields} />
+
       <label className="block text-sm font-semibold">
         Nombre legal
         <input
