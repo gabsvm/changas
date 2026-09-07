@@ -149,7 +149,7 @@ export function AuthenticatedBottomNav({
                 <NavIcon name={item.icon} />
                 {item.key === "activity" && unreadCount > 0 ? (
                   <span
-                    className="bg-brand-pink absolute -top-2 -right-2 min-w-4 rounded-full px-1 text-center text-[0.6rem] leading-4 font-bold text-white shadow-[0_3px_10px_rgba(255,10,120,0.25)]"
+                    className="bg-brand-pink-strong absolute -top-2 -right-2 min-w-4 rounded-full px-1 text-center text-[0.6rem] leading-4 font-bold text-white shadow-[0_3px_10px_rgba(214,0,96,0.25)]"
                     aria-label={`${unreadCount} notificaciones sin leer`}
                   >
                     {unreadCount > 99 ? "99+" : unreadCount}
