@@ -48,7 +48,8 @@ jobs:
             'apps/web/src/components/provider/onboarding-step-card.tsx' \
             'apps/web/src/components/ui/account-menu-item.tsx' \
             'apps/web/src/components/ui/authenticated-bottom-nav.tsx' \
-            'apps/web/src/components/ui/privacy-notice.tsx'
+            'apps/web/src/components/ui/privacy-notice.tsx' \
+            'tests/e2e/mobile-account-onboarding.spec.ts'
           git diff --check
 
       - name: Commit canonical formatting
@@ -67,7 +68,8 @@ jobs:
             'apps/web/src/components/provider/onboarding-step-card.tsx' \
             'apps/web/src/components/ui/account-menu-item.tsx' \
             'apps/web/src/components/ui/authenticated-bottom-nav.tsx' \
-            'apps/web/src/components/ui/privacy-notice.tsx'
+            'apps/web/src/components/ui/privacy-notice.tsx' \
+            'tests/e2e/mobile-account-onboarding.spec.ts'
           if git diff --cached --quiet; then
             echo 'No formatting changes to commit.'
           else
