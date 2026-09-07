@@ -6,6 +6,7 @@ import { DocumentUploader } from "@/components/provider/document-uploader";
 import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { PrivacyNotice } from "@/components/ui/privacy-notice";
+import { StickyActionBar } from "@/components/ui/sticky-action-bar";
 import { createClient } from "@/lib/supabase/server";
 
 import {
@@ -110,19 +111,21 @@ export default async function ProviderOnboardingDocumentsPage() {
         </section>
 
         {editable ? (
-          <div className="border-ink/10 mt-6 border-t pt-5">
-            <p className="text-ink/55 mb-3 text-xs leading-5">
-              Podés continuar a la revisión con el progreso que ya tengas. El
-              servidor conserva sus reglas actuales y no inventamos requisitos
-              adicionales en la interfaz.
-            </p>
-            <OnboardingAdvanceForm
-              action={saveProviderOnboarding}
-              nextStep={4}
-              nextHref="/provider/onboarding/review"
-              label="Continuar a revisión"
-            />
-          </div>
+          <StickyActionBar className="mt-6">
+            <div className="sm:border-ink/10 sm:border-t sm:pt-5">
+              <p className="text-ink/55 mb-3 text-xs leading-5">
+                Podés continuar a la revisión con el progreso que ya tengas. El
+                servidor conserva sus reglas actuales y no inventamos requisitos
+                adicionales en la interfaz.
+              </p>
+              <OnboardingAdvanceForm
+                action={saveProviderOnboarding}
+                nextStep={4}
+                nextHref="/provider/onboarding/review"
+                label="Continuar a revisión"
+              />
+            </div>
+          </StickyActionBar>
         ) : null}
       </div>
     </section>
