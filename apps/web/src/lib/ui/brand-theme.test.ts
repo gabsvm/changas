@@ -7,6 +7,14 @@ const globals = readFileSync(
   "utf8",
 );
 const icon = readFileSync(new URL("../../app/icon.svg", import.meta.url), "utf8");
+const badgeSources = [
+  "../../app/(account)/messages/page.tsx",
+  "../../app/(account)/layout.tsx",
+  "../../app/(provider)/layout.tsx",
+  "../../components/ui/authenticated-bottom-nav.tsx",
+]
+  .map((path) => readFileSync(new URL(path, import.meta.url), "utf8"))
+  .join("\n");
 
 describe("Changas brand theme", () => {
   it("uses the approved Changas palette as the global visual foundation", () => {
@@ -23,9 +31,15 @@ describe("Changas brand theme", () => {
     expect(globals).toMatch(/:focus-visible[\s\S]*outline:\s*2px solid #2563eb/i);
   });
 
-  it("uses accessible semantic derivatives instead of brand yellow or orange for small status text", () => {
+  it("uses accessible semantic derivatives instead of bright brand colors for small status text", () => {
     expect(globals).toContain("--color-terracotta: #c84010");
     expect(globals).toContain("--color-warning: #9a6500");
+    expect(globals).toContain("--color-brand-pink-strong: #d60060");
+  });
+
+  it("uses the accessible pink derivative for unread-count badges", () => {
+    expect(badgeSources).not.toMatch(/bg-brand-pink(?=\s|\")/);
+    expect(badgeSources.match(/bg-brand-pink-strong/g)).toHaveLength(4);
   });
 
   it("uses the branded icon artwork for compact wordmarks", () => {
