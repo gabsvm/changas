@@ -95,18 +95,25 @@ export default async function AccountPage() {
                   <div className="mb-2 flex items-center justify-between text-xs font-semibold">
                     <span>Progreso</span>
                     <span className="text-ink/55">
-                      Paso {Math.min(4, Math.max(1, provider.onboarding_step))} de 4
+                      Paso {Math.min(4, Math.max(1, provider.onboarding_step))}{" "}
+                      de 4
                     </span>
                   </div>
                   <ProgressBar
-                    value={(Math.min(4, Math.max(1, provider.onboarding_step)) / 4) * 100}
+                    value={
+                      (Math.min(4, Math.max(1, provider.onboarding_step)) / 4) *
+                      100
+                    }
                     label="Progreso de verificación"
                   />
                 </div>
               ) : null}
               <div className="mt-5">
                 {provider.status === "ACTIVE" ? (
-                  <Link className="button-primary w-full sm:w-auto" href="/provider/manage">
+                  <Link
+                    className="button-primary w-full sm:w-auto"
+                    href="/provider/manage"
+                  >
                     Gestionar servicios
                   </Link>
                 ) : canContinue ? (
@@ -135,7 +142,8 @@ export default async function AccountPage() {
                 ¿Querés trabajar con Changas?
               </h2>
               <p className="text-ink/60 mt-2 text-sm leading-6">
-                Prepará tu perfil de proveedor cuando quieras. Tu cuenta sigue sirviendo también para contratar.
+                Prepará tu perfil de proveedor cuando quieras. Tu cuenta sigue
+                sirviendo también para contratar.
               </p>
               <StartProviderForm action={startProviderOnboarding} />
             </>

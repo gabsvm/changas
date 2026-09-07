@@ -8,10 +8,7 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
-import {
-  getNextOnboardingHref,
-  getOnboardingSteps,
-} from "@/lib/ui/onboarding";
+import { getNextOnboardingHref, getOnboardingSteps } from "@/lib/ui/onboarding";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 
 import { startProviderOnboarding } from "../../actions";
@@ -113,7 +110,10 @@ export default async function ProviderOnboardingPage() {
           <div className="mt-3">
             <ProgressBar value={progress} label="Progreso de verificación" />
           </div>
-          <Link className="button-primary mt-5 w-full sm:w-auto" href={primaryHref}>
+          <Link
+            className="button-primary mt-5 w-full sm:w-auto"
+            href={primaryHref}
+          >
             {primaryLabel}
           </Link>
         </section>

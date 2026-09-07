@@ -66,7 +66,10 @@ export function OnboardingStepCard({
   }
 
   return (
-    <Link href={step.href} className={`${className} hover:border-moss/30 transition-colors`}>
+    <Link
+      href={step.href}
+      className={`${className} hover:border-moss/30 transition-colors`}
+    >
       {content}
     </Link>
   );

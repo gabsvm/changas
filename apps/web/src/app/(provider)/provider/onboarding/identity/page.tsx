@@ -55,8 +55,8 @@ export default async function ProviderOnboardingIdentityPage() {
           Confirmá tus datos privados
         </h1>
         <p className="text-ink/60 mt-3 text-sm leading-6">
-          Esta información sirve para procesos internos de identidad y seguridad.
-          No aparece en tu perfil público.
+          Esta información sirve para procesos internos de identidad y
+          seguridad. No aparece en tu perfil público.
         </p>
 
         <div className="mt-5">

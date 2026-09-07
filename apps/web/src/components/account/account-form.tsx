@@ -72,7 +72,7 @@ export function PublicProfileForm({
           autoComplete="name"
           required
         />
-        <span className="text-ink/50 mt-1.5 block text-xs font-normal leading-5">
+        <span className="text-ink/50 mt-1.5 block text-xs leading-5 font-normal">
           Es el nombre que verán otras personas en tu perfil.
         </span>
       </label>
@@ -86,7 +86,7 @@ export function PublicProfileForm({
           maxLength={120}
           placeholder="Ej. Palermo, CABA"
         />
-        <span className="text-ink/50 mt-1.5 block text-xs font-normal leading-5">
+        <span className="text-ink/50 mt-1.5 block text-xs leading-5 font-normal">
           No mostramos tu domicilio exacto.
         </span>
       </label>
@@ -101,8 +101,10 @@ export function PublicProfileForm({
           placeholder="Contá brevemente qué hacés, tu experiencia y cómo trabajás."
           onChange={(event) => setBioLength(event.currentTarget.value.length)}
         />
-        <span className="mt-1.5 flex items-start justify-between gap-4 text-xs font-normal leading-5">
-          <span className="text-ink/50">Una presentación breve ayuda a generar confianza.</span>
+        <span className="mt-1.5 flex items-start justify-between gap-4 text-xs leading-5 font-normal">
+          <span className="text-ink/50">
+            Una presentación breve ayuda a generar confianza.
+          </span>
           <span className="text-ink/45 shrink-0" aria-live="polite">
             {bioLength}/1000
           </span>
@@ -120,14 +122,15 @@ export function PublicProfileForm({
           inputMode="url"
           placeholder="https://…"
         />
-        <span className="text-ink/50 mt-1.5 block text-xs font-normal leading-5">
-          Por ahora usamos una URL. La carga directa de avatar queda fuera de este rediseño.
+        <span className="text-ink/50 mt-1.5 block text-xs leading-5 font-normal">
+          Por ahora usamos una URL. La carga directa de avatar queda fuera de
+          este rediseño.
         </span>
       </label>
 
       <FormStatus state={state} />
 
-      <div className="mobile-sticky-surface sticky bottom-0 -mx-5 z-20 px-5 pt-3 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+      <div className="mobile-sticky-surface sticky bottom-0 z-20 -mx-5 px-5 pt-3 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
         <button
           className="button-primary w-full sm:w-auto"
           type="submit"
@@ -224,7 +227,7 @@ export function PrivateIdentityForm({
 
       <FormStatus state={state} />
 
-      <div className="mobile-sticky-surface sticky bottom-0 -mx-5 z-20 px-5 pt-3 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+      <div className="mobile-sticky-surface sticky bottom-0 z-20 -mx-5 px-5 pt-3 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
         <button
           className="button-primary w-full sm:w-auto"
           type="submit"

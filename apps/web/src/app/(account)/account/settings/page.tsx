@@ -36,7 +36,7 @@ export default async function AccountSettingsPage() {
           <p className="text-ink/45 text-xs font-bold tracking-[0.12em] uppercase">
             Correo de acceso
           </p>
-          <p className="mt-2 break-all text-sm font-semibold">
+          <p className="mt-2 text-sm font-semibold break-all">
             {user.email ?? "Sin correo disponible"}
           </p>
         </section>

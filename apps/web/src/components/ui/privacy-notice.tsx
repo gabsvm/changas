@@ -6,7 +6,10 @@ export function PrivacyNotice({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-moss/15 bg-moss/7 text-ink rounded-2xl border p-4" role="note">
+    <div
+      className="border-moss/15 bg-moss/7 text-ink rounded-2xl border p-4"
+      role="note"
+    >
       <div className="flex gap-3">
         <span
           className="bg-moss/10 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-xl"

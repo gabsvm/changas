@@ -130,8 +130,8 @@ export function DocumentUploader({
         </span>
       </div>
       <p className="text-ink/60 mt-2 text-sm leading-6">
-        JPG, PNG o PDF. El archivo se envía mediante el flujo privado existente y
-        su ruta nunca se muestra en la interfaz pública.
+        JPG, PNG o PDF. El archivo se envía mediante el flujo privado existente
+        y su ruta nunca se muestra en la interfaz pública.
       </p>
 
       <form
@@ -185,7 +185,9 @@ export function DocumentUploader({
                 {selected.file.type === "application/pdf" ? "PDF" : "IMG"}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold">{selected.file.name}</p>
+                <p className="truncate text-sm font-bold">
+                  {selected.file.name}
+                </p>
                 <p className="text-ink/50 mt-1 text-xs">
                   {getDocumentTypeLabel(documentType)} ·{" "}
                   {formatFileSize(selected.file.size)}
@@ -225,7 +227,8 @@ export function DocumentUploader({
             </div>
             <p className="mt-3 text-sm font-bold">Elegí cómo cargarlo</p>
             <p className="text-ink/50 mt-1 text-xs leading-5">
-              Podés usar la cámara del teléfono o seleccionar un archivo guardado.
+              Podés usar la cámara del teléfono o seleccionar un archivo
+              guardado.
             </p>
           </div>
         )}

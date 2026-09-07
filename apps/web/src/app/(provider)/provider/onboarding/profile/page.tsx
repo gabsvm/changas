@@ -52,8 +52,9 @@ export default async function ProviderOnboardingProfilePage() {
           Prepará tu perfil público
         </h1>
         <p className="text-ink/60 mt-3 text-sm leading-6">
-          Estos son los datos que ayudan a que otras personas entiendan quién sos
-          y cómo trabajás. Guardarlos no publica un servicio automáticamente.
+          Estos son los datos que ayudan a que otras personas entiendan quién
+          sos y cómo trabajás. Guardarlos no publica un servicio
+          automáticamente.
         </p>
 
         <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.04)] sm:p-6">

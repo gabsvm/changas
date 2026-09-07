@@ -30,9 +30,7 @@ function CompletionRow({
       <span className="text-sm font-semibold">{label}</span>
       <span
         className={`rounded-full px-2.5 py-1 text-[0.65rem] font-bold tracking-[0.06em] uppercase ${
-          complete
-            ? "bg-success/10 text-success"
-            : "bg-warning/10 text-warning"
+          complete ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
         }`}
       >
         {complete ? "Completo" : "Revisar"}
@@ -92,10 +90,10 @@ export default async function ProviderOnboardingReviewPage() {
   );
   const privateComplete = Boolean(
     privateProfile?.legal_name &&
-      privateProfile?.private_phone &&
-      privateProfile?.date_of_birth &&
-      privateProfile?.exact_address &&
-      privateProfile?.dni_number,
+    privateProfile?.private_phone &&
+    privateProfile?.date_of_birth &&
+    privateProfile?.exact_address &&
+    privateProfile?.dni_number,
   );
   const receivedDocuments = documents ?? [];
   const documentsComplete = receivedDocuments.length > 0;
@@ -184,7 +182,10 @@ export default async function ProviderOnboardingReviewPage() {
         ) : null}
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link className="button-primary w-full sm:w-auto" href="/provider/onboarding">
+          <Link
+            className="button-primary w-full sm:w-auto"
+            href="/provider/onboarding"
+          >
             Volver al resumen
           </Link>
           <Link className="button-secondary w-full sm:w-auto" href="/account">
