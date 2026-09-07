@@ -17,6 +17,7 @@ Accessible semantic derivatives are allowed when the exact brand color does not 
 
 - Orange foreground: `#C84010`
 - Warning foreground: `#9A6500`
+- Pink badge background with white text: `#D60060`
 
 ## Composition rule
 
@@ -42,7 +43,7 @@ Functional contrast. Use for links, focus states, informational selection and se
 
 ### Pink
 
-Logo and attention accent only. Use sparingly for small notification counters or branded decorative details. It is not a general-purpose primary color.
+Logo and attention accent only. Keep the exact `#FF0A78` for the logo and decorative brand moments. Small unread-count badges with white text use the darker `#D60060` derivative for sufficient contrast. Pink is not a general-purpose primary color.
 
 ### Neutral surfaces
 
@@ -80,8 +81,8 @@ The visual language uses a friendly sans display treatment rather than the previ
 
 ## Mobile navigation
 
-The bottom navigation stays visually quiet. The active destination uses a warm orange tint and orange foreground. Blue remains available for hover/focus and secondary utility states. Notification badges use the logo pink accent sparingly.
+The bottom navigation stays visually quiet. The active destination uses a warm orange tint and orange foreground. Blue remains available for hover/focus and secondary utility states. Notification badges use the accessible dark-pink derivative sparingly while the exact logo pink remains reserved for decorative branding.
 
 ## Accessibility
 
-Exact logo colors are not automatically valid foreground colors. Small text uses accessible derivatives where needed. Keyboard focus is blue and visually explicit. Primary buttons use dark ink over orange rather than white because the exact brand orange does not provide sufficient normal-text contrast with white.
+Exact logo colors are not automatically valid foreground colors. Small text uses accessible derivatives where needed. Keyboard focus is blue and visually explicit. Primary buttons use dark ink over orange rather than white because the exact brand orange does not provide sufficient normal-text contrast with white. Unread counters use `#D60060` with white text instead of the brighter logo pink.
