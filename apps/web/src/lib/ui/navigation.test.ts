@@ -12,6 +12,9 @@ describe("getAuthenticatedNavKey", () => {
     ["/account/notifications", "activity"],
     ["/account", "account"],
     ["/account/profile", "account"],
+    ["/provider/onboarding", "account"],
+    ["/provider/onboarding/documents", "account"],
+    ["/provider/manage", "account"],
   ])("maps %s to %s", (pathname, expected) => {
     expect(getAuthenticatedNavKey(pathname)).toBe(expected);
   });
