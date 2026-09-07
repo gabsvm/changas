@@ -11,12 +11,12 @@ export function MobileAppBar({
   trailing?: ReactNode;
 }) {
   return (
-    <header className="border-ink/10 flex min-h-14 items-center gap-2 border-b py-2 sm:hidden">
-      <div className="flex w-10 shrink-0 justify-start">
+    <header className="border-ink/10 flex min-h-16 items-center gap-2 border-b py-2 sm:hidden">
+      <div className="flex w-12 shrink-0 justify-start">
         {backHref ? (
           <Link
             href={backHref}
-            className="hover:bg-ink/5 grid h-10 w-10 place-items-center rounded-xl"
+            className="hover:bg-ink/5 grid h-12 w-12 place-items-center rounded-xl"
             aria-label="Volver"
           >
             <svg
@@ -39,7 +39,7 @@ export function MobileAppBar({
       <h1 className="min-w-0 flex-1 truncate text-center text-base font-bold">
         {title}
       </h1>
-      <div className="flex w-10 shrink-0 justify-end">{trailing}</div>
+      <div className="flex w-12 shrink-0 justify-end">{trailing}</div>
     </header>
   );
 }
