@@ -76,5 +76,9 @@ export function getOnboardingSteps(
 
 export function getNextOnboardingHref(currentStep: number): string {
   const steps = getOnboardingSteps(currentStep);
-  return steps.find((step) => step.state === "current")?.href ?? steps[0].href;
+  return (
+    steps.find((step) => step.state === "current")?.href ??
+    steps[0]?.href ??
+    "/provider/onboarding/profile"
+  );
 }
