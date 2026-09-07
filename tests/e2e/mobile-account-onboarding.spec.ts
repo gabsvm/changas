@@ -145,7 +145,7 @@ for (const width of [320, 360, 390] as const) {
       page.getByRole("heading", { name: "Confirmá tus datos privados" }),
     ).toBeVisible();
     await expectMobileRoute(page);
-    await expectPrimaryActionAboveNavigation(page, "Guardar identidad");
+    await expectPrimaryActionAboveNavigation(page, "Guardar identidad privada");
 
     await page
       .getByRole("button", { name: "Continuar con documentos" })
