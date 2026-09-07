@@ -50,14 +50,14 @@ export default async function AccountPage() {
     <section className="py-6 sm:py-14">
       <div className="mx-auto max-w-3xl">
         <header className="flex items-center gap-3 sm:items-end sm:justify-between">
-          <div className="bg-terracotta text-surface grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-lg font-bold shadow-sm">
+          <div className="brand-gradient-surface grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-lg font-extrabold text-white">
             {initial}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
               Mi cuenta
             </p>
-            <h1 className="font-display mt-0.5 truncate text-2xl font-semibold tracking-[-0.025em] sm:text-4xl">
+            <h1 className="font-display mt-0.5 truncate text-2xl font-extrabold tracking-[-0.035em] sm:text-4xl">
               {displayName}
             </h1>
             <p className="text-ink/55 mt-1 truncate text-xs sm:text-sm">
@@ -66,15 +66,15 @@ export default async function AccountPage() {
           </div>
         </header>
 
-        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(22,56,50,0.05)] sm:p-6">
+        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_12px_34px_rgba(32,33,36,0.05)] sm:p-6">
           {provider ? (
             <>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.14em] uppercase">
+                  <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
                     Perfil de proveedor
                   </p>
-                  <h2 className="font-display mt-1 text-2xl font-semibold">
+                  <h2 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.025em]">
                     {provider.status === "ACTIVE"
                       ? "Tu perfil está listo"
                       : "Completá tu verificación"}
@@ -92,7 +92,7 @@ export default async function AccountPage() {
               </p>
               {provider.status !== "ACTIVE" ? (
                 <div className="mt-5">
-                  <div className="mb-2 flex items-center justify-between text-xs font-semibold">
+                  <div className="mb-2 flex items-center justify-between text-xs font-bold">
                     <span>Progreso</span>
                     <span className="text-ink/55">
                       Paso {Math.min(4, Math.max(1, provider.onboarding_step))}{" "}
@@ -135,10 +135,10 @@ export default async function AccountPage() {
             </>
           ) : (
             <>
-              <p className="text-terracotta text-[0.68rem] font-bold tracking-[0.14em] uppercase">
+              <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
                 Ofrecer servicios
               </p>
-              <h2 className="font-display mt-1 text-2xl font-semibold">
+              <h2 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.025em]">
                 ¿Querés trabajar con Changas?
               </h2>
               <p className="text-ink/60 mt-2 text-sm leading-6">
@@ -150,7 +150,7 @@ export default async function AccountPage() {
           )}
         </section>
 
-        <section className="border-ink/10 bg-surface mt-5 overflow-hidden rounded-3xl border px-4 shadow-[0_8px_24px_rgba(22,56,50,0.04)] sm:px-5">
+        <section className="border-ink/10 bg-surface mt-5 overflow-hidden rounded-3xl border px-4 shadow-[0_10px_28px_rgba(32,33,36,0.04)] sm:px-5">
           <AccountMenuItem
             href="/account/profile"
             icon="profile"
