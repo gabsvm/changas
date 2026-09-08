@@ -11,6 +11,12 @@ import { createClient } from "@/lib/supabase/server";
 const identityBucket = "identity-documents";
 const allowedDocumentTypes = new Set(["DNI_FRONT", "DNI_BACK", "SELFIE"]);
 
+type IdentitySubmitRpcClient = {
+  rpc(name: "submit_provider_identity_review"): Promise<{
+    error: { code?: string | null; message?: string | null } | null;
+  }>;
+};
+
 async function getUserAndClient() {
   const supabase = await createClient();
   const {
@@ -125,7 +131,8 @@ export async function uploadProviderIdentityDocument(
   revalidatePath("/provider/onboarding/documents");
   revalidatePath("/provider/onboarding/review");
   return {
-    success: "Documento recibido. Completá los tres requisitos antes de enviar a revisión.",
+    success:
+      "Documento recibido. Completá los tres requisitos antes de enviar a revisión.",
   };
 }
 
@@ -136,7 +143,9 @@ export async function submitProviderIdentityReview(
   const { supabase, user } = await getUserAndClient();
   if (!user) return { error: "Tu sesión expiró. Volvé a iniciar sesión." };
 
-  const { error } = await supabase.rpc("submit_provider_identity_review");
+  const { error } = await (
+    supabase as unknown as IdentitySubmitRpcClient
+  ).rpc("submit_provider_identity_review");
   if (error) {
     if (error.code === "22023") {
       return {
