@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { getAuthenticatedNavKey } from "./navigation";
+import {
+  getAuthenticatedNavKey,
+  shouldShowAuthenticatedBottomNav,
+} from "./navigation";
 
 describe("getAuthenticatedNavKey", () => {
   it.each([
@@ -22,5 +25,18 @@ describe("getAuthenticatedNavKey", () => {
     ["/provider/manage", "account"],
   ])("maps %s to %s", (pathname, expected) => {
     expect(getAuthenticatedNavKey(pathname)).toBe(expected);
+  });
+});
+
+describe("shouldShowAuthenticatedBottomNav", () => {
+  it("keeps primary message navigation but hides it inside a conversation", () => {
+    expect(shouldShowAuthenticatedBottomNav("/messages")).toBe(true);
+    expect(shouldShowAuthenticatedBottomNav("/messages/abc")).toBe(false);
+  });
+
+  it("keeps bottom navigation on normal authenticated surfaces", () => {
+    expect(shouldShowAuthenticatedBottomNav("/activity")).toBe(true);
+    expect(shouldShowAuthenticatedBottomNav("/jobs/abc")).toBe(true);
+    expect(shouldShowAuthenticatedBottomNav("/account")).toBe(true);
   });
 });
