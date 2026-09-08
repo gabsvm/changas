@@ -193,35 +193,44 @@ export function ConversationThread({
   }, [initialAttachments]);
 
   return (
-    <div className="border-ink/10 mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-[1.75rem] border bg-white/70 shadow-[0_20px_70px_rgba(22,56,50,0.08)] sm:min-h-[calc(100dvh-4rem)]">
-      <header className="border-ink/10 bg-canvas/95 sticky top-0 z-10 border-b px-4 py-4 backdrop-blur sm:px-6">
-        <div className="flex items-center gap-3">
+    <div className="border-ink/10 mx-auto flex min-h-[100dvh] w-full max-w-4xl flex-col overflow-hidden bg-white/70 sm:min-h-[calc(100dvh-4rem)] sm:rounded-[1.75rem] sm:border sm:shadow-[0_20px_70px_rgba(32,33,36,0.08)]">
+      <header className="border-ink/10 bg-canvas/96 sticky top-0 z-20 border-b px-3 py-2 backdrop-blur-xl sm:px-6 sm:py-4">
+        <div className="flex min-h-12 items-center gap-2 sm:gap-3">
           <Link
             href="/messages"
-            className="border-ink/10 grid h-10 w-10 shrink-0 place-items-center rounded-full border bg-white/70 text-lg"
+            className="hover:bg-moss/5 grid h-12 w-12 shrink-0 place-items-center rounded-2xl transition-colors"
             aria-label="Volver a mensajes"
           >
-            ←
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+              <path
+                d="m14.5 5-7 7 7 7"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </Link>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold">{peerName}</p>
+            <p className="truncate text-sm font-extrabold sm:text-base">{peerName}</p>
             <Link
               href={providerHref}
-              className="text-ink/55 block truncate text-xs underline-offset-4 hover:underline"
+              className="text-moss block truncate text-xs font-semibold underline-offset-4 hover:underline"
             >
               {serviceTitle}
             </Link>
           </div>
           <details className="relative">
-            <summary className="border-ink/10 grid h-10 w-10 cursor-pointer list-none place-items-center rounded-full border bg-white/70 text-lg">
+            <summary className="hover:bg-moss/5 grid h-12 w-12 cursor-pointer list-none place-items-center rounded-2xl text-lg transition-colors">
+              <span className="sr-only">Opciones de conversación</span>
               ···
             </summary>
-            <div className="border-ink/10 bg-canvas absolute right-0 mt-2 w-64 rounded-2xl border p-3 shadow-xl">
+            <div className="border-ink/10 bg-surface absolute right-0 z-30 mt-2 w-64 rounded-2xl border p-3 shadow-xl">
               <button
                 type="button"
                 onClick={toggleBlock}
                 disabled={changingBlock}
-                className="hover:bg-ink/5 w-full rounded-xl px-3 py-2 text-left text-sm font-semibold disabled:opacity-50"
+                className="hover:bg-ink/5 min-h-12 w-full rounded-xl px-3 py-2 text-left text-sm font-semibold disabled:opacity-50"
               >
                 {blockedByMe ? "Desbloquear persona" : "Bloquear persona"}
               </button>
@@ -230,21 +239,21 @@ export function ConversationThread({
           </details>
         </div>
         {blockedByMe ? (
-          <div className="bg-terracotta/10 text-terracotta mt-3 rounded-xl px-3 py-2 text-xs leading-5">
+          <div className="bg-danger/8 text-danger mt-2 rounded-xl px-3 py-2 text-xs leading-5">
             Bloqueaste a esta persona. El historial se conserva, pero no podés
             enviar nuevos mensajes hasta desbloquearla.
           </div>
         ) : null}
       </header>
 
-      <main className="flex-1 px-3 py-5 sm:px-6" aria-live="polite">
+      <main className="flex-1 overflow-y-auto px-3 py-5 sm:px-6" aria-live="polite">
         {hasOlder ? (
           <div className="mb-5 text-center">
             <button
               type="button"
               onClick={loadOlder}
               disabled={loadingOlder}
-              className="border-ink/10 bg-canvas rounded-full border px-4 py-2 text-xs font-semibold disabled:opacity-50"
+              className="border-ink/10 bg-canvas min-h-12 rounded-full border px-4 py-2 text-xs font-semibold disabled:opacity-50"
             >
               {loadingOlder ? "Cargando…" : "Cargar mensajes anteriores"}
             </button>
@@ -253,7 +262,7 @@ export function ConversationThread({
 
         {messages.length === 0 ? (
           <div className="mx-auto mt-12 max-w-sm text-center">
-            <p className="font-display text-2xl font-semibold">
+            <p className="text-2xl font-extrabold tracking-[-0.025em]">
               Empezá la conversación
             </p>
             <p className="text-ink/60 mt-2 text-sm leading-6">
@@ -275,7 +284,7 @@ export function ConversationThread({
         )}
       </main>
 
-      <footer className="border-ink/10 bg-canvas/95 sticky bottom-0 z-10 border-t p-3 backdrop-blur sm:p-4">
+      <footer className="mobile-safe-bottom border-ink/10 bg-canvas/96 sticky bottom-0 z-20 border-t p-3 backdrop-blur-xl sm:p-4">
         {blockedByMe ? (
           <button
             type="button"
@@ -286,18 +295,18 @@ export function ConversationThread({
             Desbloquear para volver a escribir
           </button>
         ) : (
-          <>
-            <TextComposer
-              conversationId={conversationId}
-              initialNonce={initialTextNonce}
-              onSent={refreshThread}
-            />
+          <div className="flex items-end gap-2">
             <AttachmentComposer
               conversationId={conversationId}
               initialNonce={initialAttachmentNonce}
               onSent={refreshThread}
             />
-          </>
+            <TextComposer
+              conversationId={conversationId}
+              initialNonce={initialTextNonce}
+              onSent={refreshThread}
+            />
+          </div>
         )}
       </footer>
     </div>
@@ -315,7 +324,7 @@ function MessageBubble({
 }) {
   if (message.kind === "SYSTEM") {
     return (
-      <div className="bg-moss/10 text-moss mx-auto my-4 max-w-lg rounded-xl px-4 py-3 text-center text-xs leading-5">
+      <div className="bg-moss/8 text-moss mx-auto my-4 max-w-lg rounded-xl px-4 py-3 text-center text-xs leading-5">
         {message.body ?? "Actividad de Changas"}
       </div>
     );
@@ -432,7 +441,11 @@ function TextComposer({
   }
 
   return (
-    <form ref={formRef} onSubmit={submit} className="flex items-end gap-2">
+    <form
+      ref={formRef}
+      onSubmit={submit}
+      className="relative flex min-w-0 flex-1 items-end gap-2"
+    >
       <input type="hidden" name="conversationId" value={conversationId} />
       <input
         ref={nonceRef}
@@ -446,17 +459,35 @@ function TextComposer({
         placeholder="Escribí un mensaje…"
         rows={1}
         maxLength={4000}
-        className="border-ink/10 placeholder:text-ink/35 focus:border-moss/50 min-h-12 flex-1 resize-none rounded-2xl border bg-white px-4 py-3 text-sm outline-none"
+        className="border-ink/10 placeholder:text-ink/35 focus:border-moss/50 min-h-12 min-w-0 flex-1 resize-none rounded-2xl border bg-white px-4 py-3 text-sm outline-none"
       />
       <button
         type="submit"
         disabled={pending}
-        className="bg-ink grid h-12 min-w-12 place-items-center rounded-2xl px-4 text-sm font-bold text-white disabled:opacity-40"
+        className="bg-brand-orange text-ink grid h-12 min-w-12 place-items-center rounded-2xl px-3 disabled:opacity-40"
+        aria-label={pending ? "Enviando mensaje" : "Enviar mensaje"}
       >
-        {pending ? "…" : "Enviar"}
+        {pending ? (
+          <span aria-hidden="true">…</span>
+        ) : (
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+            <path
+              d="m4 12 16-8-5.8 16-2.8-6.8L4 12Z"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinejoin="round"
+            />
+            <path
+              d="m11.4 13.2 3.7-3.7"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+        )}
       </button>
       {state.status === "WARNING" && !warningDismissed ? (
-        <div className="border-terracotta/20 absolute right-3 bottom-[5.1rem] left-3 rounded-2xl border bg-[#fff7f2] p-4 shadow-lg sm:right-4 sm:left-4">
+        <div className="border-terracotta/20 bg-surface absolute right-0 bottom-[calc(100%+0.75rem)] left-0 rounded-2xl border p-4 shadow-lg">
           <p className="text-terracotta text-sm font-semibold">
             Revisá antes de enviar
           </p>
@@ -467,14 +498,14 @@ function TextComposer({
               name="confirmLeakage"
               value="true"
               disabled={pending}
-              className="bg-terracotta rounded-full px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+              className="bg-terracotta min-h-11 rounded-xl px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
             >
               Enviar de todos modos
             </button>
             <button
               type="button"
               onClick={() => setWarningDismissed(true)}
-              className="border-ink/10 rounded-full border px-4 py-2 text-xs font-bold"
+              className="border-ink/10 min-h-11 rounded-xl border px-4 py-2 text-xs font-bold"
             >
               Editar mensaje
             </button>
@@ -483,7 +514,7 @@ function TextComposer({
       ) : null}
       {state.status === "ERROR" ? (
         <p
-          className="text-terracotta absolute right-4 bottom-[4.75rem] left-4 rounded-xl bg-[#fff7f2] px-3 py-2 text-xs"
+          className="text-danger bg-surface absolute right-0 bottom-[calc(100%+0.75rem)] left-0 rounded-xl px-3 py-2 text-xs shadow-lg"
           role="alert"
         >
           {state.message}
@@ -504,6 +535,9 @@ function AttachmentComposer({
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const nonceRef = useRef<HTMLInputElement>(null);
+  const kindRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
   const [state, setState] = useState(attachmentInitialState);
   const [pending, startTransition] = useTransition();
 
@@ -518,17 +552,24 @@ function AttachmentComposer({
       if (result.status === "success") {
         formRef.current?.reset();
         if (nonceRef.current) nonceRef.current.value = crypto.randomUUID();
+        if (detailsRef.current) detailsRef.current.open = false;
         onSent();
       }
     });
   }
 
+  function choose(kind: "IMAGE" | "FILE") {
+    if (pending || !fileRef.current || !kindRef.current) return;
+    kindRef.current.value = kind;
+    fileRef.current.accept =
+      kind === "IMAGE"
+        ? "image/jpeg,image/png,image/webp"
+        : "application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    fileRef.current.click();
+  }
+
   return (
-    <form
-      ref={formRef}
-      onSubmit={submit}
-      className="mt-2 flex items-center gap-2"
-    >
+    <form ref={formRef} onSubmit={submit} className="relative shrink-0">
       <input type="hidden" name="conversationId" value={conversationId} />
       <input
         ref={nonceRef}
@@ -536,30 +577,65 @@ function AttachmentComposer({
         name="nonce"
         defaultValue={initialNonce}
       />
-      <select
-        name="kind"
-        defaultValue="IMAGE"
-        aria-label="Tipo de adjunto"
-        className="border-ink/10 h-9 rounded-full border bg-white px-3 text-xs"
-      >
-        <option value="IMAGE">Imagen</option>
-        <option value="FILE">Archivo</option>
-      </select>
+      <input ref={kindRef} type="hidden" name="kind" defaultValue="IMAGE" />
       <input
+        ref={fileRef}
         type="file"
         name="attachments"
         multiple
-        className="file:bg-moss/10 file:text-moss min-w-0 flex-1 text-xs file:mr-2 file:rounded-full file:border-0 file:px-3 file:py-2 file:font-semibold"
+        className="sr-only"
+        onChange={() => {
+          if ((fileRef.current?.files?.length ?? 0) > 0) {
+            formRef.current?.requestSubmit();
+          }
+        }}
       />
-      <button
-        type="submit"
-        disabled={pending}
-        className="border-ink/10 rounded-full border bg-white px-3 py-2 text-xs font-bold disabled:opacity-40"
-      >
-        {pending ? "Subiendo…" : "Adjuntar"}
-      </button>
+
+      <details ref={detailsRef} className="relative">
+        <summary
+          className="border-ink/10 bg-surface hover:bg-brand-yellow/10 grid h-12 w-12 cursor-pointer list-none place-items-center rounded-2xl border transition-colors"
+          aria-label="Adjuntar"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+            <path
+              d="m8.5 12.5 5.9-5.9a3.2 3.2 0 0 1 4.5 4.5l-7.8 7.8a5 5 0 0 1-7.1-7.1l8-8"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </summary>
+        <div className="border-ink/10 bg-surface absolute bottom-[calc(100%+0.65rem)] left-0 z-30 w-44 rounded-2xl border p-2 shadow-xl">
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => choose("IMAGE")}
+            className="hover:bg-brand-yellow/10 min-h-12 w-full rounded-xl px-3 text-left text-sm font-bold disabled:opacity-50"
+          >
+            Foto o imagen
+          </button>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => choose("FILE")}
+            className="hover:bg-brand-yellow/10 min-h-12 w-full rounded-xl px-3 text-left text-sm font-bold disabled:opacity-50"
+          >
+            Archivo
+          </button>
+        </div>
+      </details>
+
+      {pending ? (
+        <span className="bg-surface text-ink/60 absolute -top-9 left-0 rounded-full px-3 py-1 text-[11px] font-bold shadow">
+          Subiendo…
+        </span>
+      ) : null}
       {state.status === "error" ? (
-        <p className="sr-only" role="alert">
+        <p
+          className="bg-surface text-danger absolute bottom-[calc(100%+0.75rem)] left-0 w-64 rounded-xl px-3 py-2 text-xs shadow-lg"
+          role="alert"
+        >
           {state.message}
         </p>
       ) : null}
@@ -575,7 +651,7 @@ function ReportForm({ conversationId }: { conversationId: string }) {
 
   return (
     <details className="border-ink/10 mt-1 border-t pt-1">
-      <summary className="hover:bg-ink/5 cursor-pointer rounded-xl px-3 py-2 text-sm font-semibold">
+      <summary className="hover:bg-ink/5 flex min-h-12 cursor-pointer items-center rounded-xl px-3 py-2 text-sm font-semibold">
         Reportar conversación
       </summary>
       <form action={action} className="space-y-2 p-2">
@@ -584,7 +660,7 @@ function ReportForm({ conversationId }: { conversationId: string }) {
           name="category"
           required
           defaultValue=""
-          className="border-ink/10 w-full rounded-xl border bg-white px-3 py-2 text-xs"
+          className="border-ink/10 min-h-12 w-full rounded-xl border bg-white px-3 py-2 text-xs"
         >
           <option value="" disabled>
             Elegí un motivo
@@ -604,14 +680,14 @@ function ReportForm({ conversationId }: { conversationId: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="bg-terracotta w-full rounded-full px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+          className="bg-terracotta min-h-12 w-full rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
         >
           {pending ? "Enviando…" : "Enviar reporte"}
         </button>
         {state.message ? (
           <p
             className={`text-[11px] leading-4 ${
-              state.status === "SUCCESS" ? "text-moss" : "text-terracotta"
+              state.status === "SUCCESS" ? "text-success" : "text-danger"
             }`}
           >
             {state.message}
