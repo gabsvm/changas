@@ -22,3 +22,7 @@ export function getAuthenticatedNavKey(pathname: string): AuthenticatedNavKey {
   }
   return "home";
 }
+
+export function shouldShowAuthenticatedBottomNav(pathname: string): boolean {
+  return !(pathname.startsWith("/messages/") && pathname !== "/messages");
+}
