@@ -8,9 +8,11 @@ import {
 
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { LocationPicker } from "@/components/discovery/location-picker";
+import { MobileFilterPanel } from "@/components/discovery/mobile-filter-panel";
 import { ConsumerShell } from "@/components/ui/consumer-shell";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
+import { countActiveDiscoveryFilters } from "@/lib/ui/discovery-filters";
 
 export const metadata: Metadata = {
   title: "Buscar servicios",
@@ -62,6 +64,7 @@ export default async function SearchPage({
   const { rows, hasMore } = searchResult;
   const categories = categoriesResult.data ?? [];
   const skills = skillsResult.data ?? [];
+  const activeFilterCount = countActiveDiscoveryFilters(filters);
   const modeValue =
     filters.modality === "IN_PERSON"
       ? "presencial"
@@ -70,20 +73,19 @@ export default async function SearchPage({
         : "todos";
 
   const controlClass =
-    "border-ink/15 focus:border-moss focus:ring-moss/15 mt-1 min-h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none focus:ring-2";
+    "border-ink/15 focus:border-moss focus:ring-moss/15 mt-1 min-h-12 w-full rounded-xl border bg-white px-3 text-sm outline-none focus:ring-2";
 
   return (
     <ConsumerShell maxWidth="max-w-6xl">
-      <section className="py-10 sm:py-14">
-        <p className="text-terracotta text-xs font-extrabold tracking-[0.1em] uppercase">
-          Descubrimiento
-        </p>
-        <h1 className="product-page-title mt-3">
-          {query ? "Resultados para “" + query + "”" : "Todos los servicios"}
+      <section className="py-8 sm:py-14">
+        <p className="product-kicker">Encontrá lo que necesitás</p>
+        <h1 className="product-page-title mt-2">
+          {query ? "Resultados para “" + query + "”" : "Buscar servicios"}
         </h1>
+
         <form
           action="/buscar"
-          className="border-ink/10 bg-surface mt-8 grid gap-4 rounded-[1.6rem] border p-4 shadow-[0_14px_38px_rgba(32,33,36,0.05)] sm:grid-cols-[1fr_auto_auto] sm:items-end sm:p-5"
+          className="border-ink/10 bg-surface mt-6 grid gap-4 rounded-[1.6rem] border p-4 shadow-[0_14px_38px_rgba(32,33,36,0.05)] sm:mt-8 sm:grid-cols-[1fr_auto_auto] sm:items-end sm:p-5"
         >
           <div>
             <label
@@ -93,19 +95,20 @@ export default async function SearchPage({
               ¿Qué necesitás?
             </label>
             <input
-              className="border-ink/15 focus:border-moss focus:ring-moss/15 mt-2 min-h-11 w-full rounded-xl border bg-white px-3 text-sm outline-none focus:ring-2"
+              className="border-ink/15 focus:border-moss focus:ring-moss/15 mt-2 min-h-12 w-full rounded-xl border bg-white px-4 text-base outline-none focus:ring-2"
               defaultValue={query}
               id="search-query"
               name="q"
-              placeholder="Ej. instalar cámara"
+              placeholder="Ej. electricista, instalar cámara…"
               type="search"
             />
           </div>
           <LocationPicker compact selected={filters.locationSlug} />
-          <button className="button-primary min-h-11" type="submit">
-            Actualizar
+          <button className="button-primary min-h-12" type="submit">
+            Buscar
           </button>
-          <div className="border-ink/10 grid gap-3 border-t pt-4 sm:col-span-3 sm:grid-cols-4 lg:grid-cols-6">
+
+          <MobileFilterPanel activeCount={activeFilterCount}>
             <div>
               <label
                 className="text-ink/65 text-xs font-bold"
@@ -161,7 +164,7 @@ export default async function SearchPage({
                 id="search-mode"
                 name="mode"
               >
-                <option value="todos">Todos</option>
+                <option value="todos">Todas</option>
                 <option value="presencial">Presencial</option>
                 <option value="remoto">Remoto</option>
               </select>
@@ -192,7 +195,7 @@ export default async function SearchPage({
                 className="text-ink/65 text-xs font-bold"
                 htmlFor="search-price-model"
               >
-                Modelo de precio
+                Tipo de precio
               </label>
               <select
                 className={controlClass}
@@ -249,7 +252,7 @@ export default async function SearchPage({
                 className="text-ink/65 text-xs font-bold"
                 htmlFor="search-radius"
               >
-                Radio
+                Distancia
               </label>
               <select
                 className={controlClass}
@@ -257,34 +260,33 @@ export default async function SearchPage({
                 id="search-radius"
                 name="radius"
               >
-                <option value="">Predeterminado</option>
+                <option value="">Predeterminada</option>
                 <option value="5000">Hasta 5 km</option>
                 <option value="10000">Hasta 10 km</option>
                 <option value="25000">Hasta 25 km</option>
               </select>
             </div>
-            <div className="flex items-end gap-3">
-              <div className="flex min-h-11 items-center gap-2 rounded-xl px-1">
+            <div className="flex items-end">
+              <label className="flex min-h-12 items-center gap-3 rounded-xl px-1 text-xs font-bold">
                 <input
-                  className="accent-terracotta h-4 w-4"
+                  className="accent-terracotta h-5 w-5"
                   defaultChecked={filters.acceptsOffers === true}
-                  id="search-offers"
                   name="offers"
                   type="checkbox"
                   value="true"
                 />
-                <label
-                  className="text-ink/65 text-xs font-bold"
-                  htmlFor="search-offers"
-                >
-                  Acepta ofertas
-                </label>
-              </div>
+                Acepta ofertas
+              </label>
             </div>
-          </div>
+            <div className="sm:hidden">
+              <button className="button-primary w-full" type="submit">
+                Aplicar filtros
+              </button>
+            </div>
+          </MobileFilterPanel>
         </form>
 
-        <div className="mt-8">
+        <div className="mt-7 sm:mt-8">
           <DiscoveryResults
             initialError={searchResult.error}
             initialHasMore={hasMore}
