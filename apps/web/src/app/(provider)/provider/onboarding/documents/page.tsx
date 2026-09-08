@@ -1,6 +1,7 @@
 import { canSelfManageProviderStatus } from "@changas/domain";
 import { redirect } from "next/navigation";
 
+import { uploadIdentityDocument } from "@/app/(provider)/actions";
 import { DocumentListItem } from "@/components/provider/document-list-item";
 import { DocumentUploader } from "@/components/provider/document-uploader";
 import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
@@ -15,10 +16,7 @@ import {
   requiredIdentityDocumentTypes,
 } from "@/lib/ui/provider-submission";
 
-import {
-  submitProviderIdentityReview,
-  uploadProviderIdentityDocument,
-} from "./actions";
+import { submitProviderIdentityReview } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -123,7 +121,7 @@ export default async function ProviderOnboardingDocumentsPage() {
         <div className="mt-6">
           <DocumentUploader
             key={`document-uploader-${receivedDocuments.length}`}
-            action={uploadProviderIdentityDocument}
+            action={uploadIdentityDocument}
             editable={editable}
           />
         </div>
