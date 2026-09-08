@@ -218,7 +218,7 @@ export async function uploadIdentityDocument(
 
   const { data: previousDocument } = await supabase
     .from("provider_documents")
-    .select("id, storage_path, document_type, mime_type, file_size_bytes")
+    .select("id, storage_path")
     .eq("user_id", user.id)
     .eq("document_type", metadata.data.documentType)
     .maybeSingle();
@@ -234,55 +234,26 @@ export async function uploadIdentityDocument(
     ? await supabase
         .from("provider_documents")
         .update({
-          document_type: documentPayload.document_type,
           storage_path: documentPayload.storage_path,
           mime_type: documentPayload.mime_type,
           file_size_bytes: documentPayload.file_size_bytes,
         })
         .eq("id", previousDocument.id)
-        .select("id")
-        .single()
-    : await supabase
-        .from("provider_documents")
-        .insert(documentPayload)
-        .select("id")
-        .single();
+    : await supabase.from("provider_documents").insert(documentPayload);
 
   if (metadataResult.error) {
     await supabase.storage.from(identityBucket).remove([storagePath]);
     return { error: "No pudimos registrar el documento." };
   }
 
-  const { error: statusError } = await supabase
-    .from("provider_profiles")
-    .update({ status: "IDENTITY_PENDING" })
-    .eq("user_id", user.id);
-
-  if (statusError) {
-    if (previousDocument) {
-      await supabase
-        .from("provider_documents")
-        .update({
-          storage_path: previousDocument.storage_path,
-          mime_type: previousDocument.mime_type,
-          file_size_bytes: previousDocument.file_size_bytes,
-        })
-        .eq("id", previousDocument.id);
-    } else {
-      await supabase
-        .from("provider_documents")
-        .delete()
-        .eq("id", metadataResult.data.id);
-    }
-    await supabase.storage.from(identityBucket).remove([storagePath]);
-    return { error: "No pudimos actualizar el estado de identidad." };
-  }
-
-  if (previousDocument && previousDocument.storage_path !== storagePath) {
+  if (previousDocument?.storage_path) {
     await supabase.storage
       .from(identityBucket)
       .remove([previousDocument.storage_path]);
   }
 
-  return { success: "Documento recibido. Quedará pendiente de revisión." };
+  return {
+    success:
+      "Documento recibido. Completá los tres requisitos antes de enviar a revisión.",
+  };
 }
