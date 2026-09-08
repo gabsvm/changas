@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { AdminNavigation } from "@/components/admin/admin-navigation";
 import { requireAdminPage } from "@/lib/admin/server";
 
+import "./admin.css";
+
 export default async function AdminLayout({
   children,
 }: {
