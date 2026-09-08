@@ -3,13 +3,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { DocumentListItem } from "@/components/provider/document-list-item";
-import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
+import { hasRequiredIdentityDocuments } from "@/lib/ui/provider-submission";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
-
-import { saveProviderOnboarding } from "../../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -92,13 +90,15 @@ export default async function ProviderOnboardingReviewPage() {
   );
   const privateComplete = Boolean(
     privateProfile?.legal_name &&
-    privateProfile?.private_phone &&
-    privateProfile?.date_of_birth &&
-    privateProfile?.exact_address &&
-    privateProfile?.dni_number,
+      privateProfile?.private_phone &&
+      privateProfile?.date_of_birth &&
+      privateProfile?.exact_address &&
+      privateProfile?.dni_number,
   );
   const receivedDocuments = documents ?? [];
-  const documentsComplete = receivedDocuments.length > 0;
+  const documentsComplete = hasRequiredIdentityDocuments(receivedDocuments);
+  const readyForSubmission = publicComplete && privateComplete && documentsComplete;
+  const submitted = provider.status === "IDENTITY_PENDING" || provider.status === "UNDER_REVIEW";
 
   return (
     <section className="pb-6 sm:py-14">
@@ -110,16 +110,18 @@ export default async function ProviderOnboardingReviewPage() {
               Paso 4 de 4
             </p>
             <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
-              Revisá lo cargado
+              Estado de tu verificación
             </h1>
           </div>
           <StatusBadge label={presentation.label} tone={presentation.tone} />
         </div>
 
         <p className="text-ink/60 mt-3 max-w-2xl text-sm leading-6">
-          Esta pantalla resume tu progreso. No significa que el perfil esté
-          aprobado: la habilitación continúa dependiendo del estado real y de la
-          revisión correspondiente.
+          {submitted
+            ? "Tu identidad fue enviada y ahora sí está en la cola administrativa de revisión."
+            : readyForSubmission
+              ? "Ya completaste los requisitos, pero todavía tenés que enviarlos desde Documentos para entrar en revisión."
+              : "Esta pantalla resume lo cargado. Estar en el paso 4 no significa que tu identidad haya sido enviada a revisión."}
         </p>
 
         <section className="border-ink/10 bg-surface mt-6 rounded-3xl border px-5 py-2 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:px-6">
@@ -134,11 +136,39 @@ export default async function ProviderOnboardingReviewPage() {
             href="/provider/onboarding/identity"
           />
           <CompletionRow
-            label="Documentos"
+            label="Documentos requeridos"
             complete={documentsComplete}
             href="/provider/onboarding/documents"
           />
         </section>
+
+        {!submitted ? (
+          <div className="border-brand-yellow/30 bg-brand-yellow/12 mt-6 rounded-3xl border p-5">
+            <p className="font-extrabold text-warning">
+              {readyForSubmission
+                ? "Falta enviarlo a revisión"
+                : "La verificación todavía está incompleta"}
+            </p>
+            <p className="text-ink/60 mt-2 text-sm leading-6">
+              {readyForSubmission
+                ? "Volvé a Documentos y tocá “Enviar a revisión”. Recién entonces un administrador verá tu caso."
+                : "Completá los elementos marcados como Revisar y luego enviá la identidad desde Documentos."}
+            </p>
+            <Link
+              className="button-primary mt-4 w-full sm:w-auto"
+              href="/provider/onboarding/documents"
+            >
+              Ir a documentos
+            </Link>
+          </div>
+        ) : (
+          <div className="border-moss/25 bg-moss/8 mt-6 rounded-3xl border p-5">
+            <p className="font-extrabold text-moss">Caso enviado correctamente</p>
+            <p className="text-ink/60 mt-2 text-sm leading-6">
+              Un administrador puede revisar ahora la evidencia privada y tomar una decisión.
+            </p>
+          </div>
+        )}
 
         <section className="mt-6">
           <div className="flex items-end justify-between gap-4">
@@ -172,17 +202,6 @@ export default async function ProviderOnboardingReviewPage() {
           )}
         </section>
 
-        {editable && provider.onboarding_step < 4 ? (
-          <div className="border-ink/10 mt-6 border-t pt-5">
-            <OnboardingAdvanceForm
-              action={saveProviderOnboarding}
-              nextStep={4}
-              nextHref="/provider/onboarding/review"
-              label="Guardar este paso"
-            />
-          </div>
-        ) : null}
-
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Link
             className="button-primary w-full sm:w-auto"
@@ -195,10 +214,11 @@ export default async function ProviderOnboardingReviewPage() {
           </Link>
         </div>
 
-        <p className="text-ink/50 mt-5 text-xs leading-5">
-          Changas no cambia tu perfil a activo desde esta pantalla. Los estados
-          de revisión y habilitación siguen controlados por la lógica existente.
-        </p>
+        {editable && !submitted ? (
+          <p className="text-ink/50 mt-5 text-xs leading-5">
+            Podés seguir corrigiendo tu información mientras el perfil no haya sido enviado.
+          </p>
+        ) : null}
       </div>
     </section>
   );
