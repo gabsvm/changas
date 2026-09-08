@@ -36,6 +36,9 @@ export default async function AdminAuditPage() {
                   <p className="text-sm font-extrabold text-white">
                     {humanAction(event.action_type)}
                   </p>
+                  <code className="mt-1 block truncate text-[0.62rem] font-bold tracking-[0.04em] text-[#596579]">
+                    {event.action_type}
+                  </code>
                   <p className="mt-1 truncate text-xs text-[#7f8a9b]">
                     {event.target_type} · {event.target_id ?? "sin target"}
                   </p>
