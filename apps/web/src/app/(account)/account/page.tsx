@@ -54,10 +54,8 @@ export default async function AccountPage() {
             {initial}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
-              Mi cuenta
-            </p>
-            <h1 className="font-display mt-0.5 truncate text-2xl font-extrabold tracking-[-0.035em] sm:text-4xl">
+            <p className="product-kicker">Mi cuenta</p>
+            <h1 className="font-display mt-0.5 truncate text-2xl font-extrabold tracking-[-0.03em] sm:text-4xl">
               {displayName}
             </h1>
             <p className="text-ink/55 mt-1 truncate text-xs sm:text-sm">
@@ -71,9 +69,7 @@ export default async function AccountPage() {
             <>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
-                    Perfil de proveedor
-                  </p>
+                  <p className="product-kicker">Perfil de proveedor</p>
                   <h2 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.025em]">
                     {provider.status === "ACTIVE"
                       ? "Tu perfil está listo"
@@ -135,9 +131,7 @@ export default async function AccountPage() {
             </>
           ) : (
             <>
-              <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
-                Ofrecer servicios
-              </p>
+              <p className="product-kicker">Ofrecer servicios</p>
               <h2 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.025em]">
                 ¿Querés trabajar con Changas?
               </h2>
@@ -170,16 +164,16 @@ export default async function AccountPage() {
             description="Profesionales y servicios que marcaste"
           />
           <AccountMenuItem
-            href="/account/notifications"
+            href="/activity"
             icon="activity"
-            title="Actividad y notificaciones"
-            description="Novedades y preferencias de avisos"
+            title="Actividad y trabajos"
+            description="Trabajos, novedades y avisos importantes"
           />
           <AccountMenuItem
             href="/account/settings"
             icon="settings"
             title="Configuración"
-            description="Preferencias de cuenta y sesión"
+            description="Notificaciones, preferencias y sesión"
           />
         </section>
       </div>
