@@ -1,7 +1,6 @@
 import { canSelfManageProviderStatus } from "@changas/domain";
 import { redirect } from "next/navigation";
 
-import { uploadIdentityDocument } from "@/app/(provider)/actions";
 import { DocumentListItem } from "@/components/provider/document-list-item";
 import { DocumentUploader } from "@/components/provider/document-uploader";
 import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
@@ -16,7 +15,10 @@ import {
   requiredIdentityDocumentTypes,
 } from "@/lib/ui/provider-submission";
 
-import { submitProviderIdentityReview } from "./actions";
+import {
+  submitProviderIdentityReview,
+  uploadProviderIdentityDocument,
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +49,9 @@ export default async function ProviderOnboardingDocumentsPage() {
     redirect("/provider/onboarding");
   }
 
-  const editable = canSelfManageProviderStatus(provider.status);
+  const submitted =
+    provider.status === "IDENTITY_PENDING" || provider.status === "UNDER_REVIEW";
+  const editable = canSelfManageProviderStatus(provider.status) && !submitted;
   const receivedDocuments = documents ?? [];
   const documentsComplete = hasRequiredIdentityDocuments(receivedDocuments);
   const missingDocuments = missingRequiredIdentityDocuments(receivedDocuments);
@@ -88,12 +92,18 @@ export default async function ProviderOnboardingDocumentsPage() {
             </div>
             <span
               className={`rounded-full px-3 py-1 text-xs font-extrabold ${
-                documentsComplete
-                  ? "bg-success/10 text-success"
-                  : "bg-brand-yellow/20 text-warning"
+                submitted
+                  ? "bg-moss/10 text-moss"
+                  : documentsComplete
+                    ? "bg-success/10 text-success"
+                    : "bg-brand-yellow/20 text-warning"
               }`}
             >
-              {documentsComplete ? "Listo para enviar" : "Faltan documentos"}
+              {submitted
+                ? "En revisión"
+                : documentsComplete
+                  ? "Listo para enviar"
+                  : "Faltan documentos"}
             </span>
           </div>
           <div className="mt-4 grid gap-2 sm:grid-cols-3">
@@ -118,13 +128,24 @@ export default async function ProviderOnboardingDocumentsPage() {
           </div>
         </section>
 
-        <div className="mt-6">
-          <DocumentUploader
-            key={`document-uploader-${receivedDocuments.length}`}
-            action={uploadIdentityDocument}
-            editable={editable}
-          />
-        </div>
+        {submitted ? (
+          <div className="border-moss/25 bg-moss/8 mt-6 rounded-3xl border p-5">
+            <p className="font-extrabold text-moss">Identidad enviada</p>
+            <p className="text-ink/60 mt-2 text-sm leading-6">
+              El caso ya está en la cola administrativa. Para mantener estable la
+              evidencia que está siendo revisada, la carga queda bloqueada hasta
+              que exista una decisión.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-6">
+            <DocumentUploader
+              key={`document-uploader-${receivedDocuments.length}`}
+              action={uploadProviderIdentityDocument}
+              editable={editable}
+            />
+          </div>
+        )}
 
         <section className="mt-6">
           <div className="flex items-end justify-between gap-4">

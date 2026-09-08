@@ -18,7 +18,10 @@ export function AdminProviderControls({
     providerStatus === "SUSPENDED" ||
     providerStatus === "RESTRICTED" ||
     providerStatus === "DEACTIVATED";
-  const canManualActivate = providerStatus !== "ACTIVE" && !blocked;
+  const canManualActivate =
+    providerStatus === null ||
+    providerStatus === "PROFILE_INCOMPLETE" ||
+    providerStatus === "REJECTED";
 
   return (
     <div className="space-y-2">
@@ -47,6 +50,13 @@ export function AdminProviderControls({
         >
           Ver progreso de prestador
         </Link>
+      ) : null}
+
+      {providerStatus === "REJECTED" ? (
+        <p className="rounded-2xl border border-[#ef5350]/25 bg-[#ef5350]/8 px-3 py-2 text-xs leading-5 text-[#ff7774]">
+          La revisión fue rechazada. Si existe una verificación alternativa válida,
+          podés resolver la excepción mediante activación manual auditada.
+        </p>
       ) : null}
 
       {canManualActivate ? (

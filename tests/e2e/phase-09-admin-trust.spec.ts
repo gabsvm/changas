@@ -201,13 +201,11 @@ test.describe("Phase 09 admin trust and safety", () => {
     await expect(
       page.getByRole("heading", { name: "Revisión de identidad" }),
     ).toBeVisible();
-    const identityCard = page.locator(
-      `article:has(input[name="providerUserId"][value="${provider.id}"])`,
-    );
+    const identityCard = page
+      .getByRole("button", { name: "Aprobar identidad" })
+      .locator("xpath=ancestor::section[1]");
     await expect(identityCard).toHaveCount(1);
-    await expect(
-      identityCard.getByText("IDENTITY_PENDING", { exact: true }),
-    ).toBeVisible();
+    await expect(identityCard.getByText("En revisión", { exact: true })).toBeVisible();
 
     const signedResponse = await page.request.get(
       `/api/admin/identity-documents/${documentId}`,
@@ -221,9 +219,7 @@ test.describe("Phase 09 admin trust and safety", () => {
     await identityCard
       .getByRole("button", { name: "Aprobar identidad" })
       .click();
-    await expect(
-      identityCard.getByText("ACTIVE", { exact: true }),
-    ).toBeVisible();
+    await expect(identityCard.getByText("Activo", { exact: true })).toBeVisible();
 
     const providerState = await adminRequest(
       `/rest/v1/provider_profiles?user_id=eq.${provider.id}&select=status`,

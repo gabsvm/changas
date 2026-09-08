@@ -19,6 +19,25 @@
   animation: admin-enter 180ms ease-out both;
 }
 
+/* Legacy admin sections such as Catalog keep their backend/forms but inherit
+   the same page-heading hierarchy while they migrate to shared primitives. */
+.admin-shell .admin-main > div > section > div:first-child > h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.admin-shell .admin-main > div > section > div:first-child > h2 + p {
+  margin-top: 0.5rem;
+  max-width: 42rem;
+  color: var(--admin-muted) !important;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
 .admin-shell .bg-white,
 .admin-shell .bg-slate-50,
 .admin-shell .bg-slate-100 {
@@ -101,6 +120,10 @@
   outline-offset: 1px;
 }
 
+.admin-shell button {
+  min-height: 3rem;
+}
+
 .admin-shell button,
 .admin-shell a {
   -webkit-tap-highlight-color: transparent;
@@ -115,7 +138,7 @@
 }
 
 .admin-shell summary {
-  min-height: 2.75rem;
+  min-height: 3rem;
   display: flex;
   align-items: center;
 }

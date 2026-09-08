@@ -40,7 +40,7 @@ export default async function AdminLayout({
           <div className="flex-1" />
 
           <Link
-            className="flex min-h-11 items-center gap-2 rounded-xl border border-[#273142] bg-[#121923] px-3 text-xs font-bold text-[#98a2b3] transition-colors hover:border-[#3a4659] hover:text-white"
+            className="flex min-h-12 items-center gap-2 rounded-xl border border-[#273142] bg-[#121923] px-3 text-xs font-bold text-[#98a2b3] transition-colors hover:border-[#3a4659] hover:text-white"
             href="/"
           >
             <span aria-hidden="true">←</span>

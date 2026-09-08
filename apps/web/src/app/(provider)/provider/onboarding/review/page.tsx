@@ -15,16 +15,15 @@ function CompletionRow({
   label,
   complete,
   href,
+  editable,
 }: {
   label: string;
   complete: boolean;
   href: string;
+  editable: boolean;
 }) {
-  return (
-    <Link
-      href={href}
-      className="border-ink/10 hover:bg-moss/5 flex min-h-14 items-center justify-between gap-4 border-b py-3 transition-colors last:border-b-0"
-    >
+  const content = (
+    <>
       <span className="text-sm font-bold">{label}</span>
       <span
         className={`rounded-full px-2.5 py-1 text-[0.65rem] font-bold tracking-[0.06em] uppercase ${
@@ -35,6 +34,26 @@ function CompletionRow({
       >
         {complete ? "Completo" : "Revisar"}
       </span>
+    </>
+  );
+
+  if (!editable) {
+    return (
+      <div
+        aria-disabled="true"
+        className="border-ink/10 flex min-h-14 items-center justify-between gap-4 border-b py-3 last:border-b-0"
+      >
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      className="border-ink/10 hover:bg-moss/5 flex min-h-14 items-center justify-between gap-4 border-b py-3 transition-colors last:border-b-0"
+    >
+      {content}
     </Link>
   );
 }
@@ -83,7 +102,6 @@ export default async function ProviderOnboardingReviewPage() {
     redirect("/provider/onboarding");
   }
 
-  const editable = canSelfManageProviderStatus(provider.status);
   const presentation = getProviderStatusPresentation(provider.status);
   const publicComplete = Boolean(
     profile?.display_name && profile?.public_zone && profile?.bio,
@@ -98,7 +116,27 @@ export default async function ProviderOnboardingReviewPage() {
   const receivedDocuments = documents ?? [];
   const documentsComplete = hasRequiredIdentityDocuments(receivedDocuments);
   const readyForSubmission = publicComplete && privateComplete && documentsComplete;
-  const submitted = provider.status === "IDENTITY_PENDING" || provider.status === "UNDER_REVIEW";
+  const pendingReview =
+    provider.status === "IDENTITY_PENDING" || provider.status === "UNDER_REVIEW";
+  const approved = provider.status === "ACTIVE";
+  const rejected = provider.status === "REJECTED";
+  const editable = canSelfManageProviderStatus(provider.status) && !pendingReview;
+
+  let summary =
+    "Esta pantalla resume lo cargado. Estar en el paso 4 no significa que tu identidad haya sido enviada a revisión.";
+  if (pendingReview) {
+    summary =
+      "Tu identidad fue enviada y está en la cola administrativa de revisión. La evidencia queda bloqueada mientras se toma una decisión.";
+  } else if (approved) {
+    summary =
+      "Tu identidad fue aprobada y tu perfil de prestador está habilitado.";
+  } else if (rejected) {
+    summary =
+      "La revisión fue rechazada y requiere una nueva decisión administrativa antes de habilitar el perfil.";
+  } else if (readyForSubmission) {
+    summary =
+      "Ya completaste los requisitos, pero todavía tenés que enviarlos desde Documentos para entrar en revisión.";
+  }
 
   return (
     <section className="pb-6 sm:py-14">
@@ -116,33 +154,51 @@ export default async function ProviderOnboardingReviewPage() {
           <StatusBadge label={presentation.label} tone={presentation.tone} />
         </div>
 
-        <p className="text-ink/60 mt-3 max-w-2xl text-sm leading-6">
-          {submitted
-            ? "Tu identidad fue enviada y ahora sí está en la cola administrativa de revisión."
-            : readyForSubmission
-              ? "Ya completaste los requisitos, pero todavía tenés que enviarlos desde Documentos para entrar en revisión."
-              : "Esta pantalla resume lo cargado. Estar en el paso 4 no significa que tu identidad haya sido enviada a revisión."}
-        </p>
+        <p className="text-ink/60 mt-3 max-w-2xl text-sm leading-6">{summary}</p>
 
         <section className="border-ink/10 bg-surface mt-6 rounded-3xl border px-5 py-2 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:px-6">
           <CompletionRow
             label="Perfil público"
             complete={publicComplete}
             href="/provider/onboarding/profile"
+            editable={editable}
           />
           <CompletionRow
             label="Identidad privada"
             complete={privateComplete}
             href="/provider/onboarding/identity"
+            editable={editable}
           />
           <CompletionRow
             label="Documentos requeridos"
             complete={documentsComplete}
             href="/provider/onboarding/documents"
+            editable={editable}
           />
         </section>
 
-        {!submitted ? (
+        {pendingReview ? (
+          <div className="border-moss/25 bg-moss/8 mt-6 rounded-3xl border p-5">
+            <p className="font-extrabold text-moss">Caso enviado correctamente</p>
+            <p className="text-ink/60 mt-2 text-sm leading-6">
+              Un administrador puede revisar ahora la evidencia privada y tomar una decisión.
+            </p>
+          </div>
+        ) : approved ? (
+          <div className="border-success/25 bg-success/8 mt-6 rounded-3xl border p-5">
+            <p className="font-extrabold text-success">Prestador habilitado</p>
+            <p className="text-ink/60 mt-2 text-sm leading-6">
+              La verificación ya fue aprobada. No necesitás volver a enviar documentación desde este flujo.
+            </p>
+          </div>
+        ) : rejected ? (
+          <div className="border-danger/25 bg-danger/8 mt-6 rounded-3xl border p-5">
+            <p className="font-extrabold text-danger">Revisión rechazada</p>
+            <p className="text-ink/60 mt-2 text-sm leading-6">
+              La documentación queda conservada y bloqueada. Un administrador puede revisar el caso y decidir el próximo paso.
+            </p>
+          </div>
+        ) : (
           <div className="border-brand-yellow/30 bg-brand-yellow/12 mt-6 rounded-3xl border p-5">
             <p className="font-extrabold text-warning">
               {readyForSubmission
@@ -160,13 +216,6 @@ export default async function ProviderOnboardingReviewPage() {
             >
               Ir a documentos
             </Link>
-          </div>
-        ) : (
-          <div className="border-moss/25 bg-moss/8 mt-6 rounded-3xl border p-5">
-            <p className="font-extrabold text-moss">Caso enviado correctamente</p>
-            <p className="text-ink/60 mt-2 text-sm leading-6">
-              Un administrador puede revisar ahora la evidencia privada y tomar una decisión.
-            </p>
           </div>
         )}
 
@@ -214,7 +263,7 @@ export default async function ProviderOnboardingReviewPage() {
           </Link>
         </div>
 
-        {editable && !submitted ? (
+        {editable ? (
           <p className="text-ink/50 mt-5 text-xs leading-5">
             Podés seguir corrigiendo tu información mientras el perfil no haya sido enviado.
           </p>
