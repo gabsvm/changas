@@ -2,13 +2,30 @@ import Link from "next/link";
 
 import { decideIdentityAction } from "@/app/admin/actions";
 import {
+  AdminEmptyState,
+  AdminPageHeader,
+  AdminPanel,
+  AdminStatusBadge,
+  providerTone,
+} from "@/components/admin/admin-ui";
+import {
   getAdminIdentityCase,
   listAdminIdentityQueue,
 } from "@/lib/admin/identity";
+import { getDocumentTypeLabel } from "@/lib/ui/documents";
+import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 
 type SearchParams = { provider?: string | string[] };
 const first = (value: string | string[] | undefined) =>
   Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+
+function dateTime(value: unknown) {
+  if (typeof value !== "string" || !value) return "—";
+  return new Intl.DateTimeFormat("es-AR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
 
 export default async function AdminIdentityPage({
   searchParams,
@@ -32,50 +49,81 @@ export default async function AdminIdentityPage({
 
   return (
     <section className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Revisión de identidad</h2>
-        <p className="text-sm text-slate-600">
-          Los documentos siguen privados; el panel sólo genera acceso temporal
-          al archivo exacto.
-        </p>
-      </div>
+      <AdminPageHeader
+        eyebrow="Trust & Safety"
+        title="Revisión de identidad"
+        description="Sólo aparecen acá los prestadores que realmente enviaron su identidad. Los archivos siguen privados y cada apertura genera acceso temporal al documento exacto."
+        action={
+          <div className="rounded-2xl border border-[#ffc857]/30 bg-[#ffc857]/10 px-4 py-3 text-center">
+            <p className="text-2xl font-extrabold text-[#ffd878]">{queue.length}</p>
+            <p className="text-[0.65rem] font-extrabold tracking-[0.08em] text-[#b99a53] uppercase">
+              pendientes
+            </p>
+          </div>
+        }
+      />
+
       {identityCase ? (
-        <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex flex-wrap justify-between gap-2">
-            <div>
-              <p className="font-bold">
+        <AdminPanel className="space-y-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[0.65rem] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
+                Caso seleccionado
+              </p>
+              <h2 className="mt-1 truncate text-xl font-extrabold text-white">
                 {identityCase.display_name ??
                   identityCase.email ??
                   identityCase.provider_user_id}
-              </p>
-              <p className="text-xs text-slate-500">
+              </h2>
+              <p className="mt-1 truncate text-sm text-[#98a2b3]">
                 {identityCase.email ?? identityCase.provider_user_id}
               </p>
             </div>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold">
-              {identityCase.status}
-            </span>
+            <AdminStatusBadge
+              label={getProviderStatusPresentation(identityCase.status).label}
+              tone={providerTone(identityCase.status)}
+            />
           </div>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            {documents.map((document) => {
-              const id = String(document.id ?? "");
-              return (
-                <a
-                  className="rounded-xl border border-slate-200 px-3 py-3 text-sm font-semibold"
-                  href={`/api/admin/identity-documents/${id}`}
-                  key={id}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  Abrir {String(document.document_type ?? "documento")}
-                </a>
-              );
-            })}
+
+          <div className="rounded-2xl border border-[#273142] bg-[#101720] p-4">
+            <p className="text-xs font-bold text-[#697386]">Identidad declarada</p>
+            <p className="mt-1 text-sm font-extrabold text-[#d0d5dd]">
+              {identityCase.legal_name ?? "Sin nombre legal"}
+            </p>
+            <p className="mt-1 text-xs text-[#7f8a9b]">
+              DNI y fecha de nacimiento se consultan sólo dentro de este contexto administrativo.
+            </p>
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+
+          <div>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h3 className="text-sm font-extrabold text-white">Evidencia privada</h3>
+              <span className="text-xs font-bold text-[#697386]">{documents.length} archivos</span>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {documents.map((document) => {
+                const id = String(document.id ?? "");
+                const type = String(document.document_type ?? "");
+                return (
+                  <a
+                    className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-[#273142] bg-[#0d131d] px-4 py-3 text-sm font-extrabold text-[#d0d5dd] transition-colors hover:border-[#4f7dff]/45 hover:text-white"
+                    href={`/api/admin/identity-documents/${id}`}
+                    key={id}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <span>{getDocumentTypeLabel(type)}</span>
+                    <span className="text-[#7ea2ff]" aria-hidden="true">↗</span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
             <form
               action={decideIdentityAction}
-              className="rounded-xl border border-slate-200 p-3"
+              className="rounded-2xl border border-[#43c982]/25 bg-[#43c982]/8 p-3"
             >
               <input
                 type="hidden"
@@ -83,18 +131,21 @@ export default async function AdminIdentityPage({
                 value={identityCase.provider_user_id}
               />
               <input type="hidden" name="decision" value="APPROVE" />
-              <input
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                name="reason"
-                placeholder="Nota opcional"
-              />
-              <button className="mt-2 w-full rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white">
+              <label className="text-xs font-bold text-[#8f99aa]">
+                Nota opcional
+                <input
+                  className="mt-1 w-full px-3 py-2 text-sm"
+                  name="reason"
+                  placeholder="Ej: documentación coincidente"
+                />
+              </label>
+              <button className="mt-2 min-h-12 w-full rounded-2xl bg-[#43c982] px-4 py-3 text-sm font-extrabold text-[#0b1018]">
                 Aprobar identidad
               </button>
             </form>
             <form
               action={decideIdentityAction}
-              className="rounded-xl border border-slate-200 p-3"
+              className="rounded-2xl border border-[#ef5350]/25 bg-[#ef5350]/8 p-3"
             >
               <input
                 type="hidden"
@@ -102,63 +153,80 @@ export default async function AdminIdentityPage({
                 value={identityCase.provider_user_id}
               />
               <input type="hidden" name="decision" value="REJECT" />
-              <input
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                name="reason"
-                required
-                minLength={2}
-                placeholder="Motivo del rechazo"
-              />
-              <button className="mt-2 w-full rounded-lg bg-red-700 px-3 py-2 text-sm font-semibold text-white">
+              <label className="text-xs font-bold text-[#8f99aa]">
+                Motivo obligatorio
+                <input
+                  className="mt-1 w-full px-3 py-2 text-sm"
+                  name="reason"
+                  required
+                  minLength={2}
+                  placeholder="Indicá qué debe corregir"
+                />
+              </label>
+              <button className="mt-2 min-h-12 w-full rounded-2xl bg-[#ef5350] px-4 py-3 text-sm font-extrabold text-white">
                 Rechazar identidad
               </button>
             </form>
           </div>
+
           {history.length ? (
-            <div className="mt-5">
-              <p className="text-sm font-bold">Historial</p>
-              <ul className="mt-2 space-y-2 text-sm text-slate-600">
+            <details className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
+              <summary className="cursor-pointer text-sm font-extrabold text-[#d0d5dd]">
+                Historial de decisiones ({history.length})
+              </summary>
+              <ul className="mt-3 space-y-2">
                 {history.map((item) => (
                   <li
-                    className="rounded-lg bg-slate-50 p-2"
+                    className="rounded-xl border border-[#273142] bg-[#0d131d] p-3 text-xs text-[#98a2b3]"
                     key={String(item.id ?? item.created_at)}
                   >
-                    {String(item.decision ?? "DECISIÓN")} ·{" "}
-                    {String(item.created_at ?? "")}
+                    <span className="font-extrabold text-[#d0d5dd]">
+                      {String(item.decision ?? "DECISIÓN")}
+                    </span>{" "}
+                    · {dateTime(item.created_at)}
+                    {item.reason ? ` · ${String(item.reason)}` : ""}
                   </li>
                 ))}
               </ul>
-            </div>
+            </details>
           ) : null}
-        </article>
+        </AdminPanel>
       ) : null}
-      <div className="space-y-2">
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-base font-extrabold text-white">Cola de revisión</h2>
+          <span className="text-xs font-bold text-[#697386]">Más antiguos primero</span>
+        </div>
+
         {queue.length ? (
-          queue.map((row) => (
-            <Link
-              className="block rounded-xl border border-slate-200 bg-white p-4"
-              href={`/admin/identity?provider=${row.provider_user_id}`}
-              key={row.provider_user_id}
-            >
-              <div className="flex justify-between gap-3">
-                <div>
-                  <p className="font-semibold">
+          <div className="grid gap-2 md:grid-cols-2">
+            {queue.map((row) => (
+              <Link
+                className="flex min-h-24 items-center justify-between gap-3 rounded-[1.4rem] border border-[#273142] bg-[#151c27] p-4 transition-colors hover:border-[#ffc857]/35 hover:bg-[#192230]"
+                href={`/admin/identity?provider=${row.provider_user_id}`}
+                key={row.provider_user_id}
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-extrabold text-white">
                     {row.display_name ?? row.email ?? row.provider_user_id}
                   </p>
-                  <p className="text-xs text-slate-500">
-                    {row.document_count} documentos
+                  <p className="mt-1 text-xs text-[#7f8a9b]">
+                    {row.document_count} documentos · enviado {dateTime(row.submitted_at ?? row.updated_at)}
                   </p>
                 </div>
-                <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">
-                  {row.status}
-                </span>
-              </div>
-            </Link>
-          ))
+                <AdminStatusBadge
+                  label={getProviderStatusPresentation(row.status).label}
+                  tone="pending"
+                />
+              </Link>
+            ))}
+          </div>
         ) : (
-          <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
-            No hay casos pendientes.
-          </p>
+          <AdminEmptyState
+            title="Todo al día"
+            description="No hay identidades realmente enviadas a revisión. Los perfiles incompletos se gestionan desde Usuarios o Prestadores."
+          />
         )}
       </div>
     </section>
