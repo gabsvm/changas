@@ -1,5 +1,6 @@
 -- Admin provider operations and explicit provider identity review submission.
--- Additive: does not weaken RLS or expose private identity evidence.
+-- This migration keeps identity evidence private and restores provider status
+-- transitions to server-authoritative RPCs only.
 
 create or replace function public.submit_provider_identity_review()
 returns void
@@ -79,6 +80,25 @@ revoke all on function public.submit_provider_identity_review()
 from public, anon, authenticated, service_role;
 grant execute on function public.submit_provider_identity_review()
 to authenticated, service_role;
+
+-- Phase 10 temporarily allowed a direct owner update from PROFILE_INCOMPLETE to
+-- IDENTITY_PENDING after any single uploaded document. Submission now goes
+-- through submit_provider_identity_review(), which validates the complete case.
+create or replace function public.guard_provider_status_change()
+returns trigger
+language plpgsql
+set search_path = pg_catalog, public
+as $$
+begin
+  if new.status is distinct from old.status
+     and current_user not in ('postgres', 'service_role') then
+    raise exception 'provider status is server-authoritative'
+      using errcode = '42501';
+  end if;
+
+  return new;
+end;
+$$;
 
 create or replace function public.admin_prepare_provider(
   target_user_id uuid
