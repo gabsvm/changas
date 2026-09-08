@@ -26,7 +26,7 @@ const items: NavItem[] = [
   {
     key: "activity",
     label: "Actividad",
-    href: "/account/notifications",
+    href: "/activity",
     icon: "activity",
   },
   { key: "account", label: "Cuenta", href: "/account", icon: "account" },
@@ -90,16 +90,20 @@ function NavIcon({ name }: { name: NavItem["icon"] }) {
         fill="none"
       >
         <path
-          d="M6.5 9a5.5 5.5 0 0 1 11 0v3.5l2 3H4.5l2-3V9Z"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M10 19a2 2 0 0 0 4 0"
+          d="M4 12h3l2-5 4 10 2.5-6H20"
           stroke="currentColor"
           strokeWidth="1.8"
           strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <rect
+          x="3"
+          y="3"
+          width="18"
+          height="18"
+          rx="5"
+          stroke="currentColor"
+          strokeWidth="1.8"
         />
       </svg>
     );
@@ -139,9 +143,9 @@ export function AuthenticatedBottomNav({
               key={item.key}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-[0.68rem] font-bold transition-colors ${
+              className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-xs font-bold transition-colors ${
                 active
-                  ? "bg-terracotta/10 text-terracotta"
+                  ? "bg-brand-orange/12 text-terracotta"
                   : "text-ink/55 hover:bg-moss/5 hover:text-moss"
               }`}
             >
