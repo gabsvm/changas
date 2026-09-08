@@ -14,8 +14,8 @@
   --color-success: #2f7d4a;
   --color-warning: #9a6500;
   --color-danger: #c93c32;
-  --font-display: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  --font-sans: Arial, Helvetica, sans-serif;
+  --font-display: var(--font-plus-jakarta), sans-serif;
+  --font-sans: var(--font-plus-jakarta), sans-serif;
 }
 
 :root {
@@ -49,7 +49,8 @@ body {
   margin: 0;
   background: #fff9f3;
   color: #202124;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-plus-jakarta), sans-serif;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -175,6 +176,38 @@ textarea {
   backdrop-filter: blur(14px);
 }
 
+.mobile-sticky-surface-immersive {
+  bottom: 0;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  background: rgb(255 249 243 / 96%);
+  border-top: 1px solid var(--border-soft);
+  backdrop-filter: blur(14px);
+}
+
+.product-kicker {
+  color: #c84010;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.product-page-title {
+  font-family: var(--font-plus-jakarta), sans-serif;
+  font-size: clamp(2rem, 7vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.03;
+}
+
+.product-section-title {
+  font-family: var(--font-plus-jakarta), sans-serif;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
 .hero-orbit {
   position: absolute;
   top: -2rem;
@@ -238,6 +271,10 @@ textarea {
   .mobile-sticky-surface {
     bottom: auto;
     padding-bottom: 0;
+  }
+
+  .product-page-title {
+    font-size: clamp(2.5rem, 4vw, 3rem);
   }
 }
 
