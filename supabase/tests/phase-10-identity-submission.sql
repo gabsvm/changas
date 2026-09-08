@@ -25,6 +25,35 @@ values
   ('00000000-0000-0000-0000-000000001001', 'PROFILE_INCOMPLETE', 4),
   ('00000000-0000-0000-0000-000000001002', 'PROFILE_INCOMPLETE', 4);
 
+insert into public.profiles (id, display_name, public_zone, bio)
+values (
+  '00000000-0000-0000-0000-000000001001',
+  'Phase 10 Owner',
+  'Zona de prueba',
+  'Perfil sintético completo.'
+)
+on conflict (id) do update
+set display_name = excluded.display_name,
+    public_zone = excluded.public_zone,
+    bio = excluded.bio;
+
+insert into public.profile_private (
+  user_id, legal_name, private_phone, date_of_birth, exact_address, dni_number
+) values (
+  '00000000-0000-0000-0000-000000001001',
+  'Persona de prueba',
+  '0000000000',
+  '1990-01-01',
+  'Domicilio sintético',
+  '00000000'
+)
+on conflict (user_id) do update
+set legal_name = excluded.legal_name,
+    private_phone = excluded.private_phone,
+    date_of_birth = excluded.date_of_birth,
+    exact_address = excluded.exact_address,
+    dni_number = excluded.dni_number;
+
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000001001', true);
 select set_config('request.jwt.claim.role', 'authenticated', true);
@@ -45,7 +74,17 @@ set local role postgres;
 insert into storage.objects (bucket_id, name, owner, metadata)
 values (
   'identity-documents',
-  '00000000-0000-0000-0000-000000001001/phase10-test.jpg',
+  '00000000-0000-0000-0000-000000001001/phase10-front.jpg',
+  '00000000-0000-0000-0000-000000001001',
+  '{"mimetype":"image/jpeg","size":4}'::jsonb
+), (
+  'identity-documents',
+  '00000000-0000-0000-0000-000000001001/phase10-back.jpg',
+  '00000000-0000-0000-0000-000000001001',
+  '{"mimetype":"image/jpeg","size":4}'::jsonb
+), (
+  'identity-documents',
+  '00000000-0000-0000-0000-000000001001/phase10-selfie.jpg',
   '00000000-0000-0000-0000-000000001001',
   '{"mimetype":"image/jpeg","size":4}'::jsonb
 );
@@ -55,7 +94,19 @@ insert into public.provider_documents (
 ) values (
   '00000000-0000-0000-0000-000000001001',
   'DNI_FRONT',
-  '00000000-0000-0000-0000-000000001001/phase10-test.jpg',
+  '00000000-0000-0000-0000-000000001001/phase10-front.jpg',
+  'image/jpeg',
+  4
+), (
+  '00000000-0000-0000-0000-000000001001',
+  'DNI_BACK',
+  '00000000-0000-0000-0000-000000001001/phase10-back.jpg',
+  'image/jpeg',
+  4
+), (
+  '00000000-0000-0000-0000-000000001001',
+  'SELFIE',
+  '00000000-0000-0000-0000-000000001001/phase10-selfie.jpg',
   'image/jpeg',
   4
 );
@@ -66,11 +117,9 @@ select set_config('request.jwt.claim.role', 'authenticated', true);
 
 select lives_ok(
   $$
-    update public.provider_profiles
-    set status = 'IDENTITY_PENDING'
-    where user_id = '00000000-0000-0000-0000-000000001001'
+    select public.submit_provider_identity_review()
   $$,
-  'owner can submit an evidence-backed incomplete profile for identity review'
+  'owner can submit a complete evidence-backed profile for identity review'
 );
 
 select is(

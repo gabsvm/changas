@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import type { ActionState } from "@/lib/forms/action-state";
 import { createClient } from "@/lib/supabase/server";
@@ -22,9 +23,9 @@ export async function submitProviderIdentityReview(
 
   if (!user) return { error: "Tu sesión expiró. Volvé a iniciar sesión." };
 
-  const { error } = await (
-    supabase as unknown as IdentitySubmitRpcClient
-  ).rpc("submit_provider_identity_review");
+  const { error } = await (supabase as unknown as IdentitySubmitRpcClient).rpc(
+    "submit_provider_identity_review",
+  );
 
   if (error) {
     if (error.code === "22023") {
@@ -40,5 +41,5 @@ export async function submitProviderIdentityReview(
   revalidatePath("/provider/onboarding/documents");
   revalidatePath("/provider/onboarding/review");
   revalidatePath("/admin/identity");
-  return { success: "Identidad enviada a revisión." };
+  redirect("/provider/onboarding/review");
 }

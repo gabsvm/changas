@@ -1,6 +1,7 @@
 import { canSelfManageProviderStatus } from "@changas/domain";
 import { redirect } from "next/navigation";
 
+import { uploadIdentityDocument } from "@/app/(provider)/actions";
 import { DocumentListItem } from "@/components/provider/document-list-item";
 import { DocumentUploader } from "@/components/provider/document-uploader";
 import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
@@ -15,10 +16,7 @@ import {
   requiredIdentityDocumentTypes,
 } from "@/lib/ui/provider-submission";
 
-import {
-  submitProviderIdentityReview,
-  uploadProviderIdentityDocument,
-} from "./actions";
+import { submitProviderIdentityReview } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +48,8 @@ export default async function ProviderOnboardingDocumentsPage() {
   }
 
   const submitted =
-    provider.status === "IDENTITY_PENDING" || provider.status === "UNDER_REVIEW";
+    provider.status === "IDENTITY_PENDING" ||
+    provider.status === "UNDER_REVIEW";
   const editable = canSelfManageProviderStatus(provider.status) && !submitted;
   const receivedDocuments = documents ?? [];
   const documentsComplete = hasRequiredIdentityDocuments(receivedDocuments);
@@ -68,8 +67,8 @@ export default async function ProviderOnboardingDocumentsPage() {
         </h1>
         <p className="text-ink/60 mt-3 max-w-2xl text-sm leading-6">
           Para enviar tu perfil a revisión necesitamos tres evidencias: frente y
-          dorso del DNI, más una selfie de validación. Subir archivos no envía el
-          caso automáticamente: vos decidís cuándo está listo.
+          dorso del DNI, más una selfie de validación. Subir archivos no envía
+          el caso automáticamente: vos decidís cuándo está listo.
         </p>
 
         <div className="mt-5">
@@ -130,18 +129,18 @@ export default async function ProviderOnboardingDocumentsPage() {
 
         {submitted ? (
           <div className="border-moss/25 bg-moss/8 mt-6 rounded-3xl border p-5">
-            <p className="font-extrabold text-moss">Identidad enviada</p>
+            <p className="text-moss font-extrabold">Identidad enviada</p>
             <p className="text-ink/60 mt-2 text-sm leading-6">
-              El caso ya está en la cola administrativa. Para mantener estable la
-              evidencia que está siendo revisada, la carga queda bloqueada hasta
-              que exista una decisión.
+              El caso ya está en la cola administrativa. Para mantener estable
+              la evidencia que está siendo revisada, la carga queda bloqueada
+              hasta que exista una decisión.
             </p>
           </div>
         ) : (
           <div className="mt-6">
             <DocumentUploader
               key={`document-uploader-${receivedDocuments.length}`}
-              action={uploadProviderIdentityDocument}
+              action={uploadIdentityDocument}
               editable={editable}
             />
           </div>
@@ -199,7 +198,8 @@ export default async function ProviderOnboardingDocumentsPage() {
               ) : (
                 <>
                   <p className="text-ink/55 mb-3 text-xs leading-5">
-                    Faltan: {missingDocuments.map(getDocumentTypeLabel).join(", ")}.
+                    Faltan:{" "}
+                    {missingDocuments.map(getDocumentTypeLabel).join(", ")}.
                   </p>
                   <button
                     className="button-primary w-full opacity-50 sm:w-auto"

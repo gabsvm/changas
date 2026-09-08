@@ -119,16 +119,19 @@ async function prepareProviderFixture(user: TestUser) {
   });
   expect(response.ok).toBeTruthy();
 
-  response = await adminRequest(`/rest/v1/profile_private?user_id=eq.${user.id}`, {
-    method: "PATCH",
-    body: JSON.stringify({
-      legal_name: "Prestador Verificación E2E",
-      private_phone: "+54 11 5555 0101",
-      date_of_birth: "1990-01-01",
-      exact_address: "Dirección sintética 123, CABA",
-      dni_number: "30111222",
-    }),
-  });
+  response = await adminRequest(
+    `/rest/v1/profile_private?user_id=eq.${user.id}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        legal_name: "Prestador Verificación E2E",
+        private_phone: "+54 11 5555 0101",
+        date_of_birth: "1990-01-01",
+        exact_address: "Dirección sintética 123, CABA",
+        dni_number: "30111222",
+      }),
+    },
+  );
   expect(response.ok).toBeTruthy();
 }
 
@@ -144,11 +147,15 @@ async function uploadIdentityDocument(
     buffer: tinyPng,
   });
   await page.getByRole("button", { name: "Subir documento privado" }).click();
-  await expect(page.getByText(expectedLabel, { exact: true }).last()).toBeVisible();
+  await expect(
+    page.getByText(expectedLabel, { exact: true }).last(),
+  ).toBeVisible();
 }
 
 test.describe("admin mobile revamp and provider operations", () => {
-  test("admin shell is mobile-first at 320, 360 and 390 px", async ({ page }) => {
+  test("admin shell is mobile-first at 320, 360 and 390 px", async ({
+    page,
+  }) => {
     const admin = await createTestUser("Admin Mobile Shell");
     await promoteAdmin(admin.id);
     await login(page, admin, "/admin");
@@ -156,10 +163,14 @@ test.describe("admin mobile revamp and provider operations", () => {
     for (const width of [320, 360, 390]) {
       await page.setViewportSize({ width, height: 844 });
       await page.goto("/admin");
-      await expect(page.getByRole("heading", { name: "Resumen" })).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Resumen" }),
+      ).toBeVisible();
       await expectNoHorizontalOverflow(page);
 
-      const nav = page.getByRole("navigation", { name: "Administración móvil" });
+      const nav = page.getByRole("navigation", {
+        name: "Administración móvil",
+      });
       await expect(nav).toBeVisible();
       await expect(nav.getByRole("link", { name: "Resumen" })).toBeVisible();
       await expect(nav.getByRole("link", { name: "Identidad" })).toBeVisible();
@@ -208,17 +219,23 @@ test.describe("admin mobile revamp and provider operations", () => {
     await page
       .getByRole("button", { name: "Invitar a completar perfil" })
       .click();
-    await expect(page.getByText("Perfil incompleto", { exact: true }).first()).toBeVisible();
-    expect(await providerStatus(normalFlow.id)).toMatchObject({
-      status: "PROFILE_INCOMPLETE",
-      onboarding_step: 1,
-    });
+    await expect(
+      page.getByText("Perfil incompleto", { exact: true }).first(),
+    ).toBeVisible();
+    await expect
+      .poll(() => providerStatus(normalFlow.id))
+      .toMatchObject({
+        status: "PROFILE_INCOMPLETE",
+        onboarding_step: 1,
+      });
 
     let auditResponse = await adminRequest(
       `/rest/v1/admin_audit_events?target_id=eq.${normalFlow.id}&action_type=eq.PROVIDER_ONBOARDING_PREPARED&select=action_type,metadata`,
     );
     expect(auditResponse.ok).toBeTruthy();
-    let auditRows = (await auditResponse.json()) as Array<{ action_type: string }>;
+    let auditRows = (await auditResponse.json()) as Array<{
+      action_type: string;
+    }>;
     expect(auditRows).toHaveLength(1);
 
     await page.goto(`/admin/users?user=${manualFlow.id}`);
@@ -230,11 +247,15 @@ test.describe("admin mobile revamp and provider operations", () => {
     await page
       .getByRole("button", { name: "Confirmar activación manual" })
       .click();
-    await expect(page.getByText("Activo", { exact: true }).first()).toBeVisible();
-    expect(await providerStatus(manualFlow.id)).toMatchObject({
-      status: "ACTIVE",
-      onboarding_step: 4,
-    });
+    await expect(
+      page.getByText("Activo", { exact: true }).first(),
+    ).toBeVisible();
+    await expect
+      .poll(() => providerStatus(manualFlow.id))
+      .toMatchObject({
+        status: "ACTIVE",
+        onboarding_step: 4,
+      });
 
     auditResponse = await adminRequest(
       `/rest/v1/admin_audit_events?target_id=eq.${manualFlow.id}&action_type=eq.PROVIDER_MANUALLY_ACTIVATED&select=action_type,metadata`,
@@ -274,7 +295,9 @@ test.describe("admin mobile revamp and provider operations", () => {
     await submit.click();
 
     await expect(page).toHaveURL("/provider/onboarding/review");
-    await expect(page.getByText("En revisión", { exact: true }).first()).toBeVisible();
+    await expect(
+      page.getByText("En revisión", { exact: true }).first(),
+    ).toBeVisible();
     await expect(
       page.getByText("Caso enviado correctamente", { exact: true }),
     ).toBeVisible();
