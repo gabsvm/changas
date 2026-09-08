@@ -1,13 +1,18 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { formatServicePrice } from "@changas/domain";
 
 import { ProviderReputation } from "@/components/reputation/provider-reputation";
+import { ConsumerShell } from "@/components/ui/consumer-shell";
 import { toggleProviderFavorite } from "@/lib/favorites/actions";
 import { createClient } from "@/lib/supabase/server";
+import {
+  formatDistanceMeters,
+  getModalityLabel,
+} from "@/lib/ui/marketplace-labels";
 
 export const dynamic = "force-dynamic";
 
@@ -114,84 +119,131 @@ export default async function PublicProviderPage({
   ]);
 
   return (
-    <main
-      id="main-content"
-      className="bg-canvas text-ink min-h-screen px-5 py-5 sm:px-8"
-    >
-      <div className="mx-auto max-w-5xl">
-        <header className="border-ink/10 flex items-center justify-between border-b pb-5">
-          <Link
-            className="flex items-center gap-3"
-            href="/"
-            aria-label="Changas, inicio"
-          >
-            <span className="brand-mark" aria-hidden="true">
-              C
-            </span>
-            <span className="font-display text-xl font-semibold">Changas</span>
-          </Link>
-          <span className="text-ink/50 text-xs font-semibold tracking-[0.16em] uppercase">
-            Perfil público
-          </span>
-        </header>
-        <section className="border-ink/10 mt-10 rounded-[2rem] border bg-white/70 p-7 shadow-[0_24px_80px_rgba(22,56,50,0.08)] sm:p-10">
-          {pageSearchParams.favoriteError ? (
-            <p className="text-terracotta mb-5 text-sm" role="alert">
-              No pudimos actualizar el proveedor guardado. Intentá nuevamente.
-            </p>
-          ) : null}
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-terracotta text-xs font-semibold tracking-[0.18em] uppercase">
-                Perfil activo
-              </p>
-              <h1 className="font-display mt-3 text-5xl leading-none font-semibold tracking-[-0.04em]">
+    <ConsumerShell maxWidth="max-w-5xl">
+      <section className="border-ink/10 bg-surface mt-8 rounded-[1.75rem] border p-5 shadow-[0_18px_50px_rgba(32,33,36,0.06)] sm:mt-10 sm:p-8">
+        {pageSearchParams.favoriteError ? (
+          <p className="bg-danger/8 text-danger mb-5 rounded-xl px-4 py-3 text-sm" role="alert">
+            No pudimos actualizar el proveedor guardado. Intentá nuevamente.
+          </p>
+        ) : null}
+
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 items-start gap-4 sm:gap-5">
+            <div className="bg-brand-yellow/20 text-terracotta grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-3xl text-2xl font-extrabold sm:h-24 sm:w-24">
+              {provider.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={provider.avatar_url}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                provider.display_name.slice(0, 1).toUpperCase()
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="product-kicker">Profesional en Changas</p>
+              <h1 className="product-page-title mt-2 break-words">
                 {provider.display_name}
               </h1>
-              <p className="text-moss mt-4 text-lg font-semibold">
-                {provider.public_headline ?? "Servicios hechos con criterio"}
+              <p className="text-moss mt-2 text-base font-bold sm:text-lg">
+                {provider.public_headline ?? "Servicios publicados"}
               </p>
-              <p className="text-ink/65 mt-3 max-w-2xl text-sm leading-6">
-                {provider.bio ??
-                  "Este proveedor todavía no agregó una presentación."}
-              </p>
+              {provider.public_zone ? (
+                <p className="text-ink/60 mt-2 text-sm">
+                  {provider.public_zone}
+                </p>
+              ) : null}
             </div>
-            <form action={toggleProviderFavorite}>
-              <input
-                name="providerSlug"
-                type="hidden"
-                value={provider.public_slug}
-              />
-              <input
-                name="returnTo"
-                type="hidden"
-                value={"/p/" + provider.public_slug}
-              />
-              <input
-                name="shouldFavorite"
-                type="hidden"
-                value={String(!isFavorite)}
-              />
-              <button
-                className="button-secondary whitespace-nowrap"
-                type="submit"
-              >
-                {isFavorite ? "Quitar guardado" : "Guardar proveedor"}
-              </button>
-            </form>
           </div>
-          {provider.public_zone ? (
-            <p className="text-ink/60 mt-6 text-sm">
-              Zona aproximada:{" "}
-              <strong className="text-ink">{provider.public_zone}</strong>
-            </p>
-          ) : null}
-        </section>
 
-        <ProviderReputation providerSlug={provider.public_slug} />
+          <form action={toggleProviderFavorite} className="shrink-0">
+            <input
+              name="providerSlug"
+              type="hidden"
+              value={provider.public_slug}
+            />
+            <input
+              name="returnTo"
+              type="hidden"
+              value={"/p/" + provider.public_slug}
+            />
+            <input
+              name="shouldFavorite"
+              type="hidden"
+              value={String(!isFavorite)}
+            />
+            <button className="button-secondary w-full sm:w-auto" type="submit">
+              {isFavorite ? "Quitar de guardados" : "Guardar"}
+            </button>
+          </form>
+        </div>
 
-        <section className="mt-6 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="space-y-6">
+        <p className="text-ink/65 mt-5 max-w-3xl text-sm leading-6 sm:text-base sm:leading-7">
+          {provider.bio ?? "Este profesional todavía no agregó una presentación."}
+        </p>
+      </section>
+
+      <section className="mt-8" aria-labelledby="provider-services-title">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="product-kicker">Qué ofrece</p>
+            <h2 id="provider-services-title" className="product-section-title mt-1">
+              Servicios
+            </h2>
+          </div>
+          <span className="text-ink/45 text-xs font-bold">
+            {(services ?? []).length} publicado{(services ?? []).length === 1 ? "" : "s"}
+          </span>
+        </div>
+
+        {(services ?? []).length > 0 ? (
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {(services ?? []).map((service) => (
+              <Link
+                className="border-ink/10 bg-surface hover:border-brand-orange/35 group rounded-2xl border p-5 shadow-[0_10px_30px_rgba(32,33,36,0.04)] transition-colors"
+                href={`/p/${slug}/${service.public_slug}`}
+                key={service.public_slug}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-terracotta text-xs font-bold">
+                      {service.skill_name}
+                    </p>
+                    <h3 className="mt-1 text-lg font-extrabold tracking-[-0.02em] group-hover:underline">
+                      {service.title}
+                    </h3>
+                  </div>
+                  <span className="bg-moss/8 text-moss shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold">
+                    {getModalityLabel(service.modality)}
+                  </span>
+                </div>
+                <p className="text-ink/60 mt-3 line-clamp-2 text-sm leading-6">
+                  {service.description}
+                </p>
+                <p className="mt-4 text-base font-extrabold">
+                  {formatServicePrice(
+                    service.price_model,
+                    service.price_amount,
+                    service.currency_code,
+                    service.price_unit,
+                  )}
+                </p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="border-ink/10 bg-surface text-ink/60 mt-4 rounded-2xl border p-5 text-sm">
+            Este profesional todavía no tiene servicios publicados.
+          </p>
+        )}
+      </section>
+
+      <ProviderReputation providerSlug={provider.public_slug} />
+
+      <section className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="space-y-6">
+          {(skills ?? []).length > 0 ? (
             <PublicCard title="Habilidades">
               <div className="flex flex-wrap gap-2">
                 {(skills ?? []).map((skill) => (
@@ -204,26 +256,32 @@ export default async function PublicProviderPage({
                 ))}
               </div>
             </PublicCard>
+          ) : null}
+
+          {(areas ?? []).length > 0 ? (
             <PublicCard title="Zona de servicio">
               <div className="space-y-3">
                 {(areas ?? []).map((area) => (
                   <div key={`${area.label}-${area.radius_meters}`}>
-                    <p className="font-semibold">{area.label}</p>
-                    <p className="text-ink/55 text-sm">
-                      Radio aproximado: {area.radius_meters} m
+                    <p className="font-bold">{area.label}</p>
+                    <p className="text-ink/55 mt-0.5 text-sm">
+                      Hasta {formatDistanceMeters(area.radius_meters)} aprox.
                     </p>
                   </div>
                 ))}
               </div>
               <p className="text-ink/50 mt-4 text-xs">
-                No mostramos dirección exacta ni coordenadas.
+                La dirección exacta se mantiene privada.
               </p>
             </PublicCard>
+          ) : null}
+
+          {(education ?? []).length > 0 ? (
             <PublicCard title="Formación">
               <div className="space-y-4">
                 {(education ?? []).map((item) => (
                   <div key={`${item.institution}-${item.started_on}`}>
-                    <p className="font-semibold">{item.institution}</p>
+                    <p className="font-bold">{item.institution}</p>
                     <p className="text-ink/55 text-sm">
                       {item.field_of_study ?? "Formación"}
                     </p>
@@ -231,64 +289,36 @@ export default async function PublicProviderPage({
                 ))}
               </div>
             </PublicCard>
-          </div>
-          <div className="space-y-6">
-            <PublicCard title="Servicios">
-              <div className="grid gap-4">
-                {(services ?? []).map((service) => (
-                  <Link
-                    className="border-ink/10 group rounded-2xl border bg-white/70 p-5 transition hover:-translate-y-0.5 hover:shadow-lg"
-                    href={`/p/${slug}/${service.public_slug}`}
-                    key={service.public_slug}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-terracotta text-xs font-semibold tracking-[0.14em] uppercase">
-                          {service.skill_name}
-                        </p>
-                        <h3 className="font-display mt-2 text-2xl font-semibold group-hover:underline">
-                          {service.title}
-                        </h3>
-                      </div>
-                      <span className="bg-moss/10 text-moss rounded-full px-3 py-1 text-xs font-semibold">
-                        {service.modality}
-                      </span>
-                    </div>
-                    <p className="text-ink/65 mt-3 line-clamp-3 text-sm leading-6">
-                      {service.description}
-                    </p>
-                    <p className="text-ink mt-4 text-sm font-semibold">
-                      {formatServicePrice(
-                        service.price_model,
-                        service.price_amount,
-                        service.currency_code,
-                        service.price_unit,
-                      )}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </PublicCard>
+          ) : null}
+        </div>
+
+        <div className="space-y-6">
+          {(experiences ?? []).length > 0 ? (
             <PublicCard title="Experiencia">
               <div className="space-y-4">
                 {(experiences ?? []).map((item) => (
                   <div key={`${item.title}-${item.started_on}`}>
-                    <p className="font-semibold">{item.title}</p>
+                    <p className="font-bold">{item.title}</p>
                     <p className="text-ink/55 text-sm">
                       {item.organization ?? "Experiencia independiente"}
                     </p>
-                    <p className="text-ink/65 mt-1 text-sm">
-                      {item.description}
-                    </p>
+                    {item.description ? (
+                      <p className="text-ink/65 mt-1 text-sm leading-6">
+                        {item.description}
+                      </p>
+                    ) : null}
                   </div>
                 ))}
               </div>
             </PublicCard>
+          ) : null}
+
+          {(certifications ?? []).length > 0 ? (
             <PublicCard title="Certificaciones">
               <div className="space-y-3">
                 {(certifications ?? []).map((item) => (
                   <div key={`${item.title}-${item.issued_on}`}>
-                    <p className="font-semibold">{item.title}</p>
+                    <p className="font-bold">{item.title}</p>
                     <p className="text-ink/55 text-sm">
                       {item.issuer ?? "Emisor no especificado"}
                     </p>
@@ -296,40 +326,44 @@ export default async function PublicProviderPage({
                 ))}
               </div>
             </PublicCard>
-            {(portfolio ?? []).length ? (
-              <PublicCard title="Portfolio">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {(portfolio ?? []).map((item) => (
-                    <div
-                      className="border-ink/10 rounded-xl border bg-white/70 p-4"
-                      key={item.id}
-                    >
-                      {item.media_path ? (
-                        <Image
-                          className="mb-3 aspect-video w-full rounded-lg object-cover"
-                          src={`/api/portfolio/${item.media_path.split("/").map(encodeURIComponent).join("/")}`}
-                          alt=""
-                          width={640}
-                          height={360}
-                          unoptimized
-                        />
-                      ) : null}
-                      <p className="font-semibold">{item.title}</p>
+          ) : null}
+
+          {(portfolio ?? []).length > 0 ? (
+            <PublicCard title="Portfolio">
+              <div className="grid gap-3 sm:grid-cols-2">
+                {(portfolio ?? []).map((item) => (
+                  <div
+                    className="border-ink/10 rounded-xl border bg-white/70 p-4"
+                    key={item.id}
+                  >
+                    {item.media_path ? (
+                      <Image
+                        className="mb-3 aspect-video w-full rounded-lg object-cover"
+                        src={`/api/portfolio/${item.media_path.split("/").map(encodeURIComponent).join("/")}`}
+                        alt=""
+                        width={640}
+                        height={360}
+                        unoptimized
+                      />
+                    ) : null}
+                    <p className="font-bold">{item.title}</p>
+                    {item.description ? (
                       <p className="text-ink/60 mt-1 text-sm">
                         {item.description}
                       </p>
-                    </div>
-                  ))}
-                </div>
-              </PublicCard>
-            ) : null}
-          </div>
-        </section>
-        <footer className="text-ink/45 py-8 text-center text-xs">
-          Changas · información publicada por el proveedor
-        </footer>
-      </div>
-    </main>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </PublicCard>
+          ) : null}
+        </div>
+      </section>
+
+      <footer className="text-ink/45 py-8 text-center text-xs">
+        Changas · información publicada por el profesional
+      </footer>
+    </ConsumerShell>
   );
 }
 
@@ -341,8 +375,8 @@ function PublicCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-ink/10 rounded-2xl border bg-white/55 p-5 sm:p-6">
-      <h2 className="font-display text-2xl font-semibold">{title}</h2>
+    <section className="border-ink/10 bg-surface rounded-2xl border p-5 shadow-[0_8px_24px_rgba(32,33,36,0.025)] sm:p-6">
+      <h2 className="text-xl font-extrabold tracking-[-0.02em]">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
