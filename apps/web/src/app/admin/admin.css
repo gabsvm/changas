@@ -1,0 +1,150 @@
+.admin-shell {
+  --admin-bg: #0b1018;
+  --admin-surface: #151c27;
+  --admin-surface-2: #111822;
+  --admin-border: #273142;
+  --admin-muted: #98a2b3;
+  --admin-orange: #ff6b35;
+  --admin-yellow: #ffc857;
+  --admin-blue: #2563eb;
+  --admin-pink: #d60060;
+  color-scheme: dark;
+  background:
+    radial-gradient(circle at 92% 4%, rgb(255 107 53 / 8%), transparent 28rem),
+    radial-gradient(circle at 10% 80%, rgb(37 99 235 / 5%), transparent 24rem),
+    var(--admin-bg);
+}
+
+.admin-shell .admin-main > div > section {
+  animation: admin-enter 180ms ease-out both;
+}
+
+.admin-shell .bg-white,
+.admin-shell .bg-slate-50,
+.admin-shell .bg-slate-100 {
+  background-color: var(--admin-surface) !important;
+}
+
+.admin-shell .text-slate-950,
+.admin-shell .text-slate-900,
+.admin-shell .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+.admin-shell .text-slate-700,
+.admin-shell .text-slate-600,
+.admin-shell .text-slate-500 {
+  color: var(--admin-muted) !important;
+}
+
+.admin-shell .border-slate-200,
+.admin-shell .border-slate-300 {
+  border-color: var(--admin-border) !important;
+}
+
+.admin-shell .bg-slate-950,
+.admin-shell .bg-slate-900 {
+  background-color: var(--admin-orange) !important;
+  color: #10131a !important;
+}
+
+.admin-shell .hover\:bg-slate-100:hover,
+.admin-shell .hover\:bg-slate-800:hover {
+  background-color: #1d2633 !important;
+}
+
+.admin-shell .bg-amber-100 {
+  background-color: rgb(255 200 87 / 12%) !important;
+}
+
+.admin-shell .text-amber-900 {
+  color: #ffd878 !important;
+}
+
+.admin-shell .bg-emerald-100 {
+  background-color: rgb(67 201 130 / 12%) !important;
+}
+
+.admin-shell .text-emerald-800 {
+  color: #66dda0 !important;
+}
+
+.admin-shell .bg-red-100 {
+  background-color: rgb(239 83 80 / 12%) !important;
+}
+
+.admin-shell .text-red-800,
+.admin-shell .text-red-700 {
+  color: #ff7774 !important;
+}
+
+.admin-shell input:not([type="hidden"]),
+.admin-shell select,
+.admin-shell textarea {
+  min-height: 3rem;
+  border-color: #2c3748 !important;
+  background: #0d131d !important;
+  color: #f8fafc !important;
+  border-radius: 0.9rem !important;
+}
+
+.admin-shell input::placeholder,
+.admin-shell textarea::placeholder {
+  color: #596579;
+}
+
+.admin-shell input:focus,
+.admin-shell select:focus,
+.admin-shell textarea:focus {
+  border-color: rgb(255 107 53 / 70%) !important;
+  outline: 2px solid rgb(255 107 53 / 18%);
+  outline-offset: 1px;
+}
+
+.admin-shell button,
+.admin-shell a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.admin-shell button:not(:disabled) {
+  cursor: pointer;
+}
+
+.admin-shell details {
+  border-color: var(--admin-border);
+}
+
+.admin-shell summary {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.admin-shell table {
+  border-color: var(--admin-border);
+}
+
+.admin-shell th {
+  color: #697386;
+}
+
+.admin-shell td {
+  border-color: rgb(39 49 66 / 75%);
+}
+
+@keyframes admin-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-shell .admin-main > div > section {
+    animation: none;
+  }
+}
