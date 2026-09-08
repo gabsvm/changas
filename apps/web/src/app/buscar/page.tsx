@@ -92,7 +92,7 @@ export default async function SearchPage({
             </span>
           </Link>
           <Link
-            className="text-ink/65 text-sm underline decoration-terracotta/35 underline-offset-4 transition hover:text-terracotta"
+            className="text-ink/65 decoration-terracotta/35 hover:text-terracotta text-sm underline underline-offset-4 transition"
             href="/login"
           >
             Ingresar
@@ -132,7 +132,10 @@ export default async function SearchPage({
             </button>
             <div className="border-ink/10 grid gap-3 border-t pt-4 sm:col-span-3 sm:grid-cols-4 lg:grid-cols-6">
               <div>
-                <label className="text-ink/65 text-xs font-bold" htmlFor="search-category">
+                <label
+                  className="text-ink/65 text-xs font-bold"
+                  htmlFor="search-category"
+                >
                   Categoría
                 </label>
                 <select
@@ -150,7 +153,10 @@ export default async function SearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-ink/65 text-xs font-bold" htmlFor="search-skill">
+                <label
+                  className="text-ink/65 text-xs font-bold"
+                  htmlFor="search-skill"
+                >
                   Habilidad
                 </label>
                 <select
@@ -168,7 +174,10 @@ export default async function SearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-ink/65 text-xs font-bold" htmlFor="search-mode">
+                <label
+                  className="text-ink/65 text-xs font-bold"
+                  htmlFor="search-mode"
+                >
                   Modalidad
                 </label>
                 <select
@@ -183,7 +192,10 @@ export default async function SearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-ink/65 text-xs font-bold" htmlFor="search-sort">
+                <label
+                  className="text-ink/65 text-xs font-bold"
+                  htmlFor="search-sort"
+                >
                   Ordenar
                 </label>
                 <select
@@ -194,7 +206,9 @@ export default async function SearchPage({
                 >
                   <option value="recommended">Recomendados</option>
                   <option value="best-rated">Mejor calificados</option>
-                  <option value="most-completed">Más trabajos completados</option>
+                  <option value="most-completed">
+                    Más trabajos completados
+                  </option>
                   <option value="nearest">Más cercanos</option>
                   <option value="price-asc">Precio menor</option>
                   <option value="price-desc">Precio mayor</option>
@@ -222,7 +236,10 @@ export default async function SearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-ink/65 text-xs font-bold" htmlFor="search-min">
+                <label
+                  className="text-ink/65 text-xs font-bold"
+                  htmlFor="search-min"
+                >
                   Precio desde
                 </label>
                 <input
@@ -237,7 +254,10 @@ export default async function SearchPage({
                 />
               </div>
               <div>
-                <label className="text-ink/65 text-xs font-bold" htmlFor="search-max">
+                <label
+                  className="text-ink/65 text-xs font-bold"
+                  htmlFor="search-max"
+                >
                   Precio hasta
                 </label>
                 <input
@@ -252,7 +272,10 @@ export default async function SearchPage({
                 />
               </div>
               <div>
-                <label className="text-ink/65 text-xs font-bold" htmlFor="search-radius">
+                <label
+                  className="text-ink/65 text-xs font-bold"
+                  htmlFor="search-radius"
+                >
                   Radio
                 </label>
                 <select
@@ -277,7 +300,10 @@ export default async function SearchPage({
                     type="checkbox"
                     value="true"
                   />
-                  <label className="text-ink/65 text-xs font-bold" htmlFor="search-offers">
+                  <label
+                    className="text-ink/65 text-xs font-bold"
+                    htmlFor="search-offers"
+                  >
                     Acepta ofertas
                   </label>
                 </div>

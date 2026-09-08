@@ -63,14 +63,14 @@ export default async function HomePage() {
           <nav className="flex items-center gap-4 text-sm" aria-label="Acceso">
             {user ? (
               <Link
-                className="text-ink/65 underline decoration-terracotta/40 underline-offset-4 transition hover:text-terracotta"
+                className="text-ink/65 decoration-terracotta/40 hover:text-terracotta underline underline-offset-4 transition"
                 href="/account"
               >
                 Mi cuenta
               </Link>
             ) : (
               <Link
-                className="text-ink/65 underline decoration-terracotta/40 underline-offset-4 transition hover:text-terracotta"
+                className="text-ink/65 decoration-terracotta/40 hover:text-terracotta underline underline-offset-4 transition"
                 href="/login"
               >
                 Ingresar
@@ -126,13 +126,13 @@ export default async function HomePage() {
             </form>
             <div className="mt-4 flex flex-wrap gap-3 text-sm">
               <Link
-                className="text-moss font-bold underline decoration-moss/30 underline-offset-4"
+                className="text-moss decoration-moss/30 font-bold underline underline-offset-4"
                 href="/buscar?mode=remoto"
               >
                 Ver servicios remotos
               </Link>
               <Link
-                className="text-ink/65 underline decoration-terracotta/35 underline-offset-4"
+                className="text-ink/65 decoration-terracotta/35 underline underline-offset-4"
                 href="/provider/onboarding"
               >
                 Publicar como proveedor
@@ -149,13 +149,13 @@ export default async function HomePage() {
               Una buena changa empieza con una búsqueda clara.
             </h2>
             <div className="relative mt-8 grid gap-3 text-sm">
-              <div className="border-ink/10 bg-white/75 rounded-2xl border p-4 backdrop-blur-sm">
+              <div className="border-ink/10 rounded-2xl border bg-white/75 p-4 backdrop-blur-sm">
                 <p className="font-extrabold">Cerca tuyo</p>
                 <p className="text-ink/65 mt-1">
                   Explorá por zona y radio aproximado, sin mostrar direcciones.
                 </p>
               </div>
-              <div className="border-ink/10 bg-white/75 rounded-2xl border p-4 backdrop-blur-sm">
+              <div className="border-ink/10 rounded-2xl border bg-white/75 p-4 backdrop-blur-sm">
                 <p className="font-extrabold">A distancia</p>
                 <p className="text-ink/65 mt-1">
                   Las habilidades remotas están disponibles estés donde estés.
@@ -182,7 +182,7 @@ export default async function HomePage() {
               </h2>
             </div>
             <Link
-              className="text-moss text-sm font-bold underline decoration-moss/30 underline-offset-4"
+              className="text-moss decoration-moss/30 text-sm font-bold underline underline-offset-4"
               href="/buscar"
             >
               Ver todo
@@ -220,7 +220,7 @@ export default async function HomePage() {
               </h2>
             </div>
             <Link
-              className="text-moss text-sm font-bold underline decoration-moss/30 underline-offset-4"
+              className="text-moss decoration-moss/30 text-sm font-bold underline underline-offset-4"
               href="/buscar"
             >
               Buscar más

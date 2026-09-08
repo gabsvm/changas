@@ -37,13 +37,13 @@ export default async function ProviderLayout({
             aria-label="Proveedor"
           >
             <Link
-              className="hover:text-moss underline decoration-ink/20 underline-offset-4 transition-colors"
+              className="hover:text-moss decoration-ink/20 underline underline-offset-4 transition-colors"
               href="/messages"
             >
               Mensajes
             </Link>
             <Link
-              className="hover:text-moss flex items-center gap-2 underline decoration-ink/20 underline-offset-4 transition-colors"
+              className="hover:text-moss decoration-ink/20 flex items-center gap-2 underline underline-offset-4 transition-colors"
               href="/account/notifications"
             >
               Notificaciones
@@ -57,7 +57,7 @@ export default async function ProviderLayout({
               ) : null}
             </Link>
             <Link
-              className="hover:text-moss underline decoration-ink/20 underline-offset-4 transition-colors"
+              className="hover:text-moss decoration-ink/20 underline underline-offset-4 transition-colors"
               href="/account"
             >
               Cuenta

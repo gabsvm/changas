@@ -30,7 +30,9 @@ function CompletionRow({
       <span className="text-sm font-bold">{label}</span>
       <span
         className={`rounded-full px-2.5 py-1 text-[0.65rem] font-bold tracking-[0.06em] uppercase ${
-          complete ? "bg-success/10 text-success" : "bg-brand-yellow/18 text-warning"
+          complete
+            ? "bg-success/10 text-success"
+            : "bg-brand-yellow/18 text-warning"
         }`}
       >
         {complete ? "Completo" : "Revisar"}

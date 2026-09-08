@@ -6,7 +6,10 @@ const globals = readFileSync(
   new URL("../../app/globals.css", import.meta.url),
   "utf8",
 );
-const icon = readFileSync(new URL("../../app/icon.svg", import.meta.url), "utf8");
+const icon = readFileSync(
+  new URL("../../app/icon.svg", import.meta.url),
+  "utf8",
+);
 const badgeSources = [
   "../../app/(account)/messages/page.tsx",
   "../../app/(account)/layout.tsx",
@@ -28,7 +31,9 @@ describe("Changas brand theme", () => {
   it("keeps primary actions warm and reserves blue for functional contrast", () => {
     expect(globals).toMatch(/\.button-primary[\s\S]*background:\s*#ff6b35/i);
     expect(globals).toMatch(/\.button-primary[\s\S]*color:\s*#202124/i);
-    expect(globals).toMatch(/:focus-visible[\s\S]*outline:\s*2px solid #2563eb/i);
+    expect(globals).toMatch(
+      /:focus-visible[\s\S]*outline:\s*2px solid #2563eb/i,
+    );
   });
 
   it("uses accessible semantic derivatives instead of bright brand colors for small status text", () => {

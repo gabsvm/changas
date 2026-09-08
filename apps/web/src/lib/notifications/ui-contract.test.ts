@@ -17,7 +17,7 @@ describe("Phase 08 notification center UI contract", () => {
     expect(page).toContain("markAllNotificationsReadAction");
     expect(page).toContain("NotificationPreferencesForm");
     expect(page).toContain("PushOptIn");
-    expect(page).toContain("No tenés notificaciones todavía");
+    expect(page).toContain("Estás al día");
   });
 
   it("shows an SSR unread badge in account navigation", () => {

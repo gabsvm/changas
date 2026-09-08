@@ -132,7 +132,7 @@ export default async function ProviderOnboardingPage() {
         </div>
 
         {!editable && provider.status !== "ACTIVE" ? (
-          <p className="bg-brand-yellow/18 text-warning mt-5 rounded-2xl border border-brand-yellow/25 px-4 py-3 text-sm leading-6">
+          <p className="bg-brand-yellow/18 text-warning border-brand-yellow/25 mt-5 rounded-2xl border px-4 py-3 text-sm leading-6">
             Mientras el perfil está en revisión o requiere intervención, los
             pasos de edición quedan bloqueados desde tu cuenta.
           </p>

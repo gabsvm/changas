@@ -180,13 +180,13 @@ export function AuthForm({
         {mode === "login" ? (
           <>
             <Link
-              className="text-moss font-semibold underline decoration-moss/30 underline-offset-4"
+              className="text-moss decoration-moss/30 font-semibold underline underline-offset-4"
               href="/sign-up"
             >
               Crear cuenta
             </Link>
             <Link
-              className="hover:text-moss underline decoration-ink/20 underline-offset-4 transition-colors"
+              className="hover:text-moss decoration-ink/20 underline underline-offset-4 transition-colors"
               href="/forgot-password"
             >
               Olvidé mi contraseña
@@ -195,7 +195,7 @@ export function AuthForm({
         ) : null}
         {mode === "signup" ? (
           <Link
-            className="text-moss font-semibold underline decoration-moss/30 underline-offset-4"
+            className="text-moss decoration-moss/30 font-semibold underline underline-offset-4"
             href="/login"
           >
             Ya tengo una cuenta
@@ -203,7 +203,7 @@ export function AuthForm({
         ) : null}
         {mode === "reset" ? (
           <Link
-            className="text-moss font-semibold underline decoration-moss/30 underline-offset-4"
+            className="text-moss decoration-moss/30 font-semibold underline underline-offset-4"
             href="/login"
           >
             Volver a iniciar sesión
@@ -211,7 +211,7 @@ export function AuthForm({
         ) : null}
         {mode === "update" ? (
           <Link
-            className="text-moss font-semibold underline decoration-moss/30 underline-offset-4"
+            className="text-moss decoration-moss/30 font-semibold underline underline-offset-4"
             href="/login"
           >
             Volver a iniciar sesión

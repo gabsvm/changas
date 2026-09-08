@@ -49,7 +49,7 @@ export function DiscoveryCard({ row }: { row: ReputationDiscoveryServiceRow }) {
         )}
         <div className="min-w-0 flex-1">
           <Link
-            className="text-ink/65 text-sm font-bold underline-offset-4 hover:text-moss hover:underline"
+            className="text-ink/65 hover:text-moss text-sm font-bold underline-offset-4 hover:underline"
             href={"/p/" + row.provider_slug}
           >
             {row.provider_display_name}
