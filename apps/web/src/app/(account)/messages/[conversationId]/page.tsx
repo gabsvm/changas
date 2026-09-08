@@ -78,8 +78,8 @@ export default async function ConversationPage({
   const allowFakePayments = process.env.NODE_ENV !== "production";
 
   return (
-    <section className="space-y-4 py-4 sm:py-6">
-      <div className="mx-auto w-full max-w-4xl space-y-3">
+    <section className="-mx-5 sm:mx-0 sm:space-y-4 sm:py-6">
+      <div className="mx-auto hidden w-full max-w-4xl space-y-3 sm:block">
         <ProposalComposer
           conversationId={conversationId}
           currentUserIsClient={currentUserIsClient}
@@ -102,6 +102,37 @@ export default async function ConversationPage({
             ))}
           </section>
         ) : null}
+      </div>
+
+      <div className="border-ink/10 bg-canvas border-b px-3 py-2 sm:hidden">
+        <details className="group">
+          <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-2 text-sm font-extrabold">
+            <span>
+              Acuerdos y propuestas
+              {proposals.length > 0 ? ` · ${proposals.length}` : ""}
+            </span>
+            <span className="text-moss text-xs group-open:rotate-180" aria-hidden="true">
+              ▼
+            </span>
+          </summary>
+          <div className="space-y-3 pb-3">
+            <ProposalComposer
+              conversationId={conversationId}
+              currentUserIsClient={currentUserIsClient}
+            />
+            {proposals.map((proposal) => (
+              <ProposalCard
+                key={`mobile:${proposal.proposal_id}:${proposal.current_version_id}:${proposal.proposal_status}`}
+                proposal={proposal}
+                conversationId={conversationId}
+                currentUserId={user.id}
+                clientUserId={context.client_user_id}
+                providerUserId={context.provider_user_id}
+                allowFakePayments={allowFakePayments}
+              />
+            ))}
+          </div>
+        </details>
       </div>
 
       <ConversationThread
