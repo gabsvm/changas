@@ -6,6 +6,10 @@ const globals = readFileSync(
   new URL("../../app/globals.css", import.meta.url),
   "utf8",
 );
+const layout = readFileSync(
+  new URL("../../app/layout.tsx", import.meta.url),
+  "utf8",
+);
 const icon = readFileSync(
   new URL("../../app/icon.svg", import.meta.url),
   "utf8",
@@ -58,5 +62,14 @@ describe("Changas brand theme", () => {
     expect(globals).not.toContain("#163832");
     expect(globals).not.toContain("#285943");
     expect(globals).not.toContain("#b86145");
+  });
+
+  it("uses Plus Jakarta Sans as the single product type family", () => {
+    expect(layout).toContain("Plus_Jakarta_Sans");
+    expect(layout).toContain('variable: "--font-plus-jakarta"');
+    expect(globals).toMatch(/--font-display:\s*var\(--font-plus-jakarta\)/);
+    expect(globals).toMatch(/--font-sans:\s*var\(--font-plus-jakarta\)/);
+    expect(globals).not.toContain('"Trebuchet MS"');
+    expect(globals).not.toContain("font-family: Arial");
   });
 });
