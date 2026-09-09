@@ -5,19 +5,17 @@ import { useState } from "react";
 
 import { minorUnitsToMajorInput, type DiscoveryFilters } from "@changas/domain";
 
+import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { actionButtonClass } from "@/components/ui/marketplace/action-button";
 import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
 
 import { DiscoveryCard } from "./discovery-card";
 
 function nullableFiniteNumber(value: unknown): boolean {
-  return (
-    value === null || (typeof value === "number" && Number.isFinite(value))
-  );
+  return value === null || (typeof value === "number" && Number.isFinite(value));
 }
 
-function isDiscoveryRow(
-  value: unknown,
-): value is ReputationDiscoveryServiceRow {
+function isDiscoveryRow(value: unknown): value is ReputationDiscoveryServiceRow {
   if (!value || typeof value !== "object") return false;
   const row = value as Partial<ReputationDiscoveryServiceRow>;
   return (
@@ -44,11 +42,7 @@ function isDiscoveryRow(
   );
 }
 
-function searchHref(
-  query: string,
-  filters: DiscoveryFilters,
-  page: number,
-): string {
+function searchHref(query: string, filters: DiscoveryFilters, page: number): string {
   const params = new URLSearchParams();
   if (query) params.set("q", query);
   if (filters.categorySlug) params.set("category", filters.categorySlug);
@@ -56,19 +50,16 @@ function searchHref(
   if (filters.locationSlug) params.set("location", filters.locationSlug);
   if (filters.modality === "IN_PERSON") params.set("mode", "presencial");
   if (filters.modality === "REMOTE") params.set("mode", "remoto");
-  if (filters.minPrice !== null)
-    params.set("min", minorUnitsToMajorInput(filters.minPrice));
-  if (filters.maxPrice !== null)
-    params.set("max", minorUnitsToMajorInput(filters.maxPrice));
-  if (filters.radiusMeters !== null)
-    params.set("radius", String(filters.radiusMeters));
+  if (filters.minPrice !== null) params.set("min", minorUnitsToMajorInput(filters.minPrice));
+  if (filters.maxPrice !== null) params.set("max", minorUnitsToMajorInput(filters.maxPrice));
+  if (filters.radiusMeters !== null) params.set("radius", String(filters.radiusMeters));
   if (filters.acceptsOffers === true) params.set("offers", "true");
   if (filters.priceModel) params.set("priceModel", filters.priceModel);
   if (filters.sort !== "recommended") params.set("sort", filters.sort);
   if (filters.pageSize !== 24) params.set("pageSize", String(filters.pageSize));
   if (page > 1) params.set("page", String(page));
   const queryString = params.toString();
-  return queryString ? "/buscar?" + queryString : "/buscar";
+  return queryString ? `/buscar?${queryString}` : "/buscar";
 }
 
 export function DiscoveryResults({
@@ -94,10 +85,7 @@ export function DiscoveryResults({
   const [nearbyLoading, setNearbyLoading] = useState(false);
   const [gpsMode, setGpsMode] = useState(false);
   const [gpsPage, setGpsPage] = useState(1);
-  const [gpsPoint, setGpsPoint] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
+  const [gpsPoint, setGpsPoint] = useState<{ latitude: number; longitude: number } | null>(null);
 
   async function fetchNearbyPage(
     page: number,
@@ -121,9 +109,7 @@ export function DiscoveryResults({
         throw new Error("discovery request failed");
       }
       const candidate = (payload as { rows?: unknown }).rows;
-      const nextRows = Array.isArray(candidate)
-        ? candidate.filter(isDiscoveryRow)
-        : [];
+      const nextRows = Array.isArray(candidate) ? candidate.filter(isDiscoveryRow) : [];
       setRows(nextRows);
       setHasMore((payload as { hasMore?: unknown }).hasMore === true);
       setGpsPage(page);
@@ -145,17 +131,12 @@ export function DiscoveryResults({
     setResultsError(null);
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        const point = {
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-        };
+        const point = { latitude: coords.latitude, longitude: coords.longitude };
         setGpsPoint(point);
         void fetchNearbyPage(1, point);
       },
       () => {
-        setResultsError(
-          "No pudimos acceder a tu ubicación. Podés elegir una zona manualmente.",
-        );
+        setResultsError("No pudimos acceder a tu ubicación. Podés elegir una zona manualmente.");
         setNearbyLoading(false);
       },
       { enableHighAccuracy: false, maximumAge: 300_000, timeout: 10_000 },
@@ -164,64 +145,59 @@ export function DiscoveryResults({
 
   return (
     <section aria-live="polite" aria-label="Resultados de búsqueda">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-ink/60 text-sm">
+      <div className="flex min-h-11 flex-wrap items-center justify-between gap-2">
+        <p className={`text-sm ${resultsError ? "text-danger" : "text-ink/55"}`}>
           {resultsError
             ? resultsError
             : rows.length === 0
               ? "No encontramos servicios con esos criterios."
-              : rows.length + " resultado" + (rows.length === 1 ? "" : "s")}
+              : `${rows.length} resultado${rows.length === 1 ? "" : "s"}`}
         </p>
         {enableNearby ? (
           <button
-            className="button-secondary"
+            className="consumer-pressable inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold text-terracotta hover:bg-brand-orange/[0.07]"
             type="button"
             onClick={searchNearby}
             disabled={nearbyLoading}
           >
-            {nearbyLoading ? "Buscando cerca…" : "Buscar cerca mío"}
+            <span aria-hidden="true">⌖</span>
+            {nearbyLoading ? "Buscando…" : "Cerca mío"}
           </button>
         ) : null}
       </div>
-      {rows.length && !resultsError ? (
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
+
+      {rows.length > 0 && !resultsError ? (
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
           {rows.map((row) => (
-            <DiscoveryCard
-              key={row.provider_slug + "/" + row.service_slug}
-              row={row}
-            />
+            <DiscoveryCard key={`${row.provider_slug}/${row.service_slug}`} row={row} />
           ))}
         </div>
       ) : !resultsError ? (
-        <div className="border-ink/10 mt-5 rounded-2xl border border-dashed bg-white/45 p-8 text-center">
-          <p className="font-display text-2xl font-semibold">
-            Probá otra búsqueda
-          </p>
-          <p className="text-ink/60 mt-2 text-sm">
-            También podés explorar una categoría o elegir servicios remotos.
-          </p>
-        </div>
+        <EmptyState
+          className="py-10"
+          title="Probá otra búsqueda"
+          description="Podés cambiar la categoría, la zona o elegir servicios remotos."
+          actionHref="/buscar"
+          actionLabel="Limpiar filtros"
+          actionTone="secondary"
+        />
       ) : null}
+
       {enableNearby && gpsMode && gpsPoint && !resultsError ? (
-        <nav
-          aria-label="Paginación de resultados cercanos"
-          className="mt-8 flex items-center justify-between gap-4"
-        >
+        <nav aria-label="Paginación de resultados cercanos" className="mt-6 flex items-center justify-between gap-3">
           {gpsPage > 1 ? (
             <button
-              className="button-secondary"
+              className={actionButtonClass("secondary")}
               type="button"
               onClick={() => void fetchNearbyPage(gpsPage - 1, gpsPoint)}
               disabled={nearbyLoading}
             >
               Anterior
             </button>
-          ) : (
-            <span />
-          )}
+          ) : <span />}
           {hasMore ? (
             <button
-              className="button-secondary"
+              className={actionButtonClass("secondary")}
               type="button"
               onClick={() => void fetchNearbyPage(gpsPage + 1, gpsPoint)}
               disabled={nearbyLoading}
@@ -231,25 +207,14 @@ export function DiscoveryResults({
           ) : null}
         </nav>
       ) : enableNearby && !resultsError ? (
-        <nav
-          aria-label="Paginación de resultados"
-          className="mt-8 flex items-center justify-between gap-4"
-        >
+        <nav aria-label="Paginación de resultados" className="mt-6 flex items-center justify-between gap-3">
           {filters.page > 1 ? (
-            <Link
-              className="button-secondary"
-              href={searchHref(query, filters, filters.page - 1)}
-            >
+            <Link className={actionButtonClass("secondary")} href={searchHref(query, filters, filters.page - 1)}>
               Anterior
             </Link>
-          ) : (
-            <span />
-          )}
+          ) : <span />}
           {hasMore ? (
-            <Link
-              className="button-secondary"
-              href={searchHref(query, filters, filters.page + 1)}
-            >
+            <Link className={actionButtonClass("secondary")} href={searchHref(query, filters, filters.page + 1)}>
               Siguiente
             </Link>
           ) : null}
