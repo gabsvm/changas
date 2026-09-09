@@ -2,9 +2,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { StartProviderForm } from "@/components/account/account-form";
-import { AccountMenuItem } from "@/components/ui/account-menu-item";
+import { Avatar } from "@/components/ui/marketplace/avatar";
+import { SettingsRow } from "@/components/ui/marketplace/settings-row";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
 import { getNextOnboardingHref } from "@/lib/ui/onboarding";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
@@ -19,14 +20,12 @@ export default async function AccountPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login?next=/account");
-  }
+  if (!user) redirect("/login?next=/account");
 
   const [{ data: profile }, { data: provider }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("display_name, public_zone, bio")
+      .select("display_name, public_zone, bio, avatar_url")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -36,152 +35,135 @@ export default async function AccountPage() {
       .maybeSingle(),
   ]);
 
-  const displayName =
-    profile?.display_name || user.email?.split("@")[0] || "Tu cuenta";
-  const initial = displayName.trim().charAt(0).toUpperCase() || "C";
+  const displayName = profile?.display_name || user.email?.split("@")[0] || "Tu cuenta";
   const providerPresentation = provider
     ? getProviderStatusPresentation(provider.status)
     : null;
+  const step = provider ? Math.min(4, Math.max(1, provider.onboarding_step)) : 0;
   const canContinue =
     provider?.status === "PROFILE_INCOMPLETE" ||
     provider?.status === "IDENTITY_PENDING";
 
   return (
-    <section className="py-6 sm:py-14">
-      <div className="mx-auto max-w-3xl">
-        <header className="flex items-center gap-3 sm:items-end sm:justify-between">
-          <div className="brand-gradient-surface grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-lg font-extrabold text-white">
-            {initial}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
-              Mi cuenta
-            </p>
-            <h1 className="font-display mt-0.5 truncate text-2xl font-extrabold tracking-[-0.035em] sm:text-4xl">
-              {displayName}
-            </h1>
-            <p className="text-ink/55 mt-1 truncate text-xs sm:text-sm">
-              {user.email ?? "Cuenta de Changas"}
-            </p>
-          </div>
+    <section className="pb-6 pt-5 sm:py-10">
+      <div className="mx-auto max-w-2xl">
+        <header>
+          <Link
+            href="/account/profile"
+            className="consumer-pressable -mx-2 flex min-h-16 items-center gap-3 rounded-xl px-2 py-2 hover:bg-ink/[0.03]"
+          >
+            <Avatar name={displayName} src={profile?.avatar_url} size="lg" />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-xl font-bold tracking-[-0.025em]">
+                {displayName}
+              </span>
+              <span className="text-ink/48 mt-0.5 block truncate text-sm">
+                {user.email ?? "Cuenta de Changas"}
+              </span>
+            </span>
+            <span className="text-ink/28 text-2xl" aria-hidden="true">›</span>
+          </Link>
         </header>
 
-        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_12px_34px_rgba(32,33,36,0.05)] sm:p-6">
+        <section className="mt-5 border-y border-ink/[0.07] py-4 sm:rounded-xl sm:border sm:bg-surface sm:px-4">
           {provider ? (
-            <>
+            <div>
               <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
-                    Perfil de proveedor
-                  </p>
-                  <h2 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.025em]">
-                    {provider.status === "ACTIVE"
-                      ? "Tu perfil está listo"
-                      : "Completá tu verificación"}
+                <div className="min-w-0">
+                  <p className="text-ink/45 text-xs font-semibold">Perfil de proveedor</p>
+                  <h2 className="mt-0.5 text-lg font-bold tracking-[-0.02em]">
+                    {provider.status === "ACTIVE" ? "Listo para trabajar" : "Completá tu verificación"}
                   </h2>
                 </div>
                 {providerPresentation ? (
-                  <StatusBadge
-                    label={providerPresentation.label}
-                    tone={providerPresentation.tone}
-                  />
+                  <StatusChip
+                    tone={
+                      provider.status === "ACTIVE"
+                        ? "success"
+                        : provider.status === "REJECTED"
+                          ? "danger"
+                          : "warning"
+                    }
+                  >
+                    {providerPresentation.label}
+                  </StatusChip>
                 ) : null}
               </div>
-              <p className="text-ink/60 mt-2 text-sm leading-6">
+              <p className="text-ink/52 mt-1 text-sm leading-5">
                 {providerPresentation?.description}
               </p>
               {provider.status !== "ACTIVE" ? (
-                <div className="mt-5">
-                  <div className="mb-2 flex items-center justify-between text-xs font-bold">
+                <div className="mt-3">
+                  <div className="text-ink/48 mb-1.5 flex items-center justify-between text-xs font-semibold">
                     <span>Progreso</span>
-                    <span className="text-ink/55">
-                      Paso {Math.min(4, Math.max(1, provider.onboarding_step))}{" "}
-                      de 4
-                    </span>
+                    <span>{step} de 4</span>
                   </div>
-                  <ProgressBar
-                    value={
-                      (Math.min(4, Math.max(1, provider.onboarding_step)) / 4) *
-                      100
-                    }
-                    label="Progreso de verificación"
-                  />
+                  <ProgressBar value={(step / 4) * 100} label="Progreso de verificación" />
                 </div>
               ) : null}
-              <div className="mt-5">
-                {provider.status === "ACTIVE" ? (
-                  <Link
-                    className="button-primary w-full sm:w-auto"
-                    href="/provider/manage"
-                  >
-                    Gestionar servicios
-                  </Link>
-                ) : canContinue ? (
-                  <Link
-                    className="button-primary w-full sm:w-auto"
-                    href={getNextOnboardingHref(provider.onboarding_step)}
-                  >
-                    Continuar verificación
-                  </Link>
-                ) : (
-                  <Link
-                    className="button-secondary w-full sm:w-auto"
-                    href="/provider/onboarding"
-                  >
-                    Ver estado
-                  </Link>
-                )}
-              </div>
-            </>
+              <Link
+                className="consumer-pressable text-terracotta mt-3 inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold hover:bg-brand-orange/[0.07]"
+                href={
+                  provider.status === "ACTIVE"
+                    ? "/provider/manage"
+                    : canContinue
+                      ? getNextOnboardingHref(provider.onboarding_step)
+                      : "/provider/onboarding"
+                }
+              >
+                {provider.status === "ACTIVE"
+                  ? "Gestionar servicios"
+                  : canContinue
+                    ? "Continuar verificación"
+                    : "Ver estado"}
+                <span className="ml-1" aria-hidden="true">›</span>
+              </Link>
+            </div>
           ) : (
-            <>
-              <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
-                Ofrecer servicios
-              </p>
-              <h2 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.025em]">
-                ¿Querés trabajar con Changas?
-              </h2>
-              <p className="text-ink/60 mt-2 text-sm leading-6">
-                Prepará tu perfil de proveedor cuando quieras. Tu cuenta sigue
-                sirviendo también para contratar.
+            <div>
+              <h2 className="text-lg font-bold tracking-[-0.02em]">¿Querés ofrecer servicios?</h2>
+              <p className="text-ink/52 mt-1 text-sm leading-5">
+                Creá tu perfil profesional sin cambiar cómo usás Changas para contratar.
               </p>
               <StartProviderForm action={startProviderOnboarding} />
-            </>
+            </div>
           )}
         </section>
 
-        <section className="border-ink/10 bg-surface mt-5 overflow-hidden rounded-3xl border px-4 shadow-[0_10px_28px_rgba(32,33,36,0.04)] sm:px-5">
-          <AccountMenuItem
-            href="/account/profile"
-            icon="profile"
-            title="Perfil público"
-            description="Nombre, zona y presentación"
-          />
-          <AccountMenuItem
-            href="/account/identity"
-            icon="identity"
-            title="Identidad privada"
-            description="Datos legales que no se publican"
-          />
-          <AccountMenuItem
-            href="/account/favorites"
-            icon="saved"
-            title="Guardados"
-            description="Profesionales y servicios que marcaste"
-          />
-          <AccountMenuItem
-            href="/account/notifications"
-            icon="activity"
-            title="Actividad y notificaciones"
-            description="Novedades y preferencias de avisos"
-          />
-          <AccountMenuItem
-            href="/account/settings"
-            icon="settings"
-            title="Configuración"
-            description="Preferencias de cuenta y sesión"
-          />
-        </section>
+        <AccountGroup title="Cuenta">
+          <SettingsRow href="/account/profile" title="Perfil público" description="Foto, nombre, zona y presentación" />
+          <SettingsRow href="/account/identity" title="Identidad y seguridad" description="Datos legales que no se publican" />
+          <SettingsRow href="/account/favorites" title="Guardados" description="Servicios y profesionales que marcaste" />
+          <SettingsRow href="/account/notifications" title="Notificaciones" description="Actividad y preferencias de avisos" />
+        </AccountGroup>
+
+        {provider ? (
+          <AccountGroup title="Proveedor">
+            <SettingsRow
+              href={provider.status === "ACTIVE" ? "/provider/manage" : "/provider/onboarding"}
+              title={provider.status === "ACTIVE" ? "Mis servicios" : "Verificación de proveedor"}
+              description={provider.status === "ACTIVE" ? "Servicios, habilidades y disponibilidad" : "Completá los pasos para publicar"}
+            />
+            {provider.status === "ACTIVE" ? (
+              <SettingsRow href="/provider/manage" title="Disponibilidad" description="Zonas, horarios y pausas" />
+            ) : null}
+          </AccountGroup>
+        ) : null}
+
+        <AccountGroup title="Preferencias">
+          <SettingsRow href="/account/settings" title="Configuración" description="Cuenta, privacidad y sesión" />
+        </AccountGroup>
+      </div>
+    </section>
+  );
+}
+
+function AccountGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mt-7" aria-label={title}>
+      <h2 className="text-ink/42 px-1 text-xs font-bold uppercase tracking-[0.08em]">{title}</h2>
+      <div className="mt-1 divide-y divide-ink/[0.07] border-y border-ink/[0.07] sm:rounded-xl sm:border sm:bg-surface sm:px-4">
+        {children}
       </div>
     </section>
   );
