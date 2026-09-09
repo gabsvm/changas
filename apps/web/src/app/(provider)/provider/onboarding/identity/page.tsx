@@ -44,26 +44,26 @@ export default async function ProviderOnboardingIdentityPage() {
   return (
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Identidad privada" backHref="/provider/onboarding" />
-      <div className="mx-auto max-w-2xl pt-6 sm:pt-0">
+      <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
           Paso 2 de 4
         </p>
-        <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
+        <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
           Confirmá tus datos privados
         </h1>
-        <p className="text-ink/60 mt-3 text-sm leading-6">
-          Esta información sirve para procesos internos de identidad y
-          seguridad. No aparece en tu perfil público.
+        <p className="text-ink/58 mt-2 text-sm leading-6">
+          Estos datos sirven para identidad y seguridad. Nunca forman parte de
+          tu perfil público.
         </p>
 
-        <div className="mt-5">
+        <div className="mt-4">
           <PrivacyNotice>
-            Los datos legales se almacenan separados de tu presentación pública.
-            El flujo de onboarding no cambia las reglas de acceso existentes.
+            Nombre legal, teléfono, fecha de nacimiento, DNI y domicilio se
+            guardan separados de tu información pública.
           </PrivacyNotice>
         </div>
 
-        <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:p-6">
+        <div className="border-ink/10 mt-5 border-t pt-5">
           <PrivateIdentityForm
             action={saveProviderIdentityStep}
             initialValues={{
@@ -77,11 +77,6 @@ export default async function ProviderOnboardingIdentityPage() {
             hiddenFields={{ step: String(nextStep) }}
           />
         </div>
-
-        <p className="text-ink/50 mt-4 text-xs leading-5">
-          Al continuar guardamos tus datos privados y avanzamos directamente a
-          la carga de documentos, sin pasos intermedios innecesarios.
-        </p>
       </div>
     </section>
   );
