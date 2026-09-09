@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import { getPublicSiteUrl } from "@changas/config/public";
+import { ImageUploadCompressionGuard } from "@/components/media/image-upload-compression-guard";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 
@@ -42,6 +43,7 @@ export default function RootLayout({
         </a>
         <ServiceWorkerRegister />
         <InstallPrompt />
+        <ImageUploadCompressionGuard />
         {children}
       </body>
     </html>
