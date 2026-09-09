@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef } from "react";
 
+import { SettingsRow } from "@/components/ui/marketplace/settings-row";
+import { Switch } from "@/components/ui/marketplace/switch";
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
 import type { NotificationPreferences } from "@/lib/notifications/server";
@@ -11,34 +13,46 @@ type PreferencesAction = (
   formData: FormData,
 ) => Promise<ActionState>;
 
-function PreferenceToggle({
-  name,
-  title,
-  description,
-  defaultChecked,
-}: {
-  name: string;
+type ToggleConfig = {
+  name: keyof Pick<
+    NotificationPreferences,
+    | "emailImportantEnabled"
+    | "jobRemindersEnabled"
+    | "proposalAlertsEnabled"
+    | "verificationAlertsEnabled"
+    | "promotionalEnabled"
+  >;
   title: string;
   description: string;
-  defaultChecked: boolean;
-}) {
-  return (
-    <label className="border-ink/10 flex items-start justify-between gap-4 rounded-xl border bg-white/60 p-4">
-      <span>
-        <span className="block text-sm font-semibold">{title}</span>
-        <span className="text-ink/60 mt-1 block text-sm leading-5">
-          {description}
-        </span>
-      </span>
-      <input
-        className="mt-1 size-5 accent-[#31594f]"
-        name={name}
-        type="checkbox"
-        defaultChecked={defaultChecked}
-      />
-    </label>
-  );
-}
+};
+
+const toggles: ToggleConfig[] = [
+  {
+    name: "emailImportantEnabled",
+    title: "Correos importantes",
+    description: "Cambios de trabajos, pagos y cuenta.",
+  },
+  {
+    name: "jobRemindersEnabled",
+    title: "Recordatorios de trabajos",
+    description: "Avisos para trabajos programados próximos.",
+  },
+  {
+    name: "proposalAlertsEnabled",
+    title: "Propuestas",
+    description: "Cuando una propuesta requiere tu atención.",
+  },
+  {
+    name: "verificationAlertsEnabled",
+    title: "Verificación",
+    description: "Cambios relevantes de cuenta o perfil.",
+  },
+  {
+    name: "promotionalEnabled",
+    title: "Promociones",
+    description: "Novedades comerciales opcionales.",
+  },
+];
 
 export function NotificationPreferencesForm({
   action,
@@ -47,89 +61,49 @@ export function NotificationPreferencesForm({
   action: PreferencesAction;
   initialValues: NotificationPreferences;
 }) {
-  const [state, formAction, pending] = useActionState(
-    action,
-    initialActionState,
-  );
+  const formRef = useRef<HTMLFormElement>(null);
+  const [state, formAction, pending] = useActionState(action, initialActionState);
+
+  function persistChange() {
+    window.setTimeout(() => formRef.current?.requestSubmit(), 0);
+  }
 
   return (
-    <form action={formAction} className="space-y-4">
-      <div className="border-ink/10 rounded-xl border bg-white/60 p-4">
-        <div className="flex items-start justify-between gap-4">
-          <span>
-            <span className="block text-sm font-semibold">En la app</span>
-            <span className="text-ink/60 mt-1 block text-sm leading-5">
-              Las alertas importantes de seguridad, cuenta y actividad siempre
-              quedan disponibles dentro de Changas.
-            </span>
-          </span>
-          <input
-            className="mt-1 size-5 accent-[#31594f]"
-            type="checkbox"
-            checked
-            disabled
-            readOnly
-            aria-label="Notificaciones dentro de la app activadas"
-          />
-        </div>
-      </div>
+    <form ref={formRef} action={formAction} className="divide-y divide-ink/[0.07]">
+      {toggles.map((toggle) => (
+        <SettingsRow
+          key={toggle.name}
+          title={toggle.title}
+          description={toggle.description}
+          trailing={
+            <Switch
+              name={toggle.name}
+              defaultChecked={initialValues[toggle.name]}
+              onChange={persistChange}
+              disabled={pending}
+              ariaLabel={`${toggle.title}: ${initialValues[toggle.name] ? "activado" : "desactivado"}`}
+            />
+          }
+        />
+      ))}
 
-      <PreferenceToggle
-        name="emailImportantEnabled"
-        title="Correos importantes"
-        description="Recibí por email cambios importantes de trabajos, pagos y cuenta cuando corresponda."
-        defaultChecked={initialValues.emailImportantEnabled}
-      />
-      <PreferenceToggle
-        name="jobRemindersEnabled"
-        title="Recordatorios de trabajos"
-        description="Avisos para trabajos programados próximos."
-        defaultChecked={initialValues.jobRemindersEnabled}
-      />
-      <PreferenceToggle
-        name="proposalAlertsEnabled"
-        title="Propuestas"
-        description="Alertas cuando una propuesta requiere tu atención."
-        defaultChecked={initialValues.proposalAlertsEnabled}
-      />
-      <PreferenceToggle
-        name="verificationAlertsEnabled"
-        title="Verificación"
-        description="Cambios relevantes en verificaciones de la cuenta o del perfil."
-        defaultChecked={initialValues.verificationAlertsEnabled}
-      />
-      <PreferenceToggle
-        name="promotionalEnabled"
-        title="Promociones"
-        description="Novedades comerciales opcionales. Desactivarlas no silencia alertas importantes."
-        defaultChecked={initialValues.promotionalEnabled}
-      />
+      <button type="submit" className="sr-only" tabIndex={-1} aria-hidden="true">
+        Guardar preferencias
+      </button>
 
-      {state.error ? (
-        <p
-          className="bg-terracotta/10 text-terracotta rounded-xl px-4 py-3 text-sm"
-          role="alert"
-        >
+      {pending ? (
+        <p className="text-ink/45 py-3 text-xs" role="status" aria-live="polite">
+          Guardando cambio…
+        </p>
+      ) : state.error ? (
+        <p className="text-danger py-3 text-xs" role="alert">
           {state.error}
         </p>
-      ) : null}
-      {state.success ? (
-        <p
-          className="bg-moss/10 text-moss rounded-xl px-4 py-3 text-sm"
-          role="status"
-          aria-live="polite"
-        >
-          {state.success}
+      ) : state.success ? (
+        <p className="text-success py-3 text-xs" role="status" aria-live="polite">
+          Cambios guardados
         </p>
       ) : null}
-
-      <button
-        className="button-primary disabled:cursor-wait disabled:opacity-60"
-        type="submit"
-        disabled={pending}
-      >
-        {pending ? "Guardando…" : "Guardar preferencias"}
-      </button>
     </form>
   );
 }
