@@ -12,7 +12,7 @@ export function ProfileAvatarUploader({
   initialAvatarUrl,
 }: {
   displayName: string;
-  initialAvatarUrl?: string | null;
+  initialAvatarUrl?: string | null | undefined;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -49,13 +49,17 @@ export function ProfileAvatarUploader({
 
       const path = `${user.id}/${crypto.randomUUID()}-${file.name}`;
       uploadedPath = path;
-      setMessage(`Subiendo foto optimizada · ${Math.max(1, Math.round(file.size / 1024))} KiB`);
+      setMessage(
+        `Subiendo foto optimizada · ${Math.max(1, Math.round(file.size / 1024))} KiB`,
+      );
 
-      const upload = await supabase.storage.from("profile-avatars").upload(path, file, {
-        contentType: file.type,
-        cacheControl: "3600",
-        upsert: false,
-      });
+      const upload = await supabase.storage
+        .from("profile-avatars")
+        .upload(path, file, {
+          contentType: file.type,
+          cacheControl: "3600",
+          upsert: false,
+        });
       if (upload.error) throw new Error("No pudimos subir la foto.");
 
       const result = await saveProfileAvatarUpload({
@@ -82,7 +86,11 @@ export function ProfileAvatarUploader({
           // Best-effort cleanup. Server registration remains authoritative.
         }
       }
-      setError(caught instanceof Error ? caught.message : "No pudimos actualizar la foto.");
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "No pudimos actualizar la foto.",
+      );
       setMessage(null);
     } finally {
       setPending(false);
@@ -103,17 +111,25 @@ export function ProfileAvatarUploader({
         />
         <button
           type="button"
-          className="consumer-pressable inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold text-terracotta hover:bg-brand-orange/[0.07] disabled:opacity-50"
+          className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold disabled:opacity-50"
           onClick={() => inputRef.current?.click()}
           disabled={pending}
         >
-          {pending ? "Procesando…" : avatarUrl ? "Cambiar foto" : "Agregar foto"}
+          {pending
+            ? "Procesando…"
+            : avatarUrl
+              ? "Cambiar foto"
+              : "Agregar foto"}
         </button>
         <p className="text-ink/45 mt-0.5 text-xs leading-5">
           Se optimiza automáticamente antes de subirla.
         </p>
         {message ? (
-          <p className="text-success mt-1 text-xs" role="status" aria-live="polite">
+          <p
+            className="text-success mt-1 text-xs"
+            role="status"
+            aria-live="polite"
+          >
             {message}
           </p>
         ) : null}

@@ -29,7 +29,7 @@ export async function GET(
 
   return new Response(data, {
     headers: {
-      "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=86400",
+      "Cache-Control": "no-store",
       "Content-Type": data.type || "image/jpeg",
       "X-Content-Type-Options": "nosniff",
     },

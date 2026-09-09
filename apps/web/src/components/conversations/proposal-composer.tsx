@@ -22,7 +22,7 @@ export function ProposalComposer({
   );
 
   return (
-    <details className="border-ink/10 rounded-2xl border bg-white/80 p-3">
+    <details className="border-ink/10 rounded-xl border bg-white/80 p-3">
       <summary className="cursor-pointer text-sm font-bold">
         {currentUserIsClient ? "Proponer un acuerdo" : "Enviar una cotización"}
       </summary>
@@ -35,7 +35,7 @@ export function ProposalComposer({
             defaultValue={
               currentUserIsClient ? "QUOTE_REQUEST" : "PROVIDER_QUOTE"
             }
-            className="border-ink/10 text-ink mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm"
+            className="consumer-control text-ink mt-1 w-full px-3 py-2 text-sm"
           >
             {currentUserIsClient ? (
               <>
@@ -56,7 +56,7 @@ export function ProposalComposer({
             name="price"
             inputMode="decimal"
             placeholder="Dejar vacío si es a cotizar"
-            className="border-ink/10 text-ink mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm"
+            className="consumer-control text-ink mt-1 w-full px-3 py-2 text-sm"
           />
         </label>
         <label className="text-ink/60 text-xs font-semibold sm:col-span-2">
@@ -66,7 +66,7 @@ export function ProposalComposer({
             rows={3}
             maxLength={4000}
             placeholder="Qué incluye el trabajo o qué necesitás cotizar"
-            className="border-ink/10 text-ink mt-1 w-full resize-none rounded-xl border bg-white px-3 py-2 text-sm"
+            className="consumer-control text-ink mt-1 w-full resize-none px-3 py-2 text-sm"
           />
         </label>
         <label className="text-ink/60 text-xs font-semibold">
@@ -74,7 +74,7 @@ export function ProposalComposer({
           <input
             type="datetime-local"
             name="scheduleStartAt"
-            className="border-ink/10 text-ink mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm"
+            className="consumer-control text-ink mt-1 w-full px-3 py-2 text-sm"
           />
         </label>
         <label className="text-ink/60 text-xs font-semibold">
@@ -82,7 +82,7 @@ export function ProposalComposer({
           <input
             type="datetime-local"
             name="scheduleEndAt"
-            className="border-ink/10 text-ink mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm"
+            className="consumer-control text-ink mt-1 w-full px-3 py-2 text-sm"
           />
         </label>
         <div className="flex items-center gap-3 sm:col-span-2">

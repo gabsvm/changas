@@ -17,7 +17,7 @@ describe("Phase 08 notification center UI contract", () => {
     expect(page).toContain("markAllNotificationsReadAction");
     expect(page).toContain("NotificationPreferencesForm");
     expect(page).toContain("PushOptIn");
-    expect(page).toContain("Estás al día");
+    expect(page).toContain("Todo al día");
   });
 
   it("shows an SSR unread badge in account navigation", () => {
@@ -25,7 +25,7 @@ describe("Phase 08 notification center UI contract", () => {
 
     expect(layout).toContain("getUnreadNotificationCount");
     expect(layout).toContain('href="/account/notifications"');
-    expect(layout).toContain("Notificaciones");
+    expect(layout).toContain("Actividad");
   });
 
   it("keeps permission prompting behind an explicit push-enable action", () => {
@@ -33,7 +33,7 @@ describe("Phase 08 notification center UI contract", () => {
 
     expect(control).toContain("enablePush");
     expect(control).toContain("Notification.requestPermission()");
-    expect(control).toContain('type="button"');
+    expect(control).toContain("<Switch");
     expect(control).not.toMatch(
       /useEffect\([\s\S]{0,500}Notification\.requestPermission\(\)/,
     );

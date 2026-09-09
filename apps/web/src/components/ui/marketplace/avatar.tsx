@@ -24,7 +24,7 @@ export function Avatar({
   className = "",
 }: {
   name: string;
-  src?: string | null;
+  src?: string | null | undefined;
   size?: AvatarSize;
   className?: string;
 }) {
@@ -33,7 +33,11 @@ export function Avatar({
   if (src) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img className={`${classes} object-cover`} src={src} alt={`Foto de ${name}`} />
+      <img
+        className={`${classes} object-cover`}
+        src={src}
+        alt={`Foto de ${name}`}
+      />
     );
   }
 

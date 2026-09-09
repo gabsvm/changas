@@ -196,7 +196,7 @@ export function ConversationThread({
   }, [initialAttachments]);
 
   return (
-    <div className="border-ink/10 mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-[1.75rem] border bg-white/70 shadow-[0_20px_70px_rgba(22,56,50,0.08)] sm:min-h-[calc(100dvh-4rem)]">
+    <div className="border-ink/10 mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col border-y bg-white/70 sm:min-h-[calc(100dvh-4rem)] sm:rounded-xl sm:border">
       <header className="border-ink/10 bg-canvas/95 sticky top-0 z-10 border-b px-4 py-4 backdrop-blur sm:px-6">
         <div className="flex items-center gap-3">
           <Link
@@ -219,7 +219,7 @@ export function ConversationThread({
             <summary className="border-ink/10 grid h-10 w-10 cursor-pointer list-none place-items-center rounded-full border bg-white/70 text-lg">
               ···
             </summary>
-            <div className="border-ink/10 bg-canvas absolute right-0 mt-2 w-64 rounded-2xl border p-3 shadow-xl">
+            <div className="border-ink/10 bg-canvas absolute right-0 mt-2 w-64 rounded-xl border p-3 shadow-lg">
               <button
                 type="button"
                 onClick={toggleBlock}
@@ -240,7 +240,10 @@ export function ConversationThread({
         ) : null}
       </header>
 
-      <main className="flex-1 px-3 py-5 sm:px-6" aria-live="polite">
+      <main
+        className="mobile-content-with-nav flex-1 px-3 py-5 sm:px-6"
+        aria-live="polite"
+      >
         {hasOlder ? (
           <div className="mb-5 text-center">
             <button
@@ -256,9 +259,7 @@ export function ConversationThread({
 
         {messages.length === 0 ? (
           <div className="mx-auto mt-12 max-w-sm text-center">
-            <p className="font-display text-2xl font-semibold">
-              Empezá la conversación
-            </p>
+            <p className="text-xl font-semibold">Empezá la conversación</p>
             <p className="text-ink/60 mt-2 text-sm leading-6">
               Este chat está asociado a {serviceTitle}. Acordá alcance y tiempos
               antes de avanzar.
@@ -278,7 +279,7 @@ export function ConversationThread({
         )}
       </main>
 
-      <footer className="border-ink/10 bg-canvas/95 sticky bottom-0 z-10 border-t p-3 backdrop-blur sm:p-4">
+      <footer className="mobile-sticky-surface sticky z-10 border-t p-3 backdrop-blur sm:static sm:p-4">
         {blockedByMe ? (
           <button
             type="button"
@@ -327,7 +328,7 @@ function MessageBubble({
   return (
     <div className={`flex ${own ? "justify-end" : "justify-start"}`}>
       <article
-        className={`max-w-[86%] rounded-2xl px-3.5 py-2.5 text-sm shadow-sm sm:max-w-[72%] ${
+        className={`max-w-[86%] rounded-xl px-3.5 py-2.5 text-sm sm:max-w-[72%] ${
           own
             ? "bg-ink rounded-br-md text-white"
             : "border-ink/10 text-ink rounded-bl-md border bg-white"

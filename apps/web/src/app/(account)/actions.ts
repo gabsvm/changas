@@ -11,7 +11,11 @@ import { getFormString } from "@/lib/forms/form-data";
 import { createClient } from "@/lib/supabase/server";
 
 const profileAvatarBucket = "profile-avatars";
-const profileAvatarMimeTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+const profileAvatarMimeTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
 const profileAvatarMaxBytes = 262_144;
 
 async function getAuthenticatedUser() {
@@ -84,14 +88,13 @@ export async function saveProfileAvatarUpload(input: {
     return { ok: false, error: "El avatar subido no es válido." };
   }
 
-  const fileName = segments[1];
+  const fileName = segments[1]!;
   const { data: objects, error: listError } = await supabase.storage
     .from(profileAvatarBucket)
     .list(user.id, { search: fileName, limit: 10 });
   const object = objects?.find((entry) => entry.name === fileName);
   const metadata = object?.metadata as
-    | { mimetype?: string; size?: number | string }
-    | undefined;
+    { mimetype?: string; size?: number | string } | undefined;
 
   if (
     listError ||

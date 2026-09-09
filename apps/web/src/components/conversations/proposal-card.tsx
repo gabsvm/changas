@@ -82,7 +82,7 @@ export function ProposalCard({
       : "COUNTEROFFER";
 
   return (
-    <article className="border-ink/10 rounded-2xl border bg-white p-4 shadow-sm">
+    <article className="border-ink/10 rounded-xl border bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-ink/50 text-[11px] font-bold tracking-[0.08em] uppercase">
@@ -100,7 +100,7 @@ export function ProposalCard({
       </p>
 
       <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
-        <div className="bg-canvas rounded-xl p-3">
+        <div className="bg-canvas rounded-lg p-3">
           <dt className="text-ink/45">Precio</dt>
           <dd className="mt-1 font-bold">
             {proposal.price_amount === null
@@ -108,7 +108,7 @@ export function ProposalCard({
               : formatMinorUnits(proposal.price_amount, proposal.currency_code)}
           </dd>
         </div>
-        <div className="bg-canvas rounded-xl p-3">
+        <div className="bg-canvas rounded-lg p-3">
           <dt className="text-ink/45">Modalidad</dt>
           <dd className="mt-1 font-bold">
             {proposal.modality === "REMOTE"
@@ -205,7 +205,7 @@ export function ProposalCard({
               required
               maxLength={4000}
               rows={3}
-              className="border-ink/10 w-full resize-none rounded-xl border bg-white px-3 py-2 text-sm"
+              className="consumer-control w-full resize-none px-3 py-2 text-sm"
             />
             <input
               name="price"
@@ -216,7 +216,7 @@ export function ProposalCard({
                 proposal.currency_code,
               )}
               placeholder="Precio en ARS"
-              className="border-ink/10 w-full rounded-xl border bg-white px-3 py-2 text-sm"
+              className="consumer-control w-full px-3 py-2 text-sm"
             />
             <button
               type="submit"
@@ -236,7 +236,7 @@ export function ProposalCard({
         proposal.proposal_status === "PAYMENT_FAILED") &&
       currentUserIsClient &&
       allowFakePayments ? (
-        <div className="border-moss/20 bg-moss/5 mt-4 rounded-xl border p-3">
+        <div className="border-moss/20 bg-moss/5 mt-4 rounded-lg border p-3">
           <p className="text-moss text-xs font-bold">
             Pago simulado · solo desarrollo
           </p>

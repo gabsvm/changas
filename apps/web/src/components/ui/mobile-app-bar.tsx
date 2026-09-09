@@ -8,7 +8,7 @@ export function MobileAppBar({
   trailing,
 }: {
   title: string;
-  backHref?: string;
+  backHref?: string | undefined;
   trailing?: ReactNode;
 }) {
   return (
