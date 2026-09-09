@@ -1,6 +1,10 @@
 import Link from "next/link";
 
+import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { listMyUpcomingJobs } from "@/lib/jobs/server";
+import { getJobStatusPresentation } from "@/lib/ui/job-status";
 
 function scheduleLabel(
   job: Awaited<ReturnType<typeof listMyUpcomingJobs>>[number],
@@ -21,60 +25,63 @@ export default async function JobsPage() {
   const jobs = await listMyUpcomingJobs();
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-10">
-      <header className="mb-6">
-        <p className="text-moss text-xs font-bold tracking-[0.16em] uppercase">
-          Trabajo protegido
+    <section className="pb-6 sm:py-14">
+      <MobileAppBar title="Mis trabajos" backHref="/account" />
+      <div className="mx-auto max-w-3xl pt-5 sm:pt-0">
+        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+          Actividad
         </p>
-        <h1 className="font-display mt-2 text-3xl font-semibold sm:text-4xl">
+        <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
           Mis trabajos
         </h1>
-        <p className="text-ink/60 mt-2 max-w-xl text-sm leading-6">
-          Acá aparecen los trabajos confirmados, en curso o pendientes de
-          cierre.
+        <p className="text-ink/55 mt-1.5 text-sm leading-6">
+          Trabajos confirmados, en curso o pendientes de cierre.
         </p>
-      </header>
 
-      {jobs.length === 0 ? (
-        <section className="border-ink/10 rounded-3xl border bg-white/70 p-6 text-center sm:p-10">
-          <h2 className="font-display text-2xl font-semibold">
-            Todavía no hay trabajos activos
-          </h2>
-          <p className="text-ink/60 mx-auto mt-2 max-w-md text-sm leading-6">
-            Cuando una propuesta quede aceptada y el pago correspondiente se
-            confirme, aparecerá acá.
-          </p>
-          <Link href="/buscar" className="button-primary mt-5 inline-flex">
-            Explorar servicios
-          </Link>
-        </section>
-      ) : (
-        <div className="space-y-3">
-          {jobs.map((job) => (
-            <Link
-              key={job.job_id}
-              href={`/jobs/${job.job_id}`}
-              className="border-ink/10 hover:border-moss/30 block rounded-3xl border bg-white/75 p-4 shadow-[0_12px_40px_rgba(22,56,50,0.05)] transition sm:p-5"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="truncate font-semibold">{job.service_title}</p>
-                  <p className="text-ink/55 mt-1 truncate text-sm">
-                    {job.counterparty_name}
-                  </p>
-                </div>
-                <span className="bg-moss/10 text-moss rounded-full px-3 py-1 text-[11px] font-bold">
-                  {job.job_status.replaceAll("_", " ")}
-                </span>
-              </div>
-              <div className="text-ink/55 mt-4 flex items-center justify-between gap-3 text-xs">
-                <span>{scheduleLabel(job)}</span>
-                <span aria-hidden>→</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-    </main>
+        {jobs.length === 0 ? (
+          <EmptyState
+            title="Todavía no hay trabajos activos"
+            description="Cuando una propuesta quede aceptada y el pago correspondiente se confirme, aparecerá acá."
+            actionHref="/buscar"
+            actionLabel="Explorar servicios"
+            className="pt-14"
+          />
+        ) : (
+          <div className="border-ink/10 mt-5 divide-y divide-ink/10 border-y">
+            {jobs.map((job) => {
+              const status = getJobStatusPresentation(job.job_status);
+              return (
+                <Link
+                  key={job.job_id}
+                  href={`/jobs/${job.job_id}`}
+                  className="consumer-pressable flex min-h-[4.75rem] items-center gap-3 rounded-lg px-1 py-3 hover:bg-ink/[0.035]"
+                >
+                  <span className="bg-brand-orange/10 text-terracotta grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-extrabold">
+                    {job.service_title.trim().charAt(0).toUpperCase() || "C"}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold">
+                      {job.service_title}
+                    </span>
+                    <span className="text-ink/52 mt-0.5 block truncate text-sm">
+                      {job.counterparty_name}
+                    </span>
+                    <span className="text-ink/38 mt-0.5 block truncate text-xs">
+                      {scheduleLabel(job)}
+                    </span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1.5">
+                    <StatusChip tone={status.tone}>{status.label}</StatusChip>
+                    <span className="text-ink/25 text-xl" aria-hidden="true">
+                      ›
+                    </span>
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
