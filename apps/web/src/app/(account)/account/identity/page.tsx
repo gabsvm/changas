@@ -15,41 +15,34 @@ export default async function AccountIdentityPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login?next=/account/identity");
-  }
+  if (!user) redirect("/login?next=/account/identity");
 
   const { data: privateProfile } = await supabase
     .from("profile_private")
-    .select(
-      "legal_name, private_phone, date_of_birth, exact_address, dni_number",
-    )
+    .select("legal_name, private_phone, date_of_birth, exact_address, dni_number")
     .eq("user_id", user.id)
     .maybeSingle();
 
   return (
-    <section className="pb-4 sm:py-14">
-      <MobileAppBar title="Identidad privada" backHref="/account" />
-      <div className="mx-auto max-w-2xl pt-6 sm:pt-0">
-        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
-          Privado
-        </p>
-        <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
-          Tus datos de identidad
-        </h1>
-        <p className="text-ink/60 mt-3 text-sm leading-6 sm:max-w-xl">
-          Usamos estos datos para procesos internos de identidad y seguridad. No
-          forman parte de tu perfil público.
-        </p>
+    <section className="pb-4 sm:py-10">
+      <MobileAppBar title="Identidad y seguridad" backHref="/account" />
+      <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
+        <header>
+          <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
+            Identidad y seguridad
+          </h1>
+          <p className="text-ink/52 text-sm leading-6 sm:mt-1 sm:max-w-xl">
+            Estos datos se usan sólo en procesos internos de identidad y seguridad.
+          </p>
+        </header>
 
-        <div className="mt-5">
+        <div className="mt-4">
           <PrivacyNotice>
-            Tu nombre legal, teléfono, fecha de nacimiento, DNI y domicilio
-            exacto se guardan separados de la información pública del perfil.
+            Tu nombre legal, teléfono, fecha de nacimiento, DNI y domicilio exacto se guardan separados del perfil público.
           </PrivacyNotice>
         </div>
 
-        <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:p-6">
+        <div className="mt-6">
           <PrivateIdentityForm
             action={updatePrivateIdentity}
             initialValues={{
