@@ -2,6 +2,12 @@
 
 import { useActionState, useState } from "react";
 
+import { ActionButton } from "@/components/ui/marketplace/action-button";
+import {
+  FormField,
+  marketplaceInputClass,
+  marketplaceTextareaClass,
+} from "@/components/ui/marketplace/form-field";
 import { StickyActionBar } from "@/components/ui/sticky-action-bar";
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
@@ -13,36 +19,30 @@ type AccountAction = (
 
 type HiddenFields = Record<string, string>;
 
-const inputClass =
-  "border-ink/15 bg-surface focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-2xl border px-4 py-3.5 text-sm font-normal outline-none focus:ring-2";
-
 function FormStatus({ state }: { state: ActionState }) {
-  return (
-    <>
-      {state.error ? (
-        <p
-          className="bg-danger/10 text-danger rounded-2xl px-4 py-3 text-sm"
-          role="alert"
-        >
-          {state.error}
-        </p>
-      ) : null}
-      {state.success ? (
-        <p
-          className="bg-success/10 text-success rounded-2xl px-4 py-3 text-sm"
-          role="status"
-          aria-live="polite"
-        >
-          {state.success}
-        </p>
-      ) : null}
-    </>
-  );
+  if (state.error) {
+    return (
+      <p className="bg-danger/8 text-danger rounded-xl px-3 py-2.5 text-sm" role="alert">
+        {state.error}
+      </p>
+    );
+  }
+  if (state.success) {
+    return (
+      <p
+        className="bg-success/8 text-success rounded-xl px-3 py-2.5 text-sm"
+        role="status"
+        aria-live="polite"
+      >
+        {state.success}
+      </p>
+    );
+  }
+  return null;
 }
 
 function HiddenFormFields({ fields }: { fields: HiddenFields | undefined }) {
   if (!fields) return null;
-
   return Object.entries(fields).map(([name, value]) => (
     <input key={name} type="hidden" name={name} value={value} />
   ));
@@ -52,7 +52,6 @@ export type PublicProfileInitialValues = {
   displayName: string;
   publicZone: string;
   bio: string;
-  avatarUrl: string;
 };
 
 export function PublicProfileForm({
@@ -66,20 +65,19 @@ export function PublicProfileForm({
   submitLabel?: string;
   hiddenFields?: HiddenFields;
 }) {
-  const [state, formAction, pending] = useActionState(
-    action,
-    initialActionState,
-  );
+  const [state, formAction, pending] = useActionState(action, initialActionState);
   const [bioLength, setBioLength] = useState(initialValues.bio.length);
 
   return (
     <form action={formAction} className="space-y-5">
       <HiddenFormFields fields={hiddenFields} />
 
-      <label className="block text-sm font-semibold">
-        Nombre visible
+      <FormField
+        label="Nombre visible"
+        helper="Es el nombre que van a ver otras personas."
+      >
         <input
-          className={inputClass}
+          className={marketplaceInputClass}
           name="displayName"
           defaultValue={initialValues.displayName}
           minLength={2}
@@ -87,80 +85,49 @@ export function PublicProfileForm({
           autoComplete="name"
           required
         />
-        <span className="text-ink/50 mt-1.5 block text-xs leading-5 font-normal">
-          Es el nombre que verán otras personas en tu perfil.
-        </span>
-      </label>
+      </FormField>
 
-      <label className="block text-sm font-semibold">
-        Zona aproximada
+      <FormField
+        label="Zona aproximada"
+        helper="Tu domicilio exacto nunca se publica."
+      >
         <input
-          className={inputClass}
+          className={marketplaceInputClass}
           name="publicZone"
           defaultValue={initialValues.publicZone}
           maxLength={120}
           placeholder="Ej. Palermo, CABA"
+          autoComplete="address-level2"
         />
-        <span className="text-ink/50 mt-1.5 block text-xs leading-5 font-normal">
-          No mostramos tu domicilio exacto.
-        </span>
-      </label>
+      </FormField>
 
-      <label className="block text-sm font-semibold">
-        Bio
+      <FormField
+        label="Presentación"
+        helper={
+          <span className="flex items-start justify-between gap-4">
+            <span>Contá en pocas líneas qué hacés y cómo trabajás.</span>
+            <span className="shrink-0" aria-live="polite">
+              {bioLength}/1000
+            </span>
+          </span>
+        }
+      >
         <textarea
-          className={`${inputClass} min-h-32 resize-y`}
+          className={marketplaceTextareaClass}
           name="bio"
           defaultValue={initialValues.bio}
           maxLength={1000}
-          placeholder="Contá brevemente qué hacés, tu experiencia y cómo trabajás."
+          placeholder="Ej. Trabajo con instalaciones eléctricas domiciliarias…"
           onChange={(event) => setBioLength(event.currentTarget.value.length)}
         />
-        <span className="mt-1.5 flex items-start justify-between gap-4 text-xs leading-5 font-normal">
-          <span className="text-ink/50">
-            Una presentación breve ayuda a generar confianza.
-          </span>
-          <span className="text-ink/45 shrink-0" aria-live="polite">
-            {bioLength}/1000
-          </span>
-        </span>
-      </label>
-
-      <details className="border-ink/10 bg-canvas/45 rounded-2xl border">
-        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold marker:content-none">
-          Foto de perfil por URL
-          <span className="text-ink/45 text-xs font-normal">Opcional</span>
-        </summary>
-        <div className="border-ink/10 border-t px-4 pb-4">
-          <label className="mt-4 block text-sm font-semibold">
-            URL de foto
-            <input
-              className={inputClass}
-              name="avatarUrl"
-              type="url"
-              defaultValue={initialValues.avatarUrl}
-              maxLength={2048}
-              inputMode="url"
-              placeholder="https://…"
-            />
-            <span className="text-ink/50 mt-1.5 block text-xs leading-5 font-normal">
-              La carga directa de avatar queda fuera de este rediseño. Si ya
-              usás una imagen alojada, podés mantener su URL acá.
-            </span>
-          </label>
-        </div>
-      </details>
+      </FormField>
 
       <FormStatus state={state} />
 
       <StickyActionBar>
-        <button
-          className="button-primary w-full sm:w-auto"
-          type="submit"
-          disabled={pending}
-        >
+        <ActionButton className="w-full sm:w-auto" type="submit" disabled={pending}>
           {pending ? "Guardando…" : submitLabel}
-        </button>
+        </ActionButton>
       </StickyActionBar>
     </form>
   );
@@ -185,111 +152,92 @@ export function PrivateIdentityForm({
   submitLabel?: string;
   hiddenFields?: HiddenFields;
 }) {
-  const [state, formAction, pending] = useActionState(
-    action,
-    initialActionState,
-  );
+  const [state, formAction, pending] = useActionState(action, initialActionState);
 
   return (
     <form action={formAction} className="space-y-5">
       <HiddenFormFields fields={hiddenFields} />
 
-      <label className="block text-sm font-semibold">
-        Nombre legal
+      <FormField label="Nombre legal">
         <input
-          className={inputClass}
+          className={marketplaceInputClass}
           name="legalName"
           defaultValue={initialValues.legalName}
           maxLength={160}
           autoComplete="name"
         />
-      </label>
+      </FormField>
 
-      <label className="block text-sm font-semibold">
-        Teléfono privado
+      <FormField label="Teléfono privado">
         <input
-          className={inputClass}
+          className={marketplaceInputClass}
           name="privatePhone"
           defaultValue={initialValues.privatePhone}
           maxLength={40}
           autoComplete="tel"
           inputMode="tel"
         />
-      </label>
+      </FormField>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <label className="block text-sm font-semibold">
-          Fecha de nacimiento
+        <FormField label="Fecha de nacimiento">
           <input
-            className={inputClass}
+            className={marketplaceInputClass}
             name="dateOfBirth"
             type="date"
             defaultValue={initialValues.dateOfBirth}
             autoComplete="bday"
           />
-        </label>
-        <label className="block text-sm font-semibold">
-          DNI
+        </FormField>
+        <FormField label="DNI">
           <input
-            className={inputClass}
+            className={marketplaceInputClass}
             name="dniNumber"
             defaultValue={initialValues.dniNumber}
             maxLength={40}
             inputMode="numeric"
             autoComplete="off"
           />
-        </label>
+        </FormField>
       </div>
 
-      <label className="block text-sm font-semibold">
-        Domicilio exacto
+      <FormField
+        label="Domicilio exacto"
+        helper="Sólo se usa para procesos internos que realmente lo requieren."
+      >
         <textarea
-          className={`${inputClass} min-h-28 resize-y`}
+          className={marketplaceTextareaClass}
           name="exactAddress"
           defaultValue={initialValues.exactAddress}
           maxLength={240}
           autoComplete="street-address"
         />
-      </label>
+      </FormField>
 
       <FormStatus state={state} />
 
       <StickyActionBar>
-        <button
-          className="button-primary w-full sm:w-auto"
-          type="submit"
-          disabled={pending}
-        >
+        <ActionButton className="w-full sm:w-auto" type="submit" disabled={pending}>
           {pending ? "Guardando…" : submitLabel}
-        </button>
+        </ActionButton>
       </StickyActionBar>
     </form>
   );
 }
 
 export function StartProviderForm({ action }: { action: AccountAction }) {
-  const [state, formAction, pending] = useActionState(
-    action,
-    initialActionState,
-  );
+  const [state, formAction, pending] = useActionState(action, initialActionState);
 
   return (
-    <form action={formAction} className="mt-5">
+    <form action={formAction} className="mt-3">
       {state.error ? (
-        <p
-          className="bg-danger/10 text-danger mb-4 rounded-2xl px-4 py-3 text-sm"
-          role="alert"
-        >
+        <p className="text-danger mb-2 text-sm" role="alert">
           {state.error}
         </p>
       ) : null}
-      <button
-        className="button-primary w-full sm:w-auto"
-        type="submit"
-        disabled={pending}
-      >
+      <ActionButton className="w-full sm:w-auto" type="submit" disabled={pending}>
         {pending ? "Preparando…" : "Empezar como proveedor"}
-      </button>
+      </ActionButton>
     </form>
   );
 }
