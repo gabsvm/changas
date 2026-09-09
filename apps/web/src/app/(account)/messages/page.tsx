@@ -6,6 +6,9 @@ import {
   type ConversationSummary,
 } from "@/lib/conversations/server";
 import { createClient } from "@/lib/supabase/server";
+import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { Avatar } from "@/components/ui/marketplace/avatar";
+import { EmptyState } from "@/components/ui/marketplace/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -20,98 +23,81 @@ export default async function MessagesPage() {
   const conversations = await listMyConversations();
 
   return (
-    <section className="py-7 sm:py-10">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-terracotta text-xs font-extrabold tracking-[0.18em] uppercase">
-            Conversaciones
-          </p>
-          <h1 className="font-display mt-2 text-4xl font-extrabold tracking-[-0.045em] sm:text-5xl">
-            Mensajes
-          </h1>
-          <p className="text-ink/60 mt-3 max-w-xl text-sm leading-6">
-            Cada conversación conserva el contexto del servicio que estás
-            coordinando.
-          </p>
-        </div>
-        <Link href="/buscar" className="button-secondary hidden sm:inline-flex">
-          Buscar servicios
-        </Link>
-      </div>
-
-      {conversations.length === 0 ? (
-        <div className="border-ink/10 bg-surface mt-10 rounded-[1.75rem] border p-7 text-center shadow-[0_12px_32px_rgba(32,33,36,0.04)] sm:p-10">
-          <div className="bg-brand-yellow/20 text-terracotta mx-auto grid h-12 w-12 place-items-center rounded-2xl text-lg font-extrabold">
-            C
+    <section className="pb-6 sm:py-10">
+      <MobileAppBar title="Mensajes" />
+      <div className="pt-4 sm:pt-0">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
+              Mensajes
+            </h1>
+            <p className="text-ink/52 text-sm sm:mt-1">
+              Tus conversaciones sobre servicios y trabajos.
+            </p>
           </div>
-          <p className="font-display mt-4 text-2xl font-extrabold tracking-[-0.03em]">
-            Todavía no tenés conversaciones
-          </p>
-          <p className="text-ink/60 mx-auto mt-2 max-w-md text-sm leading-6">
-            Abrí un servicio y usá “Consultar por este servicio” para iniciar un
-            chat contextual.
-          </p>
-          <Link href="/buscar" className="button-primary mt-5">
-            Explorar servicios
+          <Link
+            href="/buscar"
+            className="consumer-pressable inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold text-terracotta hover:bg-brand-orange/[0.07]"
+          >
+            Buscar servicios
           </Link>
         </div>
-      ) : (
-        <div className="border-ink/10 bg-surface mt-8 overflow-hidden rounded-[1.75rem] border shadow-[0_12px_32px_rgba(32,33,36,0.04)]">
-          {conversations.map((conversation) => (
-            <ConversationRow
-              key={conversation.conversation_id}
-              conversation={conversation}
-            />
-          ))}
-        </div>
-      )}
+
+        {conversations.length === 0 ? (
+          <EmptyState
+            className="py-16 sm:py-20"
+            title="Todavía no tenés conversaciones"
+            description="Cuando consultes por un servicio, el chat va a aparecer acá."
+            actionHref="/buscar"
+            actionLabel="Explorar servicios"
+          />
+        ) : (
+          <div className="mt-4 divide-y divide-ink/[0.07] border-y border-ink/[0.07] sm:mt-6 sm:rounded-xl sm:border sm:bg-surface sm:px-3">
+            {conversations.map((conversation) => (
+              <ConversationRow
+                key={conversation.conversation_id}
+                conversation={conversation}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
 
-function ConversationRow({
-  conversation,
-}: {
-  conversation: ConversationSummary;
-}) {
+function ConversationRow({ conversation }: { conversation: ConversationSummary }) {
   return (
     <Link
       href={`/messages/${conversation.conversation_id}`}
-      className="border-ink/10 hover:bg-brand-yellow/8 flex min-h-24 items-center gap-3 border-b px-4 py-4 transition-colors last:border-b-0 sm:px-5"
+      className="consumer-pressable flex min-h-[4.75rem] items-center gap-3 py-3 hover:bg-ink/[0.025] sm:px-2"
     >
-      <div className="bg-moss/8 text-moss grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full text-sm font-extrabold">
-        {conversation.peer_avatar_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={conversation.peer_avatar_url}
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          conversation.peer_display_name.slice(0, 1).toUpperCase()
-        )}
-      </div>
+      <Avatar
+        name={conversation.peer_display_name}
+        src={conversation.peer_avatar_url}
+        size="md"
+      />
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-3">
-          <p className="truncate font-bold">{conversation.peer_display_name}</p>
-          <time className="text-ink/45 shrink-0 text-[11px]">
+          <p className="truncate text-[0.95rem] font-semibold text-ink">
+            {conversation.peer_display_name}
+          </p>
+          <time className="text-ink/40 shrink-0 text-[0.7rem]">
             {formatConversationTime(
               conversation.last_message_at ?? conversation.updated_at,
             )}
           </time>
         </div>
-        <p className="text-moss mt-0.5 truncate text-xs font-semibold">
+        <p className="text-ink/48 mt-0.5 truncate text-xs font-medium">
           {conversation.service_title}
         </p>
-        <div className="mt-1 flex items-center gap-2">
-          <p className="text-ink/55 min-w-0 flex-1 truncate text-sm">
+        <div className="mt-0.5 flex items-center gap-2">
+          <p className="text-ink/58 min-w-0 flex-1 truncate text-sm">
             {conversationPreview(conversation)}
           </p>
           {conversation.unread_count > 0 ? (
-            <span className="bg-brand-pink-strong grid min-h-5 min-w-5 shrink-0 place-items-center rounded-full px-1.5 text-[10px] font-bold text-white shadow-[0_3px_10px_rgba(214,0,96,0.22)]">
-              {conversation.unread_count > 99
-                ? "99+"
-                : conversation.unread_count}
+            <span className="bg-brand-pink-strong grid min-h-5 min-w-5 shrink-0 place-items-center rounded-full px-1.5 text-[0.62rem] font-bold text-white">
+              {conversation.unread_count > 99 ? "99+" : conversation.unread_count}
             </span>
           ) : null}
         </div>
@@ -121,8 +107,7 @@ function ConversationRow({
 }
 
 function conversationPreview(conversation: ConversationSummary): string {
-  if (conversation.last_message_preview)
-    return conversation.last_message_preview;
+  if (conversation.last_message_preview) return conversation.last_message_preview;
   switch (conversation.last_message_kind) {
     case "IMAGE":
       return "Imagen";
