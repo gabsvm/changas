@@ -1,3 +1,4 @@
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import type { ProviderPaymentAccountState } from "@/lib/payments/server";
 
 type ProviderPaymentAccountProps = {
@@ -5,11 +6,17 @@ type ProviderPaymentAccountProps = {
   feedback?: "connected" | "oauth_error" | null;
 };
 
-const statusLabel: Record<ProviderPaymentAccountState["status"], string> = {
-  CONNECTED: "Conectada",
-  REAUTH_REQUIRED: "Requiere reconexión",
-  DISCONNECTED: "Sin conectar",
-  SUSPENDED: "Suspendida",
+const statusPresentation: Record<
+  ProviderPaymentAccountState["status"],
+  {
+    label: string;
+    tone: "neutral" | "success" | "warning" | "danger";
+  }
+> = {
+  CONNECTED: { label: "Conectada", tone: "success" },
+  REAUTH_REQUIRED: { label: "Requiere reconexión", tone: "warning" },
+  DISCONNECTED: { label: "Sin conectar", tone: "neutral" },
+  SUSPENDED: { label: "Suspendida", tone: "danger" },
 };
 
 export function ProviderPaymentAccount({
@@ -20,36 +27,32 @@ export function ProviderPaymentAccount({
   const actionLabel = connected
     ? "Reconectar Mercado Pago"
     : "Conectar Mercado Pago";
+  const status = statusPresentation[account.status];
 
   return (
-    <section
-      aria-labelledby="provider-payment-account-title"
-      className="border-ink/10 rounded-2xl border bg-white/70 p-6 sm:p-7"
-    >
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-        <div className="max-w-2xl">
-          <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
+    <section aria-labelledby="provider-payment-account-title">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
             Cobros
           </p>
           <h2
             id="provider-payment-account-title"
-            className="font-display mt-2 text-3xl font-semibold tracking-[-0.03em]"
+            className="mt-1 text-xl font-bold tracking-[-0.02em]"
           >
             Mercado Pago
           </h2>
-          <p className="text-ink/65 mt-3 text-sm leading-6">
-            Vinculá tu cuenta para recibir pagos del marketplace. Changas nunca
-            muestra ni entrega tus credenciales de Mercado Pago al navegador.
+          <p className="text-ink/55 mt-1 max-w-2xl text-sm leading-6">
+            Vinculá tu cuenta para recibir pagos del marketplace. Tus
+            credenciales nunca se exponen al navegador.
           </p>
         </div>
-        <span className="bg-ink/5 text-ink/70 rounded-full px-3 py-2 text-xs font-semibold tracking-[0.1em] uppercase">
-          {statusLabel[account.status]}
-        </span>
+        <StatusChip tone={status.tone}>{status.label}</StatusChip>
       </div>
 
       {feedback === "connected" ? (
         <p
-          className="bg-moss/10 text-moss mt-5 rounded-xl px-4 py-3 text-sm"
+          className="bg-success/[0.07] text-success mt-3 rounded-xl px-3 py-2.5 text-sm"
           role="status"
         >
           Cuenta de Mercado Pago vinculada correctamente.
@@ -57,7 +60,7 @@ export function ProviderPaymentAccount({
       ) : null}
       {feedback === "oauth_error" ? (
         <p
-          className="bg-terracotta/10 text-terracotta mt-5 rounded-xl px-4 py-3 text-sm"
+          className="bg-danger/[0.07] text-danger mt-3 rounded-xl px-3 py-2.5 text-sm"
           role="alert"
         >
           No pudimos completar la vinculación. Podés volver a intentarlo sin
@@ -65,16 +68,16 @@ export function ProviderPaymentAccount({
         </p>
       ) : null}
 
-      <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
-        <div>
+      <dl className="border-ink/10 mt-4 divide-y divide-ink/10 border-y text-sm">
+        <div className="flex min-h-12 items-center justify-between gap-4 py-2.5">
           <dt className="text-ink/50">Cuenta</dt>
-          <dd className="text-ink mt-1 font-medium">
+          <dd className="min-w-0 truncate text-right font-semibold">
             {account.providerAccountReference ?? "Todavía no vinculada"}
           </dd>
         </div>
-        <div>
+        <div className="flex min-h-12 items-center justify-between gap-4 py-2.5">
           <dt className="text-ink/50">Autorización</dt>
-          <dd className="text-ink mt-1 font-medium">
+          <dd className="text-right font-semibold">
             {account.tokenExpiresAt
               ? new Intl.DateTimeFormat("es-AR", {
                   dateStyle: "medium",
@@ -87,7 +90,7 @@ export function ProviderPaymentAccount({
       </dl>
 
       <a
-        className="button-primary mt-6 inline-flex"
+        className="button-primary mt-4 inline-flex w-full sm:w-auto"
         href="/api/payments/mercado-pago/oauth/start"
       >
         {actionLabel}
