@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { NotificationPreferencesForm } from "@/components/notifications/notification-preferences-form";
 import { PushOptIn } from "@/components/pwa/push-opt-in";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import {
   getNotificationPreferences,
   listNotifications,
@@ -20,10 +22,34 @@ import {
 export const dynamic = "force-dynamic";
 
 const dateFormatter = new Intl.DateTimeFormat("es-AR", {
-  dateStyle: "medium",
-  timeStyle: "short",
+  day: "numeric",
+  month: "short",
   timeZone: "America/Argentina/Buenos_Aires",
 });
+
+const timeFormatter = new Intl.DateTimeFormat("es-AR", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "America/Argentina/Buenos_Aires",
+});
+
+const dayKeyFormatter = new Intl.DateTimeFormat("en-CA", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  timeZone: "America/Argentina/Buenos_Aires",
+});
+
+function dayKey(value: Date): string {
+  return dayKeyFormatter.format(value);
+}
+
+function activityGroupLabel(value: Date, now = new Date()): string {
+  const key = dayKey(value);
+  if (key === dayKey(now)) return "Hoy";
+  if (key === dayKey(new Date(now.getTime() - 86_400_000))) return "Ayer";
+  return dateFormatter.format(value);
+}
 
 export default async function NotificationCenterPage() {
   const supabase = await createClient();
@@ -31,162 +57,133 @@ export default async function NotificationCenterPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login?next=/account/notifications");
-  }
+  if (!user) redirect("/login?next=/account/notifications");
 
   const [notifications, preferences] = await Promise.all([
     listNotifications(supabase),
     getNotificationPreferences(supabase),
   ]);
   const unreadCount = notifications.filter((item) => item.unread).length;
+  const groups = new Map<string, typeof notifications>();
+
+  for (const notification of notifications) {
+    const label = activityGroupLabel(new Date(notification.createdAt));
+    groups.set(label, [...(groups.get(label) ?? []), notification]);
+  }
 
   return (
-    <section className="pb-6 sm:py-14">
+    <section className="pb-6 sm:py-10">
       <MobileAppBar title="Actividad" />
-      <div className="pt-6 sm:pt-0">
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-          <div className="max-w-2xl">
-            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+      <div className="pt-4 sm:pt-0">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
               Actividad
-            </p>
-            <div className="mt-2 flex flex-wrap items-center gap-3">
-              <h1 className="font-display text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
-                Notificaciones
-              </h1>
-              {unreadCount > 0 ? (
-                <span className="bg-brand-orange/12 text-terracotta rounded-full px-3 py-1 text-xs font-extrabold">
-                  {unreadCount} sin leer
-                </span>
-              ) : null}
-            </div>
-            <p className="text-ink/60 mt-3 max-w-xl text-sm leading-6">
-              Acá concentramos cambios importantes de trabajos, propuestas,
-              pagos y cuenta para que puedas detectar rápido qué requiere tu
-              atención.
+            </h1>
+            <p className="text-ink/52 text-sm sm:mt-1">
+              Novedades de trabajos, propuestas, pagos y cuenta.
             </p>
           </div>
-
           {unreadCount > 0 ? (
             <form action={markAllNotificationsReadAction}>
               <button
-                className="button-secondary w-full sm:w-auto"
+                className="consumer-pressable inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold text-terracotta hover:bg-brand-orange/[0.07]"
                 type="submit"
               >
-                Marcar todas como leídas
+                Marcar todo leído
               </button>
             </form>
           ) : null}
         </div>
 
-        <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(20rem,0.7fr)] lg:gap-10">
-          <div>
+        <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(19rem,0.7fr)] lg:gap-10">
+          <section aria-label="Actividad reciente">
             {notifications.length === 0 ? (
-              <div className="border-ink/10 bg-surface rounded-3xl border p-6 shadow-[0_12px_32px_rgba(32,33,36,0.04)] sm:p-8">
-                <span
-                  className="bg-brand-yellow/24 text-ink grid h-12 w-12 place-items-center rounded-2xl font-extrabold"
-                  aria-hidden="true"
-                >
-                  ✓
-                </span>
-                <h2 className="font-display mt-4 text-2xl font-extrabold tracking-[-0.025em]">
-                  Estás al día
-                </h2>
-                <p className="text-ink/60 mt-2 text-sm leading-6">
-                  Cuando haya algo que requiera tu atención va a aparecer acá,
-                  aunque no actives las notificaciones push.
-                </p>
-              </div>
+              <EmptyState
+                className="py-12"
+                icon={<span aria-hidden="true">✓</span>}
+                title="Todo al día"
+                description="No tenés novedades pendientes. Cuando algo requiera tu atención va a aparecer acá."
+              />
             ) : (
-              <ol className="space-y-3">
-                {notifications.map((item) => (
-                  <li
-                    key={item.id}
-                    className={`rounded-3xl border p-5 shadow-[0_8px_24px_rgba(32,33,36,0.035)] sm:p-6 ${
-                      item.unread
-                        ? "border-moss/20 bg-moss/[0.045]"
-                        : "border-ink/10 bg-surface"
-                    }`}
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.12em] uppercase">
-                            {getNotificationKindLabel(item.kind)}
-                          </p>
-                          {item.unread ? (
-                            <span className="bg-moss/10 text-moss rounded-full px-2.5 py-1 text-[0.68rem] font-bold">
-                              Nueva
-                            </span>
-                          ) : null}
-                        </div>
-                        <h2 className="font-display mt-2 text-xl font-extrabold tracking-[-0.02em] sm:text-2xl">
-                          {item.title}
-                        </h2>
-                      </div>
-                      <time
-                        className="text-ink/45 shrink-0 text-xs"
-                        dateTime={item.createdAt}
-                      >
-                        {dateFormatter.format(new Date(item.createdAt))}
-                      </time>
-                    </div>
-
-                    <p className="text-ink/65 mt-3 text-sm leading-6">
-                      {item.body}
-                    </p>
-
-                    <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      <Link
-                        className="button-secondary min-h-12 w-full sm:w-auto"
-                        href={item.actionUrl}
-                      >
-                        Abrir detalle
-                      </Link>
-                      {item.unread ? (
-                        <form action={markNotificationReadAction}>
-                          <input
-                            type="hidden"
-                            name="notificationId"
-                            value={item.id}
-                          />
-                          <button
-                            className="hover:bg-moss/5 hover:text-moss text-ink/65 min-h-12 w-full rounded-2xl px-4 text-sm font-bold sm:w-auto"
-                            type="submit"
-                          >
-                            Marcar como leída
-                          </button>
-                        </form>
-                      ) : null}
-                    </div>
-                  </li>
+              <div className="space-y-6">
+                {Array.from(groups.entries()).map(([label, items]) => (
+                  <section key={label} aria-labelledby={`activity-${label}`}>
+                    <h2
+                      id={`activity-${label}`}
+                      className="text-ink/48 mb-1 text-xs font-bold uppercase tracking-[0.1em]"
+                    >
+                      {label}
+                    </h2>
+                    <ol className="divide-y divide-ink/[0.07] border-y border-ink/[0.07] sm:rounded-xl sm:border sm:bg-surface sm:px-3">
+                      {items.map((item) => (
+                        <li key={item.id} className="py-3 sm:px-1">
+                          <div className="flex gap-3">
+                            <span
+                              className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.unread ? "bg-brand-orange" : "bg-ink/18"}`}
+                              aria-hidden="true"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    <span className="text-ink/45 text-[0.68rem] font-semibold">
+                                      {getNotificationKindLabel(item.kind)}
+                                    </span>
+                                    {item.unread ? <StatusChip tone="brand">Nueva</StatusChip> : null}
+                                  </div>
+                                  <Link
+                                    href={item.actionUrl}
+                                    className="mt-0.5 block text-[0.98rem] font-semibold leading-6 text-ink hover:text-terracotta"
+                                  >
+                                    {item.title}
+                                  </Link>
+                                </div>
+                                <time
+                                  className="text-ink/38 shrink-0 text-[0.68rem]"
+                                  dateTime={item.createdAt}
+                                >
+                                  {timeFormatter.format(new Date(item.createdAt))}
+                                </time>
+                              </div>
+                              <p className="text-ink/55 mt-0.5 text-sm leading-5">{item.body}</p>
+                              {item.unread ? (
+                                <form action={markNotificationReadAction} className="mt-1.5">
+                                  <input type="hidden" name="notificationId" value={item.id} />
+                                  <button
+                                    className="consumer-pressable -ml-2 inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-ink/48 hover:bg-ink/[0.035] hover:text-ink"
+                                    type="submit"
+                                  >
+                                    Marcar como leída
+                                  </button>
+                                </form>
+                              ) : null}
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
                 ))}
-              </ol>
+              </div>
             )}
-          </div>
+          </section>
 
-          <aside className="space-y-5">
-            <PushOptIn
-              publicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""}
-              initialEnabled={preferences.pushActionableEnabled}
-            />
-
-            <section className="border-ink/10 bg-surface rounded-3xl border p-5 shadow-[0_10px_28px_rgba(32,33,36,0.04)] sm:p-6">
-              <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
-                Preferencias
-              </p>
-              <h2 className="font-display mt-2 text-2xl font-extrabold tracking-[-0.025em]">
-                Qué querés recibir
-              </h2>
-              <p className="text-ink/60 mt-2 mb-5 text-sm leading-6">
-                Las alertas críticas dentro de Changas siguen activas aunque
-                desactives promociones o canales externos.
-              </p>
+          <aside>
+            <h2 className="text-lg font-bold tracking-[-0.02em]">Notificaciones</h2>
+            <p className="text-ink/48 mt-1 text-xs leading-5">
+              Las alertas críticas dentro de Changas siguen disponibles aunque desactives canales externos.
+            </p>
+            <div className="mt-3 divide-y divide-ink/[0.07] border-y border-ink/[0.07] sm:rounded-xl sm:border sm:bg-surface sm:px-4">
+              <PushOptIn
+                publicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""}
+                initialEnabled={preferences.pushActionableEnabled}
+              />
               <NotificationPreferencesForm
                 action={updateNotificationPreferencesAction}
                 initialValues={preferences}
               />
-            </section>
+            </div>
           </aside>
         </div>
       </div>
