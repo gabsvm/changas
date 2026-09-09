@@ -81,7 +81,7 @@ export function NotificationPreferencesForm({
               defaultChecked={initialValues[toggle.name]}
               onChange={persistChange}
               disabled={pending}
-              ariaLabel={`${toggle.title}: ${initialValues[toggle.name] ? "activado" : "desactivado"}`}
+              ariaLabel={toggle.title}
             />
           }
         />
