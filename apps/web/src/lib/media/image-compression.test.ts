@@ -17,6 +17,9 @@ describe("image upload compression contract", () => {
     expect(isCompressibleImageType("image/jpeg")).toBe(true);
     expect(isCompressibleImageType("image/png")).toBe(true);
     expect(isCompressibleImageType("image/webp")).toBe(true);
+    expect(isCompressibleImageType("image/heic")).toBe(true);
+    expect(isCompressibleImageType("image/heif")).toBe(true);
+    expect(isCompressibleImageType("image/svg+xml")).toBe(false);
     expect(isCompressibleImageType("application/pdf")).toBe(false);
   });
 
