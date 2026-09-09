@@ -6,6 +6,7 @@ import { DocumentListItem } from "@/components/provider/document-list-item";
 import { DocumentUploader } from "@/components/provider/document-uploader";
 import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { PrivacyNotice } from "@/components/ui/privacy-notice";
 import { StickyActionBar } from "@/components/ui/sticky-action-bar";
 import { createClient } from "@/lib/supabase/server";
@@ -54,73 +55,65 @@ export default async function ProviderOnboardingDocumentsPage() {
   const receivedDocuments = documents ?? [];
   const documentsComplete = hasRequiredIdentityDocuments(receivedDocuments);
   const missingDocuments = missingRequiredIdentityDocuments(receivedDocuments);
+  const receivedTypes = new Set(
+    receivedDocuments.map((document) => document.document_type),
+  );
 
   return (
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Documentos" backHref="/provider/onboarding" />
-      <div className="mx-auto max-w-3xl pt-6 sm:pt-0">
+      <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
           Paso 3 de 4
         </p>
-        <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
+        <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
           Verificá tu identidad
         </h1>
-        <p className="text-ink/60 mt-3 max-w-2xl text-sm leading-6">
-          Para enviar tu perfil a revisión necesitamos tres evidencias: frente y
-          dorso del DNI, más una selfie de validación. Subir archivos no envía
-          el caso automáticamente: vos decidís cuándo está listo.
+        <p className="text-ink/58 mt-2 text-sm leading-6">
+          Necesitamos frente y dorso del DNI más una selfie. Subir archivos no
+          envía el caso: vos decidís cuándo mandarlo a revisión.
         </p>
 
-        <div className="mt-5">
-          <PrivacyNotice title="Carga privada y controlada">
-            Los archivos quedan en almacenamiento privado. El panel
-            administrativo sólo genera acceso temporal al documento exacto
-            durante la revisión.
+        <div className="mt-4">
+          <PrivacyNotice title="Carga privada">
+            Los archivos quedan en almacenamiento privado y sólo se habilita
+            acceso controlado durante la revisión.
           </PrivacyNotice>
         </div>
 
-        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border p-4 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:p-5">
+        <section className="border-ink/10 mt-5 border-y py-3">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
-                Requisitos
-              </p>
-              <h2 className="mt-1 text-lg font-extrabold">
+              <p className="text-sm font-bold">Requisitos</p>
+              <p className="text-ink/45 mt-0.5 text-xs">
                 {receivedDocuments.length}/3 recibidos
-              </h2>
+              </p>
             </div>
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-extrabold ${
-                submitted
-                  ? "bg-moss/10 text-moss"
-                  : documentsComplete
-                    ? "bg-success/10 text-success"
-                    : "bg-brand-yellow/20 text-warning"
-              }`}
+            <StatusChip
+              tone={submitted ? "info" : documentsComplete ? "success" : "warning"}
             >
               {submitted
                 ? "En revisión"
                 : documentsComplete
                   ? "Listo para enviar"
                   : "Faltan documentos"}
-            </span>
+            </StatusChip>
           </div>
-          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+
+          <div className="mt-3 divide-y divide-ink/10">
             {requiredIdentityDocumentTypes.map((type) => {
-              const present = receivedDocuments.some(
-                (document) => document.document_type === type,
-              );
+              const present = receivedTypes.has(type);
               return (
                 <div
-                  className={`rounded-2xl border px-3 py-3 text-sm font-bold ${
-                    present
-                      ? "border-success/20 bg-success/8 text-success"
-                      : "border-ink/10 bg-canvas text-ink/55"
-                  }`}
+                  className="flex min-h-11 items-center justify-between gap-3 py-2"
                   key={type}
                 >
-                  {present ? "✓ " : "○ "}
-                  {getDocumentTypeLabel(type)}
+                  <span className="text-sm font-semibold">
+                    {getDocumentTypeLabel(type)}
+                  </span>
+                  <StatusChip tone={present ? "success" : "neutral"}>
+                    {present ? "Recibido" : "Pendiente"}
+                  </StatusChip>
                 </div>
               );
             })}
@@ -128,16 +121,15 @@ export default async function ProviderOnboardingDocumentsPage() {
         </section>
 
         {submitted ? (
-          <div className="border-moss/25 bg-moss/8 mt-6 rounded-3xl border p-5">
-            <p className="text-moss font-extrabold">Identidad enviada</p>
-            <p className="text-ink/60 mt-2 text-sm leading-6">
-              El caso ya está en la cola administrativa. Para mantener estable
-              la evidencia que está siendo revisada, la carga queda bloqueada
-              hasta que exista una decisión.
+          <div className="border-moss/20 bg-moss/[0.06] mt-5 rounded-xl border px-4 py-3">
+            <p className="text-moss text-sm font-bold">Identidad enviada</p>
+            <p className="text-ink/58 mt-1 text-sm leading-6">
+              La evidencia queda bloqueada mientras un administrador revisa el
+              caso.
             </p>
           </div>
         ) : (
-          <div className="mt-6">
+          <div className="mt-5">
             <DocumentUploader
               key={`document-uploader-${receivedDocuments.length}`}
               action={uploadIdentityDocument}
@@ -147,23 +139,15 @@ export default async function ProviderOnboardingDocumentsPage() {
         )}
 
         <section className="mt-6">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
-                Recibidos
-              </p>
-              <h2 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.025em]">
-                Tus documentos
-              </h2>
-            </div>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-lg font-bold">Tus documentos</h2>
             <span className="text-ink/45 text-xs font-semibold">
-              {receivedDocuments.length} cargado
-              {receivedDocuments.length === 1 ? "" : "s"}
+              {receivedDocuments.length}
             </span>
           </div>
 
           {receivedDocuments.length > 0 ? (
-            <ul className="mt-4 space-y-3">
+            <ul className="border-ink/10 mt-2 divide-y divide-ink/10 border-y">
               {receivedDocuments.map((document) => (
                 <DocumentListItem
                   key={`${document.document_type}-${document.created_at}`}
@@ -173,7 +157,7 @@ export default async function ProviderOnboardingDocumentsPage() {
               ))}
             </ul>
           ) : (
-            <p className="border-ink/10 bg-surface text-ink/55 mt-4 rounded-2xl border px-4 py-4 text-sm shadow-[0_8px_24px_rgba(32,33,36,0.025)]">
+            <p className="text-ink/50 border-ink/10 mt-2 border-y py-4 text-sm">
               Todavía no hay documentos registrados.
             </p>
           )}
@@ -181,36 +165,33 @@ export default async function ProviderOnboardingDocumentsPage() {
 
         {editable ? (
           <StickyActionBar className="mt-6">
-            <div className="sm:border-ink/10 sm:border-t sm:pt-5">
-              {documentsComplete ? (
-                <>
-                  <p className="text-ink/55 mb-3 text-xs leading-5">
-                    Al enviar, tu caso aparecerá en la cola de revisión y un
-                    administrador podrá aprobarlo o rechazarlo.
-                  </p>
-                  <OnboardingAdvanceForm
-                    action={submitProviderIdentityReview}
-                    nextStep={4}
-                    nextHref="/provider/onboarding/review"
-                    label="Enviar a revisión"
-                  />
-                </>
-              ) : (
-                <>
-                  <p className="text-ink/55 mb-3 text-xs leading-5">
-                    Faltan:{" "}
-                    {missingDocuments.map(getDocumentTypeLabel).join(", ")}.
-                  </p>
-                  <button
-                    className="button-primary w-full opacity-50 sm:w-auto"
-                    type="button"
-                    disabled
-                  >
-                    Enviar a revisión
-                  </button>
-                </>
-              )}
-            </div>
+            {documentsComplete ? (
+              <div>
+                <p className="text-ink/50 mb-2 text-xs leading-5">
+                  Al enviar, la evidencia entra en la cola administrativa de
+                  revisión.
+                </p>
+                <OnboardingAdvanceForm
+                  action={submitProviderIdentityReview}
+                  nextStep={4}
+                  nextHref="/provider/onboarding/review"
+                  label="Enviar a revisión"
+                />
+              </div>
+            ) : (
+              <div>
+                <p className="text-ink/50 mb-2 text-xs leading-5">
+                  Faltan: {missingDocuments.map(getDocumentTypeLabel).join(", ")}.
+                </p>
+                <button
+                  className="button-primary w-full opacity-50 sm:w-auto"
+                  type="button"
+                  disabled
+                >
+                  Enviar a revisión
+                </button>
+              </div>
+            )}
           </StickyActionBar>
         ) : null}
       </div>
