@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { PublicProfileForm } from "@/components/account/account-form";
+import { ProfileAvatarUploader } from "@/components/account/profile-avatar-uploader";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,39 +15,42 @@ export default async function AccountProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login?next=/account/profile");
-  }
+  if (!user) redirect("/login?next=/account/profile");
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("display_name, public_zone, bio, avatar_url")
     .eq("id", user.id)
     .maybeSingle();
+  const displayName = profile?.display_name || user.email?.split("@")[0] || "Tu perfil";
 
   return (
-    <section className="pb-4 sm:py-14">
+    <section className="pb-4 sm:py-10">
       <MobileAppBar title="Perfil público" backHref="/account" />
-      <div className="mx-auto max-w-2xl pt-6 sm:pt-0">
-        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
-          Visible
-        </p>
-        <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
-          Así te van a ver
-        </h1>
-        <p className="text-ink/60 mt-3 text-sm leading-6 sm:max-w-xl">
-          Cuidá que tu nombre, zona y presentación expliquen rápido quién sos y
-          cómo trabajás. Esta información puede aparecer en tu perfil público.
-        </p>
+      <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
+        <header className="mb-6">
+          <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
+            Perfil público
+          </h1>
+          <p className="text-ink/52 text-sm leading-6 sm:mt-1 sm:max-w-xl">
+            Esta información puede aparecer en tus servicios y conversaciones.
+          </p>
+        </header>
 
-        <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:p-6">
+        <section className="border-b border-ink/[0.07] pb-5">
+          <ProfileAvatarUploader
+            displayName={displayName}
+            initialAvatarUrl={profile?.avatar_url}
+          />
+        </section>
+
+        <div className="mt-5">
           <PublicProfileForm
             action={updatePublicProfile}
             initialValues={{
               displayName: profile?.display_name ?? "",
               publicZone: profile?.public_zone ?? "",
               bio: profile?.bio ?? "",
-              avatarUrl: profile?.avatar_url ?? "",
             }}
           />
         </div>
