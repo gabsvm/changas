@@ -16,69 +16,44 @@ export default async function AccountLayout({
   return (
     <main
       id="main-content"
-      className="bg-canvas text-ink mobile-content-with-nav min-h-screen px-5 sm:px-8 sm:py-5"
+      className="bg-canvas text-ink mobile-content-with-nav min-h-screen px-4 sm:px-8 sm:py-5"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <header className="border-ink/10 hidden items-center justify-between gap-4 border-b pb-5 sm:flex">
-          <Link
-            className="flex items-center gap-3"
-            href="/"
-            aria-label="Changas, inicio"
-          >
-            <span className="brand-mark" aria-hidden="true">
-              C
-            </span>
-            <span className="font-display text-xl font-extrabold tracking-[-0.035em]">
-              Changas
-            </span>
+        <header className="hidden min-h-14 items-center justify-between gap-5 border-b border-ink/[0.07] pb-4 sm:flex">
+          <Link className="flex items-center gap-2.5" href="/" aria-label="Changas, inicio">
+            <span className="brand-mark" aria-hidden="true">C</span>
+            <span className="text-lg font-bold tracking-[-0.025em]">Changas</span>
           </Link>
-          <nav
-            className="flex items-center justify-end gap-4 text-sm font-semibold"
-            aria-label="Cuenta"
-          >
-            <Link
-              className="hover:text-moss decoration-ink/20 underline underline-offset-4 transition-colors"
-              href="/messages"
-            >
-              Mensajes
-            </Link>
-            <Link
-              className="hover:text-moss decoration-ink/20 flex items-center gap-2 underline underline-offset-4 transition-colors"
-              href="/account/notifications"
-            >
-              Notificaciones
-              {unreadCount > 0 ? (
-                <span
-                  className="bg-brand-pink-strong min-w-5 rounded-full px-1.5 py-0.5 text-center text-[0.65rem] leading-4 font-bold text-white no-underline"
-                  aria-label={`${unreadCount} notificaciones sin leer`}
-                >
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              ) : null}
-            </Link>
-            <Link
-              className="hover:text-moss decoration-ink/20 underline underline-offset-4 transition-colors"
-              href="/account"
-            >
-              Cuenta
-            </Link>
-            <Link
-              className="hover:text-moss decoration-ink/20 underline underline-offset-4 transition-colors"
-              href="/account/settings"
-            >
-              Configuración
-            </Link>
-            <Link
-              className="hover:text-moss decoration-ink/20 underline underline-offset-4 transition-colors"
-              href="/account/favorites"
-            >
-              Guardados
-            </Link>
+          <nav className="flex items-center justify-end gap-1 text-sm font-semibold" aria-label="Cuenta">
+            <DesktopNavLink href="/messages">Mensajes</DesktopNavLink>
+            <DesktopNavLink href="/account/notifications">
+              <span className="flex items-center gap-2">
+                Actividad
+                {unreadCount > 0 ? (
+                  <span className="bg-brand-pink-strong min-w-5 rounded-full px-1.5 py-0.5 text-center text-[0.65rem] leading-4 font-bold text-white">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                ) : null}
+              </span>
+            </DesktopNavLink>
+            <DesktopNavLink href="/account">Cuenta</DesktopNavLink>
+            <DesktopNavLink href="/account/favorites">Guardados</DesktopNavLink>
           </nav>
         </header>
         {children}
       </div>
       {user ? <AuthenticatedBottomNav unreadCount={unreadCount} /> : null}
     </main>
+  );
+}
+
+function DesktopNavLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="consumer-pressable hover:bg-ink/[0.04] inline-flex min-h-11 items-center rounded-lg px-3 text-ink/65 hover:text-ink"
+    >
+      {children}
+    </Link>
   );
 }
