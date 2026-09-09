@@ -16,9 +16,13 @@ export type ImageCompressionResult = {
 };
 
 export function isCompressibleImageType(mimeType: string): boolean {
-  return ["image/jpeg", "image/png", "image/webp"].includes(
-    mimeType.toLowerCase(),
-  );
+  return [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/heic",
+    "image/heif",
+  ].includes(mimeType.toLowerCase());
 }
 
 export function buildCompressedImageName(name: string): string {
