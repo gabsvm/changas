@@ -7,7 +7,7 @@ const serviceRoleKey =
 type TestUser = { id: string; email: string; password: string };
 
 const tinyPng = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl7j9sAAAAASUVORK5CYII=",
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
   "base64",
 );
 
@@ -139,6 +139,7 @@ async function uploadIdentityDocument(
   page: Page,
   documentType: "DNI_FRONT" | "DNI_BACK" | "SELFIE",
   expectedLabel: string,
+  expectedCount: number,
 ) {
   await page.getByLabel("Tipo de documento").selectOption(documentType);
   await page.locator('input[name="document"]').setInputFiles({
@@ -149,6 +150,9 @@ async function uploadIdentityDocument(
   await page.getByRole("button", { name: "Subir documento privado" }).click();
   await expect(
     page.getByText(expectedLabel, { exact: true }).last(),
+  ).toBeVisible();
+  await expect(
+    page.getByText(`${expectedCount}/3 recibidos`, { exact: true }),
   ).toBeVisible();
 }
 
@@ -280,8 +284,8 @@ test.describe("admin mobile revamp and provider operations", () => {
     await prepareProviderFixture(provider);
     await login(page, provider, "/provider/onboarding/documents");
 
-    await uploadIdentityDocument(page, "DNI_FRONT", "DNI frente");
-    await uploadIdentityDocument(page, "DNI_BACK", "DNI dorso");
+    await uploadIdentityDocument(page, "DNI_FRONT", "DNI frente", 1);
+    await uploadIdentityDocument(page, "DNI_BACK", "DNI dorso", 2);
     await expect(
       page.getByRole("button", { name: "Enviar a revisión" }),
     ).toBeDisabled();
@@ -289,7 +293,7 @@ test.describe("admin mobile revamp and provider operations", () => {
       status: "PROFILE_INCOMPLETE",
     });
 
-    await uploadIdentityDocument(page, "SELFIE", "Selfie de validación");
+    await uploadIdentityDocument(page, "SELFIE", "Selfie de validación", 3);
     const submit = page.getByRole("button", { name: "Enviar a revisión" });
     await expect(submit).toBeEnabled();
     await submit.click();

@@ -148,10 +148,22 @@ export async function uploadIdentityDocument(
 ): Promise<ActionState> {
   const documentType = getFormString(formData, "documentType");
   const fileValue = formData.get("document");
+  const uploadedPath = getFormString(formData, "storagePath");
+  const uploadedMimeType = getFormString(formData, "storageMimeType");
+  const uploadedSize = Number(getFormString(formData, "storageFileSizeBytes"));
+  const sourceMimeType = uploadedPath
+    ? uploadedMimeType
+    : fileValue instanceof File
+      ? fileValue.type
+      : "";
+  const sourceSize = uploadedPath
+    ? uploadedSize
+    : fileValue instanceof File
+      ? fileValue.size
+      : 0;
 
   if (
-    !(fileValue instanceof File) ||
-    fileValue.size === 0 ||
+    ((!(fileValue instanceof File) || fileValue.size === 0) && !uploadedPath) ||
     !allowedDocumentTypes.has(documentType)
   ) {
     return { error: "Elegí un documento válido." };
@@ -159,8 +171,8 @@ export async function uploadIdentityDocument(
 
   const metadata = identityDocumentSchema.safeParse({
     documentType,
-    mimeType: fileValue.type,
-    fileSizeBytes: fileValue.size,
+    mimeType: sourceMimeType,
+    fileSizeBytes: sourceSize,
   });
 
   if (!metadata.success) {
@@ -173,6 +185,32 @@ export async function uploadIdentityDocument(
 
   if (!user) {
     return { error: "Tu sesión expiró. Volvé a iniciar sesión." };
+  }
+
+  if (uploadedPath) {
+    if (
+      !uploadedPath.startsWith(`${user.id}/`) ||
+      !Number.isSafeInteger(uploadedSize) ||
+      uploadedSize < 1
+    ) {
+      return { error: "El documento subido no es válido." };
+    }
+    const fileName = uploadedPath.slice(uploadedPath.lastIndexOf("/") + 1);
+    const { data: objects, error: listError } = await supabase.storage
+      .from(identityBucket)
+      .list(user.id, { search: fileName, limit: 100 });
+    const object = objects?.find((entry) => entry.name === fileName);
+    const objectMetadata = object?.metadata as
+      { mimetype?: string; size?: number | string } | undefined;
+    if (
+      listError ||
+      !object ||
+      (objectMetadata?.mimetype &&
+        objectMetadata.mimetype !== uploadedMimeType) ||
+      (objectMetadata?.size && Number(objectMetadata.size) !== uploadedSize)
+    ) {
+      return { error: "No pudimos verificar el documento subido." };
+    }
   }
 
   const { data: provider, error: providerReadError } = await supabase
@@ -201,19 +239,20 @@ export async function uploadIdentityDocument(
   }
 
   const safeName =
-    (fileValue.name || "document")
+    (fileValue instanceof File ? fileValue.name : "document")
       .replace(/[^a-zA-Z0-9._-]/g, "_")
       .slice(-80) || "document";
-  const storagePath = `${user.id}/${crypto.randomUUID()}-${safeName}`;
-  const { error: uploadError } = await supabase.storage
-    .from(identityBucket)
-    .upload(storagePath, fileValue, {
-      contentType: fileValue.type,
-      upsert: false,
-    });
+  let storagePath = uploadedPath;
+  if (!storagePath) {
+    storagePath = `${user.id}/${crypto.randomUUID()}-${safeName}`;
+    const { error: uploadError } = await supabase.storage
+      .from(identityBucket)
+      .upload(storagePath, fileValue as File, {
+        contentType: metadata.data.mimeType,
+        upsert: false,
+      });
 
-  if (uploadError) {
-    return { error: "No pudimos subir el documento." };
+    if (uploadError) return { error: "No pudimos subir el documento." };
   }
 
   const { data: previousDocument } = await supabase

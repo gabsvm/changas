@@ -15,6 +15,37 @@ export type ImageCompressionResult = {
   wasCompressed: boolean;
 };
 
+export async function compressInputFiles(
+  input: HTMLInputElement,
+): Promise<{ originalBytes: number; compressedBytes: number }> {
+  const files = Array.from(input.files ?? []);
+  if (files.length === 0) return { originalBytes: 0, compressedBytes: 0 };
+  if (typeof DataTransfer !== "function") {
+    throw new Error(
+      "Este navegador no permite optimizar la imagen antes de subirla.",
+    );
+  }
+
+  const processed: File[] = [];
+  let originalBytes = 0;
+  let compressedBytes = 0;
+  for (const file of files) {
+    if (!isCompressibleImageType(file.type)) {
+      processed.push(file);
+      continue;
+    }
+    originalBytes += file.size;
+    const result = await compressImageForUpload(file);
+    processed.push(result.file);
+    compressedBytes += result.compressedBytes;
+  }
+
+  const transfer = new DataTransfer();
+  for (const file of processed) transfer.items.add(file);
+  input.files = transfer.files;
+  return { originalBytes, compressedBytes };
+}
+
 export function isCompressibleImageType(mimeType: string): boolean {
   return [
     "image/jpeg",
@@ -34,7 +65,11 @@ export function buildCompressedImageName(name: string): string {
   return `${safe || "imagen"}.jpg`;
 }
 
-function fitWithinDimension(width: number, height: number, maxDimension: number) {
+function fitWithinDimension(
+  width: number,
+  height: number,
+  maxDimension: number,
+) {
   const largest = Math.max(width, height);
   if (largest <= maxDimension) return { width, height };
   const scale = maxDimension / largest;
@@ -67,7 +102,9 @@ async function loadImage(file: File): Promise<{
   close: () => void;
 }> {
   if (typeof createImageBitmap === "function") {
-    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const bitmap = await createImageBitmap(file, {
+      imageOrientation: "from-image",
+    });
     return {
       source: bitmap,
       width: bitmap.width,
@@ -172,12 +209,17 @@ export async function compressImageForUpload(
         loaded.height,
         maxDimension,
       );
-      const canvas = drawImage(loaded.source, dimensions.width, dimensions.height);
+      const canvas = drawImage(
+        loaded.source,
+        dimensions.width,
+        dimensions.height,
+      );
       candidate = await bestJpegUnderTarget(canvas, targetBytes);
       canvas.width = 1;
       canvas.height = 1;
 
-      if (candidate.size <= targetBytes || maxDimension === MIN_DIMENSION) break;
+      if (candidate.size <= targetBytes || maxDimension === MIN_DIMENSION)
+        break;
       maxDimension = Math.max(MIN_DIMENSION, Math.floor(maxDimension * 0.82));
     }
 

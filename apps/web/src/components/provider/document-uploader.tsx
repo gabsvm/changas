@@ -5,6 +5,8 @@ import { useActionState, useEffect, useRef, useState } from "react";
 
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
+import { compressInputFiles } from "@/lib/media/image-compression";
+import { createClient } from "@/lib/supabase/client";
 import {
   formatFileSize,
   getDocumentTypeLabel,
@@ -33,10 +35,20 @@ export function DocumentUploader({
   const [documentType, setDocumentType] = useState("DNI_FRONT");
   const [selected, setSelected] = useState<SelectedFile | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [compressing, setCompressing] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [compressionNotice, setCompressionNotice] = useState<string | null>(
+    null,
+  );
   const [state, formAction, pending] = useActionState(
     action,
     initialActionState,
   );
+  const [directMetadata, setDirectMetadata] = useState<{
+    path: string;
+    mimeType: string;
+    size: number;
+  } | null>(null);
 
   useEffect(() => {
     return () => {
@@ -66,11 +78,44 @@ export function DocumentUploader({
   function clearSelection() {
     if (inputRef.current) inputRef.current.value = "";
     setSelected(null);
+    setDirectMetadata(null);
     setLocalError(null);
   }
 
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.currentTarget.files?.[0];
+  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    if (!input.files?.[0]) {
+      setSelected(null);
+      setDirectMetadata(null);
+      return;
+    }
+
+    setCompressing(true);
+    setLocalError(null);
+    setCompressionNotice(null);
+    setDirectMetadata(null);
+    try {
+      const result = await compressInputFiles(input);
+      if (result.originalBytes > result.compressedBytes) {
+        setCompressionNotice(
+          `Imagen optimizada: ${Math.max(1, Math.round(result.compressedBytes / 1024))} KiB para subir.`,
+        );
+      }
+    } catch (error) {
+      input.value = "";
+      setSelected(null);
+      setDirectMetadata(null);
+      setLocalError(
+        error instanceof Error
+          ? error.message
+          : "No pudimos optimizar la imagen.",
+      );
+      return;
+    } finally {
+      setCompressing(false);
+    }
+
+    const file = input.files?.[0];
     if (!file) {
       setSelected(null);
       return;
@@ -88,13 +133,47 @@ export function DocumentUploader({
       return;
     }
 
-    setLocalError(null);
     setSelected({
       file,
       previewUrl: file.type.startsWith("image/")
         ? URL.createObjectURL(file)
         : null,
     });
+
+    if (file.type.startsWith("image/")) return;
+
+    setUploading(true);
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      input.value = "";
+      setSelected(null);
+      setLocalError("Tu sesión expiró. Volvé a iniciar sesión.");
+      setUploading(false);
+      return;
+    }
+    const safeName =
+      file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "document";
+    const storagePath = `${user.id}/${crypto.randomUUID()}-${safeName}`;
+    const upload = await supabase.storage
+      .from("identity-documents")
+      .upload(storagePath, file, { contentType: file.type, upsert: false });
+    if (upload.error) {
+      input.value = "";
+      setSelected(null);
+      setLocalError("No pudimos subir el documento.");
+      setUploading(false);
+      return;
+    }
+    input.value = "";
+    setDirectMetadata({
+      path: storagePath,
+      mimeType: file.type,
+      size: file.size,
+    });
+    setUploading(false);
   }
 
   if (!editable) {
@@ -139,6 +218,25 @@ export function DocumentUploader({
         encType="multipart/form-data"
         className="mt-6 space-y-5"
       >
+        {directMetadata ? (
+          <>
+            <input
+              type="hidden"
+              name="storagePath"
+              value={directMetadata.path}
+            />
+            <input
+              type="hidden"
+              name="storageMimeType"
+              value={directMetadata.mimeType}
+            />
+            <input
+              type="hidden"
+              name="storageFileSizeBytes"
+              value={directMetadata.size}
+            />
+          </>
+        ) : null}
         <label className="block text-sm font-bold">
           Tipo de documento
           <select
@@ -161,7 +259,7 @@ export function DocumentUploader({
           type="file"
           accept="image/jpeg,image/png,application/pdf"
           onChange={handleFileChange}
-          disabled={pending}
+          disabled={pending || compressing || uploading}
           tabIndex={-1}
         />
 
@@ -197,7 +295,7 @@ export function DocumentUploader({
                 type="button"
                 className="text-danger min-h-12 shrink-0 px-3 text-xs font-bold"
                 onClick={clearSelection}
-                disabled={pending}
+                disabled={pending || compressing}
               >
                 Quitar
               </button>
@@ -238,7 +336,7 @@ export function DocumentUploader({
             type="button"
             className="button-secondary w-full"
             onClick={() => openPicker("camera")}
-            disabled={pending}
+            disabled={pending || compressing || uploading}
           >
             Tomar foto
           </button>
@@ -246,7 +344,7 @@ export function DocumentUploader({
             type="button"
             className="button-secondary w-full"
             onClick={() => openPicker("file")}
-            disabled={pending}
+            disabled={pending || compressing || uploading}
           >
             Elegir archivo
           </button>
@@ -258,6 +356,14 @@ export function DocumentUploader({
             role="alert"
           >
             {localError}
+          </p>
+        ) : null}
+        {compressionNotice ? (
+          <p
+            className="bg-moss/10 text-moss rounded-2xl px-4 py-3 text-sm"
+            role="status"
+          >
+            {compressionNotice}
           </p>
         ) : null}
         {state.error ? (
@@ -281,9 +387,15 @@ export function DocumentUploader({
         <button
           className="button-primary w-full disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           type="submit"
-          disabled={pending || !selected || Boolean(state.success)}
+          disabled={pending || compressing || uploading || !selected}
         >
-          {pending ? "Subiendo…" : "Subir documento privado"}
+          {compressing
+            ? "Optimizando…"
+            : uploading
+              ? "Preparando…"
+              : pending
+                ? "Registrando…"
+                : "Subir documento privado"}
         </button>
       </form>
     </section>

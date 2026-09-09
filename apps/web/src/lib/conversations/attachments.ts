@@ -184,59 +184,38 @@ export async function createConversationAttachmentMessage(
   return data;
 }
 
-export async function uploadConversationAttachment(input: {
-  conversationId: string;
+export async function registerConversationAttachment(input: {
   messageId: string;
+  storagePath: string;
   kind: ConversationAttachmentKind;
-  file: File;
+  mimeType: string;
+  sizeBytes: number;
+  originalName: string;
 }): Promise<RegisteredConversationAttachment> {
-  ensureUuid(input.conversationId, "Conversación");
   ensureUuid(input.messageId, "Mensaje");
-
   const parsed = conversationAttachmentSchema.safeParse({
     kind: input.kind,
-    mimeType: input.file.type,
-    fileSizeBytes: input.file.size,
-    originalName: input.file.name,
+    mimeType: input.mimeType,
+    fileSizeBytes: input.sizeBytes,
+    originalName: input.originalName,
   });
-  if (!parsed.success) {
-    throw new ConversationServerError(
-      "CONFLICT",
-      "El archivo no es compatible o supera los límites permitidos.",
-    );
-  }
+  if (!parsed.success) throw mapAttachmentError({ code: "22023" });
 
   const supabase = await getAttachmentClient();
-  const storagePath = buildConversationAttachmentPath(
-    input.conversationId,
-    input.messageId,
-    parsed.data.originalName,
-  );
-  const storage = supabase.storage.from(conversationAttachmentBucket);
-  const upload = await storage.upload(storagePath, input.file, {
-    contentType: parsed.data.mimeType,
-    upsert: false,
-  });
-
-  if (upload.error) throw mapAttachmentError(upload.error);
-
   const registration = await supabase.rpc("register_conversation_attachment", {
     target_message_id: input.messageId,
-    object_path: storagePath,
+    object_path: input.storagePath,
     attachment_mime_type: parsed.data.mimeType,
     attachment_size_bytes: parsed.data.fileSizeBytes,
     attachment_original_name: parsed.data.originalName,
   });
-
   if (registration.error || !registration.data) {
-    await storage.remove([storagePath]);
     throw mapAttachmentError(registration.error);
   }
-
   return {
     id: registration.data,
     messageId: input.messageId,
-    storagePath,
+    storagePath: input.storagePath,
     originalName: parsed.data.originalName,
     mimeType: parsed.data.mimeType,
     sizeBytes: parsed.data.fileSizeBytes,

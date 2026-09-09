@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { formatServicePrice, minorUnitsToMajorInput } from "@changas/domain";
 
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
+import { compressInputFiles } from "@/lib/media/image-compression";
+import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/database.types";
 
 type ProviderAction = (
@@ -45,28 +47,111 @@ function ActionForm({
   children,
   submitLabel,
   encType,
+  directUpload,
   className = "space-y-4",
 }: {
   action: ProviderAction;
   children: React.ReactNode;
   submitLabel: string;
   encType?: "multipart/form-data";
+  directUpload?: { bucket: string; fieldName: string };
   className?: string;
 }) {
   const [state, formAction, pending] = useActionState(
     action,
     initialActionState,
   );
+  const [compressing, setCompressing] = useState(false);
+  const [compressionError, setCompressionError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [directMetadata, setDirectMetadata] = useState<{
+    path: string;
+    mimeType: string;
+    size: number;
+  } | null>(null);
+
+  async function handleFileChange(event: React.ChangeEvent<HTMLFormElement>) {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || input.type !== "file") return;
+    setCompressing(true);
+    setCompressionError(null);
+    setDirectMetadata(null);
+    try {
+      await compressInputFiles(input);
+      const file = input.files?.[0];
+      if (!file || !directUpload) return;
+      setUploading(true);
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Tu sesión expiró. Volvé a iniciar sesión.");
+      const safeName =
+        file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "media";
+      const path = `${user.id}/${crypto.randomUUID()}-${safeName}`;
+      const upload = await supabase.storage
+        .from(directUpload.bucket)
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (upload.error) throw new Error("No pudimos subir el archivo privado.");
+      input.value = "";
+      setDirectMetadata({ path, mimeType: file.type, size: file.size });
+    } catch (error) {
+      input.value = "";
+      setCompressionError(
+        error instanceof Error
+          ? error.message
+          : "No pudimos optimizar la imagen.",
+      );
+    } finally {
+      setUploading(false);
+      setCompressing(false);
+    }
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    if (compressing) event.preventDefault();
+  }
 
   return (
-    <form action={formAction} encType={encType} className={className}>
+    <form
+      action={formAction}
+      encType={encType}
+      className={className}
+      onChange={handleFileChange}
+      onSubmit={handleSubmit}
+    >
       {children}
+      {directMetadata && directUpload ? (
+        <>
+          <input
+            type="hidden"
+            name={`${directUpload.fieldName}Path`}
+            value={directMetadata.path}
+          />
+          <input
+            type="hidden"
+            name={`${directUpload.fieldName}MimeType`}
+            value={directMetadata.mimeType}
+          />
+          <input
+            type="hidden"
+            name={`${directUpload.fieldName}SizeBytes`}
+            value={directMetadata.size}
+          />
+        </>
+      ) : null}
       <button
         className="button-primary disabled:cursor-wait disabled:opacity-60"
         type="submit"
-        disabled={pending}
+        disabled={pending || compressing || uploading}
       >
-        {pending ? "Guardando…" : submitLabel}
+        {compressing
+          ? "Optimizando…"
+          : uploading
+            ? "Subiendo archivo…"
+            : pending
+              ? "Guardando…"
+              : submitLabel}
       </button>
       {state.error ? (
         <p
@@ -83,6 +168,14 @@ function ActionForm({
           aria-live="polite"
         >
           {state.success}
+        </p>
+      ) : null}
+      {compressionError ? (
+        <p
+          className="bg-terracotta/10 text-terracotta rounded-xl px-4 py-3 text-sm"
+          role="alert"
+        >
+          {compressionError}
         </p>
       ) : null}
     </form>
@@ -769,6 +862,10 @@ export function MarketplaceManagement({
               action={actions.saveCertification}
               submitLabel="Guardar certificación"
               encType="multipart/form-data"
+              directUpload={{
+                bucket: "provider-certification-evidence",
+                fieldName: "evidence",
+              }}
             >
               <Field label="Título" name="title" required />
               <Field label="Emisor" name="issuer" />
@@ -820,6 +917,10 @@ export function MarketplaceManagement({
               action={actions.savePortfolio}
               submitLabel="Guardar pieza"
               encType="multipart/form-data"
+              directUpload={{
+                bucket: "provider-portfolio",
+                fieldName: "media",
+              }}
             >
               <Field label="Título" name="title" required />
               <TextArea label="Descripción" name="description" />

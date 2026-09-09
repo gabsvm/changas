@@ -28,6 +28,37 @@ const certificationMimeTypes = new Set([
 ]);
 const portfolioMimeTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
+async function verifyDirectUpload(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  bucket: string,
+  path: string,
+  mimeType: string,
+  size: number,
+): Promise<boolean> {
+  if (
+    !path.startsWith(`${userId}/`) ||
+    !Number.isSafeInteger(size) ||
+    size < 1
+  ) {
+    return false;
+  }
+  const name = path.slice(path.lastIndexOf("/") + 1);
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .list(userId, { search: name, limit: 100 });
+  const object = data?.find((entry) => entry.name === name);
+  const metadata = object?.metadata as
+    { mimetype?: string; size?: number | string } | undefined;
+  return (
+    !error &&
+    Boolean(object) &&
+    mimeType.length > 0 &&
+    (!metadata?.mimetype || metadata.mimetype === mimeType) &&
+    (!metadata?.size || Number(metadata.size) === size)
+  );
+}
+
 function textOrNull(value: string): string | null {
   const text = value.trim();
   return text ? text : null;
@@ -451,10 +482,18 @@ export async function saveCertification(
   if (existing?.error) return errorState("No pudimos leer la certificación.");
   const fileValue = formData.get("evidence");
   const hasFile = fileValue instanceof File && fileValue.size > 0;
+  const fileMimeType = fileValue instanceof File ? fileValue.type : "";
+  const fileSize = fileValue instanceof File ? fileValue.size : 0;
+  const directPath = getFormString(formData, "evidencePath");
+  const directMimeType = getFormString(formData, "evidenceMimeType");
+  const directSize = Number(getFormString(formData, "evidenceSizeBytes"));
+  const hasDirectFile = Boolean(directPath);
   if (
-    hasFile &&
-    (!certificationMimeTypes.has(fileValue.type) ||
-      fileValue.size > 10 * 1024 * 1024)
+    (hasFile || hasDirectFile) &&
+    (!certificationMimeTypes.has(
+      hasDirectFile ? directMimeType : fileMimeType,
+    ) ||
+      (hasDirectFile ? directSize : fileSize) > 10 * 1024 * 1024)
   ) {
     return errorState("La evidencia debe ser JPG, PNG o PDF de hasta 10 MiB.");
   }
@@ -462,7 +501,24 @@ export async function saveCertification(
   let evidenceMimeType = existing?.record?.evidence_mime_type ?? null;
   let evidenceSize = existing?.record?.evidence_file_size_bytes ?? null;
   let uploadedPath: string | null = null;
-  if (hasFile) {
+  if (hasDirectFile) {
+    if (
+      !(await verifyDirectUpload(
+        supabase,
+        user.id,
+        certificationBucket,
+        directPath,
+        directMimeType,
+        directSize,
+      ))
+    ) {
+      return errorState("No pudimos verificar la evidencia subida.");
+    }
+    evidencePath = directPath;
+    evidenceMimeType = directMimeType;
+    evidenceSize = directSize;
+    uploadedPath = directPath;
+  } else if (hasFile) {
     const safeName =
       fileValue.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "evidence";
     uploadedPath = `${user.id}/${crypto.randomUUID()}-${safeName}`;
@@ -560,14 +616,23 @@ export async function savePortfolioItem(
     return errorState("No pudimos leer el elemento del portfolio.");
   const fileValue = formData.get("media");
   const hasFile = fileValue instanceof File && fileValue.size > 0;
+  const fileMimeType = fileValue instanceof File ? fileValue.type : "";
+  const fileSize = fileValue instanceof File ? fileValue.size : 0;
+  const directPath = getFormString(formData, "mediaPath");
+  const directMimeType = getFormString(formData, "mediaMimeType");
+  const directSize = Number(getFormString(formData, "mediaSizeBytes"));
+  const hasDirectFile = Boolean(directPath);
   if (
-    hasFile &&
-    (!portfolioMimeTypes.has(fileValue.type) ||
-      fileValue.size > 5 * 1024 * 1024)
+    (hasFile || hasDirectFile) &&
+    (!portfolioMimeTypes.has(hasDirectFile ? directMimeType : fileMimeType) ||
+      (hasDirectFile ? directSize : fileSize) > 5 * 1024 * 1024)
   ) {
     return errorState("La imagen debe ser JPG, PNG o WebP de hasta 5 MiB.");
   }
-  if (!parsed.data.isPublic && (hasFile || existing?.record?.media_path)) {
+  if (
+    !parsed.data.isPublic &&
+    (hasFile || hasDirectFile || existing?.record?.media_path)
+  ) {
     return errorState(
       "La media de portfolio sólo se guarda si el elemento es público.",
     );
@@ -576,7 +641,24 @@ export async function savePortfolioItem(
   let mediaMimeType = existing?.record?.media_mime_type ?? null;
   let mediaSize = existing?.record?.media_file_size_bytes ?? null;
   let uploadedPath: string | null = null;
-  if (hasFile) {
+  if (hasDirectFile) {
+    if (
+      !(await verifyDirectUpload(
+        supabase,
+        user.id,
+        portfolioBucket,
+        directPath,
+        directMimeType,
+        directSize,
+      ))
+    ) {
+      return errorState("No pudimos verificar la imagen subida.");
+    }
+    mediaPath = directPath;
+    mediaMimeType = directMimeType;
+    mediaSize = directSize;
+    uploadedPath = directPath;
+  } else if (hasFile) {
     const safeName =
       fileValue.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "portfolio";
     uploadedPath = `${user.id}/${crypto.randomUUID()}-${safeName}`;

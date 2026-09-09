@@ -69,10 +69,18 @@ export async function adminRpc<T>(
   name: string,
   args: Record<string, unknown> = {},
 ): Promise<T> {
-  const { client } = await getAdminSession();
-  const result = await client.rpc(name, args);
-  if (result.error) throw mapAdminRpcError(result.error);
-  return result.data as T;
+  try {
+    const { client } = await getAdminSession();
+    const result = await client.rpc(name, args);
+    if (result.error) throw mapAdminRpcError(result.error);
+    return result.data as T;
+  } catch (error) {
+    if (error instanceof AdminUiError) {
+      if (error.code === "UNAUTHORIZED") redirect("/login?next=/admin");
+      if (error.code === "FORBIDDEN") notFound();
+    }
+    throw error;
+  }
 }
 
 export type AdminUserRow = {

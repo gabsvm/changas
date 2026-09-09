@@ -2,22 +2,23 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-const layout = readFileSync(new URL("../../app/layout.tsx", import.meta.url), "utf8");
-const guard = readFileSync(
-  new URL("../../components/media/image-upload-compression-guard.tsx", import.meta.url),
+const layout = readFileSync(
+  new URL("../../app/layout.tsx", import.meta.url),
+  "utf8",
+);
+const compression = readFileSync(
+  new URL("../media/image-compression.ts", import.meta.url),
   "utf8",
 );
 
 describe("global image upload compression", () => {
-  it("mounts one guard at the application root so every image file input is covered", () => {
-    expect(layout).toContain("ImageUploadCompressionGuard");
-    expect(layout).toContain("<ImageUploadCompressionGuard />");
+  it("does not rely on a document-level event interceptor", () => {
+    expect(layout).not.toContain("ImageUploadCompressionGuard");
+    expect(compression).toContain("compressInputFiles");
   });
 
-  it("compresses selected image files before any form can submit them", () => {
-    expect(guard).toContain('document.addEventListener("change"');
-    expect(guard).toContain('document.addEventListener("submit"');
-    expect(guard).toContain("compressImageForUpload");
-    expect(guard).toContain("DataTransfer");
+  it("uses one shared input pipeline for image uploads", () => {
+    expect(compression).toContain("compressImageForUpload");
+    expect(compression).toContain("DataTransfer");
   });
 });

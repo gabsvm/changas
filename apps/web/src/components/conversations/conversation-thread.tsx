@@ -20,7 +20,8 @@ import {
   type SendTextMessageState,
 } from "@/app/(account)/messages/actions";
 import {
-  sendAttachmentMessage,
+  prepareConversationAttachmentMessage,
+  registerConversationAttachmentUpload,
   type AttachmentActionState,
 } from "@/app/(account)/messages/attachment-actions";
 import {
@@ -32,7 +33,9 @@ import {
 } from "@/app/(account)/messages/thread-actions";
 import type { ConversationAttachmentSummary } from "@/lib/conversations/attachments";
 import type { ConversationMessage } from "@/lib/conversations/messages";
+import { compressInputFiles } from "@/lib/media/image-compression";
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeAttachmentFilename } from "@changas/validation";
 
 const textInitialState: SendTextMessageState = {
   status: "IDLE",
@@ -506,19 +509,89 @@ function AttachmentComposer({
   const nonceRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState(attachmentInitialState);
   const [pending, startTransition] = useTransition();
+  const [compressing, setCompressing] = useState(false);
+
+  async function handleFilesChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setCompressing(true);
+    setState(attachmentInitialState);
+    try {
+      await compressInputFiles(event.currentTarget);
+    } catch (error) {
+      event.currentTarget.value = "";
+      setState({
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "No pudimos optimizar la imagen.",
+      });
+    } finally {
+      setCompressing(false);
+    }
+  }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    if (compressing) return;
+    const form = event.currentTarget;
+    const input = form.elements.namedItem("attachments");
+    const files =
+      input instanceof HTMLInputElement ? Array.from(input.files ?? []) : [];
+    const kind = (form.elements.namedItem("kind") as HTMLSelectElement)
+      .value as "IMAGE" | "FILE";
+    if (files.length === 0) {
+      setState({ status: "error", message: "Elegí al menos un archivo." });
+      return;
+    }
 
     startTransition(async () => {
-      const result = await sendAttachmentMessage(attachmentInitialState, data);
-      setState(result);
-
-      if (result.status === "success") {
+      try {
+        const messageId = await prepareConversationAttachmentMessage(
+          conversationId,
+          kind,
+          nonceRef.current?.value ?? crypto.randomUUID(),
+        );
+        const supabase = createClient();
+        const uploaded = [];
+        for (const file of files) {
+          const safeName = sanitizeAttachmentFilename(file.name);
+          const storagePath = `${conversationId}/${messageId}/${crypto.randomUUID()}/${safeName}`;
+          const upload = await supabase.storage
+            .from("conversation-attachments")
+            .upload(storagePath, file, {
+              contentType: file.type,
+              upsert: false,
+            });
+          if (upload.error) throw new Error("No pudimos subir el archivo.");
+          uploaded.push(
+            await registerConversationAttachmentUpload({
+              messageId,
+              storagePath,
+              kind,
+              mimeType: file.type,
+              sizeBytes: file.size,
+              originalName: file.name,
+            }),
+          );
+        }
+        setState({
+          status: "success",
+          message:
+            files.length === 1 ? "Archivo enviado." : "Archivos enviados.",
+          messageId,
+          attachmentIds: uploaded.map((attachment) => attachment.id),
+        });
         formRef.current?.reset();
         if (nonceRef.current) nonceRef.current.value = crypto.randomUUID();
         onSent();
+      } catch (error) {
+        setState({
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "No pudimos enviar el archivo.",
+        });
       }
     });
   }
@@ -549,14 +622,16 @@ function AttachmentComposer({
         type="file"
         name="attachments"
         multiple
+        onChange={handleFilesChange}
+        disabled={pending || compressing}
         className="file:bg-moss/10 file:text-moss min-w-0 flex-1 text-xs file:mr-2 file:rounded-full file:border-0 file:px-3 file:py-2 file:font-semibold"
       />
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || compressing}
         className="border-ink/10 rounded-full border bg-white px-3 py-2 text-xs font-bold disabled:opacity-40"
       >
-        {pending ? "Subiendo…" : "Adjuntar"}
+        {compressing ? "Optimizando…" : pending ? "Subiendo…" : "Adjuntar"}
       </button>
       {state.status === "error" ? (
         <p className="sr-only" role="alert">

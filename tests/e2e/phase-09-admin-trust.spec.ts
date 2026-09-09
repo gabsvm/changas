@@ -177,6 +177,13 @@ async function createModerationService(provider: TestUser) {
 }
 
 test.describe("Phase 09 admin trust and safety", () => {
+  test("unauthenticated access to the admin surface redirects to login", async ({
+    page,
+  }) => {
+    await page.goto("/admin");
+    await expect(page).toHaveURL("/login?next=/admin");
+  });
+
   test("normal authenticated account cannot use the admin surface", async ({
     page,
   }) => {
@@ -205,7 +212,9 @@ test.describe("Phase 09 admin trust and safety", () => {
       .getByRole("button", { name: "Aprobar identidad" })
       .locator("xpath=ancestor::section[1]");
     await expect(identityCard).toHaveCount(1);
-    await expect(identityCard.getByText("En revisión", { exact: true })).toBeVisible();
+    await expect(
+      identityCard.getByText("En revisión", { exact: true }),
+    ).toBeVisible();
 
     const signedResponse = await page.request.get(
       `/api/admin/identity-documents/${documentId}`,
@@ -219,7 +228,9 @@ test.describe("Phase 09 admin trust and safety", () => {
     await identityCard
       .getByRole("button", { name: "Aprobar identidad" })
       .click();
-    await expect(identityCard.getByText("Activo", { exact: true })).toBeVisible();
+    await expect(
+      identityCard.getByText("Activo", { exact: true }),
+    ).toBeVisible();
 
     const providerState = await adminRequest(
       `/rest/v1/provider_profiles?user_id=eq.${provider.id}&select=status`,
