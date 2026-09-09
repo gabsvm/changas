@@ -122,7 +122,7 @@ async function expectMobileRoute(page: Page) {
   await expectMobileNavigation(page);
   await expect(page.locator("main h1:visible")).toHaveCount(1);
 
-  const back = page.getByRole("link", { name: "Volver" });
+  const back = page.getByRole("link", { name: "Volver", exact: true });
   await expect(back).toBeVisible();
   const box = await back.boundingBox();
   expect(box?.width ?? 0).toBeGreaterThanOrEqual(48);
@@ -146,7 +146,10 @@ async function uploadIdentityDocument(
   ).toBeVisible();
   await page.getByRole("button", { name: "Subir documento privado" }).click();
   await expect(
-    page.getByText(expectedLabel, { exact: true }).first(),
+    page
+      .getByRole("listitem")
+      .filter({ hasText: expectedLabel })
+      .getByText("Cargado", { exact: true }),
   ).toBeVisible();
 }
 
