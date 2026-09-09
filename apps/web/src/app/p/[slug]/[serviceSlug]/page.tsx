@@ -4,7 +4,11 @@ import { notFound } from "next/navigation";
 
 import { formatServicePrice } from "@changas/domain";
 
+import { Avatar } from "@/components/ui/marketplace/avatar";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
+import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { createClient } from "@/lib/supabase/server";
+import { getServiceModalityLabel } from "@/lib/ui/service-modality";
 
 import { startServiceConversation } from "./actions";
 
@@ -74,101 +78,135 @@ export default async function PublicServicePage({
     ]);
   if (!service || !provider) notFound();
 
+  const price = formatServicePrice(
+    service.price_model,
+    service.price_amount,
+    service.currency_code,
+    service.price_unit,
+  );
+
   return (
-    <main
-      id="main-content"
-      className="bg-canvas text-ink min-h-screen px-5 py-5 sm:px-8"
-    >
-      <div className="mx-auto max-w-4xl">
-        <header className="border-ink/10 flex items-center justify-between border-b pb-5">
+    <main id="main-content" className="bg-canvas text-ink min-h-screen px-4 py-4 sm:px-8">
+      <div className="mx-auto max-w-3xl">
+        <header className="border-ink/10 flex min-h-14 items-center justify-between gap-4 border-b pb-3">
           <Link
-            className="flex items-center gap-3"
+            className="consumer-pressable flex min-h-11 items-center gap-2 rounded-lg px-1"
             href="/"
             aria-label="Changas, inicio"
           >
             <span className="brand-mark" aria-hidden="true">
               C
             </span>
-            <span className="font-display text-xl font-semibold">Changas</span>
+            <span className="text-base font-extrabold tracking-[-0.025em]">Changas</span>
           </Link>
           <Link
-            className="text-ink/60 text-sm underline underline-offset-4"
+            className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
             href={`/p/${providerSlug}`}
           >
-            ← Ver perfil
+            Ver perfil
           </Link>
         </header>
-        <article className="border-ink/10 mt-10 rounded-[2rem] border bg-white/70 p-7 shadow-[0_24px_80px_rgba(22,56,50,0.08)] sm:p-10">
-          <p className="text-terracotta text-xs font-semibold tracking-[0.18em] uppercase">
-            {service.skill_name} · {service.modality}
-          </p>
-          <h1 className="font-display mt-3 text-5xl leading-none font-semibold tracking-[-0.04em]">
+
+        <article className="pt-6 sm:pt-8">
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusChip tone="neutral">{service.skill_name}</StatusChip>
+            <StatusChip tone="info">
+              {getServiceModalityLabel(service.modality)}
+            </StatusChip>
+            {service.accepts_offers ? (
+              <StatusChip tone="brand">Acepta ofertas</StatusChip>
+            ) : null}
+          </div>
+
+          <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-[-0.04em] sm:text-4xl">
             {service.title}
           </h1>
-          <p className="text-ink/65 mt-6 max-w-3xl text-base leading-8">
+          <p className="text-ink/62 mt-3 text-sm leading-6 sm:text-base">
             {service.description}
           </p>
-          <div className="border-ink/10 mt-8 grid gap-4 border-y py-6 sm:grid-cols-3">
-            <div>
-              <p className="text-ink/50 text-xs uppercase">Precio</p>
-              <p className="mt-1 text-lg font-semibold">
-                {formatServicePrice(
-                  service.price_model,
-                  service.price_amount,
-                  service.currency_code,
-                  service.price_unit,
-                )}
-              </p>
-            </div>
-            <div>
-              <p className="text-ink/50 text-xs uppercase">Duración</p>
-              <p className="mt-1 text-lg font-semibold">
-                {service.expected_duration_minutes
+
+          <section className="border-ink/10 mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y py-4 sm:grid-cols-3">
+            <Metric label="Precio" value={price} />
+            <Metric
+              label="Duración"
+              value={
+                service.expected_duration_minutes
                   ? `${service.expected_duration_minutes} min`
-                  : "A coordinar"}
-              </p>
+                  : "A coordinar"
+              }
+            />
+            <Metric
+              label="Propuestas"
+              value={service.accepts_offers ? "Acepta" : "No aplica"}
+            />
+          </section>
+
+          <section className="border-ink/10 mt-6 border-t pt-5">
+            <h2 className="text-lg font-bold">Detalles del servicio</h2>
+            <div className="mt-2 divide-y divide-ink/10">
+              <Info title="Incluye" value={service.includes} />
+              <Info title="No incluye" value={service.excludes} />
+              <Info title="Materiales y notas" value={service.materials_notes} />
             </div>
-            <div>
-              <p className="text-ink/50 text-xs uppercase">Propuestas</p>
-              <p className="mt-1 text-lg font-semibold">
-                {service.accepts_offers ? "Acepta" : "No aplica"}
-              </p>
-            </div>
-          </div>
-          <div className="mt-8 grid gap-6 sm:grid-cols-3">
-            <Info title="Incluye" value={service.includes} />
-            <Info title="No incluye" value={service.excludes} />
-            <Info title="Materiales y notas" value={service.materials_notes} />
-          </div>
+          </section>
+
           {(tags ?? []).length ? (
-            <div className="mt-8 flex flex-wrap gap-2">
-              {(tags ?? []).map((tag) => (
-                <span
-                  className="border-ink/10 rounded-full border px-3 py-2 text-xs"
-                  key={tag.tag}
-                >
-                  {tag.tag}
-                </span>
-              ))}
-            </div>
+            <section className="border-ink/10 mt-6 border-t pt-5">
+              <h2 className="text-lg font-bold">Relacionado</h2>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(tags ?? []).map((tag) => (
+                  <StatusChip tone="neutral" key={tag.tag}>
+                    {tag.tag}
+                  </StatusChip>
+                ))}
+              </div>
+            </section>
           ) : null}
-          <div className="bg-moss/10 mt-10 rounded-2xl p-5 sm:flex sm:items-center sm:justify-between sm:gap-5">
-            <div>
-              <p className="text-moss text-sm font-semibold">
-                Ofrece {provider.display_name}
-              </p>
-              <p className="text-ink/65 mt-1 max-w-xl text-sm leading-6">
-                Conversá sobre alcance, tiempos y dudas sin salir de Changas.
-                Tus mensajes quedan asociados a este servicio.
-              </p>
+
+          <section className="border-ink/10 mt-6 border-t pt-5">
+            <Link
+              href={`/p/${providerSlug}`}
+              className="consumer-pressable flex min-h-14 items-center gap-3 rounded-lg px-1 hover:bg-ink/[0.035]"
+            >
+              <Avatar
+                name={provider.display_name}
+                src={
+                  isTrustedPublicAvatarUrl(provider.avatar_url)
+                    ? provider.avatar_url
+                    : null
+                }
+              />
+              <span className="min-w-0 flex-1">
+                <span className="block text-xs font-semibold text-ink/45">Ofrece</span>
+                <span className="block truncate text-sm font-bold">
+                  {provider.display_name}
+                </span>
+                {provider.public_headline ? (
+                  <span className="text-ink/52 mt-0.5 block truncate text-sm">
+                    {provider.public_headline}
+                  </span>
+                ) : null}
+              </span>
+              <span className="text-ink/25 text-xl" aria-hidden="true">
+                ›
+              </span>
+            </Link>
+          </section>
+
+          <div className="bg-canvas/95 border-ink/10 sticky bottom-0 z-20 -mx-4 mt-6 border-t px-4 py-3 backdrop-blur-xl sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
+            <div className="flex items-center gap-3 sm:justify-between">
+              <div className="hidden sm:block">
+                <p className="text-sm font-bold">{price}</p>
+                <p className="text-ink/48 text-xs">Consultá alcance y tiempos por chat.</p>
+              </div>
+              <form action={startServiceConversation} className="w-full sm:w-auto">
+                <input type="hidden" name="providerSlug" value={providerSlug} />
+                <input type="hidden" name="serviceSlug" value={serviceSlug} />
+                <button className="button-primary w-full sm:w-auto" type="submit">
+                  Consultar por este servicio
+                </button>
+              </form>
             </div>
-            <form action={startServiceConversation} className="mt-4 sm:mt-0">
-              <input type="hidden" name="providerSlug" value={providerSlug} />
-              <input type="hidden" name="serviceSlug" value={serviceSlug} />
-              <button className="button-primary w-full sm:w-auto" type="submit">
-                Consultar por este servicio
-              </button>
-            </form>
           </div>
         </article>
       </div>
@@ -176,11 +214,22 @@ export default async function PublicServicePage({
   );
 }
 
-function Info({ title, value }: { title: string; value: string | null }) {
+function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <h2 className="font-display text-xl font-semibold">{title}</h2>
-      <p className="text-ink/65 mt-2 text-sm leading-6">
+      <p className="text-ink/42 text-[0.68rem] font-bold tracking-[0.08em] uppercase">
+        {label}
+      </p>
+      <p className="mt-1 text-sm font-bold">{value}</p>
+    </div>
+  );
+}
+
+function Info({ title, value }: { title: string; value: string | null }) {
+  return (
+    <div className="py-3">
+      <h3 className="text-sm font-semibold">{title}</h3>
+      <p className="text-ink/58 mt-1 text-sm leading-6">
         {value ?? "No especificado"}
       </p>
     </div>
