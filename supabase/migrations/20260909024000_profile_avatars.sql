@@ -1,5 +1,6 @@
--- Profile avatars are public product media, but storage remains private.
--- Anonymous reads are limited to the exact object currently referenced by a profile.
+-- Profile avatars are public product media, but the underlying bucket remains
+-- private. Public delivery is performed by /api/avatar/... after verifying that
+-- the requested object is the exact avatar currently referenced by a profile.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
@@ -15,35 +16,11 @@ on conflict (id) do update set
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
-create or replace function public.is_current_profile_avatar(object_path text)
-returns boolean
-language sql
-stable
-security definer
-set search_path = pg_catalog, public
-as $$
-  select exists (
-    select 1
-    from public.profiles p
-    where p.avatar_url = '/api/avatar/' || object_path
-  );
-$$;
-
-revoke all on function public.is_current_profile_avatar(text) from public, anon, authenticated;
-grant execute on function public.is_current_profile_avatar(text) to anon, authenticated, service_role;
-
 create policy profile_avatars_select_owner
 on storage.objects for select to authenticated
 using (
   bucket_id = 'profile-avatars'
   and (storage.foldername(name))[1] = (select auth.uid())::text
-);
-
-create policy profile_avatars_select_current_public
-on storage.objects for select to anon, authenticated
-using (
-  bucket_id = 'profile-avatars'
-  and public.is_current_profile_avatar(name)
 );
 
 create policy profile_avatars_insert_owner
