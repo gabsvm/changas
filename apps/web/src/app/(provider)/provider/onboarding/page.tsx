@@ -35,30 +35,38 @@ export default async function ProviderOnboardingPage() {
     return (
       <section className="pb-6 sm:py-14">
         <MobileAppBar title="Ser proveedor" backHref="/account" />
-        <div className="mx-auto max-w-2xl pt-6 sm:pt-0">
+        <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
           <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
             Proveedor
           </p>
-          <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
+          <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
             Empezá tu verificación
           </h1>
-          <p className="text-ink/60 mt-3 text-sm leading-6">
-            Vamos a crear un espacio privado para guardar tu progreso. Esto no
-            publica servicios ni activa tu perfil automáticamente.
+          <p className="text-ink/58 mt-2 max-w-xl text-sm leading-6">
+            Son cuatro pasos breves. Podés salir y volver cuando quieras; nada se
+            publica ni se activa sin revisión.
           </p>
-          <div className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_12px_34px_rgba(32,33,36,0.045)] sm:p-6">
-            <div className="bg-brand-yellow/22 text-ink grid h-11 w-11 place-items-center rounded-2xl font-extrabold">
-              4
-            </div>
-            <h2 className="font-display mt-4 text-2xl font-extrabold tracking-[-0.025em]">
-              Cuatro pasos, sin apuro
-            </h2>
-            <p className="text-ink/60 mt-2 text-sm leading-6">
-              Completá tus datos, identidad y documentos. Podés salir y volver
-              cuando quieras; la aprobación final sigue siendo manual.
-            </p>
-            <StartProviderForm action={startProviderOnboarding} />
-          </div>
+
+          <section className="border-ink/10 mt-6 border-y py-1">
+            {[
+              ["1", "Perfil público"],
+              ["2", "Identidad privada"],
+              ["3", "Documentos"],
+              ["4", "Revisión"],
+            ].map(([number, label]) => (
+              <div
+                className="border-ink/10 flex min-h-12 items-center gap-3 border-b py-2 last:border-b-0"
+                key={number}
+              >
+                <span className="bg-ink/[0.06] text-ink/60 grid h-8 w-8 place-items-center rounded-full text-xs font-extrabold">
+                  {number}
+                </span>
+                <span className="text-sm font-semibold">{label}</span>
+              </div>
+            ))}
+          </section>
+
+          <StartProviderForm action={startProviderOnboarding} />
         </div>
       </section>
     );
@@ -85,43 +93,39 @@ export default async function ProviderOnboardingPage() {
   return (
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Verificación" backHref="/account" />
-      <div className="mx-auto max-w-3xl pt-6 sm:pt-0">
+      <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-start justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
               Perfil de proveedor
             </p>
-            <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">
+            <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
               Tu verificación
             </h1>
           </div>
           <StatusBadge label={presentation.label} tone={presentation.tone} />
         </div>
 
-        <p className="text-ink/60 mt-3 max-w-2xl text-sm leading-6">
-          {presentation.description} El avance se guarda de forma privada y no
-          convierte tu perfil en activo sin revisión.
+        <p className="text-ink/58 mt-2 text-sm leading-6">
+          {presentation.description}
         </p>
 
-        <section className="border-ink/10 bg-surface mt-6 rounded-3xl border p-5 shadow-[0_12px_34px_rgba(32,33,36,0.045)] sm:p-6">
+        <section className="border-ink/10 mt-5 border-y py-4">
           <div className="flex items-center justify-between gap-4 text-xs font-bold">
-            <span>Progreso guardado</span>
-            <span className="text-ink/50">
+            <span>Progreso</span>
+            <span className="text-ink/45">
               Paso {current?.number ?? 1} de 4
             </span>
           </div>
-          <div className="mt-3">
+          <div className="mt-2.5">
             <ProgressBar value={progress} label="Progreso de verificación" />
           </div>
-          <Link
-            className="button-primary mt-5 w-full sm:w-auto"
-            href={primaryHref}
-          >
+          <Link className="button-primary mt-4 w-full sm:w-auto" href={primaryHref}>
             {primaryLabel}
           </Link>
         </section>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <section className="border-ink/10 mt-4 divide-y divide-ink/10 border-y">
           {steps.map((step) => (
             <OnboardingStepCard
               key={step.id}
@@ -129,12 +133,12 @@ export default async function ProviderOnboardingPage() {
               disabled={!editable && step.id !== "review"}
             />
           ))}
-        </div>
+        </section>
 
         {!editable && provider.status !== "ACTIVE" ? (
-          <p className="bg-brand-yellow/18 text-warning border-brand-yellow/25 mt-5 rounded-2xl border px-4 py-3 text-sm leading-6">
-            Mientras el perfil está en revisión o requiere intervención, los
-            pasos de edición quedan bloqueados desde tu cuenta.
+          <p className="bg-brand-yellow/14 text-warning mt-4 rounded-xl px-3 py-2.5 text-sm leading-6">
+            Mientras el perfil está en revisión o requiere intervención, la
+            edición queda bloqueada.
           </p>
         ) : null}
       </div>
