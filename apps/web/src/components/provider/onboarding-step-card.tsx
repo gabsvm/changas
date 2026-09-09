@@ -1,5 +1,7 @@
-import Link from "next/link";
+import type { ReactNode } from "react";
 
+import { ListRow } from "@/components/ui/marketplace/list-row";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import type { OnboardingStepPresentation } from "@/lib/ui/onboarding";
 
 const stateCopy = {
@@ -8,6 +10,41 @@ const stateCopy = {
   pending: "Pendiente",
 } as const;
 
+function StepBadge({ step }: { step: OnboardingStepPresentation }) {
+  return (
+    <span
+      className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-extrabold ${
+        step.state === "current"
+          ? "bg-brand-orange text-ink"
+          : step.state === "complete"
+            ? "bg-success/12 text-success"
+            : "bg-ink/[0.06] text-ink/45"
+      }`}
+      aria-hidden="true"
+    >
+      {step.state === "complete" ? "✓" : step.number}
+    </span>
+  );
+}
+
+function StepStatus({ step }: { step: OnboardingStepPresentation }) {
+  const tone =
+    step.state === "current"
+      ? "brand"
+      : step.state === "complete"
+        ? "success"
+        : "neutral";
+
+  return (
+    <span className="flex items-center gap-1.5">
+      <StatusChip tone={tone}>{stateCopy[step.state]}</StatusChip>
+      <span className="text-ink/25 text-xl" aria-hidden="true">
+        ›
+      </span>
+    </span>
+  );
+}
+
 export function OnboardingStepCard({
   step,
   disabled = false,
@@ -15,64 +52,30 @@ export function OnboardingStepCard({
   step: OnboardingStepPresentation;
   disabled?: boolean;
 }) {
-  const content = (
-    <>
-      <div className="flex items-start justify-between gap-3">
-        <span
-          className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-xs font-extrabold ${
-            step.state === "current"
-              ? "bg-brand-orange text-ink"
-              : step.state === "complete"
-                ? "bg-success/12 text-success"
-                : "bg-ink/7 text-ink/45"
-          }`}
-          aria-hidden="true"
-        >
-          {step.state === "complete" ? "✓" : step.number}
-        </span>
-        <span
-          className={`rounded-full px-2.5 py-1 text-[0.65rem] font-bold tracking-[0.08em] uppercase ${
-            step.state === "current"
-              ? "bg-brand-orange/12 text-terracotta"
-              : step.state === "complete"
-                ? "bg-success/10 text-success"
-                : "bg-ink/5 text-ink/45"
-          }`}
-        >
-          {stateCopy[step.state]}
-        </span>
-      </div>
-      <h2 className="font-display mt-4 text-xl font-extrabold tracking-[-0.02em]">
-        {step.title}
-      </h2>
-      <p className="text-ink/55 mt-1.5 text-sm leading-6">{step.description}</p>
-      {!disabled ? (
-        <span className="text-moss mt-4 inline-flex items-center gap-1 text-sm font-bold">
-          {step.state === "current" ? "Continuar" : "Ver paso"}
-          <span aria-hidden="true">→</span>
-        </span>
-      ) : null}
-    </>
-  );
-
-  const className = `border-ink/10 bg-surface block rounded-3xl border p-5 shadow-[0_8px_24px_rgba(32,33,36,0.035)] ${
-    step.state === "current" ? "ring-brand-orange/20 ring-2" : ""
-  }`;
+  const common: {
+    title: ReactNode;
+    description: ReactNode;
+    leading: ReactNode;
+    trailing: ReactNode;
+    className: string;
+  } = {
+    title: step.title,
+    description: step.description,
+    leading: <StepBadge step={step} />,
+    trailing: <StepStatus step={step} />,
+    className:
+      step.state === "current"
+        ? "bg-brand-orange/[0.045] px-2"
+        : "px-2",
+  };
 
   if (disabled) {
     return (
-      <div className={`${className} opacity-75`} aria-disabled="true">
-        {content}
+      <div aria-disabled="true" className="opacity-60">
+        <ListRow {...common} />
       </div>
     );
   }
 
-  return (
-    <Link
-      href={step.href}
-      className={`${className} hover:border-moss/30 transition-colors`}
-    >
-      {content}
-    </Link>
-  );
+  return <ListRow {...common} href={step.href} />;
 }
