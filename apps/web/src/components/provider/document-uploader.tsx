@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
 import { compressInputFiles } from "@/lib/media/image-compression";
@@ -37,13 +38,8 @@ export function DocumentUploader({
   const [localError, setLocalError] = useState<string | null>(null);
   const [compressing, setCompressing] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [compressionNotice, setCompressionNotice] = useState<string | null>(
-    null,
-  );
-  const [state, formAction, pending] = useActionState(
-    action,
-    initialActionState,
-  );
+  const [compressionNotice, setCompressionNotice] = useState<string | null>(null);
+  const [state, formAction, pending] = useActionState(action, initialActionState);
   const [directMetadata, setDirectMetadata] = useState<{
     path: string;
     mimeType: string;
@@ -178,53 +174,42 @@ export function DocumentUploader({
 
   if (!editable) {
     return (
-      <section className="border-ink/10 bg-surface rounded-3xl border p-5 sm:p-6">
-        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
-          Documentos privados
-        </p>
-        <h2 className="font-display mt-2 text-2xl font-extrabold tracking-[-0.025em]">
-          Carga temporalmente bloqueada
-        </h2>
-        <p className="text-ink/60 mt-2 text-sm leading-6">
-          Tu perfil está en un estado que no admite cambios desde la cuenta. Los
-          documentos ya recibidos siguen siendo privados.
+      <section className="border-ink/10 border-y py-4">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-base font-bold">Documentos privados</h2>
+          <StatusChip tone="warning">Carga bloqueada</StatusChip>
+        </div>
+        <p className="text-ink/55 mt-1 text-sm leading-6">
+          Tu perfil está en un estado que no admite cambios. Los documentos ya
+          recibidos siguen siendo privados.
         </p>
       </section>
     );
   }
 
   return (
-    <section className="border-ink/10 bg-surface rounded-3xl border p-5 shadow-[0_10px_30px_rgba(32,33,36,0.04)] sm:p-6">
+    <section className="border-ink/10 border-y py-4">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
             Privado
           </p>
-          <h2 className="font-display mt-2 text-2xl font-extrabold tracking-[-0.025em]">
-            Subí un documento
-          </h2>
+          <h2 className="mt-1 text-lg font-bold">Subí un documento</h2>
         </div>
-        <span className="bg-moss/10 text-moss rounded-full px-3 py-1 text-[0.65rem] font-bold tracking-[0.08em] uppercase">
-          Máx. 10 MiB
-        </span>
+        <StatusChip tone="neutral">Máx. 10 MiB</StatusChip>
       </div>
-      <p className="text-ink/60 mt-2 text-sm leading-6">
-        JPG, PNG o PDF. El archivo se envía mediante el flujo privado existente
-        y su ruta nunca se muestra en la interfaz pública.
+      <p className="text-ink/55 mt-1 text-sm leading-6">
+        JPG, PNG o PDF. La ruta privada del archivo nunca se muestra públicamente.
       </p>
 
       <form
         action={formAction}
         encType="multipart/form-data"
-        className="mt-6 space-y-5"
+        className="mt-4 space-y-4"
       >
         {directMetadata ? (
           <>
-            <input
-              type="hidden"
-              name="storagePath"
-              value={directMetadata.path}
-            />
+            <input type="hidden" name="storagePath" value={directMetadata.path} />
             <input
               type="hidden"
               name="storageMimeType"
@@ -237,10 +222,11 @@ export function DocumentUploader({
             />
           </>
         ) : null}
-        <label className="block text-sm font-bold">
+
+        <label className="block text-sm font-semibold">
           Tipo de documento
           <select
-            className="border-ink/15 bg-surface focus:border-moss focus:ring-moss/20 mt-2 min-h-12 w-full rounded-2xl border px-4 py-3 text-sm outline-none focus:ring-2"
+            className="border-ink/15 bg-surface focus:border-moss focus:ring-moss/20 mt-1.5 min-h-11 w-full rounded-xl border px-3 text-sm outline-none focus:ring-2"
             name="documentType"
             value={documentType}
             onChange={(event) => setDocumentType(event.currentTarget.value)}
@@ -264,9 +250,9 @@ export function DocumentUploader({
         />
 
         {selected ? (
-          <div className="border-moss/20 bg-moss/5 overflow-hidden rounded-2xl border">
+          <div className="border-ink/10 overflow-hidden rounded-xl border">
             {selected.previewUrl ? (
-              <div className="bg-ink/5 aspect-[16/9] w-full overflow-hidden">
+              <div className="bg-ink/[0.04] aspect-[16/9] w-full overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={selected.previewUrl}
@@ -275,25 +261,22 @@ export function DocumentUploader({
                 />
               </div>
             ) : null}
-            <div className="flex items-start gap-3 p-4">
+            <div className="flex min-h-14 items-center gap-3 px-3 py-2.5">
               <span
-                className="bg-moss/10 text-moss grid h-10 w-10 shrink-0 place-items-center rounded-xl"
+                className="bg-moss/8 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-full text-[0.68rem] font-bold"
                 aria-hidden="true"
               >
                 {selected.file.type === "application/pdf" ? "PDF" : "IMG"}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold">
-                  {selected.file.name}
-                </p>
-                <p className="text-ink/50 mt-1 text-xs">
-                  {getDocumentTypeLabel(documentType)} ·{" "}
-                  {formatFileSize(selected.file.size)}
+                <p className="truncate text-sm font-semibold">{selected.file.name}</p>
+                <p className="text-ink/45 mt-0.5 text-xs">
+                  {getDocumentTypeLabel(documentType)} · {formatFileSize(selected.file.size)}
                 </p>
               </div>
               <button
                 type="button"
-                className="text-danger min-h-12 shrink-0 px-3 text-xs font-bold"
+                className="consumer-pressable text-danger min-h-11 shrink-0 rounded-lg px-2 text-xs font-bold"
                 onClick={clearSelection}
                 disabled={pending || compressing}
               >
@@ -302,36 +285,12 @@ export function DocumentUploader({
             </div>
           </div>
         ) : (
-          <div className="border-ink/15 bg-canvas/55 rounded-2xl border border-dashed p-5 text-center">
-            <div
-              className="bg-moss/10 text-moss mx-auto grid h-12 w-12 place-items-center rounded-2xl"
-              aria-hidden="true"
-            >
-              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none">
-                <path
-                  d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M5 13.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4.5"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-            <p className="mt-3 text-sm font-bold">Elegí cómo cargarlo</p>
-            <p className="text-ink/50 mt-1 text-xs leading-5">
-              Podés usar la cámara del teléfono o seleccionar un archivo
-              guardado.
-            </p>
+          <div className="border-ink/15 text-ink/52 rounded-xl border border-dashed px-4 py-5 text-center text-sm">
+            Tomá una foto o elegí un archivo guardado.
           </div>
         )}
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2 sm:grid-cols-2">
           <button
             type="button"
             className="button-secondary w-full"
@@ -351,32 +310,23 @@ export function DocumentUploader({
         </div>
 
         {localError ? (
-          <p
-            className="bg-danger/10 text-danger rounded-2xl px-4 py-3 text-sm"
-            role="alert"
-          >
+          <p className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm" role="alert">
             {localError}
           </p>
         ) : null}
         {compressionNotice ? (
-          <p
-            className="bg-moss/10 text-moss rounded-2xl px-4 py-3 text-sm"
-            role="status"
-          >
+          <p className="bg-moss/[0.07] text-moss rounded-xl px-3 py-2.5 text-sm" role="status">
             {compressionNotice}
           </p>
         ) : null}
         {state.error ? (
-          <p
-            className="bg-danger/10 text-danger rounded-2xl px-4 py-3 text-sm"
-            role="alert"
-          >
+          <p className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm" role="alert">
             {state.error}
           </p>
         ) : null}
         {state.success ? (
           <p
-            className="bg-success/10 text-success rounded-2xl px-4 py-3 text-sm"
+            className="bg-success/[0.07] text-success rounded-xl px-3 py-2.5 text-sm"
             role="status"
             aria-live="polite"
           >
