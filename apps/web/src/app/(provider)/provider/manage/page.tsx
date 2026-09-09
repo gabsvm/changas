@@ -3,8 +3,12 @@ import { redirect } from "next/navigation";
 
 import { ProviderPaymentAccount } from "@/components/payments/provider-payment-account";
 import { MarketplaceManagement } from "@/components/provider/marketplace-management";
+import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { getProviderPaymentAccountState } from "@/lib/payments/server";
 import { createClient } from "@/lib/supabase/server";
+import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 
 import {
   deleteAvailabilityBlock,
@@ -131,28 +135,15 @@ export default async function ProviderMarketplaceManagePage({
 
   if (!provider) {
     return (
-      <section className="py-10 sm:py-14">
-        <Link
-          className="text-ink/60 text-sm underline underline-offset-4"
-          href="/provider/onboarding"
-        >
-          ← Preparar onboarding
-        </Link>
-        <div className="border-ink/10 mt-8 max-w-2xl rounded-2xl border bg-white/65 p-7">
-          <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
-            Proveedor
-          </p>
-          <h1 className="font-display mt-3 text-4xl font-semibold">
-            Primero prepará tu perfil
-          </h1>
-          <p className="text-ink/65 mt-4 text-sm leading-6">
-            La gestión del marketplace se habilita después de crear el espacio
-            privado de proveedor.
-          </p>
-          <Link className="button-primary mt-6" href="/provider/onboarding">
-            Ir al onboarding
-          </Link>
-        </div>
+      <section className="pb-6 sm:py-14">
+        <MobileAppBar title="Gestionar servicios" backHref="/account" />
+        <EmptyState
+          title="Primero prepará tu perfil"
+          description="Creá tu espacio de proveedor antes de administrar habilidades y servicios."
+          actionHref="/provider/onboarding"
+          actionLabel="Ir a verificación"
+          className="pt-16"
+        />
       </section>
     );
   }
@@ -187,87 +178,82 @@ export default async function ProviderMarketplaceManagePage({
   }
   const displayName =
     profile?.display_name ?? user.email?.split("@")[0] ?? "proveedor";
+  const status = getProviderStatusPresentation(provider.status);
 
   return (
-    <section className="py-10 sm:py-14">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <Link
-            className="text-ink/60 text-sm underline underline-offset-4"
-            href="/account"
-          >
-            ← Volver a mi cuenta
-          </Link>
-          <p className="text-terracotta mt-8 text-xs font-semibold tracking-[0.18em] uppercase">
-            Gestión de proveedor
-          </p>
-          <h1 className="font-display mt-3 text-5xl leading-none font-semibold tracking-[-0.04em]">
-            Tu marketplace, {displayName}
-          </h1>
-          <p className="text-ink/65 mt-5 max-w-2xl text-sm leading-6">
-            Prepará habilidades, servicios, trayectoria y disponibilidad. Nada
-            de esta pantalla crea reservas ni propuestas.
-          </p>
+    <section className="pb-8 sm:py-14">
+      <MobileAppBar title="Gestionar servicios" backHref="/account" />
+      <div className="pt-5 sm:pt-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+              Proveedor
+            </p>
+            <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
+              Gestioná tu oferta
+            </h1>
+            <p className="text-ink/55 mt-1 text-sm">
+              {displayName} · habilidades, servicios y disponibilidad
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusChip tone={status.tone}>{status.label}</StatusChip>
+            <Link
+              className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold hover:bg-brand-orange/[0.06]"
+              href={`/p/${provider.public_slug}`}
+              target="_blank"
+            >
+              Ver perfil público ↗
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <span className="bg-moss/10 text-moss rounded-full px-4 py-2 text-xs font-semibold tracking-[0.12em] uppercase">
-            {provider.status}
-          </span>
-          <Link
-            className="button-secondary"
-            href={`/p/${provider.public_slug}`}
-            target="_blank"
-          >
-            Ver perfil público ↗
-          </Link>
+
+        <div className="border-ink/10 mt-6 border-t pt-5">
+          <ProviderPaymentAccount
+            account={paymentAccount}
+            feedback={paymentFeedback}
+          />
         </div>
-      </div>
 
-      <div className="mt-10">
-        <ProviderPaymentAccount
-          account={paymentAccount}
-          feedback={paymentFeedback}
-        />
-      </div>
-
-      <div className="mt-10">
-        <MarketplaceManagement
-          provider={provider}
-          catalogSkills={marketplaceSkills}
-          skills={selectedSkills}
-          providerSkills={providerSkills ?? []}
-          services={services ?? []}
-          serviceTagsByServiceId={serviceTagsByServiceId}
-          experiences={experiences ?? []}
-          education={education ?? []}
-          certifications={certifications ?? []}
-          portfolioItems={portfolioItems ?? []}
-          serviceAreas={serviceAreas ?? []}
-          availabilityRules={availabilityRules ?? []}
-          availabilityBlocks={availabilityBlocks ?? []}
-          actions={{
-            settings: updateMarketplaceSettings,
-            saveSkill: saveProviderSkill,
-            removeSkill: removeProviderSkill,
-            saveService: saveServiceTransactional,
-            pauseService: toggleServicePause,
-            deleteService,
-            saveExperience,
-            deleteExperience,
-            saveEducation,
-            deleteEducation,
-            saveCertification,
-            deleteCertification,
-            savePortfolio: savePortfolioItem,
-            deletePortfolio: deletePortfolioItem,
-            saveArea: saveServiceArea,
-            deleteArea: deleteServiceArea,
-            saveRule: saveAvailabilityRule,
-            deleteRule: deleteAvailabilityRule,
-            saveBlock: saveAvailabilityBlock,
-            deleteBlock: deleteAvailabilityBlock,
-          }}
-        />
+        <div className="mt-6">
+          <MarketplaceManagement
+            provider={provider}
+            catalogSkills={marketplaceSkills}
+            skills={selectedSkills}
+            providerSkills={providerSkills ?? []}
+            services={services ?? []}
+            serviceTagsByServiceId={serviceTagsByServiceId}
+            experiences={experiences ?? []}
+            education={education ?? []}
+            certifications={certifications ?? []}
+            portfolioItems={portfolioItems ?? []}
+            serviceAreas={serviceAreas ?? []}
+            availabilityRules={availabilityRules ?? []}
+            availabilityBlocks={availabilityBlocks ?? []}
+            actions={{
+              settings: updateMarketplaceSettings,
+              saveSkill: saveProviderSkill,
+              removeSkill: removeProviderSkill,
+              saveService: saveServiceTransactional,
+              pauseService: toggleServicePause,
+              deleteService,
+              saveExperience,
+              deleteExperience,
+              saveEducation,
+              deleteEducation,
+              saveCertification,
+              deleteCertification,
+              savePortfolio: savePortfolioItem,
+              deletePortfolio: deletePortfolioItem,
+              saveArea: saveServiceArea,
+              deleteArea: deleteServiceArea,
+              saveRule: saveAvailabilityRule,
+              deleteRule: deleteAvailabilityRule,
+              saveBlock: saveAvailabilityBlock,
+              deleteBlock: deleteAvailabilityBlock,
+            }}
+          />
+        </div>
       </div>
     </section>
   );
