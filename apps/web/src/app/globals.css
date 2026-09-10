@@ -14,9 +14,11 @@
   --color-success: #2f7d4a;
   --color-warning: #9a6500;
   --color-danger: #c93c32;
-  --font-display: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+  --font-display:
+    "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
 }
 
@@ -45,7 +47,9 @@
   --consumer-surface: #fffdf9;
   --consumer-surface-strong: #ffffff;
   --consumer-muted: rgb(32 33 36 / 58%);
+  --consumer-shadow-card: 0 8px 20px rgb(32 33 36 / 6%);
   --consumer-shadow-float: 0 10px 30px rgb(32 33 36 / 8%);
+  --consumer-hero-gradient: var(--brand-gradient);
 
   --mobile-bottom-nav-height: calc(
     var(--consumer-nav-height) + max(0.75rem, env(safe-area-inset-bottom))
@@ -64,8 +68,14 @@ body {
   margin: 0;
   background: #fff9f3;
   color: #202124;
-  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  font-family:
+    "Inter",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -136,8 +146,8 @@ textarea {
 }
 
 .brand-gradient-surface {
-  background: var(--brand-gradient);
-  box-shadow: var(--brand-shadow);
+  background: var(--consumer-hero-gradient);
+  box-shadow: var(--consumer-shadow-float);
 }
 
 .brand-kicker {
@@ -201,6 +211,7 @@ textarea {
   border: 1px solid var(--consumer-divider);
   border-radius: var(--consumer-radius-card);
   background: var(--consumer-surface);
+  box-shadow: var(--consumer-shadow-card);
 }
 
 .consumer-divider {
