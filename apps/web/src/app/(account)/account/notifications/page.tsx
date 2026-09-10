@@ -115,7 +115,7 @@ export default async function NotificationCenterPage() {
                     >
                       {label}
                     </h2>
-                    <ol className="divide-y divide-ink/[0.07] border-y border-ink/[0.07] sm:rounded-xl sm:border sm:bg-surface sm:px-3">
+                    <ol className="consumer-card bg-surface divide-y divide-ink/[0.07] px-3">
                       {items.map((item) => (
                         <li key={item.id} className="py-3 sm:px-1">
                           <div className="flex gap-3">
@@ -174,7 +174,7 @@ export default async function NotificationCenterPage() {
             <p className="text-ink/48 mt-1 text-xs leading-5">
               Las alertas críticas dentro de Changas siguen disponibles aunque desactives canales externos.
             </p>
-            <div className="mt-3 divide-y divide-ink/[0.07] border-y border-ink/[0.07] sm:rounded-xl sm:border sm:bg-surface sm:px-4">
+            <div className="consumer-card bg-surface mt-3 divide-y divide-ink/[0.07] px-4">
               <PushOptIn
                 publicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""}
                 initialEnabled={preferences.pushActionableEnabled}

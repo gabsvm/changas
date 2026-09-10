@@ -65,7 +65,7 @@ export default async function AccountPage() {
           </Link>
         </header>
 
-        <section className="mt-5 border-y border-ink/[0.07] py-4 sm:rounded-xl sm:border sm:bg-surface sm:px-4">
+        <section className="consumer-card bg-surface mt-5 px-4 py-4">
           {provider ? (
             <div>
               <div className="flex items-start justify-between gap-3">
@@ -162,7 +162,7 @@ function AccountGroup({ title, children }: { title: string; children: React.Reac
   return (
     <section className="mt-7" aria-label={title}>
       <h2 className="text-ink/42 px-1 text-xs font-bold uppercase tracking-[0.08em]">{title}</h2>
-      <div className="mt-1 divide-y divide-ink/[0.07] border-y border-ink/[0.07] sm:rounded-xl sm:border sm:bg-surface sm:px-4">
+      <div className="consumer-card bg-surface mt-1 divide-y divide-ink/[0.07] px-4">
         {children}
       </div>
     </section>

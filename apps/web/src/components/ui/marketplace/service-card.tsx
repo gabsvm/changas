@@ -27,10 +27,10 @@ export function ServiceCard({ row }: { row: ReputationDiscoveryServiceRow }) {
   );
 
   return (
-    <article className="consumer-card overflow-hidden bg-surface">
+    <article className="consumer-card bg-surface overflow-hidden transition-transform duration-150 hover:-translate-y-0.5">
       <Link
         href={`/p/${row.provider_slug}/${row.service_slug}`}
-        className="consumer-pressable block p-4 hover:bg-white"
+        className="consumer-pressable group block p-4 hover:bg-white"
       >
         <div className="flex items-start gap-3">
           <Avatar
@@ -49,7 +49,7 @@ export function ServiceCard({ row }: { row: ReputationDiscoveryServiceRow }) {
                   {row.service_title}
                 </h3>
               </div>
-              <span className="shrink-0 text-sm font-bold text-ink">{price}</span>
+              <span className="text-terracotta shrink-0 text-sm font-bold">{price}</span>
             </div>
 
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -73,6 +73,9 @@ export function ServiceCard({ row }: { row: ReputationDiscoveryServiceRow }) {
               {row.completed_jobs > 0 ? <span>{row.completed_jobs} completados</span> : null}
               <span>{row.category_name}</span>
             </div>
+            <span className="text-terracotta mt-3 inline-flex min-h-11 items-center text-sm font-bold">
+              Ver servicio <span className="ml-1 transition-transform group-hover:translate-x-0.5" aria-hidden="true">→</span>
+            </span>
           </div>
         </div>
       </Link>

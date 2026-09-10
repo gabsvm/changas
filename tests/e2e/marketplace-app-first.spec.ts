@@ -30,12 +30,14 @@ for (const viewport of [
       await expect(
         page.getByRole("heading", { name: /Resultados para/ }),
       ).toBeVisible();
+      await expect(page.getByRole("article").first()).toBeVisible();
       await page.getByRole("button", { name: "Filtros" }).click();
       const sheet = page.getByRole("dialog", { name: "Filtros" });
       await expect(sheet).toBeVisible();
       await expect(
         sheet.getByRole("heading", { name: "Filtros" }),
       ).toBeVisible();
+      await expect(sheet.getByLabel("Modalidad")).toBeVisible();
       await page.keyboard.press("Escape");
       await expect(sheet).toBeHidden();
       await assertNoHorizontalOverflow(page);

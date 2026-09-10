@@ -107,7 +107,7 @@ export default async function PublicServicePage({
           </Link>
         </header>
 
-        <article className="pt-6 sm:pt-8">
+        <article className="consumer-card bg-surface mt-5 overflow-hidden p-4 pt-6 sm:mt-8 sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone="neutral">{service.skill_name}</StatusChip>
             <StatusChip tone="info">
@@ -125,7 +125,7 @@ export default async function PublicServicePage({
             {service.description}
           </p>
 
-          <section className="border-ink/10 mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y py-4 sm:grid-cols-3">
+          <section className="border-ink/10 bg-surface-muted/55 mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y py-4 sm:grid-cols-3 sm:px-3">
             <Metric label="Precio" value={price} />
             <Metric
               label="Duración"

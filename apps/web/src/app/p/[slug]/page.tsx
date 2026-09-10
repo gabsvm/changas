@@ -148,7 +148,7 @@ export default async function PublicProviderPage({
             </p>
           ) : null}
 
-          <div className="flex items-start gap-4">
+          <div className="consumer-card bg-surface flex items-start gap-4 p-4 sm:p-6">
             <Avatar
               name={provider.display_name}
               src={
@@ -199,7 +199,7 @@ export default async function PublicProviderPage({
 
         <PublicSection title="Servicios">
           {(services ?? []).length ? (
-            <div className="divide-y divide-ink/10">
+          <div className="consumer-card bg-surface divide-y divide-ink/10 overflow-hidden px-4">
               {(services ?? []).map((service) => (
                 <Link
                   className="consumer-pressable flex min-h-[5.25rem] items-start gap-3 rounded-lg px-1 py-3 hover:bg-ink/[0.035]"

@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   title: "Buscar servicios",
   description: "Explorá servicios y habilidades publicados en Changas.",
   alternates: { canonical: "/buscar" },
+  robots: { index: false, follow: true },
 };
 
 export const dynamic = "force-dynamic";
@@ -85,6 +86,8 @@ export default async function SearchPage({
         />
 
         <section className="pt-5 sm:pt-9">
+          <div className="border-brand-yellow/35 bg-surface-muted/55 rounded-[1.75rem] border p-4 shadow-[var(--consumer-shadow-card)] sm:p-6">
+          <p className="brand-kicker text-xs font-extrabold tracking-[0.14em] uppercase">Encontrá ayuda cerca tuyo</p>
           <h1 className="text-2xl font-bold tracking-[-0.035em] sm:text-3xl">
             {query ? `Resultados para “${query}”` : "Explorar servicios"}
           </h1>
@@ -123,6 +126,7 @@ export default async function SearchPage({
             {filters.modality === "IN_PERSON" ? <StatusChip tone="info">Presencial</StatusChip> : null}
             {filters.acceptsOffers ? <StatusChip tone="brand">Acepta ofertas</StatusChip> : null}
             {filters.sort !== "recommended" ? <StatusChip tone="neutral">Orden personalizado</StatusChip> : null}
+          </div>
           </div>
 
           <div className="mt-4">

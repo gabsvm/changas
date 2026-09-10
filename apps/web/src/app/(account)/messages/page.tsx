@@ -52,7 +52,7 @@ export default async function MessagesPage() {
             actionLabel="Explorar servicios"
           />
         ) : (
-          <div className="mt-4 divide-y divide-ink/[0.07] border-y border-ink/[0.07] sm:mt-6 sm:rounded-xl sm:border sm:bg-surface sm:px-3">
+          <div className="consumer-card bg-surface mt-4 divide-y divide-ink/[0.07] px-3 sm:mt-6">
             {conversations.map((conversation) => (
               <ConversationRow
                 key={conversation.conversation_id}

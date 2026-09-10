@@ -196,7 +196,7 @@ export function ConversationThread({
   }, [initialAttachments]);
 
   return (
-    <div className="border-ink/10 mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col border-y bg-white/70 sm:min-h-[calc(100dvh-4rem)] sm:rounded-xl sm:border">
+    <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden sm:min-h-[calc(100dvh-4rem)]">
       <header className="border-ink/10 bg-canvas/95 sticky top-0 z-10 border-b px-4 py-4 backdrop-blur sm:px-6">
         <div className="flex items-center gap-3">
           <Link

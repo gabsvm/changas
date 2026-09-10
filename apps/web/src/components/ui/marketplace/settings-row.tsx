@@ -35,7 +35,7 @@ export function SettingsRow({
 
   if (href) {
     return (
-      <Link href={href} className={`${classes} rounded-lg hover:bg-ink/[0.035]`}>
+      <Link href={href} className={`${classes} rounded-xl hover:bg-brand-orange/[0.05]`}>
         {content}
       </Link>
     );

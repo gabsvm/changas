@@ -55,7 +55,7 @@ export default async function FavoritesPage() {
         </p>
 
         {favorites?.length ? (
-          <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {favorites.map((provider) => {
               const rating =
                 provider.rating_average !== null && provider.review_count > 0
