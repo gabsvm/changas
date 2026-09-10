@@ -44,6 +44,13 @@ const emptyStateSource = readFileSync(
   new URL("../../components/ui/marketplace/empty-state.tsx", import.meta.url),
   "utf8",
 );
+const marketplaceManagementSource = readFileSync(
+  new URL(
+    "../../components/provider/marketplace-management.tsx",
+    import.meta.url,
+  ),
+  "utf8",
+);
 
 describe("marketplace polish contracts", () => {
   it("gives the home hero and search panel layered depth", () => {
@@ -61,6 +68,22 @@ describe("marketplace polish contracts", () => {
     expect(rootSource).toContain("mode=remoto");
     expect(locationSource).toContain("findNearestManualLocation");
     expect(locationSource).toContain("Ubicación actual");
+  });
+
+  it("makes the compact location action right-aligned and explains its sheet", () => {
+    expect(locationSource).toContain("justify-between");
+    expect(locationSource).toContain("location-picker-sheet");
+    expect(locationSource).toContain("¿Dónde estás buscando?");
+    expect(locationSource).toContain("Usar mi ubicación actual");
+    expect(locationSource).toContain('aria-modal="true"');
+  });
+
+  it("explains the public profile link without exposing technical slug jargon", () => {
+    expect(marketplaceManagementSource).toContain("Enlace de tu perfil");
+    expect(marketplaceManagementSource).toContain(
+      "Se usa para crear el enlace que vas a compartir",
+    );
+    expect(marketplaceManagementSource).not.toContain('label="Slug público"');
   });
 
   it("keeps the primary hero action readable on narrow screens", () => {

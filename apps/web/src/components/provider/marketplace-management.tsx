@@ -202,6 +202,7 @@ function Field({
   defaultValue,
   type = "text",
   required = false,
+  helper,
   min,
   max,
   step,
@@ -211,6 +212,7 @@ function Field({
   defaultValue?: string | number | null | undefined;
   type?: string;
   required?: boolean;
+  helper?: string;
   min?: string | number;
   max?: string | number;
   step?: string | number;
@@ -228,6 +230,11 @@ function Field({
         max={max}
         step={step}
       />
+      {helper ? (
+        <span className="text-ink/48 mt-1.5 block text-xs leading-5 font-normal">
+          {helper}
+        </span>
+      ) : null}
     </label>
   );
 }
@@ -574,10 +581,11 @@ export function MarketplaceManagement({
         >
           <div className="grid gap-4 md:grid-cols-2">
             <Field
-              label="Slug público"
+              label="Enlace de tu perfil"
               name="publicSlug"
               defaultValue={provider.public_slug}
               required
+              helper="Se usa para crear el enlace que vas a compartir: /p/tu-nombre."
             />
             <Field
               label="Titular público"
