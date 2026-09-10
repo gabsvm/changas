@@ -12,7 +12,7 @@ export function BrandHero({
   children?: ReactNode;
 }) {
   return (
-    <section className="brand-gradient-surface relative overflow-hidden rounded-[2rem] px-5 pt-6 pb-8 text-white sm:px-8 sm:pt-8">
+    <section className="brand-gradient-surface relative overflow-hidden rounded-[2rem] px-5 pt-6 pb-8 text-white shadow-[var(--consumer-shadow-hero)] sm:px-8 sm:pt-8">
       <div className="relative z-10">
         <p className="text-xs font-extrabold tracking-[0.1em] text-white/80 uppercase">
           {eyebrow}
@@ -24,7 +24,7 @@ export function BrandHero({
           {description}
         </p>
         {children ? (
-          <div className="text-ink bg-canvas mt-6 rounded-[1.5rem] p-3 shadow-[0_14px_30px_rgba(32,33,36,0.12)] sm:p-4">
+          <div className="brand-hero-panel text-ink bg-canvas mt-6 rounded-[1.5rem] p-3 shadow-[var(--consumer-shadow-float)] sm:p-4">
             {children}
           </div>
         ) : null}

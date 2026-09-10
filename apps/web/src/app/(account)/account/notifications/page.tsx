@@ -87,7 +87,7 @@ export default async function NotificationCenterPage() {
           {unreadCount > 0 ? (
             <form action={markAllNotificationsReadAction}>
               <button
-                className="consumer-pressable inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold text-terracotta hover:bg-brand-orange/[0.07]"
+                className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold"
                 type="submit"
               >
                 Marcar todo leído
@@ -100,7 +100,7 @@ export default async function NotificationCenterPage() {
           <section aria-label="Actividad reciente">
             {notifications.length === 0 ? (
               <EmptyState
-                className="py-12"
+                className="empty-state-card py-12"
                 icon={<span aria-hidden="true">✓</span>}
                 title="Todo al día"
                 description="No tenés novedades pendientes. Cuando algo requiera tu atención va a aparecer acá."
@@ -111,11 +111,11 @@ export default async function NotificationCenterPage() {
                   <section key={label} aria-labelledby={`activity-${label}`}>
                     <h2
                       id={`activity-${label}`}
-                      className="text-ink/48 mb-1 text-xs font-bold uppercase tracking-[0.1em]"
+                      className="text-ink/48 mb-1 text-xs font-bold tracking-[0.1em] uppercase"
                     >
                       {label}
                     </h2>
-                    <ol className="consumer-card bg-surface divide-y divide-ink/[0.07] px-3">
+                    <ol className="consumer-card bg-surface divide-ink/[0.07] divide-y px-3">
                       {items.map((item) => (
                         <li key={item.id} className="py-3 sm:px-1">
                           <div className="flex gap-3">
@@ -130,11 +130,15 @@ export default async function NotificationCenterPage() {
                                     <span className="text-ink/45 text-[0.68rem] font-semibold">
                                       {getNotificationKindLabel(item.kind)}
                                     </span>
-                                    {item.unread ? <StatusChip tone="brand">Nueva</StatusChip> : null}
+                                    {item.unread ? (
+                                      <StatusChip tone="brand">
+                                        Nueva
+                                      </StatusChip>
+                                    ) : null}
                                   </div>
                                   <Link
                                     href={item.actionUrl}
-                                    className="mt-0.5 block text-[0.98rem] font-semibold leading-6 text-ink hover:text-terracotta"
+                                    className="text-ink hover:text-terracotta mt-0.5 block text-[0.98rem] leading-6 font-semibold"
                                   >
                                     {item.title}
                                   </Link>
@@ -143,15 +147,26 @@ export default async function NotificationCenterPage() {
                                   className="text-ink/38 shrink-0 text-[0.68rem]"
                                   dateTime={item.createdAt}
                                 >
-                                  {timeFormatter.format(new Date(item.createdAt))}
+                                  {timeFormatter.format(
+                                    new Date(item.createdAt),
+                                  )}
                                 </time>
                               </div>
-                              <p className="text-ink/55 mt-0.5 text-sm leading-5">{item.body}</p>
+                              <p className="text-ink/55 mt-0.5 text-sm leading-5">
+                                {item.body}
+                              </p>
                               {item.unread ? (
-                                <form action={markNotificationReadAction} className="mt-1.5">
-                                  <input type="hidden" name="notificationId" value={item.id} />
+                                <form
+                                  action={markNotificationReadAction}
+                                  className="mt-1.5"
+                                >
+                                  <input
+                                    type="hidden"
+                                    name="notificationId"
+                                    value={item.id}
+                                  />
                                   <button
-                                    className="consumer-pressable -ml-2 inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-ink/48 hover:bg-ink/[0.035] hover:text-ink"
+                                    className="consumer-pressable text-ink/48 hover:bg-ink/[0.035] hover:text-ink -ml-2 inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold"
                                     type="submit"
                                   >
                                     Marcar como leída
@@ -170,11 +185,14 @@ export default async function NotificationCenterPage() {
           </section>
 
           <aside>
-            <h2 className="text-lg font-bold tracking-[-0.02em]">Notificaciones</h2>
+            <h2 className="text-lg font-bold tracking-[-0.02em]">
+              Notificaciones
+            </h2>
             <p className="text-ink/48 mt-1 text-xs leading-5">
-              Las alertas críticas dentro de Changas siguen disponibles aunque desactives canales externos.
+              Las alertas críticas dentro de Changas siguen disponibles aunque
+              desactives canales externos.
             </p>
-            <div className="consumer-card bg-surface mt-3 divide-y divide-ink/[0.07] px-4">
+            <div className="consumer-card settings-card bg-surface divide-ink/[0.07] mt-3 divide-y px-4">
               <PushOptIn
                 publicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""}
                 initialEnabled={preferences.pushActionableEnabled}

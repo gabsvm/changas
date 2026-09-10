@@ -28,6 +28,8 @@ describe("profile and admin regressions", () => {
 
   it("keeps the Storage error available when an avatar upload fails", () => {
     expect(avatarSource).toContain("upload.error.message");
+    expect(avatarSource).toContain("Bucket not found");
+    expect(avatarSource).toContain("almacenamiento de fotos");
   });
 
   it("opens identity evidence through an in-app preview", () => {

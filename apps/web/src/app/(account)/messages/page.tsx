@@ -37,22 +37,25 @@ export default async function MessagesPage() {
           </div>
           <Link
             href="/buscar"
-            className="consumer-pressable inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold text-terracotta hover:bg-brand-orange/[0.07]"
+            className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center gap-1 rounded-lg px-2.5 text-sm font-bold"
           >
-            Buscar servicios
+            Buscar servicios{" "}
+            <span className="chevron" aria-hidden="true">
+              →
+            </span>
           </Link>
         </div>
 
         {conversations.length === 0 ? (
           <EmptyState
-            className="py-16 sm:py-20"
+            className="empty-state-card py-16 sm:py-20"
             title="Todavía no tenés conversaciones"
             description="Cuando consultes por un servicio, el chat va a aparecer acá."
             actionHref="/buscar"
             actionLabel="Explorar servicios"
           />
         ) : (
-          <div className="consumer-card bg-surface mt-4 divide-y divide-ink/[0.07] px-3 sm:mt-6">
+          <div className="consumer-card bg-surface divide-ink/[0.07] mt-4 divide-y px-3 sm:mt-6">
             {conversations.map((conversation) => (
               <ConversationRow
                 key={conversation.conversation_id}
@@ -66,11 +69,15 @@ export default async function MessagesPage() {
   );
 }
 
-function ConversationRow({ conversation }: { conversation: ConversationSummary }) {
+function ConversationRow({
+  conversation,
+}: {
+  conversation: ConversationSummary;
+}) {
   return (
     <Link
       href={`/messages/${conversation.conversation_id}`}
-      className="consumer-pressable flex min-h-[4.75rem] items-center gap-3 py-3 hover:bg-ink/[0.025] sm:px-2"
+      className="consumer-pressable hover:bg-ink/[0.025] flex min-h-[4.75rem] items-center gap-3 py-3 sm:px-2"
     >
       <Avatar
         name={conversation.peer_display_name}
@@ -79,7 +86,7 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
       />
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-3">
-          <p className="truncate text-[0.95rem] font-semibold text-ink">
+          <p className="text-ink truncate text-[0.95rem] font-semibold">
             {conversation.peer_display_name}
           </p>
           <time className="text-ink/40 shrink-0 text-[0.7rem]">
@@ -97,7 +104,9 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
           </p>
           {conversation.unread_count > 0 ? (
             <span className="bg-brand-pink-strong grid min-h-5 min-w-5 shrink-0 place-items-center rounded-full px-1.5 text-[0.62rem] font-bold text-white">
-              {conversation.unread_count > 99 ? "99+" : conversation.unread_count}
+              {conversation.unread_count > 99
+                ? "99+"
+                : conversation.unread_count}
             </span>
           ) : null}
         </div>
@@ -107,7 +116,8 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
 }
 
 function conversationPreview(conversation: ConversationSummary): string {
-  if (conversation.last_message_preview) return conversation.last_message_preview;
+  if (conversation.last_message_preview)
+    return conversation.last_message_preview;
   switch (conversation.last_message_kind) {
     case "IMAGE":
       return "Imagen";

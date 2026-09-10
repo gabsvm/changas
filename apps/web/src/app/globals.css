@@ -46,9 +46,11 @@
   --consumer-divider: rgb(32 33 36 / 8%);
   --consumer-surface: #fffdf9;
   --consumer-surface-strong: #ffffff;
+  --consumer-surface-raised: #ffffff;
   --consumer-muted: rgb(32 33 36 / 58%);
   --consumer-shadow-card: 0 8px 20px rgb(32 33 36 / 6%);
   --consumer-shadow-float: 0 10px 30px rgb(32 33 36 / 8%);
+  --consumer-shadow-hero: 0 24px 70px rgb(32 33 36 / 14%);
   --consumer-hero-gradient: var(--brand-gradient);
 
   --mobile-bottom-nav-height: calc(
@@ -150,6 +152,17 @@ textarea {
   box-shadow: var(--consumer-shadow-float);
 }
 
+.brand-hero-panel {
+  border: 1px solid rgb(255 255 255 / 72%);
+  background: var(--consumer-surface-raised);
+}
+
+.brand-hero-search .consumer-control,
+.brand-hero-search input,
+.brand-hero-search select {
+  box-shadow: 0 3px 12px rgb(32 33 36 / 5%);
+}
+
 .brand-kicker {
   color: #c84010;
 }
@@ -212,6 +225,28 @@ textarea {
   border-radius: var(--consumer-radius-card);
   background: var(--consumer-surface);
   box-shadow: var(--consumer-shadow-card);
+}
+
+.empty-state-card {
+  border: 1px solid var(--consumer-divider);
+  border-radius: var(--consumer-radius-card);
+  background: var(--consumer-surface);
+  box-shadow: var(--consumer-shadow-card);
+}
+
+.settings-card {
+  background: var(--consumer-surface-raised);
+  box-shadow: var(--consumer-shadow-float);
+}
+
+.chevron {
+  display: inline-block;
+  transition: transform 150ms ease;
+}
+
+a:hover .chevron,
+button:hover .chevron {
+  transform: translateX(2px);
 }
 
 .consumer-divider {

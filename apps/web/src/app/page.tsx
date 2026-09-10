@@ -101,7 +101,7 @@ export default async function HomePage() {
           title="Tu mercado de tareas rápidas"
           description="Encontrá ayuda real para lo que necesitás hoy, cerca tuyo o de forma remota."
         >
-          <form action="/buscar" className="max-w-3xl">
+          <form action="/buscar" className="brand-hero-search max-w-3xl">
             <SearchField
               id="home-query"
               name="q"
@@ -113,12 +113,15 @@ export default async function HomePage() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/buscar?mode=remoto"
-                  className="consumer-pressable text-ink/58 hover:bg-ink/[0.035] hover:text-ink inline-flex min-h-12 items-center rounded-lg px-2.5 text-sm font-semibold"
+                  className="consumer-pressable text-ink/58 hover:bg-ink/[0.035] hover:text-ink inline-flex min-h-12 items-center gap-1 rounded-lg px-2.5 text-sm font-semibold"
                 >
-                  Servicios remotos
+                  Servicios remotos{" "}
+                  <span className="chevron" aria-hidden="true">
+                    →
+                  </span>
                 </Link>
                 <button
-                  className="consumer-pressable bg-brand-orange text-ink min-h-12 rounded-xl px-4 text-sm font-bold shadow-[0_5px_14px_rgba(255,107,53,0.15)]"
+                  className="consumer-pressable bg-brand-orange text-ink min-h-12 rounded-xl px-4 text-sm font-bold shadow-[0_8px_18px_rgba(255,107,53,0.24)]"
                   type="submit"
                 >
                   Explorar servicios

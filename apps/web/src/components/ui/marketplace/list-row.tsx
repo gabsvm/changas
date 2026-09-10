@@ -23,7 +23,7 @@ export function ListRow({
     <>
       {leading ? <span className="shrink-0">{leading}</span> : null}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[0.95rem] font-semibold text-ink">
+        <span className="text-ink block truncate text-[0.95rem] font-semibold">
           {title}
         </span>
         {description ? (
@@ -32,7 +32,12 @@ export function ListRow({
           </span>
         ) : null}
       </span>
-      {trailing ?? (href ? <span className="text-ink/30 text-xl">›</span> : null)}
+      {trailing ??
+        (href ? (
+          <span className="chevron text-ink/30 text-xl" aria-hidden="true">
+            ›
+          </span>
+        ) : null)}
     </>
   );
 
@@ -40,7 +45,7 @@ export function ListRow({
     return (
       <Link
         href={href}
-        className={`${baseClass} rounded-lg px-1 hover:bg-ink/[0.035] ${className}`}
+        className={`${baseClass} hover:bg-ink/[0.035] rounded-lg px-1 ${className}`}
       >
         {content}
       </Link>

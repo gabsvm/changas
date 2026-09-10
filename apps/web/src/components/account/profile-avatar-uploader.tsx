@@ -61,7 +61,13 @@ export function ProfileAvatarUploader({
           upsert: false,
         });
       if (upload.error) {
-        throw new Error(upload.error.message || "No pudimos subir la foto.");
+        const uploadMessage = upload.error.message || "";
+        if (uploadMessage.includes("Bucket not found")) {
+          throw new Error(
+            "No encontramos el almacenamiento de fotos. Aplicá las migraciones de Supabase y volvé a intentar.",
+          );
+        }
+        throw new Error(uploadMessage || "No pudimos subir la foto.");
       }
 
       const result = await saveProfileAvatarUpload({

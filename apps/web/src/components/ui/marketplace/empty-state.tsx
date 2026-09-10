@@ -20,7 +20,9 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={`mx-auto max-w-md py-10 text-center ${className}`}>
+    <div
+      className={`empty-state-card mx-auto max-w-md py-10 text-center ${className}`}
+    >
       {icon ? (
         <div className="bg-brand-yellow/20 text-terracotta mx-auto grid h-11 w-11 place-items-center rounded-full">
           {icon}
