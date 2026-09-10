@@ -7,6 +7,13 @@ function source(path: string): string {
 
 const providerPage = source("../../app/p/[slug]/page.tsx");
 const servicePage = source("../../app/p/[slug]/[serviceSlug]/page.tsx");
+const brandHero = source("../../components/ui/marketplace/brand-hero.tsx");
+const categoryTile = source(
+  "../../components/ui/marketplace/category-tile.tsx",
+);
+const nearbyServiceRail = source(
+  "../../components/ui/marketplace/nearby-service-rail.tsx",
+);
 
 describe("public marketplace detail UI", () => {
   it("avoids giant hero-card chrome", () => {
@@ -28,5 +35,18 @@ describe("public marketplace detail UI", () => {
     expect(providerPage).toContain("toggleProviderFavorite");
     expect(providerPage).toContain("ProviderReputation");
     expect(servicePage).toContain("startServiceConversation");
+  });
+
+  it("keeps marketplace compositions semantic and public-data only", () => {
+    expect(brandHero).toContain("<section");
+    expect(brandHero).toContain("<h1");
+    expect(categoryTile).toContain("Link");
+    expect(categoryTile).toContain("min-h-12");
+    expect(nearbyServiceRail).toContain("ServiceCard");
+    expect(nearbyServiceRail).toContain("aria-label");
+    for (const file of [brandHero, categoryTile, nearbyServiceRail]) {
+      expect(file).not.toContain("rating");
+      expect(file).not.toContain("verific");
+    }
   });
 });
