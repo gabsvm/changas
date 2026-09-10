@@ -16,7 +16,7 @@ export function AppHeader({
 }) {
   return (
     <header
-      className={`bg-canvas/96 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-14 items-center gap-3 border-b px-4 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none ${className}`}
+      className={`consumer-app-header bg-canvas/96 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-14 items-center gap-3 border-b px-4 shadow-[0_1px_0_rgba(32,33,36,0.04)] backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:shadow-none sm:backdrop-blur-none ${className}`}
     >
       {backHref ? (
         <Link

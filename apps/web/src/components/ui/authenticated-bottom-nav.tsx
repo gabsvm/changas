@@ -30,46 +30,105 @@ const items: NavItem[] = [
 function NavIcon({ name }: { name: NavItem["icon"] }) {
   if (name === "home") {
     return (
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none">
-        <path d="M3.5 10.5 12 3l8.5 7.5v9A1.5 1.5 0 0 1 19 21H5a1.5 1.5 0 0 1-1.5-1.5v-9Z" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" />
-        <path d="M9 21v-6h6v6" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" />
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-[22px] w-[22px]"
+        fill="none"
+      >
+        <path
+          d="M3.5 10.5 12 3l8.5 7.5v9A1.5 1.5 0 0 1 19 21H5a1.5 1.5 0 0 1-1.5-1.5v-9Z"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M9 21v-6h6v6"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinejoin="round"
+        />
       </svg>
     );
   }
 
   if (name === "messages") {
     return (
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none">
-        <path d="M4 5.5h16v11H9l-5 4v-15Z" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" />
-        <path d="M8 10h8M8 13.5h5" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-[22px] w-[22px]"
+        fill="none"
+      >
+        <path
+          d="M4 5.5h16v11H9l-5 4v-15Z"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M8 10h8M8 13.5h5"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+        />
       </svg>
     );
   }
 
   if (name === "activity") {
     return (
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none">
-        <path d="M6.5 9a5.5 5.5 0 0 1 11 0v3.5l2 3H4.5l2-3V9Z" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" />
-        <path d="M10 19a2 2 0 0 0 4 0" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-[22px] w-[22px]"
+        fill="none"
+      >
+        <path
+          d="M6.5 9a5.5 5.5 0 0 1 11 0v3.5l2 3H4.5l2-3V9Z"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M10 19a2 2 0 0 0 4 0"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+        />
       </svg>
     );
   }
 
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-[22px] w-[22px]"
+      fill="none"
+    >
       <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.9" />
-      <path d="M5 20c.7-4 3.1-6 7-6s6.3 2 7 6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <path
+        d="M5 20c.7-4 3.1-6 7-6s6.3 2 7 6"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-export function AuthenticatedBottomNav({ unreadCount }: { unreadCount: number }) {
+export function AuthenticatedBottomNav({
+  unreadCount,
+}: {
+  unreadCount: number;
+}) {
   const pathname = usePathname();
   const activeKey = getAuthenticatedNavKey(pathname);
 
   return (
     <nav
-      className="mobile-safe-bottom bg-surface/98 fixed inset-x-0 bottom-0 z-50 border-t border-ink/[0.07] px-2 pt-1.5 backdrop-blur-xl sm:hidden"
+      className="mobile-safe-bottom bg-surface/98 border-ink/[0.07] fixed inset-x-0 bottom-0 z-50 border-t px-2 pt-1.5 backdrop-blur-xl sm:hidden"
       aria-label="Navegación principal"
     >
       <div className="mx-auto grid h-[var(--consumer-nav-height)] max-w-md grid-cols-4">
@@ -80,7 +139,7 @@ export function AuthenticatedBottomNav({ unreadCount }: { unreadCount: number })
               key={item.key}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`consumer-pressable relative flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1 text-[0.7rem] font-semibold ${
+              className={`consumer-pressable focus-visible:ring-moss/45 focus-visible:ring-offset-surface relative flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1 text-[0.7rem] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
                 active ? "text-terracotta" : "text-ink/52 hover:text-ink/78"
               }`}
             >

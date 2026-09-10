@@ -32,6 +32,18 @@ const installPromptSource = readFileSync(
   new URL("../../components/pwa/install-prompt.tsx", import.meta.url),
   "utf8",
 );
+const appHeaderSource = readFileSync(
+  new URL("../../components/ui/marketplace/app-header.tsx", import.meta.url),
+  "utf8",
+);
+const bottomNavSource = readFileSync(
+  new URL("../../components/ui/authenticated-bottom-nav.tsx", import.meta.url),
+  "utf8",
+);
+const emptyStateSource = readFileSync(
+  new URL("../../components/ui/marketplace/empty-state.tsx", import.meta.url),
+  "utf8",
+);
 
 describe("marketplace polish contracts", () => {
   it("gives the home hero and search panel layered depth", () => {
@@ -75,5 +87,18 @@ describe("marketplace polish contracts", () => {
     expect(installPromptSource).toContain("max-h-[calc(100dvh");
     expect(installPromptSource).toContain("overflow-y-auto");
     expect(installPromptSource).toContain("env(safe-area-inset-bottom)");
+  });
+
+  it("keeps authenticated headers and empty copy composed on mobile", () => {
+    expect(messagesSource).toContain("max-w-[18rem]");
+    expect(messagesSource).toContain("whitespace-nowrap");
+    expect(activitySource).toContain("max-w-[22rem]");
+    expect(emptyStateSource).toContain("px-5");
+    expect(appHeaderSource).toContain("consumer-app-header");
+  });
+
+  it("uses visible focus without leaving a browser outline on touch navigation", () => {
+    expect(bottomNavSource).toContain("focus-visible:ring");
+    expect(bottomNavSource).toContain("outline-none");
   });
 });

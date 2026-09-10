@@ -75,19 +75,19 @@ export default async function NotificationCenterPage() {
     <section className="pb-6 sm:py-10">
       <MobileAppBar title="Actividad" />
       <div className="pt-4 sm:pt-0">
-        <div className="flex items-center justify-between gap-4">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
             <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
               Actividad
             </h1>
-            <p className="text-ink/52 text-sm sm:mt-1">
+            <p className="text-ink/52 max-w-[22rem] text-sm leading-5 sm:mt-1">
               Novedades de trabajos, propuestas, pagos y cuenta.
             </p>
           </div>
           {unreadCount > 0 ? (
             <form action={markAllNotificationsReadAction}>
               <button
-                className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold"
+                className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center self-start rounded-lg px-2.5 text-sm font-bold whitespace-nowrap"
                 type="submit"
               >
                 Marcar todo leído
