@@ -60,10 +60,12 @@ const marketplaceManagementSource = readFileSync(
 );
 
 describe("marketplace polish contracts", () => {
-  it("gives the home hero and search panel layered depth", () => {
-    expect(heroSource).toContain("brand-hero-panel");
+  it("gives the home feed a standalone search and quick-action depth", () => {
+    expect(rootSource).toContain("home-search-panel");
+    expect(rootSource).toContain("quick-action-card");
+    expect(rootSource).toContain("shadow");
+    expect(rootSource).not.toContain("<BrandHero");
     expect(heroSource).toContain("shadow");
-    expect(rootSource).toContain("brand-hero-search");
   });
 
   it("offers explicit device location with a manual and remote fallback", () => {
@@ -102,6 +104,8 @@ describe("marketplace polish contracts", () => {
     expect(rootSource).toContain("feed-home");
     expect(rootSource).toContain("Oficios populares");
     expect(rootSource).toContain("Profesionales destacados");
+    expect(rootSource).toContain("Explorá por modalidad");
+    expect(rootSource).toContain("Ofrecer mis servicios");
     expect(rootSource).toContain('layout="stack"');
     expect(rootSource).toContain("Garantía comunitaria");
     expect(nearbySource).toContain('layout?: "rail" | "stack"');

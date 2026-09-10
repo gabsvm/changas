@@ -6,7 +6,6 @@ import { parseDiscoveryFilters } from "@changas/domain";
 import { LocationPicker } from "@/components/discovery/location-picker";
 import { AuthenticatedBottomNav } from "@/components/ui/authenticated-bottom-nav";
 import { Avatar } from "@/components/ui/marketplace/avatar";
-import { BrandHero } from "@/components/ui/marketplace/brand-hero";
 import { CategoryTile } from "@/components/ui/marketplace/category-tile";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { NearbyServiceRail } from "@/components/ui/marketplace/nearby-service-rail";
@@ -62,17 +61,20 @@ export default async function HomePage() {
       className={`feed-home bg-canvas text-ink min-h-screen ${user ? "mobile-content-with-nav" : ""}`}
     >
       <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-8 sm:pt-5">
-        <header className="bg-canvas/96 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-16 items-center justify-between border-b px-4 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:px-0 sm:backdrop-blur-none">
+        <header className="bg-canvas/96 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-16 items-center justify-between border-b px-4 shadow-[0_1px_0_rgba(32,33,36,0.04)] backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:px-0 sm:shadow-none sm:backdrop-blur-none">
           <Link
-            className="flex items-center gap-2.5"
+            className="flex min-w-0 items-center gap-3"
             href="/"
             aria-label="Changas, inicio"
           >
-            <span className="brand-mark" aria-hidden="true">
+            <span className="brand-mark h-10 w-10" aria-hidden="true">
               C
             </span>
-            <span className="text-lg font-bold tracking-[-0.025em]">
-              Changas
+            <span className="min-w-0">
+              <span className="brand-kicker block text-[0.62rem]">CHANGAS</span>
+              <span className="block truncate text-base font-extrabold tracking-[-0.025em]">
+                {user ? `Hola, ${accountName}` : "Servicios cerca tuyo"}
+              </span>
             </span>
           </Link>
           {user ? (
@@ -88,7 +90,7 @@ export default async function HomePage() {
             </Link>
           ) : (
             <Link
-              className="consumer-pressable hover:bg-ink/[0.04] text-ink/70 inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-bold"
+              className="consumer-pressable hover:bg-ink/[0.04] text-ink/70 border-ink/[0.09] bg-surface inline-flex min-h-11 items-center rounded-full border px-3 text-sm font-bold shadow-sm"
               href="/login"
             >
               Ingresar
@@ -96,127 +98,232 @@ export default async function HomePage() {
           )}
         </header>
 
-        <BrandHero
-          eyebrow="Encontrá ayuda cerca tuyo"
-          title="¿Qué necesitás resolver hoy?"
-          description="Conectá con personas que saben hacerlo, cerca tuyo o de forma remota."
-        >
-          <form action="/buscar" className="brand-hero-search max-w-3xl">
-            <SearchField
-              id="home-query"
-              name="q"
-              placeholder="¿Qué ayuda necesitás?"
-              aria-label="Buscar un servicio o habilidad"
-            />
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
-              <LocationPicker compact />
-              <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
-                <Link
-                  href="/buscar?mode=remoto"
-                  className="consumer-pressable text-ink/58 hover:bg-ink/[0.035] hover:text-ink inline-flex min-h-11 items-center justify-center gap-1 rounded-lg px-2.5 text-sm font-semibold whitespace-nowrap sm:min-h-12"
-                >
-                  Servicios remotos{" "}
-                  <span className="chevron" aria-hidden="true">
-                    →
-                  </span>
-                </Link>
+        <div className="pt-5 sm:pt-9">
+          <section
+            className="home-search-panel consumer-card bg-surface p-3 sm:p-4"
+            aria-labelledby="home-search-title"
+          >
+            <div className="px-1 pb-2 sm:px-2">
+              <p className="brand-kicker text-xs">BUSCÁ A TU MANERA</p>
+              <h1
+                id="home-search-title"
+                className="mt-1 text-xl font-extrabold tracking-[-0.035em] sm:text-2xl"
+              >
+                ¿Qué necesitás resolver hoy?
+              </h1>
+            </div>
+            <form action="/buscar">
+              <SearchField
+                className="min-h-14"
+                id="home-query"
+                name="q"
+                placeholder="¿Qué changa o servicio necesitás?"
+                aria-label="Buscar un servicio o habilidad"
+              />
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <LocationPicker compact />
                 <button
-                  className="consumer-pressable bg-brand-orange text-ink min-h-12 w-full rounded-xl px-4 text-sm font-bold whitespace-nowrap shadow-[0_8px_18px_rgba(255,107,53,0.24)] sm:w-auto"
+                  className="consumer-pressable bg-brand-orange text-ink min-h-12 w-full rounded-xl px-5 text-sm font-extrabold whitespace-nowrap shadow-[0_6px_16px_rgba(255,107,53,0.22)] sm:w-auto"
                   type="submit"
                 >
-                  Explorar servicios
+                  Buscar servicios <span aria-hidden="true">→</span>
                 </button>
               </div>
-            </div>
-          </form>
-        </BrandHero>
+            </form>
+          </section>
 
-        <section className="mt-7" aria-labelledby="categories-title">
-          <SectionHeader
-            title="Oficios populares"
-            actionHref="/buscar"
-            actionLabel="Ver todos"
-          />
-          <div className="consumer-scrollbar-none -mx-4 mt-3 flex gap-2.5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
-            {(categories ?? []).map((category) => (
-              <CategoryTile
-                key={category.slug}
-                href={`/categoria/${category.slug}`}
-                label={category.name}
-                description={category.description}
-                icon={categoryIcon(category.slug)}
-              />
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-9">
-          {discovery.error ? (
-            <div>
-              <SectionHeader
-                title="Tareas cerca tuyo"
-                actionHref="/buscar"
-                actionLabel="Ver todo"
-              />
-              <p className="text-ink/58 mt-4 text-sm" role="status">
-                La búsqueda está momentáneamente en mantenimiento.
+          <section className="quick-action-card brand-gradient-surface relative mt-5 overflow-hidden rounded-[1.5rem] p-5 text-white shadow-[var(--consumer-shadow-hero)] sm:p-7">
+            <span
+              className="pointer-events-none absolute -right-10 -bottom-16 h-44 w-44 rounded-full border border-white/20"
+              aria-hidden="true"
+            />
+            <span
+              className="pointer-events-none absolute top-5 right-8 h-2 w-2 rounded-full bg-white/75"
+              aria-hidden="true"
+            />
+            <div className="relative z-10 max-w-2xl">
+              <p className="text-xs font-extrabold tracking-[0.14em] text-white/80 uppercase">
+                UNA CHANGA, SIN VUELTAS
               </p>
+              <h2 className="mt-3 max-w-xl text-[2rem] leading-[1.02] font-extrabold tracking-[-0.055em] sm:text-4xl">
+                Encontrá a alguien que lo resuelva.
+              </h2>
+              <p className="mt-3 max-w-lg text-sm leading-6 text-white/90 sm:text-base">
+                Personas con experiencia para ayudarte cerca tuyo o desde
+                cualquier lugar.
+              </p>
+              <div className="mt-5 flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+                <Link
+                  href="/buscar"
+                  className="consumer-pressable bg-surface text-terracotta inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-extrabold shadow-md"
+                >
+                  Explorar servicios <span aria-hidden="true">→</span>
+                </Link>
+                <Link
+                  href="/provider/onboarding"
+                  className="consumer-pressable inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-bold text-white/90 hover:bg-white/10"
+                >
+                  Ofrecer mis servicios
+                </Link>
+              </div>
             </div>
-          ) : discovery.rows.length > 0 ? (
-            <NearbyServiceRail
-              rows={discovery.rows.slice(0, 3)}
-              title="Profesionales destacados"
+          </section>
+
+          <section className="mt-8" aria-labelledby="categories-title">
+            <SectionHeader
+              title="Oficios populares"
               actionHref="/buscar"
-              layout="stack"
+              actionLabel="Ver todos"
             />
-          ) : (
-            <EmptyState
-              className="py-8"
-              title="Todavía no hay servicios para mostrar"
-              description="Probá buscar por categoría o publicá tu servicio para empezar a aparecer acá."
-              actionHref={
-                user
-                  ? "/provider/onboarding"
-                  : "/login?next=/provider/onboarding"
-              }
-              actionLabel="Publicar un servicio"
-              actionTone="secondary"
-            />
-          )}
-        </section>
+            <div className="consumer-scrollbar-none -mx-4 mt-3 flex gap-2.5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
+              {(categories ?? []).map((category) => (
+                <CategoryTile
+                  key={category.slug}
+                  href={`/categoria/${category.slug}`}
+                  label={category.name}
+                  description={category.description}
+                  icon={categoryIcon(category.slug)}
+                />
+              ))}
+            </div>
+          </section>
 
-        <section
-          className="consumer-card border-brand-orange/15 bg-surface-muted mt-7 flex items-start gap-3 p-4 sm:p-5"
-          aria-label="Garantía comunitaria"
-        >
-          <span
-            className="bg-brand-orange/15 text-terracotta grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg"
-            aria-hidden="true"
-          >
-            ✦
-          </span>
-          <div>
-            <h2 className="text-sm font-extrabold">Garantía comunitaria</h2>
-            <p className="text-ink/58 mt-1 text-xs leading-5">
-              Perfiles públicos, precios claros y contacto directo para que
-              elijas con confianza.
-            </p>
-          </div>
-        </section>
+          <section className="mt-6" aria-labelledby="modality-title">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p id="modality-title" className="text-sm font-extrabold">
+                  Explorá por modalidad
+                </p>
+                <p className="text-ink/50 mt-0.5 text-xs">
+                  Elegí cómo querés recibir ayuda.
+                </p>
+              </div>
+              <Link
+                href="/buscar"
+                className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
+              >
+                Más filtros{" "}
+                <span className="ml-1" aria-hidden="true">
+                  →
+                </span>
+              </Link>
+            </div>
+            <div className="consumer-scrollbar-none -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+              <Link
+                href="/buscar?mode=remoto"
+                className="consumer-pressable bg-surface border-ink/[0.09] text-ink hover:border-brand-orange/40 hover:bg-surface-muted inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-bold shadow-sm"
+              >
+                <span className="text-moss" aria-hidden="true">
+                  ◉
+                </span>
+                Servicios remotos
+              </Link>
+              <Link
+                href="/buscar?mode=presencial"
+                className="consumer-pressable bg-surface border-ink/[0.09] text-ink hover:border-brand-orange/40 hover:bg-surface-muted inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-bold shadow-sm"
+              >
+                <span className="text-terracotta" aria-hidden="true">
+                  ⌖
+                </span>
+                Cerca tuyo
+              </Link>
+              <Link
+                href="/buscar?offers=true"
+                className="consumer-pressable bg-surface border-ink/[0.09] text-ink hover:border-brand-orange/40 hover:bg-surface-muted inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-bold shadow-sm"
+              >
+                <span className="text-brand-orange" aria-hidden="true">
+                  $
+                </span>
+                Acepta ofertas
+              </Link>
+            </div>
+          </section>
 
-        {!user ? (
-          <section className="border-ink/[0.07] mt-8 flex flex-col gap-3 border-t pt-5 text-sm sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-ink/55">
-              ¿Querés ofrecer tus servicios en Changas?
-            </p>
+          <section className="mt-9">
+            {discovery.error ? (
+              <div>
+                <SectionHeader
+                  title="Profesionales destacados"
+                  actionHref="/buscar"
+                  actionLabel="Explorar más"
+                />
+                <p className="text-ink/58 mt-4 text-sm" role="status">
+                  La búsqueda está momentáneamente en mantenimiento.
+                </p>
+              </div>
+            ) : discovery.rows.length > 0 ? (
+              <NearbyServiceRail
+                rows={discovery.rows.slice(0, 6)}
+                title="Profesionales destacados"
+                actionHref="/buscar"
+                layout="stack"
+              />
+            ) : (
+              <EmptyState
+                className="py-8"
+                title="Todavía no hay servicios para mostrar"
+                description="Probá buscar por categoría o publicá tu servicio para empezar a aparecer acá."
+                actionHref={
+                  user
+                    ? "/provider/onboarding"
+                    : "/login?next=/provider/onboarding"
+                }
+                actionLabel="Publicar un servicio"
+                actionTone="secondary"
+              />
+            )}
+          </section>
+
+          <section className="consumer-card bg-surface-muted border-brand-orange/15 mt-7 flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div className="flex items-start gap-3">
+              <span
+                className="bg-brand-orange/15 text-terracotta grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg"
+                aria-hidden="true"
+              >
+                ✦
+              </span>
+              <div>
+                <h2 className="text-sm font-extrabold">Garantía comunitaria</h2>
+                <p className="text-ink/58 mt-1 text-xs leading-5">
+                  Perfiles públicos, precios claros y contacto directo para
+                  elegir con confianza.
+                </p>
+              </div>
+            </div>
             <Link
-              className="text-terracotta font-bold"
-              href="/provider/onboarding"
+              href="/buscar"
+              className="text-terracotta consumer-pressable inline-flex min-h-11 items-center text-sm font-extrabold sm:shrink-0"
             >
-              Empezar como proveedor →
+              Cómo funciona{" "}
+              <span className="ml-1" aria-hidden="true">
+                →
+              </span>
             </Link>
           </section>
-        ) : null}
+
+          {!user ? (
+            <section className="consumer-card border-brand-yellow/35 bg-surface-muted mt-5 flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="brand-kicker text-[0.68rem]">PARA CHANGUISTAS</p>
+                <h2 className="mt-1 text-base font-extrabold tracking-[-0.02em]">
+                  Tu oficio también merece un buen escaparate.
+                </h2>
+                <p className="text-ink/55 mt-1 text-xs">
+                  Publicá lo que hacés y empezá a recibir consultas.
+                </p>
+              </div>
+              <Link
+                className="consumer-pressable bg-ink text-surface inline-flex min-h-11 items-center justify-center rounded-xl px-4 text-sm font-extrabold shadow-sm"
+                href="/provider/onboarding"
+              >
+                Ofrecer mis servicios{" "}
+                <span className="ml-1" aria-hidden="true">
+                  →
+                </span>
+              </Link>
+            </section>
+          ) : null}
+        </div>
       </div>
       {user ? <AuthenticatedBottomNav unreadCount={unreadCount} /> : null}
     </main>
