@@ -9,6 +9,13 @@ const heroSource = readFileSync(
   new URL("../../components/ui/marketplace/brand-hero.tsx", import.meta.url),
   "utf8",
 );
+const nearbySource = readFileSync(
+  new URL(
+    "../../components/ui/marketplace/nearby-service-rail.tsx",
+    import.meta.url,
+  ),
+  "utf8",
+);
 const locationSource = readFileSync(
   new URL("../../components/discovery/location-picker.tsx", import.meta.url),
   "utf8",
@@ -89,6 +96,15 @@ describe("marketplace polish contracts", () => {
   it("keeps the primary hero action readable on narrow screens", () => {
     expect(rootSource).toContain("whitespace-nowrap");
     expect(rootSource).toContain("w-full");
+  });
+
+  it("organizes the home as a polished marketplace feed", () => {
+    expect(rootSource).toContain("feed-home");
+    expect(rootSource).toContain("Oficios populares");
+    expect(rootSource).toContain("Profesionales destacados");
+    expect(rootSource).toContain('layout="stack"');
+    expect(rootSource).toContain("Garantía comunitaria");
+    expect(nearbySource).toContain('layout?: "rail" | "stack"');
   });
 
   it("uses premium action surfaces in authenticated empty states", () => {

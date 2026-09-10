@@ -8,10 +8,12 @@ export function NearbyServiceRail({
   rows,
   title,
   actionHref,
+  layout = "rail",
 }: {
   rows: ReputationDiscoveryServiceRow[];
   title: string;
   actionHref: string;
+  layout?: "rail" | "stack";
 }) {
   if (rows.length === 0) return null;
 
@@ -34,11 +36,19 @@ export function NearbyServiceRail({
           </span>
         </Link>
       </div>
-      <ul className="consumer-scrollbar-none -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-0 sm:px-0">
+      <ul
+        className={
+          layout === "stack"
+            ? "mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+            : "consumer-scrollbar-none -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-0 sm:px-0"
+        }
+      >
         {rows.map((row) => (
           <li
             key={`${row.provider_slug}/${row.service_slug}`}
-            className="w-[min(88vw,24rem)] shrink-0"
+            className={
+              layout === "stack" ? undefined : "w-[min(88vw,24rem)] shrink-0"
+            }
           >
             <ServiceCard row={row} />
           </li>

@@ -59,7 +59,7 @@ export default async function HomePage() {
   return (
     <main
       id="main-content"
-      className={`bg-canvas text-ink min-h-screen ${user ? "mobile-content-with-nav" : ""}`}
+      className={`feed-home bg-canvas text-ink min-h-screen ${user ? "mobile-content-with-nav" : ""}`}
     >
       <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-8 sm:pt-5">
         <header className="bg-canvas/96 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-16 items-center justify-between border-b px-4 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:px-0 sm:backdrop-blur-none">
@@ -97,9 +97,9 @@ export default async function HomePage() {
         </header>
 
         <BrandHero
-          eyebrow="Servicios cerca tuyo"
-          title="Tu mercado de tareas rápidas"
-          description="Encontrá ayuda real para lo que necesitás hoy, cerca tuyo o de forma remota."
+          eyebrow="Encontrá ayuda cerca tuyo"
+          title="¿Qué necesitás resolver hoy?"
+          description="Conectá con personas que saben hacerlo, cerca tuyo o de forma remota."
         >
           <form action="/buscar" className="brand-hero-search max-w-3xl">
             <SearchField
@@ -133,9 +133,9 @@ export default async function HomePage() {
 
         <section className="mt-7" aria-labelledby="categories-title">
           <SectionHeader
-            title="Categorías"
+            title="Oficios populares"
             actionHref="/buscar"
-            actionLabel="Ver todas"
+            actionLabel="Ver todos"
           />
           <div className="consumer-scrollbar-none -mx-4 mt-3 flex gap-2.5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
             {(categories ?? []).map((category) => (
@@ -164,9 +164,10 @@ export default async function HomePage() {
             </div>
           ) : discovery.rows.length > 0 ? (
             <NearbyServiceRail
-              rows={discovery.rows}
-              title="Tareas cerca tuyo"
+              rows={discovery.rows.slice(0, 3)}
+              title="Profesionales destacados"
               actionHref="/buscar"
+              layout="stack"
             />
           ) : (
             <EmptyState
@@ -182,6 +183,25 @@ export default async function HomePage() {
               actionTone="secondary"
             />
           )}
+        </section>
+
+        <section
+          className="consumer-card border-brand-orange/15 bg-surface-muted mt-7 flex items-start gap-3 p-4 sm:p-5"
+          aria-label="Garantía comunitaria"
+        >
+          <span
+            className="bg-brand-orange/15 text-terracotta grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg"
+            aria-hidden="true"
+          >
+            ✦
+          </span>
+          <div>
+            <h2 className="text-sm font-extrabold">Garantía comunitaria</h2>
+            <p className="text-ink/58 mt-1 text-xs leading-5">
+              Perfiles públicos, precios claros y contacto directo para que
+              elijas con confianza.
+            </p>
+          </div>
         </section>
 
         {!user ? (
