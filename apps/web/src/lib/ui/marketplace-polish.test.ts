@@ -68,6 +68,11 @@ describe("marketplace polish contracts", () => {
     expect(heroSource).toContain("shadow");
   });
 
+  it("lets utility colors win over the global anchor reset", () => {
+    expect(cssSource).toContain("@layer base");
+    expect(cssSource).not.toContain("\na {\n  color: inherit;");
+  });
+
   it("offers explicit device location with a manual and remote fallback", () => {
     expect(locationSource).toContain(
       "navigator.geolocation.getCurrentPosition",
