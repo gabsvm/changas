@@ -6,6 +6,10 @@ const globals = readFileSync(
   new URL("../../app/globals.css", import.meta.url),
   "utf8",
 );
+const layout = readFileSync(
+  new URL("../../app/layout.tsx", import.meta.url),
+  "utf8",
+);
 const icon = readFileSync(
   new URL("../../app/icon.svg", import.meta.url),
   "utf8",
@@ -20,6 +24,14 @@ const badgeSources = [
   .join("\n");
 
 describe("Changas brand theme", () => {
+  it("uses Plus Jakarta Sans as the self-hosted product typeface", () => {
+    expect(layout).toContain('from "next/font/google"');
+    expect(layout).toContain("Plus_Jakarta_Sans");
+    expect(globals).toMatch(/--font-display:\s*var\(--font-plus-jakarta\)/);
+    expect(globals).toMatch(/--font-sans:\s*var\(--font-plus-jakarta\)/);
+    expect(globals).not.toContain('"Inter"');
+  });
+
   it("uses the approved Changas palette as the global visual foundation", () => {
     expect(globals).toContain("--color-canvas: #fff9f3");
     expect(globals).toContain("--color-ink: #202124");
