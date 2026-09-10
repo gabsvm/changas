@@ -8,6 +8,7 @@ import {
   AdminStatusBadge,
   providerTone,
 } from "@/components/admin/admin-ui";
+import { IdentityDocumentPreview } from "@/components/admin/identity-document-preview";
 import {
   getAdminIdentityCase,
   listAdminIdentityQueue,
@@ -42,6 +43,22 @@ export default async function AdminIdentityPage({
     identityCase && Array.isArray(identityCase.documents)
       ? (identityCase.documents as Array<Record<string, unknown>>)
       : [];
+  const previewDocuments = documents.flatMap((document) => {
+    const id = typeof document.id === "string" ? document.id : "";
+    if (!id) return [];
+    return [
+      {
+        id,
+        documentType: getDocumentTypeLabel(
+          String(document.document_type ?? ""),
+        ),
+        mimeType:
+          typeof document.mime_type === "string"
+            ? document.mime_type
+            : "application/octet-stream",
+      },
+    ];
+  });
   const history =
     identityCase && Array.isArray(identityCase.review_history)
       ? (identityCase.review_history as Array<Record<string, unknown>>)
@@ -58,7 +75,9 @@ export default async function AdminIdentityPage({
         description="Sólo aparecen en la cola los prestadores que realmente enviaron su identidad. Los archivos siguen privados y cada apertura genera acceso temporal al documento exacto."
         action={
           <div className="rounded-2xl border border-[#ffc857]/30 bg-[#ffc857]/10 px-4 py-3 text-center">
-            <p className="text-2xl font-extrabold text-[#ffd878]">{queue.length}</p>
+            <p className="text-2xl font-extrabold text-[#ffd878]">
+              {queue.length}
+            </p>
             <p className="text-[0.65rem] font-extrabold tracking-[0.08em] text-[#b99a53] uppercase">
               pendientes
             </p>
@@ -89,39 +108,29 @@ export default async function AdminIdentityPage({
           </div>
 
           <div className="rounded-2xl border border-[#273142] bg-[#101720] p-4">
-            <p className="text-xs font-bold text-[#697386]">Identidad declarada</p>
+            <p className="text-xs font-bold text-[#697386]">
+              Identidad declarada
+            </p>
             <p className="mt-1 text-sm font-extrabold text-[#d0d5dd]">
               {identityCase.legal_name ?? "Sin nombre legal"}
             </p>
             <p className="mt-1 text-xs text-[#7f8a9b]">
-              DNI y fecha de nacimiento se consultan sólo dentro de este contexto administrativo.
+              DNI y fecha de nacimiento se consultan sólo dentro de este
+              contexto administrativo.
             </p>
           </div>
 
           <div>
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h3 className="text-sm font-extrabold text-white">Evidencia privada</h3>
-              <span className="text-xs font-bold text-[#697386]">{documents.length} archivos</span>
+              <h3 className="text-sm font-extrabold text-white">
+                Evidencia privada
+              </h3>
+              <span className="text-xs font-bold text-[#697386]">
+                {documents.length} archivos
+              </span>
             </div>
             {documents.length ? (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {documents.map((document) => {
-                  const id = String(document.id ?? "");
-                  const type = String(document.document_type ?? "");
-                  return (
-                    <a
-                      className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-[#273142] bg-[#0d131d] px-4 py-3 text-sm font-extrabold text-[#d0d5dd] transition-colors hover:border-[#4f7dff]/45 hover:text-white"
-                      href={`/api/admin/identity-documents/${id}`}
-                      key={id}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      <span>{getDocumentTypeLabel(type)}</span>
-                      <span className="text-[#7ea2ff]" aria-hidden="true">↗</span>
-                    </a>
-                  );
-                })}
-              </div>
+              <IdentityDocumentPreview documents={previewDocuments} />
             ) : (
               <AdminEmptyState
                 title="Este caso no tiene evidencia registrada"
@@ -181,9 +190,12 @@ export default async function AdminIdentityPage({
             </div>
           ) : (
             <div className="rounded-2xl border border-[#273142] bg-[#101720] p-4">
-              <p className="text-sm font-extrabold text-[#d0d5dd]">Caso sin decisión pendiente</p>
+              <p className="text-sm font-extrabold text-[#d0d5dd]">
+                Caso sin decisión pendiente
+              </p>
               <p className="mt-1 text-xs leading-5 text-[#7f8a9b]">
-                Los controles de decisión quedan bloqueados una vez resuelto el caso. El historial permanece disponible abajo para trazabilidad.
+                Los controles de decisión quedan bloqueados una vez resuelto el
+                caso. El historial permanece disponible abajo para trazabilidad.
               </p>
               {identityCase.status === "ACTIVE" ? (
                 <button
@@ -233,8 +245,12 @@ export default async function AdminIdentityPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">Cola de revisión</h2>
-          <span className="text-xs font-bold text-[#697386]">Más antiguos primero</span>
+          <h2 className="text-base font-extrabold text-white">
+            Cola de revisión
+          </h2>
+          <span className="text-xs font-bold text-[#697386]">
+            Más antiguos primero
+          </span>
         </div>
 
         {queue.length ? (
@@ -250,7 +266,8 @@ export default async function AdminIdentityPage({
                     {row.display_name ?? row.email ?? row.provider_user_id}
                   </p>
                   <p className="mt-1 text-xs text-[#7f8a9b]">
-                    {row.document_count} documentos · enviado {dateTime(row.submitted_at ?? row.updated_at)}
+                    {row.document_count} documentos · enviado{" "}
+                    {dateTime(row.submitted_at ?? row.updated_at)}
                   </p>
                 </div>
                 <AdminStatusBadge

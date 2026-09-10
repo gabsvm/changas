@@ -216,6 +216,15 @@ test.describe("Phase 09 admin trust and safety", () => {
       identityCard.getByText("En revisión", { exact: true }),
     ).toBeVisible();
 
+    await page.getByRole("button", { name: "DNI frente" }).click();
+    const documentPreview = page.getByRole("dialog");
+    await expect(documentPreview).toBeVisible();
+    await expect(
+      documentPreview.getByAltText("Vista previa de DNI frente"),
+    ).toBeVisible();
+    await documentPreview.getByRole("button", { name: "Cerrar" }).click();
+    await expect(documentPreview).toBeHidden();
+
     const signedResponse = await page.request.get(
       `/api/admin/identity-documents/${documentId}`,
       { maxRedirects: 0 },

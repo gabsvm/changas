@@ -60,9 +60,6 @@ export function AuthForm({
 
   return (
     <div className="border-ink/10 bg-surface w-full max-w-md rounded-[2rem] border p-6 shadow-[0_24px_70px_rgba(32,33,36,0.08)] sm:p-8">
-      <div className="bg-brand-yellow/20 text-ink mb-5 grid h-11 w-11 place-items-center rounded-2xl font-extrabold">
-        C
-      </div>
       <p className="text-terracotta text-xs font-extrabold tracking-[0.18em] uppercase">
         Cuenta Changas
       </p>

@@ -60,7 +60,9 @@ export function ProfileAvatarUploader({
           cacheControl: "3600",
           upsert: false,
         });
-      if (upload.error) throw new Error("No pudimos subir la foto.");
+      if (upload.error) {
+        throw new Error(upload.error.message || "No pudimos subir la foto.");
+      }
 
       const result = await saveProfileAvatarUpload({
         path,
