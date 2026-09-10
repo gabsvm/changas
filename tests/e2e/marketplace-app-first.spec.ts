@@ -13,7 +13,13 @@ for (const viewport of [
     }) => {
       await page.goto("/");
       await expect(
+        page.getByRole("heading", { name: "¿Qué necesitás resolver?" }),
+      ).toBeVisible();
+      await expect(
         page.getByRole("searchbox", { name: "Buscar un servicio o habilidad" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: /remoto/i }).first(),
       ).toBeVisible();
       await expect(
         page.getByRole("link", { name: "Tecnología" }).first(),
