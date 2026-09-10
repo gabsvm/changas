@@ -108,12 +108,12 @@ export default async function HomePage() {
               placeholder="¿Qué ayuda necesitás?"
               aria-label="Buscar un servicio o habilidad"
             />
-            <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
               <LocationPicker compact />
-              <div className="flex items-center gap-2">
+              <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
                 <Link
                   href="/buscar?mode=remoto"
-                  className="consumer-pressable text-ink/58 hover:bg-ink/[0.035] hover:text-ink inline-flex min-h-12 items-center gap-1 rounded-lg px-2.5 text-sm font-semibold"
+                  className="consumer-pressable text-ink/58 hover:bg-ink/[0.035] hover:text-ink inline-flex min-h-11 items-center justify-center gap-1 rounded-lg px-2.5 text-sm font-semibold whitespace-nowrap sm:min-h-12"
                 >
                   Servicios remotos{" "}
                   <span className="chevron" aria-hidden="true">
@@ -121,7 +121,7 @@ export default async function HomePage() {
                   </span>
                 </Link>
                 <button
-                  className="consumer-pressable bg-brand-orange text-ink min-h-12 rounded-xl px-4 text-sm font-bold shadow-[0_8px_18px_rgba(255,107,53,0.24)]"
+                  className="consumer-pressable bg-brand-orange text-ink min-h-12 w-full rounded-xl px-4 text-sm font-bold whitespace-nowrap shadow-[0_8px_18px_rgba(255,107,53,0.24)] sm:w-auto"
                   type="submit"
                 >
                   Explorar servicios

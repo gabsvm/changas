@@ -28,6 +28,10 @@ const cssSource = readFileSync(
   new URL("../../app/globals.css", import.meta.url),
   "utf8",
 );
+const installPromptSource = readFileSync(
+  new URL("../../components/pwa/install-prompt.tsx", import.meta.url),
+  "utf8",
+);
 
 describe("marketplace polish contracts", () => {
   it("gives the home hero and search panel layered depth", () => {
@@ -43,6 +47,13 @@ describe("marketplace polish contracts", () => {
     expect(locationSource).toContain("Usar mi ubicación");
     expect(locationSource).toContain("Sin ubicación");
     expect(rootSource).toContain("mode=remoto");
+    expect(locationSource).toContain("findNearestManualLocation");
+    expect(locationSource).toContain("Ubicación actual");
+  });
+
+  it("keeps the primary hero action readable on narrow screens", () => {
+    expect(rootSource).toContain("whitespace-nowrap");
+    expect(rootSource).toContain("w-full");
   });
 
   it("uses premium action surfaces in authenticated empty states", () => {
@@ -57,5 +68,12 @@ describe("marketplace polish contracts", () => {
     expect(cssSource).toContain("--consumer-shadow-float");
     expect(cssSource).toContain("--consumer-shadow-hero");
     expect(cssSource).toContain("--consumer-surface-raised");
+  });
+
+  it("keeps the install prompt above navigation and inside the safe viewport", () => {
+    expect(installPromptSource).toContain("z-[60]");
+    expect(installPromptSource).toContain("max-h-[calc(100dvh");
+    expect(installPromptSource).toContain("overflow-y-auto");
+    expect(installPromptSource).toContain("env(safe-area-inset-bottom)");
   });
 });

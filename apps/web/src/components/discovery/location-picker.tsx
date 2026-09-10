@@ -9,11 +9,27 @@ export const browserLocationStorageKey = "changas:search-location";
 
 type BrowserLocation = { latitude: number; longitude: number };
 
-function readLocationLabel(selected: string): string {
-  return (
-    manualLocations.find((location) => location.slug === selected)?.label ??
-    "Sin ubicación"
-  );
+function findNearestManualLocation(
+  latitude: number,
+  longitude: number,
+): (typeof manualLocations)[number] | null {
+  let nearest: (typeof manualLocations)[number] | null = null;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+
+  for (const location of manualLocations) {
+    const latitudeDistance = (latitude - location.latitude) * 111;
+    const longitudeDistance =
+      (longitude - location.longitude) *
+      111 *
+      Math.cos((latitude * Math.PI) / 180);
+    const distance = Math.hypot(latitudeDistance, longitudeDistance);
+    if (distance < nearestDistance) {
+      nearest = location;
+      nearestDistance = distance;
+    }
+  }
+
+  return nearestDistance <= 35 ? nearest : null;
 }
 
 export function LocationPicker({
@@ -25,6 +41,9 @@ export function LocationPicker({
 }) {
   const [manualLocation, setManualLocation] = useState(selected ?? "");
   const [usingDeviceLocation, setUsingDeviceLocation] = useState(false);
+  const [deviceLocationLabel, setDeviceLocationLabel] = useState<string | null>(
+    null,
+  );
   const [locationMessage, setLocationMessage] = useState<string | null>(null);
 
   function clearDeviceLocation() {
@@ -35,6 +54,7 @@ export function LocationPicker({
   function selectManualLocation(value: string) {
     setManualLocation(value);
     clearDeviceLocation();
+    setDeviceLocationLabel(null);
     setLocationMessage(null);
   }
 
@@ -55,9 +75,18 @@ export function LocationPicker({
           browserLocationStorageKey,
           JSON.stringify(location),
         );
+        const nearest = findNearestManualLocation(
+          location.latitude,
+          location.longitude,
+        );
         setUsingDeviceLocation(true);
+        setDeviceLocationLabel(nearest?.label ?? "Ubicación actual");
         setManualLocation("");
-        setLocationMessage("Ubicación actual lista");
+        setLocationMessage(
+          nearest
+            ? `${nearest.label} · ubicación actual`
+            : "Ubicación actual detectada",
+        );
       },
       () => {
         setLocationMessage(
@@ -102,7 +131,9 @@ export function LocationPicker({
             }
           >
             <option value="">
-              {usingDeviceLocation ? "Ubicación actual" : "Sin ubicación"}
+              {usingDeviceLocation
+                ? `${deviceLocationLabel ?? "Ubicación actual"} · actual`
+                : "Sin ubicación"}
             </option>
             {manualLocations.map((location) => (
               <option key={location.slug} value={location.slug}>
@@ -117,7 +148,9 @@ export function LocationPicker({
           onClick={useDeviceLocation}
         >
           <span aria-hidden="true">⌖</span>
-          {usingDeviceLocation ? "Ubicación lista" : "Usar mi ubicación"}
+          {usingDeviceLocation
+            ? (deviceLocationLabel ?? "Ubicación actual")
+            : "Usar mi ubicación"}
         </button>
         {locationMessage ? (
           <span
@@ -157,7 +190,9 @@ export function LocationPicker({
           onClick={useDeviceLocation}
         >
           <span aria-hidden="true">⌖</span>
-          {usingDeviceLocation ? "Ubicación actual lista" : "Usar mi ubicación"}
+          {usingDeviceLocation
+            ? (deviceLocationLabel ?? "Ubicación actual")
+            : "Usar mi ubicación"}
         </button>
         <Link
           className="text-terracotta font-semibold"
@@ -176,7 +211,6 @@ export function LocationPicker({
           zona.
         </p>
       )}
-      <span className="sr-only">{readLocationLabel(manualLocation)}</span>
     </div>
   );
 }
