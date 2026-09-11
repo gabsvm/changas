@@ -116,7 +116,7 @@ export default async function HomePage() {
             </div>
           </div>
           <section
-            className="home-search-panel consumer-card bg-surface p-3 sm:p-4"
+            className="home-search-panel consumer-card bg-surface hidden p-3 sm:block sm:p-4"
             aria-labelledby="home-search-title"
           >
             <div className="px-1 pb-2 sm:px-2">

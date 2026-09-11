@@ -84,6 +84,13 @@ describe("marketplace polish contracts", () => {
     expect(heroSource).toContain("shadow");
   });
 
+  it("keeps the mobile home focused on the primary quick action", () => {
+    expect(rootSource).toMatch(
+      /className="home-search-panel[^\"]*hidden[^\"]*sm:block/,
+    );
+    expect(rootSource).toContain("quick-action-card");
+  });
+
   it("lets utility colors win over the global anchor reset", () => {
     expect(cssSource).toContain("@layer base");
     expect(cssSource).not.toContain("\na {\n  color: inherit;");
