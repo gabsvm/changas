@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { formatServicePrice } from "@changas/domain";
 
 import { Avatar } from "@/components/ui/marketplace/avatar";
+import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { createClient } from "@/lib/supabase/server";
@@ -88,26 +89,20 @@ export default async function PublicServicePage({
   return (
     <main id="main-content" className="bg-canvas text-ink min-h-screen px-4 py-4 sm:px-8">
       <div className="mx-auto max-w-3xl">
-        <header className="border-ink/10 flex min-h-14 items-center justify-between gap-4 border-b pb-3">
-          <Link
-            className="consumer-pressable flex min-h-11 items-center gap-2 rounded-lg px-1"
-            href="/"
-            aria-label="Changas, inicio"
-          >
-            <span className="brand-mark" aria-hidden="true">
-              C
-            </span>
-            <span className="text-base font-extrabold tracking-[-0.025em]">Changas</span>
-          </Link>
-          <Link
-            className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
-            href={`/p/${providerSlug}`}
-          >
-            Ver perfil
-          </Link>
-        </header>
+        <AppHeader
+          brand
+          action={
+            <Link
+              className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
+              href={`/p/${providerSlug}`}
+            >
+              Ver perfil <span aria-hidden="true">→</span>
+            </Link>
+          }
+          className="sm:flex"
+        />
 
-        <article className="consumer-card bg-surface mt-5 overflow-hidden p-4 pt-6 sm:mt-8 sm:p-8">
+        <article className="service-hero-card consumer-card bg-surface mt-5 overflow-hidden p-4 pt-6 sm:mt-8 sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone="neutral">{service.skill_name}</StatusChip>
             <StatusChip tone="info">
@@ -125,7 +120,7 @@ export default async function PublicServicePage({
             {service.description}
           </p>
 
-          <section className="border-ink/10 bg-surface-muted/55 mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y py-4 sm:grid-cols-3 sm:px-3">
+          <section className="service-price-panel border-ink/8 bg-surface-muted/70 mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-2xl border px-4 py-4 sm:grid-cols-3">
             <Metric label="Precio" value={price} />
             <Metric
               label="Duración"
@@ -193,7 +188,7 @@ export default async function PublicServicePage({
             </Link>
           </section>
 
-          <div className="bg-canvas/95 border-ink/10 sticky bottom-0 z-20 -mx-4 mt-6 border-t px-4 py-3 backdrop-blur-xl sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
+          <div className="service-cta-bar bg-canvas/95 border-ink/10 sticky bottom-0 z-20 -mx-4 mt-6 border-t px-4 py-3 backdrop-blur-xl sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
             <div className="flex items-center gap-3 sm:justify-between">
               <div className="hidden sm:block">
                 <p className="text-sm font-bold">{price}</p>

@@ -58,6 +58,22 @@ const marketplaceManagementSource = readFileSync(
   ),
   "utf8",
 );
+const categorySource = readFileSync(
+  new URL("../../app/categoria/[slug]/page.tsx", import.meta.url),
+  "utf8",
+);
+const providerSource = readFileSync(
+  new URL("../../app/p/[slug]/page.tsx", import.meta.url),
+  "utf8",
+);
+const serviceSource = readFileSync(
+  new URL("../../app/p/[slug]/[serviceSlug]/page.tsx", import.meta.url),
+  "utf8",
+);
+const serviceCardSource = readFileSync(
+  new URL("../../components/ui/marketplace/service-card.tsx", import.meta.url),
+  "utf8",
+);
 
 describe("marketplace polish contracts", () => {
   it("gives the home feed a standalone search and quick-action depth", () => {
@@ -148,5 +164,22 @@ describe("marketplace polish contracts", () => {
   it("uses visible focus without leaving a browser outline on touch navigation", () => {
     expect(bottomNavSource).toContain("focus-visible:ring");
     expect(bottomNavSource).toContain("outline-none");
+  });
+
+  it("gives public discovery surfaces a shared tactile composition", () => {
+    expect(rootSource).toContain("feed-location-summary");
+    expect(rootSource).toContain("feed-trust-mark");
+    expect(categorySource).toContain("discovery-hero");
+    expect(categorySource).toContain("discovery-results-shell");
+    expect(providerSource).toContain("profile-hero-card");
+    expect(providerSource).toContain("profile-trust-strip");
+    expect(providerSource).toContain("profile-facts");
+    expect(providerSource).toContain("<AppHeader");
+    expect(serviceSource).toContain("service-hero-card");
+    expect(serviceSource).toContain("service-price-panel");
+    expect(serviceSource).toContain("<AppHeader");
+    expect(serviceSource).toContain("service-cta-bar");
+    expect(serviceCardSource).toContain("service-card-shell");
+    expect(serviceCardSource).toContain("service-card-footer");
   });
 });

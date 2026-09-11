@@ -99,6 +99,22 @@ export default async function HomePage() {
         </header>
 
         <div className="pt-5 sm:pt-9">
+          <div className="feed-location-summary mb-3 flex items-center gap-2 px-1 text-xs sm:mb-4 sm:px-0">
+            <span
+              className="bg-brand-orange/12 text-terracotta grid h-8 w-8 shrink-0 place-items-center rounded-full"
+              aria-hidden="true"
+            >
+              ⌖
+            </span>
+            <div className="min-w-0">
+              <p className="text-ink/45 font-bold tracking-[0.12em] uppercase">
+                Descubrí cerca tuyo
+              </p>
+              <p className="text-ink/58 mt-0.5 truncate">
+                Elegí una zona o buscá servicios remotos.
+              </p>
+            </div>
+          </div>
           <section
             className="home-search-panel consumer-card bg-surface p-3 sm:p-4"
             aria-labelledby="home-search-title"
@@ -277,7 +293,7 @@ export default async function HomePage() {
           <section className="consumer-card bg-surface-muted border-brand-orange/15 mt-7 flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div className="flex items-start gap-3">
               <span
-                className="bg-brand-orange/15 text-terracotta grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg"
+                className="feed-trust-mark bg-brand-orange/15 text-terracotta grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg"
                 aria-hidden="true"
               >
                 ✦

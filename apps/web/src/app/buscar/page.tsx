@@ -86,7 +86,7 @@ export default async function SearchPage({
         />
 
         <section className="pt-5 sm:pt-9">
-          <div className="border-brand-yellow/35 bg-surface-muted/55 rounded-[1.75rem] border p-4 shadow-[var(--consumer-shadow-card)] sm:p-6">
+          <div className="discovery-hero border-brand-yellow/35 bg-surface-muted/55 rounded-[1.75rem] border p-4 shadow-[var(--consumer-shadow-card)] sm:p-6">
           <p className="brand-kicker text-xs font-extrabold tracking-[0.14em] uppercase">Encontrá ayuda cerca tuyo</p>
           <h1 className="text-2xl font-bold tracking-[-0.035em] sm:text-3xl">
             {query ? `Resultados para “${query}”` : "Explorar servicios"}
@@ -129,7 +129,7 @@ export default async function SearchPage({
           </div>
           </div>
 
-          <div className="mt-4">
+          <div className="discovery-results-shell mt-4">
             <DiscoveryResults
               initialError={searchResult.error}
               initialHasMore={hasMore}

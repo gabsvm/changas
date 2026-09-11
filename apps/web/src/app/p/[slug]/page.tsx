@@ -8,6 +8,7 @@ import { formatServicePrice } from "@changas/domain";
 
 import { ProviderReputation } from "@/components/reputation/provider-reputation";
 import { Avatar } from "@/components/ui/marketplace/avatar";
+import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { toggleProviderFavorite } from "@/lib/favorites/actions";
@@ -122,24 +123,18 @@ export default async function PublicProviderPage({
   return (
     <main id="main-content" className="bg-canvas text-ink min-h-screen px-4 py-4 sm:px-8">
       <div className="mx-auto max-w-4xl">
-        <header className="border-ink/10 flex min-h-14 items-center justify-between gap-4 border-b pb-3">
-          <Link
-            className="consumer-pressable flex min-h-11 items-center gap-2 rounded-lg px-1"
-            href="/"
-            aria-label="Changas, inicio"
-          >
-            <span className="brand-mark" aria-hidden="true">
-              C
-            </span>
-            <span className="text-base font-extrabold tracking-[-0.025em]">Changas</span>
-          </Link>
-          <Link
-            className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
-            href="/buscar"
-          >
-            Buscar
-          </Link>
-        </header>
+        <AppHeader
+          brand
+          action={
+            <Link
+              className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
+              href="/buscar"
+            >
+              Buscar servicios <span aria-hidden="true">→</span>
+            </Link>
+          }
+          className="sm:flex"
+        />
 
         <section className="pt-6 sm:pt-8">
           {pageSearchParams.favoriteError ? (
@@ -148,7 +143,7 @@ export default async function PublicProviderPage({
             </p>
           ) : null}
 
-          <div className="consumer-card bg-surface flex items-start gap-4 p-4 sm:p-6">
+          <div className="profile-hero-card consumer-card bg-surface flex items-start gap-4 p-4 sm:p-6">
             <Avatar
               name={provider.display_name}
               src={
@@ -182,6 +177,28 @@ export default async function PublicProviderPage({
               {provider.bio}
             </p>
           ) : null}
+
+          <div className="profile-trust-strip border-brand-yellow/35 bg-surface-muted mt-4 flex items-start gap-3 rounded-2xl border p-3.5">
+            <span
+              className="bg-brand-yellow/30 text-warning grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"
+              aria-hidden="true"
+            >
+              ✦
+            </span>
+            <div>
+              <p className="text-sm font-extrabold">Información pública clara</p>
+              <p className="text-ink/55 mt-0.5 text-xs leading-5">
+                Conocé sus servicios, zona aproximada y experiencia antes de
+                escribirle.
+              </p>
+            </div>
+          </div>
+
+          <div className="profile-facts mt-4 grid grid-cols-3 gap-2" aria-label="Resumen del perfil">
+            <ProfileFact label="Servicios" value={services?.length ?? 0} />
+            <ProfileFact label="Habilidades" value={skills?.length ?? 0} />
+            <ProfileFact label="Zonas" value={areas?.length ?? 0} />
+          </div>
 
           <form action={toggleProviderFavorite} className="mt-4">
             <input name="providerSlug" type="hidden" value={provider.public_slug} />
@@ -364,9 +381,20 @@ function PublicSection({
   children: ReactNode;
 }) {
   return (
-    <section className="border-ink/10 mt-6 border-t pt-5">
+    <section className="profile-section-card consumer-card bg-surface mt-5 p-4 sm:p-5">
       <h2 className="text-lg font-bold tracking-[-0.015em]">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>
+  );
+}
+
+function ProfileFact({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="border-ink/8 bg-surface-muted/55 rounded-xl border px-2 py-3 text-center">
+      <p className="text-lg font-extrabold tracking-[-0.03em]">{value}</p>
+      <p className="text-ink/48 mt-0.5 text-[0.68rem] font-bold uppercase">
+        {label}
+      </p>
+    </div>
   );
 }

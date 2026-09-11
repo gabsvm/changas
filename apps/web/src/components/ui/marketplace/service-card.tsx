@@ -27,7 +27,7 @@ export function ServiceCard({ row }: { row: ReputationDiscoveryServiceRow }) {
   );
 
   return (
-    <article className="consumer-card bg-surface overflow-hidden transition-transform duration-150 hover:-translate-y-0.5">
+    <article className="service-card-shell consumer-card bg-surface overflow-hidden transition-transform duration-150 hover:-translate-y-0.5">
       <Link
         href={`/p/${row.provider_slug}/${row.service_slug}`}
         className="consumer-pressable group block p-4 hover:bg-white"
@@ -73,7 +73,7 @@ export function ServiceCard({ row }: { row: ReputationDiscoveryServiceRow }) {
               {row.completed_jobs > 0 ? <span>{row.completed_jobs} completados</span> : null}
               <span>{row.category_name}</span>
             </div>
-            <span className="text-terracotta mt-3 inline-flex min-h-11 items-center text-sm font-bold">
+            <span className="service-card-footer text-terracotta mt-3 inline-flex min-h-11 items-center text-sm font-bold">
               Ver servicio <span className="ml-1 transition-transform group-hover:translate-x-0.5" aria-hidden="true">→</span>
             </span>
           </div>

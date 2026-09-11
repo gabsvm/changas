@@ -84,7 +84,7 @@ export default async function CategoryPage({
           className="sm:flex"
         />
         <section className="pt-5 sm:pt-9">
-          <div className="border-brand-yellow/35 bg-surface-muted/55 rounded-[1.75rem] border p-4 shadow-[var(--consumer-shadow-card)] sm:p-6">
+          <div className="discovery-hero border-brand-yellow/35 bg-surface-muted/55 rounded-[1.75rem] border p-4 shadow-[var(--consumer-shadow-card)] sm:p-6">
           <p className="brand-kicker text-xs font-extrabold tracking-[0.14em] uppercase">Explorá por categoría</p>
           <h1 className="mt-1 text-3xl font-bold tracking-[-0.04em] sm:text-4xl">
             {category.name}
@@ -96,7 +96,7 @@ export default async function CategoryPage({
           ) : null}
           </div>
           <p className="text-ink/42 mt-5 text-xs font-extrabold tracking-[0.12em] uppercase">Servicios publicados</p>
-          <div className="mt-5">
+          <div className="discovery-results-shell mt-5">
             <DiscoveryResults
               enableNearby={false}
               initialError={searchResult.error}
