@@ -13,11 +13,13 @@ export function SearchFiltersSheet({
   filters,
   categories,
   skills,
+  activeCount = 0,
 }: {
   query: string;
   filters: DiscoveryFilters;
   categories: Array<{ slug: string; name: string }>;
   skills: Array<{ slug: string; name: string }>;
+  activeCount?: number;
 }) {
   const [open, setOpen] = useState(false);
   const modeValue =
@@ -31,17 +33,12 @@ export function SearchFiltersSheet({
     <>
       <button
         type="button"
-        className="consumer-pressable border-ink/10 text-ink inline-flex min-h-11 items-center gap-2 rounded-xl border bg-white px-3.5 text-sm font-bold"
+        className="consumer-pressable border-ink/[0.1] text-ink inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border bg-white px-4 text-[15px] font-bold sm:w-auto"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          className="h-4.5 w-4.5"
-          fill="none"
-        >
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
           <path
             d="M4 7h16M7 12h10M10 17h4"
             stroke="currentColor"
@@ -50,6 +47,11 @@ export function SearchFiltersSheet({
           />
         </svg>
         Filtros
+        {activeCount > 0 ? (
+          <span className="bg-ink text-surface grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-xs font-extrabold">
+            {activeCount}
+          </span>
+        ) : null}
       </button>
 
       <BottomSheet open={open} title="Filtros" onClose={() => setOpen(false)}>
@@ -181,17 +183,17 @@ export function SearchFiltersSheet({
             </span>
           </label>
 
-          <div className="border-ink/[0.07] bg-surface/95 sticky bottom-0 -mx-4 mt-1 flex gap-2 border-t px-4 pt-3 backdrop-blur sm:static sm:col-span-2 sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pt-0">
+          <div className="border-ink/[0.07] bg-surface/95 mobile-safe-bottom sticky bottom-0 -mx-4 mt-1 flex gap-2 border-t px-4 pt-3 backdrop-blur sm:static sm:col-span-2 sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pt-0">
             <a
               href={
                 query ? `/buscar?q=${encodeURIComponent(query)}` : "/buscar"
               }
-              className="consumer-pressable border-ink/10 inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold"
+              className="consumer-pressable border-ink/10 inline-flex min-h-[52px] flex-1 items-center justify-center rounded-xl border bg-white px-4 text-[15px] font-bold"
             >
               Limpiar
             </a>
-            <ActionButton className="flex-1" type="submit">
-              Aplicar filtros
+            <ActionButton className="min-h-[52px] flex-[2] text-[15px]" type="submit">
+              Ver resultados
             </ActionButton>
           </div>
         </form>

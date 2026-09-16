@@ -16,12 +16,12 @@ export function AppHeader({
 }) {
   return (
     <header
-      className={`consumer-app-header bg-canvas/96 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-14 items-center gap-3 border-b px-4 shadow-[0_1px_0_rgba(32,33,36,0.04)] backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:shadow-none sm:backdrop-blur-none ${className}`}
+      className={`consumer-app-header bg-canvas/90 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-14 items-center gap-2.5 border-b px-4 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none ${className}`}
     >
       {backHref ? (
         <Link
           href={backHref}
-          className="consumer-pressable text-ink/75 hover:bg-ink/[0.05] -ml-2 grid h-12 w-12 shrink-0 place-items-center rounded-full"
+          className="consumer-pressable text-ink hover:bg-ink/[0.05] -ml-2 grid h-12 w-12 shrink-0 place-items-center rounded-full"
           aria-label="Volver"
         >
           <svg
@@ -56,7 +56,7 @@ export function AppHeader({
 
       {title ? (
         <span
-          className={`${backHref ? "text-center" : ""} min-w-0 flex-1 truncate text-[1.05rem] font-bold tracking-[-0.015em]`}
+          className="min-w-0 flex-1 truncate text-[17px] font-extrabold tracking-[-0.02em]"
         >
           {title}
         </span>

@@ -126,9 +126,12 @@ export default async function JobPage({
         trailing={
           <Link
             href={`/messages/${detail.conversation_id}`}
-            className="consumer-pressable text-terracotta inline-flex h-11 w-11 items-center justify-center rounded-lg text-xs font-bold"
+            className="consumer-pressable text-terracotta inline-flex h-12 min-w-12 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-bold hover:bg-brand-orange/[0.08]"
             aria-label="Abrir conversación"
           >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+              <path d="M4 5.5h16v11H9l-5 4v-15Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+            </svg>
             Chat
           </Link>
         }
@@ -147,27 +150,28 @@ export default async function JobPage({
           </Link>
         </div>
 
-        <header className="mt-0 sm:mt-5">
-          <div className="flex flex-wrap items-center gap-2">
+        <header className="consumer-card bg-surface mt-0 p-4 sm:mt-5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <StatusChip tone={status.tone}>{status.label}</StatusChip>
             <StatusChip tone="neutral">
               {getServiceModalityLabel(detail.modality)}
             </StatusChip>
           </div>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-[-0.035em]">
+          <h1 className="mt-2 text-[22px] leading-7 font-extrabold tracking-[-0.025em]">
             {detail.service_title}
           </h1>
-          <p className="text-ink/52 mt-1 text-sm">Con {detail.counterparty_name}</p>
+          <p className="text-ink/60 mt-1 text-sm">Con {detail.counterparty_name} · {price}</p>
+          <div className="bg-canvas mt-3 grid grid-cols-2 gap-2 rounded-xl p-3 text-sm">
+            <div>
+              <p className="text-ink/60 text-xs font-semibold">Próxima fecha</p>
+              <p className="mt-0.5 font-bold">{schedulePrimary ? dateTime(schedulePrimary) ?? "A coordinar" : "A coordinar"}</p>
+            </div>
+            <div>
+              <p className="text-ink/60 text-xs font-semibold">Precio acordado</p>
+              <p className="mt-0.5 font-extrabold">{price}</p>
+            </div>
+          </div>
         </header>
-
-        <section className="border-ink/10 mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y py-4 sm:grid-cols-3">
-          <Metric label="Precio acordado" value={price} />
-          <Metric
-            label="Agenda"
-            value={schedulePrimary ? dateTime(schedulePrimary) ?? "A coordinar" : "A coordinar"}
-          />
-          <Metric label="Modalidad" value={getServiceModalityLabel(detail.modality)} />
-        </section>
 
         <section className="border-ink/10 mt-5 border-t pt-4">
           <p className="text-ink/42 text-[0.68rem] font-bold tracking-[0.08em] uppercase">

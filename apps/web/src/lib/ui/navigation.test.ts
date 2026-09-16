@@ -5,11 +5,13 @@ import { getAuthenticatedNavKey } from "./navigation";
 describe("getAuthenticatedNavKey", () => {
   it.each([
     ["/", "home"],
-    ["/buscar", "home"],
-    ["/categoria/electricidad", "home"],
+    ["/buscar", "search"],
+    ["/categoria/electricidad", "search"],
     ["/messages", "messages"],
     ["/messages/123", "messages"],
     ["/account/notifications", "activity"],
+    ["/jobs", "activity"],
+    ["/jobs/123", "activity"],
     ["/account", "account"],
     ["/account/profile", "account"],
     ["/provider/onboarding", "account"],

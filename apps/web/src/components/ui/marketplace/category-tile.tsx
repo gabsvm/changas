@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { CategoryIcon } from "./category-icon";
+
 export function CategoryTile({
   href,
   label,
@@ -14,18 +16,16 @@ export function CategoryTile({
   return (
     <Link
       href={href}
-      className="consumer-card consumer-pressable flex min-h-12 w-24 shrink-0 flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-center hover:-translate-y-0.5 hover:bg-white"
+      className="consumer-card consumer-pressable consumer-card-pressed flex w-24 shrink-0 flex-col items-center gap-2 rounded-2xl px-2 py-3 text-center"
       aria-label={description ? `${label}: ${description}` : label}
     >
       <span
-        className="bg-brand-yellow grid h-11 w-11 place-items-center rounded-2xl text-xl"
+        className="bg-brand-yellow/25 text-terracotta grid h-12 w-12 place-items-center rounded-2xl"
         aria-hidden="true"
       >
-        {icon}
+        <CategoryIcon slug={icon} className="h-6 w-6" />
       </span>
-      <span className="text-ink text-[0.72rem] leading-4 font-bold">
-        {label}
-      </span>
+      <span className="text-ink line-clamp-2 text-xs leading-4 font-bold">{label}</span>
     </Link>
   );
 }

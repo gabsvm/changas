@@ -8,7 +8,7 @@ export function actionButtonClass(
   className = "",
 ): string {
   const base =
-    "consumer-pressable inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold outline-none transition disabled:cursor-not-allowed disabled:opacity-55";
+    "consumer-pressable inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl px-5 text-[15px] font-extrabold outline-none transition disabled:cursor-not-allowed disabled:opacity-55";
   const tones: Record<ActionTone, string> = {
     primary:
       "bg-brand-orange text-ink shadow-[0_5px_14px_rgba(255,107,53,0.16)] hover:bg-[#f75b29]",

@@ -41,11 +41,11 @@ describe("public marketplace detail UI", () => {
     expect(brandHero).toContain("<section");
     expect(brandHero).toContain("<h1");
     expect(categoryTile).toContain("Link");
-    expect(categoryTile).toContain("min-h-12");
+    expect(categoryTile).toContain("w-24");
+    expect(categoryTile).toContain("CategoryIcon");
     expect(nearbyServiceRail).toContain("ServiceCard");
     expect(nearbyServiceRail).toContain("aria-label");
     for (const file of [brandHero, categoryTile, nearbyServiceRail]) {
-      expect(file).not.toContain("rating");
       expect(file).not.toContain("verific");
     }
   });

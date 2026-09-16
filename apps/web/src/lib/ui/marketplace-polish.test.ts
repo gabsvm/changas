@@ -132,16 +132,16 @@ describe("marketplace polish contracts", () => {
     expect(rootSource).toContain("feed-home");
     expect(rootSource).toContain("Oficios populares");
     expect(rootSource).toContain("Profesionales destacados");
-    expect(rootSource).toContain("Explorá por modalidad");
     expect(rootSource).toContain("Ofrecer mis servicios");
     expect(rootSource).toContain('layout="stack"');
-    expect(rootSource).toContain("Garantía comunitaria");
+    expect(rootSource).toContain("Elegí con confianza");
+    expect(rootSource).toContain("home-query-mobile");
     expect(nearbySource).toContain('layout?: "rail" | "stack"');
   });
 
   it("uses premium action surfaces in authenticated empty states", () => {
     expect(messagesSource).toContain("empty-state-card");
-    expect(messagesSource).toContain("chevron");
+    expect(messagesSource).toContain("rounded-full");
     expect(activitySource).toContain("empty-state-card");
     expect(activitySource).toContain("settings-card");
   });
@@ -161,7 +161,7 @@ describe("marketplace polish contracts", () => {
   });
 
   it("keeps authenticated headers and empty copy composed on mobile", () => {
-    expect(messagesSource).toContain("max-w-[18rem]");
+    expect(messagesSource).toContain("max-w-[20rem]");
     expect(messagesSource).toContain("whitespace-nowrap");
     expect(activitySource).toContain("max-w-[22rem]");
     expect(emptyStateSource).toContain("px-5");
@@ -174,8 +174,8 @@ describe("marketplace polish contracts", () => {
   });
 
   it("gives public discovery surfaces a shared tactile composition", () => {
-    expect(rootSource).toContain("feed-location-summary");
     expect(rootSource).toContain("feed-trust-mark");
+    expect(rootSource).toContain("consumer-snap-rail");
     expect(categorySource).toContain("discovery-hero");
     expect(categorySource).toContain("discovery-results-shell");
     expect(providerSource).toContain("profile-hero-card");
@@ -187,6 +187,6 @@ describe("marketplace polish contracts", () => {
     expect(serviceSource).toContain("<AppHeader");
     expect(serviceSource).toContain("service-cta-bar");
     expect(serviceCardSource).toContain("service-card-shell");
-    expect(serviceCardSource).toContain("service-card-footer");
+    expect(serviceCardSource).toContain("consumer-card-pressed");
   });
 });

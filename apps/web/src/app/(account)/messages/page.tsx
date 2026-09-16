@@ -28,21 +28,18 @@ export default async function MessagesPage() {
       <div className="pt-4 sm:pt-0">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
-            <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
+            <h1 className="hidden text-3xl font-extrabold tracking-[-0.03em] sm:block">
               Mensajes
             </h1>
-            <p className="text-ink/52 max-w-[18rem] text-sm leading-5 sm:mt-1">
+            <p className="text-ink/60 max-w-[20rem] text-sm leading-5 sm:mt-1">
               Tus conversaciones sobre servicios y trabajos.
             </p>
           </div>
           <Link
             href="/buscar"
-            className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center gap-1 self-start rounded-lg px-2.5 text-sm font-bold whitespace-nowrap"
+            className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.08] inline-flex min-h-11 items-center gap-1 self-start rounded-full px-3 text-sm font-bold whitespace-nowrap"
           >
-            Buscar servicios{" "}
-            <span className="chevron" aria-hidden="true">
-              →
-            </span>
+            Buscar servicios
           </Link>
         </div>
 
@@ -77,7 +74,7 @@ function ConversationRow({
   return (
     <Link
       href={`/messages/${conversation.conversation_id}`}
-      className="consumer-pressable hover:bg-ink/[0.025] flex min-h-[4.75rem] items-center gap-3 py-3 sm:px-2"
+      className="consumer-pressable hover:bg-ink/[0.025] flex min-h-[76px] items-center gap-3 py-3 sm:px-2"
     >
       <Avatar
         name={conversation.peer_display_name}
@@ -86,24 +83,24 @@ function ConversationRow({
       />
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-ink truncate text-[0.95rem] font-semibold">
+          <p className="text-ink truncate text-[15px] font-bold">
             {conversation.peer_display_name}
           </p>
-          <time className="text-ink/40 shrink-0 text-[0.7rem]">
+          <time className="text-ink/60 shrink-0 text-xs font-medium">
             {formatConversationTime(
               conversation.last_message_at ?? conversation.updated_at,
             )}
           </time>
         </div>
-        <p className="text-ink/48 mt-0.5 truncate text-xs font-medium">
+        <p className="text-ink/60 mt-0.5 truncate text-[13px] font-semibold">
           {conversation.service_title}
         </p>
         <div className="mt-0.5 flex items-center gap-2">
-          <p className="text-ink/58 min-w-0 flex-1 truncate text-sm">
+          <p className="text-ink/60 min-w-0 flex-1 truncate text-sm">
             {conversationPreview(conversation)}
           </p>
           {conversation.unread_count > 0 ? (
-            <span className="bg-brand-pink-strong grid min-h-5 min-w-5 shrink-0 place-items-center rounded-full px-1.5 text-[0.62rem] font-bold text-white">
+            <span className="bg-brand-pink-strong grid h-5 min-w-5 shrink-0 place-items-center rounded-full px-1.5 text-[11px] font-bold text-white">
               {conversation.unread_count > 99
                 ? "99+"
                 : conversation.unread_count}

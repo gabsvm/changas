@@ -22,11 +22,13 @@ export function ProviderCard({
     >
       <Avatar name={name} src={avatarUrl} />
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-bold text-ink">{name}</span>
-        {subtitle ? <span className="text-ink/55 mt-0.5 block truncate text-sm">{subtitle}</span> : null}
-        {meta ? <span className="text-ink/42 mt-0.5 block truncate text-xs">{meta}</span> : null}
+        <span className="block truncate text-[15px] font-bold text-ink">{name}</span>
+        {subtitle ? <span className="text-ink/60 mt-0.5 block truncate text-sm">{subtitle}</span> : null}
+        {meta ? <span className="text-ink/60 mt-0.5 block truncate text-[13px]">{meta}</span> : null}
       </span>
-      <span className="text-ink/28 text-xl" aria-hidden="true">›</span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="text-ink/50 h-5 w-5 shrink-0" fill="none">
+        <path d="m9 5 7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </Link>
   );
 }

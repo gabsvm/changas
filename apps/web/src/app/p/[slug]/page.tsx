@@ -121,7 +121,7 @@ export default async function PublicProviderPage({
   ]);
 
   return (
-    <main id="main-content" className="bg-canvas text-ink min-h-screen px-4 py-4 sm:px-8">
+    <main id="main-content" className="bg-canvas text-ink min-h-screen px-4 pt-4 pb-28 sm:px-8 sm:pb-10">
       <div className="mx-auto max-w-4xl">
         <AppHeader
           brand
@@ -152,25 +152,52 @@ export default async function PublicProviderPage({
                   : null
               }
               size="lg"
-              className="h-16 w-16 text-lg"
             />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <StatusChip tone="success">Proveedor verificado</StatusChip>
+                <StatusChip tone="success">Identidad verificada</StatusChip>
                 {provider.public_zone ? (
-                  <span className="text-ink/48 text-xs">{provider.public_zone}</span>
+                  <span className="text-ink/60 text-[13px] font-medium">{provider.public_zone}</span>
                 ) : null}
               </div>
-              <h1 className="mt-2 text-3xl font-extrabold tracking-[-0.04em]">
+              <h1 className="mt-2 text-[26px] leading-7 font-extrabold tracking-[-0.03em]">
                 {provider.display_name}
               </h1>
               {provider.public_headline ? (
-                <p className="text-terracotta mt-1 text-base font-semibold">
+                <p className="text-ink/60 mt-1 text-[15px] font-semibold">
                   {provider.public_headline}
                 </p>
               ) : null}
             </div>
           </div>
+
+          {services?.[0]?.public_slug ? (
+            <div className="service-cta-bar bg-canvas/95 border-ink/[0.08] fixed inset-x-0 z-30 border-t px-4 pt-2 backdrop-blur-xl sm:hidden">
+              <div className="mx-auto flex max-w-4xl items-center gap-2">
+                <form action={toggleProviderFavorite} className="shrink-0">
+                  <input name="providerSlug" type="hidden" value={provider.public_slug} />
+                  <input name="returnTo" type="hidden" value={`/p/${provider.public_slug}`} />
+                  <input name="shouldFavorite" type="hidden" value={String(!isFavorite)} />
+                  <button
+                    className="consumer-pressable border-ink/[0.1] grid h-[52px] w-[52px] place-items-center rounded-2xl border bg-white"
+                    type="submit"
+                    aria-label={isFavorite ? "Quitar de guardados" : "Guardar proveedor"}
+                    aria-pressed={isFavorite}
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 24 24" className={`h-6 w-6 ${isFavorite ? "fill-danger stroke-danger" : "fill-none stroke-ink"}`} strokeWidth="1.8">
+                      <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </form>
+                <Link
+                  href={`/p/${slug}/${services?.[0]?.public_slug ?? ""}`}
+                  className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-[52px] flex-1 items-center justify-center rounded-2xl px-5 text-[15px] font-extrabold shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
+                >
+                  Contactar
+                </Link>
+              </div>
+            </div>
+          ) : null}
 
           {provider.bio ? (
             <p className="text-ink/62 mt-4 max-w-2xl text-sm leading-6">
@@ -200,11 +227,11 @@ export default async function PublicProviderPage({
             <ProfileFact label="Zonas" value={areas?.length ?? 0} />
           </div>
 
-          <form action={toggleProviderFavorite} className="mt-4">
+          <form action={toggleProviderFavorite} className="mt-4 hidden sm:block">
             <input name="providerSlug" type="hidden" value={provider.public_slug} />
             <input name="returnTo" type="hidden" value={`/p/${provider.public_slug}`} />
             <input name="shouldFavorite" type="hidden" value={String(!isFavorite)} />
-            <button className="button-secondary min-h-11" type="submit">
+            <button className="button-secondary min-h-12" type="submit">
               {isFavorite ? "Quitar de guardados" : "Guardar proveedor"}
             </button>
           </form>
@@ -224,10 +251,10 @@ export default async function PublicProviderPage({
                   key={service.public_slug}
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="text-ink/45 text-xs font-semibold">
+                    <p className="text-ink/60 text-[13px] font-semibold">
                       {service.skill_name}
                     </p>
-                    <h3 className="mt-0.5 line-clamp-2 text-base font-bold">
+                    <h3 className="mt-0.5 line-clamp-2 text-[15px] leading-5 font-bold">
                       {service.title}
                     </h3>
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -239,8 +266,8 @@ export default async function PublicProviderPage({
                       ) : null}
                     </div>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <p className="text-sm font-bold">
+                  <div className="flex shrink-0 flex-col items-end gap-2">
+                    <p className="text-[15px] font-extrabold">
                       {formatServicePrice(
                         service.price_model,
                         service.price_amount,
@@ -248,9 +275,9 @@ export default async function PublicProviderPage({
                         service.price_unit,
                       )}
                     </p>
-                    <span className="text-ink/25 mt-2 block text-xl" aria-hidden="true">
-                      ›
-                    </span>
+                    <svg aria-hidden="true" viewBox="0 0 24 24" className="text-ink/50 h-5 w-5" fill="none">
+                      <path d="m9 5 7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </div>
                 </Link>
               ))}

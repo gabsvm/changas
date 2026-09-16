@@ -87,7 +87,7 @@ export default async function PublicServicePage({
   );
 
   return (
-    <main id="main-content" className="bg-canvas text-ink min-h-screen px-4 py-4 sm:px-8">
+    <main id="main-content" className="bg-canvas text-ink min-h-screen px-4 pt-4 pb-28 sm:px-8 sm:pb-10">
       <div className="mx-auto max-w-3xl">
         <AppHeader
           brand
@@ -102,8 +102,8 @@ export default async function PublicServicePage({
           className="sm:flex"
         />
 
-        <article className="service-hero-card consumer-card bg-surface mt-5 overflow-hidden p-4 pt-6 sm:mt-8 sm:p-8">
-          <div className="flex flex-wrap items-center gap-2">
+        <article className="service-hero-card consumer-card bg-surface mt-4 overflow-hidden p-4 pt-5 sm:mt-8 sm:p-8">
+          <div className="flex flex-wrap items-center gap-1.5">
             <StatusChip tone="neutral">{service.skill_name}</StatusChip>
             <StatusChip tone="info">
               {getServiceModalityLabel(service.modality)}
@@ -113,14 +113,14 @@ export default async function PublicServicePage({
             ) : null}
           </div>
 
-          <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-[-0.04em] sm:text-4xl">
+          <h1 className="mt-3 text-[24px] leading-7 font-extrabold tracking-[-0.03em] sm:text-4xl">
             {service.title}
           </h1>
-          <p className="text-ink/62 mt-3 text-sm leading-6 sm:text-base">
+          <p className="text-ink/60 mt-2.5 text-[15px] leading-6 sm:text-base">
             {service.description}
           </p>
 
-          <section className="service-price-panel border-ink/8 bg-surface-muted/70 mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-2xl border px-4 py-4 sm:grid-cols-3">
+          <section className="service-price-panel border-ink/[0.08] bg-surface-muted/70 mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-2xl border px-4 py-4 sm:grid-cols-3" aria-label="Precio y condiciones">
             <Metric label="Precio" value={price} />
             <Metric
               label="Duración"
@@ -132,7 +132,7 @@ export default async function PublicServicePage({
             />
             <Metric
               label="Propuestas"
-              value={service.accepts_offers ? "Acepta" : "No aplica"}
+              value={service.accepts_offers ? "Acepta" : "Precio fijo"}
             />
           </section>
 
@@ -188,17 +188,21 @@ export default async function PublicServicePage({
             </Link>
           </section>
 
-          <div className="service-cta-bar bg-canvas/95 border-ink/10 sticky bottom-0 z-20 -mx-4 mt-6 border-t px-4 py-3 backdrop-blur-xl sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
-            <div className="flex items-center gap-3 sm:justify-between">
-              <div className="hidden sm:block">
-                <p className="text-sm font-bold">{price}</p>
-                <p className="text-ink/48 text-xs">Consultá alcance y tiempos por chat.</p>
+          <div className="service-cta-bar bg-canvas/95 border-ink/[0.08] fixed inset-x-0 z-30 border-t px-4 pt-2 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
+            <div className="mx-auto flex max-w-3xl items-stretch gap-2 sm:items-center sm:justify-between">
+              <div className="bg-surface border-ink/[0.08] hidden min-w-40 flex-col justify-center rounded-2xl border px-4 py-2 sm:flex">
+                <p className="text-[15px] leading-5 font-extrabold">{price}</p>
+                <p className="text-ink/60 text-xs">Alcance y tiempos por chat</p>
               </div>
-              <form action={startServiceConversation} className="w-full sm:w-auto">
+              <form action={startServiceConversation} className="flex min-w-0 flex-1 items-center gap-2">
                 <input type="hidden" name="providerSlug" value={providerSlug} />
                 <input type="hidden" name="serviceSlug" value={serviceSlug} />
-                <button className="button-primary w-full sm:w-auto" type="submit">
-                  Consultar por este servicio
+                <div className="bg-surface border-ink/[0.08] flex min-w-0 flex-1 flex-col justify-center rounded-2xl border px-4 py-2 sm:hidden">
+                  <p className="truncate text-[15px] leading-5 font-extrabold">{price}</p>
+                  <p className="text-ink/60 truncate text-xs">Por chat · responde rápido</p>
+                </div>
+                <button className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-[52px] shrink-0 items-center justify-center rounded-2xl px-6 text-[15px] font-extrabold shadow-[0_6px_16px_rgba(255,107,53,0.22)]" type="submit">
+                  Consultar
                 </button>
               </form>
             </div>
@@ -212,20 +216,21 @@ export default async function PublicServicePage({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-ink/42 text-[0.68rem] font-bold tracking-[0.08em] uppercase">
+      <p className="text-ink/60 text-xs font-bold tracking-[0.06em] uppercase">
         {label}
       </p>
-      <p className="mt-1 text-sm font-bold">{value}</p>
+      <p className="mt-1 text-[15px] font-extrabold">{value}</p>
     </div>
   );
 }
 
 function Info({ title, value }: { title: string; value: string | null }) {
+  if (!value) return null;
   return (
     <div className="py-3">
-      <h3 className="text-sm font-semibold">{title}</h3>
-      <p className="text-ink/58 mt-1 text-sm leading-6">
-        {value ?? "No especificado"}
+      <h3 className="text-sm font-bold">{title}</h3>
+      <p className="text-ink/60 mt-1 text-sm leading-6">
+        {value}
       </p>
     </div>
   );

@@ -28,14 +28,11 @@ export default async function JobsPage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Mis trabajos" backHref="/account" />
       <div className="mx-auto max-w-3xl pt-5 sm:pt-0">
-        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
-          Actividad
-        </p>
-        <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
+        <h1 className="mt-1.5 text-[24px] leading-7 font-extrabold tracking-[-0.03em]">
           Mis trabajos
         </h1>
-        <p className="text-ink/55 mt-1.5 text-sm leading-6">
-          Trabajos confirmados, en curso o pendientes de cierre.
+        <p className="text-ink/60 mt-1.5 text-sm leading-6">
+          Confirmados, en curso o pendientes de cierre.
         </p>
 
         {jobs.length === 0 ? (
@@ -47,35 +44,32 @@ export default async function JobsPage() {
             className="pt-14"
           />
         ) : (
-          <div className="border-ink/10 mt-5 divide-y divide-ink/10 border-y">
+          <div className="mt-5 grid gap-2.5">
             {jobs.map((job) => {
               const status = getJobStatusPresentation(job.job_status);
               return (
                 <Link
                   key={job.job_id}
                   href={`/jobs/${job.job_id}`}
-                  className="consumer-pressable flex min-h-[4.75rem] items-center gap-3 rounded-lg px-1 py-3 hover:bg-ink/[0.035]"
+                  className="consumer-card consumer-card-pressed consumer-pressable flex min-h-[76px] items-center gap-3 p-3.5"
                 >
-                  <span className="bg-brand-orange/10 text-terracotta grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-extrabold">
+                  <span className="bg-brand-orange/10 text-terracotta grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-base font-extrabold">
                     {job.service_title.trim().charAt(0).toUpperCase() || "C"}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold">
+                    <span className="block truncate text-[15px] font-bold">
                       {job.service_title}
                     </span>
-                    <span className="text-ink/52 mt-0.5 block truncate text-sm">
-                      {job.counterparty_name}
+                    <span className="text-ink/60 mt-0.5 block truncate text-[13px]">
+                      {job.counterparty_name} · {scheduleLabel(job)}
                     </span>
-                    <span className="text-ink/38 mt-0.5 block truncate text-xs">
-                      {scheduleLabel(job)}
-                    </span>
-                  </span>
-                  <span className="flex shrink-0 items-center gap-1.5">
-                    <StatusChip tone={status.tone}>{status.label}</StatusChip>
-                    <span className="text-ink/25 text-xl" aria-hidden="true">
-                      ›
+                    <span className="mt-1.5 block">
+                      <StatusChip tone={status.tone}>{status.label}</StatusChip>
                     </span>
                   </span>
+                  <svg aria-hidden="true" viewBox="0 0 24 24" className="text-ink/50 h-5 w-5 shrink-0" fill="none">
+                    <path d="m9 5 7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </Link>
               );
             })}

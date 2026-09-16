@@ -197,29 +197,36 @@ export function ConversationThread({
 
   return (
     <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden sm:min-h-[calc(100dvh-4rem)]">
-      <header className="border-ink/10 bg-canvas/95 sticky top-0 z-10 border-b px-4 py-4 backdrop-blur sm:px-6">
-        <div className="flex items-center gap-3">
+      <header className="border-ink/[0.08] bg-canvas/95 sticky top-0 z-10 border-b px-4 py-3 backdrop-blur sm:px-6">
+        <div className="flex min-h-12 items-center gap-2.5">
           <Link
             href="/messages"
-            className="border-ink/10 grid h-10 w-10 shrink-0 place-items-center rounded-full border bg-white/70 text-lg"
+            className="consumer-pressable grid h-12 w-12 shrink-0 place-items-center rounded-full hover:bg-ink/[0.05]"
             aria-label="Volver a mensajes"
           >
-            ←
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
+              <path d="m15 5-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </Link>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold">{peerName}</p>
+            <p className="truncate text-[15px] font-extrabold">{peerName}</p>
             <Link
               href={providerHref}
-              className="text-ink/55 block truncate text-xs underline-offset-4 hover:underline"
+              className="text-ink/60 block truncate text-[13px] underline-offset-4 hover:underline"
             >
               {serviceTitle}
             </Link>
           </div>
           <details className="relative">
-            <summary className="border-ink/10 grid h-10 w-10 cursor-pointer list-none place-items-center rounded-full border bg-white/70 text-lg">
-              ···
+            <summary className="consumer-pressable grid h-12 w-12 cursor-pointer list-none place-items-center rounded-full hover:bg-ink/[0.05] [&::-webkit-details-marker]:hidden">
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+                <circle cx="5" cy="12" r="1.6" fill="currentColor" />
+                <circle cx="12" cy="12" r="1.6" fill="currentColor" />
+                <circle cx="19" cy="12" r="1.6" fill="currentColor" />
+              </svg>
+              <span className="sr-only">Opciones de conversación</span>
             </summary>
-            <div className="border-ink/10 bg-canvas absolute right-0 mt-2 w-64 rounded-xl border p-3 shadow-lg">
+            <div className="border-ink/[0.08] bg-surface absolute right-0 mt-2 w-60 max-w-[70vw] rounded-2xl border p-2 shadow-lg">
               <button
                 type="button"
                 onClick={toggleBlock}
@@ -328,10 +335,10 @@ function MessageBubble({
   return (
     <div className={`flex ${own ? "justify-end" : "justify-start"}`}>
       <article
-        className={`max-w-[86%] rounded-xl px-3.5 py-2.5 text-sm sm:max-w-[72%] ${
+        className={`max-w-[78%] rounded-[1.125rem] px-3.5 py-2.5 text-[15px] leading-6 sm:max-w-[72%] ${
           own
             ? "bg-ink rounded-br-md text-white"
-            : "border-ink/10 text-ink rounded-bl-md border bg-white"
+            : "border-ink/[0.08] text-ink rounded-bl-md border bg-white shadow-sm"
         }`}
       >
         {message.body ? (
@@ -373,9 +380,7 @@ function MessageBubble({
           </p>
         ) : null}
         <time
-          className={`mt-1.5 block text-right text-[10px] ${
-            own ? "text-white/55" : "text-ink/40"
-          }`}
+          className="text-ink/60 mt-1 block text-right text-[11px] font-medium"
           dateTime={message.created_at}
         >
           {new Intl.DateTimeFormat("es-AR", {
@@ -450,17 +455,24 @@ function TextComposer({
         placeholder="Escribí un mensaje…"
         rows={1}
         maxLength={4000}
-        className="border-ink/10 placeholder:text-ink/35 focus:border-moss/50 min-h-12 flex-1 resize-none rounded-2xl border bg-white px-4 py-3 text-sm outline-none"
+        className="border-ink/[0.1] placeholder:text-ink/40 focus:border-moss/50 min-h-[52px] flex-1 resize-none rounded-2xl border bg-white px-4 py-3.5 text-base outline-none"
       />
       <button
         type="submit"
         disabled={pending}
-        className="bg-ink grid h-12 min-w-12 place-items-center rounded-2xl px-4 text-sm font-bold text-white disabled:opacity-40"
+        className="consumer-pressable bg-ink grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl text-white disabled:opacity-40"
+        aria-label="Enviar mensaje"
       >
-        {pending ? "…" : "Enviar"}
+        {pending ? (
+          "…"
+        ) : (
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+            <path d="M4 12 20 4l-4.5 16-3.5-6.5L4 12Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+          </svg>
+        )}
       </button>
       {state.status === "WARNING" && !warningDismissed ? (
-        <div className="border-terracotta/20 absolute right-3 bottom-[5.1rem] left-3 rounded-2xl border bg-[#fff7f2] p-4 shadow-lg sm:right-4 sm:left-4">
+        <div className="border-terracotta/20 bg-surface relative mt-2 rounded-2xl border p-4 shadow-lg">
           <p className="text-terracotta text-sm font-semibold">
             Revisá antes de enviar
           </p>
@@ -614,7 +626,7 @@ function AttachmentComposer({
         name="kind"
         defaultValue="IMAGE"
         aria-label="Tipo de adjunto"
-        className="border-ink/10 h-9 rounded-full border bg-white px-3 text-xs"
+        className="border-ink/[0.1] min-h-11 rounded-xl border bg-white px-3 text-sm font-semibold"
       >
         <option value="IMAGE">Imagen</option>
         <option value="FILE">Archivo</option>
@@ -625,12 +637,13 @@ function AttachmentComposer({
         multiple
         onChange={handleFilesChange}
         disabled={pending || compressing}
-        className="file:bg-moss/10 file:text-moss min-w-0 flex-1 text-xs file:mr-2 file:rounded-full file:border-0 file:px-3 file:py-2 file:font-semibold"
+        aria-label="Elegir archivos para adjuntar"
+        className="file:bg-moss/10 file:text-moss min-h-11 min-w-0 flex-1 content-center text-[13px] file:mr-2 file:min-h-11 file:rounded-xl file:border-0 file:px-3 file:font-bold"
       />
       <button
         type="submit"
         disabled={pending || compressing}
-        className="border-ink/10 rounded-full border bg-white px-3 py-2 text-xs font-bold disabled:opacity-40"
+        className="consumer-pressable border-ink/[0.1] inline-flex min-h-11 items-center rounded-xl border bg-white px-4 text-sm font-bold disabled:opacity-40"
       >
         {compressing ? "Optimizando…" : pending ? "Subiendo…" : "Adjuntar"}
       </button>

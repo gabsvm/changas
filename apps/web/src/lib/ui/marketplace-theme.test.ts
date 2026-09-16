@@ -10,9 +10,10 @@ const css = readFileSync(
 describe("marketplace consumer theme", () => {
   it("defines compact consumer surface tokens", () => {
     expect(css).toContain("--consumer-page-padding: 1rem");
-    expect(css).toContain("--consumer-radius-card: 0.875rem");
+    expect(css).toContain("--consumer-radius-card: 1rem");
     expect(css).toContain("--consumer-nav-height: 4rem");
     expect(css).toContain("consumer-pressable");
+    expect(css).toContain("--sticky-offset");
   });
 
   it("uses the approved Changas brand colors", () => {

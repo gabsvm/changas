@@ -82,54 +82,54 @@ export function ProposalCard({
       : "COUNTEROFFER";
 
   return (
-    <article className="border-ink/10 rounded-xl border bg-white p-4">
+    <article className="border-brand-orange/20 bg-surface rounded-2xl border p-4 shadow-[var(--consumer-shadow-card)]">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-ink/50 text-[11px] font-bold tracking-[0.08em] uppercase">
+        <div className="min-w-0">
+          <p className="text-ink/60 text-xs font-bold tracking-[0.06em] uppercase">
             {kindLabels[proposal.proposal_kind]} · v{proposal.version_number}
           </p>
-          <h3 className="mt-1 font-semibold">{proposal.service_title}</h3>
+          <h3 className="mt-1 truncate text-[15px] font-extrabold">{proposal.service_title}</h3>
         </div>
-        <span className="bg-moss/10 text-moss rounded-full px-2.5 py-1 text-[11px] font-bold">
+        <span className="bg-moss/10 text-moss shrink-0 rounded-full px-2.5 py-1 text-xs font-bold">
           {statusLabels[proposal.proposal_status]}
         </span>
       </div>
 
-      <p className="text-ink/70 mt-3 text-sm leading-6 whitespace-pre-wrap">
+      <p className="text-ink/70 mt-2.5 text-sm leading-6 whitespace-pre-wrap">
         {proposal.scope_text}
       </p>
 
-      <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
-        <div className="bg-canvas rounded-lg p-3">
-          <dt className="text-ink/45">Precio</dt>
-          <dd className="mt-1 font-bold">
+      <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
+        <div className="bg-canvas rounded-xl p-3">
+          <dt className="text-ink/60 text-xs font-semibold">Precio total</dt>
+          <dd className="mt-1 text-[15px] font-extrabold">
             {proposal.price_amount === null
               ? "A cotizar"
               : formatMinorUnits(proposal.price_amount, proposal.currency_code)}
           </dd>
         </div>
-        <div className="bg-canvas rounded-lg p-3">
-          <dt className="text-ink/45">Modalidad</dt>
-          <dd className="mt-1 font-bold">
+        <div className="bg-canvas rounded-xl p-3">
+          <dt className="text-ink/60 text-xs font-semibold">Modalidad</dt>
+          <dd className="mt-1 text-[15px] font-extrabold">
             {proposal.modality === "REMOTE"
               ? "Remoto"
               : proposal.modality === "IN_PERSON"
                 ? "Presencial"
-                : "Presencial o remoto"}
+                : "Ambas"}
           </dd>
         </div>
       </dl>
 
       {proposal.expires_at ? (
-        <p className="text-ink/45 mt-3 text-[11px]">
+        <p className="text-ink/60 mt-3 text-xs">
           Vigente hasta {expiresFormatter.format(new Date(proposal.expires_at))}
         </p>
       ) : null}
 
       {proposal.proposal_status === "OPEN" ? (
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 grid gap-2">
           {canAccept ? (
-            <form action={respondProposalAction}>
+            <form action={respondProposalAction} className="grid">
               <input
                 type="hidden"
                 name="conversationId"
@@ -141,13 +141,13 @@ export function ProposalCard({
                 value={proposal.proposal_id}
               />
               <input type="hidden" name="action" value="ACCEPT" />
-              <button className="bg-ink rounded-full px-4 py-2 text-xs font-bold text-white">
-                Aceptar
+              <button className="consumer-pressable bg-ink inline-flex min-h-[52px] items-center justify-center rounded-xl px-4 text-[15px] font-extrabold text-white">
+                Aceptar propuesta
               </button>
             </form>
           ) : null}
           {!ownTerms ? (
-            <form action={respondProposalAction}>
+            <form action={respondProposalAction} className="grid grid-cols-2 gap-2">
               <input
                 type="hidden"
                 name="conversationId"
@@ -159,12 +159,19 @@ export function ProposalCard({
                 value={proposal.proposal_id}
               />
               <input type="hidden" name="action" value="REJECT" />
-              <button className="border-ink/10 rounded-full border px-4 py-2 text-xs font-bold">
+              <button className="consumer-pressable border-ink/[0.1] inline-flex min-h-12 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold">
                 Rechazar
+              </button>
+              <button
+                type="button"
+                className="consumer-pressable inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-bold text-ink/60"
+                onClick={() => document.getElementById(`counter-${proposal.proposal_id}`)?.toggleAttribute("open")}
+              >
+                Contraofertar
               </button>
             </form>
           ) : (
-            <form action={respondProposalAction}>
+            <form action={respondProposalAction} className="grid">
               <input
                 type="hidden"
                 name="conversationId"
@@ -176,8 +183,8 @@ export function ProposalCard({
                 value={proposal.proposal_id}
               />
               <input type="hidden" name="action" value="WITHDRAW" />
-              <button className="border-ink/10 rounded-full border px-4 py-2 text-xs font-bold">
-                Retirar
+              <button className="consumer-pressable border-ink/[0.1] inline-flex min-h-12 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold">
+                Retirar propuesta
               </button>
             </form>
           )}
@@ -185,8 +192,8 @@ export function ProposalCard({
       ) : null}
 
       {canCounter ? (
-        <details className="border-ink/10 mt-4 border-t pt-3">
-          <summary className="cursor-pointer text-xs font-bold">
+        <details id={`counter-${proposal.proposal_id}`} className="border-ink/[0.08] mt-4 border-t pt-3">
+          <summary className="consumer-pressable inline-flex min-h-11 cursor-pointer items-center text-sm font-bold text-terracotta">
             {counterKind === "PROVIDER_QUOTE"
               ? "Enviar cotización"
               : "Responder con contraoferta"}

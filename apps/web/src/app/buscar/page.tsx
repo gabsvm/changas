@@ -9,10 +9,12 @@ import {
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { LocationPicker } from "@/components/discovery/location-picker";
 import { SearchFiltersSheet } from "@/components/discovery/search-filters-sheet";
+import { AuthenticatedBottomNav } from "@/components/ui/authenticated-bottom-nav";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { SearchField } from "@/components/ui/marketplace/search-field";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { searchDiscovery } from "@/lib/discovery/server";
+import { getUnreadNotificationCount } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -68,65 +70,76 @@ export default async function SearchPage({
   const skills = skillsResult.data ?? [];
   const activeCategory = categories.find((item) => item.slug === filters.categorySlug)?.name;
   const activeSkill = skills.find((item) => item.slug === filters.skillSlug)?.name;
+  const unreadCount = user ? await getUnreadNotificationCount(supabase) : 0;
+
+  const activeFilterCount =
+    (filters.categorySlug ? 1 : 0) +
+    (filters.skillSlug ? 1 : 0) +
+    (filters.modality ? 1 : 0) +
+    (filters.priceModel ? 1 : 0) +
+    (filters.acceptsOffers ? 1 : 0) +
+    (filters.sort !== "recommended" ? 1 : 0);
 
   return (
-    <main id="main-content" className="bg-canvas text-ink min-h-screen">
+    <main id="main-content" className="bg-canvas text-ink mobile-content-with-nav min-h-screen">
       <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-8 sm:pt-5">
         <AppHeader
-          brand
+          backHref="/"
+          title={query ? `“${query}”` : "Buscar"}
           action={
             <Link
               href={user ? "/account" : "/login"}
-              className="consumer-pressable inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold text-ink/65 hover:bg-ink/[0.035] hover:text-ink"
+              className="consumer-pressable text-ink/60 inline-flex min-h-12 items-center rounded-full px-3 text-sm font-bold hover:bg-ink/[0.04]"
             >
-              {user ? "Mi cuenta" : "Ingresar"}
+              {user ? "Cuenta" : "Ingresar"}
             </Link>
           }
-          className="sm:flex"
         />
 
-        <section className="pt-5 sm:pt-9">
-          <div className="discovery-hero border-brand-yellow/35 bg-surface-muted/55 rounded-[1.75rem] border p-4 shadow-[var(--consumer-shadow-card)] sm:p-6">
-          <p className="brand-kicker text-xs font-extrabold tracking-[0.14em] uppercase">Encontrá ayuda cerca tuyo</p>
-          <h1 className="text-2xl font-bold tracking-[-0.035em] sm:text-3xl">
-            {query ? `Resultados para “${query}”` : "Explorar servicios"}
-          </h1>
+        <section className="pt-3 sm:pt-8">
+          <div className="discovery-hero border-ink/[0.07] bg-surface rounded-[1.25rem] border p-4 shadow-[var(--consumer-shadow-card)] sm:p-6">
+            <h1 className="text-[22px] leading-7 font-extrabold tracking-[-0.025em] sm:text-3xl">
+              {query ? `Resultados para “${query}”` : "Explorar servicios"}
+            </h1>
 
-          <form action="/buscar" className="mt-4">
-            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
-              <SearchField
-                defaultValue={query}
-                id="search-query"
-                name="q"
-                placeholder="Buscar un servicio o habilidad"
-                aria-label="Buscar un servicio o habilidad"
-              />
-              <div className="flex min-w-0 items-center justify-between gap-2 sm:justify-start">
-                <LocationPicker compact selected={filters.locationSlug} />
-                <button
-                  className="consumer-pressable bg-brand-orange min-h-11 rounded-xl px-4 text-sm font-bold text-ink"
-                  type="submit"
-                >
-                  Buscar
-                </button>
+            <form action="/buscar" className="mt-3">
+              <div className="grid gap-2">
+                <SearchField
+                  defaultValue={query}
+                  id="search-query"
+                  name="q"
+                  placeholder="Electricista, clases de inglés…"
+                  aria-label="Buscar un servicio o habilidad"
+                />
+                <div className="flex min-w-0 items-center gap-2">
+                  <div className="min-w-0 flex-1">
+                    <LocationPicker compact selected={filters.locationSlug} />
+                  </div>
+                  <button
+                    className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-[52px] shrink-0 items-center rounded-2xl px-5 text-[15px] font-extrabold"
+                    type="submit"
+                  >
+                    Buscar
+                  </button>
+                </div>
+                <SearchFiltersSheet
+                  query={query}
+                  filters={filters}
+                  categories={categories}
+                  skills={skills}
+                  activeCount={activeFilterCount}
+                />
               </div>
-              <SearchFiltersSheet
-                query={query}
-                filters={filters}
-                categories={categories}
-                skills={skills}
-              />
-            </div>
-          </form>
+            </form>
 
-          <div className="consumer-scrollbar-none -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
-            {activeCategory ? <StatusChip tone="brand">{activeCategory}</StatusChip> : null}
-            {activeSkill ? <StatusChip tone="neutral">{activeSkill}</StatusChip> : null}
-            {filters.modality === "REMOTE" ? <StatusChip tone="info">Remoto</StatusChip> : null}
-            {filters.modality === "IN_PERSON" ? <StatusChip tone="info">Presencial</StatusChip> : null}
-            {filters.acceptsOffers ? <StatusChip tone="brand">Acepta ofertas</StatusChip> : null}
-            {filters.sort !== "recommended" ? <StatusChip tone="neutral">Orden personalizado</StatusChip> : null}
-          </div>
+            <div className="consumer-scrollbar-none -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+              {activeCategory ? <StatusChip tone="brand">{activeCategory}</StatusChip> : null}
+              {activeSkill ? <StatusChip tone="neutral">{activeSkill}</StatusChip> : null}
+              {filters.modality === "REMOTE" ? <StatusChip tone="info">Remoto</StatusChip> : null}
+              {filters.modality === "IN_PERSON" ? <StatusChip tone="info">Presencial</StatusChip> : null}
+              {filters.acceptsOffers ? <StatusChip tone="brand">Acepta ofertas</StatusChip> : null}
+              {filters.sort !== "recommended" ? <StatusChip tone="neutral">Orden personalizado</StatusChip> : null}
+            </div>
           </div>
 
           <div className="discovery-results-shell mt-4">
@@ -140,6 +153,7 @@ export default async function SearchPage({
           </div>
         </section>
       </div>
+      <AuthenticatedBottomNav unreadCount={unreadCount} />
     </main>
   );
 }

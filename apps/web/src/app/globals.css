@@ -40,22 +40,24 @@
   /* Consumer marketplace system. Keep these scoped semantically so the
      operational Admin can retain its own dark visual language. */
   --consumer-page-padding: 1rem;
-  --consumer-radius-card: 0.875rem;
+  --consumer-radius-card: 1rem;
+  --consumer-radius-large: 1.25rem;
   --consumer-radius-control: 0.75rem;
   --consumer-nav-height: 4rem;
   --consumer-divider: rgb(32 33 36 / 8%);
   --consumer-surface: #fffdf9;
   --consumer-surface-strong: #ffffff;
   --consumer-surface-raised: #ffffff;
-  --consumer-muted: rgb(32 33 36 / 58%);
+  --consumer-muted: rgb(32 33 36 / 60%);
   --consumer-shadow-card: 0 8px 20px rgb(32 33 36 / 6%);
-  --consumer-shadow-float: 0 10px 30px rgb(32 33 36 / 8%);
-  --consumer-shadow-hero: 0 24px 70px rgb(32 33 36 / 14%);
+  --consumer-shadow-float: 0 12px 32px rgb(32 33 36 / 10%);
+  --consumer-shadow-hero: 0 24px 60px rgb(255 107 53 / 18%);
   --consumer-hero-gradient: var(--brand-gradient);
 
   --mobile-bottom-nav-height: calc(
     var(--consumer-nav-height) + max(0.75rem, env(safe-area-inset-bottom))
   );
+  --sticky-offset: calc(var(--mobile-bottom-nav-height) + 0.5rem);
 }
 
 * {
@@ -176,14 +178,14 @@ textarea {
 .button-primary,
 .button-secondary {
   display: inline-flex;
-  min-height: 3.125rem;
+  min-height: 3.25rem;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.8rem;
+  border-radius: 0.75rem;
   padding: 0.7rem 1.15rem;
-  font-size: 0.875rem;
-  font-weight: 750;
+  font-size: 0.9375rem;
+  font-weight: 800;
   line-height: 1.25rem;
   transition:
     transform 150ms ease,
@@ -227,6 +229,43 @@ textarea {
   border-radius: var(--consumer-radius-card);
   background: var(--consumer-surface);
   box-shadow: var(--consumer-shadow-card);
+}
+
+.consumer-card-pressed:active {
+  transform: scale(0.99);
+  background: var(--surface-muted);
+}
+
+.consumer-snap-rail {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.consumer-snap-rail > * {
+  scroll-snap-align: start;
+}
+
+.consumer-skeleton {
+  background: rgb(32 33 36 / 6%);
+  border-radius: 0.75rem;
+  animation: consumer-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes consumer-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.consumer-toast {
+  border-radius: 0.75rem;
+  background: #202124;
+  color: #fff;
+  box-shadow: var(--consumer-shadow-float);
 }
 
 .feed-location-summary {
@@ -279,7 +318,12 @@ textarea {
 }
 
 .service-cta-bar {
-  box-shadow: 0 -10px 24px rgb(32 33 36 / 5%);
+  box-shadow: 0 -10px 24px rgb(32 33 36 / 8%);
+  bottom: var(--sticky-offset);
+}
+
+.service-cta-bar-no-nav {
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .empty-state-card {

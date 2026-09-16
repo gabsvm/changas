@@ -79,31 +79,6 @@ export default async function ConversationPage({
 
   return (
     <section className="space-y-4 py-4 sm:py-6">
-      <div className="mx-auto w-full max-w-4xl space-y-3">
-        <ProposalComposer
-          conversationId={conversationId}
-          currentUserIsClient={currentUserIsClient}
-        />
-        {proposals.length > 0 ? (
-          <section
-            className="space-y-3"
-            aria-label="Propuestas de la conversación"
-          >
-            {proposals.map((proposal) => (
-              <ProposalCard
-                key={`${proposal.proposal_id}:${proposal.current_version_id}:${proposal.proposal_status}`}
-                proposal={proposal}
-                conversationId={conversationId}
-                currentUserId={user.id}
-                clientUserId={context.client_user_id}
-                providerUserId={context.provider_user_id}
-                allowFakePayments={allowFakePayments}
-              />
-            ))}
-          </section>
-        ) : null}
-      </div>
-
       <ConversationThread
         key={threadVersion}
         conversationId={conversationId}
@@ -118,6 +93,34 @@ export default async function ConversationPage({
         initialTextNonce={initialTextNonce}
         initialAttachmentNonce={initialAttachmentNonce}
       />
+
+      <div className="mx-auto w-full max-w-4xl space-y-3 px-4 sm:px-0">
+        {proposals.length > 0 ? (
+          <section
+            className="space-y-3"
+            aria-label="Propuestas de la conversación"
+          >
+            <h2 className="text-base font-extrabold tracking-[-0.02em]">
+              Propuestas ({proposals.length})
+            </h2>
+            {proposals.map((proposal) => (
+              <ProposalCard
+                key={`${proposal.proposal_id}:${proposal.current_version_id}:${proposal.proposal_status}`}
+                proposal={proposal}
+                conversationId={conversationId}
+                currentUserId={user.id}
+                clientUserId={context.client_user_id}
+                providerUserId={context.provider_user_id}
+                allowFakePayments={allowFakePayments}
+              />
+            ))}
+          </section>
+        ) : null}
+        <ProposalComposer
+          conversationId={conversationId}
+          currentUserIsClient={currentUserIsClient}
+        />
+      </div>
     </section>
   );
 }

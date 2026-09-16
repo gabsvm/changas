@@ -197,25 +197,28 @@ export function DiscoveryResults({
 
   return (
     <section aria-live="polite" aria-label="Resultados de búsqueda">
-      <div className="flex min-h-11 flex-wrap items-center justify-between gap-2">
+      <div className="flex min-h-12 flex-wrap items-center justify-between gap-2">
         <p
-          className={`text-sm ${resultsError ? "text-danger" : "text-ink/55"}`}
+          className={`text-sm font-semibold ${resultsError ? "text-danger" : "text-ink/60"}`}
         >
           {resultsError
             ? resultsError
             : rows.length === 0
               ? "No encontramos servicios con esos criterios."
-              : `${rows.length} resultado${rows.length === 1 ? "" : "s"}`}
+              : `${rows.length} resultado${rows.length === 1 ? "" : "s"}${hasMore ? "+" : ""}`}
         </p>
         {enableNearby ? (
           <button
-            className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold"
+            className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.08] inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold"
             type="button"
             onClick={searchNearby}
             disabled={nearbyLoading}
           >
-            <span aria-hidden="true">⌖</span>
-            {nearbyLoading ? "Buscando…" : "Cerca mío"}
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+              <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+            {nearbyLoading ? "Buscando…" : gpsMode ? "Actualizar ubicación" : "Cerca mío"}
           </button>
         ) : null}
       </div>
@@ -241,54 +244,34 @@ export function DiscoveryResults({
       ) : null}
 
       {enableNearby && gpsMode && gpsPoint && !resultsError ? (
-        <nav
-          aria-label="Paginación de resultados cercanos"
-          className="mt-6 flex items-center justify-between gap-3"
-        >
-          {gpsPage > 1 ? (
-            <button
-              className={actionButtonClass("secondary")}
-              type="button"
-              onClick={() => void fetchNearbyPage(gpsPage - 1, gpsPoint)}
-              disabled={nearbyLoading}
-            >
-              Anterior
-            </button>
-          ) : (
-            <span />
-          )}
+        <nav aria-label="Más resultados cercanos" className="mt-6 grid gap-2">
+          <p className="text-ink/60 text-center text-[13px] font-medium">
+            Página {gpsPage}
+            {hasMore ? " · hay más para explorar" : " · llegaste al final"}
+          </p>
           {hasMore ? (
             <button
-              className={actionButtonClass("secondary")}
+              className={actionButtonClass("secondary", "w-full min-h-[52px] text-[15px]")}
               type="button"
               onClick={() => void fetchNearbyPage(gpsPage + 1, gpsPoint)}
               disabled={nearbyLoading}
             >
-              Siguiente
+              {nearbyLoading ? "Buscando…" : "Cargar más"}
             </button>
           ) : null}
         </nav>
       ) : enableNearby && !resultsError ? (
-        <nav
-          aria-label="Paginación de resultados"
-          className="mt-6 flex items-center justify-between gap-3"
-        >
-          {filters.page > 1 ? (
-            <Link
-              className={actionButtonClass("secondary")}
-              href={searchHref(query, filters, filters.page - 1)}
-            >
-              Anterior
-            </Link>
-          ) : (
-            <span />
-          )}
+        <nav aria-label="Más resultados" className="mt-6 grid gap-2">
+          <p className="text-ink/60 text-center text-[13px] font-medium">
+            Página {filters.page}
+            {hasMore ? " · hay más para explorar" : rows.length > 0 ? " · llegaste al final" : ""}
+          </p>
           {hasMore ? (
             <Link
-              className={actionButtonClass("secondary")}
+              className={actionButtonClass("secondary", "w-full min-h-[52px] text-[15px]")}
               href={searchHref(query, filters, filters.page + 1)}
             >
-              Siguiente
+              Cargar más
             </Link>
           ) : null}
         </nav>
