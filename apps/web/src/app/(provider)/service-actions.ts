@@ -1,11 +1,13 @@
 "use server";
 
-import { parseServicePrice, type PriceModel } from "@changas/domain";
-import { serviceSchema, serviceTagsSchema } from "@changas/validation";
 import { revalidatePath } from "next/cache";
 
 import type { ActionState } from "@/lib/forms/action-state";
 import { getFormString } from "@/lib/forms/form-data";
+import {
+  parseServiceForm,
+  type ServiceFormRaw,
+} from "@/lib/provider/service-input";
 import { createClient } from "@/lib/supabase/server";
 
 function checkbox(formData: FormData, name: string): boolean {
@@ -27,14 +29,14 @@ function errorState(message: string): ActionState {
   return { error: message };
 }
 
-function serviceInput(formData: FormData, priceAmount?: number) {
+function serviceRaw(formData: FormData): ServiceFormRaw {
   return {
     skillId: getFormString(formData, "skillId"),
     title: getFormString(formData, "title"),
     description: getFormString(formData, "description"),
     modality: getFormString(formData, "modality"),
     priceModel: getFormString(formData, "priceModel"),
-    priceAmount,
+    priceAmount: getFormString(formData, "priceAmount"),
     currencyCode: getFormString(formData, "currencyCode") || "ARS",
     priceUnit: getFormString(formData, "priceUnit"),
     acceptsOffers: checkbox(formData, "acceptsOffers"),
@@ -47,6 +49,10 @@ function serviceInput(formData: FormData, priceAmount?: number) {
     materialsNotes: getFormString(formData, "materialsNotes"),
     isPublished: checkbox(formData, "isPublished"),
     isPaused: checkbox(formData, "isPaused"),
+    tags: getFormString(formData, "tags")
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean),
   };
 }
 
@@ -82,39 +88,11 @@ export async function saveServiceTransactional(
   _previousState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const priceModel = getFormString(formData, "priceModel");
-  const currencyCode = getFormString(formData, "currencyCode") || "ARS";
-  let priceAmount: number | null;
-  try {
-    priceAmount = parseServicePrice(
-      priceModel as PriceModel,
-      getFormString(formData, "priceAmount"),
-      currencyCode,
-    );
-  } catch {
-    return errorState(
-      "El monto debe ser positivo, válido y estar expresado en ARS.",
-    );
+  const parsedForm = parseServiceForm(serviceRaw(formData));
+  if (!parsedForm.ok) {
+    return errorState(parsedForm.message);
   }
-
-  const parsed = serviceSchema.safeParse(
-    serviceInput(formData, priceAmount ?? undefined),
-  );
-  if (!parsed.success) {
-    return errorState("Revisá título, descripción y precio.");
-  }
-
-  const parsedTags = serviceTagsSchema.safeParse(
-    getFormString(formData, "tags")
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean),
-  );
-  if (!parsedTags.success) {
-    return errorState(
-      "Usá hasta ocho tags únicos de entre 2 y 80 caracteres, separados por comas.",
-    );
-  }
+  const { data: parsed, tags: parsedTags } = parsedForm;
 
   const supabase = await createClient();
   const {
@@ -131,24 +109,24 @@ export async function saveServiceTransactional(
 
   const args: SaveServiceRpcArgs = {
     target_service_id: getFormString(formData, "serviceId") || null,
-    requested_skill_id: parsed.data.skillId,
-    requested_title: parsed.data.title,
-    requested_description: parsed.data.description,
-    requested_modality: parsed.data.modality,
-    requested_price_model: parsed.data.priceModel,
-    requested_price_amount: parsed.data.priceAmount ?? null,
-    requested_currency_code: parsed.data.currencyCode,
-    requested_price_unit: textOrNull(parsed.data.priceUnit),
-    requested_accepts_offers: parsed.data.acceptsOffers,
+    requested_skill_id: parsed.skillId,
+    requested_title: parsed.title,
+    requested_description: parsed.description,
+    requested_modality: parsed.modality,
+    requested_price_model: parsed.priceModel,
+    requested_price_amount: parsed.priceAmount ?? null,
+    requested_currency_code: parsed.currencyCode,
+    requested_price_unit: textOrNull(parsed.priceUnit),
+    requested_accepts_offers: parsed.acceptsOffers,
     requested_expected_duration_minutes:
-      parsed.data.expectedDurationMinutes ?? null,
-    requested_schedule_type: parsed.data.scheduleType,
-    requested_includes: textOrNull(parsed.data.includes),
-    requested_excludes: textOrNull(parsed.data.excludes),
-    requested_materials_notes: textOrNull(parsed.data.materialsNotes),
-    requested_is_published: parsed.data.isPublished,
-    requested_is_paused: parsed.data.isPaused,
-    requested_tags: parsedTags.data,
+      parsed.expectedDurationMinutes ?? null,
+    requested_schedule_type: parsed.scheduleType,
+    requested_includes: textOrNull(parsed.includes),
+    requested_excludes: textOrNull(parsed.excludes),
+    requested_materials_notes: textOrNull(parsed.materialsNotes),
+    requested_is_published: parsed.isPublished,
+    requested_is_paused: parsed.isPaused,
+    requested_tags: parsedTags,
   };
 
   const rpc = supabase.rpc as unknown as (
@@ -159,7 +137,7 @@ export async function saveServiceTransactional(
 
   if (error || !data?.length) {
     return errorState(
-      parsed.data.isPublished
+      parsed.isPublished
         ? "No se pudo publicar el servicio. Revisá que tu perfil esté ACTIVE, sin pausas y que la habilidad siga seleccionada."
         : "No pudimos guardar el servicio y sus tags.",
     );

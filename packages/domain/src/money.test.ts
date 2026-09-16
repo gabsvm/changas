@@ -29,6 +29,12 @@ describe("money helpers", () => {
     expect(formatServicePrice("QUOTE", null, "ARS", null)).toBe("A cotizar");
   });
 
+  it("accepts the es-AR comma decimal separator", () => {
+    expect(parseMajorAmountToMinor("12500,50", "ARS")).toBe(1_250_050);
+    expect(parseMajorAmountToMinor("  99,9  ", "ARS")).toBe(9_990);
+    expect(parseServicePrice("FIXED", "1500,50", "ARS")).toBe(150_050);
+  });
+
   it("parses quote and rejects invalid, negative, unsupported, or unsafe values", () => {
     expect(parseServicePrice("QUOTE", "", "ARS")).toBeNull();
     expect(() => parseServicePrice("QUOTE", "100", "ARS")).toThrow();

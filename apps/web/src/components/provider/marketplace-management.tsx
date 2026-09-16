@@ -206,22 +206,28 @@ function Field({
   min,
   max,
   step,
+  minLength,
+  maxLength,
+  disabled = false,
 }: {
   label: string;
   name: string;
   defaultValue?: string | number | null | undefined;
   type?: string;
   required?: boolean;
-  helper?: string;
+  helper?: string | undefined;
   min?: string | number;
   max?: string | number;
   step?: string | number;
+  minLength?: number;
+  maxLength?: number;
+  disabled?: boolean;
 }) {
   return (
     <label className="text-sm font-semibold">
       {label}
       <input
-        className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2"
+        className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 disabled:bg-ink/[0.04] disabled:text-ink/40"
         name={name}
         type={type}
         defaultValue={defaultValue ?? ""}
@@ -229,6 +235,9 @@ function Field({
         min={min}
         max={max}
         step={step}
+        minLength={minLength}
+        maxLength={maxLength}
+        disabled={disabled}
       />
       {helper ? (
         <span className="text-ink/48 mt-1.5 block text-xs leading-5 font-normal">
@@ -244,21 +253,46 @@ function TextArea({
   name,
   defaultValue,
   required = false,
+  minLength,
+  maxLength,
+  helper,
 }: {
   label: string;
   name: string;
   defaultValue?: string | null | undefined;
   required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  helper?: string | undefined;
 }) {
+  const [length, setLength] = useState(String(defaultValue ?? "").length);
   return (
     <label className="text-sm font-semibold">
-      {label}
+      <span className="flex items-baseline justify-between gap-2">
+        <span>{label}</span>
+        {maxLength || minLength ? (
+          <span
+            className={`text-xs font-normal ${length < (minLength ?? 0) ? "text-terracotta" : "text-ink/45"}`}
+          >
+            {length}
+            {maxLength ? `/${maxLength}` : minLength ? ` (mín. ${minLength})` : ""}
+          </span>
+        ) : null}
+      </span>
       <textarea
         className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 min-h-24 w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2"
         name={name}
         defaultValue={defaultValue ?? ""}
         required={required}
+        minLength={minLength}
+        maxLength={maxLength}
+        onChange={(event) => setLength(event.target.value.length)}
       />
+      {helper ? (
+        <span className="text-ink/48 mt-1.5 block text-xs leading-5 font-normal">
+          {helper}
+        </span>
+      ) : null}
     </label>
   );
 }
@@ -323,6 +357,11 @@ function ServiceForm({
   skills: Skill[];
   serviceTags: string[];
 }) {
+  const [priceModel, setPriceModel] = useState<string>(
+    service?.price_model ?? "FIXED",
+  );
+  const isQuote = priceModel === "QUOTE";
+  const isPerUnit = priceModel === "PER_UNIT";
   return (
     <ActionForm
       action={action}
@@ -348,17 +387,22 @@ function ServiceForm({
           </select>
         </label>
         <Field
-          label="Título público"
+          label="Título público (mín. 3 caracteres)"
           name="title"
           defaultValue={service?.title}
           required
+          minLength={3}
+          maxLength={120}
         />
       </div>
       <TextArea
-        label="Descripción (mínimo 20 caracteres)"
+        label="Descripción"
         name="description"
         defaultValue={service?.description}
         required
+        minLength={20}
+        maxLength={3000}
+        helper="Contá qué incluye el trabajo: mínimo 20 caracteres."
       />
       <div className="grid gap-4 md:grid-cols-3">
         <label className="text-sm font-semibold">
@@ -378,7 +422,8 @@ function ServiceForm({
           <select
             className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
             name="priceModel"
-            defaultValue={service?.price_model ?? "FIXED"}
+            value={priceModel}
+            onChange={(event) => setPriceModel(event.target.value)}
           >
             <option value="FIXED">Precio fijo</option>
             <option value="STARTING_AT">Desde</option>
@@ -387,16 +432,25 @@ function ServiceForm({
             <option value="QUOTE">A cotizar</option>
           </select>
         </label>
-        <Field
-          label="Monto"
-          name="priceAmount"
-          type="number"
-          min={1}
-          step="0.01"
-          defaultValue={
-            service ? minorUnitsToMajorInput(service.price_amount) : ""
-          }
-        />
+        <div key={`amount-${priceModel}`}>
+          <Field
+            label={isQuote ? "Monto (no aplica a cotizar)" : "Monto en ARS"}
+            name="priceAmount"
+            type="number"
+            min={1}
+            step="0.01"
+            defaultValue={
+              isQuote
+                ? ""
+                : service
+                  ? minorUnitsToMajorInput(service.price_amount)
+                  : ""
+            }
+            disabled={isQuote}
+            required={!isQuote}
+            helper={isQuote ? "“A cotizar” no lleva monto." : undefined}
+          />
+        </div>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         <label className="text-sm font-semibold">
@@ -409,11 +463,22 @@ function ServiceForm({
             <option value="ARS">ARS · Peso argentino</option>
           </select>
         </label>
-        <Field
-          label="Unidad (sólo por unidad)"
-          name="priceUnit"
-          defaultValue={service?.price_unit}
-        />
+        <div key={`unit-${priceModel}`}>
+          <Field
+            label={
+              isPerUnit ? "Unidad (requerida)" : "Unidad (sólo por unidad)"
+            }
+            name="priceUnit"
+            defaultValue={isPerUnit ? service?.price_unit : ""}
+            disabled={!isPerUnit}
+            required={isPerUnit}
+            helper={
+              isPerUnit
+                ? "Ej: hora, metro, unidad, equipo."
+                : "Se habilita con “Por unidad”."
+            }
+          />
+        </div>
         <Field
           label="Duración en minutos"
           name="expectedDurationMinutes"

@@ -29,7 +29,13 @@ export function parseMajorAmountToMinor(
   currency = "ARS",
 ): number {
   assertSupportedCurrency(currency);
-  const normalized = input.trim();
+  // Teclados es-AR suelen emitir coma decimal ("1500,50"). Si no hay punto,
+  // una única coma se interpreta como separador decimal.
+  const trimmed = input.trim();
+  const normalized =
+    !trimmed.includes(".") && /^[^,]*,[^,]*$/.test(trimmed)
+      ? trimmed.replace(",", ".")
+      : trimmed;
   const match = MAJOR_AMOUNT_PATTERN.exec(normalized);
   if (!match) throw new Error("Invalid major amount");
 
