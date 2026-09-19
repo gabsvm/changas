@@ -76,19 +76,24 @@ const serviceCardSource = readFileSync(
 );
 
 describe("marketplace polish contracts", () => {
-  it("gives the home feed a standalone search and quick-action depth", () => {
-    expect(rootSource).toContain("home-search-panel");
-    expect(rootSource).toContain("quick-action-card");
+  it("gives the home feed a unified hero search with depth", () => {
+    expect(rootSource).toContain("brand-gradient-surface");
+    expect(rootSource).toContain("home-query");
+    expect(rootSource).toContain("mode=presencial");
+    expect(rootSource).toContain("mode=remoto");
+    expect(rootSource).toContain("offers=true");
     expect(rootSource).toContain("shadow");
     expect(rootSource).not.toContain("<BrandHero");
+    expect(rootSource).not.toContain("home-search-panel");
+    expect(rootSource).not.toContain("quick-action-card");
     expect(heroSource).toContain("shadow");
   });
 
-  it("keeps the mobile home focused on the primary quick action", () => {
-    expect(rootSource).toMatch(
-      /className="home-search-panel[^\"]*hidden[^\"]*sm:block/,
-    );
-    expect(rootSource).toContain("quick-action-card");
+  it("keeps a single responsive home search instead of mobile/desktop duplicates", () => {
+    expect(rootSource).toContain('id="home-query"');
+    expect(rootSource).not.toContain("home-query-mobile");
+    expect(rootSource).not.toContain("home-search-title-desktop");
+    expect(rootSource).toContain("flex-col");
   });
 
   it("lets utility colors win over the global anchor reset", () => {
@@ -135,7 +140,7 @@ describe("marketplace polish contracts", () => {
     expect(rootSource).toContain("Ofrecer mis servicios");
     expect(rootSource).toContain('layout="stack"');
     expect(rootSource).toContain("Elegí con confianza");
-    expect(rootSource).toContain("home-query-mobile");
+    expect(rootSource).toContain('id="home-query"');
     expect(nearbySource).toContain('layout?: "rail" | "stack"');
   });
 

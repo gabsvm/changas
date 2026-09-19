@@ -1,0 +1,1126 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Changas — Propuesta landing (ver antes de aprobar)</title>
+    <style>
+      :root {
+        --canvas: #fff9f3;
+        --surface: #fffdf9;
+        --ink: #202124;
+        --muted: rgba(32, 33, 36, 0.62);
+        --orange: #ff6b35;
+        --orange-d: #c84010;
+        --yellow: #ffc857;
+        --pink: #ff0a78;
+        --pink-d: #d60060;
+        --blue: #2563eb;
+        --line: rgba(32, 33, 36, 0.1);
+        --ok: #2f7d4a;
+        --font:
+          "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: #171310;
+        color: #f3e9de;
+        padding: 26px;
+        display: grid;
+        gap: 20px;
+        justify-items: center;
+      }
+      .cap {
+        width: min(1180px, 100%);
+        font-size: 13px;
+        line-height: 1.65;
+        color: #d8c9bc;
+      }
+      .cap b {
+        color: #fff;
+      }
+      .cap code {
+        color: #ffc857;
+        font-size: 12px;
+      }
+      .toolbar {
+        width: min(1180px, 100%);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .toolbar .grp {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .toolbar span.lbl {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #a89888;
+        text-transform: uppercase;
+      }
+      .tbtn {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #4a3d33;
+        background: #2c241e;
+        color: #e8d9cb;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .tbtn.on {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #202124;
+      }
+      .tbtn.blue.on {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: #fff;
+      }
+      .frame {
+        width: min(1180px, 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #3a2f28;
+        background: var(--canvas);
+        color: var(--ink);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+      }
+      .flabel {
+        padding: 11px 16px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+      }
+      .flabel.old {
+        background: #2a2f38;
+        color: #e8eef7;
+      }
+      .flabel.new {
+        background: #0f3a2c;
+        color: #baf4d3;
+      }
+      .flabel.prop {
+        background: #3a2a10;
+        color: #ffe8a5;
+      }
+      .stage {
+        padding: 0;
+      }
+      /* --- mock browser --- */
+      .browser {
+        background: var(--canvas);
+      }
+      .mhead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 249, 243, 0.92);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        color: transparent;
+        background: linear-gradient(135deg, #ffc857, #ff6b35 55%, #ff0a78);
+        box-shadow: 0 6px 18px rgba(255, 107, 53, 0.25);
+      }
+      .mark::after {
+        content: "C";
+        color: #202124;
+        font-size: 18px;
+      }
+      .brand strong {
+        display: block;
+        font-size: 16px;
+        letter-spacing: -0.02em;
+      }
+      .brand small {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .login {
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      /* HOY */
+      .today {
+        padding: 18px 20px 22px;
+        display: grid;
+        gap: 12px;
+      }
+      .dup-search {
+        border: 1px dashed #c0392b;
+        border-radius: 12px;
+        padding: 12px;
+        background: #fff;
+      }
+      .dup-tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 900;
+        color: #fff;
+        background: #c0392b;
+        border-radius: 999px;
+        padding: 2px 9px;
+        margin-bottom: 8px;
+        letter-spacing: 0.06em;
+      }
+      .searchrow {
+        display: flex;
+        gap: 8px;
+      }
+      .searchrow input {
+        flex: 1;
+        padding: 13px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        font: inherit;
+        font-size: 13px;
+        background: #fff;
+      }
+      .searchrow button {
+        background: var(--orange);
+        border: 0;
+        border-radius: 12px;
+        min-width: 52px;
+        font-size: 18px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+      .chips {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        padding: 8px 13px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .hero-old {
+        background: linear-gradient(135deg, #ffc857, #ff6b35 55%, #ff0a78);
+        border-radius: 18px;
+        color: #fff;
+        padding: 22px;
+      }
+      .hero-old h2 {
+        font-size: 26px;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+      }
+      .hero-old p {
+        margin-top: 6px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .hero-old .row {
+        display: flex;
+        gap: 8px;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+      .btn-w {
+        background: #fff;
+        color: #c84010;
+        border: 0;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .btn-g {
+        border: 0;
+        background: transparent;
+        color: #fff;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .rail {
+        display: flex;
+        gap: 10px;
+        overflow: hidden;
+      }
+      .tile-old {
+        flex: 0 0 150px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        padding: 12px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .card-old {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        padding: 12px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .av {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #ffc857, #ff0a78);
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        font-size: 13px;
+        color: #202124;
+        flex: 0 0 40px;
+      }
+      /* PROPUESTO */
+      .hero-new {
+        background: linear-gradient(
+          135deg,
+          #ffc857 0%,
+          #ff6b35 55%,
+          #ff0a78 130%
+        );
+        padding: 30px 24px 0;
+      }
+      .hero-new h1 {
+        color: #fff;
+        font-size: clamp(30px, 4.4vw, 44px);
+        letter-spacing: -0.035em;
+        line-height: 1;
+        max-width: 640px;
+      }
+      .hero-new .sub {
+        color: rgba(255, 255, 255, 0.92);
+        margin-top: 8px;
+        font-size: 14.5px;
+        max-width: 560px;
+      }
+      .mode-toggle {
+        display: inline-flex;
+        background: rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 999px;
+        padding: 4px;
+        margin-top: 14px;
+      }
+      .mode-toggle button {
+        border: 0;
+        background: transparent;
+        color: #fff;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        padding: 9px 16px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+      .mode-toggle button.on {
+        background: #fff;
+        color: #202124;
+      }
+      .sheet {
+        background: var(--canvas);
+        border-radius: 22px 22px 0 0;
+        margin-top: 18px;
+        padding: 18px;
+        box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.18);
+      }
+      .sheet form {
+        display: flex;
+        gap: 8px;
+      }
+      .sheet input {
+        flex: 1;
+        padding: 15px 16px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        font: inherit;
+        font-size: 14px;
+        background: #fff;
+      }
+      .sheet input:focus {
+        outline: 2px solid var(--blue);
+        outline-offset: 2px;
+      }
+      .cta {
+        background: var(--orange);
+        color: #202124;
+        border: 0;
+        border-radius: 14px;
+        padding: 0 22px;
+        font: inherit;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3);
+      }
+      .sheet .chips {
+        margin-top: 10px;
+      }
+      .fchip {
+        padding: 8px 13px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .fchip.on {
+        background: #202124;
+        color: #fff;
+        border-color: #202124;
+      }
+      .sec {
+        padding: 18px;
+        background: var(--canvas);
+      }
+      .sec h3 {
+        font-size: 16px;
+        letter-spacing: -0.02em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .sec h3 a {
+        font-size: 12.5px;
+        color: var(--orange-d);
+        font-weight: 800;
+      }
+      .catgrid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .cat {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px;
+        text-align: left;
+        font: inherit;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(32, 33, 36, 0.06);
+      }
+      .cat:hover {
+        border-color: var(--orange);
+      }
+      .cat .ic {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        background: #fff1e8;
+        margin-bottom: 8px;
+      }
+      .cat b {
+        display: block;
+        font-size: 13px;
+      }
+      .cat small {
+        color: var(--muted);
+        font-size: 11.5px;
+      }
+      .progrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .pro {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 8px 20px rgba(32, 33, 36, 0.06);
+      }
+      .pro .top {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .pro b {
+        font-size: 13.5px;
+        display: block;
+      }
+      .pro small {
+        color: var(--muted);
+        font-size: 11.5px;
+      }
+      .pro .meta {
+        display: flex;
+        gap: 6px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        font-size: 10.5px;
+        font-weight: 800;
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: #fff1e8;
+        color: #9a6500;
+      }
+      .pill.b {
+        background: #e8effe;
+        color: #1d4ed8;
+      }
+      .pill.g {
+        background: #e5f4ea;
+        color: #1f7a44;
+      }
+      .pro .price {
+        margin-top: 10px;
+        font-weight: 900;
+        font-size: 14px;
+      }
+      .pro button {
+        margin-top: 10px;
+        width: 100%;
+        padding: 11px;
+        border-radius: 11px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .pro button:hover {
+        background: var(--orange);
+        border-color: var(--orange);
+      }
+      .trust {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px 16px;
+        margin: 14px 18px;
+      }
+      .trust .tk {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+        background: rgba(255, 107, 53, 0.15);
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        flex: 0 0 42px;
+      }
+      .trust p {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .trust b {
+        font-size: 14px;
+      }
+      .provider {
+        background: #202124;
+        color: #fff;
+        border-radius: 18px;
+        margin: 0 18px 20px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .provider .cta {
+        background: var(--yellow);
+      }
+      .fixlist {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 18px;
+      }
+      .fix {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+      }
+      .fix.bad {
+        border-top: 4px solid #c0392b;
+      }
+      .fix.good {
+        border-top: 4px solid var(--ok);
+      }
+      .fix h4 {
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .fix p {
+        font-size: 12.5px;
+        color: #4a4a4a;
+        line-height: 1.55;
+      }
+      .fix code {
+        color: var(--orange-d);
+        font-size: 11.5px;
+      }
+      .legend {
+        width: min(1180px, 100%);
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: #d8c9bc;
+      }
+      .legend b {
+        color: #fff;
+      }
+      .legend code {
+        color: #ffc857;
+        font-size: 11.5px;
+      }
+      .check {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        margin-top: 6px;
+        font-size: 12.5px;
+      }
+      .phone {
+        width: 360px;
+        margin: 0 auto;
+        border: 10px solid #202124;
+        border-radius: 34px;
+        overflow: hidden;
+        background: var(--canvas);
+      }
+      .hidden {
+        display: none !important;
+      }
+      @media (max-width: 760px) {
+        .catgrid,
+        .progrid,
+        .fixlist {
+          grid-template-columns: 1fr 1fr;
+        }
+        .sheet form {
+          flex-direction: column;
+        }
+        .cta {
+          min-height: 50px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <p class="cap">
+      <b>Changas · Propuesta visual del landing (ver antes de aprobar).</b>
+      Formato como tus previews de Shomer Shield: <b>HOY vs PROPUESTO</b>,
+      interactivo, sin tocar código. Brand system respetado:
+      <code>#FFF9F3 / #FF6B35 / #FFC857 / #FF0A78 / #2563EB</code>. Nada se
+      implementa hasta que apruebes.
+    </p>
+
+    <div class="toolbar">
+      <div class="grp">
+        <span class="lbl">Vista</span>
+        <button class="tbtn on" data-view="both">Hoy + Propuesta</button>
+        <button class="tbtn" data-view="old">Solo hoy</button>
+        <button class="tbtn" data-view="new">Solo propuesta</button>
+      </div>
+      <div class="grp">
+        <span class="lbl">Dispositivo</span>
+        <button class="tbtn blue on" data-dev="desk">Desktop</button>
+        <button class="tbtn blue" data-dev="mob">Mobile</button>
+      </div>
+    </div>
+
+    <div class="frame" id="f-old">
+      <div class="flabel old">
+        ▣ HOY — landing actual (recreación fiel de
+        <code>apps/web/src/app/page.tsx</code>)
+      </div>
+      <div class="stage browser">
+        <div class="mhead">
+          <div class="brand">
+            <span class="mark"></span>
+            <div>
+              <strong>Changas</strong><small>Servicios cerca tuyo</small>
+            </div>
+          </div>
+          <button class="login">Ingresar</button>
+        </div>
+        <div class="today">
+          <div class="dup-search">
+            <span class="dup-tag">PROBLEMA 1 · DOBLE H1 + DOBLE BUSCADOR</span>
+            <div class="searchrow">
+              <input value="¿Qué necesitás resolver hoy?" readonly /><button>
+                ⌕
+              </button>
+            </div>
+            <div class="chips">
+              <span class="chip">Remoto</span><span class="chip">Cerca mío</span
+              ><span class="chip">Acepta ofertas</span>
+            </div>
+          </div>
+          <div class="dup-search">
+            <span class="dup-tag"
+              >PROBLEMA 2 · SEGUNDO PANEL “BUSCÁ A TU MANERA” (desktop)</span
+            >
+            <p style="font-size: 12px; font-weight: 800; color: #c84010">
+              BUSCÁ A TU MANERA
+            </p>
+            <h2 style="font-size: 20px">¿Qué necesitás resolver hoy?</h2>
+            <div class="searchrow" style="margin-top: 8px">
+              <input
+                value="¿Qué changa o servicio necesitás?"
+                readonly
+              /><button style="font-size: 13px; padding: 0 16px">Buscar</button>
+            </div>
+          </div>
+          <div class="hero-old">
+            <span class="dup-tag"
+              >PROBLEMA 3 · HERO AISLADO, NO INTEGRA BÚSQUEDA</span
+            >
+            <h2>Encontrá a alguien que lo resuelva.</h2>
+            <p>Personas con experiencia cerca tuyo o desde cualquier lugar.</p>
+            <div class="row">
+              <button class="btn-w">Explorar servicios</button
+              ><button class="btn-g">Ofrecer mis servicios</button>
+            </div>
+          </div>
+          <div>
+            <p style="font-size: 13px; font-weight: 800">
+              Oficios populares · <span style="color: #c84010">Ver todos</span>
+            </p>
+            <div class="rail" style="margin-top: 8px">
+              <div class="tile-old">🔧 Plomería</div>
+              <div class="tile-old">💡 Electricidad</div>
+              <div class="tile-old">🎨 Pintura</div>
+              <div class="tile-old">🐕 Mascotas</div>
+            </div>
+          </div>
+          <div class="card-old">
+            <span class="av">JM</span>
+            <div>
+              <b style="font-size: 13px">Juan M. · Plomero</b><br /><small
+                style="color: #666"
+                >Villa Crespo · Presencial · ★ 4.8</small
+              >
+            </div>
+          </div>
+          <div class="card-old">
+            <span class="av">LU</span>
+            <div>
+              <b style="font-size: 13px">Lucía G. · Electricista</b><br /><small
+                style="color: #666"
+                >Remoto / CABA · ★ 4.9</small
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" id="f-new">
+      <div class="flabel prop">
+        ▣ PROPUESTO — hero integrado + buscador único + superficie crema
+        (interactivo)
+      </div>
+      <div class="stage browser">
+        <div class="mhead">
+          <div class="brand">
+            <span class="mark"></span>
+            <div>
+              <strong>Changas</strong
+              ><small id="loc-label">CABA · Cerca tuyo ▾</small>
+            </div>
+          </div>
+          <button class="login">Ingresar</button>
+        </div>
+        <div class="hero-new">
+          <p
+            style="
+              font-size: 11px;
+              font-weight: 900;
+              letter-spacing: 0.12em;
+              color: rgba(255, 255, 255, 0.85);
+            "
+          >
+            TU MERCADO DE TAREAS RÁPIDAS
+          </p>
+          <h1>Encontrá a alguien que lo haga.</h1>
+          <p class="sub">
+            Oficios verificados cerca tuyo o por videollamada. Un solo H1, una
+            sola acción primaria.
+          </p>
+          <div class="mode-toggle" role="tablist" aria-label="Modalidad">
+            <button class="on" data-mode="cerca">Cerca mío</button>
+            <button data-mode="remoto">Remoto</button>
+          </div>
+          <div class="sheet">
+            <form onsubmit="return false;">
+              <input
+                id="q"
+                placeholder="¿Qué ayuda necesitás? Ej: plomero, clases, paseo…"
+                aria-label="Buscar un servicio"
+              /><button class="cta" type="submit">Buscar</button>
+            </form>
+            <div class="chips">
+              <button class="fchip on" data-cat="all">Todo</button>
+              <button class="fchip" data-cat="hogar">Hogar</button>
+              <button class="fchip" data-cat="clases">Clases</button>
+              <button class="fchip" data-cat="mascotas">Mascotas</button>
+              <button class="fchip" data-cat="ofertas">Acepta ofertas</button>
+            </div>
+          </div>
+        </div>
+        <div class="sec">
+          <h3>
+            Oficios populares <a href="#" onclick="return false;">Ver todos</a>
+          </h3>
+          <div class="catgrid">
+            <button class="cat" data-cat="hogar">
+              <span class="ic">🔧</span><b>Plomería</b
+              ><small>124 cerca · desde $8.000</small>
+            </button>
+            <button class="cat" data-cat="hogar">
+              <span class="ic">💡</span><b>Electricidad</b
+              ><small>98 cerca · desde $9.500</small>
+            </button>
+            <button class="cat" data-cat="hogar">
+              <span class="ic">🎨</span><b>Pintura</b
+              ><small>76 cerca · a convenir</small>
+            </button>
+            <button class="cat" data-cat="mascotas">
+              <span class="ic">🐾</span><b>Mascotas</b
+              ><small>54 cerca · desde $5.000</small>
+            </button>
+          </div>
+          <h3 style="margin-top: 18px">
+            Profesionales destacados
+            <a href="#" onclick="return false;">Explorar más</a>
+          </h3>
+          <div class="progrid" id="progrid">
+            <div class="pro" data-mode="cerca" data-cat="hogar">
+              <div class="top">
+                <span class="av">JM</span>
+                <div>
+                  <b>Juan M. · Plomero</b
+                  ><small>Villa Crespo · 2,1 km · ★ 4.8 (46)</small>
+                </div>
+              </div>
+              <div class="meta">
+                <span class="pill">Presencial</span
+                ><span class="pill g">Disponible hoy</span>
+              </div>
+              <p class="price">Desde $8.000</p>
+              <button>Consultar</button>
+            </div>
+            <div class="pro" data-mode="remoto" data-cat="clases">
+              <div class="top">
+                <span class="av">LU</span>
+                <div>
+                  <b>Lucía G. · Clases de inglés</b
+                  ><small>Remoto · ★ 4.9 (112)</small>
+                </div>
+              </div>
+              <div class="meta">
+                <span class="pill b">Remoto</span
+                ><span class="pill g">Acepta ofertas</span>
+              </div>
+              <p class="price">$7.500 / clase</p>
+              <button>Consultar</button>
+            </div>
+            <div class="pro" data-mode="cerca" data-cat="mascotas">
+              <div class="top">
+                <span class="av">SO</span>
+                <div>
+                  <b>Sofi R. · Paseadora</b
+                  ><small>Palermo · 900 m · ★ 5.0 (31)</small>
+                </div>
+              </div>
+              <div class="meta">
+                <span class="pill">Presencial</span
+                ><span class="pill g">Disponible hoy</span>
+              </div>
+              <p class="price">Desde $5.000</p>
+              <button>Consultar</button>
+            </div>
+          </div>
+          <p
+            id="nores"
+            class="hidden"
+            style="margin-top: 10px; font-size: 13px; color: #666"
+          >
+            Sin resultados con ese filtro — probá “Todo” o cambiá de modalidad.
+          </p>
+        </div>
+        <div class="trust">
+          <span class="tk">🛡</span>
+          <div>
+            <b>Elegí con confianza</b>
+            <p>
+              Perfiles públicos, precios claros y reseñas de trabajos reales.
+              <a
+                href="#"
+                onclick="return false;"
+                style="color: #2563eb; font-weight: 800"
+                >Cómo funciona</a
+              >
+            </p>
+          </div>
+        </div>
+        <div class="provider">
+          <div>
+            <b style="font-size: 15px">Tu oficio merece un buen escaparate.</b>
+            <p style="font-size: 12.5px; color: rgba(255, 255, 255, 0.7)">
+              Publicá lo que hacés y empezá a recibir consultas.
+            </p>
+          </div>
+          <button class="cta" style="padding: 13px 20px">
+            Ofrecer mis servicios
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" id="f-fix">
+      <div class="flabel new">
+        ▣ CORRECCIONES VISUALES — qué cambia y por qué (nada implementado aún)
+      </div>
+      <div class="fixlist">
+        <div class="fix bad">
+          <h4>✕ Hoy: dos H1 compitiendo</h4>
+          <p>
+            “¿Qué necesitás resolver hoy?” (panel) + “Encontrá a alguien que lo
+            resuelva” (hero). Rompe jerarquía y SEO.
+            <code>page.tsx:143 + 172</code>.
+          </p>
+        </div>
+        <div class="fix good">
+          <h4>✓ Propuesto: un solo H1</h4>
+          <p>
+            “Encontrá a alguien que lo haga.” El buscador pasa a ser un campo
+            con label, no un título. Un H1 por pantalla.
+          </p>
+        </div>
+        <div class="fix bad">
+          <h4>✕ Hoy: buscador duplicado</h4>
+          <p>
+            Formulario mobile + panel desktop con distinto placeholder y
+            distinto botón (⌕ vs “Buscar”). Doble mantenimiento.
+          </p>
+        </div>
+        <div class="fix good">
+          <h4>✓ Propuesto: buscador único</h4>
+          <p>
+            Un componente, dentro de la superficie crema superpuesta al hero
+            (como pide el spec <code>2026-09-09-marketplace-app-first</code>).
+            Mismo markup mobile/desktop, solo cambia el layout.
+          </p>
+        </div>
+        <div class="fix bad">
+          <h4>✕ Hoy: hero aislado + tarjetas planas</h4>
+          <p>
+            Gradiente usado como bloque suelto; categorías y profesionales sin
+            aire, bordes repetidos, CTAs secundarios débiles.
+          </p>
+        </div>
+        <div class="fix good">
+          <h4>✓ Propuesto: composición 70/20/10</h4>
+          <p>
+            Gradiente solo en hero (regla de
+            <code>changas-brand-system.md</code>), contenido en crema con
+            sombras suaves, primaria naranja + tinta, foco azul visible, badges
+            accesibles (<code>#D60060</code>).
+          </p>
+        </div>
+        <div class="fix bad">
+          <h4>✕ Hoy: modalidad poco clara</h4>
+          <p>
+            Chips “Remoto / Cerca mío” sueltos bajo el search, sin estado activo
+            ni efecto en resultados.
+          </p>
+        </div>
+        <div class="fix good">
+          <h4>✓ Propuesto: toggle Cerca / Remoto funcional</h4>
+          <p>
+            Probalo arriba: filtra las tarjetas mock. En la app real, setea
+            <code>?mode=</code> en la URL como ya hace <code>/buscar</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>Si aprobás, implemento así (estimación, sin código todavía):</b> 1)
+      unificar buscador en
+      <code>apps/web/src/components/ui/marketplace/search-field.tsx</code> +
+      hero en <code>page.tsx</code> (H1 único, sheet crema); 2) toggle
+      <code>Cerca mío / Remoto</code> con estado en URL; 3) grid de categorías
+      con <code>category-tile.tsx</code> extendido (icono + conteo + precio
+      base, sin inventar fotos); 4) pulir
+      <code>provider-card.tsx / nearby-service-rail.tsx</code> (orden título →
+      proveedor → zona → precio → acción); 5) test en
+      <code>lib/ui/public-marketplace-ui.test.ts</code>. Respondeme qué aprobar
+      / qué ajustar y recién ahí toco el repo.
+      <div class="check">
+        ☐ <span><b>Aprobar propuesta</b> tal cual → la implemento.</span>
+      </div>
+      <div class="check">
+        ☐
+        <span
+          ><b>Ajustar copy</b> del H1 (ej: “Tu mercado de tareas
+          rápidas”).</span
+        >
+      </div>
+      <div class="check">
+        ☐
+        <span
+          ><b>Cambiar alcance</b> (solo hero, sin tocar categorías/cards).</span
+        >
+      </div>
+    </div>
+
+    <script>
+      let mode = "cerca",
+        cat = "all";
+      const q = document.getElementById("q"),
+        grid = document.getElementById("progrid"),
+        nores = document.getElementById("nores");
+      function apply() {
+        let n = 0;
+        grid.querySelectorAll(".pro").forEach((c) => {
+          const okM = mode === "cerca" ? c.dataset.mode === "cerca" : true;
+          const okC =
+            cat === "all"
+              ? true
+              : cat === "ofertas"
+                ? c.innerHTML.includes("ofertas")
+                : c.dataset.cat === cat;
+          const okQ =
+            !q.value ||
+            c.textContent.toLowerCase().includes(q.value.toLowerCase());
+          const show = okM && okC && okQ;
+          c.style.display = show ? "" : "none";
+          if (show) n++;
+        });
+        nores.classList.toggle("hidden", n > 0);
+        document
+          .querySelectorAll("[data-mode]")
+          .forEach((b) => b.classList.toggle("on", b.dataset.mode === mode));
+        document.querySelectorAll("[data-cat].fchip, .cat").forEach((b) => {
+          if (b.classList.contains("fchip"))
+            b.classList.toggle("on", b.dataset.cat === cat);
+        });
+      }
+      document.querySelectorAll("[data-mode]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            mode = b.dataset.mode;
+            apply();
+          }),
+      );
+      document.querySelectorAll(".fchip").forEach(
+        (b) =>
+          (b.onclick = () => {
+            cat = b.dataset.cat;
+            apply();
+          }),
+      );
+      document.querySelectorAll(".cat").forEach(
+        (b) =>
+          (b.onclick = () => {
+            cat = b.dataset.cat;
+            apply();
+            document
+              .querySelector(".sheet")
+              .scrollIntoView({ behavior: "smooth", block: "center" });
+          }),
+      );
+      q.addEventListener("input", apply);
+      document.querySelectorAll("[data-view]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("[data-view]")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            const v = b.dataset.view;
+            document.getElementById("f-old").style.display =
+              v === "new" ? "none" : "";
+            document.getElementById("f-fix").style.display =
+              v !== "both" ? "none" : "";
+            document.getElementById("f-new").style.display =
+              v === "old" ? "none" : "";
+          }),
+      );
+      document.querySelectorAll("[data-dev]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("[data-dev]")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            const mob = b.dataset.dev === "mob";
+            document
+              .querySelectorAll(".frame")
+              .forEach((f) => (f.style.maxWidth = mob ? "430px" : "1180px"));
+          }),
+      );
+      apply();
+    </script>
+  </body>
+</html>

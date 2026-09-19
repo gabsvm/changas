@@ -87,104 +87,80 @@ export default async function HomePage() {
         </header>
 
         <div className="pt-4 sm:pt-9">
-          <section aria-labelledby="home-search-title" className="sm:hidden">
-            <h1 id="home-search-title" className="sr-only">
-              Buscar servicios en Changas
-            </h1>
-            <form action="/buscar" className="flex items-center gap-2">
-              <div className="min-w-0 flex-1">
-                <SearchField
-                  id="home-query-mobile"
-                  name="q"
-                  placeholder="¿Qué necesitás resolver hoy?"
-                  aria-label="Buscar un servicio o habilidad"
-                />
-              </div>
-              <button
-                className="consumer-pressable bg-brand-orange text-ink grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
-                type="submit"
-                aria-label="Buscar servicios"
-              >
-                <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
-                  <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="2" />
-                  <path d="m16 16 4.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </button>
-            </form>
-            <div className="consumer-scrollbar-none -mx-4 mt-2.5 flex gap-2 overflow-x-auto px-4 pb-1">
-              <Link
-                href="/buscar?mode=remoto"
-                className="consumer-pressable bg-surface border-ink/[0.08] inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-bold shadow-sm"
-              >
-                Remoto
-              </Link>
-              <Link
-                href="/buscar?mode=presencial"
-                className="consumer-pressable bg-surface border-ink/[0.08] inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-bold shadow-sm"
-              >
-                Cerca mío
-              </Link>
-              <Link
-                href="/buscar?offers=true"
-                className="consumer-pressable bg-surface border-ink/[0.08] inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-bold shadow-sm"
-              >
-                Acepta ofertas
-              </Link>
-            </div>
-          </section>
-
           <section
-            className="home-search-panel consumer-card bg-surface hidden p-3 sm:block sm:p-4"
-            aria-labelledby="home-search-title-desktop"
+            aria-labelledby="home-search-title"
+            className="brand-gradient-surface relative overflow-hidden rounded-[1.25rem] p-5 text-white shadow-[var(--consumer-shadow-hero)] sm:p-7"
           >
-            <div className="px-1 pb-2 sm:px-2">
-              <p className="brand-kicker text-xs font-extrabold tracking-[0.12em] uppercase">
-                Buscá a tu manera
+            <div className="relative z-10 max-w-2xl">
+              <p className="text-xs font-extrabold tracking-[0.12em] text-white/80 uppercase">
+                Tu mercado de tareas rápidas
               </p>
               <h1
-                id="home-search-title-desktop"
-                className="mt-1 text-xl font-extrabold tracking-[-0.03em] sm:text-2xl"
+                id="home-search-title"
+                className="mt-2 max-w-xl text-[2rem] leading-[1.02] font-extrabold tracking-[-0.03em] sm:text-4xl"
               >
-                ¿Qué necesitás resolver hoy?
+                Encontrá a alguien que lo haga.
               </h1>
-            </div>
-            <form action="/buscar" className="flex items-center gap-2">
-              <div className="min-w-0 flex-1">
-                <SearchField
-                  className="min-h-14"
-                  id="home-query"
-                  name="q"
-                  placeholder="¿Qué changa o servicio necesitás?"
-                  aria-label="Buscar un servicio o habilidad"
-                />
-              </div>
-              <button
-                className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-14 items-center rounded-2xl px-5 text-sm font-extrabold whitespace-nowrap shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
-                type="submit"
-              >
-                Buscar
-              </button>
-            </form>
-          </section>
-
-          <section className="quick-action-card brand-gradient-surface relative mt-4 overflow-hidden rounded-[1.25rem] p-5 text-white shadow-[var(--consumer-shadow-hero)] sm:mt-5 sm:p-7">
-            <div className="relative z-10 max-w-2xl">
-              <h2 className="max-w-xl text-[1.65rem] leading-[1.05] font-extrabold tracking-[-0.03em] sm:text-4xl">
-                Encontrá a alguien que lo resuelva.
-              </h2>
               <p className="mt-2 max-w-lg text-sm leading-6 text-white/90 sm:text-base">
-                Personas con experiencia cerca tuyo o desde cualquier lugar.
+                Oficios verificables cerca tuyo o por videollamada. Buscá una
+                vez y elegí con precios claros.
               </p>
-              <div className="mt-4 flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+              <div
+                className="mt-4 inline-flex rounded-full border border-white/30 bg-black/20 p-1"
+                role="group"
+                aria-label="Elegir modalidad"
+              >
+                <Link
+                  href="/buscar?mode=presencial"
+                  className="consumer-pressable text-ink inline-flex min-h-10 items-center rounded-full bg-white px-4 text-[13px] font-extrabold"
+                >
+                  Cerca mío
+                </Link>
+                <Link
+                  href="/buscar?mode=remoto"
+                  className="consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold text-white hover:bg-white/10"
+                >
+                  Remoto
+                </Link>
+              </div>
+            </div>
+            <div className="bg-canvas text-ink relative z-10 mt-5 rounded-2xl p-3 shadow-[var(--consumer-shadow-float)] sm:p-4">
+              <form
+                action="/buscar"
+                className="flex flex-col gap-2 sm:flex-row sm:items-center"
+              >
+                <div className="min-w-0 flex-1">
+                  <SearchField
+                    className="min-h-14"
+                    id="home-query"
+                    name="q"
+                    placeholder="¿Qué ayuda necesitás? Ej: plomero, clases, paseo…"
+                    aria-label="Buscar un servicio o habilidad"
+                  />
+                </div>
+                <button
+                  className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-14 items-center justify-center rounded-2xl px-6 text-sm font-extrabold whitespace-nowrap shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
+                  type="submit"
+                >
+                  Buscar
+                </button>
+              </form>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Link
+                  href="/buscar?offers=true"
+                  className="consumer-pressable text-ink/70 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full px-3 text-[13px] font-bold"
+                >
+                  Acepta ofertas
+                </Link>
                 <Link
                   href="/buscar"
-                  className="consumer-pressable bg-surface text-terracotta inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-extrabold shadow-md"
+                  className="consumer-pressable text-terracotta inline-flex min-h-9 items-center rounded-full px-3 text-[13px] font-extrabold"
                 >
                   Explorar servicios
                 </Link>
                 <Link
                   href="/provider/onboarding"
-                  className="consumer-pressable inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-bold text-white hover:bg-white/10"
+                  className="consumer-pressable text-ink/70 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full px-3 text-[13px] font-bold"
                 >
                   Ofrecer mis servicios
                 </Link>
@@ -271,9 +247,12 @@ export default async function HomePage() {
                 </svg>
               </span>
               <div>
-                <h2 className="text-[15px] font-extrabold">Elegí con confianza</h2>
+                <h2 className="text-[15px] font-extrabold">
+                  Elegí con confianza
+                </h2>
                 <p className="text-ink/60 mt-1 text-[13px] leading-5">
-                  Perfiles públicos, precios claros y reseñas de trabajos reales.
+                  Perfiles públicos, precios claros y reseñas de trabajos
+                  reales.
                 </p>
               </div>
             </div>

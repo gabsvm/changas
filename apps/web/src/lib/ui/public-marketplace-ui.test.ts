@@ -7,6 +7,7 @@ function source(path: string): string {
 
 const providerPage = source("../../app/p/[slug]/page.tsx");
 const servicePage = source("../../app/p/[slug]/[serviceSlug]/page.tsx");
+const searchPage = source("../../app/buscar/page.tsx");
 const brandHero = source("../../components/ui/marketplace/brand-hero.tsx");
 const categoryTile = source(
   "../../components/ui/marketplace/category-tile.tsx",
@@ -35,6 +36,27 @@ describe("public marketplace detail UI", () => {
     expect(providerPage).toContain("toggleProviderFavorite");
     expect(providerPage).toContain("ProviderReputation");
     expect(servicePage).toContain("startServiceConversation");
+  });
+
+  it("makes search filters removable without losing the query", () => {
+    expect(searchPage).toContain("discovery-hero");
+    expect(searchPage).toContain("discovery-results-shell");
+    expect(searchPage).toContain("Filtros activos");
+    expect(searchPage).toContain("Quitar filtro");
+    expect(searchPage).toContain("clearHref");
+  });
+
+  it("keeps fixed CTA bars clear of the system gesture area", () => {
+    expect(servicePage).toContain("service-cta-bar");
+    expect(servicePage).toContain("safe-area-inset-bottom");
+    expect(providerPage).toContain("service-cta-bar");
+    expect(providerPage).toContain("safe-area-inset-bottom");
+  });
+
+  it("offers contact next to save on wide provider profiles", () => {
+    expect(providerPage).toContain("Guardar proveedor");
+    expect(providerPage).toContain("Contactar");
+    expect(providerPage).toContain("hidden gap-3 sm:flex");
   });
 
   it("keeps marketplace compositions semantic and public-data only", () => {

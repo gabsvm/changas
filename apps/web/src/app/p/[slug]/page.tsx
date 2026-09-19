@@ -121,7 +121,10 @@ export default async function PublicProviderPage({
   ]);
 
   return (
-    <main id="main-content" className="bg-canvas text-ink min-h-screen px-4 pt-4 pb-28 sm:px-8 sm:pb-10">
+    <main
+      id="main-content"
+      className="bg-canvas text-ink min-h-screen px-4 pt-4 pb-28 sm:px-8 sm:pb-10"
+    >
       <div className="mx-auto max-w-4xl">
         <AppHeader
           brand
@@ -138,12 +141,15 @@ export default async function PublicProviderPage({
 
         <section className="pt-6 sm:pt-8">
           {pageSearchParams.favoriteError ? (
-            <p className="bg-danger/[0.07] text-danger mb-4 rounded-xl px-3 py-2.5 text-sm" role="alert">
+            <p
+              className="bg-danger/[0.07] text-danger mb-4 rounded-xl px-3 py-2.5 text-sm"
+              role="alert"
+            >
               No pudimos actualizar el proveedor guardado. Intentá nuevamente.
             </p>
           ) : null}
 
-          <div className="profile-hero-card consumer-card bg-surface flex items-start gap-4 p-4 sm:p-6">
+          <div className="profile-hero-card consumer-card bg-surface flex items-start gap-5 p-5 sm:p-7">
             <Avatar
               name={provider.display_name}
               src={
@@ -157,14 +163,16 @@ export default async function PublicProviderPage({
               <div className="flex flex-wrap items-center gap-2">
                 <StatusChip tone="success">Identidad verificada</StatusChip>
                 {provider.public_zone ? (
-                  <span className="text-ink/60 text-[13px] font-medium">{provider.public_zone}</span>
+                  <span className="text-ink/60 text-[13px] font-medium">
+                    {provider.public_zone}
+                  </span>
                 ) : null}
               </div>
-              <h1 className="mt-2 text-[26px] leading-7 font-extrabold tracking-[-0.03em]">
+              <h1 className="mt-3 text-[26px] leading-8 font-extrabold tracking-[-0.03em]">
                 {provider.display_name}
               </h1>
               {provider.public_headline ? (
-                <p className="text-ink/60 mt-1 text-[15px] font-semibold">
+                <p className="text-ink/60 mt-1.5 text-[15px] leading-6 font-semibold">
                   {provider.public_headline}
                 </p>
               ) : null}
@@ -172,20 +180,42 @@ export default async function PublicProviderPage({
           </div>
 
           {services?.[0]?.public_slug ? (
-            <div className="service-cta-bar bg-canvas/95 border-ink/[0.08] fixed inset-x-0 z-30 border-t px-4 pt-2 backdrop-blur-xl sm:hidden">
-              <div className="mx-auto flex max-w-4xl items-center gap-2">
+            <div className="service-cta-bar bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:hidden">
+              <div className="mx-auto flex max-w-4xl items-center gap-3">
                 <form action={toggleProviderFavorite} className="shrink-0">
-                  <input name="providerSlug" type="hidden" value={provider.public_slug} />
-                  <input name="returnTo" type="hidden" value={`/p/${provider.public_slug}`} />
-                  <input name="shouldFavorite" type="hidden" value={String(!isFavorite)} />
+                  <input
+                    name="providerSlug"
+                    type="hidden"
+                    value={provider.public_slug}
+                  />
+                  <input
+                    name="returnTo"
+                    type="hidden"
+                    value={`/p/${provider.public_slug}`}
+                  />
+                  <input
+                    name="shouldFavorite"
+                    type="hidden"
+                    value={String(!isFavorite)}
+                  />
                   <button
                     className="consumer-pressable border-ink/[0.1] grid h-[52px] w-[52px] place-items-center rounded-2xl border bg-white"
                     type="submit"
-                    aria-label={isFavorite ? "Quitar de guardados" : "Guardar proveedor"}
+                    aria-label={
+                      isFavorite ? "Quitar de guardados" : "Guardar proveedor"
+                    }
                     aria-pressed={isFavorite}
                   >
-                    <svg aria-hidden="true" viewBox="0 0 24 24" className={`h-6 w-6 ${isFavorite ? "fill-danger stroke-danger" : "fill-none stroke-ink"}`} strokeWidth="1.8">
-                      <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" strokeLinejoin="round" />
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      className={`h-6 w-6 ${isFavorite ? "fill-danger stroke-danger" : "stroke-ink fill-none"}`}
+                      strokeWidth="1.8"
+                    >
+                      <path
+                        d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </button>
                 </form>
@@ -200,12 +230,12 @@ export default async function PublicProviderPage({
           ) : null}
 
           {provider.bio ? (
-            <p className="text-ink/62 mt-4 max-w-2xl text-sm leading-6">
+            <p className="text-ink/62 mt-5 max-w-2xl text-sm leading-7">
               {provider.bio}
             </p>
           ) : null}
 
-          <div className="profile-trust-strip border-brand-yellow/35 bg-surface-muted mt-4 flex items-start gap-3 rounded-2xl border p-3.5">
+          <div className="profile-trust-strip border-brand-yellow/35 bg-surface-muted mt-5 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
             <span
               className="bg-brand-yellow/30 text-warning grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"
               aria-hidden="true"
@@ -213,40 +243,70 @@ export default async function PublicProviderPage({
               ✦
             </span>
             <div>
-              <p className="text-sm font-extrabold">Información pública clara</p>
-              <p className="text-ink/55 mt-0.5 text-xs leading-5">
+              <p className="text-sm font-extrabold">
+                Información pública clara
+              </p>
+              <p className="text-ink/55 mt-1 text-xs leading-6">
                 Conocé sus servicios, zona aproximada y experiencia antes de
                 escribirle.
               </p>
             </div>
           </div>
 
-          <div className="profile-facts mt-4 grid grid-cols-3 gap-2" aria-label="Resumen del perfil">
+          <div
+            className="profile-facts mt-5 grid grid-cols-3 gap-3"
+            aria-label="Resumen del perfil"
+          >
             <ProfileFact label="Servicios" value={services?.length ?? 0} />
             <ProfileFact label="Habilidades" value={skills?.length ?? 0} />
             <ProfileFact label="Zonas" value={areas?.length ?? 0} />
           </div>
 
-          <form action={toggleProviderFavorite} className="mt-4 hidden sm:block">
-            <input name="providerSlug" type="hidden" value={provider.public_slug} />
-            <input name="returnTo" type="hidden" value={`/p/${provider.public_slug}`} />
-            <input name="shouldFavorite" type="hidden" value={String(!isFavorite)} />
-            <button className="button-secondary min-h-12" type="submit">
-              {isFavorite ? "Quitar de guardados" : "Guardar proveedor"}
-            </button>
-          </form>
+          <div className="mt-5 hidden gap-3 sm:flex">
+            <form action={toggleProviderFavorite} className="flex-1">
+              <input
+                name="providerSlug"
+                type="hidden"
+                value={provider.public_slug}
+              />
+              <input
+                name="returnTo"
+                type="hidden"
+                value={`/p/${provider.public_slug}`}
+              />
+              <input
+                name="shouldFavorite"
+                type="hidden"
+                value={String(!isFavorite)}
+              />
+              <button
+                className="button-secondary min-h-12 w-full"
+                type="submit"
+              >
+                {isFavorite ? "Quitar de guardados" : "Guardar proveedor"}
+              </button>
+            </form>
+            {services?.[0]?.public_slug ? (
+              <Link
+                href={`/p/${slug}/${services?.[0]?.public_slug ?? ""}`}
+                className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-12 flex-1 items-center justify-center rounded-xl px-5 text-sm font-extrabold shadow-md"
+              >
+                Contactar
+              </Link>
+            ) : null}
+          </div>
         </section>
 
-        <div className="mt-6">
+        <div className="mt-8">
           <ProviderReputation providerSlug={provider.public_slug} />
         </div>
 
         <PublicSection title="Servicios">
           {(services ?? []).length ? (
-          <div className="consumer-card bg-surface divide-y divide-ink/10 overflow-hidden px-4">
+            <div className="consumer-card bg-surface divide-ink/10 divide-y overflow-hidden px-4">
               {(services ?? []).map((service) => (
                 <Link
-                  className="consumer-pressable flex min-h-[5.25rem] items-start gap-3 rounded-lg px-1 py-3 hover:bg-ink/[0.035]"
+                  className="consumer-pressable hover:bg-ink/[0.035] flex min-h-[5.25rem] items-start gap-4 rounded-lg px-2 py-4"
                   href={`/p/${slug}/${service.public_slug}`}
                   key={service.public_slug}
                 >
@@ -254,10 +314,10 @@ export default async function PublicProviderPage({
                     <p className="text-ink/60 text-[13px] font-semibold">
                       {service.skill_name}
                     </p>
-                    <h3 className="mt-0.5 line-clamp-2 text-[15px] leading-5 font-bold">
+                    <h3 className="mt-1 line-clamp-2 text-[15px] leading-6 font-bold">
                       {service.title}
                     </h3>
-                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    <div className="mt-2 flex flex-wrap gap-1.5">
                       <StatusChip tone="neutral">
                         {getServiceModalityLabel(service.modality)}
                       </StatusChip>
@@ -266,7 +326,7 @@ export default async function PublicProviderPage({
                       ) : null}
                     </div>
                   </div>
-                  <div className="flex shrink-0 flex-col items-end gap-2">
+                  <div className="flex shrink-0 flex-col items-end gap-3">
                     <p className="text-[15px] font-extrabold">
                       {formatServicePrice(
                         service.price_model,
@@ -275,15 +335,28 @@ export default async function PublicProviderPage({
                         service.price_unit,
                       )}
                     </p>
-                    <svg aria-hidden="true" viewBox="0 0 24 24" className="text-ink/50 h-5 w-5" fill="none">
-                      <path d="m9 5 7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      className="text-ink/50 h-5 w-5"
+                      fill="none"
+                    >
+                      <path
+                        d="m9 5 7 7-7 7"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </div>
                 </Link>
               ))}
             </div>
           ) : (
-            <p className="text-ink/50 py-3 text-sm">No hay servicios publicados.</p>
+            <p className="text-ink/50 py-3 text-sm">
+              No hay servicios publicados.
+            </p>
           )}
         </PublicSection>
 
@@ -301,9 +374,12 @@ export default async function PublicProviderPage({
 
         {(areas ?? []).length ? (
           <PublicSection title="Zona de servicio">
-            <div className="divide-y divide-ink/10">
+            <div className="divide-ink/10 divide-y">
               {(areas ?? []).map((area) => (
-                <div className="flex min-h-12 items-center justify-between gap-4 py-2" key={`${area.label}-${area.radius_meters}`}>
+                <div
+                  className="flex min-h-12 items-center justify-between gap-4 py-3"
+                  key={`${area.label}-${area.radius_meters}`}
+                >
                   <span className="text-sm font-semibold">{area.label}</span>
                   <span className="text-ink/48 text-xs">
                     Radio aprox. {area.radius_meters} m
@@ -311,7 +387,7 @@ export default async function PublicProviderPage({
                 </div>
               ))}
             </div>
-            <p className="text-ink/42 mt-2 text-xs">
+            <p className="text-ink/42 mt-3 text-xs leading-5">
               La dirección exacta y las coordenadas no se muestran públicamente.
             </p>
           </PublicSection>
@@ -319,9 +395,12 @@ export default async function PublicProviderPage({
 
         {(portfolio ?? []).length ? (
           <PublicSection title="Portfolio">
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               {(portfolio ?? []).map((item) => (
-                <article className="border-ink/10 overflow-hidden rounded-xl border bg-surface" key={item.id}>
+                <article
+                  className="border-ink/10 bg-surface overflow-hidden rounded-xl border"
+                  key={item.id}
+                >
                   {item.media_path ? (
                     <Image
                       className="aspect-video w-full object-cover"
@@ -335,10 +414,12 @@ export default async function PublicProviderPage({
                       unoptimized
                     />
                   ) : null}
-                  <div className="p-3">
-                    <p className="text-sm font-semibold">{item.title}</p>
+                  <div className="p-4">
+                    <p className="text-sm leading-5 font-semibold">
+                      {item.title}
+                    </p>
                     {item.description ? (
-                      <p className="text-ink/55 mt-1 text-sm leading-5">
+                      <p className="text-ink/55 mt-1.5 text-sm leading-6">
                         {item.description}
                       </p>
                     ) : null}
@@ -351,15 +432,17 @@ export default async function PublicProviderPage({
 
         {(experiences ?? []).length ? (
           <PublicSection title="Experiencia">
-            <div className="divide-y divide-ink/10">
+            <div className="divide-ink/10 divide-y">
               {(experiences ?? []).map((item) => (
-                <div className="py-3" key={`${item.title}-${item.started_on}`}>
-                  <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="text-ink/48 mt-0.5 text-sm">
+                <div className="py-4" key={`${item.title}-${item.started_on}`}>
+                  <p className="text-sm leading-5 font-semibold">
+                    {item.title}
+                  </p>
+                  <p className="text-ink/48 mt-1 text-sm leading-5">
                     {item.organization ?? "Experiencia independiente"}
                   </p>
                   {item.description ? (
-                    <p className="text-ink/58 mt-1 text-sm leading-6">
+                    <p className="text-ink/58 mt-1.5 text-sm leading-7">
                       {item.description}
                     </p>
                   ) : null}
@@ -371,19 +454,26 @@ export default async function PublicProviderPage({
 
         {(education ?? []).length || (certifications ?? []).length ? (
           <PublicSection title="Formación y credenciales">
-            <div className="divide-y divide-ink/10">
+            <div className="divide-ink/10 divide-y">
               {(education ?? []).map((item) => (
-                <div className="py-3" key={`${item.institution}-${item.started_on}`}>
-                  <p className="text-sm font-semibold">{item.institution}</p>
-                  <p className="text-ink/48 mt-0.5 text-sm">
+                <div
+                  className="py-4"
+                  key={`${item.institution}-${item.started_on}`}
+                >
+                  <p className="text-sm leading-5 font-semibold">
+                    {item.institution}
+                  </p>
+                  <p className="text-ink/48 mt-1 text-sm leading-5">
                     {item.field_of_study ?? "Formación"}
                   </p>
                 </div>
               ))}
               {(certifications ?? []).map((item) => (
-                <div className="py-3" key={`${item.title}-${item.issued_on}`}>
-                  <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="text-ink/48 mt-0.5 text-sm">
+                <div className="py-4" key={`${item.title}-${item.issued_on}`}>
+                  <p className="text-sm leading-5 font-semibold">
+                    {item.title}
+                  </p>
+                  <p className="text-ink/48 mt-1 text-sm leading-5">
                     {item.issuer ?? "Emisor no especificado"}
                   </p>
                 </div>
@@ -392,7 +482,7 @@ export default async function PublicProviderPage({
           </PublicSection>
         ) : null}
 
-        <footer className="text-ink/38 border-ink/10 mt-8 border-t py-6 text-center text-xs">
+        <footer className="text-ink/38 border-ink/10 mt-10 border-t py-6 text-center text-xs leading-5">
           Changas · información publicada por el proveedor
         </footer>
       </div>
@@ -408,18 +498,22 @@ function PublicSection({
   children: ReactNode;
 }) {
   return (
-    <section className="profile-section-card consumer-card bg-surface mt-5 p-4 sm:p-5">
-      <h2 className="text-lg font-bold tracking-[-0.015em]">{title}</h2>
-      <div className="mt-3">{children}</div>
+    <section className="profile-section-card consumer-card bg-surface mt-6 p-5 sm:p-6">
+      <h2 className="text-lg leading-7 font-bold tracking-[-0.015em]">
+        {title}
+      </h2>
+      <div className="mt-4">{children}</div>
     </section>
   );
 }
 
 function ProfileFact({ label, value }: { label: string; value: number }) {
   return (
-    <div className="border-ink/8 bg-surface-muted/55 rounded-xl border px-2 py-3 text-center">
-      <p className="text-lg font-extrabold tracking-[-0.03em]">{value}</p>
-      <p className="text-ink/48 mt-0.5 text-[0.68rem] font-bold uppercase">
+    <div className="border-ink/8 bg-surface-muted/55 rounded-xl border px-3 py-4 text-center">
+      <p className="text-xl leading-7 font-extrabold tracking-[-0.03em]">
+        {value}
+      </p>
+      <p className="text-ink/48 mt-1 text-[0.68rem] leading-4 font-bold uppercase">
         {label}
       </p>
     </div>
