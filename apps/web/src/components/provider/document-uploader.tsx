@@ -38,8 +38,13 @@ export function DocumentUploader({
   const [localError, setLocalError] = useState<string | null>(null);
   const [compressing, setCompressing] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [compressionNotice, setCompressionNotice] = useState<string | null>(null);
-  const [state, formAction, pending] = useActionState(action, initialActionState);
+  const [compressionNotice, setCompressionNotice] = useState<string | null>(
+    null,
+  );
+  const [state, formAction, pending] = useActionState(
+    action,
+    initialActionState,
+  );
   const [directMetadata, setDirectMetadata] = useState<{
     path: string;
     mimeType: string;
@@ -199,7 +204,8 @@ export function DocumentUploader({
         <StatusChip tone="neutral">Máx. 10 MiB</StatusChip>
       </div>
       <p className="text-ink/55 mt-1 text-sm leading-6">
-        JPG, PNG o PDF. La ruta privada del archivo nunca se muestra públicamente.
+        JPG, PNG o PDF. La ruta privada del archivo nunca se muestra
+        públicamente.
       </p>
 
       <form
@@ -209,7 +215,11 @@ export function DocumentUploader({
       >
         {directMetadata ? (
           <>
-            <input type="hidden" name="storagePath" value={directMetadata.path} />
+            <input
+              type="hidden"
+              name="storagePath"
+              value={directMetadata.path}
+            />
             <input
               type="hidden"
               name="storageMimeType"
@@ -269,9 +279,12 @@ export function DocumentUploader({
                 {selected.file.type === "application/pdf" ? "PDF" : "IMG"}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{selected.file.name}</p>
+                <p className="truncate text-sm font-semibold">
+                  {selected.file.name}
+                </p>
                 <p className="text-ink/45 mt-0.5 text-xs">
-                  {getDocumentTypeLabel(documentType)} · {formatFileSize(selected.file.size)}
+                  {getDocumentTypeLabel(documentType)} ·{" "}
+                  {formatFileSize(selected.file.size)}
                 </p>
               </div>
               <button
@@ -310,17 +323,26 @@ export function DocumentUploader({
         </div>
 
         {localError ? (
-          <p className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm" role="alert">
+          <p
+            className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm"
+            role="alert"
+          >
             {localError}
           </p>
         ) : null}
         {compressionNotice ? (
-          <p className="bg-moss/[0.07] text-moss rounded-xl px-3 py-2.5 text-sm" role="status">
+          <p
+            className="bg-moss/[0.07] text-moss rounded-xl px-3 py-2.5 text-sm"
+            role="status"
+          >
             {compressionNotice}
           </p>
         ) : null}
         {state.error ? (
-          <p className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm" role="alert">
+          <p
+            className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm"
+            role="alert"
+          >
             {state.error}
           </p>
         ) : null}
@@ -330,7 +352,13 @@ export function DocumentUploader({
             role="status"
             aria-live="polite"
           >
-            {state.success}
+            {state.success}{" "}
+            <a
+              className="font-bold underline underline-offset-2"
+              href="#documentos"
+            >
+              Ver en la lista ↓
+            </a>
           </p>
         ) : null}
 

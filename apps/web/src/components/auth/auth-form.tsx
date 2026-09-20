@@ -59,18 +59,18 @@ export function AuthForm({
   const modeCopy = copy[mode];
 
   return (
-    <div className="border-ink/10 bg-surface w-full max-w-md rounded-[2rem] border p-6 shadow-[0_24px_70px_rgba(32,33,36,0.08)] sm:p-8">
+    <div className="border-ink/10 bg-surface w-full max-w-md rounded-[1.25rem] border p-5 sm:rounded-[2rem] sm:p-8 sm:shadow-[0_24px_70px_rgba(32,33,36,0.08)]">
       <p className="text-terracotta text-xs font-extrabold tracking-[0.18em] uppercase">
         Cuenta Changas
       </p>
-      <h1 className="font-display mt-3 text-4xl leading-tight font-extrabold tracking-[-0.04em]">
+      <h1 className="font-display mt-2 text-3xl leading-tight font-extrabold tracking-[-0.04em] sm:mt-3 sm:text-4xl">
         {modeCopy.title}
       </h1>
-      <p className="text-ink/65 mt-3 text-sm leading-6">
+      <p className="text-ink/65 mt-2 text-sm leading-6 sm:mt-3">
         {modeCopy.description}
       </p>
 
-      <form action={formAction} className="mt-8 space-y-5">
+      <form action={formAction} className="mt-6 space-y-5 sm:mt-8">
         <input type="hidden" name="next" value={nextPath} />
 
         {mode === "signup" ? (
@@ -162,12 +162,22 @@ export function AuthForm({
       {googleEnabled &&
       googleAction &&
       (mode === "login" || mode === "signup") ? (
-        <form action={googleAction} className="mt-4">
-          <input type="hidden" name="next" value={nextPath} />
-          <button className="button-secondary w-full" type="submit">
-            Continuar con Google
-          </button>
-        </form>
+        <>
+          <div
+            className="text-ink/45 my-4 flex items-center gap-3 text-xs font-bold"
+            aria-hidden="true"
+          >
+            <span className="bg-ink/10 h-px flex-1" />
+            <span>o</span>
+            <span className="bg-ink/10 h-px flex-1" />
+          </div>
+          <form action={googleAction}>
+            <input type="hidden" name="next" value={nextPath} />
+            <button className="button-secondary w-full" type="submit">
+              Continuar con Google
+            </button>
+          </form>
+        </>
       ) : null}
 
       <nav

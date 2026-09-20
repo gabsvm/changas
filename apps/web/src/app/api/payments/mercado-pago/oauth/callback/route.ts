@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { completeMercadoPagoOAuthCallback } from "@/lib/payments/server";
+import { safeNextPath } from "@/lib/auth/redirect";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,17 +18,6 @@ function fallbackUrl(request: Request) {
   return url;
 }
 
-function safeLocalReturnUrl(request: Request, returnPath: string) {
-  if (
-    !returnPath.startsWith("/") ||
-    returnPath.startsWith("//") ||
-    returnPath.includes("\\")
-  ) {
-    return fallbackUrl(request);
-  }
-  return new URL(returnPath, request.url);
-}
-
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
@@ -39,7 +29,10 @@ export async function GET(request: Request) {
 
   try {
     const result = await completeMercadoPagoOAuthCallback({ code, state });
-    const destination = safeLocalReturnUrl(request, result.returnPath);
+    const destination = new URL(
+      safeNextPath(result.returnPath, "/provider/manage"),
+      request.url,
+    );
     destination.searchParams.set("payment_account", "connected");
     return redirectWithNoStore(destination);
   } catch {

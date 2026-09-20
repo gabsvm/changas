@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { isUuid } from "@changas/validation";
+
 import {
   listConversationMessages,
   type ConversationMessage,
@@ -13,11 +15,8 @@ import {
   unblockConversationUser,
 } from "@/lib/conversations/server";
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
 function assertUuid(value: string): void {
-  if (!UUID_PATTERN.test(value)) throw new Error("Identificador inválido.");
+  if (!isUuid(value)) throw new Error("Identificador inválido.");
 }
 
 export async function loadOlderMessages(
@@ -77,7 +76,7 @@ export async function submitConversationReport(
   const category = String(formData.get("category") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim();
 
-  if (!UUID_PATTERN.test(conversationId)) {
+  if (!isUuid(conversationId)) {
     return { status: "ERROR", message: "Conversación inválida." };
   }
   if (category.length < 2 || category.length > 80) {

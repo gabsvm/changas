@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Changas — Propuesta registro y previews mobile (ver antes de aprobar)
+    </title>
+    <style>
+      :root {
+        --canvas: #fff9f3;
+        --surface: #fffdf9;
+        --ink: #202124;
+        --muted: rgba(32, 33, 36, 0.62);
+        --orange: #ff6b35;
+        --orange-d: #c84010;
+        --yellow: #ffc857;
+        --blue: #2563eb;
+        --ok: #2f7d4a;
+        --danger: #c93c32;
+        --line: rgba(32, 33, 36, 0.1);
+        --font:
+          "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: #171310;
+        color: #f3e9de;
+        padding: 26px;
+        display: grid;
+        gap: 20px;
+        justify-items: center;
+      }
+      .cap {
+        width: min(1180px, 100%);
+        font-size: 13px;
+        line-height: 1.65;
+        color: #d8c9bc;
+      }
+      .cap b {
+        color: #fff;
+      }
+      .cap code {
+        color: #ffc857;
+        font-size: 12px;
+      }
+      .toolbar {
+        width: min(1180px, 100%);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .toolbar .lbl {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #a89888;
+        text-transform: uppercase;
+      }
+      .tbtn {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #4a3d33;
+        background: #2c241e;
+        color: #e8d9cb;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .tbtn.on {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #202124;
+      }
+      .frame {
+        width: min(1180px, 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #3a2f28;
+        background: #2b241f;
+        color: var(--ink);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+      }
+      .flabel {
+        padding: 11px 16px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+      }
+      .flabel.old {
+        background: #2a2f38;
+        color: #e8eef7;
+      }
+      .flabel.prop {
+        background: #3a2a10;
+        color: #ffe8a5;
+      }
+      .flabel.new {
+        background: #0f3a2c;
+        color: #baf4d3;
+      }
+      .stage {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 22px 18px;
+        background: #241d17;
+      }
+      .phone {
+        width: 375px;
+        max-width: 100%;
+        height: 740px;
+        background: var(--canvas);
+        border-radius: 32px;
+        overflow-y: auto;
+        border: 10px solid #101010;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      .appbar {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 14px;
+        background: rgba(255, 249, 243, 0.96);
+        border-bottom: 1px solid var(--line);
+        font-size: 16px;
+        font-weight: 800;
+        z-index: 2;
+      }
+      .appbar .bk {
+        font-size: 18px;
+      }
+      .mbody {
+        padding: 16px 14px 22px;
+      }
+      .kick {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        color: var(--orange-d);
+      }
+      .mbody h1 {
+        font-size: 26px;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        margin-top: 8px;
+      }
+      .desc {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 8px;
+        line-height: 1.6;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 900;
+        color: #fff;
+        background: #c0392b;
+        border-radius: 999px;
+        padding: 2px 9px;
+        margin-bottom: 10px;
+        letter-spacing: 0.06em;
+      }
+      .tag.g {
+        background: var(--ok);
+      }
+      .req {
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        margin-top: 14px;
+        padding: 12px 0;
+      }
+      .req .hd {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .req .hd b {
+        font-size: 14px;
+      }
+      .req .hd small {
+        font-size: 12px;
+        color: var(--muted);
+        display: block;
+        margin-top: 2px;
+      }
+      .pill {
+        font-size: 10.5px;
+        font-weight: 800;
+        border-radius: 999px;
+        padding: 4px 10px;
+      }
+      .pill.g {
+        background: #e5f4ea;
+        color: #1f7a44;
+      }
+      .pill.n {
+        background: #f1efe9;
+        color: #666;
+      }
+      .pill.w {
+        background: #fff1e8;
+        color: #9a6500;
+      }
+      .rrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 0;
+        border-top: 1px solid var(--line);
+        font-size: 13.5px;
+        font-weight: 700;
+      }
+      .rrow:first-of-type {
+        border-top: 0;
+      }
+      .doc {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 13px 0;
+        border-top: 1px solid var(--line);
+      }
+      .thumb {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        flex: 0 0 56px;
+        background: linear-gradient(135deg, #ffe3c2, #ffc857);
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 900;
+        color: #7a5200;
+        object-fit: cover;
+      }
+      .thumb.none {
+        background: #f1efe9;
+        color: #aaa;
+      }
+      .doc b {
+        font-size: 13.5px;
+        display: block;
+      }
+      .doc small {
+        font-size: 11.5px;
+        color: var(--muted);
+        display: block;
+        margin-top: 3px;
+      }
+      .doc .ok {
+        margin-left: auto;
+        flex: 0 0 auto;
+      }
+      .prev {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        margin-top: 12px;
+        background: #fff;
+      }
+      .prev .im {
+        height: 150px;
+        background: linear-gradient(
+          135deg,
+          #ffe3c2 0%,
+          #ffc857 55%,
+          #ff6b35 130%
+        );
+        display: grid;
+        place-items: center;
+        color: #7a5200;
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+        padding: 0 30px;
+      }
+      .prev .ft {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 12px;
+        font-size: 12.5px;
+      }
+      .prev .ft b {
+        display: block;
+        font-size: 13px;
+      }
+      .prev .ft small {
+        color: var(--muted);
+      }
+      .prev .ft button {
+        margin-left: auto;
+        border: 0;
+        background: none;
+        color: var(--danger);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        min-height: 44px;
+        padding: 0 6px;
+      }
+      .btnrow {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .btnrow button {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 12px;
+        padding: 14px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .go {
+        width: 100%;
+        border: 0;
+        background: var(--orange);
+        border-radius: 12px;
+        padding: 15px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 900;
+        margin-top: 12px;
+        cursor: pointer;
+      }
+      details.rev {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        margin-top: 10px;
+      }
+      details.rev summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px;
+        cursor: pointer;
+        list-style: none;
+        font-size: 14px;
+        font-weight: 800;
+      }
+      details.rev summary::-webkit-details-marker {
+        display: none;
+      }
+      details.rev summary .go2 {
+        margin-left: auto;
+        color: #999;
+        font-size: 18px;
+      }
+      details.rev .bd {
+        border-top: 1px solid var(--line);
+        padding: 12px 14px;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+      details.rev .bd dt {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-top: 10px;
+      }
+      details.rev .bd dt:first-child {
+        margin-top: 0;
+      }
+      details.rev .bd dd {
+        font-weight: 700;
+      }
+      details.rev .bd .ed {
+        color: var(--blue);
+        font-size: 12.5px;
+        font-weight: 800;
+      }
+      .mini {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px;
+        margin-top: 12px;
+      }
+      .mini .av {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ffc857, #ff0a78);
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        flex: 0 0 48px;
+      }
+      .mini b {
+        font-size: 14px;
+        display: block;
+      }
+      .mini small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .legend {
+        width: min(1180px, 100%);
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: #d8c9bc;
+      }
+      .legend b {
+        color: #fff;
+      }
+      .legend code {
+        color: #ffc857;
+        font-size: 11.5px;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="cap">
+      <b
+        >Changas · Propuesta registro y previews mobile (ver antes de
+        aprobar).</b
+      >
+      Revisé el alta como usuario (sign-up, ya revampeado) y como proveedor
+      (pasos 1-4). Hallazgo: el uploader ya previsualiza <b>antes</b> de subir,
+      pero lo <b>cargado</b> se ve como texto sin miniatura y el review no
+      muestra <b>valores</b>. Teléfonos de <b>375px</b>. Nada se implementa
+      hasta que apruebes.
+    </p>
+
+    <div class="toolbar">
+      <span class="lbl">Vista</span>
+      <button class="tbtn on" data-v="all">Todo</button>
+      <button class="tbtn" data-v="docs">Documentos</button>
+      <button class="tbtn" data-v="review">Revisión</button>
+    </div>
+
+    <div class="frame" data-s="docs">
+      <div class="flabel old">
+        ▣ DOCUMENTOS HOY — cargado sin miniatura (<code
+          >documents/page.tsx:141-164</code
+        >
+        + <code>document-list-item.tsx</code>)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Documentos</div>
+          <div class="mbody">
+            <span class="tag">HOY · “Cargado” pero sin ver qué es</span>
+            <div class="req">
+              <div class="hd">
+                <div><b>Requisitos</b><small>3/3 recibidos</small></div>
+                <span class="pill g">Listo para enviar</span>
+              </div>
+            </div>
+            <div class="doc">
+              <span class="thumb none">—</span>
+              <div><b>DNI frente</b><small>Recibido 12/09</small></div>
+              <span class="ok pill g">Cargado</span>
+            </div>
+            <div class="doc" style="border-top: 1px solid var(--line)">
+              <span class="thumb none">—</span>
+              <div><b>DNI dorso</b><small>Recibido 12/09</small></div>
+              <span class="ok pill g">Cargado</span>
+            </div>
+            <p
+              style="
+                font-size: 12px;
+                color: #8a7a6e;
+                margin-top: 10px;
+                line-height: 1.55;
+              "
+            >
+              El query solo trae <code>document_type, created_at</code>: sin
+              ruta no hay miniatura posible.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="docs">
+      <div class="flabel prop">
+        ▣ DOCUMENTOS PROPUESTO — miniaturas firmadas + éxito visible
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Documentos</div>
+          <div class="mbody">
+            <div class="req">
+              <div class="hd">
+                <div><b>Requisitos</b><small>3/3 recibidos</small></div>
+                <span class="pill g">Listo para enviar</span>
+              </div>
+            </div>
+            <div class="doc">
+              <span class="thumb">DNI ▸</span>
+              <div>
+                <b>DNI frente</b><small>Recibido 12/09 · JPG 84 KiB</small>
+              </div>
+              <span class="ok pill g">Cargado</span>
+            </div>
+            <div class="doc" style="border-top: 1px solid var(--line)">
+              <span class="thumb">DNI ▸</span>
+              <div>
+                <b>DNI dorso</b><small>Recibido 12/09 · JPG 79 KiB</small>
+              </div>
+              <span class="ok pill g">Cargado</span>
+            </div>
+            <div class="prev">
+              <div class="im">
+                VISTA PREVIA DEL ARCHIVO<br />(URL firmada, expira)
+              </div>
+              <div class="ft">
+                <div><b>dorso.jpg</b><small>DNI dorso · 79 KiB</small></div>
+                <button id="q1">Quitar</button>
+              </div>
+            </div>
+            <div class="btnrow">
+              <button>Tomar foto</button><button>Elegir archivo</button>
+            </div>
+            <button class="go">Subir documento privado</button>
+            <p
+              style="
+                font-size: 11.5px;
+                color: #8a7a6e;
+                margin-top: 10px;
+                line-height: 1.5;
+              "
+            >
+              Mock: miniaturas vía URL firmada del bucket privado (solo el
+              dueño, expira en minutos).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="review">
+      <div class="flabel old">
+        ▣ REVISIÓN HOY — filas Completo/Revisar sin valores
+        (<code>review/page.tsx:177-196</code>)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Revisión</div>
+          <div class="mbody">
+            <span class="tag">HOY · ¿qué cargué exactamente? No se ve</span>
+            <div class="rrow">
+              <span>Perfil público</span><span class="pill g">Completo</span>
+            </div>
+            <div class="rrow">
+              <span>Identidad privada</span><span class="pill g">Completo</span>
+            </div>
+            <div class="rrow">
+              <span>Documentos requeridos</span
+              ><span class="pill w">Revisar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="review">
+      <div class="flabel new">
+        ▣ REVISIÓN PROPUESTO — filas expandibles con valores (interactivo)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Revisión</div>
+          <div class="mbody">
+            <div class="mini">
+              <span class="av">G</span>
+              <div>
+                <b>gabi · electricista</b
+                ><small>Villa Crespo · “trabajos prolijos…”</small>
+              </div>
+            </div>
+            <details class="rev" open>
+              <summary>
+                Perfil público <span class="pill g">Completo</span
+                ><span class="go2">›</span>
+              </summary>
+              <div class="bd">
+                <dt>Nombre visible</dt>
+                <dd>gabi</dd>
+                <dt>Zona</dt>
+                <dd>Villa Crespo</dd>
+                <dt>Presentación</dt>
+                <dd>Electricista matriculado, trabajos prolijos y a tiempo.</dd>
+                <a class="ed" href="#" onclick="return false;"
+                  >Editar paso 1 ›</a
+                >
+              </div>
+            </details>
+            <details class="rev">
+              <summary>
+                Identidad privada <span class="pill g">Completo</span
+                ><span class="go2">›</span>
+              </summary>
+              <div class="bd">
+                <dt>Nombre legal</dt>
+                <dd>G. Pérez</dd>
+                <dt>DNI</dt>
+                <dd>•••• 4821</dd>
+                <dt>Teléfono</dt>
+                <dd>•••• 5678</dd>
+                <a class="ed" href="#" onclick="return false;"
+                  >Editar paso 2 ›</a
+                >
+              </div>
+            </details>
+            <details class="rev">
+              <summary>
+                Documentos requeridos <span class="pill w">Revisar</span
+                ><span class="go2">›</span>
+              </summary>
+              <div class="bd">
+                <div class="doc" style="border: 0; padding: 6px 0">
+                  <span class="thumb">DNI ▸</span>
+                  <div><b>DNI frente</b><small>JPG 84 KiB</small></div>
+                </div>
+                <a class="ed" href="#" onclick="return false;"
+                  >Ir a documentos ›</a
+                >
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>Si aprobás, implemento así (sin código todavía):</b> documentos → query
+      suma <code>storage_path, mime_type, file_size_bytes</code> de
+      <code>provider_documents</code> + server action que genera URL firmada
+      corta del bucket privado + <code>DocumentListItem</code> con miniatura
+      (solo imagen; PDF muestra ficha) + éxito post-carga con ancla a la lista;
+      review → <code>CompletionRow</code> expandible con valores cargados
+      (DNI/teléfono enmascarados, nunca completos) + mini tarjeta “así se ve tu
+      perfil” arriba; perfil → misma mini tarjeta con avatar real. Sin tocar RLS
+      ni lógica de revisión. Tests en <code>lib/ui/documents.test.ts</code> +
+      <code>provider-submission.test.ts</code>. Decime qué aprobar / ajustar.
+    </div>
+
+    <script>
+      document.querySelectorAll("[data-v]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("[data-v]")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            const v = b.dataset.v;
+            document
+              .querySelectorAll(".frame")
+              .forEach(
+                (f) =>
+                  (f.style.display =
+                    v === "all" || f.dataset.s === v ? "" : "none"),
+              );
+          }),
+      );
+      document.getElementById("q1").onclick = (e) => {
+        e.target.closest(".prev").remove();
+      };
+    </script>
+  </body>
+</html>

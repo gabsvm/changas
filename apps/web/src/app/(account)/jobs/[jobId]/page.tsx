@@ -47,20 +47,28 @@ function scheduleTypeLabel(value: string): string {
 function requestStatus(value: string) {
   const labels: Record<
     string,
-    { label: string; tone: "neutral" | "info" | "success" | "warning" | "danger" }
+    {
+      label: string;
+      tone: "neutral" | "info" | "success" | "warning" | "danger";
+    }
   > = {
     OPEN: { label: "Pendiente", tone: "warning" },
     ACCEPTED: { label: "Aceptada", tone: "success" },
     REJECTED: { label: "Rechazada", tone: "danger" },
     WITHDRAWN: { label: "Retirada", tone: "neutral" },
   };
-  return labels[value] ?? { label: "Estado de solicitud", tone: "neutral" as const };
+  return (
+    labels[value] ?? { label: "Estado de solicitud", tone: "neutral" as const }
+  );
 }
 
 function scopeStatus(value: string) {
   const labels: Record<
     string,
-    { label: string; tone: "neutral" | "info" | "success" | "warning" | "danger" }
+    {
+      label: string;
+      tone: "neutral" | "info" | "success" | "warning" | "danger";
+    }
   > = {
     OPEN: { label: "Pendiente", tone: "warning" },
     REJECTED: { label: "Rechazado", tone: "danger" },
@@ -69,7 +77,9 @@ function scopeStatus(value: string) {
     PAYMENT_FAILED: { label: "Pago fallido", tone: "danger" },
     PAID: { label: "Pagado", tone: "success" },
   };
-  return labels[value] ?? { label: "Estado del cambio", tone: "neutral" as const };
+  return (
+    labels[value] ?? { label: "Estado del cambio", tone: "neutral" as const }
+  );
 }
 
 function eventLabel(value: string): string {
@@ -113,6 +123,34 @@ export default async function JobPage({
   const schedulePrimary =
     detail.schedule_starts_at ?? detail.schedule_deadline_at ?? null;
   const status = getJobStatusPresentation(detail.job_status);
+  const nextTransition: {
+    expected: JobStatus;
+    requested: JobStatus;
+    heading: string;
+    label: string;
+  } | null =
+    isProvider && detail.job_status === "CONFIRMED"
+      ? {
+          expected: "CONFIRMED",
+          requested: "IN_PROGRESS",
+          heading: "Iniciá el trabajo cuando llegues",
+          label: "Iniciar trabajo",
+        }
+      : isProvider && detail.job_status === "IN_PROGRESS"
+        ? {
+            expected: "IN_PROGRESS",
+            requested: "COMPLETION_REQUESTED",
+            heading: "Pedí la finalización al terminar",
+            label: "Solicitar finalización",
+          }
+        : isClient && detail.job_status === "COMPLETION_REQUESTED"
+          ? {
+              expected: "COMPLETION_REQUESTED",
+              requested: "COMPLETED",
+              heading: "Confirmá que el trabajo está listo",
+              label: "Confirmar finalización",
+            }
+          : null;
   const price = formatMinorUnits(
     detail.base_price_amount,
     detail.currency_code as "ARS",
@@ -126,11 +164,21 @@ export default async function JobPage({
         trailing={
           <Link
             href={`/messages/${detail.conversation_id}`}
-            className="consumer-pressable text-terracotta inline-flex h-12 min-w-12 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-bold hover:bg-brand-orange/[0.08]"
+            className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.08] inline-flex h-12 min-w-12 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-bold"
             aria-label="Abrir conversación"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
-              <path d="M4 5.5h16v11H9l-5 4v-15Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+            >
+              <path
+                d="M4 5.5h16v11H9l-5 4v-15Z"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinejoin="round"
+              />
             </svg>
             Chat
           </Link>
@@ -157,27 +205,65 @@ export default async function JobPage({
               {getServiceModalityLabel(detail.modality)}
             </StatusChip>
           </div>
-          <h1 className="mt-2 text-[22px] leading-7 font-extrabold tracking-[-0.025em]">
+          <h1 className="mt-3 text-[22px] leading-8 font-extrabold tracking-[-0.025em]">
             {detail.service_title}
           </h1>
-          <p className="text-ink/60 mt-1 text-sm">Con {detail.counterparty_name} · {price}</p>
-          <div className="bg-canvas mt-3 grid grid-cols-2 gap-2 rounded-xl p-3 text-sm">
+          <p className="text-ink/60 mt-1.5 text-sm leading-6">
+            Con {detail.counterparty_name} · {price}
+          </p>
+          <div className="bg-canvas mt-4 grid grid-cols-2 gap-3 rounded-xl p-4 text-sm">
             <div>
-              <p className="text-ink/60 text-xs font-semibold">Próxima fecha</p>
-              <p className="mt-0.5 font-bold">{schedulePrimary ? dateTime(schedulePrimary) ?? "A coordinar" : "A coordinar"}</p>
+              <p className="text-ink/60 text-xs leading-4 font-semibold">
+                Próxima fecha
+              </p>
+              <p className="mt-0.5 font-bold">
+                {schedulePrimary
+                  ? (dateTime(schedulePrimary) ?? "A coordinar")
+                  : "A coordinar"}
+              </p>
             </div>
             <div>
-              <p className="text-ink/60 text-xs font-semibold">Precio acordado</p>
+              <p className="text-ink/60 text-xs leading-4 font-semibold">
+                Precio acordado
+              </p>
               <p className="mt-0.5 font-extrabold">{price}</p>
             </div>
           </div>
         </header>
 
-        <section className="border-ink/10 mt-5 border-t pt-4">
+        {nextTransition ? (
+          <section
+            className="bg-ink mt-5 rounded-2xl p-5 text-white"
+            aria-label="Próxima acción"
+          >
+            <p className="text-[0.68rem] font-bold tracking-[0.08em] text-white/60 uppercase">
+              Próxima acción
+            </p>
+            <h2 className="mt-1 text-lg leading-7 font-extrabold">
+              {nextTransition.heading}
+            </h2>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <StatusButton
+                jobId={jobId}
+                expected={nextTransition.expected}
+                requested={nextTransition.requested}
+                label={nextTransition.label}
+              />
+              <Link
+                href={`/messages/${detail.conversation_id}`}
+                className="consumer-pressable inline-flex min-h-[52px] items-center justify-center rounded-xl border border-white/25 px-4 text-sm font-bold text-white"
+              >
+                Ver chat
+              </Link>
+            </div>
+          </section>
+        ) : null}
+
+        <section className="border-ink/10 mt-6 border-t pt-5">
           <p className="text-ink/42 text-[0.68rem] font-bold tracking-[0.08em] uppercase">
             Alcance acordado
           </p>
-          <p className="mt-2 text-sm leading-6 whitespace-pre-wrap">
+          <p className="mt-3 text-sm leading-7 whitespace-pre-wrap">
             {detail.scope_snapshot}
           </p>
         </section>
@@ -191,36 +277,9 @@ export default async function JobPage({
           />
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
-          <div className="space-y-6">
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_.8fr]">
+          <div className="space-y-8">
             <JobSection title="Acciones del trabajo">
-              <div className="grid gap-2 sm:grid-cols-2">
-                {isProvider && detail.job_status === "CONFIRMED" ? (
-                  <StatusButton
-                    jobId={jobId}
-                    expected="CONFIRMED"
-                    requested="IN_PROGRESS"
-                    label="Iniciar trabajo"
-                  />
-                ) : null}
-                {isProvider && detail.job_status === "IN_PROGRESS" ? (
-                  <StatusButton
-                    jobId={jobId}
-                    expected="IN_PROGRESS"
-                    requested="COMPLETION_REQUESTED"
-                    label="Solicitar finalización"
-                  />
-                ) : null}
-                {isClient && detail.job_status === "COMPLETION_REQUESTED" ? (
-                  <StatusButton
-                    jobId={jobId}
-                    expected="COMPLETION_REQUESTED"
-                    requested="COMPLETED"
-                    label="Confirmar finalización"
-                  />
-                ) : null}
-              </div>
-
               {["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
                 detail.job_status,
               ) ? (
@@ -257,6 +316,7 @@ export default async function JobPage({
             {detail.job_status === "CONFIRMED" ? (
               <JobSection
                 title="Reprogramar"
+                collapsible
                 description="La otra parte debe aceptar el nuevo horario antes de reemplazar al actual."
               >
                 <form
@@ -315,18 +375,26 @@ export default async function JobPage({
                 </form>
 
                 {reschedules.length > 0 ? (
-                  <div className="border-ink/10 mt-4 divide-y divide-ink/10 border-t">
+                  <div className="border-ink/10 divide-ink/10 mt-4 divide-y border-t">
                     {reschedules.map((request) => {
                       const state = requestStatus(request.request_status);
                       return (
-                        <article key={request.request_id} className="py-3 text-sm">
+                        <article
+                          key={request.request_id}
+                          className="py-3 text-sm"
+                        >
                           <div className="flex items-center justify-between gap-3">
-                            <strong>{scheduleTypeLabel(request.schedule_type)}</strong>
-                            <StatusChip tone={state.tone}>{state.label}</StatusChip>
+                            <strong>
+                              {scheduleTypeLabel(request.schedule_type)}
+                            </strong>
+                            <StatusChip tone={state.tone}>
+                              {state.label}
+                            </StatusChip>
                           </div>
                           <p className="text-ink/55 mt-1">
-                            {dateTime(request.starts_at ?? request.deadline_at) ??
-                              "A coordinar"}
+                            {dateTime(
+                              request.starts_at ?? request.deadline_at,
+                            ) ?? "A coordinar"}
                           </p>
                           {request.request_status === "OPEN" &&
                           request.requested_by_user_id !== user.id ? (
@@ -369,6 +437,7 @@ export default async function JobPage({
             isProvider ? (
               <JobSection
                 title="Cambio de alcance"
+                collapsible
                 description="Un aumento de precio requiere aceptación del cliente y pago adicional confirmado."
               >
                 <form action={requestScopeChangeAction} className="grid gap-3">
@@ -397,18 +466,20 @@ export default async function JobPage({
 
             {scopeChanges.length > 0 ? (
               <JobSection title="Cambios de alcance">
-                <div className="divide-y divide-ink/10">
+                <div className="divide-ink/10 divide-y">
                   {scopeChanges.map((change) => {
                     const state = scopeStatus(change.change_status);
                     return (
                       <article key={change.scope_change_id} className="py-3">
                         <div className="flex items-center justify-between gap-3">
-                          <StatusChip tone={state.tone}>{state.label}</StatusChip>
+                          <StatusChip tone={state.tone}>
+                            {state.label}
+                          </StatusChip>
                           <span className="text-ink/45 text-xs">
                             {dateTime(change.created_at)}
                           </span>
                         </div>
-                        <p className="mt-2 text-sm leading-6 whitespace-pre-wrap">
+                        <p className="mt-3 text-sm leading-7 whitespace-pre-wrap">
                           {change.scope_snapshot}
                         </p>
                         <div className="text-ink/55 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
@@ -423,7 +494,8 @@ export default async function JobPage({
                           <strong className="text-ink">
                             Nuevo total:{" "}
                             {formatMinorUnits(
-                              detail.base_price_amount + change.additional_amount_minor,
+                              detail.base_price_amount +
+                                change.additional_amount_minor,
                               detail.currency_code as "ARS",
                             )}
                           </strong>
@@ -499,7 +571,7 @@ export default async function JobPage({
             ) : null}
           </div>
 
-          <aside className="space-y-6">
+          <aside className="space-y-8">
             {detail.modality === "IN_PERSON" || detail.modality === "BOTH" ? (
               <JobSection title="Ubicación del trabajo">
                 {detail.exact_address ? (
@@ -542,18 +614,22 @@ export default async function JobPage({
             ) : null}
 
             <JobSection title="Historial">
-              <ol className="divide-y divide-ink/10">
+              <ol className="border-ink/10 relative space-y-4 border-l-2 pl-4">
                 {events.map((event) => (
-                  <li key={event.event_id} className="py-3 text-sm">
+                  <li key={event.event_id} className="relative text-sm">
                     <div className="flex items-start gap-2.5">
-                      <span className="bg-moss mt-1.5 h-2 w-2 shrink-0 rounded-full" />
+                      <span className="bg-moss ring-canvas absolute top-1 -left-[22px] h-2.5 w-2.5 rounded-full ring-4" />
                       <div className="min-w-0">
-                        <strong className="block">{eventLabel(event.event_type)}</strong>
-                        <time className="text-ink/42 mt-0.5 block text-xs">
+                        <strong className="block">
+                          {eventLabel(event.event_type)}
+                        </strong>
+                        <time className="text-ink/42 mt-1 block text-xs leading-4">
                           {dateTime(event.created_at)}
                         </time>
                         {event.reason ? (
-                          <p className="text-ink/58 mt-1 leading-5">{event.reason}</p>
+                          <p className="text-ink/58 mt-1.5 leading-6">
+                            {event.reason}
+                          </p>
                         ) : null}
                       </div>
                     </div>
@@ -583,16 +659,36 @@ function JobSection({
   title,
   description,
   children,
+  collapsible = false,
 }: {
   title: string;
   description?: string;
   children: React.ReactNode;
+  collapsible?: boolean;
 }) {
+  if (collapsible) {
+    return (
+      <details className="border-ink/10 border-t pt-4">
+        <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-lg leading-7 font-bold tracking-[-0.015em]">
+          {title}
+          <span className="text-ink/40 text-xl" aria-hidden="true">
+            ›
+          </span>
+        </summary>
+        {description ? (
+          <p className="text-ink/52 mt-1.5 text-sm leading-6">{description}</p>
+        ) : null}
+        <div className="mt-3 pb-1">{children}</div>
+      </details>
+    );
+  }
   return (
     <section className="border-ink/10 border-t pt-4">
-      <h2 className="text-lg font-bold tracking-[-0.015em]">{title}</h2>
+      <h2 className="text-lg leading-7 font-bold tracking-[-0.015em]">
+        {title}
+      </h2>
       {description ? (
-        <p className="text-ink/52 mt-1 text-sm leading-6">{description}</p>
+        <p className="text-ink/52 mt-1.5 text-sm leading-6">{description}</p>
       ) : null}
       <div className="mt-3">{children}</div>
     </section>

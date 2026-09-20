@@ -10,6 +10,7 @@ import {
   type JobStatus,
   type ScheduleType,
 } from "@changas/domain";
+import { isUuid } from "@changas/validation";
 
 import {
   applyFakeAdditionalPayment,
@@ -29,9 +30,6 @@ import {
 } from "@/lib/reputation/server";
 import { createClient } from "@/lib/supabase/server";
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
 const reviewReportReasons: ReviewReportReason[] = [
   "THREATS",
   "INSULTS",
@@ -50,7 +48,7 @@ function stringField(formData: FormData, name: string): string {
 
 function uuidField(formData: FormData, name: string): string {
   const value = stringField(formData, name);
-  if (!UUID_PATTERN.test(value)) throw new Error("Identificador inválido.");
+  if (!isUuid(value)) throw new Error("Identificador inválido.");
   return value;
 }
 
@@ -166,7 +164,7 @@ export async function fakeAdditionalPaymentAction(
   const jobId = uuidField(formData, "jobId");
   const scopeChangeId = uuidField(formData, "scopeChangeId");
   const nonce = stringField(formData, "paymentNonce") || crypto.randomUUID();
-  if (!UUID_PATTERN.test(nonce)) throw new Error("Pago inválido.");
+  if (!isUuid(nonce)) throw new Error("Pago inválido.");
   const outcome = stringField(formData, "outcome");
   if (outcome !== "SUCCESS" && outcome !== "PENDING" && outcome !== "FAILURE") {
     throw new Error("Resultado inválido.");

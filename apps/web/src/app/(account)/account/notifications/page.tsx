@@ -84,16 +84,24 @@ export default async function NotificationCenterPage() {
               Novedades de trabajos, propuestas, pagos y cuenta.
             </p>
           </div>
-          {unreadCount > 0 ? (
-            <form action={markAllNotificationsReadAction}>
-              <button
-                className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center self-start rounded-lg px-2.5 text-sm font-bold whitespace-nowrap"
-                type="submit"
-              >
-                Marcar todo leído
-              </button>
-            </form>
-          ) : null}
+          <div className="flex items-center gap-1 self-start">
+            <Link
+              href="#preferencias"
+              className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold whitespace-nowrap"
+            >
+              Preferencias de avisos
+            </Link>
+            {unreadCount > 0 ? (
+              <form action={markAllNotificationsReadAction}>
+                <button
+                  className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center self-start rounded-lg px-2.5 text-sm font-bold whitespace-nowrap"
+                  type="submit"
+                >
+                  Marcar todo leído
+                </button>
+              </form>
+            ) : null}
+          </div>
         </div>
 
         <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(19rem,0.7fr)] lg:gap-10">
@@ -111,13 +119,13 @@ export default async function NotificationCenterPage() {
                   <section key={label} aria-labelledby={`activity-${label}`}>
                     <h2
                       id={`activity-${label}`}
-                      className="text-ink/48 mb-1 text-xs font-bold tracking-[0.1em] uppercase"
+                      className="text-ink/48 mb-2 text-xs font-bold tracking-[0.1em] uppercase"
                     >
                       {label}
                     </h2>
                     <ol className="consumer-card bg-surface divide-ink/[0.07] divide-y px-3">
                       {items.map((item) => (
-                        <li key={item.id} className="py-3 sm:px-1">
+                        <li key={item.id} className="py-3.5 sm:px-1">
                           <div className="flex gap-3">
                             <span
                               className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.unread ? "bg-brand-orange" : "bg-ink/18"}`}
@@ -138,41 +146,40 @@ export default async function NotificationCenterPage() {
                                   </div>
                                   <Link
                                     href={item.actionUrl}
-                                    className="text-ink hover:text-terracotta mt-0.5 block text-[0.98rem] leading-6 font-semibold"
+                                    className="text-ink hover:text-terracotta mt-1 block text-[0.98rem] leading-6 font-semibold"
                                   >
                                     {item.title}
                                   </Link>
                                 </div>
-                                <time
-                                  className="text-ink/38 shrink-0 text-[0.68rem]"
-                                  dateTime={item.createdAt}
-                                >
-                                  {timeFormatter.format(
-                                    new Date(item.createdAt),
-                                  )}
-                                </time>
+                                <div className="flex shrink-0 flex-col items-end gap-1">
+                                  <time
+                                    className="text-ink/38 shrink-0 text-[0.68rem]"
+                                    dateTime={item.createdAt}
+                                  >
+                                    {timeFormatter.format(
+                                      new Date(item.createdAt),
+                                    )}
+                                  </time>
+                                  {item.unread ? (
+                                    <form action={markNotificationReadAction}>
+                                      <input
+                                        type="hidden"
+                                        name="notificationId"
+                                        value={item.id}
+                                      />
+                                      <button
+                                        className="consumer-pressable text-moss hover:bg-moss/[0.07] inline-flex min-h-9 items-center rounded-lg px-2 text-[11px] font-bold"
+                                        type="submit"
+                                      >
+                                        Marcar
+                                      </button>
+                                    </form>
+                                  ) : null}
+                                </div>
                               </div>
                               <p className="text-ink/55 mt-0.5 text-sm leading-5">
                                 {item.body}
                               </p>
-                              {item.unread ? (
-                                <form
-                                  action={markNotificationReadAction}
-                                  className="mt-1.5"
-                                >
-                                  <input
-                                    type="hidden"
-                                    name="notificationId"
-                                    value={item.id}
-                                  />
-                                  <button
-                                    className="consumer-pressable text-ink/48 hover:bg-ink/[0.035] hover:text-ink -ml-2 inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold"
-                                    type="submit"
-                                  >
-                                    Marcar como leída
-                                  </button>
-                                </form>
-                              ) : null}
                             </div>
                           </div>
                         </li>
@@ -184,7 +191,7 @@ export default async function NotificationCenterPage() {
             )}
           </section>
 
-          <aside>
+          <aside id="preferencias" className="scroll-mt-24">
             <h2 className="text-lg font-bold tracking-[-0.02em]">
               Notificaciones
             </h2>

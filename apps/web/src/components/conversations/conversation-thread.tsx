@@ -87,6 +87,7 @@ export function ConversationThread({
   peerName,
   serviceTitle,
   providerHref,
+  deal,
   initialMessages,
   initialAttachments,
   initiallyBlockedByMe,
@@ -99,6 +100,7 @@ export function ConversationThread({
   peerName: string;
   serviceTitle: string;
   providerHref: string;
+  deal: { statusLabel: string; amountLabel: string } | null;
   initialMessages: ConversationMessage[];
   initialAttachments: ConversationAttachmentSummary[];
   initiallyBlockedByMe: boolean;
@@ -112,6 +114,7 @@ export function ConversationThread({
   const [loadingOlder, startOlderTransition] = useTransition();
   const [blockedByMe, setBlockedByMe] = useState(initiallyBlockedByMe);
   const [changingBlock, startBlockTransition] = useTransition();
+  const [showAttach, setShowAttach] = useState(false);
   const connectedOnce = useRef(false);
 
   useEffect(() => {
@@ -201,11 +204,22 @@ export function ConversationThread({
         <div className="flex min-h-12 items-center gap-2.5">
           <Link
             href="/messages"
-            className="consumer-pressable grid h-12 w-12 shrink-0 place-items-center rounded-full hover:bg-ink/[0.05]"
+            className="consumer-pressable hover:bg-ink/[0.05] grid h-12 w-12 shrink-0 place-items-center rounded-full"
             aria-label="Volver a mensajes"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
-              <path d="m15 5-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-6 w-6"
+              fill="none"
+            >
+              <path
+                d="m15 5-7 7 7 7"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </Link>
           <div className="min-w-0 flex-1">
@@ -218,8 +232,13 @@ export function ConversationThread({
             </Link>
           </div>
           <details className="relative">
-            <summary className="consumer-pressable grid h-12 w-12 cursor-pointer list-none place-items-center rounded-full hover:bg-ink/[0.05] [&::-webkit-details-marker]:hidden">
-              <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+            <summary className="consumer-pressable hover:bg-ink/[0.05] grid h-12 w-12 cursor-pointer list-none place-items-center rounded-full [&::-webkit-details-marker]:hidden">
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="h-5 w-5"
+                fill="none"
+              >
                 <circle cx="5" cy="12" r="1.6" fill="currentColor" />
                 <circle cx="12" cy="12" r="1.6" fill="currentColor" />
                 <circle cx="19" cy="12" r="1.6" fill="currentColor" />
@@ -244,6 +263,23 @@ export function ConversationThread({
             Bloqueaste a esta persona. El historial se conserva, pero no podés
             enviar nuevos mensajes hasta desbloquearla.
           </div>
+        ) : null}
+        {deal ? (
+          <a
+            href="#propuestas"
+            className="border-ink/[0.08] bg-surface mt-3 flex items-center gap-2.5 rounded-2xl border px-3.5 py-2.5"
+            aria-label={`Ver acuerdo: ${deal.statusLabel}, ${deal.amountLabel}`}
+          >
+            <span className="bg-brand-orange/12 text-terracotta shrink-0 rounded-full px-2.5 py-1 text-xs font-bold">
+              {deal.statusLabel}
+            </span>
+            <span className="truncate text-sm font-extrabold">
+              {deal.amountLabel}
+            </span>
+            <span className="text-terracotta ml-auto shrink-0 text-[13px] font-bold">
+              Ver acuerdo ↓
+            </span>
+          </a>
         ) : null}
       </header>
 
@@ -298,16 +334,33 @@ export function ConversationThread({
           </button>
         ) : (
           <>
-            <TextComposer
-              conversationId={conversationId}
-              initialNonce={initialTextNonce}
-              onSent={refreshThread}
-            />
-            <AttachmentComposer
-              conversationId={conversationId}
-              initialNonce={initialAttachmentNonce}
-              onSent={refreshThread}
-            />
+            <div className="flex items-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowAttach((value) => !value)}
+                aria-expanded={showAttach}
+                aria-label={
+                  showAttach ? "Ocultar adjuntos" : "Adjuntar archivo"
+                }
+                className="consumer-pressable border-ink/[0.1] grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl bg-white text-2xl font-bold"
+              >
+                +
+              </button>
+              <div className="min-w-0 flex-1">
+                <TextComposer
+                  conversationId={conversationId}
+                  initialNonce={initialTextNonce}
+                  onSent={refreshThread}
+                />
+              </div>
+            </div>
+            {showAttach ? (
+              <AttachmentComposer
+                conversationId={conversationId}
+                initialNonce={initialAttachmentNonce}
+                onSent={refreshThread}
+              />
+            ) : null}
           </>
         )}
       </footer>
@@ -466,8 +519,18 @@ function TextComposer({
         {pending ? (
           "…"
         ) : (
-          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
-            <path d="M4 12 20 4l-4.5 16-3.5-6.5L4 12Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="h-5 w-5"
+            fill="none"
+          >
+            <path
+              d="M4 12 20 4l-4.5 16-3.5-6.5L4 12Z"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinejoin="round"
+            />
           </svg>
         )}
       </button>

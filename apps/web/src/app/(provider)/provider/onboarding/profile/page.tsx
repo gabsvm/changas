@@ -2,6 +2,7 @@ import { canSelfManageProviderStatus } from "@changas/domain";
 import { redirect } from "next/navigation";
 
 import { PublicProfileForm } from "@/components/account/account-form";
+import { Avatar } from "@/components/ui/marketplace/avatar";
 import { ProfileAvatarUploader } from "@/components/account/profile-avatar-uploader";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { createClient } from "@/lib/supabase/server";
@@ -38,7 +39,8 @@ export default async function ProviderOnboardingProfilePage() {
   }
 
   const nextStep = Math.min(4, Math.max(provider.onboarding_step, 2));
-  const displayName = profile?.display_name ?? user.email?.split("@")[0] ?? "Tu perfil";
+  const displayName =
+    profile?.display_name ?? user.email?.split("@")[0] ?? "Tu perfil";
 
   return (
     <section className="pb-6 sm:py-14">
@@ -54,6 +56,24 @@ export default async function ProviderOnboardingProfilePage() {
           Mostrá lo esencial para que otras personas entiendan quién sos y cómo
           trabajás. Guardar este paso no publica servicios.
         </p>
+
+        <div
+          className="consumer-card bg-surface mt-5 flex items-center gap-3 p-4"
+          aria-label="Vista previa de tu perfil"
+        >
+          <Avatar
+            name={displayName}
+            src={profile?.avatar_url ?? null}
+            size="md"
+          />
+          <div className="min-w-0">
+            <p className="truncate text-[15px] font-bold">{displayName}</p>
+            <p className="text-ink/60 mt-0.5 truncate text-[13px]">
+              {profile?.public_zone ?? "Sin zona"}
+              {profile?.bio ? ` · ${profile.bio}` : null}
+            </p>
+          </div>
+        </div>
 
         <section className="border-ink/10 mt-6 border-y py-4">
           <ProfileAvatarUploader

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { DocumentListItem } from "@/components/provider/document-list-item";
+import { maskPrivateReference } from "@/lib/ui/documents";
+import { Avatar } from "@/components/ui/marketplace/avatar";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -53,7 +55,7 @@ function CompletionRow({
   return (
     <Link
       href={href}
-      className="consumer-pressable flex min-h-14 items-center justify-between gap-4 rounded-lg px-1 py-3 hover:bg-ink/[0.035]"
+      className="consumer-pressable hover:bg-ink/[0.035] flex min-h-14 items-center justify-between gap-4 rounded-lg px-1 py-3"
     >
       {content}
     </Link>
@@ -95,7 +97,7 @@ export default async function ProviderOnboardingReviewPage() {
       .maybeSingle(),
     supabase
       .from("provider_documents")
-      .select("document_type, created_at")
+      .select("id, document_type, mime_type, file_size_bytes, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
   ]);
@@ -110,19 +112,22 @@ export default async function ProviderOnboardingReviewPage() {
   );
   const privateComplete = Boolean(
     privateProfile?.legal_name &&
-      privateProfile?.private_phone &&
-      privateProfile?.date_of_birth &&
-      privateProfile?.exact_address &&
-      privateProfile?.dni_number,
+    privateProfile?.private_phone &&
+    privateProfile?.date_of_birth &&
+    privateProfile?.exact_address &&
+    privateProfile?.dni_number,
   );
   const receivedDocuments = documents ?? [];
   const documentsComplete = hasRequiredIdentityDocuments(receivedDocuments);
-  const readyForSubmission = publicComplete && privateComplete && documentsComplete;
+  const readyForSubmission =
+    publicComplete && privateComplete && documentsComplete;
   const pendingReview =
-    provider.status === "IDENTITY_PENDING" || provider.status === "UNDER_REVIEW";
+    provider.status === "IDENTITY_PENDING" ||
+    provider.status === "UNDER_REVIEW";
   const approved = provider.status === "ACTIVE";
   const rejected = provider.status === "REJECTED";
-  const editable = canSelfManageProviderStatus(provider.status) && !pendingReview;
+  const editable =
+    canSelfManageProviderStatus(provider.status) && !pendingReview;
 
   let summary =
     "Este resumen no envía tu identidad. La revisión empieza únicamente cuando confirmás el envío desde Documentos.";
@@ -130,7 +135,8 @@ export default async function ProviderOnboardingReviewPage() {
     summary =
       "Tu identidad ya está en la cola administrativa. La evidencia queda bloqueada mientras se toma una decisión.";
   } else if (approved) {
-    summary = "Tu identidad fue aprobada y el perfil de proveedor está habilitado.";
+    summary =
+      "Tu identidad fue aprobada y el perfil de proveedor está habilitado.";
   } else if (rejected) {
     summary =
       "La revisión requiere intervención antes de que el perfil pueda habilitarse.";
@@ -174,7 +180,24 @@ export default async function ProviderOnboardingReviewPage() {
 
         <p className="text-ink/58 mt-2 text-sm leading-6">{summary}</p>
 
-        <section className="border-ink/10 mt-5 divide-y divide-ink/10 border-y">
+        <div className="consumer-card bg-surface mt-5 flex items-center gap-3 p-4">
+          <Avatar
+            name={profile?.display_name ?? "Tu perfil"}
+            src={null}
+            size="md"
+          />
+          <div className="min-w-0">
+            <p className="truncate text-[15px] font-bold">
+              {profile?.display_name ?? "Sin nombre"}
+            </p>
+            <p className="text-ink/60 mt-0.5 truncate text-[13px]">
+              {profile?.public_zone ?? "Sin zona"}
+              {profile?.bio ? ` · ${profile.bio}` : null}
+            </p>
+          </div>
+        </div>
+
+        <section className="border-ink/10 divide-ink/10 mt-5 divide-y border-y">
           <CompletionRow
             label="Perfil público"
             complete={publicComplete}
@@ -195,7 +218,93 @@ export default async function ProviderOnboardingReviewPage() {
           />
         </section>
 
-        <div className="mt-5 rounded-xl border border-ink/10 px-4 py-3">
+        <section className="mt-6" aria-label="Lo que cargaste">
+          <h2 className="text-lg leading-7 font-bold">Lo que cargaste</h2>
+          <details className="border-ink/10 mt-3 border-y">
+            <summary className="consumer-pressable flex min-h-14 cursor-pointer items-center justify-between gap-3 py-3 text-sm font-bold">
+              Perfil público
+              <span className="text-ink/40 text-xl" aria-hidden="true">
+                ›
+              </span>
+            </summary>
+            <dl className="space-y-2.5 pb-4 text-sm">
+              <div>
+                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                  Nombre visible
+                </dt>
+                <dd className="mt-0.5 font-semibold">
+                  {profile?.display_name ?? "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                  Zona
+                </dt>
+                <dd className="mt-0.5 font-semibold">
+                  {profile?.public_zone ?? "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                  Presentación
+                </dt>
+                <dd className="mt-0.5 leading-6">{profile?.bio ?? "—"}</dd>
+              </div>
+            </dl>
+            {editable ? (
+              <Link
+                className="text-moss mb-4 inline-flex min-h-11 items-center text-sm font-bold"
+                href="/provider/onboarding/profile"
+              >
+                Editar paso 1
+              </Link>
+            ) : null}
+          </details>
+          <details className="border-ink/10 border-b">
+            <summary className="consumer-pressable flex min-h-14 cursor-pointer items-center justify-between gap-3 py-3 text-sm font-bold">
+              Identidad privada
+              <span className="text-ink/40 text-xl" aria-hidden="true">
+                ›
+              </span>
+            </summary>
+            <dl className="space-y-2.5 pb-4 text-sm">
+              <div>
+                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                  Nombre legal
+                </dt>
+                <dd className="mt-0.5 font-semibold">
+                  {privateProfile?.legal_name ?? "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                  DNI
+                </dt>
+                <dd className="mt-0.5 font-semibold">
+                  {maskPrivateReference(privateProfile?.dni_number ?? null)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                  Teléfono
+                </dt>
+                <dd className="mt-0.5 font-semibold">
+                  {maskPrivateReference(privateProfile?.private_phone ?? null)}
+                </dd>
+              </div>
+            </dl>
+            {editable ? (
+              <Link
+                className="text-moss mb-4 inline-flex min-h-11 items-center text-sm font-bold"
+                href="/provider/onboarding/identity"
+              >
+                Editar paso 2
+              </Link>
+            ) : null}
+          </details>
+        </section>
+
+        <div className="border-ink/10 mt-5 rounded-xl border px-4 py-3">
           <StatusChip tone={stateTone}>{stateTitle}</StatusChip>
           <p className="text-ink/58 mt-2 text-sm leading-6">
             {pendingReview
@@ -227,12 +336,15 @@ export default async function ProviderOnboardingReviewPage() {
           </div>
 
           {receivedDocuments.length > 0 ? (
-            <ul className="border-ink/10 mt-2 divide-y divide-ink/10 border-y">
+            <ul className="border-ink/10 divide-ink/10 mt-2 divide-y border-y">
               {receivedDocuments.map((document) => (
                 <DocumentListItem
                   key={`${document.document_type}-${document.created_at}`}
                   documentType={document.document_type}
                   createdAt={document.created_at}
+                  documentId={document.id}
+                  mimeType={document.mime_type}
+                  fileSizeBytes={document.file_size_bytes}
                 />
               ))}
             </ul>
@@ -244,7 +356,10 @@ export default async function ProviderOnboardingReviewPage() {
         </section>
 
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-          <Link className="button-primary w-full sm:w-auto" href="/provider/onboarding">
+          <Link
+            className="button-primary w-full sm:w-auto"
+            href="/provider/onboarding"
+          >
             Volver al resumen
           </Link>
           <Link className="button-secondary w-full sm:w-auto" href="/account">

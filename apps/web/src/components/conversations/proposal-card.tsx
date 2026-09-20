@@ -88,7 +88,9 @@ export function ProposalCard({
           <p className="text-ink/60 text-xs font-bold tracking-[0.06em] uppercase">
             {kindLabels[proposal.proposal_kind]} · v{proposal.version_number}
           </p>
-          <h3 className="mt-1 truncate text-[15px] font-extrabold">{proposal.service_title}</h3>
+          <h3 className="mt-1 truncate text-[15px] font-extrabold">
+            {proposal.service_title}
+          </h3>
         </div>
         <span className="bg-moss/10 text-moss shrink-0 rounded-full px-2.5 py-1 text-xs font-bold">
           {statusLabels[proposal.proposal_status]}
@@ -147,7 +149,10 @@ export function ProposalCard({
             </form>
           ) : null}
           {!ownTerms ? (
-            <form action={respondProposalAction} className="grid grid-cols-2 gap-2">
+            <form
+              action={respondProposalAction}
+              className="grid grid-cols-2 gap-2"
+            >
               <input
                 type="hidden"
                 name="conversationId"
@@ -164,8 +169,12 @@ export function ProposalCard({
               </button>
               <button
                 type="button"
-                className="consumer-pressable inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-bold text-ink/60"
-                onClick={() => document.getElementById(`counter-${proposal.proposal_id}`)?.toggleAttribute("open")}
+                className="consumer-pressable text-ink/60 inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-bold"
+                onClick={() =>
+                  document
+                    .getElementById(`counter-${proposal.proposal_id}`)
+                    ?.toggleAttribute("open")
+                }
               >
                 Contraofertar
               </button>
@@ -192,8 +201,11 @@ export function ProposalCard({
       ) : null}
 
       {canCounter ? (
-        <details id={`counter-${proposal.proposal_id}`} className="border-ink/[0.08] mt-4 border-t pt-3">
-          <summary className="consumer-pressable inline-flex min-h-11 cursor-pointer items-center text-sm font-bold text-terracotta">
+        <details
+          id={`counter-${proposal.proposal_id}`}
+          className="border-ink/[0.08] mt-4 border-t pt-3"
+        >
+          <summary className="consumer-pressable text-terracotta inline-flex min-h-11 cursor-pointer items-center text-sm font-bold">
             {counterKind === "PROVIDER_QUOTE"
               ? "Enviar cotización"
               : "Responder con contraoferta"}
@@ -228,12 +240,22 @@ export function ProposalCard({
             <button
               type="submit"
               disabled={revising}
-              className="bg-ink rounded-full px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+              className="consumer-pressable bg-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold text-white disabled:opacity-50"
             >
               {revising ? "Enviando…" : "Enviar respuesta"}
             </button>
             {revisionState.message ? (
-              <p className="text-ink/55 text-xs">{revisionState.message}</p>
+              <p
+                className={
+                  revisionState.status === "ERROR"
+                    ? "bg-danger/[0.07] text-danger mt-2 rounded-xl px-3 py-2.5 text-sm font-semibold"
+                    : "bg-success/[0.07] text-success mt-2 rounded-xl px-3 py-2.5 text-sm font-semibold"
+                }
+                role={revisionState.status === "ERROR" ? "alert" : "status"}
+                aria-live="polite"
+              >
+                {revisionState.message}
+              </p>
             ) : null}
           </form>
         </details>
@@ -261,7 +283,7 @@ export function ProposalCard({
                   value={proposal.proposal_id}
                 />
                 <input type="hidden" name="outcome" value={outcome} />
-                <button className="border-moss/20 rounded-full border bg-white px-3 py-1.5 text-[11px] font-bold">
+                <button className="consumer-pressable border-moss/20 inline-flex min-h-11 items-center rounded-full border bg-white px-4 text-[13px] font-bold">
                   {outcome === "SUCCESS"
                     ? "Simular aprobado"
                     : outcome === "PENDING"

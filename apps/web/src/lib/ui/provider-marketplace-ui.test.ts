@@ -21,6 +21,9 @@ const onboardingReviewPage = source(
   "../../app/(provider)/provider/onboarding/review/page.tsx",
 );
 const managePage = source("../../app/(provider)/provider/manage/page.tsx");
+const manageComponent = source(
+  "../../components/provider/marketplace-management.tsx",
+);
 const stepComponent = source(
   "../../components/provider/onboarding-step-card.tsx",
 );
@@ -42,6 +45,16 @@ describe("provider marketplace app-first UI", () => {
   it("uses humanized provider status in management", () => {
     expect(managePage).toContain("getProviderStatusPresentation");
     expect(managePage).not.toContain("{provider.status}");
+  });
+
+  it("keeps provider services scannable with edit forms collapsed", () => {
+    expect(manageComponent).toContain("<details");
+    expect(manageComponent).toContain("Editar servicio");
+    expect(manageComponent).toContain("+ Nuevo servicio");
+    expect(manageComponent).toContain('anchor="servicios"');
+    expect(manageComponent).toContain("Secciones de gestión");
+    expect(manageComponent).toContain("Pausar servicio");
+    expect(manageComponent).not.toContain("rounded-3xl");
   });
 
   it("does not regress the provider profile step to a URL-based avatar field", () => {

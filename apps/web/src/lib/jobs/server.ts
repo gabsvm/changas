@@ -2,6 +2,7 @@ import "server-only";
 
 import type { JobStatus, ScheduleType } from "@changas/domain";
 import { jobStatuses, scheduleTypes } from "@changas/domain";
+import { isUuid } from "@changas/validation";
 
 import { createFakeAdditionalPaymentRecord } from "@/lib/jobs/payment-adapter";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -30,6 +31,9 @@ export type UpcomingJob = {
   ends_at: string | null;
   deadline_at: string | null;
   updated_at: string;
+  base_price_amount: number | null;
+  currency_code: string | null;
+  is_client: boolean | null;
 };
 
 export type JobDetail = {
@@ -108,13 +112,6 @@ type JobsRpcClient = {
   rpc(name: string, args?: Record<string, unknown>): RpcResult<unknown>;
 };
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-function isUuid(value: unknown): value is string {
-  return typeof value === "string" && UUID_PATTERN.test(value);
-}
-
 function mapError(code?: string | null): JobServerError {
   switch (code) {
     case "42501":
@@ -167,12 +164,24 @@ export async function listMyUpcomingJobs(limit = 20): Promise<UpcomingJob[]> {
   });
   if (error) throw mapError(error.code);
   const rows = requireRows<UpcomingJob>(data);
-  return rows.filter(
-    (row) =>
-      isUuid(row.job_id) &&
-      jobStatuses.includes(row.job_status) &&
-      scheduleTypes.includes(row.schedule_type),
-  );
+  return rows
+    .filter(
+      (row) =>
+        isUuid(row.job_id) &&
+        jobStatuses.includes(row.job_status) &&
+        scheduleTypes.includes(row.schedule_type),
+    )
+    .map((row) => ({
+      ...row,
+      base_price_amount:
+        typeof row.base_price_amount === "number" &&
+        Number.isFinite(row.base_price_amount)
+          ? row.base_price_amount
+          : null,
+      currency_code:
+        typeof row.currency_code === "string" ? row.currency_code : null,
+      is_client: typeof row.is_client === "boolean" ? row.is_client : null,
+    }));
 }
 
 export async function getJobDetail(jobId: string): Promise<JobDetail> {

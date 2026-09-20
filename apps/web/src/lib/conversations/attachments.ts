@@ -1,5 +1,6 @@
 import {
   conversationAttachmentSchema,
+  isUuid,
   sanitizeAttachmentFilename,
 } from "@changas/validation";
 
@@ -7,9 +8,6 @@ import { ConversationServerError } from "./server";
 
 export const conversationAttachmentBucket = "conversation-attachments";
 export const conversationAttachmentSignedUrlTtlSeconds = 300;
-
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export type ConversationAttachmentKind = "IMAGE" | "FILE";
 
@@ -103,7 +101,7 @@ type AttachmentRpcClient = {
 };
 
 function ensureUuid(value: string, label: string): void {
-  if (!UUID_PATTERN.test(value)) {
+  if (!isUuid(value)) {
     throw new ConversationServerError("CONFLICT", `${label} inválido.`);
   }
 }

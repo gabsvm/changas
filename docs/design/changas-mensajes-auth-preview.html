@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Changas — Propuesta mensajes + auth mobile (ver antes de aprobar)
+    </title>
+    <style>
+      :root {
+        --canvas: #fff9f3;
+        --surface: #fffdf9;
+        --ink: #202124;
+        --muted: rgba(32, 33, 36, 0.62);
+        --orange: #ff6b35;
+        --orange-d: #c84010;
+        --yellow: #ffc857;
+        --blue: #2563eb;
+        --ok: #2f7d4a;
+        --danger: #c93c32;
+        --pink-d: #d60060;
+        --line: rgba(32, 33, 36, 0.1);
+        --font:
+          "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: #171310;
+        color: #f3e9de;
+        padding: 26px;
+        display: grid;
+        gap: 20px;
+        justify-items: center;
+      }
+      .cap {
+        width: min(1180px, 100%);
+        font-size: 13px;
+        line-height: 1.65;
+        color: #d8c9bc;
+      }
+      .cap b {
+        color: #fff;
+      }
+      .cap code {
+        color: #ffc857;
+        font-size: 12px;
+      }
+      .toolbar {
+        width: min(1180px, 100%);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .toolbar .lbl {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #a89888;
+        text-transform: uppercase;
+      }
+      .tbtn {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #4a3d33;
+        background: #2c241e;
+        color: #e8d9cb;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .tbtn.on {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #202124;
+      }
+      .frame {
+        width: min(1180px, 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #3a2f28;
+        background: #2b241f;
+        color: var(--ink);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+      }
+      .flabel {
+        padding: 11px 16px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+      }
+      .flabel.old {
+        background: #2a2f38;
+        color: #e8eef7;
+      }
+      .flabel.prop {
+        background: #3a2a10;
+        color: #ffe8a5;
+      }
+      .stage {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 22px 18px;
+        background: #241d17;
+      }
+      .phone {
+        width: 375px;
+        max-width: 100%;
+        height: 740px;
+        background: var(--canvas);
+        border-radius: 32px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        border: 10px solid #101010;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      .appbar {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px;
+        background: rgba(255, 249, 243, 0.96);
+        border-bottom: 1px solid var(--line);
+        font-size: 16px;
+        font-weight: 800;
+        z-index: 2;
+      }
+      .mbody {
+        padding: 14px 14px 20px;
+      }
+      .mhead {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 8px;
+      }
+      .mhead p {
+        font-size: 13px;
+        color: var(--muted);
+        max-width: 220px;
+        line-height: 1.45;
+      }
+      .mhead a {
+        font-size: 12.5px;
+        font-weight: 800;
+        color: var(--orange-d);
+        white-space: nowrap;
+      }
+      .mtabs {
+        display: flex;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .mtabs button {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 9px 15px;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .mtabs button.on {
+        background: #202124;
+        color: #fff;
+        border-color: #202124;
+      }
+      .rows {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        margin-top: 12px;
+        overflow: hidden;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .row:last-child {
+        border-bottom: 0;
+      }
+      .av {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ffc857, #ff0a78);
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        flex: 0 0 48px;
+      }
+      .row .tx {
+        min-width: 0;
+        flex: 1;
+      }
+      .row .l1 {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: baseline;
+      }
+      .row .l1 b {
+        font-size: 14.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .row .l1 time {
+        font-size: 11px;
+        color: var(--muted);
+        flex: 0 0 auto;
+      }
+      .row .svc {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .row .pv {
+        font-size: 13.5px;
+        color: var(--muted);
+        margin-top: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .row .pv.unread {
+        color: var(--ink);
+        font-weight: 700;
+      }
+      .badge {
+        background: var(--pink-d);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 800;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        padding: 0 6px;
+        flex: 0 0 auto;
+      }
+      .dealchip {
+        display: inline-block;
+        font-size: 10.5px;
+        font-weight: 800;
+        background: #fff1e8;
+        color: #9a6500;
+        border-radius: 999px;
+        padding: 3px 9px;
+        margin-top: 5px;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 900;
+        color: #fff;
+        background: #c0392b;
+        border-radius: 999px;
+        padding: 2px 9px;
+        margin-bottom: 10px;
+        letter-spacing: 0.06em;
+      }
+      .acard {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 22px;
+        margin: 14px;
+        box-shadow: 0 24px 70px rgba(32, 33, 36, 0.08);
+      }
+      .acard.slim {
+        border-radius: 20px;
+        padding: 20px;
+      }
+      .kick {
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        color: var(--orange-d);
+      }
+      .acard h1 {
+        font-size: 32px;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        margin-top: 8px;
+      }
+      .acard.slim h1 {
+        font-size: 26px;
+      }
+      .acard .sub {
+        font-size: 13.5px;
+        color: var(--muted);
+        margin-top: 8px;
+        line-height: 1.55;
+      }
+      .fld {
+        display: block;
+        font-size: 13.5px;
+        font-weight: 800;
+        margin-top: 14px;
+      }
+      .fld input {
+        display: block;
+        width: 100%;
+        margin-top: 6px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 13px 14px;
+        font: inherit;
+        font-size: 15px;
+        font-weight: 500;
+        background: #fff;
+      }
+      .fld input:focus {
+        outline: 2px solid var(--blue);
+        outline-offset: 2px;
+      }
+      .go {
+        width: 100%;
+        border: 0;
+        background: var(--orange);
+        border-radius: 12px;
+        padding: 15px;
+        font: inherit;
+        font-size: 14.5px;
+        font-weight: 900;
+        margin-top: 16px;
+        cursor: pointer;
+      }
+      .or {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        margin: 14px 0;
+      }
+      .or::before,
+      .or::after {
+        content: "";
+        flex: 1;
+        border-top: 1px solid var(--line);
+      }
+      .gbtn {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .alinks {
+        display: flex;
+        gap: 16px;
+        margin-top: 14px;
+        font-size: 13px;
+      }
+      .alinks a {
+        color: var(--blue);
+        font-weight: 700;
+      }
+      .legend {
+        width: min(1180px, 100%);
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: #d8c9bc;
+      }
+      .legend b {
+        color: #fff;
+      }
+      .legend code {
+        color: #ffc857;
+        font-size: 11.5px;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="cap">
+      <b
+        >Changas · Propuesta mensajes + auth mobile-first (ver antes de
+        aprobar).</b
+      >
+      Teléfonos de <b>375px</b>: <b>C · Lista de mensajes</b> (filas
+      indistinguibles, sin contexto del acuerdo) y <b>D · Login</b> (tarjeta
+      pesada que empuja el form bajo el pliegue). Nada se implementa hasta que
+      apruebes.
+    </p>
+
+    <div class="toolbar">
+      <span class="lbl">Vista</span>
+      <button class="tbtn on" data-v="all">Todo</button>
+      <button class="tbtn" data-v="msgs">Mensajes</button>
+      <button class="tbtn" data-v="auth">Auth</button>
+    </div>
+
+    <div class="frame" data-s="msgs">
+      <div class="flabel old">
+        ▣ MENSAJES HOY — 3 líneas grises iguales + H1 oculto en mobile
+        (<code>messages/page.tsx:69-113</code>)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar">Mensajes</div>
+          <div class="mbody">
+            <span class="tag"
+              >HOY · ¿cuál necesita acción? Hay que abrirlos uno por uno</span
+            >
+            <div class="rows" style="margin-top: 0">
+              <div class="row">
+                <span class="av">JM</span>
+                <div class="tx">
+                  <div class="l1"><b>Juan M.</b><time>10:33</time></div>
+                  <p class="svc">Reparación de grifería</p>
+                  <p class="pv">Te paso la cotización…</p>
+                </div>
+              </div>
+              <div class="row">
+                <span class="av">LU</span>
+                <div class="tx">
+                  <div class="l1"><b>Lucía G.</b><time>ayer</time></div>
+                  <p class="svc">Clases de inglés</p>
+                  <p class="pv">Dale, coordinamos…</p>
+                </div>
+                <span class="badge">2</span>
+              </div>
+              <div class="row">
+                <span class="av">SO</span>
+                <div class="tx">
+                  <div class="l1"><b>Sofi R.</b><time>lun</time></div>
+                  <p class="svc">Paseo de perros</p>
+                  <p class="pv">Gracias!…</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="msgs">
+      <div class="flabel prop">
+        ▣ MENSAJES PROPUESTO — jerarquía + contexto de acuerdo + filtro
+        (interactivo)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar">Mensajes</div>
+          <div class="mbody">
+            <div class="mhead">
+              <p>Tus conversaciones sobre servicios y trabajos.</p>
+              <a href="#" onclick="return false;">Buscar servicios</a>
+            </div>
+            <div class="mtabs">
+              <button class="on" data-f="all">Todas</button
+              ><button data-f="unread">
+                No leídas <span id="ucount">(1)</span>
+              </button>
+            </div>
+            <div class="rows" id="mrows">
+              <div class="row" data-u="0">
+                <span class="av">JM</span>
+                <div class="tx">
+                  <div class="l1"><b>Juan M.</b><time>10:33</time></div>
+                  <span class="dealchip">Cotización abierta · $9.500</span>
+                  <p class="pv">Te paso la cotización…</p>
+                </div>
+              </div>
+              <div class="row" data-u="1">
+                <span class="av">LU</span>
+                <div class="tx">
+                  <div class="l1"><b>Lucía G.</b><time>ayer</time></div>
+                  <p class="svc">Clases de inglés</p>
+                  <p class="pv unread">Dale, coordinamos…</p>
+                </div>
+                <span class="badge" id="bdg">2</span>
+              </div>
+              <div class="row" data-u="0">
+                <span class="av">SO</span>
+                <div class="tx">
+                  <div class="l1"><b>Sofi R.</b><time>lun</time></div>
+                  <p class="svc">Paseo de perros</p>
+                  <p class="pv">Gracias!</p>
+                </div>
+              </div>
+            </div>
+            <p
+              style="
+                font-size: 11.5px;
+                color: #8a7a6e;
+                margin-top: 10px;
+                line-height: 1.5;
+              "
+            >
+              El chip de acuerdo es mock: <code>ConversationSummary</code> hoy
+              no trae estado de cotización.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="auth">
+      <div class="flabel old">
+        ▣ LOGIN HOY — tarjeta 2rem + sombra + título 4xl en 360px
+        (<code>auth-form.tsx:62-73</code>)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="mbody">
+            <span class="tag"
+              >HOY · 3 bloques de texto antes del primer campo</span
+            >
+            <div class="acard">
+              <p class="kick">CUENTA CHANGAS</p>
+              <h1>Volvé a Changas</h1>
+              <p class="sub">Ingresá para continuar con tu cuenta.</p>
+              <label class="fld"
+                >Correo electrónico<input value="gabi@mail.com" readonly
+              /></label>
+              <label class="fld"
+                >Contraseña<input value="••••••••" type="password" readonly
+              /></label>
+              <button class="go">Iniciar sesión</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="auth">
+      <div class="flabel prop">
+        ▣ LOGIN PROPUESTO — plancha liviana mobile, tarjeta solo en desktop
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="mbody">
+            <div class="acard slim">
+              <p class="kick">CUENTA CHANGAS</p>
+              <h1>Volvé a Changas</h1>
+              <p class="sub">Ingresá para continuar.</p>
+              <label class="fld"
+                >Correo electrónico<input
+                  id="amail"
+                  value=""
+                  placeholder="tu@mail.com"
+              /></label>
+              <label class="fld"
+                >Contraseña<input
+                  value=""
+                  type="password"
+                  placeholder="Tu contraseña"
+              /></label>
+              <button class="go" id="agog">Iniciar sesión</button>
+              <div class="or">o</div>
+              <button class="gbtn">Continuar con Google</button>
+              <div class="alinks">
+                <a href="#" onclick="return false;">Crear cuenta</a
+                ><a href="#" onclick="return false;">Olvidé mi contraseña</a>
+              </div>
+              <p
+                id="amsg"
+                class="hidden"
+                style="
+                  margin-top: 10px;
+                  font-size: 12.5px;
+                  color: #1f7a44;
+                  font-weight: 700;
+                "
+              ></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>Si aprobás, implemento así (sin código todavía):</b> mensajes → filas
+      con preview en negrita si no leído + chip de acuerdo (requiere extender
+      <code>listMyConversations</code>/<code>ConversationSummary</code> con
+      estado de cotización abierta, hoy no existe) + tabs Todas/No leídas como
+      filtro de la query ya cargada; auth → <code>auth-form.tsx</code> con
+      radio/título/sombra compactos en mobile (<code>rounded-[1.25rem]</code>,
+      título <code>text-3xl</code>) manteniendo la tarjeta editorial en
+      <code>sm:</code>. Tests en
+      <code>lib/ui/marketplace-conversation.test.ts</code> + nuevo contrato de
+      auth. Decime qué aprobar / ajustar.
+    </div>
+
+    <script>
+      document.querySelectorAll("[data-v]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("[data-v]")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            const v = b.dataset.v;
+            document
+              .querySelectorAll(".frame")
+              .forEach(
+                (f) =>
+                  (f.style.display =
+                    v === "all" || f.dataset.s === v ? "" : "none"),
+              );
+          }),
+      );
+      document.querySelectorAll("[data-f]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("[data-f]")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            const u = b.dataset.f === "unread";
+            document
+              .querySelectorAll("#mrows .row")
+              .forEach(
+                (r) =>
+                  (r.style.display = !u || r.dataset.u === "1" ? "" : "none"),
+              );
+          }),
+      );
+      document.querySelectorAll("#mrows .row").forEach(
+        (r) =>
+          (r.onclick = () => {
+            if (r.dataset.u !== "1") return;
+            r.dataset.u = "0";
+            r.querySelector(".pv").classList.remove("unread");
+            const b = document.getElementById("bdg");
+            if (b) b.remove();
+            document.getElementById("ucount").textContent = "(0)";
+          }),
+      );
+      document.getElementById("agog").onclick = () => {
+        const m = document.getElementById("amsg"),
+          v = document.getElementById("amail").value;
+        m.classList.remove("hidden");
+        m.textContent = v
+          ? "Revisá tu correo " + v + " (demo)."
+          : "Escribí tu correo para continuar (demo).";
+      };
+    </script>
+  </body>
+</html>

@@ -7,6 +7,7 @@ import {
   proposalKinds,
   type ProposalKind,
 } from "@changas/domain";
+import { isUuid } from "@changas/validation";
 
 import {
   createConversationProposal,
@@ -23,9 +24,6 @@ export type ProposalActionState = {
   message: string;
 };
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
 function stringField(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === "string" ? value.trim() : "";
@@ -33,7 +31,7 @@ function stringField(formData: FormData, name: string): string {
 
 function requiredUuid(formData: FormData, name: string): string {
   const value = stringField(formData, name);
-  if (!UUID_PATTERN.test(value)) throw new Error("Identificador inválido.");
+  if (!isUuid(value)) throw new Error("Identificador inválido.");
   return value;
 }
 
@@ -137,7 +135,7 @@ export async function fakePaymentAction(formData: FormData): Promise<void> {
   const proposalId = requiredUuid(formData, "proposalId");
   const submittedNonce = stringField(formData, "paymentNonce");
   const nonce = submittedNonce || crypto.randomUUID();
-  if (!UUID_PATTERN.test(nonce)) {
+  if (!isUuid(nonce)) {
     throw new Error("Identificador de pago inválido.");
   }
   const outcome = stringField(formData, "outcome") as FakePaymentOutcome;

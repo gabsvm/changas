@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Changas — Propuesta filtros de búsqueda mobile (ver antes de aprobar)
+    </title>
+    <style>
+      :root {
+        --canvas: #fff9f3;
+        --ink: #202124;
+        --muted: rgba(32, 33, 36, 0.62);
+        --orange: #ff6b35;
+        --orange-d: #c84010;
+        --yellow: #ffc857;
+        --ok: #2f7d4a;
+        --moss: #2f7d4a;
+        --line: rgba(32, 33, 36, 0.1);
+        --font:
+          "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: #171310;
+        color: #f3e9de;
+        padding: 26px;
+        display: grid;
+        gap: 20px;
+        justify-items: center;
+      }
+      .cap {
+        width: min(1180px, 100%);
+        font-size: 13px;
+        line-height: 1.65;
+        color: #d8c9bc;
+      }
+      .cap b {
+        color: #fff;
+      }
+      .cap code {
+        color: #ffc857;
+        font-size: 12px;
+      }
+      .toolbar {
+        width: min(1180px, 100%);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .toolbar .lbl {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #a89888;
+        text-transform: uppercase;
+      }
+      .tbtn {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #4a3d33;
+        background: #2c241e;
+        color: #e8d9cb;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .tbtn.on {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #202124;
+      }
+      .frame {
+        width: min(1180px, 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #3a2f28;
+        background: #2b241f;
+        color: var(--ink);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+      }
+      .flabel {
+        padding: 11px 16px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+      }
+      .flabel.old {
+        background: #2a2f38;
+        color: #e8eef7;
+      }
+      .flabel.prop {
+        background: #3a2a10;
+        color: #ffe8a5;
+      }
+      .stage {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 22px 18px;
+        background: #241d17;
+      }
+      .phone {
+        width: 375px;
+        max-width: 100%;
+        height: 740px;
+        background: var(--canvas);
+        border-radius: 32px;
+        overflow: hidden;
+        border: 10px solid #101010;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+      }
+      .dim {
+        flex: 0 0 200px;
+        background: rgba(32, 33, 36, 0.35);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 12px;
+      }
+      .pill-res {
+        width: 220px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--muted);
+        text-align: center;
+      }
+      .sheet {
+        flex: 1;
+        background: var(--canvas);
+        border-radius: 24px 24px 0 0;
+        padding: 10px 16px 0;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+      .grab {
+        width: 44px;
+        height: 5px;
+        border-radius: 99px;
+        background: rgba(32, 33, 36, 0.18);
+        margin: 4px auto 10px;
+      }
+      .stitle {
+        font-size: 17px;
+        font-weight: 800;
+        text-align: center;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 900;
+        color: #fff;
+        background: #c0392b;
+        border-radius: 999px;
+        padding: 2px 9px;
+        margin: 10px auto;
+        letter-spacing: 0.06em;
+      }
+      .tag.ok {
+        background: var(--ok);
+      }
+      .fld {
+        margin-top: 12px;
+        font-size: 13.5px;
+        font-weight: 700;
+      }
+      .fld select,
+      .fld input {
+        display: block;
+        width: 100%;
+        margin-top: 6px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 12px;
+        font: inherit;
+        font-size: 15px;
+        background: #fff;
+        color: var(--ink);
+      }
+      .check {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 13.5px;
+        font-weight: 700;
+      }
+      .check .box {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        background: var(--moss);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 14px;
+        flex: 0 0 22px;
+      }
+      .gsub {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 18px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gsub::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+      .gsub:first-of-type {
+        margin-top: 12px;
+      }
+      .foot {
+        position: sticky;
+        bottom: 0;
+        margin: 14px -16px 0;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+        background: rgba(255, 249, 243, 0.96);
+        border-top: 1px solid var(--line);
+        display: flex;
+        gap: 8px;
+        backdrop-filter: blur(8px);
+      }
+      .btn-clear {
+        flex: 1;
+        min-height: 52px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font: inherit;
+        font-size: 15px;
+        font-weight: 800;
+      }
+      .btn-go {
+        flex: 2;
+        min-height: 52px;
+        border-radius: 12px;
+        border: 0;
+        background: var(--ink);
+        color: #fff;
+        font: inherit;
+        font-size: 15px;
+        font-weight: 800;
+      }
+      .scroll-hint {
+        text-align: center;
+        font-size: 11px;
+        color: var(--muted);
+        padding: 6px 0 2px;
+      }
+      .legend {
+        width: min(1180px, 100%);
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: #d8c9bc;
+      }
+      .legend b {
+        color: #fff;
+      }
+      .legend code {
+        color: #ffc857;
+        font-size: 11.5px;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="cap">
+      <b
+        >Changas · Propuesta filtros de búsqueda mobile (ver antes de
+        aprobar).</b
+      >
+      Teléfonos de <b>375px</b>: HOY el bottom-sheet lista 8 selects planos +
+      checkbox (mucho scroll); PROPUESTO los agrupa en 4 secciones con
+      sub-títulos para escanear y llegar al CTA. Mismo form, mismos
+      <code>name</code>, mismo footer sticky. Nada se implementa hasta que
+      apruebes.
+    </p>
+
+    <div class="toolbar">
+      <span class="lbl">Vista</span>
+      <button class="tbtn on" data-v="all">Todo</button>
+      <button class="tbtn" data-v="hoy">Hoy</button>
+      <button class="tbtn" data-v="nuevo">Propuesta</button>
+    </div>
+
+    <div class="frame" data-s="hoy">
+      <div class="flabel old">
+        ▣ FILTROS HOY — 8 selects planos, sin secciones
+        (<code>search-filters-sheet.tsx:58-199</code>)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="dim">
+            <div class="pill-res">Filtros ③ · resultados atrás</div>
+          </div>
+          <div class="sheet">
+            <div class="grab"></div>
+            <p class="stitle">Filtros</p>
+            <span class="tag">HOY · todo plano, ~3 pantallas de scroll</span>
+            <div class="fld">
+              Categoría<select>
+                <option>Todas</option>
+                <option>Plomería</option>
+              </select>
+            </div>
+            <div class="fld">
+              Habilidad<select>
+                <option>Todas</option>
+              </select>
+            </div>
+            <div class="fld">
+              Modalidad<select>
+                <option>Todos</option>
+              </select>
+            </div>
+            <div class="fld">
+              Ordenar<select>
+                <option>Recomendados</option>
+              </select>
+            </div>
+            <div class="fld">
+              Modelo de precio<select>
+                <option>Todos</option>
+              </select>
+            </div>
+            <div class="fld">
+              Radio<select>
+                <option>Predeterminado</option>
+              </select>
+            </div>
+            <div class="fld">Precio desde<input placeholder="$" /></div>
+            <div class="fld">Precio hasta<input placeholder="$" /></div>
+            <label class="check"
+              ><span class="box">✓</span> Sólo servicios que aceptan
+              ofertas</label
+            >
+            <p class="scroll-hint">↓ seguir bajando para “Ver resultados” ↓</p>
+            <div class="foot">
+              <button class="btn-clear">Limpiar</button>
+              <button class="btn-go">Ver resultados</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="nuevo">
+      <div class="flabel prop">
+        ✦ PROPUESTA — 4 secciones con sub-títulos (mismos names y footer)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="dim">
+            <div class="pill-res">Filtros ③ · resultados atrás</div>
+          </div>
+          <div class="sheet">
+            <div class="grab"></div>
+            <p class="stitle">Filtros</p>
+            <span class="tag ok">PROPUESTO · escaneable por secciones</span>
+            <p class="gsub">Qué buscás</p>
+            <div class="fld">
+              Categoría<select>
+                <option>Todas</option>
+                <option>Plomería</option>
+              </select>
+            </div>
+            <div class="fld">
+              Habilidad<select>
+                <option>Todas</option>
+              </select>
+            </div>
+            <p class="gsub">Dónde y cómo</p>
+            <div class="fld">
+              Modalidad<select>
+                <option>Todos</option>
+              </select>
+            </div>
+            <div class="fld">
+              Radio<select>
+                <option>Predeterminado</option>
+              </select>
+            </div>
+            <p class="gsub">Precio</p>
+            <div class="fld">
+              Modelo de precio<select>
+                <option>Todos</option>
+              </select>
+            </div>
+            <div class="fld">Precio desde<input placeholder="$" /></div>
+            <div class="fld">Precio hasta<input placeholder="$" /></div>
+            <label class="check"
+              ><span class="box">✓</span> Sólo servicios que aceptan
+              ofertas</label
+            >
+            <p class="gsub">Orden</p>
+            <div class="fld">
+              Ordenar<select>
+                <option>Recomendados</option>
+              </select>
+            </div>
+            <div class="foot">
+              <button class="btn-clear">Limpiar</button>
+              <button class="btn-go">Ver resultados</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>Cambios propuestos (solo UI, mismo GET a /buscar).</b><br />
+      1) <code>search-filters-sheet.tsx</code>: envolver campos en 4
+      <code>&lt;fieldset&gt;</code> con <code>&lt;legend&gt;</code> (“Qué buscás
+      / Dónde y cómo / Precio / Orden”); checkbox de ofertas dentro de
+      Precio.<br />
+      2) Sin cambios de <code>name</code>, valores, footer sticky ni badge de
+      conteo.<br />
+      Orden nuevo sugerido: Categoría, Habilidad → Modalidad, Radio → Modelo de
+      precio, Desde, Hasta, Ofertas → Ordenar (lo que más se toca queda arriba;
+      ordenar queda último junto al CTA).
+    </div>
+
+    <script>
+      document.querySelectorAll(".tbtn").forEach((b) =>
+        b.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tbtn")
+            .forEach((x) => x.classList.remove("on"));
+          b.classList.add("on");
+          const v = b.dataset.v;
+          document.querySelectorAll(".frame").forEach((f) => {
+            f.classList.toggle("hidden", v !== "all" && f.dataset.s !== v);
+          });
+        }),
+      );
+    </script>
+  </body>
+</html>

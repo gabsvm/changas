@@ -1,5 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
+import { formatMinorUnits } from "@changas/domain";
+
 import { ConversationThread } from "@/components/conversations/conversation-thread";
 import { ProposalCard } from "@/components/conversations/proposal-card";
 import { ProposalComposer } from "@/components/conversations/proposal-composer";
@@ -13,6 +15,7 @@ import {
 import {
   listConversationProposals,
   ProposalServerError,
+  type ProposalSummary,
 } from "@/lib/proposals/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -77,6 +80,36 @@ export default async function ConversationPage({
   const initialAttachmentNonce = crypto.randomUUID();
   const allowFakePayments = process.env.NODE_ENV !== "production";
 
+  const proposalStatusLabels: Record<
+    ProposalSummary["proposal_status"],
+    string
+  > = {
+    OPEN: "Acuerdo abierto",
+    ACCEPTED: "Aceptada",
+    REJECTED: "Rechazada",
+    WITHDRAWN: "Retirada",
+    EXPIRED: "Vencida",
+    AWAITING_PAYMENT: "Esperando pago",
+    PAYMENT_FAILED: "Pago fallido",
+    PAID: "Pagada",
+  };
+  const activeProposal =
+    proposals.find((proposal) => proposal.proposal_status === "OPEN") ??
+    proposals[0] ??
+    null;
+  const deal = activeProposal
+    ? {
+        statusLabel: proposalStatusLabels[activeProposal.proposal_status],
+        amountLabel:
+          activeProposal.price_amount === null
+            ? "A cotizar"
+            : formatMinorUnits(
+                activeProposal.price_amount,
+                activeProposal.currency_code,
+              ),
+      }
+    : null;
+
   return (
     <section className="space-y-4 py-4 sm:py-6">
       <ConversationThread
@@ -92,12 +125,14 @@ export default async function ConversationPage({
         initiallyBlockedByMe={blockedUserId === peerUserId}
         initialTextNonce={initialTextNonce}
         initialAttachmentNonce={initialAttachmentNonce}
+        deal={deal}
       />
 
       <div className="mx-auto w-full max-w-4xl space-y-3 px-4 sm:px-0">
         {proposals.length > 0 ? (
           <section
             className="space-y-3"
+            id="propuestas"
             aria-label="Propuestas de la conversación"
           >
             <h2 className="text-base font-extrabold tracking-[-0.02em]">

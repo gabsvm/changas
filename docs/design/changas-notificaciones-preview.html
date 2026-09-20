@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Changas — Propuesta notificaciones mobile (ver antes de aprobar)
+    </title>
+    <style>
+      :root{
+        --canvas:#FFF9F3; --surface:#FFFDF9; --ink:#202124; --muted:rgba(32,33,36,.62);
+        --orange:#FF6B35; --orange-d:#C84010; --yellow:#FFC857; --blue:#2563EB;
+        --ok:#2F7D4A; --line:rgba(32,33,36,.1);
+        --font:"Plus Jakarta Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+      }
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:var(--font);background:#171310;color:#f3e9de;padding:26px;display:grid;gap:20px;justify-items:center}
+      .cap{width:min(1180px,100%);font-size:13px;line-height:1.65;color:#d8c9bc}
+      .cap b{color:#fff}.cap code{color:#FFC857;font-size:12px}
+      .toolbar{width:min(1180px,100%);display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#221b16;border:1px solid #3a2f28;border-radius:12px;padding:12px 14px}
+      .toolbar .lbl{font-size:11px;font-weight:800;letter-spacing:.08em;color:#a89888;text-transform:uppercase}
+      .tbtn{padding:8px 14px;border-radius:999px;border:1px solid #4a3d33;background:#2c241e;color:#e8d9cb;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
+      .tbtn.on{background:var(--orange);border-color:var(--orange);color:#202124}
+      .frame{width:min(1180px,100%);border-radius:16px;overflow:hidden;border:1px solid #3a2f28;background:#2b241f;color:var(--ink);box-shadow:0 30px 90px rgba(0,0,0,.5)}
+      .flabel{padding:11px 16px;font-size:12px;font-weight:800;letter-spacing:.05em}
+      .flabel.old{background:#2a2f38;color:#e8eef7}
+      .flabel.prop{background:#3a2a10;color:#ffe8a5}
+      .stage{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;padding:22px 18px;background:#241d17}
+      .phone{width:375px;max-width:100%;height:740px;background:var(--canvas);border-radius:32px;overflow-y:auto;border:10px solid #101010;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+      .appbar{position:sticky;top:0;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(255,249,243,.96);border-bottom:1px solid var(--line);font-size:16px;font-weight:800;z-index:2}
+      .mbody{padding:14px 14px 22px}
+      .mhead{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
+      .mhead p{font-size:13px;color:var(--muted);line-height:1.45;max-width:210px}
+      .mhead button,.mhead a{border:0;background:none;color:var(--orange-d);font:inherit;font-size:12.5px;font-weight:800;white-space:nowrap;cursor:pointer;padding:10px 4px}
+      .grouplab{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--muted);margin:16px 2px 0;text-transform:uppercase}
+      .card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:6px}
+      .nrow{display:flex;gap:10px;padding:13px 12px;border-bottom:1px solid var(--line)}
+      .nrow:last-child{border-bottom:0}
+      .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);margin-top:7px;flex:0 0 8px}
+      .dot.read{background:rgba(32,33,36,.18)}
+      .nrow .tx{min-width:0;flex:1}
+      .kind{font-size:10.5px;font-weight:700;color:var(--muted)}
+      .pill{display:inline-block;font-size:10px;font-weight:800;background:#FFF1E8;color:#9A6500;border-radius:999px;padding:2px 8px;margin-left:6px}
+      .nrow a.tt{display:block;font-size:14px;font-weight:700;line-height:1.45;margin-top:3px;color:var(--ink)}
+      .nrow p.bd{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5}
+      .nrow time{font-size:11px;color:var(--muted);flex:0 0 auto}
+      .mark{display:block;margin-top:8px;border:0;background:none;color:var(--muted);font:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:10px 8px;margin-left:-8px;min-height:44px}
+      .mark.inline{display:inline;margin:0 0 0 8px;padding:4px;min-height:0;font-size:11.5px;color:var(--blue)}
+      .aside{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:18px}
+      .aside h2{font-size:16px}
+      .aside p{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.6}
+      .prow{display:flex;justify-content:space-between;align-items:center;gap-10px;padding:13px 0;border-top:1px solid var(--line);font-size:13.5px;font-weight:700}
+      .prow:first-of-type{margin-top:10px}
+      .prow small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+      .sw{width:46px;height:28px;border-radius:99px;background:var(--ok);position:relative;flex:0 0 46px}
+      .sw::after{content:"";position:absolute;right:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff}
+      .sw.off{background:#ccc}.sw.off::after{right:auto;left:3px}
+      .tag{display:inline-block;font-size:10px;font-weight:900;color:#fff;background:#c0392b;border-radius:999px;padding:2px 9px;margin-bottom:10px;letter-spacing:.06em}
+      .legend{width:min(1180px,100%);background:#221b16;border:1px solid #3a2f28;border-radius:12px;padding:14px 18px;font-size:12.5px;line-height:1.7;color:#d8c9bc}
+      .legend b{color:#fff}.legend code{color:#FFC857;font-size:11.5px}
+      .hidden{display:none!important}
+    </style>
+  </head>
+  <body>
+    <p class="cap">
+      <b>Changas · Propuesta notificaciones mobile (ver antes de aprobar).</b>
+      Teléfonos de <b>375px</b>: cada fila no leída suma un botón propio de 44px
+      y las preferencias quedan bajo toda la lista. Nada se implementa hasta que
+      apruebes.
+    </p>
+
+    <div class="toolbar">
+      <span class="lbl">Vista</span>
+      <button class="tbtn on" data-v="all">Todo</button>
+      <button class="tbtn" data-v="hoy">Hoy</button>
+      <button class="tbtn" data-v="nuevo">Propuesta</button>
+    </div>
+
+    <div class="frame" data-s="hoy">
+      <div class="flabel old">
+        ▣ ACTIVIDAD HOY — botón “Marcar” por fila + prefs al fondo
+        (<code>notifications/page.tsx:118-205</code>)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar">Actividad</div>
+          <div class="mbody">
+            <span class="tag">HOY · cada no leída ocupa ~150px</span>
+            <div class="mhead">
+              <p>Novedades de trabajos, propuestas y pagos.</p>
+              <button>Marcar todo leído</button>
+            </div>
+            <p class="grouplab">Hoy</p>
+            <div class="card">
+              <div class="nrow">
+                <span class="dot"></span>
+                <div class="tx">
+                  <span class="kind">COTIZACIÓN</span
+                  ><span class="pill">Nueva</span
+                  ><a class="tt" href="#" onclick="return false;"
+                    >Juan M. te envió una cotización</a
+                  >
+                  <p class="bd">Reparación de grifería · $9.500</p>
+                  <button class="mark">Marcar como leída</button>
+                </div>
+                <time>10:33</time>
+              </div>
+              <div class="nrow">
+                <span class="dot read"></span>
+                <div class="tx">
+                  <span class="kind">MENSAJE</span
+                  ><a class="tt" href="#" onclick="return false;"
+                    >Nuevo mensaje de Lucía G.</a
+                  >
+                  <p class="bd">Dale, coordinamos…</p>
+                </div>
+                <time>ayer</time>
+              </div>
+            </div>
+            <div class="aside">
+              <h2>Notificaciones</h2>
+              <p>…preferencias y push, 3 pantallas más abajo ↓</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="nuevo">
+      <div class="flabel prop">
+        ▣ ACTIVIDAD PROPUESTO — marcar inline + salto a prefs (interactivo)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar">Actividad</div>
+          <div class="mbody">
+            <div class="mhead">
+              <p>Novedades de trabajos, propuestas y pagos.</p>
+              <button id="mall">Marcar todo leído</button>
+            </div>
+            <p style="margin-top: 8px">
+              <a
+                href="#prefs"
+                style="
+                  font-size: 12.5px;
+                  font-weight: 800;
+                  color: var(--orange-d);
+                "
+                >Preferencias de avisos ↓</a
+              >
+            </p>
+            <p class="grouplab">Hoy</p>
+            <div class="card" id="ncards">
+              <div class="nrow">
+                <span class="dot" data-d></span>
+                <div class="tx">
+                  <span class="kind">COTIZACIÓN</span
+                  ><span class="pill" data-p>Nueva</span
+                  ><a class="tt" href="#" onclick="return false;"
+                    >Juan M. te envió una cotización</a
+                  >
+                  <p class="bd">Reparación de grifería · $9.500</p>
+                </div>
+                <time
+                  >10:33<br /><button class="mark inline" data-m>
+                    Marcar
+                  </button></time
+                >
+              </div>
+              <div class="nrow">
+                <span class="dot read"></span>
+                <div class="tx">
+                  <span class="kind">MENSAJE</span
+                  ><a class="tt" href="#" onclick="return false;"
+                    >Nuevo mensaje de Lucía G.</a
+                  >
+                  <p class="bd">Dale, coordinamos…</p>
+                </div>
+                <time>ayer</time>
+              </div>
+            </div>
+            <div class="aside" id="prefs">
+              <h2>Notificaciones</h2>
+              <p>
+                Las alertas críticas siguen disponibles aunque desactives
+                canales externos.
+              </p>
+              <div class="prow">
+                <div>
+                  Push accionables<small>Cotizaciones y mensajes</small>
+                </div>
+                <span class="sw" data-sw></span>
+              </div>
+              <div class="prow">
+                <div>Resumen por correo<small>Una vez por día</small></div>
+                <span class="sw off" data-sw></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>Si aprobás, implemento así (sin código todavía):</b> fila no leída
+      compacta (mismo server action, botón “Marcar” inline junto a la hora en
+      vez de bloque de 44px) + link “Preferencias de avisos” con
+      <code>id="preferencias"</code> en el aside + ritmo (<code>mb-1→mb-2</code>
+      en grupos, <code>py-3→py-3.5</code> en filas). Sin tocar acciones, RLS ni
+      lógica de push. Tests en
+      <code>lib/ui/marketplace-polish.test.ts</code> (ya cubre la página).
+      Decime qué aprobar / ajustar.
+    </div>
+
+    <script>
+      document.querySelectorAll("[data-v]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("[data-v]")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            const v = b.dataset.v;
+            document
+              .querySelectorAll(".frame")
+              .forEach(
+                (f) =>
+                  (f.style.display =
+                    v === "all" || f.dataset.s === v ? "" : "none"),
+              );
+          }),
+      );
+      function clearRow(btn) {
+        const r = btn.closest(".nrow");
+        const d = r.querySelector("[data-d]");
+        if (d) d.classList.add("read");
+        const p = r.querySelector("[data-p]");
+        if (p) p.remove();
+        btn.remove();
+      }
+      document
+        .querySelectorAll("[data-m]")
+        .forEach((b) => (b.onclick = () => clearRow(b)));
+      document.getElementById("mall").onclick = () => {
+        document.querySelectorAll("[data-m]").forEach((b) => {
+          try {
+            clearRow(b);
+          } catch (e) {}
+        });
+        document.getElementById("mall").textContent = "Todo al día ✓";
+      };
+      document
+        .querySelectorAll("[data-sw]")
+        .forEach((s) => (s.onclick = () => s.classList.toggle("off")));
+    </script>
+  </body>
+</html>

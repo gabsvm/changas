@@ -8,6 +8,7 @@ function source(path: string): string {
 const providerPage = source("../../app/p/[slug]/page.tsx");
 const servicePage = source("../../app/p/[slug]/[serviceSlug]/page.tsx");
 const searchPage = source("../../app/buscar/page.tsx");
+const categoryPage = source("../../app/categoria/[slug]/page.tsx");
 const brandHero = source("../../components/ui/marketplace/brand-hero.tsx");
 const categoryTile = source(
   "../../components/ui/marketplace/category-tile.tsx",
@@ -51,6 +52,18 @@ describe("public marketplace detail UI", () => {
     expect(servicePage).toContain("safe-area-inset-bottom");
     expect(providerPage).toContain("service-cta-bar");
     expect(providerPage).toContain("safe-area-inset-bottom");
+  });
+
+  it("lets category visitors refine without leaving", () => {
+    expect(categoryPage).toContain("discovery-hero");
+    expect(categoryPage).toContain("discovery-results-shell");
+    expect(categoryPage).toContain('name="q"');
+    expect(categoryPage).toContain('"presencial"');
+    expect(categoryPage).toContain('"remoto"');
+    expect(categoryPage).toContain("categoryHref");
+    expect(categoryPage).toContain("rounded-[1.25rem]");
+    expect(categoryPage).not.toContain("rounded-[1.75rem]");
+    expect(categoryPage).toContain("pageHref");
   });
 
   it("offers contact next to save on wide provider profiles", () => {

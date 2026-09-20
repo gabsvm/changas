@@ -151,6 +151,12 @@ describe("marketplace polish contracts", () => {
     expect(activitySource).toContain("settings-card");
   });
 
+  it("keeps activity rows compact with preferences reachable", () => {
+    expect(activitySource).toContain("#preferencias");
+    expect(activitySource).toContain("Preferencias de avisos");
+    expect(activitySource).not.toContain("Marcar como leída");
+  });
+
   it("defines shared depth and interaction tokens", () => {
     expect(cssSource).toContain("--consumer-shadow-card");
     expect(cssSource).toContain("--consumer-shadow-float");

@@ -39,7 +39,7 @@ export default async function ProviderOnboardingDocumentsPage() {
       .maybeSingle(),
     supabase
       .from("provider_documents")
-      .select("document_type, created_at")
+      .select("id, document_type, mime_type, file_size_bytes, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
   ]);
@@ -90,7 +90,9 @@ export default async function ProviderOnboardingDocumentsPage() {
               </p>
             </div>
             <StatusChip
-              tone={submitted ? "info" : documentsComplete ? "success" : "warning"}
+              tone={
+                submitted ? "info" : documentsComplete ? "success" : "warning"
+              }
             >
               {submitted
                 ? "En revisión"
@@ -100,7 +102,7 @@ export default async function ProviderOnboardingDocumentsPage() {
             </StatusChip>
           </div>
 
-          <div className="mt-3 divide-y divide-ink/10">
+          <div className="divide-ink/10 mt-3 divide-y">
             {requiredIdentityDocumentTypes.map((type) => {
               const present = receivedTypes.has(type);
               return (
@@ -138,7 +140,7 @@ export default async function ProviderOnboardingDocumentsPage() {
           </div>
         )}
 
-        <section className="mt-6">
+        <section id="documentos" className="mt-6 scroll-mt-24">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-lg font-bold">Tus documentos</h2>
             <span className="text-ink/45 text-xs font-semibold">
@@ -147,12 +149,15 @@ export default async function ProviderOnboardingDocumentsPage() {
           </div>
 
           {receivedDocuments.length > 0 ? (
-            <ul className="border-ink/10 mt-2 divide-y divide-ink/10 border-y">
+            <ul className="border-ink/10 divide-ink/10 mt-2 divide-y border-y">
               {receivedDocuments.map((document) => (
                 <DocumentListItem
                   key={`${document.document_type}-${document.created_at}`}
                   documentType={document.document_type}
                   createdAt={document.created_at}
+                  documentId={document.id}
+                  mimeType={document.mime_type}
+                  fileSizeBytes={document.file_size_bytes}
                 />
               ))}
             </ul>
@@ -181,7 +186,8 @@ export default async function ProviderOnboardingDocumentsPage() {
             ) : (
               <div>
                 <p className="text-ink/50 mb-2 text-xs leading-5">
-                  Faltan: {missingDocuments.map(getDocumentTypeLabel).join(", ")}.
+                  Faltan:{" "}
+                  {missingDocuments.map(getDocumentTypeLabel).join(", ")}.
                 </p>
                 <button
                   className="button-primary w-full opacity-50 sm:w-auto"

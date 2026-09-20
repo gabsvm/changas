@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { isUuid } from "@changas/validation";
+
 import type { ActionState } from "@/lib/forms/action-state";
 import {
   deletePushSubscription,
@@ -14,9 +16,6 @@ import {
 } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
 function checkbox(formData: FormData, name: string): boolean {
   return formData.get(name) === "on";
 }
@@ -25,10 +24,7 @@ export async function markNotificationReadAction(
   formData: FormData,
 ): Promise<void> {
   const notificationId = formData.get("notificationId");
-  if (
-    typeof notificationId !== "string" ||
-    !UUID_PATTERN.test(notificationId)
-  ) {
+  if (typeof notificationId !== "string" || !isUuid(notificationId)) {
     throw new Error("Notificación inválida.");
   }
 

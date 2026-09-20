@@ -8,7 +8,8 @@ export function safeNextPath(
     candidate.length === 0 ||
     !candidate.startsWith("/") ||
     candidate.startsWith("//") ||
-    candidate.includes("\\")
+    candidate.includes("\\") ||
+    /[\u0000-\u001f\u007f]/.test(candidate)
   ) {
     return fallback;
   }

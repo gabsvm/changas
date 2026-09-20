@@ -1,7 +1,7 @@
 "use server";
 
 import { assessOutgoingMessage, type LeakageSignalType } from "@changas/domain";
-import { messageTextSchema } from "@changas/validation";
+import { isUuid, messageTextSchema } from "@changas/validation";
 
 import { sendConversationText } from "@/lib/conversations/messages";
 import {
@@ -16,9 +16,6 @@ export type SendTextMessageState = {
   signalTypes?: LeakageSignalType[];
 };
 
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
 export async function sendTextMessage(
   _previousState: SendTextMessageState,
   formData: FormData,
@@ -28,7 +25,7 @@ export async function sendTextMessage(
   const bodyResult = messageTextSchema.safeParse(formData.get("body"));
   const explicitlyConfirmed = formData.get("confirmLeakage") === "true";
 
-  if (!uuidPattern.test(conversationId) || !uuidPattern.test(nonce)) {
+  if (!isUuid(conversationId) || !isUuid(nonce)) {
     return {
       status: "ERROR",
       message: "No pudimos identificar la conversación o el mensaje.",

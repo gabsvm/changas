@@ -1,6 +1,6 @@
 begin;
 
-select plan(24);
+select plan(27);
 
 select ok(to_regclass('public.job_events') is not null, 'job events table exists');
 select ok(to_regclass('public.job_schedule_versions') is not null, 'job schedule versions table exists');
@@ -45,6 +45,21 @@ select ok(to_regprocedure('public.apply_fake_additional_payment_result(uuid,uuid
 select ok(to_regprocedure('public.set_job_exact_location(uuid,text,double precision,double precision,text)') is not null, 'private exact location rpc exists');
 select ok(to_regprocedure('public.get_job_detail(uuid)') is not null, 'job detail read model exists');
 select ok(to_regprocedure('public.list_my_upcoming_jobs(integer)') is not null, 'upcoming work read model exists');
+select ok(
+  (select proargnames::text from pg_proc where oid = to_regprocedure('public.list_my_upcoming_jobs(integer)'))
+  like '%base_price_amount%',
+  'upcoming work read model exposes agreed pricing'
+);
+select ok(
+  (select proargnames::text from pg_proc where oid = to_regprocedure('public.list_my_upcoming_jobs(integer)'))
+  like '%is_client%',
+  'upcoming work read model exposes caller role'
+);
+select ok(
+  not has_function_privilege('anon', 'public.list_my_upcoming_jobs(integer)', 'EXECUTE')
+  and has_function_privilege('authenticated', 'public.list_my_upcoming_jobs(integer)', 'EXECUTE'),
+  'upcoming work read model stays authenticated-only'
+);
 
 select ok(
   (select bool_and(relrowsecurity)

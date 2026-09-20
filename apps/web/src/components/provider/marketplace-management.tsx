@@ -227,7 +227,7 @@ function Field({
     <label className="text-sm font-semibold">
       {label}
       <input
-        className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 disabled:bg-ink/[0.04] disabled:text-ink/40"
+        className="border-ink/15 focus:border-moss focus:ring-moss/20 disabled:bg-ink/[0.04] disabled:text-ink/40 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2"
         name={name}
         type={type}
         defaultValue={defaultValue ?? ""}
@@ -275,7 +275,11 @@ function TextArea({
             className={`text-xs font-normal ${length < (minLength ?? 0) ? "text-terracotta" : "text-ink/45"}`}
           >
             {length}
-            {maxLength ? `/${maxLength}` : minLength ? ` (mín. ${minLength})` : ""}
+            {maxLength
+              ? `/${maxLength}`
+              : minLength
+                ? ` (mín. ${minLength})`
+                : ""}
           </span>
         ) : null}
       </span>
@@ -323,15 +327,20 @@ function Section({
   eyebrow,
   title,
   description,
+  anchor,
   children,
 }: {
   eyebrow: string;
   title: string;
   description: string;
+  anchor?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-ink/10 rounded-2xl border bg-white/65 p-5 sm:p-7">
+    <section
+      id={anchor}
+      className="border-ink/10 scroll-mt-32 rounded-2xl border bg-white/65 p-5 sm:p-7"
+    >
       <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
         {eyebrow}
       </p>
@@ -635,7 +644,34 @@ export function MarketplaceManagement({
   );
   return (
     <div className="space-y-6">
+      <nav
+        className="consumer-scrollbar-none sticky top-16 z-20 -mx-1 flex gap-2 overflow-x-auto px-1 py-2 sm:static"
+        aria-label="Secciones de gestión"
+      >
+        {(
+          [
+            ["perfil", "Perfil"],
+            ["habilidades", "Habilidades"],
+            ["servicios", "Servicios"],
+            ["experiencia", "Experiencia"],
+            ["formacion", "Formación"],
+            ["certificaciones", "Certificaciones"],
+            ["portfolio", "Portfolio"],
+            ["zonas", "Zonas"],
+            ["disponibilidad", "Disponibilidad"],
+          ] as Array<[string, string]>
+        ).map(([id, label]) => (
+          <a
+            key={id}
+            href={`#${id}`}
+            className="consumer-pressable border-ink/[0.08] inline-flex min-h-10 shrink-0 items-center rounded-full border bg-white px-4 text-[13px] font-bold"
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
       <Section
+        anchor="perfil"
         eyebrow="Perfil público"
         title="Tu escaparate, bajo tu control"
         description="Editá sólo la información que querés publicar. La identidad privada y los documentos de onboarding quedan fuera de esta pantalla."
@@ -679,6 +715,7 @@ export function MarketplaceManagement({
       </Section>
 
       <Section
+        anchor="habilidades"
         eyebrow="Catálogo controlado"
         title="Habilidades que ofrecés"
         description="Una habilidad es una capacidad del catálogo; un servicio es una oferta concreta. Podés combinar habilidades no relacionadas sin convertirlas en servicios automáticamente."
@@ -744,17 +781,28 @@ export function MarketplaceManagement({
       </Section>
 
       <Section
+        anchor="servicios"
         eyebrow="Servicios"
         title="Ofertas concretas"
         description="Definí precio fijo, desde, por hora, por unidad o a cotizar; modalidad presencial/remota/ambas; propuestas y pausa. Publicar queda bloqueado hasta que el proveedor esté ACTIVE."
       >
         <div className="space-y-5">
           {skills.length ? (
-            <ServiceForm
-              action={actions.saveService}
-              skills={skills}
-              serviceTags={[]}
-            />
+            <details className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3">
+              <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+                + Nuevo servicio
+                <span className="text-ink/40 text-xl" aria-hidden="true">
+                  ›
+                </span>
+              </summary>
+              <div className="pt-2">
+                <ServiceForm
+                  action={actions.saveService}
+                  skills={skills}
+                  serviceTags={[]}
+                />
+              </div>
+            </details>
           ) : (
             <p className="text-ink/55 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
               Primero agregá al menos una habilidad para poder crear un
@@ -783,14 +831,13 @@ export function MarketplaceManagement({
                     service.price_unit,
                   )}
                 </span>
+                {service.is_paused ? (
+                  <span className="bg-ink/[0.06] text-ink/60 rounded-full px-3 py-1 text-xs font-semibold">
+                    Pausado
+                  </span>
+                ) : null}
               </div>
-              <ServiceForm
-                action={actions.saveService}
-                service={service}
-                skills={skills}
-                serviceTags={serviceTagsByServiceId[service.id] ?? []}
-              />
-              <div className="mt-3 flex flex-wrap gap-3">
+              <div className="mt-3 flex flex-wrap gap-2">
                 <ActionForm
                   action={actions.pauseService}
                   submitLabel={
@@ -805,11 +852,29 @@ export function MarketplaceManagement({
                     value={String(!service.is_paused)}
                   />
                 </ActionForm>
-                <DeleteForm
-                  action={actions.deleteService}
-                  recordId={service.id}
-                />
               </div>
+              <details className="border-ink/10 mt-3 border-t pt-2">
+                <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+                  Editar servicio
+                  <span className="text-ink/40 text-xl" aria-hidden="true">
+                    ›
+                  </span>
+                </summary>
+                <div className="pt-2">
+                  <ServiceForm
+                    action={actions.saveService}
+                    service={service}
+                    skills={skills}
+                    serviceTags={serviceTagsByServiceId[service.id] ?? []}
+                  />
+                  <div className="border-ink/10 mt-3 border-t pt-2">
+                    <DeleteForm
+                      action={actions.deleteService}
+                      recordId={service.id}
+                    />
+                  </div>
+                </div>
+              </details>
             </div>
           ))}
         </div>
@@ -817,6 +882,7 @@ export function MarketplaceManagement({
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Section
+          anchor="experiencia"
           eyebrow="Trayectoria"
           title="Experiencia"
           description="Mostrá experiencia pública o conservá registros privados para tu gestión."
@@ -861,6 +927,7 @@ export function MarketplaceManagement({
           </div>
         </Section>
         <Section
+          anchor="formacion"
           eyebrow="Formación"
           title="Educación"
           description="Compartí estudios relevantes sin exponer información privada de identidad."
@@ -904,6 +971,7 @@ export function MarketplaceManagement({
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Section
+          anchor="certificaciones"
           eyebrow="Certificaciones"
           title="Credenciales"
           description="La ficha pública puede mostrar el título y emisor; la evidencia binaria siempre queda en un bucket privado y separado."
@@ -961,6 +1029,7 @@ export function MarketplaceManagement({
           </div>
         </Section>
         <Section
+          anchor="portfolio"
           eyebrow="Portfolio"
           title="Trabajo visible"
           description="Las piezas de portfolio pueden ser públicas sólo cuando vos las marcás así. La media vive en un bucket distinto del de identidad."
@@ -1014,6 +1083,7 @@ export function MarketplaceManagement({
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Section
+          anchor="zonas"
           eyebrow="Zonas"
           title="Área de servicio"
           description="Guardamos un centro exacto privado para futuras consultas geográficas, pero la vista pública sólo muestra etiqueta y radio aproximado."
@@ -1071,6 +1141,7 @@ export function MarketplaceManagement({
           </div>
         </Section>
         <Section
+          anchor="disponibilidad"
           eyebrow="Disponibilidad"
           title="Reglas y bloqueos"
           description="Esto sólo prepara disponibilidad; no crea reservas ni agenda turnos en Phase 02."

@@ -15,5 +15,8 @@ describe("safeNextPath", () => {
     expect(safeNextPath("https://evil.example")).toBe("/account");
     expect(safeNextPath("//evil.example")).toBe("/account");
     expect(safeNextPath("javascript:alert(1)")).toBe("/account");
+    expect(safeNextPath("/account\nset-cookie: injected=true")).toBe(
+      "/account",
+    );
   });
 });

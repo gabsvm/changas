@@ -1,13 +1,12 @@
 import "server-only";
 
+import { isUuid } from "@changas/validation";
+
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export const identityDocumentBucket = "identity-documents";
 export const identityDocumentSignedUrlTtlSeconds = 180;
-
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type RpcError = { code?: string | null; message?: string | null } | null;
 type RpcResult<T> = Promise<{ data: T | null; error: RpcError }>;
@@ -76,7 +75,7 @@ export class AdminIdentityError extends Error {
 }
 
 function ensureUuid(value: string, label: string): void {
-  if (!UUID_PATTERN.test(value)) {
+  if (!isUuid(value)) {
     throw new AdminIdentityError("CONFLICT", `${label} inválido.`);
   }
 }

@@ -7,52 +7,12 @@ import { Switch } from "@/components/ui/marketplace/switch";
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
 import type { NotificationPreferences } from "@/lib/notifications/server";
+import { NOTIFICATION_PREFERENCE_GROUPS } from "@/lib/ui/account-settings";
 
 type PreferencesAction = (
   previousState: ActionState,
   formData: FormData,
 ) => Promise<ActionState>;
-
-type ToggleConfig = {
-  name: keyof Pick<
-    NotificationPreferences,
-    | "emailImportantEnabled"
-    | "jobRemindersEnabled"
-    | "proposalAlertsEnabled"
-    | "verificationAlertsEnabled"
-    | "promotionalEnabled"
-  >;
-  title: string;
-  description: string;
-};
-
-const toggles: ToggleConfig[] = [
-  {
-    name: "emailImportantEnabled",
-    title: "Correos importantes",
-    description: "Cambios de trabajos, pagos y cuenta.",
-  },
-  {
-    name: "jobRemindersEnabled",
-    title: "Recordatorios de trabajos",
-    description: "Avisos para trabajos programados próximos.",
-  },
-  {
-    name: "proposalAlertsEnabled",
-    title: "Propuestas",
-    description: "Cuando una propuesta requiere tu atención.",
-  },
-  {
-    name: "verificationAlertsEnabled",
-    title: "Verificación",
-    description: "Cambios relevantes de cuenta o perfil.",
-  },
-  {
-    name: "promotionalEnabled",
-    title: "Promociones",
-    description: "Novedades comerciales opcionales.",
-  },
-];
 
 export function NotificationPreferencesForm({
   action,
@@ -62,48 +22,76 @@ export function NotificationPreferencesForm({
   initialValues: NotificationPreferences;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [state, formAction, pending] = useActionState(action, initialActionState);
+  const [state, formAction, pending] = useActionState(
+    action,
+    initialActionState,
+  );
 
   function persistChange() {
     window.setTimeout(() => formRef.current?.requestSubmit(), 0);
   }
 
   return (
-    <form ref={formRef} action={formAction} className="divide-y divide-ink/[0.07]">
-      {toggles.map((toggle) => (
-        <SettingsRow
-          key={toggle.name}
-          title={toggle.title}
-          description={toggle.description}
-          trailing={
-            <Switch
-              name={toggle.name}
-              defaultChecked={initialValues[toggle.name]}
-              onChange={persistChange}
-              disabled={pending}
-              ariaLabel={toggle.title}
-            />
-          }
-        />
-      ))}
-
-      <button type="submit" className="sr-only" tabIndex={-1} aria-hidden="true">
-        Guardar preferencias
-      </button>
-
+    <form ref={formRef} action={formAction}>
       {pending ? (
-        <p className="text-ink/45 py-3 text-xs" role="status" aria-live="polite">
+        <p
+          className="bg-brand-orange/[0.08] text-terracotta px-4 py-2.5 text-sm font-semibold"
+          role="status"
+          aria-live="polite"
+        >
           Guardando cambio…
         </p>
       ) : state.error ? (
-        <p className="text-danger py-3 text-xs" role="alert">
+        <p
+          className="bg-danger/[0.07] text-danger px-4 py-2.5 text-sm font-semibold"
+          role="alert"
+        >
           {state.error}
         </p>
       ) : state.success ? (
-        <p className="text-success py-3 text-xs" role="status" aria-live="polite">
+        <p
+          className="bg-success/[0.07] text-success px-4 py-2.5 text-sm font-semibold"
+          role="status"
+          aria-live="polite"
+        >
           Cambios guardados
         </p>
       ) : null}
+
+      {NOTIFICATION_PREFERENCE_GROUPS.map((group) => (
+        <fieldset key={group.id} className="px-0">
+          <legend className="text-ink/48 px-0 pt-3 text-[0.68rem] font-bold tracking-[0.1em] uppercase">
+            {group.title}
+          </legend>
+          <div className="divide-ink/[0.07] divide-y">
+            {group.toggles.map((toggle) => (
+              <SettingsRow
+                key={toggle.name}
+                title={toggle.title}
+                description={toggle.description}
+                trailing={
+                  <Switch
+                    name={toggle.name}
+                    defaultChecked={initialValues[toggle.name]}
+                    onChange={persistChange}
+                    disabled={pending}
+                    ariaLabel={toggle.title}
+                  />
+                }
+              />
+            ))}
+          </div>
+        </fieldset>
+      ))}
+
+      <button
+        type="submit"
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden="true"
+      >
+        Guardar preferencias
+      </button>
     </form>
   );
 }

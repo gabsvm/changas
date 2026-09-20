@@ -24,11 +24,27 @@ export function ProposalComposer({
   return (
     <details className="border-ink/[0.08] bg-surface rounded-2xl border p-4 shadow-[var(--consumer-shadow-card)]">
       <summary className="consumer-pressable inline-flex min-h-12 cursor-pointer items-center gap-2 text-[15px] font-extrabold">
-        <span className="bg-brand-orange/15 text-terracotta grid h-9 w-9 place-items-center rounded-xl text-lg" aria-hidden="true">
+        <span
+          className="bg-brand-orange/15 text-terracotta grid h-9 w-9 place-items-center rounded-xl text-lg"
+          aria-hidden="true"
+        >
           +
         </span>
         {currentUserIsClient ? "Proponer un acuerdo" : "Enviar una cotización"}
       </summary>
+      {state.message ? (
+        <p
+          className={
+            state.status === "ERROR"
+              ? "bg-danger/[0.07] text-danger mt-3 rounded-xl px-3 py-2.5 text-sm font-semibold"
+              : "bg-success/[0.07] text-success mt-3 rounded-xl px-3 py-2.5 text-sm font-semibold"
+          }
+          role={state.status === "ERROR" ? "alert" : "status"}
+          aria-live="polite"
+        >
+          {state.message}
+        </p>
+      ) : null}
       <form action={action} className="mt-3 grid gap-3 sm:grid-cols-2">
         <input type="hidden" name="conversationId" value={conversationId} />
         <label className="text-ink text-sm font-bold">
@@ -88,24 +104,14 @@ export function ProposalComposer({
             className="consumer-control text-ink mt-1.5 min-h-[52px] w-full px-3.5 text-base"
           />
         </label>
-        <div className="flex items-center gap-3 sm:col-span-2">
+        <div className="sm:col-span-2">
           <button
             type="submit"
             disabled={pending}
-            className="consumer-pressable bg-ink inline-flex min-h-[52px] flex-1 items-center justify-center rounded-xl px-4 text-[15px] font-extrabold text-white disabled:opacity-50 sm:flex-none sm:px-8"
+            className="consumer-pressable bg-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold text-white disabled:opacity-50 sm:w-auto sm:px-8"
           >
             {pending ? "Guardando…" : "Enviar propuesta"}
           </button>
-          {state.message ? (
-            <p
-              className={`text-xs ${
-                state.status === "SUCCESS" ? "text-moss" : "text-terracotta"
-              }`}
-              role={state.status === "ERROR" ? "alert" : undefined}
-            >
-              {state.message}
-            </p>
-          ) : null}
         </div>
       </form>
     </details>

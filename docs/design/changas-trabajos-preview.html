@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Changas — Propuesta Mis trabajos mobile (ver antes de aprobar)
+    </title>
+    <style>
+      :root {
+        --canvas: #fff9f3;
+        --surface: #fffdf9;
+        --ink: #202124;
+        --muted: rgba(32, 33, 36, 0.62);
+        --orange: #ff6b35;
+        --orange-d: #c84010;
+        --yellow: #ffc857;
+        --blue: #2563eb;
+        --ok: #2f7d4a;
+        --danger: #c93c32;
+        --line: rgba(32, 33, 36, 0.1);
+        --font:
+          "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: #171310;
+        color: #f3e9de;
+        padding: 26px;
+        display: grid;
+        gap: 20px;
+        justify-items: center;
+      }
+      .cap {
+        width: min(1180px, 100%);
+        font-size: 13px;
+        line-height: 1.65;
+        color: #d8c9bc;
+      }
+      .cap b {
+        color: #fff;
+      }
+      .cap code {
+        color: #ffc857;
+        font-size: 12px;
+      }
+      .toolbar {
+        width: min(1180px, 100%);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .toolbar .lbl {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #a89888;
+        text-transform: uppercase;
+      }
+      .tbtn {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #4a3d33;
+        background: #2c241e;
+        color: #e8d9cb;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .tbtn.on {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #202124;
+      }
+      .frame {
+        width: min(1180px, 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #3a2f28;
+        background: #2b241f;
+        color: var(--ink);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+      }
+      .flabel {
+        padding: 11px 16px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+      }
+      .flabel.old {
+        background: #2a2f38;
+        color: #e8eef7;
+      }
+      .flabel.prop {
+        background: #3a2a10;
+        color: #ffe8a5;
+      }
+      .stage {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 22px 18px;
+        background: #241d17;
+      }
+      .phone {
+        width: 375px;
+        max-width: 100%;
+        height: 740px;
+        background: var(--canvas);
+        border-radius: 32px;
+        overflow-y: auto;
+        border: 10px solid #101010;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      .appbar {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 14px;
+        background: rgba(255, 249, 243, 0.96);
+        border-bottom: 1px solid var(--line);
+        font-size: 16px;
+        font-weight: 800;
+        z-index: 2;
+      }
+      .appbar .bk {
+        font-size: 18px;
+      }
+      .mbody {
+        padding: 14px 14px 20px;
+      }
+      .mbody h1 {
+        font-size: 22px;
+        letter-spacing: -0.03em;
+        line-height: 1.2;
+      }
+      .mbody .sub {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 900;
+        color: #fff;
+        background: #c0392b;
+        border-radius: 999px;
+        padding: 2px 9px;
+        margin-bottom: 10px;
+        letter-spacing: 0.06em;
+      }
+      .fchips {
+        display: flex;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .fchips button {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 9px 14px;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .fchips button.on {
+        background: #202124;
+        color: #fff;
+        border-color: #202124;
+      }
+      .job {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px;
+        margin-top: 10px;
+      }
+      .jk {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: rgba(255, 107, 53, 0.12);
+        color: var(--orange-d);
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        font-size: 18px;
+        flex: 0 0 44px;
+      }
+      .job .tx {
+        min-width: 0;
+        flex: 1;
+      }
+      .job .tx b {
+        display: block;
+        font-size: 14.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .job .tx small {
+        display: block;
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-top: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 10.5px;
+        font-weight: 800;
+        border-radius: 999px;
+        padding: 4px 10px;
+        margin-top: 7px;
+        background: #e8effe;
+        color: #1d4ed8;
+      }
+      .pill.g {
+        background: #e5f4ea;
+        color: #1f7a44;
+      }
+      .pill.w {
+        background: #fff1e8;
+        color: #9a6500;
+      }
+      .job .rt {
+        text-align: right;
+        flex: 0 0 auto;
+      }
+      .job .rt b {
+        font-size: 14.5px;
+      }
+      .job .rt span {
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--orange-d);
+        margin-top: 4px;
+      }
+      .job .rt .done {
+        color: var(--ok);
+      }
+      .chev {
+        color: #999;
+        font-size: 18px;
+      }
+      .dcard {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px;
+        margin-top: 12px;
+      }
+      .dcard h2 {
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+      .dcard .meta {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 5px;
+      }
+      .kv {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        background: #fff9f3;
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 12px;
+      }
+      .kv span {
+        font-size: 10.5px;
+        font-weight: 800;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .kv b {
+        font-size: 14px;
+        display: block;
+        margin-top: 3px;
+      }
+      .act {
+        background: #202124;
+        color: #fff;
+        border-radius: 16px;
+        padding: 16px;
+        margin-top: 12px;
+      }
+      .act p {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #ffb59a;
+        text-transform: uppercase;
+      }
+      .act h3 {
+        font-size: 16px;
+        margin-top: 5px;
+      }
+      .act .row {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .bpay {
+        flex: 1;
+        background: var(--orange);
+        color: #202124;
+        border: 0;
+        border-radius: 12px;
+        padding: 14px;
+        font: inherit;
+        font-size: 13.5px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+      .bchat {
+        flex: 1;
+        background: transparent;
+        color: #fff;
+        border: 1px solid #555;
+        border-radius: 12px;
+        padding: 14px;
+        font: inherit;
+        font-size: 13.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      details.acc {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        margin-top: 10px;
+        padding: 13px 14px;
+        font-size: 13.5px;
+        font-weight: 700;
+      }
+      details.acc summary {
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      details.acc summary::-webkit-details-marker {
+        display: none;
+      }
+      details.acc .bd {
+        margin-top: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #555;
+        line-height: 1.6;
+      }
+      .tl {
+        margin-top: 12px;
+        display: grid;
+        gap: 0;
+      }
+      .tl div {
+        display: grid;
+        grid-template-columns: 22px 1fr;
+        gap: 10px;
+        position: relative;
+        padding-bottom: 14px;
+        font-size: 13px;
+      }
+      .tl div::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--orange);
+        margin-top: 5px;
+      }
+      .tl div:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        left: 4px;
+        top: 18px;
+        bottom: 0;
+        width: 1px;
+        background: var(--line);
+      }
+      .tl small {
+        display: block;
+        color: var(--muted);
+        font-size: 11.5px;
+        margin-top: 2px;
+      }
+      .legend {
+        width: min(1180px, 100%);
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: #d8c9bc;
+      }
+      .legend b {
+        color: #fff;
+      }
+      .legend code {
+        color: #ffc857;
+        font-size: 11.5px;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="cap">
+      <b>Changas · Propuesta Mis trabajos mobile (ver antes de aprobar).</b>
+      Teléfonos de <b>375px</b>: la lista no muestra montos y el detalle apila 5
+      secciones con igual peso. Nada se implementa hasta que apruebes.
+    </p>
+
+    <div class="toolbar">
+      <span class="lbl">Vista</span>
+      <button class="tbtn on" data-v="all">Todo</button>
+      <button class="tbtn" data-v="lista">Lista</button>
+      <button class="tbtn" data-v="detalle">Detalle</button>
+    </div>
+
+    <div class="frame" data-s="lista">
+      <div class="flabel old">
+        ▣ LISTA HOY — filas sin monto ni acción
+        (<code>jobs/page.tsx:51-74</code>)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Mis trabajos</div>
+          <div class="mbody">
+            <span class="tag"
+              >HOY · ¿cuál hay que pagar? Hay que abrirlos uno por uno</span
+            >
+            <div class="job">
+              <span class="jk">R</span>
+              <div class="tx">
+                <b>Reparación de grifería</b
+                ><small>Juan M. · mañana 10:00</small
+                ><span class="pill">Confirmado</span>
+              </div>
+              <span class="chev">›</span>
+            </div>
+            <div class="job">
+              <span class="jk">C</span>
+              <div class="tx">
+                <b>Clases de inglés</b><small>Lucía G. · vie 18:00</small
+                ><span class="pill g">En curso</span>
+              </div>
+              <span class="chev">›</span>
+            </div>
+            <div class="job">
+              <span class="jk">P</span>
+              <div class="tx">
+                <b>Pintura living</b><small>Marta D. · a coordinar</small
+                ><span class="pill w">Esperando pago</span>
+              </div>
+              <span class="chev">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="lista">
+      <div class="flabel prop">
+        ▣ LISTA PROPUESTO — monto + próxima acción + filtro (interactivo)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Mis trabajos</div>
+          <div class="mbody">
+            <h1>Mis trabajos</h1>
+            <p class="sub">Confirmados, en curso o pendientes de cierre.</p>
+            <div class="fchips">
+              <button class="on" data-j="all">Todos</button
+              ><button data-j="pay">Por pagar</button
+              ><button data-j="rate">Para calificar</button>
+            </div>
+            <div id="jobs">
+              <div class="job" data-k="pay">
+                <span class="jk">R</span>
+                <div class="tx">
+                  <b>Reparación de grifería</b
+                  ><small>Juan M. · mañana 10:00</small
+                  ><span class="pill">Confirmado</span>
+                </div>
+                <div class="rt"><b>$9.500</b><span>Pagar →</span></div>
+              </div>
+              <div class="job" data-k="rate">
+                <span class="jk">C</span>
+                <div class="tx">
+                  <b>Clases de inglés</b><small>Lucía G. · vie 18:00</small
+                  ><span class="pill g">En curso</span>
+                </div>
+                <div class="rt">
+                  <b>$7.500</b><span class="done">Calificar →</span>
+                </div>
+              </div>
+              <div class="job" data-k="pay">
+                <span class="jk">P</span>
+                <div class="tx">
+                  <b>Pintura living</b><small>Marta D. · a coordinar</small
+                  ><span class="pill w">Esperando pago</span>
+                </div>
+                <div class="rt"><b>$42.000</b><span>Pagar →</span></div>
+              </div>
+            </div>
+            <p
+              style="
+                font-size: 11.5px;
+                color: #8a7a6e;
+                margin-top: 10px;
+                line-height: 1.5;
+              "
+            >
+              Montos mock: la lista (<code>UpcomingJob</code>) hoy no trae
+              precio; solo el detalle lo tiene.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="detalle">
+      <div class="flabel old">
+        ▣ DETALLE HOY — 5 secciones con igual peso
+        (<code>jobs/[jobId]/page.tsx:194-563</code>)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Trabajo</div>
+          <div class="mbody">
+            <span class="tag"
+              >HOY · Acciones / Cambios / Reprogramaciones / Ubicación /
+              Historial, todo apilado</span
+            >
+            <div class="dcard">
+              <span class="pill w">Esperando pago</span>
+              <h2 style="margin-top: 8px">Pintura living</h2>
+              <p class="meta">Con Marta D. · $42.000</p>
+            </div>
+            <div class="dcard">
+              <h2 style="font-size: 15px">Acciones del trabajo</h2>
+              <p class="meta">
+                Pagar · Reprogramar · Cambiar alcance · Ubicación…
+              </p>
+            </div>
+            <div class="dcard">
+              <h2 style="font-size: 15px">Cambios de alcance</h2>
+              <p class="meta">Sin cambios.</p>
+            </div>
+            <div class="dcard">
+              <h2 style="font-size: 15px">Historial</h2>
+              <p class="meta">Confirmado → …</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="detalle">
+      <div class="flabel prop">
+        ▣ DETALLE PROPUESTO — próxima acción primero, resto colapsado
+        (interactivo)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Trabajo</div>
+          <div class="mbody">
+            <div class="dcard">
+              <span class="pill w" id="dst">Esperando pago</span>
+              <h2 style="margin-top: 8px">Pintura living</h2>
+              <p class="meta">Con Marta D. · A coordinar</p>
+              <div class="kv">
+                <div><span>Precio acordado</span><b>$42.000</b></div>
+                <div><span>Modalidad</span><b>Presencial</b></div>
+              </div>
+            </div>
+            <div class="act">
+              <p>Próxima acción</p>
+              <h3 id="dh3">Pagar el anticipo de $42.000</h3>
+              <div class="row">
+                <button class="bpay" id="bpay">Pagar</button
+                ><button class="bchat">Ver chat</button>
+              </div>
+            </div>
+            <div class="tl" style="margin-top: 16px">
+              <div>
+                <p>Confirmado<b></b><small>Hoy 09:12 · por Marta D.</small></p>
+              </div>
+              <div>
+                <p>Anticipo solicitado<small>Ayer 18:40 · $42.000</small></p>
+              </div>
+            </div>
+            <details class="acc">
+              <summary>Alcance acordado <span>›</span></summary>
+              <p class="bd">
+                Pintura completa del living, 2 manos, materiales incluidos.
+              </p>
+            </details>
+            <details class="acc">
+              <summary>Ubicación y acceso <span>›</span></summary>
+              <p class="bd">
+                Zona aproximada visible tras el pago. La dirección exacta se
+                comparte por chat.
+              </p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>Si aprobás, implemento así (sin código todavía):</b> lista → monto +
+      próxima acción por fila (requiere extender
+      <code>listMyUpcomingJobs</code> con precio y estado de pago; el tipo
+      <code>UpcomingJob</code> hoy no los trae) + filtro Todas/Por pagar/Para
+      calificar por query; detalle → tarjeta de próxima acción primera según
+      <code>job_status</code> + timeline con <code>listJobEvents</code> + resto
+      en acordeones, reutilizando <code>JobSection</code> y acciones existentes
+      sin tocar lógica. Tests en <code>lib/ui/job-detail-ui.test.ts</code>.
+      Decime qué aprobar / ajustar.
+    </div>
+
+    <script>
+      document.querySelectorAll("[data-v]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("[data-v]")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            const v = b.dataset.v;
+            document
+              .querySelectorAll(".frame")
+              .forEach(
+                (f) =>
+                  (f.style.display =
+                    v === "all" || f.dataset.s === v ? "" : "none"),
+              );
+          }),
+      );
+      document.querySelectorAll("[data-j]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("[data-j]")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            const k = b.dataset.j;
+            document
+              .querySelectorAll("#jobs .job")
+              .forEach(
+                (j) =>
+                  (j.style.display =
+                    k === "all" || j.dataset.k === k ? "" : "none"),
+              );
+          }),
+      );
+      document.getElementById("bpay").onclick = () => {
+        document.getElementById("dst").textContent = "Pagado · en curso";
+        document.getElementById("dst").className = "pill g";
+        document.getElementById("dh3").textContent =
+          "Calificá el trabajo cuando termine";
+        document.getElementById("bpay").textContent = "Calificar";
+      };
+    </script>
+  </body>
+</html>

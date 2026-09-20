@@ -43,8 +43,8 @@ export default async function ProviderOnboardingPage() {
             Empezá tu verificación
           </h1>
           <p className="text-ink/58 mt-2 max-w-xl text-sm leading-6">
-            Son cuatro pasos breves. Podés salir y volver cuando quieras; nada se
-            publica ni se activa sin revisión.
+            Son cuatro pasos breves. Podés salir y volver cuando quieras; nada
+            se publica ni se activa sin revisión.
           </p>
 
           <section className="border-ink/10 mt-6 border-y py-1">
@@ -99,18 +99,18 @@ export default async function ProviderOnboardingPage() {
             <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
               Perfil de proveedor
             </p>
-            <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
+            <h1 className="mt-2 text-3xl leading-9 font-extrabold tracking-[-0.035em]">
               Tu verificación
             </h1>
           </div>
           <StatusBadge label={presentation.label} tone={presentation.tone} />
         </div>
 
-        <p className="text-ink/58 mt-2 text-sm leading-6">
+        <p className="text-ink/58 mt-3 text-sm leading-7">
           {presentation.description}
         </p>
 
-        <section className="border-ink/10 mt-5 border-y py-4">
+        <section className="border-ink/10 mt-6 border-y py-5">
           <div className="flex items-center justify-between gap-4 text-xs font-bold">
             <span>Progreso</span>
             <span className="text-ink/45">
@@ -120,12 +120,15 @@ export default async function ProviderOnboardingPage() {
           <div className="mt-2.5">
             <ProgressBar value={progress} label="Progreso de verificación" />
           </div>
-          <Link className="button-primary mt-4 w-full sm:w-auto" href={primaryHref}>
+          <Link
+            className="button-primary mt-5 w-full sm:w-auto"
+            href={primaryHref}
+          >
             {primaryLabel}
           </Link>
         </section>
 
-        <section className="border-ink/10 mt-4 divide-y divide-ink/10 border-y">
+        <section className="border-ink/10 divide-ink/10 mt-5 divide-y border-y">
           {steps.map((step) => (
             <OnboardingStepCard
               key={step.id}

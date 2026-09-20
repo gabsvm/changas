@@ -8,6 +8,11 @@ import {
 } from "@/app/(account)/account/notifications/actions";
 import { SettingsRow } from "@/components/ui/marketplace/settings-row";
 import { Switch } from "@/components/ui/marketplace/switch";
+import {
+  resolvePushMessageTone,
+  type PushMessageKind,
+  type PushMessageTone,
+} from "@/lib/ui/account-settings";
 
 import { resolvePushCapability, type PushCapability } from "./push-permission";
 
@@ -45,12 +50,21 @@ export function PushOptIn({
   const [capability, setCapability] = useState<PushCapability>("unsupported");
   const [enabled, setEnabled] = useState(initialEnabled);
   const [pending, setPending] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{
+    text: string;
+    tone: PushMessageTone;
+  } | null>(null);
+
+  function notify(text: string, kind: PushMessageKind) {
+    setMessage({ text, tone: resolvePushMessageTone(kind) });
+  }
 
   useEffect(() => {
     const notificationSupported = "Notification" in window;
     const serviceWorkerSupported = "serviceWorker" in navigator;
-    const permission = notificationSupported ? Notification.permission : "default";
+    const permission = notificationSupported
+      ? Notification.permission
+      : "default";
     const nextCapability = resolvePushCapability({
       notificationSupported,
       serviceWorkerSupported,
@@ -61,10 +75,12 @@ export function PushOptIn({
 
     if (!notificationSupported || !serviceWorkerSupported) return;
 
-    void navigator.serviceWorker.getRegistration().then(async (registration) => {
-      const subscription = await registration?.pushManager.getSubscription();
-      if (!subscription && initialEnabled) setEnabled(false);
-    });
+    void navigator.serviceWorker
+      .getRegistration()
+      .then(async (registration) => {
+        const subscription = await registration?.pushManager.getSubscription();
+        if (!subscription && initialEnabled) setEnabled(false);
+      });
   }, [initialEnabled]);
 
   async function enablePush() {
@@ -88,13 +104,19 @@ export function PushOptIn({
 
       if (permission !== "granted") {
         setEnabled(false);
-        setMessage("El navegador no habilitó las alertas push.");
+        notify(
+          "El navegador no habilitó las alertas push.",
+          "permission-denied",
+        );
         return;
       }
 
       if (!publicKey) {
         setEnabled(false);
-        setMessage("Las notificaciones push todavía no están configuradas.");
+        notify(
+          "Las notificaciones push todavía no están configuradas.",
+          "not-configured",
+        );
         return;
       }
 
@@ -112,7 +134,10 @@ export function PushOptIn({
       if (!p256dh || !auth) {
         if (!existing) await subscription.unsubscribe();
         setEnabled(false);
-        setMessage("El navegador no devolvió una suscripción push válida.");
+        notify(
+          "El navegador no devolvió una suscripción push válida.",
+          "invalid-subscription",
+        );
         return;
       }
 
@@ -126,15 +151,15 @@ export function PushOptIn({
       if (!result.ok) {
         if (!existing) await subscription.unsubscribe();
         setEnabled(false);
-        setMessage(result.error);
+        notify(result.error, "save-failed");
         return;
       }
 
       setEnabled(true);
-      setMessage("Push activado en este dispositivo.");
+      notify("Push activado en este dispositivo.", "enabled");
     } catch {
       setEnabled(false);
-      setMessage("No pudimos activar las notificaciones push.");
+      notify("No pudimos activar las notificaciones push.", "save-failed");
     } finally {
       setPending(false);
     }
@@ -145,22 +170,28 @@ export function PushOptIn({
     setMessage(null);
 
     try {
-      const registration = "serviceWorker" in navigator
-        ? await navigator.serviceWorker.getRegistration()
-        : undefined;
+      const registration =
+        "serviceWorker" in navigator
+          ? await navigator.serviceWorker.getRegistration()
+          : undefined;
       const subscription = await registration?.pushManager.getSubscription();
-      const result = await disablePushSubscriptionAction(subscription?.endpoint ?? null);
+      const result = await disablePushSubscriptionAction(
+        subscription?.endpoint ?? null,
+      );
 
       if (!result.ok) {
-        setMessage(result.error);
+        notify(result.error, "disable-failed");
         return;
       }
 
       if (subscription) await subscription.unsubscribe();
       setEnabled(false);
-      setMessage("Push desactivado en este dispositivo.");
+      notify("Push desactivado en este dispositivo.", "disabled");
     } catch {
-      setMessage("No pudimos desactivar las notificaciones push.");
+      notify(
+        "No pudimos desactivar las notificaciones push.",
+        "disable-failed",
+      );
     } finally {
       setPending(false);
     }
@@ -193,11 +224,15 @@ export function PushOptIn({
       />
       {message ? (
         <p
-          className={`pb-3 text-xs ${message.includes("No pudimos") || message.includes("no habilitó") ? "text-danger" : "text-ink/50"}`}
-          role="status"
+          className={
+            message.tone === "error"
+              ? "bg-danger/[0.07] text-danger px-4 py-2.5 text-sm font-semibold"
+              : "bg-success/[0.07] text-success px-4 py-2.5 text-sm font-semibold"
+          }
+          role={message.tone === "error" ? "alert" : "status"}
           aria-live="polite"
         >
-          {message}
+          {message.text}
         </p>
       ) : null}
     </div>

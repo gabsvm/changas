@@ -1,9 +1,9 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
+import { isUuid } from "@changas/validation";
+
 const OAUTH_STATE_TTL_MS = 10 * 60_000;
 const MAX_FUTURE_SKEW_MS = 60_000;
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type OAuthStateInput = {
   providerUserId: string;
@@ -51,7 +51,7 @@ function decodeCanonicalBase64Url(value: string, field: string): Buffer {
 }
 
 function assertProviderUserId(providerUserId: string): void {
-  if (!UUID_PATTERN.test(providerUserId)) {
+  if (!isUuid(providerUserId)) {
     throw new Error("OAuth state provider user ID must be a UUID.");
   }
 }

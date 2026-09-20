@@ -44,6 +44,12 @@ export function validateIdentityFileMetadata(input: {
   return { valid: true };
 }
 
+export function maskPrivateReference(value: string | null): string {
+  const digits = (value ?? "").replace(/\D/g, "");
+  if (digits.length <= 4) return "••••";
+  return `•••• ${digits.slice(-4)}`;
+}
+
 export function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   const kib = bytes / 1024;

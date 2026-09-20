@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Changas — Propuesta Mis servicios mobile (ver antes de aprobar)
+    </title>
+    <style>
+      :root {
+        --canvas: #fff9f3;
+        --surface: #fffdf9;
+        --ink: #202124;
+        --muted: rgba(32, 33, 36, 0.62);
+        --orange: #ff6b35;
+        --orange-d: #c84010;
+        --yellow: #ffc857;
+        --blue: #2563eb;
+        --ok: #2f7d4a;
+        --warn: #9a6500;
+        --line: rgba(32, 33, 36, 0.1);
+        --font:
+          "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: #171310;
+        color: #f3e9de;
+        padding: 26px;
+        display: grid;
+        gap: 20px;
+        justify-items: center;
+      }
+      .cap {
+        width: min(1180px, 100%);
+        font-size: 13px;
+        line-height: 1.65;
+        color: #d8c9bc;
+      }
+      .cap b {
+        color: #fff;
+      }
+      .cap code {
+        color: #ffc857;
+        font-size: 12px;
+      }
+      .toolbar {
+        width: min(1180px, 100%);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .toolbar .lbl {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #a89888;
+        text-transform: uppercase;
+      }
+      .tbtn {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #4a3d33;
+        background: #2c241e;
+        color: #e8d9cb;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .tbtn.on {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #202124;
+      }
+      .frame {
+        width: min(1180px, 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #3a2f28;
+        background: #2b241f;
+        color: var(--ink);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+      }
+      .flabel {
+        padding: 11px 16px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+      }
+      .flabel.old {
+        background: #2a2f38;
+        color: #e8eef7;
+      }
+      .flabel.prop {
+        background: #3a2a10;
+        color: #ffe8a5;
+      }
+      .stage {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 22px 18px;
+        background: #241d17;
+      }
+      .phone {
+        width: 375px;
+        max-width: 100%;
+        height: 740px;
+        background: var(--canvas);
+        border-radius: 32px;
+        overflow-y: auto;
+        border: 10px solid #101010;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      .appbar {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 14px;
+        background: rgba(255, 249, 243, 0.96);
+        border-bottom: 1px solid var(--line);
+        font-size: 16px;
+        font-weight: 800;
+        z-index: 3;
+      }
+      .appbar .bk {
+        font-size: 18px;
+      }
+      .secnav {
+        position: sticky;
+        top: 53px;
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 10px 12px;
+        background: rgba(255, 249, 243, 0.96);
+        border-bottom: 1px solid var(--line);
+        z-index: 2;
+      }
+      .secnav a {
+        flex: 0 0 auto;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 8px 13px;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .mbody {
+        padding: 14px 14px 22px;
+      }
+      .kick {
+        font-size: 10.5px;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        color: var(--orange-d);
+      }
+      .mbody h2 {
+        font-size: 21px;
+        letter-spacing: -0.02em;
+        margin-top: 5px;
+      }
+      .mbody .sub {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-top: 5px;
+        line-height: 1.55;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 900;
+        color: #fff;
+        background: #c0392b;
+        border-radius: 999px;
+        padding: 2px 9px;
+        margin-bottom: 10px;
+        letter-spacing: 0.06em;
+      }
+      .svc {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px;
+        margin-top: 10px;
+      }
+      .svc.dim {
+        opacity: 0.75;
+      }
+      .svc .hd {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: flex-start;
+      }
+      .svc .hd b {
+        font-size: 14.5px;
+      }
+      .svc .hd small {
+        display: block;
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .price {
+        background: #e8effe;
+        color: #1d4ed8;
+        font-size: 11.5px;
+        font-weight: 800;
+        border-radius: 999px;
+        padding: 5px 11px;
+        white-space: nowrap;
+      }
+      .chips {
+        display: flex;
+        gap: 6px;
+        margin-top: 9px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        font-size: 10.5px;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #e5f4ea;
+        color: #1f7a44;
+      }
+      .pill.w {
+        background: #fff1e8;
+        color: var(--warn);
+      }
+      .pill.n {
+        background: #f1efe9;
+        color: #666;
+      }
+      .rowbtns {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .bpausa {
+        flex: 1;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 13px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .bedit {
+        flex: 1;
+        background: var(--orange);
+        border: 0;
+        border-radius: 12px;
+        padding: 13px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+      details.ed {
+        margin-top: 10px;
+        border-top: 1px solid var(--line);
+        padding-top: 6px;
+      }
+      details.ed summary {
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--blue);
+        padding: 10px 2px;
+        list-style: none;
+      }
+      details.ed summary::-webkit-details-marker {
+        display: none;
+      }
+      .fld {
+        display: block;
+        font-size: 13px;
+        font-weight: 800;
+        margin-top: 10px;
+      }
+      .fld input,
+      .fld select,
+      .fld textarea {
+        display: block;
+        width: 100%;
+        margin-top: 6px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        background: #fff;
+      }
+      .go {
+        width: 100%;
+        border: 0;
+        background: var(--orange);
+        border-radius: 12px;
+        padding: 14px;
+        font: inherit;
+        font-size: 13.5px;
+        font-weight: 900;
+        margin-top: 12px;
+        cursor: pointer;
+      }
+      .danger {
+        background: none;
+        border: 0;
+        color: var(--danger);
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 700;
+        margin-top: 10px;
+        cursor: pointer;
+        padding: 10px 2px;
+      }
+      .new {
+        border: 1.5px dashed var(--line);
+        border-radius: 16px;
+        padding: 16px;
+        margin-top: 14px;
+        text-align: center;
+        font-size: 13.5px;
+        font-weight: 800;
+        background: #fff;
+        cursor: pointer;
+        width: 100%;
+        font: inherit;
+      }
+      .legend {
+        width: min(1180px, 100%);
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: #d8c9bc;
+      }
+      .legend b {
+        color: #fff;
+      }
+      .legend code {
+        color: #ffc857;
+        font-size: 11.5px;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="cap">
+      <b>Changas · Propuesta Mis servicios mobile (ver antes de aprobar).</b>
+      Teléfonos de <b>375px</b>: cada servicio renderiza su formulario completo
+      inline — con 3 servicios el scroll no termina. Nada se implementa hasta
+      que apruebes.
+    </p>
+
+    <div class="toolbar">
+      <span class="lbl">Vista</span>
+      <button class="tbtn on" data-v="all">Todo</button>
+      <button class="tbtn" data-v="hoy">Hoy</button>
+      <button class="tbtn" data-v="nuevo">Propuesta</button>
+    </div>
+
+    <div class="frame" data-s="hoy">
+      <div class="flabel old">
+        ▣ MANAGE HOY — form completo por servicio
+        (<code>marketplace-management.tsx:764-814</code>)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Mis servicios</div>
+          <div class="mbody">
+            <span class="tag"
+              >HOY · 3 servicios = 3 formularios enteros apilados</span
+            >
+            <div class="svc">
+              <div class="hd">
+                <div>
+                  <b>Reparación de grifería</b
+                  ><small>reparacion-griferia · publicado</small>
+                </div>
+                <span class="price">Desde $8.000</span>
+              </div>
+              <label class="fld"
+                >Título<input value="Reparación de grifería"
+              /></label>
+              <label class="fld">Precio<input value="8000" /></label>
+              <label class="fld"
+                >Modalidad<select>
+                  <option>Presencial</option>
+                </select></label
+              >
+              <label class="fld"
+                >Descripción<textarea rows="2">Diagnóstico en el día…</textarea>
+              </label>
+              <div class="rowbtns">
+                <button class="bpausa">Pausar servicio</button
+                ><button class="bedit">Guardar</button>
+              </div>
+            </div>
+            <div class="svc">
+              <div class="hd">
+                <div>
+                  <b>Destapaciones 24h</b
+                  ><small>destapaciones · publicado</small>
+                </div>
+                <span class="price">Desde $12.000</span>
+              </div>
+              <label class="fld"
+                >Título<input value="Destapaciones 24h"
+              /></label>
+              <label class="fld">Precio<input value="12000" /></label>
+              <p style="font-size: 12px; color: #999; margin-top: 8px">
+                …y 8 campos más por servicio ↓
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="nuevo">
+      <div class="flabel prop">
+        ▣ MANAGE PROPUESTO — resumen + editar colapsado (interactivo)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar"><span class="bk">←</span> Mis servicios</div>
+          <div class="secnav">
+            <a href="#" onclick="return false;">Perfil</a
+            ><a href="#" onclick="return false;">Habilidades</a
+            ><a href="#" onclick="return false;">Servicios</a
+            ><a href="#" onclick="return false;">Trayectoria</a
+            ><a href="#" onclick="return false;">Zonas</a>
+          </div>
+          <div class="mbody">
+            <p class="kick">OFERTAS CONCRETAS</p>
+            <h2>Ofertas concretas</h2>
+            <p class="sub">
+              Pausá, editá o creá servicios. Publicar requiere perfil ACTIVE.
+            </p>
+            <div class="svc" id="s1">
+              <div class="hd">
+                <div>
+                  <b>Reparación de grifería</b
+                  ><small>reparacion-griferia</small>
+                </div>
+                <span class="price">$8.000</span>
+              </div>
+              <div class="chips">
+                <span class="pill" data-st>Publicado</span
+                ><span class="pill" data-st2>Visible</span>
+              </div>
+              <div class="rowbtns">
+                <button class="bpausa" id="bpause">Pausar servicio</button>
+              </div>
+              <details class="ed">
+                <summary>Editar servicio ›</summary>
+                <label class="fld"
+                  >Título<input value="Reparación de grifería"
+                /></label>
+                <label class="fld">Precio<input value="8000" /></label>
+                <label class="fld"
+                  >Modalidad<select>
+                    <option>Presencial</option>
+                  </select></label
+                >
+                <button class="go">Guardar cambios</button>
+                <button class="danger">Eliminar servicio</button>
+              </details>
+            </div>
+            <div class="svc">
+              <div class="hd">
+                <div><b>Destapaciones 24h</b><small>destapaciones</small></div>
+                <span class="price">$12.000</span>
+              </div>
+              <div class="chips">
+                <span class="pill">Publicado</span
+                ><span class="pill">Visible</span>
+              </div>
+              <div class="rowbtns">
+                <button class="bpausa">Pausar servicio</button>
+              </div>
+              <details class="ed">
+                <summary>Editar servicio ›</summary>
+                <label class="fld"
+                  >Título<input value="Destapaciones 24h"
+                /></label>
+                <button class="go">Guardar cambios</button>
+              </details>
+            </div>
+            <button class="new">+ Nuevo servicio</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>Si aprobás, implemento así (sin código todavía):</b> tarjeta resumen
+      por servicio (título, slug, precio con <code>formatServicePrice</code>,
+      chips publicado/pausado, acción Pausar/Reanudar visible) +
+      <code>ServiceForm</code> existente movido dentro de
+      <code>&lt;details&gt;</code> + eliminar junto al guardar (no más fila
+      separada) + mini-nav sticky de secciones con anclas (<code
+        >Perfil, Habilidades, Servicios…</code
+      >). Sin tocar actions, validaciones ni RLS. Tests en
+      <code>lib/ui/provider-marketplace-ui.test.ts</code>. Decime qué aprobar /
+      ajustar.
+    </div>
+
+    <script>
+      document.querySelectorAll("[data-v]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("[data-v]")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            const v = b.dataset.v;
+            document
+              .querySelectorAll(".frame")
+              .forEach(
+                (f) =>
+                  (f.style.display =
+                    v === "all" || f.dataset.s === v ? "" : "none"),
+              );
+          }),
+      );
+      document.getElementById("bpause").onclick = (e) => {
+        const b = e.target,
+          c = b.closest(".svc");
+        const paused = b.textContent.includes("Pausar");
+        b.textContent = paused ? "Reanudar servicio" : "Pausar servicio";
+        c.classList.toggle("dim", paused);
+        c.querySelector("[data-st]").textContent = paused
+          ? "Pausado"
+          : "Publicado";
+        c.querySelector("[data-st]").className = paused ? "pill w" : "pill";
+        c.querySelector("[data-st2]").textContent = paused
+          ? "Oculto"
+          : "Visible";
+      };
+    </script>
+  </body>
+</html>

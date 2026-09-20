@@ -174,16 +174,3 @@ export async function updatePrivateIdentity(
     ? { error: "No pudimos guardar tu información privada." }
     : { success: "Datos privados actualizados." };
 }
-
-export async function updateAccount(
-  previousState: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  const publicResult = await updatePublicProfile(previousState, formData);
-  if (publicResult.error) return publicResult;
-
-  const privateResult = await updatePrivateIdentity(previousState, formData);
-  if (privateResult.error) return privateResult;
-
-  return { success: "Perfil actualizado." };
-}

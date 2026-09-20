@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Changas — Propuesta conversación: composer y contraoferta mobile (ver
+      antes de aprobar)
+    </title>
+    <style>
+      :root {
+        --canvas: #fff9f3;
+        --ink: #202124;
+        --muted: rgba(32, 33, 36, 0.62);
+        --orange: #ff6b35;
+        --orange-d: #c84010;
+        --yellow: #ffc857;
+        --ok: #2f7d4a;
+        --err: #c0392b;
+        --line: rgba(32, 33, 36, 0.1);
+        --font:
+          "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: #171310;
+        color: #f3e9de;
+        padding: 26px;
+        display: grid;
+        gap: 20px;
+        justify-items: center;
+      }
+      .cap {
+        width: min(1180px, 100%);
+        font-size: 13px;
+        line-height: 1.65;
+        color: #d8c9bc;
+      }
+      .cap b {
+        color: #fff;
+      }
+      .cap code {
+        color: #ffc857;
+        font-size: 12px;
+      }
+      .toolbar {
+        width: min(1180px, 100%);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .toolbar .lbl {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #a89888;
+        text-transform: uppercase;
+      }
+      .tbtn {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #4a3d33;
+        background: #2c241e;
+        color: #e8d9cb;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .tbtn.on {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #202124;
+      }
+      .frame {
+        width: min(1180px, 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #3a2f28;
+        background: #2b241f;
+        color: var(--ink);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+      }
+      .flabel {
+        padding: 11px 16px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+      }
+      .flabel.old {
+        background: #2a2f38;
+        color: #e8eef7;
+      }
+      .flabel.prop {
+        background: #3a2a10;
+        color: #ffe8a5;
+      }
+      .stage {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 22px 18px;
+        background: #241d17;
+      }
+      .phone {
+        width: 375px;
+        max-width: 100%;
+        height: 740px;
+        background: var(--canvas);
+        border-radius: 32px;
+        overflow-y: auto;
+        border: 10px solid #101010;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      .appbar {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px;
+        background: rgba(255, 249, 243, 0.96);
+        border-bottom: 1px solid var(--line);
+        font-size: 15px;
+        font-weight: 800;
+        z-index: 2;
+      }
+      .appbar .bk {
+        font-size: 18px;
+      }
+      .mbody {
+        padding: 16px 14px 24px;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 900;
+        color: #fff;
+        background: #c0392b;
+        border-radius: 999px;
+        padding: 2px 9px;
+        margin-bottom: 10px;
+        letter-spacing: 0.06em;
+      }
+      .tag.ok {
+        background: var(--ok);
+      }
+      .card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 6px 18px rgba(32, 33, 36, 0.06);
+      }
+      .sum {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
+        font-weight: 800;
+      }
+      .plus {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: #ffe9dc;
+        color: var(--orange-d);
+        font-size: 20px;
+        flex: 0 0 36px;
+      }
+      .fld {
+        margin-top: 12px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .fld input,
+      .fld select,
+      .fld textarea {
+        display: block;
+        width: 100%;
+        margin-top: 6px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+        font: inherit;
+        font-size: 15px;
+        background: #fff;
+        color: var(--ink);
+      }
+      .rowbtn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .btn-ink {
+        flex: 1;
+        min-height: 52px;
+        border: 0;
+        border-radius: 12px;
+        background: var(--ink);
+        color: #fff;
+        font: inherit;
+        font-size: 15px;
+        font-weight: 800;
+      }
+      .btn-tiny {
+        border: 0;
+        border-radius: 999px;
+        background: var(--ink);
+        color: #fff;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 8px 16px;
+      }
+      .fb {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .banner {
+        margin-top: 12px;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+      .banner.ok {
+        background: rgba(47, 125, 74, 0.1);
+        color: var(--ok);
+      }
+      .banner.err {
+        background: rgba(192, 57, 43, 0.07);
+        color: var(--err);
+      }
+      .counter {
+        margin-top: 12px;
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+      }
+      .counter summary {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--orange-d);
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+      .sim {
+        margin-top: 12px;
+        border: 1px solid rgba(47, 125, 74, 0.25);
+        background: rgba(47, 125, 74, 0.05);
+        border-radius: 12px;
+        padding: 12px;
+      }
+      .sim p {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--ok);
+      }
+      .sim .opts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .sim button {
+        border: 1px solid rgba(47, 125, 74, 0.25);
+        background: #fff;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font: inherit;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .sim button.big {
+        min-height: 44px;
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+      .gapsec {
+        height: 26px;
+      }
+      .legend {
+        width: min(1180px, 100%);
+        background: #221b16;
+        border: 1px solid #3a2f28;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: #d8c9bc;
+      }
+      .legend b {
+        color: #fff;
+      }
+      .legend code {
+        color: #ffc857;
+        font-size: 11.5px;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="cap">
+      <b
+        >Changas · Propuesta conversación: composer + contraoferta (ver antes de
+        aprobar).</b
+      >
+      Teléfonos de <b>375px</b>: HOY el envío de contraoferta usa un botón de
+      ~28px y los mensajes de estado van en 11px; PROPUESTO lleva todo a targets
+      de 44–52px y banners legibles. Nada se implementa hasta que apruebes.
+    </p>
+
+    <div class="toolbar">
+      <span class="lbl">Vista</span>
+      <button class="tbtn on" data-v="all">Todo</button>
+      <button class="tbtn" data-v="hoy">Hoy</button>
+      <button class="tbtn" data-v="nuevo">Propuesta</button>
+    </div>
+
+    <div class="frame" data-s="hoy">
+      <div class="flabel old">
+        ▣ COMPOSER + CONTRAOFERTA HOY — botón tiny, feedback 11px (<code
+          >proposal-composer.tsx:91-109 · proposal-card.tsx:194-240</code
+        >)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar">
+            <span class="bk">‹</span> Martín P. · Plomería
+          </div>
+          <div class="mbody">
+            <span class="tag">HOY · contraoferta: botón ~28px</span>
+            <div class="card">
+              <p style="font-size: 13px; font-weight: 800">
+                Cotización · $9.500
+              </p>
+              <p
+                style="
+                  font-size: 12.5px;
+                  color: var(--muted);
+                  margin-top: 4px;
+                  line-height: 1.5;
+                "
+              >
+                Reparación de grifería, repuestos incluidos.
+              </p>
+              <div class="counter">
+                <summary>Responder con contraoferta</summary>
+                <div class="fld">
+                  Alcance<textarea rows="2">Lo mismo sin repuestos</textarea>
+                </div>
+                <div class="fld">Precio<input value="7500" /></div>
+                <div class="rowbtn">
+                  <button class="btn-tiny">Enviar respuesta</button>
+                </div>
+                <p class="fb" style="margin-top: 8px">
+                  Revisá el precio antes de enviar… (11px)
+                </p>
+              </div>
+            </div>
+            <div class="gapsec"></div>
+            <span class="tag">HOY · composer: estado en 11-12px</span>
+            <div class="card">
+              <div class="sum">
+                <span class="plus">+</span> Enviar una cotización
+              </div>
+              <div class="fld">
+                Precio ARS<input placeholder="Dejar vacío si es a cotizar" />
+              </div>
+              <div class="rowbtn">
+                <button class="btn-ink">Enviar propuesta</button>
+                <span class="fb">Guardando…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-s="nuevo">
+      <div class="flabel prop">
+        ✦ PROPUESTA — targets 44–52px + banners de estado (mismas actions)
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="appbar">
+            <span class="bk">‹</span> Martín P. · Plomería
+          </div>
+          <div class="mbody">
+            <span class="tag ok">PROPUESTO · contraoferta full-width 52px</span>
+            <div class="card">
+              <p style="font-size: 13px; font-weight: 800">
+                Cotización · $9.500
+              </p>
+              <p
+                style="
+                  font-size: 12.5px;
+                  color: var(--muted);
+                  margin-top: 4px;
+                  line-height: 1.5;
+                "
+              >
+                Reparación de grifería, repuestos incluidos.
+              </p>
+              <div class="counter">
+                <summary>Responder con contraoferta</summary>
+                <div class="fld">
+                  Alcance<textarea rows="2">Lo mismo sin repuestos</textarea>
+                </div>
+                <div class="fld">Precio<input value="7500" /></div>
+                <button class="btn-ink" style="width: 100%; margin-top: 14px">
+                  Enviar respuesta
+                </button>
+                <div class="banner ok">
+                  ✓ Contraoferta enviada. Martín tiene 48 h para responder.
+                </div>
+              </div>
+            </div>
+            <div class="gapsec"></div>
+            <span class="tag ok">PROPUESTO · composer con banner</span>
+            <div class="card">
+              <div class="sum">
+                <span class="plus">+</span> Enviar una cotización
+              </div>
+              <div class="fld">
+                Precio ARS<input placeholder="Dejar vacío si es a cotizar" />
+              </div>
+              <div class="banner err">
+                ⚠ Indicá un precio o dejalo vacío solo si es a cotizar.
+              </div>
+              <button class="btn-ink" style="width: 100%; margin-top: 14px">
+                Enviar propuesta
+              </button>
+            </div>
+            <div class="gapsec"></div>
+            <span class="tag ok">PROPUESTO · sim dev con targets 44px</span>
+            <div class="sim">
+              <p>Pago simulado · solo desarrollo</p>
+              <div class="opts">
+                <button class="big">Simular aprobado</button>
+                <button class="big">Simular pendiente</button>
+                <button class="big">Simular fallo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>Cambios propuestos (solo UI, mismas actions y estados).</b><br />
+      1) <code>proposal-card.tsx</code> contraoferta: submit pasa de
+      <code>rounded-full px-4 py-2 text-xs</code> a botón 52px full-width +
+      mensaje de estado como banner 13px con <code>role</code>.<br />
+      2) <code>proposal-composer.tsx</code>: mensaje junto al botón pasa a
+      banner superior 13px; éxito con <code>role="status"</code>, error con tono
+      <code>danger</code> (hoy <code>terracotta</code>).<br />
+      3) Bloque de pago simulado (solo dev): botones a 44px para probar en el
+      teléfono real.<br />
+      Sin cambios de actions, validaciones ni flujos.
+    </div>
+
+    <script>
+      document.querySelectorAll(".tbtn").forEach((b) =>
+        b.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tbtn")
+            .forEach((x) => x.classList.remove("on"));
+          b.classList.add("on");
+          const v = b.dataset.v;
+          document.querySelectorAll(".frame").forEach((f) => {
+            f.classList.toggle("hidden", v !== "all" && f.dataset.s !== v);
+          });
+        }),
+      );
+    </script>
+  </body>
+</html>
