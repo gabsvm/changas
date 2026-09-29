@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { animatePanelEntrance } from "@/lib/ui/panel-motion";
+import { useDialogFocus } from "@/lib/ui/use-dialog-focus";
 
 import {
   adminMoreItems,
@@ -52,9 +55,19 @@ function NavIcon({ id }: { id: AdminNavigationId | "more" }) {
 export function AdminNavigation() {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
+  const motionRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const moreActive = adminMoreItems.some((item) =>
     isAdminNavigationItemActive(pathname, item.href),
   );
+
+  useDialogFocus(moreOpen, dialogRef, closeRef, () => setMoreOpen(false));
+
+  useEffect(() => {
+    if (!moreOpen || !motionRef.current) return;
+    return animatePanelEntrance(motionRef.current);
+  }, [moreOpen]);
 
   return (
     <>
@@ -85,15 +98,25 @@ export function AdminNavigation() {
       </aside>
 
       {moreOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden" role="presentation">
+        <div
+          ref={motionRef}
+          className="fixed inset-0 z-50 lg:hidden"
+          role="presentation"
+        >
           <button
             aria-label="Cerrar menú"
             className="absolute inset-0 bg-black/65 backdrop-blur-sm"
+            data-motion-backdrop
             onClick={() => setMoreOpen(false)}
             type="button"
           />
           <section
-            aria-label="Más secciones administrativas"
+            ref={dialogRef}
+            id="admin-more-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-more-menu-title"
+            data-motion-panel
             className="mobile-safe-bottom absolute right-0 bottom-0 left-0 rounded-t-[2rem] border-t border-[#2a3445] bg-[#121923] px-4 pt-4 pb-[calc(5rem+env(safe-area-inset-bottom))] shadow-2xl"
           >
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#3a4557]" />
@@ -102,9 +125,15 @@ export function AdminNavigation() {
                 <p className="text-xs font-extrabold tracking-[0.14em] text-[#ff6b35] uppercase">
                   Administración
                 </p>
-                <h2 className="mt-1 text-xl font-extrabold text-white">Más herramientas</h2>
+                <h2
+                  id="admin-more-menu-title"
+                  className="mt-1 text-xl font-extrabold text-white"
+                >
+                  Más herramientas
+                </h2>
               </div>
               <button
+                ref={closeRef}
                 className="grid min-h-12 min-w-12 place-items-center rounded-2xl border border-[#2a3445] bg-[#0d131d] text-[#98a2b3]"
                 onClick={() => setMoreOpen(false)}
                 type="button"
@@ -160,6 +189,8 @@ export function AdminNavigation() {
         })}
         <button
           aria-expanded={moreOpen}
+          aria-controls="admin-more-menu"
+          aria-haspopup="dialog"
           className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[0.65rem] font-extrabold ${
             moreActive || moreOpen ? "text-[#ff7b4c]" : "text-[#7f8a9b]"
           }`}

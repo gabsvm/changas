@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
+
+import { animatePanelEntrance } from "@/lib/ui/panel-motion";
+import { useDialogFocus } from "@/lib/ui/use-dialog-focus";
 
 export function BottomSheet({
   open,
@@ -16,31 +19,37 @@ export function BottomSheet({
   closeLabel?: string;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
+  const titleId = useId();
+
+  useDialogFocus(open, dialogRef, closeRef, onClose);
 
   useEffect(() => {
-    if (!open) return;
-    closeRef.current?.focus();
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onClose, open]);
+    if (!open || !rootRef.current) return;
+    return animatePanelEntrance(rootRef.current);
+  }, [open]);
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center">
+    <div
+      ref={rootRef}
+      className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
+    >
       <button
         type="button"
         className="absolute inset-0 bg-black/40"
+        data-motion-backdrop
         aria-label={closeLabel ?? `Cerrar ${title}`}
         onClick={onClose}
       />
       <section
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="marketplace-sheet-title"
+        aria-labelledby={titleId}
+        data-motion-panel
         className="mobile-safe-bottom bg-surface relative z-10 max-h-[88dvh] w-full overflow-y-auto rounded-t-[1.25rem] px-4 pt-3 pb-4 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] sm:max-w-xl sm:rounded-2xl sm:p-5"
       >
         <div
@@ -49,7 +58,7 @@ export function BottomSheet({
         />
         <div className="flex min-h-14 items-center justify-between gap-4">
           <h2
-            id="marketplace-sheet-title"
+            id={titleId}
             className="text-lg font-extrabold tracking-[-0.02em]"
           >
             {title}

@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { useDialogFocus } from "@/lib/ui/use-dialog-focus";
 
 type IdentityDocument = {
   id: string;
@@ -15,20 +17,21 @@ export function IdentityDocumentPreview({
 }) {
   const [selected, setSelected] = useState<IdentityDocument | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useDialogFocus(Boolean(selected), dialogRef, closeRef, () =>
+    setSelected(null),
+  );
 
   useEffect(() => {
     if (!selected) return;
 
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelected(null);
-    };
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", closeOnEscape);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", closeOnEscape);
     };
   }, [selected]);
 
@@ -67,6 +70,7 @@ export function IdentityDocumentPreview({
           }}
         >
           <div
+            ref={dialogRef}
             className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-3xl border border-[#273142] bg-[#101720] p-4 shadow-2xl"
             role="dialog"
             aria-modal="true"
@@ -80,6 +84,7 @@ export function IdentityDocumentPreview({
                 {selected.documentType}
               </h2>
               <button
+                ref={closeRef}
                 className="min-h-11 rounded-xl px-3 text-sm font-bold text-[#d0d5dd] hover:bg-white/10"
                 type="button"
                 onClick={() => setSelected(null)}

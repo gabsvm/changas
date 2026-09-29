@@ -216,13 +216,26 @@ test.describe("Phase 09 admin trust and safety", () => {
       identityCard.getByText("En revisión", { exact: true }),
     ).toBeVisible();
 
-    await page.getByRole("button", { name: "DNI frente" }).click();
+    const documentTrigger = page.getByRole("button", { name: "DNI frente" });
+    await documentTrigger.click();
     const documentPreview = page.getByRole("dialog");
+    await expect(documentPreview).toBeVisible();
+    const closePreview = documentPreview.getByRole("button", {
+      name: "Cerrar",
+    });
+    await expect(closePreview).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(closePreview).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(documentPreview).toBeHidden();
+    await expect(documentTrigger).toBeFocused();
+
+    await documentTrigger.click();
     await expect(documentPreview).toBeVisible();
     await expect(
       documentPreview.getByAltText("Vista previa de DNI frente"),
     ).toBeVisible();
-    await documentPreview.getByRole("button", { name: "Cerrar" }).click();
+    await closePreview.click();
     await expect(documentPreview).toBeHidden();
 
     const signedResponse = await page.request.get(

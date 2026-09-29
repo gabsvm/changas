@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { manualLocations } from "@changas/domain";
+import { useDialogFocus } from "@/lib/ui/use-dialog-focus";
 
 export const browserLocationStorageKey = "changas:search-location";
 
@@ -46,6 +47,15 @@ export function LocationPicker({
   );
   const [locationMessage, setLocationMessage] = useState<string | null>(null);
   const [locationSheetOpen, setLocationSheetOpen] = useState(false);
+  const locationDialogRef = useRef<HTMLDivElement>(null);
+  const locationCloseRef = useRef<HTMLButtonElement>(null);
+
+  useDialogFocus(
+    locationSheetOpen,
+    locationDialogRef,
+    locationCloseRef,
+    () => setLocationSheetOpen(false),
+  );
 
   function clearDeviceLocation() {
     window.sessionStorage.removeItem(browserLocationStorageKey);
@@ -171,6 +181,7 @@ export function LocationPicker({
             onClick={() => setLocationSheetOpen(false)}
           >
             <div
+              ref={locationDialogRef}
               className="location-picker-sheet bg-surface w-full max-w-lg overflow-y-auto rounded-[1.5rem] border border-white/80 p-5 shadow-[0_24px_70px_rgba(32,33,36,0.2)] sm:p-6"
               role="dialog"
               aria-modal="true"
@@ -190,6 +201,7 @@ export function LocationPicker({
                   </h2>
                 </div>
                 <button
+                  ref={locationCloseRef}
                   className="consumer-pressable text-ink/55 hover:bg-ink/[0.05] grid h-10 w-10 shrink-0 place-items-center rounded-full text-2xl leading-none"
                   type="button"
                   onClick={() => setLocationSheetOpen(false)}

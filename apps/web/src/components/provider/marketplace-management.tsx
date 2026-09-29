@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { formatServicePrice, minorUnitsToMajorInput } from "@changas/domain";
 
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
 import { compressInputFiles } from "@/lib/media/image-compression";
+import { animateConfirmedSave } from "@/lib/ui/panel-motion";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -61,6 +62,7 @@ function ActionForm({
     action,
     initialActionState,
   );
+  const successRef = useRef<HTMLParagraphElement>(null);
   const [compressing, setCompressing] = useState(false);
   const [compressionError, setCompressionError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -69,6 +71,11 @@ function ActionForm({
     mimeType: string;
     size: number;
   } | null>(null);
+
+  useEffect(() => {
+    if (!successRef.current) return;
+    return animateConfirmedSave(successRef.current, state.success);
+  }, [state]);
 
   async function handleFileChange(event: React.ChangeEvent<HTMLFormElement>) {
     const input = event.target;
@@ -163,6 +170,8 @@ function ActionForm({
       ) : null}
       {state.success ? (
         <p
+          ref={successRef}
+          data-motion-save
           className="bg-moss/10 text-moss rounded-xl px-4 py-3 text-sm"
           role="status"
           aria-live="polite"

@@ -192,10 +192,11 @@ test.describe("admin mobile revamp and provider operations", () => {
       }
 
       await nav.getByRole("button", { name: "Más" }).click();
-      const sheet = page.getByRole("region", {
-        name: "Más secciones administrativas",
+      const sheet = page.getByRole("dialog", {
+        name: "Más herramientas",
       });
       await expect(sheet).toBeVisible();
+      await expect(sheet.getByRole("button", { name: "Cerrar" })).toBeFocused();
       for (const label of [
         "Prestadores",
         "Catálogo",
@@ -206,8 +207,15 @@ test.describe("admin mobile revamp and provider operations", () => {
       ]) {
         await expect(sheet.getByRole("link", { name: label })).toBeVisible();
       }
-      await sheet.getByRole("button", { name: "Cerrar" }).click();
+      await page.keyboard.press("Shift+Tab");
+      await expect(
+        sheet.getByRole("link", { name: "Auditoría" }),
+      ).toBeFocused();
+      await page.keyboard.press("Tab");
+      await expect(sheet.getByRole("button", { name: "Cerrar" })).toBeFocused();
+      await page.keyboard.press("Escape");
       await expect(sheet).toBeHidden();
+      await expect(nav.getByRole("button", { name: "Más" })).toBeFocused();
     }
   });
 

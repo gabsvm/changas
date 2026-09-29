@@ -78,6 +78,17 @@ test.describe("Phase 02 mobile web smoke", () => {
         page.getByRole("heading", { name: /Tu marketplace, Proveedor E2E/ }),
       ).toBeVisible();
       await expect(page.getByText("Habilidades que ofrecés")).toBeVisible();
+
+      await page
+        .getByRole("button", { name: "Guardar perfil público" })
+        .click();
+      const saved = page.getByRole("status").filter({
+        hasText: "Configuración pública guardada.",
+      });
+      await expect(saved).toBeVisible();
+      await expect
+        .poll(() => saved.evaluate((element) => element.getAnimations().length))
+        .toBeGreaterThan(0);
     } finally {
       if (userId) {
         await adminRequest(`/auth/v1/admin/users/${userId}`, {
