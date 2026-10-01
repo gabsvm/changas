@@ -7,6 +7,29 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
+const DISMISSED_KEY = "changas:install-dismissed-at";
+const DISMISS_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
+
+function wasRecentlyDismissed(): boolean {
+  try {
+    const stored = window.localStorage.getItem(DISMISSED_KEY);
+    const timestamp = stored === null ? Number.NaN : Number(stored);
+    return (
+      Number.isFinite(timestamp) && Date.now() - timestamp < DISMISS_DURATION_MS
+    );
+  } catch {
+    return false;
+  }
+}
+
+function persistDismissal(): void {
+  try {
+    window.localStorage.setItem(DISMISSED_KEY, String(Date.now()));
+  } catch {
+    // Storage can be unavailable (private mode, blocked site data).
+  }
+}
+
 function isStandalone(): boolean {
   const displayModeStandalone = window.matchMedia(
     "(display-mode: standalone)",
@@ -27,6 +50,11 @@ export function InstallPrompt() {
   const [showIosGuide, setShowIosGuide] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
+  function dismiss() {
+    persistDismissal();
+    setDismissed(true);
+  }
+
   async function installApp() {
     if (!deferredPrompt) return;
 
@@ -34,12 +62,12 @@ export function InstallPrompt() {
     const choice = await deferredPrompt.userChoice;
     setDeferredPrompt(null);
     if (choice.outcome === "accepted") {
-      setDismissed(true);
+      dismiss();
     }
   }
 
   useEffect(() => {
-    if (isStandalone()) return;
+    if (isStandalone() || wasRecentlyDismissed()) return;
 
     if (isIosDevice()) {
       queueMicrotask(() => setShowIosGuide(true));
@@ -53,6 +81,7 @@ export function InstallPrompt() {
     function handleInstalled() {
       setDeferredPrompt(null);
       setShowIosGuide(false);
+      persistDismissal();
       setDismissed(true);
     }
 
@@ -72,7 +101,7 @@ export function InstallPrompt() {
 
   return (
     <aside
-      className="border-ink/10 bg-canvas/96 text-ink fixed right-3 bottom-2 left-3 z-[60] mx-auto flex max-h-[calc(100dvh-1rem)] max-w-lg flex-col overflow-hidden rounded-[1.5rem] border shadow-[0_-18px_50px_rgba(32,33,36,0.18)] backdrop-blur-xl sm:right-4 sm:bottom-4 sm:left-4"
+      className="border-ink/10 bg-canvas/96 text-ink fixed right-3 bottom-[calc(var(--mobile-bottom-nav-height)+0.5rem)] left-3 z-[60] mx-auto flex max-h-[calc(100dvh-1rem)] max-w-lg flex-col overflow-hidden rounded-[1.5rem] border shadow-[0_-18px_50px_rgba(32,33,36,0.18)] backdrop-blur-xl sm:right-4 sm:bottom-4 sm:left-4"
       aria-label="Instalar Changas"
       role="dialog"
       aria-modal="false"
@@ -94,7 +123,7 @@ export function InstallPrompt() {
           <button
             className="consumer-pressable text-ink/55 hover:bg-ink/[0.05] inline-flex min-h-10 shrink-0 items-center rounded-full px-3 text-sm font-semibold"
             type="button"
-            onClick={() => setDismissed(true)}
+            onClick={dismiss}
             aria-label="Cerrar sugerencia de instalación"
           >
             Cerrar
