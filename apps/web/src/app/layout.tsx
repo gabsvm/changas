@@ -6,6 +6,7 @@ import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 
 import "./globals.css";
+import "./contrast.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],

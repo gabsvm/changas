@@ -91,10 +91,10 @@ export default async function HomePage() {
         <div className="pt-4 sm:pt-9">
           <section
             aria-labelledby="home-search-title"
-            className="brand-gradient-surface relative overflow-hidden rounded-[1.25rem] p-5 text-white shadow-[var(--consumer-shadow-hero)] sm:p-7"
+            className="brand-gradient-surface text-ink relative overflow-hidden rounded-[1.25rem] p-5 shadow-[var(--consumer-shadow-hero)] sm:p-7"
           >
             <div className="relative z-10 max-w-2xl">
-              <p className="text-xs font-extrabold tracking-[0.12em] text-white/80 uppercase">
+              <p className="text-ink/85 text-xs font-extrabold tracking-[0.12em] uppercase">
                 Tu mercado de tareas rápidas
               </p>
               <h1
@@ -103,24 +103,24 @@ export default async function HomePage() {
               >
                 Encontrá a alguien que lo haga.
               </h1>
-              <p className="mt-2 max-w-lg text-sm leading-6 text-white/90 sm:text-base">
+              <p className="text-ink/85 mt-2 max-w-lg text-sm leading-6 sm:text-base">
                 Oficios verificables cerca tuyo o por videollamada. Buscá una
                 vez y elegí con precios claros.
               </p>
               <div
-                className="mt-4 inline-flex rounded-full border border-white/30 bg-black/20 p-1"
+                className="border-ink/15 mt-4 inline-flex gap-1 rounded-full border bg-white/40 p-1"
                 role="group"
                 aria-label="Elegir modalidad"
               >
                 <Link
                   href="/buscar?mode=presencial"
-                  className="consumer-pressable text-ink inline-flex min-h-10 items-center rounded-full bg-white px-4 text-[13px] font-extrabold"
+                  className="consumer-pressable text-ink inline-flex min-h-10 items-center rounded-full bg-white px-4 text-[13px] font-bold"
                 >
-                  Cerca mío
+                  Presencial
                 </Link>
                 <Link
                   href="/buscar?mode=remoto"
-                  className="consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold text-white hover:bg-white/10"
+                  className="consumer-pressable text-ink inline-flex min-h-10 items-center rounded-full bg-white px-4 text-[13px] font-bold"
                 >
                   Remoto
                 </Link>
