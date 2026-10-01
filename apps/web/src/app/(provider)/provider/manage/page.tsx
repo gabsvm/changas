@@ -6,7 +6,10 @@ import { MarketplaceManagement } from "@/components/provider/marketplace-managem
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
-import { getProviderPaymentAccountState } from "@/lib/payments/server";
+import {
+  getProviderPaymentAccountState,
+  type ProviderPaymentAccountState,
+} from "@/lib/payments/server";
 import { createClient } from "@/lib/supabase/server";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 
@@ -52,20 +55,20 @@ export default async function ProviderMarketplaceManagePage({
   if (!user) redirect("/login?next=/provider/manage");
 
   const [
-    { data: provider },
-    { data: profile },
-    { data: skills },
-    { data: categories },
-    { data: providerSkills },
-    { data: services },
-    { data: serviceTags },
-    { data: experiences },
-    { data: education },
-    { data: certifications },
-    { data: portfolioItems },
-    { data: serviceAreas },
-    { data: availabilityRules },
-    { data: availabilityBlocks },
+    providerResult,
+    profileResult,
+    skillsResult,
+    categoriesResult,
+    providerSkillsResult,
+    servicesResult,
+    serviceTagsResult,
+    experiencesResult,
+    educationResult,
+    certificationsResult,
+    portfolioItemsResult,
+    serviceAreasResult,
+    availabilityRulesResult,
+    availabilityBlocksResult,
   ] = await Promise.all([
     supabase
       .from("provider_profiles")
@@ -133,6 +136,52 @@ export default async function ProviderMarketplaceManagePage({
       .order("starts_at"),
   ]);
 
+  const provider = providerResult.data;
+  const profile = profileResult.data;
+  const skills = skillsResult.data;
+  const categories = categoriesResult.data;
+  const providerSkills = providerSkillsResult.data;
+  const services = servicesResult.data;
+  const serviceTags = serviceTagsResult.data;
+  const experiences = experiencesResult.data;
+  const education = educationResult.data;
+  const certifications = certificationsResult.data;
+  const portfolioItems = portfolioItemsResult.data;
+  const serviceAreas = serviceAreasResult.data;
+  const availabilityRules = availabilityRulesResult.data;
+  const availabilityBlocks = availabilityBlocksResult.data;
+
+  const loadFailed = [
+    providerResult,
+    skillsResult,
+    categoriesResult,
+    providerSkillsResult,
+    servicesResult,
+    serviceTagsResult,
+    experiencesResult,
+    educationResult,
+    certificationsResult,
+    portfolioItemsResult,
+    serviceAreasResult,
+    availabilityRulesResult,
+    availabilityBlocksResult,
+  ].some((result) => result.error);
+
+  if (providerResult.error) {
+    return (
+      <section className="pb-6 sm:py-14">
+        <MobileAppBar title="Gestionar servicios" backHref="/account" />
+        <EmptyState
+          title="No pudimos cargar tu perfil"
+          description="Hubo un problema al leer tus datos. Recargá la página en unos segundos."
+          actionHref="/provider/manage"
+          actionLabel="Reintentar"
+          className="pt-16"
+        />
+      </section>
+    );
+  }
+
   if (!provider) {
     return (
       <section className="pb-6 sm:py-14">
@@ -148,8 +197,15 @@ export default async function ProviderMarketplaceManagePage({
     );
   }
 
+  // A payments failure must not take down the whole management page.
   const [paymentAccount, resolvedSearchParams] = await Promise.all([
-    getProviderPaymentAccountState(),
+    getProviderPaymentAccountState().catch((): ProviderPaymentAccountState => ({
+      providerName: "MERCADO_PAGO",
+      providerAccountReference: null,
+      status: "DISCONNECTED",
+      tokenExpiresAt: null,
+      updatedAt: null,
+    })),
     searchParams,
   ]);
   const paymentParam = resolvedSearchParams.payment_account;
@@ -199,7 +255,7 @@ export default async function ProviderMarketplaceManagePage({
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone={status.tone}>{status.label}</StatusChip>
             <Link
-              className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold hover:bg-brand-orange/[0.06]"
+              className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.06] inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
               href={`/p/${provider.public_slug}`}
               target="_blank"
             >
@@ -207,6 +263,16 @@ export default async function ProviderMarketplaceManagePage({
             </Link>
           </div>
         </div>
+
+        {loadFailed ? (
+          <p
+            className="bg-terracotta/10 text-terracotta mt-5 rounded-xl px-4 py-3 text-sm"
+            role="alert"
+          >
+            No pudimos cargar algunas secciones. Lo que ves puede estar
+            incompleto: recargá antes de editar.
+          </p>
+        ) : null}
 
         <div className="border-ink/10 mt-6 border-t pt-5">
           <ProviderPaymentAccount

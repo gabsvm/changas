@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AuthenticatedBottomNav } from "@/components/ui/authenticated-bottom-nav";
+import { getUnreadConversationCount } from "@/lib/conversations/server";
 import { getUnreadNotificationCount } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -12,6 +13,7 @@ export default async function AccountLayout({
     data: { user },
   } = await supabase.auth.getUser();
   const unreadCount = user ? await getUnreadNotificationCount(supabase) : 0;
+  const unreadMessages = user ? await getUnreadConversationCount() : 0;
 
   return (
     <main
@@ -53,7 +55,12 @@ export default async function AccountLayout({
         </header>
         {children}
       </div>
-      {user ? <AuthenticatedBottomNav unreadCount={unreadCount} /> : null}
+      {user ? (
+        <AuthenticatedBottomNav
+          unreadCount={unreadCount}
+          unreadMessages={unreadMessages}
+        />
+      ) : null}
     </main>
   );
 }

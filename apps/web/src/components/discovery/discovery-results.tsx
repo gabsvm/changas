@@ -196,9 +196,10 @@ export function DiscoveryResults({
   }
 
   return (
-    <section aria-live="polite" aria-label="Resultados de búsqueda">
+    <section aria-label="Resultados de búsqueda">
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-2">
         <p
+          aria-live="polite"
           className={`text-sm font-semibold ${resultsError ? "text-danger" : "text-ink/60"}`}
         >
           {resultsError
@@ -214,11 +215,31 @@ export function DiscoveryResults({
             onClick={searchNearby}
             disabled={nearbyLoading}
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4" fill="none">
-              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
-              <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-4 w-4"
+              fill="none"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+              <path
+                d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
             </svg>
-            {nearbyLoading ? "Buscando…" : gpsMode ? "Actualizar ubicación" : "Cerca mío"}
+            {nearbyLoading
+              ? "Buscando…"
+              : gpsMode
+                ? "Actualizar ubicación"
+                : "Cerca mío"}
           </button>
         ) : null}
       </div>
@@ -251,7 +272,10 @@ export function DiscoveryResults({
           </p>
           {hasMore ? (
             <button
-              className={actionButtonClass("secondary", "w-full min-h-[52px] text-[15px]")}
+              className={actionButtonClass(
+                "secondary",
+                "min-h-[52px] w-full text-[15px]",
+              )}
               type="button"
               onClick={() => void fetchNearbyPage(gpsPage + 1, gpsPoint)}
               disabled={nearbyLoading}
@@ -264,11 +288,18 @@ export function DiscoveryResults({
         <nav aria-label="Más resultados" className="mt-6 grid gap-2">
           <p className="text-ink/60 text-center text-[13px] font-medium">
             Página {filters.page}
-            {hasMore ? " · hay más para explorar" : rows.length > 0 ? " · llegaste al final" : ""}
+            {hasMore
+              ? " · hay más para explorar"
+              : rows.length > 0
+                ? " · llegaste al final"
+                : ""}
           </p>
           {hasMore ? (
             <Link
-              className={actionButtonClass("secondary", "w-full min-h-[52px] text-[15px]")}
+              className={actionButtonClass(
+                "secondary",
+                "min-h-[52px] w-full text-[15px]",
+              )}
               href={searchHref(query, filters, filters.page + 1)}
             >
               Cargar más

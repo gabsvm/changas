@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import type { AuthActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
@@ -56,7 +56,11 @@ export function AuthForm({
     action,
     initialActionState,
   );
+  const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const modeCopy = copy[mode];
+  const nextQuery =
+    nextPath !== "/account" ? `?next=${encodeURIComponent(nextPath)}` : "";
 
   return (
     <div className="border-ink/10 bg-surface w-full max-w-md rounded-[1.25rem] border p-5 sm:rounded-[2rem] sm:p-8 sm:shadow-[0_24px_70px_rgba(32,33,36,0.08)]">
@@ -79,6 +83,8 @@ export function AuthForm({
             <input
               className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
               name="displayName"
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
               autoComplete="name"
               minLength={2}
               maxLength={80}
@@ -94,7 +100,12 @@ export function AuthForm({
               className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
               name="email"
               type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               autoComplete="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              inputMode="email"
               required
             />
           </label>
@@ -187,13 +198,13 @@ export function AuthForm({
         {mode === "login" ? (
           <>
             <Link
-              className="text-moss decoration-moss/30 font-semibold underline underline-offset-4"
-              href="/sign-up"
+              className="text-moss decoration-moss/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+              href={`/sign-up${nextQuery}`}
             >
               Crear cuenta
             </Link>
             <Link
-              className="hover:text-moss decoration-ink/20 underline underline-offset-4 transition-colors"
+              className="hover:text-moss decoration-ink/20 inline-flex min-h-11 items-center underline underline-offset-4 transition-colors"
               href="/forgot-password"
             >
               Olvidé mi contraseña
@@ -202,24 +213,24 @@ export function AuthForm({
         ) : null}
         {mode === "signup" ? (
           <Link
-            className="text-moss decoration-moss/30 font-semibold underline underline-offset-4"
-            href="/login"
+            className="text-moss decoration-moss/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+            href={`/login${nextQuery}`}
           >
             Ya tengo una cuenta
           </Link>
         ) : null}
         {mode === "reset" ? (
           <Link
-            className="text-moss decoration-moss/30 font-semibold underline underline-offset-4"
-            href="/login"
+            className="text-moss decoration-moss/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+            href={`/login${nextQuery}`}
           >
             Volver a iniciar sesión
           </Link>
         ) : null}
         {mode === "update" ? (
           <Link
-            className="text-moss decoration-moss/30 font-semibold underline underline-offset-4"
-            href="/login"
+            className="text-moss decoration-moss/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+            href={`/login${nextQuery}`}
           >
             Volver a iniciar sesión
           </Link>

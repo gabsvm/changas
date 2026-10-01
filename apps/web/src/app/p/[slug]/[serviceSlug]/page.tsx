@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { formatServicePrice } from "@changas/domain";
 
+import { ConsultButton } from "@/components/service/consult-button";
 import { Avatar } from "@/components/ui/marketplace/avatar";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
@@ -201,7 +202,7 @@ export default async function PublicServicePage({
             </Link>
           </section>
 
-          <div className="service-cta-bar bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:static sm:mx-0 sm:mt-8 sm:border-0 sm:bg-transparent sm:p-0">
+          <div className="service-cta-bar service-cta-bar-no-nav bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:static sm:mx-0 sm:mt-8 sm:border-0 sm:bg-transparent sm:p-0">
             <div className="mx-auto flex max-w-3xl items-stretch gap-3 sm:items-center sm:justify-between">
               <div className="bg-surface border-ink/[0.08] hidden min-w-40 flex-col justify-center rounded-2xl border px-4 py-2 sm:flex">
                 <p className="text-[15px] leading-5 font-extrabold">{price}</p>
@@ -223,12 +224,7 @@ export default async function PublicServicePage({
                     Por chat · responde rápido
                   </p>
                 </div>
-                <button
-                  className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-[52px] shrink-0 items-center justify-center rounded-2xl px-6 text-[15px] font-extrabold shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
-                  type="submit"
-                >
-                  Consultar
-                </button>
+                <ConsultButton />
               </form>
             </div>
           </div>

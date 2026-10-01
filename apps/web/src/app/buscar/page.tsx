@@ -14,6 +14,7 @@ import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { SearchField } from "@/components/ui/marketplace/search-field";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { searchDiscovery } from "@/lib/discovery/server";
+import { getUnreadConversationCount } from "@/lib/conversations/server";
 import { getUnreadNotificationCount } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -83,6 +84,7 @@ export default async function SearchPage({
     (item) => item.slug === filters.skillSlug,
   )?.name;
   const unreadCount = user ? await getUnreadNotificationCount(supabase) : 0;
+  const unreadMessages = user ? await getUnreadConversationCount() : 0;
 
   const activeFilterCount =
     (filters.categorySlug ? 1 : 0) +
@@ -171,6 +173,7 @@ export default async function SearchPage({
 
             <div
               className="consumer-scrollbar-none -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pt-1 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
+              role="group"
               aria-label="Filtros activos"
             >
               {activeCategory ? (
@@ -294,7 +297,10 @@ export default async function SearchPage({
           </div>
         </section>
       </div>
-      <AuthenticatedBottomNav unreadCount={unreadCount} />
+      <AuthenticatedBottomNav
+        unreadCount={unreadCount}
+        unreadMessages={unreadMessages}
+      />
     </main>
   );
 }

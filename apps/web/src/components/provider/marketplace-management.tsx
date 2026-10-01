@@ -1,6 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { formatServicePrice, minorUnitsToMajorInput } from "@changas/domain";
 
@@ -63,6 +69,7 @@ function ActionForm({
     initialActionState,
   );
   const successRef = useRef<HTMLParagraphElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [compressing, setCompressing] = useState(false);
   const [compressionError, setCompressionError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -73,6 +80,9 @@ function ActionForm({
   } | null>(null);
 
   useEffect(() => {
+    // The form is submitted manually (see handleSubmit), so React does not
+    // reset it; clear it only once the save succeeded.
+    if (state.success) formRef.current?.reset();
     if (!successRef.current) return;
     return animateConfirmedSave(successRef.current, state.success);
   }, [state]);
@@ -116,12 +126,18 @@ function ActionForm({
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if (compressing) event.preventDefault();
+    // Passing `action` to <form> makes React 19 reset every field after the
+    // action settles, even on validation errors. Dispatch manually so a failed
+    // save keeps what the user typed.
+    event.preventDefault();
+    if (compressing || uploading) return;
+    const formData = new FormData(event.currentTarget);
+    startTransition(() => formAction(formData));
   }
 
   return (
     <form
-      action={formAction}
+      ref={formRef}
       encType={encType}
       className={className}
       onChange={handleFileChange}

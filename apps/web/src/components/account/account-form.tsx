@@ -22,7 +22,10 @@ type HiddenFields = Record<string, string>;
 function FormStatus({ state }: { state: ActionState }) {
   if (state.error) {
     return (
-      <p className="bg-danger/8 text-danger rounded-xl px-3 py-2.5 text-sm" role="alert">
+      <p
+        className="bg-danger/8 text-danger rounded-xl px-3 py-2.5 text-sm"
+        role="alert"
+      >
         {state.error}
       </p>
     );
@@ -65,7 +68,10 @@ export function PublicProfileForm({
   submitLabel?: string;
   hiddenFields?: HiddenFields;
 }) {
-  const [state, formAction, pending] = useActionState(action, initialActionState);
+  const [state, formAction, pending] = useActionState(
+    action,
+    initialActionState,
+  );
   const [bioLength, setBioLength] = useState(initialValues.bio.length);
 
   return (
@@ -106,9 +112,7 @@ export function PublicProfileForm({
         helper={
           <span className="flex items-start justify-between gap-4">
             <span>Contá en pocas líneas qué hacés y cómo trabajás.</span>
-            <span className="shrink-0" aria-live="polite">
-              {bioLength}/1000
-            </span>
+            <span className="shrink-0">{bioLength}/1000</span>
           </span>
         }
       >
@@ -125,7 +129,11 @@ export function PublicProfileForm({
       <FormStatus state={state} />
 
       <StickyActionBar>
-        <ActionButton className="w-full sm:w-auto" type="submit" disabled={pending}>
+        <ActionButton
+          className="w-full sm:w-auto"
+          type="submit"
+          disabled={pending}
+        >
           {pending ? "Guardando…" : submitLabel}
         </ActionButton>
       </StickyActionBar>
@@ -152,7 +160,10 @@ export function PrivateIdentityForm({
   submitLabel?: string;
   hiddenFields?: HiddenFields;
 }) {
-  const [state, formAction, pending] = useActionState(action, initialActionState);
+  const [state, formAction, pending] = useActionState(
+    action,
+    initialActionState,
+  );
 
   return (
     <form action={formAction} className="space-y-5">
@@ -217,7 +228,11 @@ export function PrivateIdentityForm({
       <FormStatus state={state} />
 
       <StickyActionBar>
-        <ActionButton className="w-full sm:w-auto" type="submit" disabled={pending}>
+        <ActionButton
+          className="w-full sm:w-auto"
+          type="submit"
+          disabled={pending}
+        >
           {pending ? "Guardando…" : submitLabel}
         </ActionButton>
       </StickyActionBar>
@@ -226,7 +241,10 @@ export function PrivateIdentityForm({
 }
 
 export function StartProviderForm({ action }: { action: AccountAction }) {
-  const [state, formAction, pending] = useActionState(action, initialActionState);
+  const [state, formAction, pending] = useActionState(
+    action,
+    initialActionState,
+  );
 
   return (
     <form action={formAction} className="mt-3">
@@ -235,7 +253,11 @@ export function StartProviderForm({ action }: { action: AccountAction }) {
           {state.error}
         </p>
       ) : null}
-      <ActionButton className="w-full sm:w-auto" type="submit" disabled={pending}>
+      <ActionButton
+        className="w-full sm:w-auto"
+        type="submit"
+        disabled={pending}
+      >
         {pending ? "Preparando…" : "Empezar como proveedor"}
       </ActionButton>
     </form>

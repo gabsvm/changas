@@ -178,6 +178,17 @@ export async function listMyConversations(
   return data ?? [];
 }
 
+/** Conversations with unread messages; never throws so layouts keep rendering. */
+export async function getUnreadConversationCount(): Promise<number> {
+  try {
+    const conversations = await listMyConversations();
+    return conversations.filter((conversation) => conversation.unread_count > 0)
+      .length;
+  } catch {
+    return 0;
+  }
+}
+
 export async function getConversationContext(
   id: string,
 ): Promise<ConversationContext | null> {
