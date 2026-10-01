@@ -64,9 +64,7 @@ export function OnboardingStepCard({
     leading: <StepBadge step={step} />,
     trailing: <StepStatus step={step} />,
     className:
-      step.state === "current"
-        ? "bg-brand-orange/[0.045] px-2"
-        : "px-2",
+      step.state === "current" ? "bg-brand-orange/[0.045] px-2" : "px-2",
   };
 
   if (disabled) {

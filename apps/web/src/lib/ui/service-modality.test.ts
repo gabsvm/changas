@@ -10,6 +10,8 @@ describe("getServiceModalityLabel", () => {
   });
 
   it("does not leak an unknown raw enum", () => {
-    expect(getServiceModalityLabel("SOMETHING_NEW")).toBe("Modalidad a coordinar");
+    expect(getServiceModalityLabel("SOMETHING_NEW")).toBe(
+      "Modalidad a coordinar",
+    );
   });
 });

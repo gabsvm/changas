@@ -26,7 +26,10 @@ export default async function AdminLayout({
             href="/admin"
             aria-label="Changas Administración"
           >
-            <span className="brand-mark h-10 w-10 shrink-0" aria-hidden="true" />
+            <span
+              className="brand-mark h-10 w-10 shrink-0"
+              aria-hidden="true"
+            />
             <div className="min-w-0">
               <p className="truncate text-[0.62rem] font-extrabold tracking-[0.19em] text-[#ff7b4c] uppercase">
                 Changas

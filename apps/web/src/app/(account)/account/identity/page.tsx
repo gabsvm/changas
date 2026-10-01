@@ -19,7 +19,9 @@ export default async function AccountIdentityPage() {
 
   const { data: privateProfile } = await supabase
     .from("profile_private")
-    .select("legal_name, private_phone, date_of_birth, exact_address, dni_number")
+    .select(
+      "legal_name, private_phone, date_of_birth, exact_address, dni_number",
+    )
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -32,13 +34,15 @@ export default async function AccountIdentityPage() {
             Identidad y seguridad
           </h1>
           <p className="text-ink/52 text-sm leading-6 sm:mt-1 sm:max-w-xl">
-            Estos datos se usan sólo en procesos internos de identidad y seguridad.
+            Estos datos se usan sólo en procesos internos de identidad y
+            seguridad.
           </p>
         </header>
 
         <div className="mt-4">
           <PrivacyNotice>
-            Tu nombre legal, teléfono, fecha de nacimiento, DNI y domicilio exacto se guardan separados del perfil público.
+            Tu nombre legal, teléfono, fecha de nacimiento, DNI y domicilio
+            exacto se guardan separados del perfil público.
           </PrivacyNotice>
         </div>
 

@@ -26,8 +26,8 @@ describe("admin navigation", () => {
   it("marks exact overview and nested admin sections correctly", () => {
     expect(isAdminNavigationItemActive("/admin", "/admin")).toBe(true);
     expect(isAdminNavigationItemActive("/admin/users", "/admin")).toBe(false);
-    expect(isAdminNavigationItemActive("/admin/users/abc", "/admin/users")).toBe(
-      true,
-    );
+    expect(
+      isAdminNavigationItemActive("/admin/users/abc", "/admin/users"),
+    ).toBe(true);
   });
 });

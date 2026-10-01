@@ -8,7 +8,8 @@ function raw(overrides: Partial<ServiceFormRaw> = {}): ServiceFormRaw {
   return {
     skillId: SKILL_ID,
     title: "Reparación de PC a domicilio",
-    description: "Diagnóstico completo y reparación de computadoras a domicilio.",
+    description:
+      "Diagnóstico completo y reparación de computadoras a domicilio.",
     modality: "IN_PERSON",
     priceModel: "FIXED",
     priceAmount: "30000",

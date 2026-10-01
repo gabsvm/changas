@@ -18,6 +18,7 @@ Production diagnosis on 2026-09-08 showed the recent admin user Alejandro Vera h
 ## Provider submission model
 
 Required identity documents for normal verification are:
+
 - `DNI_FRONT`
 - `DNI_BACK`
 - `SELFIE`
@@ -25,6 +26,7 @@ Required identity documents for normal verification are:
 Uploading a file only stores/replaces the document. It does not itself claim that the provider has submitted for review.
 
 A new server-authoritative RPC `submit_provider_identity_review()` validates:
+
 - authenticated user owns the provider profile;
 - status is `PROFILE_INCOMPLETE` or `IDENTITY_PENDING`;
 - public profile is complete;
@@ -38,6 +40,7 @@ If valid, it changes status to `IDENTITY_PENDING`, sets onboarding step 4, and r
 New admin RPCs:
 
 ### `admin_prepare_provider(target_user_id uuid)`
+
 - requires admin;
 - rejects null/nonexistent target;
 - inserts `provider_profiles` with `PROFILE_INCOMPLETE`, step 1 when absent;
@@ -45,6 +48,7 @@ New admin RPCs:
 - writes `PROVIDER_ONBOARDING_PREPARED` to `admin_audit_events`.
 
 ### `admin_activate_provider(target_user_id uuid, requested_reason text)`
+
 - requires admin;
 - requires a meaningful reason;
 - inserts provider profile if absent or updates it to `ACTIVE`, step 4;
@@ -56,6 +60,7 @@ No admin UI action silently grants provider access. Manual activation is visuall
 ## Admin information architecture
 
 ### Mobile shell
+
 - Dark operational canvas specific to admin: near-black navy surfaces.
 - Changas orange `#FF6B35` is primary action/accent.
 - Changas yellow `#FFC857` represents pending attention.
@@ -67,8 +72,10 @@ No admin UI action silently grants provider access. Manual activation is visuall
 - Desktop retains the same hierarchy with a compact sidebar/rail instead of horizontal pills.
 
 ### Dashboard `/admin`
+
 Operational dashboard, not a directory of links.
 Priority order:
+
 1. identity pending count;
 2. open reports;
 3. provider/account exceptions;
@@ -76,20 +83,25 @@ Priority order:
 5. quick links to lower-frequency areas.
 
 ### Users `/admin/users`
+
 Mobile cards show name/email, role, provider status and contextual actions.
 Provider actions:
+
 - no provider profile -> `Invitar a completar perfil` + `Activar manualmente`;
 - `PROFILE_INCOMPLETE` -> `Ver onboarding`/provider context + `Activar manualmente`;
 - pending -> `Revisar identidad`;
 - active -> status only plus existing restriction controls.
 
 ### Providers `/admin/providers`
+
 Mobile provider cards replace compressed table-like layouts. Detail includes onboarding step, docs/services count, operational pause state, and contextual actions.
 
 ### Identity `/admin/identity`
+
 Pending cases are the first content. Each card shows human-readable status, document completeness, date, and an obvious review action. Detail keeps signed/private document access and approve/reject controls.
 
 ### Other admin sections
+
 Catalog, Reports, Jobs, Payments and Audit adopt the shared page header, dark surface cards, compact mobile rows/cards, human-readable badges and responsive desktop enhancements. Existing backend behavior remains unchanged except for the provider operations described above.
 
 ## Security

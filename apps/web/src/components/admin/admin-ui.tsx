@@ -111,9 +111,13 @@ export function AdminMetricCard({
     <div className="rounded-[1.4rem] border border-[#273142] bg-[#151c27] p-4">
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs font-bold text-[#8f99aa]">{label}</p>
-        <span className={`mt-1 h-2.5 w-2.5 rounded-full border ${toneClasses[tone]}`} />
+        <span
+          className={`mt-1 h-2.5 w-2.5 rounded-full border ${toneClasses[tone]}`}
+        />
       </div>
-      <p className="mt-2 text-3xl font-extrabold tracking-[-0.04em] text-white">{value}</p>
+      <p className="mt-2 text-3xl font-extrabold tracking-[-0.04em] text-white">
+        {value}
+      </p>
       {hint ? <p className="mt-1 text-xs text-[#697386]">{hint}</p> : null}
     </div>
   );

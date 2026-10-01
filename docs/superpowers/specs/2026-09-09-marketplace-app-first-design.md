@@ -248,18 +248,21 @@ Provider verification/progress should appear as one purposeful progress surface 
 Group settings into sections such as:
 
 ### Cuenta
+
 - Perfil público
 - Identidad y seguridad
 - Guardados
 - Notificaciones
 
 ### Proveedor
+
 - onboarding/progress or provider management entry;
 - services;
 - availability where implemented;
 - payments where implemented.
 
 ### Support / Session
+
 - help/support only if currently implemented;
 - sign out as a plain destructive/text action, not a dominant CTA.
 

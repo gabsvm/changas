@@ -20,14 +20,17 @@ export function SettingsRow({
     <>
       {leading ? <span className="shrink-0">{leading}</span> : null}
       <span className="min-w-0 flex-1 py-0.5">
-        <span className="block text-[0.95rem] font-semibold text-ink">{title}</span>
+        <span className="text-ink block text-[0.95rem] font-semibold">
+          {title}
+        </span>
         {description ? (
           <span className="text-ink/52 mt-0.5 block text-sm leading-5">
             {description}
           </span>
         ) : null}
       </span>
-      {trailing ?? (href ? <span className="text-ink/28 text-xl">›</span> : null)}
+      {trailing ??
+        (href ? <span className="text-ink/28 text-xl">›</span> : null)}
     </>
   );
 
@@ -35,7 +38,10 @@ export function SettingsRow({
 
   if (href) {
     return (
-      <Link href={href} className={`${classes} rounded-xl hover:bg-brand-orange/[0.05]`}>
+      <Link
+        href={href}
+        className={`${classes} hover:bg-brand-orange/[0.05] rounded-xl`}
+      >
         {content}
       </Link>
     );

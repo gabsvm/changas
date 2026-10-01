@@ -91,8 +91,12 @@ export default async function AdminProvidersPage({
                 className="rounded-2xl border border-[#273142] bg-[#101720] p-3"
                 key={label}
               >
-                <p className="text-[0.65rem] font-bold text-[#697386]">{label}</p>
-                <p className="mt-1 text-sm font-extrabold text-[#d0d5dd]">{value}</p>
+                <p className="text-[0.65rem] font-bold text-[#697386]">
+                  {label}
+                </p>
+                <p className="mt-1 text-sm font-extrabold text-[#d0d5dd]">
+                  {value}
+                </p>
               </div>
             ))}
           </div>
@@ -108,7 +112,11 @@ export default async function AdminProvidersPage({
             </summary>
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
               <form action={setAccountRestrictionAction}>
-                <input type="hidden" name="userId" value={detail.provider_user_id} />
+                <input
+                  type="hidden"
+                  name="userId"
+                  value={detail.provider_user_id}
+                />
                 <input type="hidden" name="kind" value="RESTRICTED" />
                 <input
                   className="w-full px-3 py-2 text-sm"
@@ -122,7 +130,11 @@ export default async function AdminProvidersPage({
                 </button>
               </form>
               <form action={setAccountRestrictionAction}>
-                <input type="hidden" name="userId" value={detail.provider_user_id} />
+                <input
+                  type="hidden"
+                  name="userId"
+                  value={detail.provider_user_id}
+                />
                 <input type="hidden" name="kind" value="SUSPENDED" />
                 <input
                   className="w-full px-3 py-2 text-sm"
@@ -136,7 +148,11 @@ export default async function AdminProvidersPage({
                 </button>
               </form>
               <form action={restoreAccountAction}>
-                <input type="hidden" name="userId" value={detail.provider_user_id} />
+                <input
+                  type="hidden"
+                  name="userId"
+                  value={detail.provider_user_id}
+                />
                 <input
                   className="w-full px-3 py-2 text-sm"
                   name="reason"
@@ -153,7 +169,9 @@ export default async function AdminProvidersPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">Prestadores registrados</h2>
+          <h2 className="text-base font-extrabold text-white">
+            Prestadores registrados
+          </h2>
           <span className="rounded-full border border-[#273142] bg-[#151c27] px-2.5 py-1 text-xs font-bold text-[#8f99aa]">
             {providers.length}
           </span>
@@ -175,7 +193,8 @@ export default async function AdminProvidersPage({
                     {provider.email ?? provider.public_slug}
                   </p>
                   <p className="mt-2 text-[0.68rem] font-bold text-[#697386]">
-                    Paso {provider.onboarding_step}/4 · {provider.document_count} docs
+                    Paso {provider.onboarding_step}/4 ·{" "}
+                    {provider.document_count} docs
                   </p>
                 </div>
                 <AdminStatusBadge

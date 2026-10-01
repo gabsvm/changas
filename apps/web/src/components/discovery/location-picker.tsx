@@ -50,11 +50,8 @@ export function LocationPicker({
   const locationDialogRef = useRef<HTMLDivElement>(null);
   const locationCloseRef = useRef<HTMLButtonElement>(null);
 
-  useDialogFocus(
-    locationSheetOpen,
-    locationDialogRef,
-    locationCloseRef,
-    () => setLocationSheetOpen(false),
+  useDialogFocus(locationSheetOpen, locationDialogRef, locationCloseRef, () =>
+    setLocationSheetOpen(false),
   );
 
   function clearDeviceLocation() {

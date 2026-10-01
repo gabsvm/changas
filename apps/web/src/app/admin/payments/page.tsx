@@ -88,7 +88,9 @@ export default async function AdminPaymentsPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-base font-extrabold text-white">Movimientos</h2>
-          <span className="text-xs font-bold text-[#697386]">{payments.length} registros</span>
+          <span className="text-xs font-bold text-[#697386]">
+            {payments.length} registros
+          </span>
         </div>
 
         {payments.length ? (
@@ -107,7 +109,7 @@ export default async function AdminPaymentsPage() {
                     <p className="truncate text-sm font-extrabold text-white">
                       {payment.providerName}
                     </p>
-                    <p className="mt-1 break-all text-[0.68rem] text-[#697386]">
+                    <p className="mt-1 text-[0.68rem] break-all text-[#697386]">
                       Ref. {payment.providerReference}
                     </p>
                   </div>
@@ -119,23 +121,33 @@ export default async function AdminPaymentsPage() {
 
                 <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
                   <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[0.68rem] font-bold text-[#697386]">Estado local</dt>
+                    <dt className="text-[0.68rem] font-bold text-[#697386]">
+                      Estado local
+                    </dt>
                     <dd className="mt-1 font-extrabold text-[#d0d5dd]">
                       {paymentStatusLabel(payment.localStatus)}
                     </dd>
                   </div>
                   <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[0.68rem] font-bold text-[#697386]">Proveedor de pago</dt>
+                    <dt className="text-[0.68rem] font-bold text-[#697386]">
+                      Proveedor de pago
+                    </dt>
                     <dd className="mt-1 font-extrabold text-[#d0d5dd]">
                       {paymentStatusLabel(payment.providerStatus)}
                     </dd>
                   </div>
                   <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[0.68rem] font-bold text-[#697386]">Bruto</dt>
-                    <dd className="mt-1 font-extrabold text-white">{money(payment.grossMinor)}</dd>
+                    <dt className="text-[0.68rem] font-bold text-[#697386]">
+                      Bruto
+                    </dt>
+                    <dd className="mt-1 font-extrabold text-white">
+                      {money(payment.grossMinor)}
+                    </dd>
                   </div>
                   <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[0.68rem] font-bold text-[#697386]">Comisión Changas</dt>
+                    <dt className="text-[0.68rem] font-bold text-[#697386]">
+                      Comisión Changas
+                    </dt>
                     <dd className="mt-1 font-extrabold text-white">
                       {money(payment.marketplaceFeeMinor)}
                     </dd>
@@ -148,19 +160,25 @@ export default async function AdminPaymentsPage() {
                   </summary>
                   <dl className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
                     <div>
-                      <dt className="font-bold text-[#697386]">Neto esperado prestador</dt>
+                      <dt className="font-bold text-[#697386]">
+                        Neto esperado prestador
+                      </dt>
                       <dd className="mt-1 font-semibold text-[#d0d5dd]">
                         {money(payment.providerExpectedNetMinor)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-bold text-[#697386]">Costo proveedor de pago</dt>
+                      <dt className="font-bold text-[#697386]">
+                        Costo proveedor de pago
+                      </dt>
                       <dd className="mt-1 font-semibold text-[#d0d5dd]">
                         {money(payment.providerFeeMinor)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-bold text-[#697386]">Neto observado</dt>
+                      <dt className="font-bold text-[#697386]">
+                        Neto observado
+                      </dt>
                       <dd className="mt-1 font-semibold text-[#d0d5dd]">
                         {money(payment.providerNetReceivedMinor)}
                       </dd>
@@ -169,14 +187,17 @@ export default async function AdminPaymentsPage() {
                       <dt className="font-bold text-[#697386]">Reembolsado</dt>
                       <dd className="mt-1 font-semibold text-[#d0d5dd]">
                         {money(payment.refundedMinor)}
-                        {payment.refundStatus ? ` · ${payment.refundStatus}` : ""}
+                        {payment.refundStatus
+                          ? ` · ${payment.refundStatus}`
+                          : ""}
                       </dd>
                     </div>
                   </dl>
                 </details>
 
                 <p className="mt-3 text-[0.68rem] leading-5 text-[#697386]">
-                  Settlement: {payment.settlementStatus ?? "—"} · Última conciliación: {dateTime(payment.lastReconciledAt)}
+                  Settlement: {payment.settlementStatus ?? "—"} · Última
+                  conciliación: {dateTime(payment.lastReconciledAt)}
                 </p>
               </article>
             ))}
@@ -191,8 +212,12 @@ export default async function AdminPaymentsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">Ejecuciones de conciliación</h2>
-          <span className="text-xs font-bold text-[#697386]">{runs.length} ejecuciones</span>
+          <h2 className="text-base font-extrabold text-white">
+            Ejecuciones de conciliación
+          </h2>
+          <span className="text-xs font-bold text-[#697386]">
+            {runs.length} ejecuciones
+          </span>
         </div>
 
         {runs.length ? (
@@ -207,11 +232,17 @@ export default async function AdminPaymentsPage() {
                     <p className="truncate text-sm font-extrabold text-white">
                       {run.providerName ?? "Proveedor de pago"}
                     </p>
-                    <p className="mt-1 text-xs text-[#697386]">{dateTime(run.startedAt)}</p>
+                    <p className="mt-1 text-xs text-[#697386]">
+                      {dateTime(run.startedAt)}
+                    </p>
                   </div>
                   <AdminStatusBadge
                     label={run.status.replaceAll("_", " ")}
-                    tone={run.failedCount || run.mismatchedCount ? "danger" : "success"}
+                    tone={
+                      run.failedCount || run.mismatchedCount
+                        ? "danger"
+                        : "success"
+                    }
                   />
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
@@ -221,9 +252,14 @@ export default async function AdminPaymentsPage() {
                     ["Desajustes", run.mismatchedCount],
                     ["Fallos", run.failedCount],
                   ].map(([label, value]) => (
-                    <div className="rounded-xl border border-[#273142] bg-[#101720] p-2.5" key={label}>
+                    <div
+                      className="rounded-xl border border-[#273142] bg-[#101720] p-2.5"
+                      key={label}
+                    >
                       <p className="font-bold text-[#697386]">{label}</p>
-                      <p className="mt-1 text-base font-extrabold text-[#d0d5dd]">{value}</p>
+                      <p className="mt-1 text-base font-extrabold text-[#d0d5dd]">
+                        {value}
+                      </p>
                     </div>
                   ))}
                 </div>

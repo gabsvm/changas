@@ -31,7 +31,9 @@ export async function prepareProviderAction(formData: FormData) {
 export async function activateProviderAction(formData: FormData) {
   const reason = requiredText(formData, "reason");
   if (reason.length < 3) {
-    throw new Error("El motivo de activación manual debe tener al menos 3 caracteres.");
+    throw new Error(
+      "El motivo de activación manual debe tener al menos 3 caracteres.",
+    );
   }
 
   await adminRpc("admin_activate_provider", {

@@ -18,7 +18,13 @@ type NavItem = {
 
 const items: NavItem[] = [
   { key: "home", label: "Inicio", href: "/", icon: "home" },
-  { key: "search", label: "Buscar", href: "/buscar", icon: "search", central: true },
+  {
+    key: "search",
+    label: "Buscar",
+    href: "/buscar",
+    icon: "search",
+    central: true,
+  },
   { key: "messages", label: "Mensajes", href: "/messages", icon: "messages" },
   {
     key: "activity",
@@ -35,7 +41,12 @@ function NavIcon({ name, active }: { name: NavItem["icon"]; active: boolean }) {
   const fillOpacity = active ? 0.16 : 0;
   if (name === "home") {
     return (
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+      >
         <path
           d="M3.5 10.5 12 3l8.5 7.5v9A1.5 1.5 0 0 1 19 21H5a1.5 1.5 0 0 1-1.5-1.5v-9Z"
           fill={fill}
@@ -55,8 +66,19 @@ function NavIcon({ name, active }: { name: NavItem["icon"]; active: boolean }) {
   }
   if (name === "search") {
     return (
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
-        <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth={stroke} />
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+      >
+        <circle
+          cx="11"
+          cy="11"
+          r="6.5"
+          stroke="currentColor"
+          strokeWidth={stroke}
+        />
         <path
           d="m16 16 4.5 4.5"
           stroke="currentColor"
@@ -68,7 +90,12 @@ function NavIcon({ name, active }: { name: NavItem["icon"]; active: boolean }) {
   }
   if (name === "messages") {
     return (
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+      >
         <path
           d="M4 5.5h16v11H9l-5 4v-15Z"
           fill={fill}
@@ -88,7 +115,12 @@ function NavIcon({ name, active }: { name: NavItem["icon"]; active: boolean }) {
   }
   if (name === "activity") {
     return (
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+      >
         <path
           d="M6.5 9a5.5 5.5 0 0 1 11 0v3.5l2 3H4.5l2-3V9Z"
           fill={fill}
@@ -146,13 +178,17 @@ export function AuthenticatedBottomNav({
         {items.map((item) => {
           const active = item.key === activeKey;
           const badge =
-            item.key === "activity" ? unreadCount : item.key === "messages" ? unreadMessages : 0;
+            item.key === "activity"
+              ? unreadCount
+              : item.key === "messages"
+                ? unreadMessages
+                : 0;
           return (
             <Link
               key={item.key}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`consumer-pressable relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[0.68rem] font-bold outline-none focus-visible:ring-2 focus-visible:ring-moss/45 ${
+              className={`consumer-pressable focus-visible:ring-moss/45 relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[0.68rem] font-bold outline-none focus-visible:ring-2 ${
                 active ? "text-ink" : "text-ink/55 hover:text-ink/80"
               }`}
             >
@@ -161,7 +197,7 @@ export function AuthenticatedBottomNav({
                   item.central && active
                     ? "bg-ink h-12 w-12 text-white shadow-lg"
                     : item.central
-                      ? "bg-ink/[0.06] h-12 w-12 text-ink"
+                      ? "bg-ink/[0.06] text-ink h-12 w-12"
                       : "h-6 w-6"
                 }`}
               >
@@ -175,7 +211,9 @@ export function AuthenticatedBottomNav({
                   </span>
                 ) : null}
               </span>
-              <span className={active ? "font-extrabold" : undefined}>{item.label}</span>
+              <span className={active ? "font-extrabold" : undefined}>
+                {item.label}
+              </span>
               {active ? (
                 <span
                   className="bg-brand-orange absolute bottom-0.5 h-1 w-1 rounded-full"

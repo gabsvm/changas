@@ -26,6 +26,7 @@
 ### Task 1: Consumer design tokens and shared primitives
 
 **Files:**
+
 - Modify: `apps/web/src/app/globals.css`
 - Create: `apps/web/src/components/ui/marketplace/app-header.tsx`
 - Create: `apps/web/src/components/ui/marketplace/avatar.tsx`
@@ -42,6 +43,7 @@
 - Test: `apps/web/src/lib/ui/marketplace-theme.test.ts`
 
 **Interfaces:**
+
 - Produces compact marketplace primitives with semantic props only.
 - Keeps admin visual system untouched.
 
@@ -51,7 +53,10 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const css = readFileSync(new URL("../../app/globals.css", import.meta.url), "utf8");
+const css = readFileSync(
+  new URL("../../app/globals.css", import.meta.url),
+  "utf8",
+);
 
 describe("marketplace consumer theme", () => {
   it("defines compact consumer surface tokens", () => {
@@ -86,6 +91,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 ### Task 2: Compact authenticated shell and bottom navigation
 
 **Files:**
+
 - Modify: `apps/web/src/components/ui/authenticated-bottom-nav.tsx`
 - Modify: `apps/web/src/components/ui/mobile-app-bar.tsx`
 - Modify: `apps/web/src/app/(account)/layout.tsx`
@@ -93,6 +99,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 - Test: `apps/web/src/lib/ui/navigation.test.ts`
 
 **Interfaces:**
+
 - Consumes shared action/icon/surface tokens from Task 1.
 - Produces a 4-tab compact nav with orange active icon/text and subtle marker; no active background tile.
 
@@ -106,6 +113,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 ### Task 3: Home, discovery, search, category, and marketplace cards
 
 **Files:**
+
 - Modify: `apps/web/src/app/page.tsx`
 - Modify: `apps/web/src/app/buscar/page.tsx`
 - Modify: `apps/web/src/app/categoria/[slug]/page.tsx`
@@ -117,6 +125,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 - Test: `apps/web/src/lib/ui/home-marketplace.test.ts`
 
 **Interfaces:**
+
 - Home consumes real `categories` and `searchDiscovery()` rows already loaded server-side.
 - Do not invent ratings, pricing, availability, distance, or providers.
 
@@ -131,12 +140,14 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 ### Task 4: Messages list and conversation surfaces
 
 **Files:**
+
 - Modify: `apps/web/src/app/(account)/messages/page.tsx`
 - Modify: `apps/web/src/app/(account)/messages/[conversationId]/page.tsx`
 - Modify files under: `apps/web/src/components/conversations/`
 - Test: existing conversation/unit tests plus mobile E2E fixture where available.
 
 **Interfaces:**
+
 - Conversation summaries keep peer avatar, service context, preview, timestamp, unread count.
 - Attachments continue through existing safe browser upload pipeline and private access routes.
 
@@ -150,6 +161,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 ### Task 5: Activity feed and native notification preferences
 
 **Files:**
+
 - Modify: `apps/web/src/app/(account)/account/notifications/page.tsx`
 - Modify: `apps/web/src/components/notifications/notification-preferences-form.tsx`
 - Modify: `apps/web/src/components/pwa/push-opt-in.tsx`
@@ -157,6 +169,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 - Test: notification UI unit tests.
 
 **Interfaces:**
+
 - Existing notification preference fields remain unchanged.
 - Switch components expose `role="switch"`/`aria-checked` semantics.
 
@@ -170,6 +183,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 ### Task 6: Account home and profile/identity forms
 
 **Files:**
+
 - Modify: `apps/web/src/app/(account)/account/page.tsx`
 - Modify: `apps/web/src/components/ui/account-menu-item.tsx`
 - Modify: `apps/web/src/app/(account)/account/profile/page.tsx`
@@ -181,6 +195,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 - Test: account/profile unit tests and E2E.
 
 **Interfaces:**
+
 - `profiles.avatar_url` remains the persisted field.
 - Do not expose a user-editable URL field.
 - Avatar image must be compressed before storage and only the optimized object is persisted.
@@ -196,6 +211,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 ### Task 7: Provider onboarding and provider management
 
 **Files:**
+
 - Modify pages under: `apps/web/src/app/(provider)/provider/onboarding/`
 - Modify: `apps/web/src/app/(provider)/provider/manage/page.tsx`
 - Modify components under: `apps/web/src/components/provider/`
@@ -203,6 +219,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 - Test: existing provider submission/admin-trust regressions plus mobile onboarding E2E.
 
 **Interfaces:**
+
 - Preserve `PROFILE_INCOMPLETE -> explicit submit -> IDENTITY_PENDING -> review` server-authoritative contract.
 - Preserve DNI front/back/selfie requirements and PDF allowance.
 
@@ -217,6 +234,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 ### Task 8: Jobs, service/provider detail, favorites, settings, payments presentation sweep
 
 **Files:**
+
 - Modify relevant pages under `apps/web/src/app/(account)/jobs/`
 - Modify public provider/service detail pages under `apps/web/src/app/p/`
 - Modify: `apps/web/src/app/(account)/account/favorites/page.tsx`
@@ -225,6 +243,7 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 - Do not modify `apps/web/src/app/admin/**` except imports of truly neutral low-level primitives if necessary.
 
 **Interfaces:**
+
 - Domain statuses continue to use humanized labels and real data.
 - Payment flows and Mercado Pago contracts remain unchanged.
 
@@ -238,10 +257,12 @@ git commit -m "feat(ui): add marketplace consumer primitives"
 ### Task 9: Mobile E2E and regression verification
 
 **Files:**
+
 - Create: `tests/e2e/marketplace-app-first.spec.ts`
 - Modify only affected existing E2E selectors where behavior remains correct.
 
 **Interfaces:**
+
 - E2E runs against local/test Supabase only.
 
 - [ ] **Step 1: Add mobile assertions for 320, 360, 390 px** covering Home, Messages, Activity, Account, Profile, Provider onboarding.

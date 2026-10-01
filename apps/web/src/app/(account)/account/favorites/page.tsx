@@ -67,7 +67,9 @@ export default async function FavoritesPage() {
                   : ""
               }`;
               const subtitle =
-                provider.public_headline ?? provider.public_zone ?? "Servicios publicados";
+                provider.public_headline ??
+                provider.public_zone ??
+                "Servicios publicados";
               const meta = provider.public_zone
                 ? `${rating} · ${provider.public_zone}`
                 : `${rating} · ${reputation}`;

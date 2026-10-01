@@ -30,7 +30,7 @@ export function Switch({
         disabled={disabled}
         aria-label={ariaLabel}
       />
-      <span className="peer-focus-visible:ring-moss/35 peer-checked:bg-brand-orange peer-disabled:opacity-45 relative h-7 w-12 rounded-full bg-ink/15 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2">
+      <span className="peer-focus-visible:ring-moss/35 peer-checked:bg-brand-orange bg-ink/15 relative h-7 w-12 rounded-full transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-disabled:opacity-45">
         <span className="absolute top-1 left-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
       </span>
     </label>
