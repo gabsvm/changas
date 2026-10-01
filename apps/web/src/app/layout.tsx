@@ -22,13 +22,11 @@ export const metadata: Metadata = {
   },
   description:
     "Una base confiable para conectar habilidades con oportunidades.",
-  alternates: { canonical: "/" },
   openGraph: {
     title: "Changas",
     description:
       "Una base confiable para conectar habilidades con oportunidades.",
     type: "website",
-    url: "/",
   },
 };
 
@@ -43,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es-AR">
       <body className={plusJakarta.variable}>
         <a className="skip-link" href="#main-content">
           Ir al contenido principal
