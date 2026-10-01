@@ -198,13 +198,13 @@ export function AuthForm({
         {mode === "login" ? (
           <>
             <Link
-              className="text-moss decoration-moss/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+              className="text-terracotta decoration-terracotta/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
               href={`/sign-up${nextQuery}`}
             >
               Crear cuenta
             </Link>
             <Link
-              className="hover:text-moss decoration-ink/20 inline-flex min-h-11 items-center underline underline-offset-4 transition-colors"
+              className="hover:text-terracotta decoration-ink/20 inline-flex min-h-11 items-center underline underline-offset-4 transition-colors"
               href="/forgot-password"
             >
               Olvidé mi contraseña
@@ -213,7 +213,7 @@ export function AuthForm({
         ) : null}
         {mode === "signup" ? (
           <Link
-            className="text-moss decoration-moss/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+            className="text-terracotta decoration-terracotta/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
             href={`/login${nextQuery}`}
           >
             Ya tengo una cuenta
@@ -221,7 +221,7 @@ export function AuthForm({
         ) : null}
         {mode === "reset" ? (
           <Link
-            className="text-moss decoration-moss/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+            className="text-terracotta decoration-terracotta/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
             href={`/login${nextQuery}`}
           >
             Volver a iniciar sesión
@@ -229,7 +229,7 @@ export function AuthForm({
         ) : null}
         {mode === "update" ? (
           <Link
-            className="text-moss decoration-moss/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+            className="text-terracotta decoration-terracotta/30 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
             href={`/login${nextQuery}`}
           >
             Volver a iniciar sesión

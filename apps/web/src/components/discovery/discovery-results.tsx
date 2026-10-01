@@ -200,7 +200,7 @@ export function DiscoveryResults({
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-2">
         <p
           aria-live="polite"
-          className={`text-sm font-semibold ${resultsError ? "text-danger" : "text-ink/60"}`}
+          className={`text-sm font-semibold ${resultsError ? "text-danger" : "text-ink/60"} ${!resultsError && rows.length === 0 ? "sr-only" : ""}`}
         >
           {resultsError
             ? resultsError
