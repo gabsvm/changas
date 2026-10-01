@@ -267,7 +267,7 @@ export default async function HomePage() {
           </section>
 
           {!user ? (
-            <section className="consumer-card bg-ink mt-4 flex flex-col gap-3 p-5 text-white">
+            <section className="consumer-card bg-ink! mt-4 flex flex-col gap-3 p-5 text-white">
               <div>
                 <h2 className="text-base font-extrabold tracking-[-0.02em]">
                   Tu oficio merece un buen escaparate.
