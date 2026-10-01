@@ -246,12 +246,23 @@ function conversationPreview(conversation: ConversationSummary): string {
   }
 }
 
+const CONVERSATION_TIME_ZONE = "America/Argentina/Buenos_Aires";
+
+const conversationDayFormatter = new Intl.DateTimeFormat("es-AR", {
+  timeZone: CONVERSATION_TIME_ZONE,
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+});
+
 function formatConversationTime(value: string): string {
   const date = new Date(value);
-  const now = new Date();
-  const sameDay = date.toDateString() === now.toDateString();
+  const sameDay =
+    conversationDayFormatter.format(date) ===
+    conversationDayFormatter.format(new Date());
 
   return new Intl.DateTimeFormat("es-AR", {
+    timeZone: CONVERSATION_TIME_ZONE,
     ...(sameDay
       ? { hour: "2-digit", minute: "2-digit" }
       : { day: "2-digit", month: "2-digit" }),
