@@ -127,35 +127,37 @@ async function onboardAndVerifyProvider({
     `Provider onboarding progress failed: ${result.error?.message ?? "unknown"}`,
   );
 
+  // Submission goes through submit_provider_identity_review(), which requires
+  // the complete case (front, back and selfie); direct status updates are
+  // server-authoritative.
   const bytes = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
-  const documentPath = `${user.id}/${crypto.randomUUID()}-phase10.jpg`;
-  const upload = await client.storage
-    .from("identity-documents")
-    .upload(documentPath, new Blob([bytes], { type: "image/jpeg" }), {
-      contentType: "image/jpeg",
-      upsert: false,
+  for (const documentType of ["DNI_FRONT", "DNI_BACK", "SELFIE"]) {
+    const documentPath = `${user.id}/${crypto.randomUUID()}-phase10-${documentType.toLowerCase()}.jpg`;
+    const upload = await client.storage
+      .from("identity-documents")
+      .upload(documentPath, new Blob([bytes], { type: "image/jpeg" }), {
+        contentType: "image/jpeg",
+        upsert: false,
+      });
+    assert(
+      !upload.error,
+      `Identity upload failed: ${upload.error?.message ?? "unknown"}`,
+    );
+
+    result = await client.from("provider_documents").insert({
+      user_id: user.id,
+      document_type: documentType,
+      storage_path: documentPath,
+      mime_type: "image/jpeg",
+      file_size_bytes: bytes.byteLength,
     });
-  assert(
-    !upload.error,
-    `Identity upload failed: ${upload.error?.message ?? "unknown"}`,
-  );
+    assert(
+      !result.error,
+      `Identity metadata failed: ${result.error?.message ?? "unknown"}`,
+    );
+  }
 
-  result = await client.from("provider_documents").insert({
-    user_id: user.id,
-    document_type: "DNI_FRONT",
-    storage_path: documentPath,
-    mime_type: "image/jpeg",
-    file_size_bytes: bytes.byteLength,
-  });
-  assert(
-    !result.error,
-    `Identity metadata failed: ${result.error?.message ?? "unknown"}`,
-  );
-
-  result = await client
-    .from("provider_profiles")
-    .update({ status: "IDENTITY_PENDING" })
-    .eq("user_id", user.id);
+  result = await client.rpc("submit_provider_identity_review");
   assert(
     !result.error,
     `Identity submission failed: ${result.error?.message ?? "unknown"}`,
