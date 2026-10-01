@@ -14,7 +14,6 @@ import { revalidatePath } from "next/cache";
 
 import type { ActionState } from "@/lib/forms/action-state";
 import { getFormString } from "@/lib/forms/form-data";
-import { parseServiceForm } from "@/lib/provider/service-input";
 import { createClient } from "@/lib/supabase/server";
 
 const certificationBucket = "provider-certification-evidence";
@@ -181,97 +180,6 @@ export async function removeProviderSkill(
   }
   revalidateMarketplace();
   return { success: "Habilidad quitada." };
-}
-
-function serviceRaw(formData: FormData) {
-  return {
-    skillId: getFormString(formData, "skillId"),
-    title: getFormString(formData, "title"),
-    description: getFormString(formData, "description"),
-    modality: getFormString(formData, "modality"),
-    priceModel: getFormString(formData, "priceModel"),
-    priceAmount: getFormString(formData, "priceAmount"),
-    currencyCode: getFormString(formData, "currencyCode") || "ARS",
-    priceUnit: getFormString(formData, "priceUnit"),
-    acceptsOffers: checkbox(formData, "acceptsOffers"),
-    expectedDurationMinutes: optionalNumber(
-      getFormString(formData, "expectedDurationMinutes"),
-    ),
-    scheduleType: getFormString(formData, "scheduleType"),
-    includes: getFormString(formData, "includes"),
-    excludes: getFormString(formData, "excludes"),
-    materialsNotes: getFormString(formData, "materialsNotes"),
-    isPublished: checkbox(formData, "isPublished"),
-    isPaused: checkbox(formData, "isPaused"),
-    tags: getFormString(formData, "tags")
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean),
-  };
-}
-
-export async function saveService(
-  _previousState: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  const parsedForm = parseServiceForm(serviceRaw(formData));
-  if (!parsedForm.ok) return errorState(parsedForm.message);
-  const { data: parsed, tags: parsedTags } = parsedForm;
-  const { supabase, user, provider } = await getContext();
-  if (!user || !provider)
-    return errorState("Prepará primero tu perfil de proveedor.");
-
-  const serviceId = getFormString(formData, "serviceId");
-  const payload = {
-    skill_id: parsed.skillId,
-    title: parsed.title,
-    description: parsed.description,
-    modality: parsed.modality,
-    price_model: parsed.priceModel,
-    price_amount: parsed.priceAmount ?? null,
-    currency_code: parsed.currencyCode,
-    price_unit: textOrNull(parsed.priceUnit),
-    accepts_offers: parsed.acceptsOffers,
-    expected_duration_minutes: parsed.expectedDurationMinutes ?? null,
-    schedule_type: parsed.scheduleType,
-    includes: textOrNull(parsed.includes),
-    excludes: textOrNull(parsed.excludes),
-    materials_notes: textOrNull(parsed.materialsNotes),
-    is_published: parsed.isPublished,
-    is_paused: parsed.isPaused,
-    sort_order: 0,
-  };
-  const result = serviceId
-    ? await supabase
-        .from("services")
-        .update(payload)
-        .eq("id", serviceId)
-        .eq("provider_user_id", user.id)
-        .select("id, public_slug")
-        .maybeSingle()
-    : await supabase
-        .from("services")
-        .insert({ ...payload, provider_user_id: user.id })
-        .select("id, public_slug")
-        .single();
-
-  if (result.error) {
-    return errorState(
-      parsed.isPublished
-        ? "No se puede publicar hasta estar ACTIVE y sin pausas."
-        : "No pudimos guardar el servicio.",
-    );
-  }
-  if (!result.data) return errorState("No pudimos encontrar el servicio.");
-
-  const { error: tagsError } = await supabase.rpc("replace_service_tags", {
-    target_service_id: result.data.id,
-    requested_tags: parsedTags,
-  });
-  if (tagsError) return errorState("No pudimos guardar los tags del servicio.");
-
-  revalidateMarketplace();
-  return { success: "Servicio guardado." };
 }
 
 export async function toggleServicePause(

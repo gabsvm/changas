@@ -81,8 +81,31 @@ type SaveServiceRpcArgs = {
 
 type SaveServiceRpcResult = {
   data: Array<{ id: string; public_slug: string }> | null;
-  error: { message: string } | null;
+  error: { message: string; code?: string | null } | null;
 };
+
+function saveServiceErrorMessage(
+  error: SaveServiceRpcResult["error"],
+  isPublished: boolean,
+): string {
+  const message = error?.message ?? "";
+  if (message.includes("only an active, unpaused provider can publish")) {
+    return "No se puede publicar hasta que tu perfil esté ACTIVE y sin pausas. Podés guardarlo sin publicar.";
+  }
+  switch (error?.code) {
+    case "42501":
+      return "Tu sesión expiró o este servicio no es tuyo. Volvé a iniciar sesión.";
+    case "23503":
+      return "La habilidad elegida ya no está en tu perfil. Agregala de nuevo arriba.";
+    case "23505":
+      return "Ya tenés un servicio con ese título. Probá con otro.";
+    case "23514":
+      return "Revisá los datos: algún campo no cumple las reglas del servicio.";
+  }
+  return isPublished
+    ? "No pudimos publicar el servicio. Probá de nuevo en unos minutos."
+    : "No pudimos guardar el servicio y sus tags. Probá de nuevo en unos minutos.";
+}
 
 export async function saveServiceTransactional(
   _previousState: ActionState,
@@ -136,11 +159,7 @@ export async function saveServiceTransactional(
   const { data, error } = await rpc("save_service_with_tags", args);
 
   if (error || !data?.length) {
-    return errorState(
-      parsed.isPublished
-        ? "No se pudo publicar el servicio. Revisá que tu perfil esté ACTIVE, sin pausas y que la habilidad siga seleccionada."
-        : "No pudimos guardar el servicio y sus tags.",
-    );
+    return errorState(saveServiceErrorMessage(error, parsed.isPublished));
   }
 
   revalidatePath("/provider/manage");
