@@ -1,6 +1,6 @@
-const STATIC_CACHE = "changas-static-v2";
+const STATIC_CACHE = "changas-static-v3";
 const OFFLINE_URL = "/offline";
-const STATIC_URLS = [OFFLINE_URL, "/icon-192.svg", "/icon-512.svg"];
+const STATIC_URLS = [OFFLINE_URL, "/icon-192.png", "/icon-512.png"];
 const SAFE_ACTION_ROOTS = ["/messages", "/jobs", "/account", "/provider"];
 
 self.addEventListener("install", (event) => {
@@ -45,8 +45,8 @@ self.addEventListener("fetch", (event) => {
 
   const isImmutableStatic =
     url.pathname.startsWith("/_next/static/") ||
-    url.pathname === "/icon-192.svg" ||
-    url.pathname === "/icon-512.svg";
+    url.pathname === "/icon-192.png" ||
+    url.pathname === "/icon-512.png";
 
   if (!isImmutableStatic) {
     return;
@@ -70,8 +70,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification("Changas", {
       body: "Tenés una actualización importante.",
-      icon: "/icon-192.svg",
-      badge: "/icon-192.svg",
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
       data: { actionUrl: "/account/notifications" },
     }),
   );
