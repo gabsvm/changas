@@ -2,6 +2,11 @@
 -- the mobile list can render amounts and next-action hints without extra calls.
 -- Columns are additive; existing callers keep working unchanged.
 
+-- Postgres cannot change the OUT columns of an existing function with
+-- "create or replace", so the previous signature is dropped first (grants are
+-- re-applied at the end of this file).
+drop function if exists public.list_my_upcoming_jobs(integer);
+
 create or replace function public.list_my_upcoming_jobs(limit_count integer default 20)
 returns table (
   job_id uuid,
