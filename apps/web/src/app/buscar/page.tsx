@@ -173,6 +173,7 @@ export default async function SearchPage({
 
             <div
               className="consumer-scrollbar-none -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pt-1 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
+              role="group"
               aria-label="Filtros activos"
             >
               {activeCategory ? (
