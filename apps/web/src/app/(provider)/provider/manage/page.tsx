@@ -55,20 +55,20 @@ export default async function ProviderMarketplaceManagePage({
   if (!user) redirect("/login?next=/provider/manage");
 
   const [
-    { data: provider },
-    { data: profile },
-    { data: skills },
-    { data: categories },
-    { data: providerSkills },
-    { data: services },
-    { data: serviceTags },
-    { data: experiences },
-    { data: education },
-    { data: certifications },
-    { data: portfolioItems },
-    { data: serviceAreas },
-    { data: availabilityRules },
-    { data: availabilityBlocks },
+    providerResult,
+    profileResult,
+    skillsResult,
+    categoriesResult,
+    providerSkillsResult,
+    servicesResult,
+    serviceTagsResult,
+    experiencesResult,
+    educationResult,
+    certificationsResult,
+    portfolioItemsResult,
+    serviceAreasResult,
+    availabilityRulesResult,
+    availabilityBlocksResult,
   ] = await Promise.all([
     supabase
       .from("provider_profiles")
@@ -135,6 +135,52 @@ export default async function ProviderMarketplaceManagePage({
       .eq("provider_user_id", user.id)
       .order("starts_at"),
   ]);
+
+  const provider = providerResult.data;
+  const profile = profileResult.data;
+  const skills = skillsResult.data;
+  const categories = categoriesResult.data;
+  const providerSkills = providerSkillsResult.data;
+  const services = servicesResult.data;
+  const serviceTags = serviceTagsResult.data;
+  const experiences = experiencesResult.data;
+  const education = educationResult.data;
+  const certifications = certificationsResult.data;
+  const portfolioItems = portfolioItemsResult.data;
+  const serviceAreas = serviceAreasResult.data;
+  const availabilityRules = availabilityRulesResult.data;
+  const availabilityBlocks = availabilityBlocksResult.data;
+
+  const loadFailed = [
+    providerResult,
+    skillsResult,
+    categoriesResult,
+    providerSkillsResult,
+    servicesResult,
+    serviceTagsResult,
+    experiencesResult,
+    educationResult,
+    certificationsResult,
+    portfolioItemsResult,
+    serviceAreasResult,
+    availabilityRulesResult,
+    availabilityBlocksResult,
+  ].some((result) => result.error);
+
+  if (providerResult.error) {
+    return (
+      <section className="pb-6 sm:py-14">
+        <MobileAppBar title="Gestionar servicios" backHref="/account" />
+        <EmptyState
+          title="No pudimos cargar tu perfil"
+          description="Hubo un problema al leer tus datos. Recargá la página en unos segundos."
+          actionHref="/provider/manage"
+          actionLabel="Reintentar"
+          className="pt-16"
+        />
+      </section>
+    );
+  }
 
   if (!provider) {
     return (
@@ -217,6 +263,16 @@ export default async function ProviderMarketplaceManagePage({
             </Link>
           </div>
         </div>
+
+        {loadFailed ? (
+          <p
+            className="bg-terracotta/10 text-terracotta mt-5 rounded-xl px-4 py-3 text-sm"
+            role="alert"
+          >
+            No pudimos cargar algunas secciones. Lo que ves puede estar
+            incompleto: recargá antes de editar.
+          </p>
+        ) : null}
 
         <div className="border-ink/10 mt-6 border-t pt-5">
           <ProviderPaymentAccount
