@@ -118,8 +118,7 @@ export async function saveServiceTransactional(
     requested_currency_code: parsed.currencyCode,
     requested_price_unit: textOrNull(parsed.priceUnit),
     requested_accepts_offers: parsed.acceptsOffers,
-    requested_expected_duration_minutes:
-      parsed.expectedDurationMinutes ?? null,
+    requested_expected_duration_minutes: parsed.expectedDurationMinutes ?? null,
     requested_schedule_type: parsed.scheduleType,
     requested_includes: textOrNull(parsed.includes),
     requested_excludes: textOrNull(parsed.excludes),
@@ -129,7 +128,8 @@ export async function saveServiceTransactional(
     requested_tags: parsedTags,
   };
 
-  const rpc = supabase.rpc as unknown as (
+  // Bind: supabase-js `rpc` reads `this.rest`, so a detached call throws.
+  const rpc = supabase.rpc.bind(supabase) as unknown as (
     functionName: "save_service_with_tags",
     rpcArgs: SaveServiceRpcArgs,
   ) => Promise<SaveServiceRpcResult>;

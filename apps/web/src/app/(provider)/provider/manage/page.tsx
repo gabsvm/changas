@@ -6,7 +6,10 @@ import { MarketplaceManagement } from "@/components/provider/marketplace-managem
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
-import { getProviderPaymentAccountState } from "@/lib/payments/server";
+import {
+  getProviderPaymentAccountState,
+  type ProviderPaymentAccountState,
+} from "@/lib/payments/server";
 import { createClient } from "@/lib/supabase/server";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 
@@ -148,8 +151,15 @@ export default async function ProviderMarketplaceManagePage({
     );
   }
 
+  // A payments failure must not take down the whole management page.
   const [paymentAccount, resolvedSearchParams] = await Promise.all([
-    getProviderPaymentAccountState(),
+    getProviderPaymentAccountState().catch((): ProviderPaymentAccountState => ({
+      providerName: "MERCADO_PAGO",
+      providerAccountReference: null,
+      status: "DISCONNECTED",
+      tokenExpiresAt: null,
+      updatedAt: null,
+    })),
     searchParams,
   ]);
   const paymentParam = resolvedSearchParams.payment_account;
@@ -199,7 +209,7 @@ export default async function ProviderMarketplaceManagePage({
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone={status.tone}>{status.label}</StatusChip>
             <Link
-              className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold hover:bg-brand-orange/[0.06]"
+              className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.06] inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
               href={`/p/${provider.public_slug}`}
               target="_blank"
             >
