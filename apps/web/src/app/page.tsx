@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import type { Metadata } from "next";
 
 import { parseDiscoveryFilters } from "@changas/domain";
@@ -70,6 +71,9 @@ export default async function HomePage() {
               </span>
             </span>
           </Link>
+          <div className="mr-2 ml-auto hidden sm:block">
+            <DesktopNav authenticated={Boolean(user)} />
+          </div>
           {user ? (
             <Link
               href="/account"

@@ -78,7 +78,17 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Start local Supabase
-        run: pnpm dlx supabase@2.116.0 start --exclude edge-runtime
+        run: |
+          # Docker Hub / ECR can rate-limit image pulls; retry before failing.
+          for attempt in 1 2 3; do
+            if pnpm dlx supabase@2.116.0 start --exclude edge-runtime; then
+              exit 0
+            fi
+            echo "supabase start failed (attempt $attempt); retrying in 30s"
+            pnpm dlx supabase@2.116.0 stop --no-backup || true
+            sleep 30
+          done
+          exit 1
 
       - name: Reset local database
         run: pnpm dlx supabase@2.116.0 db reset --local --no-seed

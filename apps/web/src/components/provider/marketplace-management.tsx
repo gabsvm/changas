@@ -486,7 +486,7 @@ function ServiceForm({
           />
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <label className="text-sm font-semibold">
           Moneda
           <select
@@ -513,68 +513,73 @@ function ServiceForm({
             }
           />
         </div>
-        <Field
-          label="Duración en minutos"
-          name="expectedDurationMinutes"
-          type="number"
-          min={1}
-          defaultValue={service?.expected_duration_minutes}
+      </div>
+      <div className="flex flex-wrap items-center gap-4">
+        <Check
+          label="Acepta propuestas"
+          name="acceptsOffers"
+          defaultChecked={service?.accepts_offers}
+        />
+        <Check
+          label="Publicado"
+          name="isPublished"
+          defaultChecked={service?.is_published}
+        />
+        <Check
+          label="Pausado"
+          name="isPaused"
+          defaultChecked={service?.is_paused}
         />
       </div>
-      <Field
-        label="Tags (separados por comas, hasta 8)"
-        name="tags"
-        defaultValue={serviceTags.join(", ")}
-      />
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="text-sm font-semibold">
-          Agenda
-          <select
-            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
-            name="scheduleType"
-            defaultValue={service?.schedule_type ?? "UNSCHEDULED"}
-          >
-            <option value="FIXED_SLOT">Horario fijo</option>
-            <option value="FLEXIBLE_WINDOW">Ventana flexible</option>
-            <option value="DEADLINE">Con fecha límite</option>
-            <option value="UNSCHEDULED">Sin agenda todavía</option>
-          </select>
-        </label>
-        <div className="flex flex-wrap items-end gap-4 pb-2">
-          <Check
-            label="Acepta propuestas"
-            name="acceptsOffers"
-            defaultChecked={service?.accepts_offers}
+      <details className="border-ink/10 rounded-xl border bg-white/60 px-3 py-1">
+        <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center text-sm font-bold">
+          Más detalles (opcional)
+        </summary>
+        <div className="space-y-4 pt-2 pb-3">
+          <Field
+            label="Duración en minutos"
+            name="expectedDurationMinutes"
+            type="number"
+            min={1}
+            defaultValue={service?.expected_duration_minutes}
           />
-          <Check
-            label="Publicado"
-            name="isPublished"
-            defaultChecked={service?.is_published}
+          <Field
+            label="Tags (separados por comas, hasta 8)"
+            name="tags"
+            defaultValue={serviceTags.join(", ")}
           />
-          <Check
-            label="Pausado"
-            name="isPaused"
-            defaultChecked={service?.is_paused}
-          />
+          <label className="text-sm font-semibold">
+            Agenda
+            <select
+              className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
+              name="scheduleType"
+              defaultValue={service?.schedule_type ?? "UNSCHEDULED"}
+            >
+              <option value="FIXED_SLOT">Horario fijo</option>
+              <option value="FLEXIBLE_WINDOW">Ventana flexible</option>
+              <option value="DEADLINE">Con fecha límite</option>
+              <option value="UNSCHEDULED">Sin agenda todavía</option>
+            </select>
+          </label>
+          <div className="grid gap-4 md:grid-cols-3">
+            <TextArea
+              label="Incluye"
+              name="includes"
+              defaultValue={service?.includes}
+            />
+            <TextArea
+              label="No incluye"
+              name="excludes"
+              defaultValue={service?.excludes}
+            />
+            <TextArea
+              label="Materiales y notas"
+              name="materialsNotes"
+              defaultValue={service?.materials_notes}
+            />
+          </div>
         </div>
-      </div>
-      <div className="grid gap-4 md:grid-cols-3">
-        <TextArea
-          label="Incluye"
-          name="includes"
-          defaultValue={service?.includes}
-        />
-        <TextArea
-          label="No incluye"
-          name="excludes"
-          defaultValue={service?.excludes}
-        />
-        <TextArea
-          label="Materiales y notas"
-          name="materialsNotes"
-          defaultValue={service?.materials_notes}
-        />
-      </div>
+      </details>
     </ActionForm>
   );
 }
@@ -813,7 +818,10 @@ export function MarketplaceManagement({
       >
         <div className="space-y-5">
           {skills.length ? (
-            <details className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3">
+            <details
+              open={services.length === 0}
+              className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3"
+            >
               <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
                 + Nuevo servicio
                 <span className="text-ink/40 text-xl" aria-hidden="true">

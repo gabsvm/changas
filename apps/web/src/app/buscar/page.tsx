@@ -1,3 +1,4 @@
+import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -125,6 +126,7 @@ export default async function SearchPage({
         <AppHeader
           backHref="/"
           title={query ? `“${query}”` : "Buscar"}
+          desktopNav={<DesktopNav authenticated={Boolean(user)} />}
           action={
             <Link
               href={user ? "/account" : "/login"}
