@@ -171,7 +171,7 @@ export function AuthenticatedBottomNav({
 
   return (
     <nav
-      className="mobile-safe-bottom bg-surface/98 border-ink/[0.07] fixed inset-x-0 bottom-0 z-50 border-t px-2 pt-1 backdrop-blur-xl sm:hidden"
+      className="bottom-nav-shell mobile-safe-bottom bg-surface/90 border-ink/[0.07] fixed inset-x-0 bottom-0 z-50 border-t px-2 pt-1 backdrop-blur-xl sm:hidden"
       aria-label="Navegación principal"
     >
       <div className="mx-auto grid h-[var(--consumer-nav-height)] max-w-md grid-cols-5">
@@ -193,7 +193,7 @@ export function AuthenticatedBottomNav({
               }`}
             >
               <span
-                className={`relative grid place-items-center rounded-full transition-colors ${
+                className={`nav-icon relative grid place-items-center rounded-full transition-colors ${
                   item.central && active
                     ? "bg-ink h-12 w-12 text-white shadow-lg"
                     : item.central

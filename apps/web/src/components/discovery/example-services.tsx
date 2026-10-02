@@ -1,3 +1,4 @@
+import { riseStyle } from "@/lib/ui/motion";
 import { EXAMPLE_SERVICES } from "@/lib/discovery/example-services";
 import { ServiceCard } from "@/components/ui/marketplace/service-card";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
@@ -21,8 +22,12 @@ export function ExampleServices({ publishHref }: { publishHref: string }) {
         y desaparecen cuando se publique el primer servicio real.
       </p>
       <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {EXAMPLE_SERVICES.map((row) => (
-          <li key={row.service_slug}>
+        {EXAMPLE_SERVICES.map((row, index) => (
+          <li
+            key={row.service_slug}
+            className="rise-in"
+            style={riseStyle(index)}
+          >
             <ServiceCard row={row} example />
           </li>
         ))}

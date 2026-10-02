@@ -51,7 +51,7 @@ export default async function HomePage() {
       className="feed-home bg-canvas text-ink mobile-content-with-nav min-h-screen"
     >
       <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-8 sm:pt-5">
-        <header className="bg-canvas/90 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-14 items-center justify-between border-b px-4 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
+        <header className="consumer-app-header bg-canvas/90 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-14 items-center justify-between border-b px-4 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
           <Link
             className="flex min-w-0 items-center gap-2.5"
             href="/"
