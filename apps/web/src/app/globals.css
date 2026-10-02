@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas: #fff9f3;
-  --color-surface: #fffdf9;
-  --color-surface-muted: #fff1e8;
-  --color-ink: #202124;
+  --color-canvas: #fbf8f3;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f3efe9;
+  --color-ink: #17140f;
   --color-moss: #2563eb;
   --color-brand-orange: #ff6b35;
   --color-terracotta: #c84010;
@@ -24,11 +24,11 @@
 
 :root {
   color-scheme: light;
-  background: #fff9f3;
-  --border-soft: rgb(32 33 36 / 9%);
-  --text-muted: rgb(32 33 36 / 62%);
-  --surface-elevated: #fffdf9;
-  --surface-muted: #fff1e8;
+  background: #fbf8f3;
+  --border-soft: rgb(23 20 15 / 9%);
+  --text-muted: rgb(23 20 15 / 62%);
+  --surface-elevated: #ffffff;
+  --surface-muted: #f3efe9;
   --brand-gradient: linear-gradient(
     135deg,
     #ffc857 0%,
@@ -44,25 +44,30 @@
   --consumer-radius-large: 1.25rem;
   --consumer-radius-control: 0.75rem;
   --consumer-nav-height: 4rem;
-  --consumer-divider: rgb(32 33 36 / 8%);
-  --consumer-surface: #fffdf9;
+  --consumer-divider: rgb(23 20 15 / 8%);
+  --consumer-surface: #ffffff;
   --consumer-surface-strong: #ffffff;
   --consumer-surface-raised: #ffffff;
-  --consumer-muted: rgb(32 33 36 / 60%);
+  --consumer-muted: rgb(23 20 15 / 60%);
   --consumer-shadow-card:
-    0 1px 2px rgb(32 33 36 / 6%), 0 8px 20px -6px rgb(32 33 36 / 12%);
+    0 1px 2px rgb(23 20 15 / 6%), 0 8px 20px -6px rgb(23 20 15 / 12%);
   --consumer-shadow-float:
-    0 2px 4px rgb(32 33 36 / 5%), 0 16px 36px -10px rgb(32 33 36 / 20%);
+    0 2px 4px rgb(23 20 15 / 5%), 0 16px 36px -10px rgb(23 20 15 / 20%);
   --consumer-shadow-hero:
     0 4px 10px rgb(255 107 53 / 14%), 0 30px 64px -18px rgb(255 87 34 / 46%);
-  --shadow-xs: 0 1px 2px rgb(32 33 36 / 8%);
+  --shadow-xs: 0 1px 2px rgb(23 20 15 / 8%);
   --shadow-md:
-    0 2px 4px rgb(32 33 36 / 6%), 0 14px 30px -8px rgb(32 33 36 / 18%);
+    0 2px 4px rgb(23 20 15 / 6%), 0 14px 30px -8px rgb(23 20 15 / 18%);
   --shadow-lg:
-    0 4px 8px rgb(32 33 36 / 7%), 0 26px 52px -14px rgb(32 33 36 / 28%);
+    0 4px 8px rgb(23 20 15 / 7%), 0 26px 52px -14px rgb(23 20 15 / 28%);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --consumer-hero-gradient: var(--brand-gradient);
+  --consumer-hero-gradient: linear-gradient(
+    135deg,
+    #ffb340 0%,
+    #ff7a2f 46%,
+    #f2531c 100%
+  );
 
   --mobile-bottom-nav-height: calc(
     var(--consumer-nav-height) + max(0.75rem, env(safe-area-inset-bottom))
@@ -80,20 +85,14 @@ html {
 
 body {
   margin: 0;
-  background: #fff9f3;
-  background-image:
-    radial-gradient(
-      90rem 28rem at 50% -14rem,
-      rgb(255 200 87 / 22%),
-      transparent 70%
-    ),
-    radial-gradient(
-      46rem 24rem at 100% 8rem,
-      rgb(255 10 120 / 5%),
-      transparent 70%
-    );
+  background: #fbf8f3;
+  background-image: radial-gradient(
+    90rem 28rem at 50% -14rem,
+    rgb(255 200 87 / 22%),
+    transparent 70%
+  );
   background-repeat: no-repeat;
-  color: #202124;
+  color: #17140f;
   font-family:
     var(--font-plus-jakarta),
     ui-sans-serif,
@@ -147,7 +146,7 @@ textarea {
 
 ::selection {
   background: rgb(255 200 87 / 48%);
-  color: #202124;
+  color: #17140f;
 }
 
 .skip-link {
@@ -157,7 +156,7 @@ textarea {
   z-index: 60;
   transform: translateY(-200%);
   border-radius: 999px;
-  background: #202124;
+  background: #17140f;
   padding: 0.75rem 1rem;
   color: white;
   font-size: 0.875rem;
@@ -217,7 +216,7 @@ textarea {
 .brand-hero-search .consumer-control,
 .brand-hero-search input,
 .brand-hero-search select {
-  box-shadow: 0 3px 12px rgb(32 33 36 / 5%);
+  box-shadow: 0 3px 12px rgb(23 20 15 / 5%);
 }
 
 .brand-kicker {
@@ -248,24 +247,19 @@ textarea {
 }
 
 .button-primary {
-  background: #ff6b35;
-  background-image: linear-gradient(
-    180deg,
-    #ff7d4a 0%,
-    #ff6b35 60%,
-    #f65a24 100%
-  );
-  color: #202124;
+  background: #17140f;
+  background-image: linear-gradient(180deg, #2c2720 0%, #17140f 100%);
+  color: #ffffff;
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 38%),
-    0 1px 2px rgb(32 33 36 / 12%),
-    0 10px 22px -8px rgb(255 87 34 / 60%);
+    inset 0 1px 0 rgb(255 255 255 / 14%),
+    0 1px 2px rgb(23 20 15 / 22%),
+    0 12px 24px -12px rgb(23 20 15 / 60%);
 }
 
 .button-secondary {
-  border: 1px solid rgb(32 33 36 / 12%);
+  border: 1px solid rgb(23 20 15 / 12%);
   background: #ffffff;
-  color: #202124;
+  color: #17140f;
   box-shadow: var(--shadow-xs);
 }
 
@@ -287,7 +281,7 @@ textarea {
 }
 
 .consumer-card {
-  border: 1px solid rgb(32 33 36 / 6%);
+  border: 1px solid rgb(23 20 15 / 6%);
   border-radius: var(--consumer-radius-card);
   background: var(--consumer-surface-strong);
   box-shadow: var(--consumer-shadow-card);
@@ -312,13 +306,13 @@ textarea {
 }
 
 .consumer-skeleton {
-  background: rgb(32 33 36 / 6%);
+  background: rgb(23 20 15 / 6%);
   border-radius: 0.75rem;
   animation: consumer-pulse 1.4s ease-in-out infinite;
 }
 
 .skeleton-shimmer {
-  background-color: rgb(32 33 36 / 6%);
+  background-color: rgb(23 20 15 / 6%);
   background-image: linear-gradient(
     100deg,
     transparent 20%,
@@ -351,7 +345,7 @@ textarea {
 
 .consumer-toast {
   border-radius: 0.75rem;
-  background: #202124;
+  background: #17140f;
   color: #fff;
   box-shadow: var(--consumer-shadow-float);
 }
@@ -384,7 +378,7 @@ textarea {
 }
 
 .profile-facts > div {
-  box-shadow: 0 4px 12px rgb(32 33 36 / 4%);
+  box-shadow: 0 4px 12px rgb(23 20 15 / 4%);
 }
 
 .service-price-panel {
@@ -392,7 +386,7 @@ textarea {
 }
 
 .profile-section-card {
-  border-color: rgb(32 33 36 / 7%);
+  border-color: rgb(23 20 15 / 7%);
 }
 
 .service-card-shell {
@@ -406,7 +400,7 @@ textarea {
 }
 
 .service-cta-bar {
-  box-shadow: 0 -10px 24px rgb(32 33 36 / 8%);
+  box-shadow: 0 -10px 24px rgb(23 20 15 / 8%);
   bottom: var(--sticky-offset);
 }
 
@@ -415,7 +409,7 @@ textarea {
 }
 
 .empty-state-card {
-  border: 1px solid rgb(32 33 36 / 6%);
+  border: 1px solid rgb(23 20 15 / 6%);
   border-radius: var(--consumer-radius-card);
   background: var(--consumer-surface-strong);
   box-shadow: var(--consumer-shadow-card);
@@ -442,7 +436,7 @@ button:hover .chevron {
 
 .consumer-control {
   min-height: 3rem;
-  border: 1px solid rgb(32 33 36 / 12%);
+  border: 1px solid rgb(23 20 15 / 12%);
   border-radius: var(--consumer-radius-control);
   background: var(--consumer-surface-strong);
   box-shadow: var(--shadow-xs);
@@ -452,7 +446,7 @@ button:hover .chevron {
 }
 
 .consumer-control:hover {
-  border-color: rgb(32 33 36 / 22%);
+  border-color: rgb(23 20 15 / 22%);
 }
 
 .consumer-control:focus-within {
@@ -500,7 +494,7 @@ button:hover .chevron {
   right: -1rem;
   height: 11rem;
   width: 11rem;
-  border: 1px solid rgb(32 33 36 / 15%);
+  border: 1px solid rgb(23 20 15 / 15%);
   border-radius: 999px;
 }
 
@@ -511,8 +505,8 @@ button:hover .chevron {
   height: 0.75rem;
   width: 0.75rem;
   border-radius: 999px;
-  background: #fff9f3;
-  box-shadow: 0 0 0 5px rgb(32 33 36 / 10%);
+  background: #fbf8f3;
+  box-shadow: 0 0 0 5px rgb(23 20 15 / 10%);
   content: "";
 }
 
@@ -559,40 +553,63 @@ button:hover .chevron {
    prefers-reduced-motion block below.
    ------------------------------------------------------------------ */
 
-/* Primary calls to action written with utilities (bg-brand-orange). */
-a.bg-brand-orange,
-button.bg-brand-orange {
-  background-image: linear-gradient(
-    180deg,
-    #ff7d4a 0%,
-    #ff6b35 60%,
-    #f65a24 100%
-  );
+/* Primary calls to action: ink with white text (Uber-like contrast). */
+.cta-ink {
+  background: #17140f;
+  background-image: linear-gradient(180deg, #2c2720 0%, #17140f 100%);
+  color: #ffffff;
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 38%),
-    0 1px 2px rgb(32 33 36 / 12%),
-    0 10px 22px -8px rgb(255 87 34 / 60%);
+    inset 0 1px 0 rgb(255 255 255 / 14%),
+    0 1px 2px rgb(23 20 15 / 22%),
+    0 12px 24px -12px rgb(23 20 15 / 60%);
   transition:
     transform 180ms var(--ease-out),
     box-shadow 180ms var(--ease-out),
     filter 180ms var(--ease-out);
 }
 
+/* Soft tiles and glass chips (categories, hero shortcuts). */
+.tile-soft {
+  background: #f2eee8;
+  transition:
+    transform 180ms var(--ease-out),
+    background-color 180ms var(--ease-out);
+}
+
+.chip-glass {
+  border: 1px solid rgb(255 255 255 / 60%);
+  background: rgb(255 255 255 / 32%);
+  color: #17140f;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition:
+    transform 180ms var(--ease-out),
+    background-color 180ms var(--ease-out);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .button-primary:hover,
-  a.bg-brand-orange:hover,
-  button.bg-brand-orange:hover {
+  .cta-ink:hover {
     transform: translateY(-1px);
-    filter: saturate(1.08) brightness(1.03);
+    filter: brightness(1.15);
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 42%),
-      0 2px 4px rgb(32 33 36 / 14%),
-      0 16px 28px -8px rgb(255 87 34 / 68%);
+      inset 0 1px 0 rgb(255 255 255 / 18%),
+      0 2px 4px rgb(23 20 15 / 24%),
+      0 18px 30px -12px rgb(23 20 15 / 70%);
+  }
+
+  .tile-soft:hover {
+    transform: translateY(-2px);
+    background: #ebe5dc;
+  }
+
+  .chip-glass:hover {
+    background: rgb(255 255 255 / 52%);
   }
 
   .button-secondary:hover {
     transform: translateY(-1px);
-    border-color: rgb(32 33 36 / 22%);
+    border-color: rgb(23 20 15 / 22%);
     box-shadow: var(--shadow-md);
   }
 
@@ -604,10 +621,14 @@ button.bg-brand-orange {
 }
 
 .button-primary:active,
-a.bg-brand-orange:active,
-button.bg-brand-orange:active {
+.cta-ink:active {
   transform: scale(0.97);
   filter: none;
+}
+
+.tile-soft:active,
+.chip-glass:active {
+  transform: scale(0.96);
 }
 
 /* Entrance: staggered rise for lists and cards. */
@@ -660,8 +681,8 @@ button.bg-brand-orange:active {
 /* Bottom navigation: lifted bar and a springy active icon. */
 .bottom-nav-shell {
   box-shadow:
-    0 -1px 0 rgb(32 33 36 / 4%),
-    0 -14px 32px -16px rgb(32 33 36 / 24%);
+    0 -1px 0 rgb(23 20 15 / 4%),
+    0 -14px 32px -16px rgb(23 20 15 / 24%);
 }
 
 @keyframes nav-pop {
@@ -683,10 +704,10 @@ a[aria-current="page"] .nav-icon {
 /* Sticky headers gain a soft shadow once the page scrolls (Chromium). */
 @keyframes header-lift {
   from {
-    box-shadow: 0 0 0 rgb(32 33 36 / 0%);
+    box-shadow: 0 0 0 rgb(23 20 15 / 0%);
   }
   to {
-    box-shadow: 0 10px 28px -14px rgb(32 33 36 / 28%);
+    box-shadow: 0 10px 28px -14px rgb(23 20 15 / 28%);
   }
 }
 

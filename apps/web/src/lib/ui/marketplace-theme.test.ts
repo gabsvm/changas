@@ -17,8 +17,8 @@ describe("marketplace consumer theme", () => {
   });
 
   it("uses the approved Changas brand colors", () => {
-    expect(css).toContain("--color-canvas: #fff9f3");
-    expect(css).toContain("--color-ink: #202124");
+    expect(css).toContain("--color-canvas: #fbf8f3");
+    expect(css).toContain("--color-ink: #17140f");
     expect(css).toContain("--color-brand-orange: #ff6b35");
     expect(css).toContain("--color-brand-yellow: #ffc857");
     expect(css).toContain("--color-brand-pink: #ff0a78");

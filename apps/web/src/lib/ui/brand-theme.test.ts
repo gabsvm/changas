@@ -32,16 +32,16 @@ describe("Changas brand theme", () => {
   });
 
   it("uses the approved Changas palette as the global visual foundation", () => {
-    expect(globals).toContain("--color-canvas: #fff9f3");
-    expect(globals).toContain("--color-ink: #202124");
+    expect(globals).toContain("--color-canvas: #fbf8f3");
+    expect(globals).toContain("--color-ink: #17140f");
     expect(globals).toContain("--color-brand-orange: #ff6b35");
     expect(globals).toContain("--color-brand-yellow: #ffc857");
     expect(globals).toContain("--color-moss: #2563eb");
   });
 
-  it("keeps primary actions warm and reserves blue for functional contrast", () => {
-    expect(globals).toMatch(/\.button-primary[\s\S]*background:\s*#ff6b35/i);
-    expect(globals).toMatch(/\.button-primary[\s\S]*color:\s*#202124/i);
+  it("uses ink primary actions and reserves blue for functional contrast", () => {
+    expect(globals).toMatch(/\.button-primary[\s\S]*background:\s*#17140f/i);
+    expect(globals).toMatch(/\.button-primary[\s\S]*color:\s*#ffffff/i);
     expect(globals).toMatch(
       /:focus-visible[\s\S]*outline:\s*2px solid #2563eb/i,
     );

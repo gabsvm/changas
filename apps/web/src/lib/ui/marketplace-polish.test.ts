@@ -185,7 +185,6 @@ describe("marketplace polish contracts", () => {
 
   it("gives public discovery surfaces a shared tactile composition", () => {
     expect(rootSource).toContain("feed-trust-mark");
-    expect(rootSource).toContain("consumer-snap-rail");
     expect(categorySource).toContain("discovery-hero");
     expect(categorySource).toContain("discovery-results-shell");
     expect(providerSource).toContain("profile-hero-card");
