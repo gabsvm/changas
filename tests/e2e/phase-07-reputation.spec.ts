@@ -212,7 +212,7 @@ test.describe("Phase 07 reputation", () => {
       page.getByRole("heading", { name: "Proveedores guardados" }),
     ).toBeVisible();
     await expect(
-      page.getByText("Proveedor guardado", { exact: true }),
+      page.getByText("Demo Proveedor", { exact: true }).first(),
     ).toBeVisible();
     await expect(page.getByText(/reseñas?/)).toBeVisible();
     await expect(page.getByText(/completados/)).toBeVisible();

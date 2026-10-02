@@ -138,13 +138,14 @@ test.describe("Phase 08 notifications and PWA", () => {
           .filter({ visible: true }),
       ).toHaveCount(0);
 
-      const promotional = page.locator('input[name="promotionalEnabled"]');
+      // Preferences auto-save when a switch changes; the switch input is
+      // visually hidden behind its track, so toggle it with force.
+      const promotional = page.getByRole("switch", { name: "Promociones" });
       await expect(promotional).not.toBeChecked();
-      await promotional.check();
-      await page.getByRole("button", { name: "Guardar preferencias" }).click();
-      await expect(page.getByRole("status")).toContainText(
-        "Preferencias actualizadas.",
-      );
+      await promotional.setChecked(true, { force: true });
+      await expect(
+        page.getByRole("status").filter({ hasText: "Cambios guardados" }),
+      ).toBeVisible();
       await page.reload();
       await expect(promotional).toBeChecked();
       await expectNoHorizontalOverflow(page);

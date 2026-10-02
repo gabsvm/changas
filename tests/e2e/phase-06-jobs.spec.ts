@@ -203,7 +203,7 @@ test.describe("Phase 06 Jobs", () => {
     await expect(page).toHaveURL(new RegExp(`/jobs/${jobId}$`));
     await expect(page.getByText("Confirmado", { exact: true })).toBeVisible();
     await expect(
-      page.getByText("Alcance congelado", { exact: true }),
+      page.getByText("Alcance acordado", { exact: true }),
     ).toBeVisible();
     await expect(page.getByText(scope, { exact: true })).toBeVisible();
     await expectNoHorizontalOverflow(page);

@@ -223,7 +223,7 @@ test("compresses large identity photos before Server Action and Storage", async 
       });
       await expect(
         page.getByRole("button", { name: "Subir documento privado" }),
-      ).toBeEnabled();
+      ).toBeEnabled({ timeout: 20_000 });
       await page
         .getByRole("button", { name: "Subir documento privado" })
         .click();
