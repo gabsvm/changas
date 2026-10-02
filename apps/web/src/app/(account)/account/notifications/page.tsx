@@ -1,22 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { NotificationPreferencesForm } from "@/components/notifications/notification-preferences-form";
-import { PushOptIn } from "@/components/pwa/push-opt-in";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
-import {
-  getNotificationPreferences,
-  listNotifications,
-} from "@/lib/notifications/server";
+import { listNotifications } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 import { getNotificationKindLabel } from "@/lib/ui/notifications";
 
 import {
   markAllNotificationsReadAction,
   markNotificationReadAction,
-  updateNotificationPreferencesAction,
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -59,10 +53,7 @@ export default async function NotificationCenterPage() {
 
   if (!user) redirect("/login?next=/account/notifications");
 
-  const [notifications, preferences] = await Promise.all([
-    listNotifications(supabase),
-    getNotificationPreferences(supabase),
-  ]);
+  const notifications = await listNotifications(supabase);
   const unreadCount = notifications.filter((item) => item.unread).length;
   const groups = new Map<string, typeof notifications>();
 
@@ -86,10 +77,10 @@ export default async function NotificationCenterPage() {
           </div>
           <div className="flex items-center gap-1 self-start">
             <Link
-              href="#preferencias"
+              href="/account/settings/notifications"
               className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold whitespace-nowrap"
             >
-              Preferencias de avisos
+              Ajustes de avisos
             </Link>
             {unreadCount > 0 ? (
               <form action={markAllNotificationsReadAction}>
@@ -104,7 +95,7 @@ export default async function NotificationCenterPage() {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(19rem,0.7fr)] lg:gap-10">
+        <div className="mt-5 max-w-3xl">
           <section aria-label="Actividad reciente">
             {notifications.length === 0 ? (
               <EmptyState
@@ -190,26 +181,6 @@ export default async function NotificationCenterPage() {
               </div>
             )}
           </section>
-
-          <aside id="preferencias" className="scroll-mt-24">
-            <h2 className="text-lg font-bold tracking-[-0.02em]">
-              Notificaciones
-            </h2>
-            <p className="text-ink/48 mt-1 text-xs leading-5">
-              Las alertas críticas dentro de Changas siguen disponibles aunque
-              desactives canales externos.
-            </p>
-            <div className="consumer-card settings-card bg-surface divide-ink/[0.07] mt-3 divide-y px-4">
-              <PushOptIn
-                publicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""}
-                initialEnabled={preferences.pushActionableEnabled}
-              />
-              <NotificationPreferencesForm
-                action={updateNotificationPreferencesAction}
-                initialValues={preferences}
-              />
-            </div>
-          </aside>
         </div>
       </div>
     </section>

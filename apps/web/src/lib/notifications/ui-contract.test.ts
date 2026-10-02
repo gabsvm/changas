@@ -8,16 +8,24 @@ function source(path: string): string {
 }
 
 describe("Phase 08 notification center UI contract", () => {
-  it("renders the owner notification center with read controls and preferences", () => {
+  it("renders the owner notification center with read controls", () => {
     const page = source(
       "apps/web/src/app/(account)/account/notifications/page.tsx",
     );
 
     expect(page).toContain("listNotifications");
     expect(page).toContain("markAllNotificationsReadAction");
+    expect(page).toContain("/account/settings/notifications");
+    expect(page).toContain("Todo al día");
+  });
+
+  it("keeps push and preferences on their own settings page", () => {
+    const page = source(
+      "apps/web/src/app/(account)/account/settings/notifications/page.tsx",
+    );
+
     expect(page).toContain("NotificationPreferencesForm");
     expect(page).toContain("PushOptIn");
-    expect(page).toContain("Todo al día");
   });
 
   it("shows an SSR unread badge in account navigation", () => {

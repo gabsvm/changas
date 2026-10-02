@@ -148,12 +148,11 @@ describe("marketplace polish contracts", () => {
     expect(messagesSource).toContain("empty-state-card");
     expect(messagesSource).toContain("rounded-full");
     expect(activitySource).toContain("empty-state-card");
-    expect(activitySource).toContain("settings-card");
   });
 
   it("keeps activity rows compact with preferences reachable", () => {
-    expect(activitySource).toContain("#preferencias");
-    expect(activitySource).toContain("Preferencias de avisos");
+    expect(activitySource).toContain("/account/settings/notifications");
+    expect(activitySource).toContain("Ajustes de avisos");
     expect(activitySource).not.toContain("Marcar como leída");
   });
 
