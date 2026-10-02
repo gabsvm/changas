@@ -236,6 +236,9 @@ test("compresses large identity photos before Server Action and Storage", async 
           return ((await response.json()) as Array<{ id: string }>).length;
         })
         .toBe(index + 1);
+      // The page refreshes after each upload and resets the form; wait for the
+      // refreshed requirements list before selecting the next document.
+      await expect(page.getByText(`${index + 1}/3 recibidos`)).toBeVisible();
     }
 
     expect(requestSizes.length).toBeGreaterThanOrEqual(2);
