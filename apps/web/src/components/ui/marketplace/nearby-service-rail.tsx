@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
 
 import { ServiceCard } from "./service-card";
+import { ServiceRow } from "./service-row";
 
 export function NearbyServiceRail({
   rows,
@@ -51,7 +52,7 @@ export function NearbyServiceRail({
       <ul
         className={
           layout === "stack"
-            ? "mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
+            ? "mt-1 grid grid-cols-1 sm:grid-cols-2 sm:gap-x-8"
             : "consumer-scrollbar-none consumer-snap-rail -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0"
         }
       >
@@ -63,7 +64,11 @@ export function NearbyServiceRail({
               layout === "stack" ? "" : "w-[min(84vw,22rem)] shrink-0"
             }`}
           >
-            <ServiceCard row={row} />
+            {layout === "stack" ? (
+              <ServiceRow row={row} />
+            ) : (
+              <ServiceCard row={row} />
+            )}
           </li>
         ))}
       </ul>

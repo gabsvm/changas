@@ -10,8 +10,7 @@ export function actionButtonClass(
   const base =
     "consumer-pressable inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl px-5 text-[15px] font-extrabold outline-none transition disabled:cursor-not-allowed disabled:opacity-55";
   const tones: Record<ActionTone, string> = {
-    primary:
-      "bg-brand-orange text-ink shadow-[0_5px_14px_rgba(255,107,53,0.16)] hover:bg-[#f75b29]",
+    primary: "cta-ink",
     secondary:
       "border border-ink/10 bg-white text-ink hover:border-ink/16 hover:bg-surface",
     ghost: "bg-transparent text-ink/70 hover:bg-ink/[0.045] hover:text-ink",

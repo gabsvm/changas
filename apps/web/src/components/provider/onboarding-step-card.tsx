@@ -15,7 +15,7 @@ function StepBadge({ step }: { step: OnboardingStepPresentation }) {
     <span
       className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-extrabold ${
         step.state === "current"
-          ? "bg-brand-orange text-ink"
+          ? "cta-ink"
           : step.state === "complete"
             ? "bg-success/12 text-success"
             : "bg-ink/[0.06] text-ink/45"

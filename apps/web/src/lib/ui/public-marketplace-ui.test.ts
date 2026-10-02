@@ -76,7 +76,7 @@ describe("public marketplace detail UI", () => {
     expect(brandHero).toContain("<section");
     expect(brandHero).toContain("<h1");
     expect(categoryTile).toContain("Link");
-    expect(categoryTile).toContain("w-24");
+    expect(categoryTile).toContain("tile-soft");
     expect(categoryTile).toContain("CategoryIcon");
     expect(nearbyServiceRail).toContain("ServiceCard");
     expect(nearbyServiceRail).toContain("aria-label");

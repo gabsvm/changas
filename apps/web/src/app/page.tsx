@@ -93,82 +93,66 @@ export default async function HomePage() {
         <div className="pt-4 sm:pt-9">
           <section
             aria-labelledby="home-search-title"
-            className="brand-gradient-surface text-ink relative overflow-hidden rounded-[1.25rem] p-5 shadow-[var(--consumer-shadow-hero)] sm:p-7"
+            className="brand-gradient-surface text-ink relative overflow-hidden rounded-[1.75rem] p-5 shadow-[var(--consumer-shadow-hero)] sm:p-9"
           >
             <div className="relative z-10 max-w-2xl">
-              <p className="text-ink/85 text-xs font-extrabold tracking-[0.12em] uppercase">
+              <p className="text-ink/80 text-xs font-extrabold tracking-[0.14em] uppercase">
                 Tu mercado de tareas rápidas
               </p>
               <h1
                 id="home-search-title"
-                className="mt-2 max-w-xl text-[2rem] leading-[1.02] font-extrabold tracking-[-0.03em] sm:text-4xl"
+                className="mt-3 max-w-xl text-[2.5rem] leading-none font-extrabold tracking-[-0.04em] sm:text-6xl"
               >
                 Encontrá a alguien que lo haga.
               </h1>
-              <p className="text-ink/85 mt-2 max-w-lg text-sm leading-6 sm:text-base">
+              <p className="text-ink/80 mt-3 max-w-lg text-[15px] leading-6 sm:text-lg">
                 Oficios verificables cerca tuyo o por videollamada. Buscá una
                 vez y elegí con precios claros.
               </p>
-              <div
-                className="border-ink/15 mt-4 inline-flex gap-1 rounded-full border bg-white/40 p-1"
-                role="group"
-                aria-label="Elegir modalidad"
-              >
-                <Link
-                  href="/buscar?mode=presencial"
-                  className="consumer-pressable text-ink inline-flex min-h-10 items-center rounded-full bg-white px-4 text-[13px] font-bold"
-                >
-                  Presencial
-                </Link>
-                <Link
-                  href="/buscar?mode=remoto"
-                  className="consumer-pressable text-ink inline-flex min-h-10 items-center rounded-full bg-white px-4 text-[13px] font-bold"
-                >
-                  Remoto
-                </Link>
-              </div>
             </div>
-            <div className="bg-canvas text-ink relative z-10 mt-5 rounded-2xl p-3 shadow-[var(--consumer-shadow-float)] sm:p-4">
-              <form
-                action="/buscar"
-                className="flex flex-col gap-2 sm:flex-row sm:items-center"
-              >
-                <div className="min-w-0 flex-1">
-                  <SearchField
-                    className="min-h-14"
-                    id="home-query"
-                    name="q"
-                    placeholder="Plomero, clases, paseo…"
-                    aria-label="Buscar un servicio o habilidad"
-                  />
-                </div>
-                <button
-                  className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-14 items-center justify-center rounded-2xl px-6 text-sm font-extrabold whitespace-nowrap shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
-                  type="submit"
-                >
-                  Buscar
-                </button>
-              </form>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Link
-                  href="/buscar?offers=true"
-                  className="consumer-pressable text-ink border-ink/10 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full border bg-white px-3 text-[13px] font-bold"
-                >
-                  Acepta ofertas
-                </Link>
-                <Link
-                  href="/buscar"
-                  className="consumer-pressable text-ink border-ink/10 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full border bg-white px-3 text-[13px] font-bold"
-                >
-                  Explorar servicios
-                </Link>
-                <Link
-                  href="/provider/onboarding"
-                  className="consumer-pressable text-ink border-ink/10 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full border bg-white px-3 text-[13px] font-bold"
-                >
-                  Ofrecer mis servicios
-                </Link>
+            <form
+              action="/buscar"
+              className="relative z-10 mt-6 flex flex-col gap-2.5 sm:max-w-2xl sm:flex-row sm:items-center"
+            >
+              <div className="min-w-0 flex-1">
+                <SearchField
+                  className="min-h-14 shadow-[var(--shadow-lg)]"
+                  id="home-query"
+                  name="q"
+                  placeholder="Plomero, clases, paseo…"
+                  aria-label="Buscar un servicio o habilidad"
+                />
               </div>
+              <button
+                className="consumer-pressable cta-ink inline-flex min-h-14 w-full items-center justify-center rounded-2xl px-8 text-[15px] font-extrabold whitespace-nowrap sm:w-auto"
+                type="submit"
+              >
+                Buscar
+              </button>
+            </form>
+            <div
+              className="relative z-10 mt-4 flex flex-wrap gap-2"
+              role="group"
+              aria-label="Atajos de búsqueda"
+            >
+              <Link
+                href="/buscar?mode=presencial"
+                className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
+              >
+                Presencial
+              </Link>
+              <Link
+                href="/buscar?mode=remoto"
+                className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
+              >
+                Remoto
+              </Link>
+              <Link
+                href="/buscar?offers=true"
+                className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
+              >
+                Acepta ofertas
+              </Link>
             </div>
           </section>
 
@@ -180,7 +164,7 @@ export default async function HomePage() {
                 actionLabel="Ver todos"
               />
             </div>
-            <div className="consumer-scrollbar-none consumer-snap-rail -mx-4 mt-2 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
+            <div className="mt-2 grid grid-cols-4 gap-2.5 sm:grid-cols-7">
               {(categories ?? []).map((category) => (
                 <CategoryTile
                   key={category.slug}
@@ -274,7 +258,7 @@ export default async function HomePage() {
                 </p>
               </div>
               <Link
-                className="consumer-pressable bg-brand-yellow text-ink inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-extrabold"
+                className="consumer-pressable text-ink inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-4 text-sm font-extrabold"
                 href="/provider/onboarding"
               >
                 Ofrecer mis servicios
