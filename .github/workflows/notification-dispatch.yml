@@ -1,0 +1,38 @@
+name: Notification dispatch
+
+# Nothing else calls /api/internal/notifications/dispatch, so queued push and
+# email notifications would never leave the outbox. This calls it every 10
+# minutes. Configure two repository secrets (Settings > Secrets > Actions):
+#   NOTIFICATION_DISPATCH_URL    e.g. https://your-domain/api/internal/notifications/dispatch
+#   NOTIFICATION_DISPATCH_SECRET same value as the Vercel env var
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: notification-dispatch
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Trigger dispatch
+        env:
+          DISPATCH_URL: ${{ secrets.NOTIFICATION_DISPATCH_URL }}
+          DISPATCH_SECRET: ${{ secrets.NOTIFICATION_DISPATCH_SECRET }}
+        run: |
+          if [ -z "$DISPATCH_URL" ] || [ -z "$DISPATCH_SECRET" ]; then
+            echo "Dispatch secrets are not configured; skipping."
+            exit 0
+          fi
+          curl --fail --silent --show-error --retry 2 --max-time 60 \
+            -X POST \
+            -H "Authorization: Bearer $DISPATCH_SECRET" \
+            "$DISPATCH_URL"
+          echo
