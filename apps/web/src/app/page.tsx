@@ -1,9 +1,11 @@
+import { SiteFooter } from "@/components/ui/site-footer";
 import Link from "next/link";
 import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import type { Metadata } from "next";
 
 import { parseDiscoveryFilters } from "@changas/domain";
 
+import { ExampleServices } from "@/components/discovery/example-services";
 import { BottomNav } from "@/components/ui/nav-with-counts";
 import { Avatar } from "@/components/ui/marketplace/avatar";
 import { CategoryTile } from "@/components/ui/marketplace/category-tile";
@@ -211,17 +213,12 @@ export default async function HomePage() {
                 layout="stack"
               />
             ) : (
-              <EmptyState
-                className="py-8"
-                title="Todavía no hay servicios para mostrar"
-                description="Probá buscar por categoría o publicá tu servicio para empezar a aparecer acá."
-                actionHref={
+              <ExampleServices
+                publishHref={
                   user
                     ? "/provider/onboarding"
                     : "/login?next=/provider/onboarding"
                 }
-                actionLabel="Publicar un servicio"
-                actionTone="secondary"
               />
             )}
           </section>
@@ -284,6 +281,7 @@ export default async function HomePage() {
               </Link>
             </section>
           ) : null}
+          <SiteFooter />
         </div>
       </div>
       <BottomNav authenticated={Boolean(user)} />

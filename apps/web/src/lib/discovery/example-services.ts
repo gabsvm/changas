@@ -1,0 +1,77 @@
+import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
+
+// Fictional listings shown only while the marketplace has no published
+// services at all, so visitors can see what a listing looks like. They are
+// rendered by ServiceCard in "example" mode: labelled, not clickable, never
+// stored in the database.
+const base = {
+  provider_avatar_url: null,
+  currency_code: "ARS",
+  price_unit: null,
+  distance_bucket: null,
+  relevance: 0,
+  has_more: false,
+  adjusted_rating: null,
+  completion_rate: null,
+  repeat_client_count: 0,
+} as const;
+
+export const EXAMPLE_SERVICES: ReputationDiscoveryServiceRow[] = [
+  {
+    ...base,
+    provider_display_name: "Nombre de ejemplo",
+    provider_slug: "ejemplo-electricidad",
+    provider_zone: "Tu barrio",
+    service_title: "Instalación de luces y tomas",
+    service_slug: "ejemplo-electricidad",
+    category_slug: "hogar",
+    category_name: "Hogar",
+    skill_slug: "electricidad",
+    skill_name: "Electricidad",
+    modality: "IN_PERSON",
+    price_model: "STARTING_AT",
+    price_amount: 1_500_000,
+    accepts_offers: true,
+    rating_average: 4.8,
+    review_count: 12,
+    completed_jobs: 18,
+  },
+  {
+    ...base,
+    provider_display_name: "Otro nombre de ejemplo",
+    provider_slug: "ejemplo-clases",
+    provider_zone: null,
+    service_title: "Clases de inglés por videollamada",
+    service_slug: "ejemplo-clases",
+    category_slug: "educacion",
+    category_name: "Educación",
+    skill_slug: "ingles",
+    skill_name: "Inglés",
+    modality: "REMOTE",
+    price_model: "HOURLY",
+    price_amount: 800_000,
+    accepts_offers: false,
+    rating_average: null,
+    review_count: 0,
+    completed_jobs: 0,
+  },
+  {
+    ...base,
+    provider_display_name: "Ejemplo de perfil",
+    provider_slug: "ejemplo-paseo",
+    provider_zone: "Cerca tuyo",
+    service_title: "Paseo y cuidado de mascotas",
+    service_slug: "ejemplo-paseo",
+    category_slug: "mascotas",
+    category_name: "Mascotas",
+    skill_slug: "paseo-de-perros",
+    skill_name: "Paseo de perros",
+    modality: "IN_PERSON",
+    price_model: "QUOTE",
+    price_amount: null,
+    accepts_offers: true,
+    rating_average: 5,
+    review_count: 3,
+    completed_jobs: 5,
+  },
+];
