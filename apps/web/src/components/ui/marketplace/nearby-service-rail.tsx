@@ -50,7 +50,7 @@ export function NearbyServiceRail({
       <ul
         className={
           layout === "stack"
-            ? "mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+            ? "mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
             : "consumer-scrollbar-none consumer-snap-rail -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0"
         }
       >
