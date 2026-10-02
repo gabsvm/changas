@@ -310,9 +310,7 @@ test.describe("admin mobile revamp and provider operations", () => {
     await expect(
       page.getByText("En revisión", { exact: true }).first(),
     ).toBeVisible();
-    await expect(
-      page.getByText("Caso enviado correctamente", { exact: true }),
-    ).toBeVisible();
+    await expect(page.getByText("Caso enviado", { exact: true })).toBeVisible();
     expect(await providerStatus(provider.id)).toMatchObject({
       status: "IDENTITY_PENDING",
       onboarding_step: 4,

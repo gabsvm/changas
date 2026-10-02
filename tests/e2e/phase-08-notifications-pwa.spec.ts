@@ -112,7 +112,11 @@ test.describe("Phase 08 notifications and PWA", () => {
       expect(approveProvider.ok).toBeTruthy();
 
       await login(page, user);
-      await expect(page.getByLabel("1 notificaciones sin leer")).toBeVisible();
+      await expect(
+        page
+          .getByLabel(/1 (notificaciones )?sin leer/)
+          .filter({ visible: true }),
+      ).toBeVisible();
       await expectNoHorizontalOverflow(page);
 
       await page.getByRole("link", { name: /Notificaciones/ }).click();
@@ -126,17 +130,22 @@ test.describe("Phase 08 notifications and PWA", () => {
       ).toBeVisible();
       await expectNoHorizontalOverflow(page);
 
-      await page.getByRole("button", { name: "Marcar como leída" }).click();
-      await expect(page.getByText("Leída", { exact: true })).toBeVisible();
-      await expect(page.getByLabel("1 notificaciones sin leer")).toHaveCount(0);
+      await page.getByRole("button", { name: "Marcar", exact: true }).click();
+      await expect(page.getByText("Nueva", { exact: true })).toHaveCount(0);
+      await expect(
+        page
+          .getByLabel(/1 (notificaciones )?sin leer/)
+          .filter({ visible: true }),
+      ).toHaveCount(0);
 
-      const promotional = page.locator('input[name="promotionalEnabled"]');
+      // Preferences auto-save when a switch changes; the switch input is
+      // visually hidden behind its track, so toggle it with force.
+      const promotional = page.getByRole("switch", { name: "Promociones" });
       await expect(promotional).not.toBeChecked();
-      await promotional.check();
-      await page.getByRole("button", { name: "Guardar preferencias" }).click();
-      await expect(page.getByRole("status")).toContainText(
-        "Preferencias actualizadas.",
-      );
+      await promotional.setChecked(true, { force: true });
+      await expect(
+        page.getByRole("status").filter({ hasText: "Cambios guardados" }),
+      ).toBeVisible();
       await page.reload();
       await expect(promotional).toBeChecked();
       await expectNoHorizontalOverflow(page);
@@ -173,11 +182,9 @@ test.describe("Phase 08 notifications and PWA", () => {
 
     try {
       await login(page, user, "/account/notifications");
+      await expect(page.getByText(/El permiso está bloqueado/)).toBeVisible();
       await expect(
-        page.getByText(/El navegador tiene bloqueado el permiso/),
-      ).toBeVisible();
-      await expect(
-        page.getByRole("button", { name: "Activar notificaciones push" }),
+        page.getByRole("switch", { name: "Notificaciones push" }),
       ).toBeDisabled();
       expect(
         await page.evaluate(
@@ -193,13 +200,19 @@ test.describe("Phase 08 notifications and PWA", () => {
       await page.goto("/jobs");
       await expect(page).toHaveURL(/\/jobs$/);
       await expect(
-        page.getByRole("link", { name: "Notificaciones" }),
+        page
+          .getByRole("link", { name: /Actividad/ })
+          .filter({ visible: true })
+          .first(),
       ).toBeVisible();
 
       await page.goto("/messages");
       await expect(page).toHaveURL(/\/messages$/);
       await expect(
-        page.getByRole("link", { name: "Notificaciones" }),
+        page
+          .getByRole("link", { name: /Actividad/ })
+          .filter({ visible: true })
+          .first(),
       ).toBeVisible();
       await expectNoHorizontalOverflow(page);
     } finally {

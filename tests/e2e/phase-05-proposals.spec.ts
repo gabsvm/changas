@@ -61,7 +61,7 @@ test.describe("Phase 05 structured proposals", () => {
       .click();
     await expect(page).toHaveURL(/\/messages\/[0-9a-f-]{36}$/i);
 
-    await page.getByText("Proponer un acuerdo", { exact: true }).click();
+    await page.locator("summary", { hasText: "Proponer un acuerdo" }).click();
     const proposalForm = page.locator("form").filter({
       has: page.getByRole("button", { name: "Enviar propuesta" }),
     });
@@ -82,7 +82,7 @@ test.describe("Phase 05 structured proposals", () => {
       page.getByText("Reserva directa · v1", { exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText("Esperando pago", { exact: true }),
+      page.getByText("Esperando pago", { exact: true }).first(),
     ).toBeVisible();
     await expect(
       page.getByText(

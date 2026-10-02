@@ -171,7 +171,7 @@ test.describe("Phase 06 Jobs", () => {
       .click();
     await expect(page).toHaveURL(/\/messages\/[0-9a-f-]{36}$/i);
 
-    await page.getByText("Proponer un acuerdo", { exact: true }).click();
+    await page.locator("summary", { hasText: "Proponer un acuerdo" }).click();
     const proposalForm = page.locator("form").filter({
       has: page.getByRole("button", { name: "Enviar propuesta" }),
     });
@@ -194,14 +194,16 @@ test.describe("Phase 06 Jobs", () => {
     await expect(
       page.getByRole("heading", { name: "Mis trabajos" }),
     ).toBeVisible();
-    await expect(page.getByText("CONFIRMED", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("Confirmado", { exact: true }).first(),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
 
     await page.locator(`a[href="/jobs/${jobId}"]`).click();
     await expect(page).toHaveURL(new RegExp(`/jobs/${jobId}$`));
     await expect(page.getByText("Confirmado", { exact: true })).toBeVisible();
     await expect(
-      page.getByText("Alcance congelado", { exact: true }),
+      page.getByText("Alcance acordado", { exact: true }),
     ).toBeVisible();
     await expect(page.getByText(scope, { exact: true })).toBeVisible();
     await expectNoHorizontalOverflow(page);
@@ -222,7 +224,7 @@ test.describe("Phase 06 Jobs", () => {
       ),
     ).toBeVisible();
     await expect(
-      page.getByText("AWAITING PAYMENT", { exact: true }),
+      page.getByText("Esperando pago", { exact: true }).first(),
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Simular pago aprobado" }),

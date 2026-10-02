@@ -74,6 +74,18 @@ function searchHref(
   return queryString ? `/buscar?${queryString}` : "/buscar";
 }
 
+function rowKey(row: ReputationDiscoveryServiceRow): string {
+  return `${row.provider_slug}/${row.service_slug}`;
+}
+
+function mergeRows(
+  current: ReputationDiscoveryServiceRow[],
+  incoming: ReputationDiscoveryServiceRow[],
+): ReputationDiscoveryServiceRow[] {
+  const known = new Set(current.map(rowKey));
+  return [...current, ...incoming.filter((row) => !known.has(rowKey(row)))];
+}
+
 export function DiscoveryResults({
   initialRows,
   initialHasMore = false,
@@ -129,7 +141,10 @@ export function DiscoveryResults({
         const nextRows = Array.isArray(candidate)
           ? candidate.filter(isDiscoveryRow)
           : [];
-        setRows(nextRows);
+        // "Cargar más" appends the next page; the first page replaces the list.
+        setRows((current) =>
+          page > 1 ? mergeRows(current, nextRows) : nextRows,
+        );
         setHasMore((payload as { hasMore?: unknown }).hasMore === true);
         setGpsPage(page);
         setGpsMode(true);
@@ -245,12 +260,9 @@ export function DiscoveryResults({
       </div>
 
       {rows.length > 0 && !resultsError ? (
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
           {rows.map((row) => (
-            <DiscoveryCard
-              key={`${row.provider_slug}/${row.service_slug}`}
-              row={row}
-            />
+            <DiscoveryCard key={rowKey(row)} row={row} />
           ))}
         </div>
       ) : !resultsError ? (
@@ -294,6 +306,17 @@ export function DiscoveryResults({
                 ? " · llegaste al final"
                 : ""}
           </p>
+          {filters.page > 1 ? (
+            <Link
+              className={actionButtonClass(
+                "secondary",
+                "min-h-[52px] w-full text-[15px]",
+              )}
+              href={searchHref(query, filters, filters.page - 1)}
+            >
+              Anterior
+            </Link>
+          ) : null}
           {hasMore ? (
             <Link
               className={actionButtonClass(

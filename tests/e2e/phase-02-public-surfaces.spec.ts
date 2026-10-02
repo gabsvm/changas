@@ -75,7 +75,7 @@ test.describe("Phase 02 mobile web smoke", () => {
 
       await expect(page).toHaveURL(/\/provider\/manage$/);
       await expect(
-        page.getByRole("heading", { name: /Tu marketplace, Proveedor E2E/ }),
+        page.getByRole("heading", { name: "Gestioná tu oferta" }),
       ).toBeVisible();
       await expect(page.getByText("Habilidades que ofrecés")).toBeVisible();
 
@@ -106,7 +106,7 @@ test.describe("Phase 02 mobile web smoke", () => {
       page.getByRole("heading", { name: "Demo Proveedor" }),
     ).toBeVisible();
     await expect(page.getByText("Proveedor verificado")).toHaveCount(0);
-    await expect(page.getByText("Perfil activo")).toBeVisible();
+    await expect(page.getByText("Identidad verificada")).toBeVisible();
   });
 
   test("public service page is isolated to the provider slug", async ({
@@ -116,6 +116,6 @@ test.describe("Phase 02 mobile web smoke", () => {
     await expect(
       page.getByRole("heading", { name: "Revisión de PC a distancia" }),
     ).toBeVisible();
-    await expect(page.getByText("$12.500")).toBeVisible();
+    await expect(page.getByText("$12.500").first()).toBeVisible();
   });
 });

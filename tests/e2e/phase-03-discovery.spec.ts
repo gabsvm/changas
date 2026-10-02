@@ -6,13 +6,13 @@ test.describe("Phase 03 public discovery", () => {
   }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { name: "¿Qué necesitás?" }),
+      page.getByRole("heading", { name: "Encontrá a alguien que lo haga." }),
     ).toBeVisible();
     await expect(
-      page.getByRole("searchbox", { name: "Buscá por servicio o habilidad" }),
+      page.getByRole("searchbox", { name: "Buscar un servicio o habilidad" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Ver servicios remotos" }),
+      page.getByRole("link", { name: "Remoto", exact: true }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Tecnología" }).first(),
@@ -50,18 +50,21 @@ test.describe("Phase 03 public discovery", () => {
       "/buscar?category=tecnologia&skill=soporte-tecnico-remoto&priceModel=STARTING_AT&min=8000&max=10000&offers=true",
     );
     await expect(
-      page.getByRole("link", { name: "Soporte técnico remoto" }),
+      page.getByRole("link", { name: "Soporte técnico remoto" }).first(),
     ).toBeVisible();
-    await expect(page.locator("#search-category")).toHaveValue("tecnologia");
-    await expect(page.locator("#search-skill")).toHaveValue(
+    // Filters live in a bottom sheet; the URL state must hydrate its fields.
+    await page.getByRole("button", { name: "Filtros" }).click();
+    const sheet = page.getByRole("dialog", { name: "Filtros" });
+    await expect(sheet.locator('[name="category"]')).toHaveValue("tecnologia");
+    await expect(sheet.locator('[name="skill"]')).toHaveValue(
       "soporte-tecnico-remoto",
     );
-    await expect(page.locator("#search-price-model")).toHaveValue(
+    await expect(sheet.locator('[name="priceModel"]')).toHaveValue(
       "STARTING_AT",
     );
-    await expect(page.locator("#search-min")).toHaveValue("8000");
-    await expect(page.locator("#search-max")).toHaveValue("10000");
-    await expect(page.locator("#search-offers")).toBeChecked();
+    await expect(sheet.locator('[name="min"]')).toHaveValue("8000");
+    await expect(sheet.locator('[name="max"]')).toHaveValue("10000");
+    await expect(sheet.locator('[name="offers"]')).toBeChecked();
   });
 
   test("category browsing opens active technology results", async ({
@@ -80,8 +83,8 @@ test.describe("Phase 03 public discovery", () => {
     page,
   }) => {
     await page.goto("/buscar?category=tecnologia&pageSize=1");
-    await expect(page.getByRole("link", { name: "Siguiente" })).toBeVisible();
-    await page.getByRole("link", { name: "Siguiente" }).click();
+    await expect(page.getByRole("link", { name: "Cargar más" })).toBeVisible();
+    await page.getByRole("link", { name: "Cargar más" }).click();
     await expect(page).toHaveURL(
       /\/buscar\?category=tecnologia&pageSize=1&page=2/,
     );
@@ -180,17 +183,17 @@ test.describe("Phase 03 public discovery", () => {
       });
     });
     await page.goto("/buscar?category=tecnologia&pageSize=1");
-    await page.getByRole("button", { name: "Buscar cerca mío" }).click();
+    await page.getByRole("button", { name: "Cerca mío" }).click();
     await expect(
       page.getByRole("heading", { name: /Servicio GPS 1/ }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Siguiente" }).click();
+    await page.getByRole("button", { name: "Cargar más" }).click();
     await expect(
       page.getByRole("heading", { name: /Servicio GPS 2/ }),
     ).toBeVisible();
     expect(requestedPage).toBe(2);
     expect(page.url()).not.toContain("34.58");
-    await page.getByRole("button", { name: "Anterior" }).click();
+    // "Cargar más" appends: the first page stays on screen.
     await expect(
       page.getByRole("heading", { name: /Servicio GPS 1/ }),
     ).toBeVisible();
@@ -251,11 +254,11 @@ test.describe("Phase 03 public discovery", () => {
     });
 
     await page.goto("/buscar?category=tecnologia");
-    await page.getByRole("button", { name: "Buscar cerca mío" }).click();
+    await page.getByRole("button", { name: "Cerca mío" }).click();
     await expect(
       page.getByText("No pudimos cargar los resultados cerca tuyo."),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Buscar cerca mío" }).click();
+    await page.getByRole("button", { name: "Cerca mío" }).click();
     await expect(
       page.getByRole("heading", { name: "Servicio recuperado" }),
     ).toBeVisible();

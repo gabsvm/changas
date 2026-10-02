@@ -145,7 +145,7 @@ test.describe("Phase 07 reputation", () => {
       .click();
     await expect(page).toHaveURL(/\/messages\/[0-9a-f-]{36}$/i);
 
-    await page.getByText("Proponer un acuerdo", { exact: true }).click();
+    await page.locator("summary", { hasText: "Proponer un acuerdo" }).click();
     const proposalForm = page.locator("form").filter({
       has: page.getByRole("button", { name: "Enviar propuesta" }),
     });
@@ -205,14 +205,14 @@ test.describe("Phase 07 reputation", () => {
     await page.goto("/p/demo-proveedor");
     await page.getByRole("button", { name: "Guardar proveedor" }).click();
     await expect(
-      page.getByRole("button", { name: "Quitar guardado" }),
+      page.getByRole("button", { name: "Quitar de guardados" }).first(),
     ).toBeVisible();
     await page.goto("/account/favorites");
     await expect(
       page.getByRole("heading", { name: "Proveedores guardados" }),
     ).toBeVisible();
     await expect(
-      page.getByText("Proveedor guardado", { exact: true }),
+      page.getByText("Demo Proveedor", { exact: true }).first(),
     ).toBeVisible();
     await expect(page.getByText(/reseñas?/)).toBeVisible();
     await expect(page.getByText(/completados/)).toBeVisible();
