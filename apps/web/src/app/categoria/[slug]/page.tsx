@@ -170,7 +170,7 @@ export default async function CategoryPage({
                 />
               </div>
               <button
-                className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-[52px] shrink-0 items-center rounded-2xl px-5 text-sm font-extrabold"
+                className="consumer-pressable cta-ink inline-flex min-h-[52px] shrink-0 items-center rounded-2xl px-5 text-sm font-extrabold"
                 type="submit"
               >
                 Buscar

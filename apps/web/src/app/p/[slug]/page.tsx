@@ -221,7 +221,7 @@ export default async function PublicProviderPage({
                 </form>
                 <Link
                   href={`/p/${slug}/${services?.[0]?.public_slug ?? ""}`}
-                  className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-[52px] flex-1 items-center justify-center rounded-2xl px-5 text-[15px] font-extrabold shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
+                  className="consumer-pressable cta-ink inline-flex min-h-[52px] flex-1 items-center justify-center rounded-2xl px-5 text-[15px] font-extrabold shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
                 >
                   Contactar
                 </Link>
@@ -289,7 +289,7 @@ export default async function PublicProviderPage({
             {services?.[0]?.public_slug ? (
               <Link
                 href={`/p/${slug}/${services?.[0]?.public_slug ?? ""}`}
-                className="consumer-pressable bg-brand-orange text-ink inline-flex min-h-12 flex-1 items-center justify-center rounded-xl px-5 text-sm font-extrabold shadow-md"
+                className="consumer-pressable cta-ink inline-flex min-h-12 flex-1 items-center justify-center rounded-xl px-5 text-sm font-extrabold shadow-md"
               >
                 Contactar
               </Link>

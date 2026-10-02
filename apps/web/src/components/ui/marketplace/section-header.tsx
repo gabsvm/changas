@@ -15,7 +15,7 @@ export function SectionHeader({
     <div
       className={`flex min-h-11 items-center justify-between gap-4 ${className}`}
     >
-      <h2 className="text-base font-extrabold tracking-[-0.015em] sm:text-xl">
+      <h2 className="text-lg font-extrabold tracking-[-0.025em] sm:text-2xl">
         {title}
       </h2>
       {actionHref ? (

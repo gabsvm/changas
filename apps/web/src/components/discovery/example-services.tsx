@@ -1,6 +1,6 @@
 import { riseStyle } from "@/lib/ui/motion";
 import { EXAMPLE_SERVICES } from "@/lib/discovery/example-services";
-import { ServiceCard } from "@/components/ui/marketplace/service-card";
+import { ServiceRow } from "@/components/ui/marketplace/service-row";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { ActionLink } from "@/components/ui/marketplace/action-button";
 
@@ -21,14 +21,14 @@ export function ExampleServices({ publishHref }: { publishHref: string }) {
         datos ficticios para que veas cómo se mostrarán: no se pueden contratar
         y desaparecen cuando se publique el primer servicio real.
       </p>
-      <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <ul className="mt-2 grid grid-cols-1 sm:grid-cols-2 sm:gap-x-8">
         {EXAMPLE_SERVICES.map((row, index) => (
           <li
             key={row.service_slug}
             className="rise-in"
             style={riseStyle(index)}
           >
-            <ServiceCard row={row} example />
+            <ServiceRow row={row} example />
           </li>
         ))}
       </ul>
