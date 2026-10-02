@@ -43,7 +43,10 @@ export default async function AccountLayout({
               <span className="flex items-center gap-2">
                 Actividad
                 {unreadCount > 0 ? (
-                  <span className="bg-brand-pink-strong min-w-5 rounded-full px-1.5 py-0.5 text-center text-[0.65rem] leading-4 font-bold text-white">
+                  <span
+                    aria-label={`${unreadCount} notificaciones sin leer`}
+                    className="bg-brand-pink-strong min-w-5 rounded-full px-1.5 py-0.5 text-center text-[0.65rem] leading-4 font-bold text-white"
+                  >
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 ) : null}
