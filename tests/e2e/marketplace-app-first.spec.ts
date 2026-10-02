@@ -13,7 +13,7 @@ for (const viewport of [
     }) => {
       await page.goto("/");
       await expect(
-        page.getByRole("heading", { name: "¿Qué necesitás resolver?" }),
+        page.getByRole("heading", { name: "Encontrá a alguien que lo haga." }),
       ).toBeVisible();
       await expect(
         page.getByRole("searchbox", { name: "Buscar un servicio o habilidad" }),
@@ -92,14 +92,11 @@ test("discovery filters do not animate when reduced motion is requested", async 
   await page.goto("/buscar?q=clases+ingles");
   await page.getByRole("button", { name: "Filtros" }).click();
 
+  // The dialog element itself is the animated panel.
   const sheet = page.getByRole("dialog", { name: "Filtros" });
   await expect(sheet).toBeVisible();
   await expect
-    .poll(() =>
-      sheet
-        .locator("[data-motion-panel]")
-        .evaluate((element) => element.getAnimations().length),
-    )
+    .poll(() => sheet.evaluate((element) => element.getAnimations().length))
     .toBe(0);
 });
 

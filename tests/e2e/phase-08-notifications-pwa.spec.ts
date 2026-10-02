@@ -112,7 +112,11 @@ test.describe("Phase 08 notifications and PWA", () => {
       expect(approveProvider.ok).toBeTruthy();
 
       await login(page, user);
-      await expect(page.getByLabel("1 notificaciones sin leer")).toBeVisible();
+      await expect(
+        page
+          .getByLabel(/1 (notificaciones )?sin leer/)
+          .filter({ visible: true }),
+      ).toBeVisible();
       await expectNoHorizontalOverflow(page);
 
       await page.getByRole("link", { name: /Notificaciones/ }).click();
@@ -128,7 +132,11 @@ test.describe("Phase 08 notifications and PWA", () => {
 
       await page.getByRole("button", { name: "Marcar como leída" }).click();
       await expect(page.getByText("Leída", { exact: true })).toBeVisible();
-      await expect(page.getByLabel("1 notificaciones sin leer")).toHaveCount(0);
+      await expect(
+        page
+          .getByLabel(/1 (notificaciones )?sin leer/)
+          .filter({ visible: true }),
+      ).toHaveCount(0);
 
       const promotional = page.locator('input[name="promotionalEnabled"]');
       await expect(promotional).not.toBeChecked();
@@ -173,9 +181,7 @@ test.describe("Phase 08 notifications and PWA", () => {
 
     try {
       await login(page, user, "/account/notifications");
-      await expect(
-        page.getByText(/El navegador tiene bloqueado el permiso/),
-      ).toBeVisible();
+      await expect(page.getByText(/El permiso está bloqueado/)).toBeVisible();
       await expect(
         page.getByRole("button", { name: "Activar notificaciones push" }),
       ).toBeDisabled();

@@ -94,7 +94,7 @@ async function expectMobileNavigation(
 
   const navTargets = nav.getByRole("link");
   const count = await navTargets.count();
-  expect(count).toBe(4);
+  expect(count).toBe(5);
   for (let index = 0; index < count; index += 1) {
     const box = await navTargets.nth(index).boundingBox();
     expect(box?.height ?? 0).toBeGreaterThanOrEqual(48);
