@@ -49,9 +49,19 @@
   --consumer-surface-strong: #ffffff;
   --consumer-surface-raised: #ffffff;
   --consumer-muted: rgb(32 33 36 / 60%);
-  --consumer-shadow-card: 0 8px 20px rgb(32 33 36 / 6%);
-  --consumer-shadow-float: 0 12px 32px rgb(32 33 36 / 10%);
-  --consumer-shadow-hero: 0 24px 60px rgb(255 107 53 / 18%);
+  --consumer-shadow-card:
+    0 1px 2px rgb(32 33 36 / 6%), 0 8px 20px -6px rgb(32 33 36 / 12%);
+  --consumer-shadow-float:
+    0 2px 4px rgb(32 33 36 / 5%), 0 16px 36px -10px rgb(32 33 36 / 20%);
+  --consumer-shadow-hero:
+    0 4px 10px rgb(255 107 53 / 14%), 0 30px 64px -18px rgb(255 87 34 / 46%);
+  --shadow-xs: 0 1px 2px rgb(32 33 36 / 8%);
+  --shadow-md:
+    0 2px 4px rgb(32 33 36 / 6%), 0 14px 30px -8px rgb(32 33 36 / 18%);
+  --shadow-lg:
+    0 4px 8px rgb(32 33 36 / 7%), 0 26px 52px -14px rgb(32 33 36 / 28%);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --consumer-hero-gradient: var(--brand-gradient);
 
   --mobile-bottom-nav-height: calc(
@@ -71,6 +81,18 @@ html {
 body {
   margin: 0;
   background: #fff9f3;
+  background-image:
+    radial-gradient(
+      90rem 28rem at 50% -14rem,
+      rgb(255 200 87 / 22%),
+      transparent 70%
+    ),
+    radial-gradient(
+      46rem 24rem at 100% 8rem,
+      rgb(255 10 120 / 5%),
+      transparent 70%
+    );
+  background-repeat: no-repeat;
   color: #202124;
   font-family:
     var(--font-plus-jakarta),
@@ -91,11 +113,23 @@ body {
   }
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
+/* In the base layer so Tailwind font utilities (text-sm, font-extrabold) win. */
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+/* iOS zooms into focused fields smaller than 16px. */
+@media (max-width: 40rem) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 button,
@@ -152,8 +186,27 @@ textarea {
 }
 
 .brand-gradient-surface {
+  position: relative;
+  isolation: isolate;
   background: var(--consumer-hero-gradient);
-  box-shadow: var(--consumer-shadow-float);
+  box-shadow: var(--consumer-shadow-hero);
+}
+
+.brand-gradient-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgb(255 255 255 / 30%), transparent 55%),
+    radial-gradient(
+      70% 60% at 100% 100%,
+      rgb(255 255 255 / 12%),
+      transparent 60%
+    );
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 40%);
 }
 
 .brand-hero-panel {
@@ -196,15 +249,24 @@ textarea {
 
 .button-primary {
   background: #ff6b35;
+  background-image: linear-gradient(
+    180deg,
+    #ff7d4a 0%,
+    #ff6b35 60%,
+    #f65a24 100%
+  );
   color: #202124;
-  box-shadow: 0 6px 16px rgb(255 107 53 / 18%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 38%),
+    0 1px 2px rgb(32 33 36 / 12%),
+    0 10px 22px -8px rgb(255 87 34 / 60%);
 }
 
 .button-secondary {
   border: 1px solid rgb(32 33 36 / 12%);
-  background: rgb(255 253 249 / 92%);
+  background: #ffffff;
   color: #202124;
-  box-shadow: none;
+  box-shadow: var(--shadow-xs);
 }
 
 .button-primary:active,
@@ -225,10 +287,14 @@ textarea {
 }
 
 .consumer-card {
-  border: 1px solid var(--consumer-divider);
+  border: 1px solid rgb(32 33 36 / 6%);
   border-radius: var(--consumer-radius-card);
-  background: var(--consumer-surface);
+  background: var(--consumer-surface-strong);
   box-shadow: var(--consumer-shadow-card);
+  transition:
+    transform 220ms var(--ease-out),
+    box-shadow 220ms var(--ease-out),
+    border-color 220ms var(--ease-out);
 }
 
 .consumer-card-pressed:active {
@@ -249,6 +315,28 @@ textarea {
   background: rgb(32 33 36 / 6%);
   border-radius: 0.75rem;
   animation: consumer-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-shimmer {
+  background-color: rgb(32 33 36 / 6%);
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(255 255 255 / 70%) 50%,
+    transparent 80%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: skeleton-sheen 1.5s var(--ease-out) infinite;
+}
+
+@keyframes skeleton-sheen {
+  from {
+    background-position: 130% 0;
+  }
+  to {
+    background-position: -130% 0;
+  }
 }
 
 @keyframes consumer-pulse {
@@ -308,7 +396,7 @@ textarea {
 }
 
 .service-card-shell {
-  box-shadow: 0 10px 26px rgb(32 33 36 / 7%);
+  box-shadow: var(--consumer-shadow-card);
 }
 
 .service-card-footer {
@@ -327,9 +415,9 @@ textarea {
 }
 
 .empty-state-card {
-  border: 1px solid var(--consumer-divider);
+  border: 1px solid rgb(32 33 36 / 6%);
   border-radius: var(--consumer-radius-card);
-  background: var(--consumer-surface);
+  background: var(--consumer-surface-strong);
   box-shadow: var(--consumer-shadow-card);
 }
 
@@ -357,6 +445,21 @@ button:hover .chevron {
   border: 1px solid rgb(32 33 36 / 12%);
   border-radius: var(--consumer-radius-control);
   background: var(--consumer-surface-strong);
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out);
+}
+
+.consumer-control:hover {
+  border-color: rgb(32 33 36 / 22%);
+}
+
+.consumer-control:focus-within {
+  border-color: #ff6b35;
+  box-shadow:
+    0 0 0 4px rgb(255 107 53 / 18%),
+    var(--shadow-xs);
 }
 
 .consumer-pressable {
@@ -447,6 +550,151 @@ button:hover .chevron {
   .mobile-sticky-surface {
     bottom: auto;
     padding-bottom: 0;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Polish layer: depth, motion and tactile feedback.
+   Everything here degrades gracefully and is disabled by the
+   prefers-reduced-motion block below.
+   ------------------------------------------------------------------ */
+
+/* Primary calls to action written with utilities (bg-brand-orange). */
+a.bg-brand-orange,
+button.bg-brand-orange {
+  background-image: linear-gradient(
+    180deg,
+    #ff7d4a 0%,
+    #ff6b35 60%,
+    #f65a24 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 38%),
+    0 1px 2px rgb(32 33 36 / 12%),
+    0 10px 22px -8px rgb(255 87 34 / 60%);
+  transition:
+    transform 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out),
+    filter 180ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button-primary:hover,
+  a.bg-brand-orange:hover,
+  button.bg-brand-orange:hover {
+    transform: translateY(-1px);
+    filter: saturate(1.08) brightness(1.03);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 42%),
+      0 2px 4px rgb(32 33 36 / 14%),
+      0 16px 28px -8px rgb(255 87 34 / 68%);
+  }
+
+  .button-secondary:hover {
+    transform: translateY(-1px);
+    border-color: rgb(32 33 36 / 22%);
+    box-shadow: var(--shadow-md);
+  }
+
+  .consumer-card-pressed:hover {
+    transform: translateY(-3px);
+    border-color: rgb(255 107 53 / 28%);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+.button-primary:active,
+a.bg-brand-orange:active,
+button.bg-brand-orange:active {
+  transform: scale(0.97);
+  filter: none;
+}
+
+/* Entrance: staggered rise for lists and cards. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise-in {
+  animation: rise 520ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* Route change: opacity only, so fixed children (bottom nav) never jump. */
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-fade {
+  animation: page-fade 260ms var(--ease-out) both;
+}
+
+/* Floating feedback (toasts). */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pop-in {
+  animation: pop-in 260ms var(--ease-spring) both;
+}
+
+/* Bottom navigation: lifted bar and a springy active icon. */
+.bottom-nav-shell {
+  box-shadow:
+    0 -1px 0 rgb(32 33 36 / 4%),
+    0 -14px 32px -16px rgb(32 33 36 / 24%);
+}
+
+@keyframes nav-pop {
+  0% {
+    transform: scale(0.82);
+  }
+  60% {
+    transform: scale(1.14);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+a[aria-current="page"] .nav-icon {
+  animation: nav-pop 420ms var(--ease-spring) both;
+}
+
+/* Sticky headers gain a soft shadow once the page scrolls (Chromium). */
+@keyframes header-lift {
+  from {
+    box-shadow: 0 0 0 rgb(32 33 36 / 0%);
+  }
+  to {
+    box-shadow: 0 10px 28px -14px rgb(32 33 36 / 28%);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .consumer-app-header {
+    animation: header-lift linear both;
+    animation-timeline: scroll();
+    animation-range: 0 72px;
   }
 }
 

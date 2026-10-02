@@ -8,6 +8,7 @@ import { minorUnitsToMajorInput, type DiscoveryFilters } from "@changas/domain";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { actionButtonClass } from "@/components/ui/marketplace/action-button";
 import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
+import { riseStyle } from "@/lib/ui/motion";
 import { browserLocationStorageKey } from "./location-picker";
 
 import { DiscoveryCard } from "./discovery-card";
@@ -261,8 +262,10 @@ export function DiscoveryResults({
 
       {rows.length > 0 && !resultsError ? (
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-          {rows.map((row) => (
-            <DiscoveryCard key={rowKey(row)} row={row} />
+          {rows.map((row, index) => (
+            <div key={rowKey(row)} className="rise-in" style={riseStyle(index)}>
+              <DiscoveryCard row={row} />
+            </div>
           ))}
         </div>
       ) : !resultsError ? (

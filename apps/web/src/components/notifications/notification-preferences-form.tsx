@@ -60,7 +60,7 @@ export function NotificationPreferencesForm({
         className="pointer-events-none fixed inset-x-4 bottom-[calc(var(--mobile-bottom-nav-height)+0.75rem)] z-40 flex justify-center sm:bottom-6"
       >
         {pending || savedVisible ? (
-          <p className="bg-ink rounded-full px-4 py-2 text-sm font-semibold text-white shadow-lg">
+          <p className="bg-ink pop-in rounded-full px-4 py-2 text-sm font-semibold text-white shadow-lg">
             {pending ? "Guardando cambio…" : "Cambios guardados"}
           </p>
         ) : null}

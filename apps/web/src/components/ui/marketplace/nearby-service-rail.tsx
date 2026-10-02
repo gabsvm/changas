@@ -1,3 +1,4 @@
+import { riseStyle } from "@/lib/ui/motion";
 import Link from "next/link";
 
 import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
@@ -54,12 +55,13 @@ export function NearbyServiceRail({
             : "consumer-scrollbar-none consumer-snap-rail -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0"
         }
       >
-        {rows.map((row) => (
+        {rows.map((row, index) => (
           <li
             key={`${row.provider_slug}/${row.service_slug}`}
-            className={
-              layout === "stack" ? undefined : "w-[min(84vw,22rem)] shrink-0"
-            }
+            style={riseStyle(index)}
+            className={`rise-in ${
+              layout === "stack" ? "" : "w-[min(84vw,22rem)] shrink-0"
+            }`}
           >
             <ServiceCard row={row} />
           </li>
