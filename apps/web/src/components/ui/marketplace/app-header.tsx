@@ -5,12 +5,14 @@ export function AppHeader({
   title,
   backHref,
   action,
+  desktopNav,
   brand = false,
   className = "",
 }: {
   title?: string;
   backHref?: string | undefined;
   action?: ReactNode;
+  desktopNav?: ReactNode;
   brand?: boolean;
   className?: string;
 }) {
@@ -62,8 +64,12 @@ export function AppHeader({
         <span className="flex-1" />
       )}
 
+      {desktopNav ? (
+        <div className="ml-auto hidden shrink-0 sm:block">{desktopNav}</div>
+      ) : null}
+
       {action ? (
-        <div className="ml-auto shrink-0">{action}</div>
+        <div className={`${desktopNav ? "" : "ml-auto"}shrink-0`}>{action}</div>
       ) : backHref ? (
         <span className="h-12 w-12" aria-hidden="true" />
       ) : null}

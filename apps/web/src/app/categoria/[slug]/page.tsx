@@ -1,3 +1,4 @@
+import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -84,6 +85,10 @@ export default async function CategoryPage({
     pageSize: pageSizeParam,
   });
   const searchResult = await searchDiscovery({ query, filters });
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   function categoryHref(overrides: Record<string, string | null>): string {
     const next = new URLSearchParams();
@@ -106,6 +111,7 @@ export default async function CategoryPage({
       <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-8 sm:pt-5">
         <AppHeader
           brand
+          desktopNav={<DesktopNav authenticated={Boolean(user)} />}
           action={
             <Link
               className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold"
