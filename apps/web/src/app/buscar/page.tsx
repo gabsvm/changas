@@ -7,6 +7,7 @@ import {
   parseDiscoveryFilters,
 } from "@changas/domain";
 
+import { ExampleServices } from "@/components/discovery/example-services";
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { LocationPicker } from "@/components/discovery/location-picker";
 import { SearchFiltersSheet } from "@/components/discovery/search-filters-sheet";
@@ -90,6 +91,14 @@ export default async function SearchPage({
     (filters.priceModel ? 1 : 0) +
     (filters.acceptsOffers ? 1 : 0) +
     (filters.sort !== "recommended" ? 1 : 0);
+
+  // No published services at all (not just no matches for a filter).
+  const marketplaceIsEmpty =
+    rows.length === 0 &&
+    !searchResult.error &&
+    query === "" &&
+    activeFilterCount === 0 &&
+    filters.page === 1;
 
   function clearHref(omit: string[]): string {
     const entries: Array<[string, string]> = [
@@ -285,13 +294,23 @@ export default async function SearchPage({
           </div>
 
           <div className="discovery-results-shell mt-5">
-            <DiscoveryResults
-              initialError={searchResult.error}
-              initialHasMore={hasMore}
-              initialRows={rows}
-              query={query}
-              filters={filters}
-            />
+            {marketplaceIsEmpty ? (
+              <ExampleServices
+                publishHref={
+                  user
+                    ? "/provider/onboarding"
+                    : "/login?next=/provider/onboarding"
+                }
+              />
+            ) : (
+              <DiscoveryResults
+                initialError={searchResult.error}
+                initialHasMore={hasMore}
+                initialRows={rows}
+                query={query}
+                filters={filters}
+              />
+            )}
           </div>
         </section>
       </div>
