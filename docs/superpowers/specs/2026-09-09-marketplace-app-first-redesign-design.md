@@ -184,4 +184,3 @@ Cada paso debe mantener rutas y contratos existentes y producir un diff pequeño
 - Mapa como experiencia primaria.
 - Rediseño funcional del admin.
 - Fotos generadas o datos ficticios de proveedores.
-

@@ -33,7 +33,7 @@ export default async function AccountSettingsPage() {
           Acceso, preferencias y datos de tu cuenta.
         </p>
 
-        <section className="border-ink/10 mt-5 divide-y divide-ink/10 border-y">
+        <section className="border-ink/10 divide-ink/10 mt-5 divide-y border-y">
           <SettingsRow
             title="Correo de acceso"
             description={user.email ?? "Sin correo disponible"}
@@ -56,7 +56,11 @@ export default async function AccountSettingsPage() {
         </section>
 
         <form action={signOut} className="border-ink/10 mt-7 border-t pt-5">
-          <ActionButton tone="danger" type="submit" className="w-full sm:w-auto">
+          <ActionButton
+            tone="danger"
+            type="submit"
+            className="w-full sm:w-auto"
+          >
             Cerrar sesión
           </ActionButton>
         </form>

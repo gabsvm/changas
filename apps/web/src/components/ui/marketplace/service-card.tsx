@@ -37,29 +37,46 @@ export function ServiceCard({ row }: { row: ReputationDiscoveryServiceRow }) {
         <div className="flex items-start gap-3">
           <Avatar
             name={row.provider_display_name}
-            src={isTrustedPublicAvatarUrl(row.provider_avatar_url) ? row.provider_avatar_url : null}
+            src={
+              isTrustedPublicAvatarUrl(row.provider_avatar_url)
+                ? row.provider_avatar_url
+                : null
+            }
             size="md"
           />
           <div className="min-w-0 flex-1">
             <p className="text-ink/60 flex items-center gap-1.5 truncate text-[13px] font-semibold">
               <span className="truncate">{row.provider_display_name}</span>
               {row.provider_zone ? (
-                <span className="shrink-0 font-normal">· {row.provider_zone}</span>
+                <span className="shrink-0 font-normal">
+                  · {row.provider_zone}
+                </span>
               ) : null}
             </p>
-            <h3 className="mt-0.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em] text-ink">
+            <h3 className="text-ink mt-0.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
               {row.service_title}
             </h3>
             <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
-              <span className="inline-flex items-center gap-1 font-bold text-ink">
-                <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-brand-yellow stroke-warning" strokeWidth="1.5">
-                  <path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z" strokeLinejoin="round" />
+              <span className="text-ink inline-flex items-center gap-1 font-bold">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="fill-brand-yellow stroke-warning h-3.5 w-3.5"
+                  strokeWidth="1.5"
+                >
+                  <path
+                    d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
+                    strokeLinejoin="round"
+                  />
                 </svg>
                 {hasRating ? row.rating_average!.toFixed(1) : "Nuevo"}
               </span>
               {hasRating ? (
                 <span className="text-ink/60 font-medium">
-                  ({row.review_count}){row.completed_jobs > 0 ? ` · ${row.completed_jobs} hechos` : ""}
+                  ({row.review_count})
+                  {row.completed_jobs > 0
+                    ? ` · ${row.completed_jobs} hechos`
+                    : ""}
                 </span>
               ) : (
                 <span className="text-ink/60 font-medium">Sin reseñas aún</span>
@@ -78,7 +95,9 @@ export function ServiceCard({ row }: { row: ReputationDiscoveryServiceRow }) {
               {distanceBucketLabels[row.distance_bucket as DistanceBucket]}
             </StatusChip>
           ) : null}
-          {row.accepts_offers ? <StatusChip tone="brand">Acepta ofertas</StatusChip> : null}
+          {row.accepts_offers ? (
+            <StatusChip tone="brand">Acepta ofertas</StatusChip>
+          ) : null}
         </div>
       </Link>
     </article>

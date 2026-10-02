@@ -39,11 +39,13 @@
 ### Task 1: Define the warm layered visual system
 
 **Files:**
+
 - Modify: `apps/web/src/app/globals.css`
 - Modify: `apps/web/src/lib/ui/marketplace-theme.test.ts`
 - Test: `apps/web/src/lib/ui/marketplace-theme.test.ts`
 
 **Interfaces:**
+
 - Produces CSS variables/classes consumed by all later marketplace components: `--consumer-surface`, `--consumer-surface-strong`, `--consumer-shadow-card`, `--consumer-shadow-float`, `--consumer-radius-card`, `--consumer-radius-control`, `--consumer-hero-gradient`, `.consumer-card`, `.brand-gradient-surface`.
 - Does not change the admin theme or existing semantic color names.
 
@@ -52,7 +54,10 @@
 Add assertions for the existing palette and the new visual primitives. The test should read `globals.css` as text and assert exact values/classes rather than relying on a browser-generated style snapshot:
 
 ```ts
-const css = readFileSync(resolve(process.cwd(), "apps/web/src/app/globals.css"), "utf8");
+const css = readFileSync(
+  resolve(process.cwd(), "apps/web/src/app/globals.css"),
+  "utf8",
+);
 
 expect(css).toContain("--color-canvas: #fff9f3");
 expect(css).toContain("--color-ink: #202124");
@@ -96,6 +101,7 @@ git commit -m "feat(ui): add warm layered marketplace tokens"
 ### Task 2: Build shared marketplace compositions
 
 **Files:**
+
 - Create: `apps/web/src/components/ui/marketplace/brand-hero.tsx`
 - Create: `apps/web/src/components/ui/marketplace/category-tile.tsx`
 - Create: `apps/web/src/components/ui/marketplace/nearby-service-rail.tsx`
@@ -106,6 +112,7 @@ git commit -m "feat(ui): add warm layered marketplace tokens"
 - Test: `apps/web/src/lib/ui/public-marketplace-ui.test.ts`
 
 **Interfaces:**
+
 - `BrandHero({ eyebrow, title, description, children })` renders brand background plus a cream content transition without owning search state.
 - `CategoryTile({ href, label, description, icon })` renders a semantic link with a 48 px minimum target and no private data.
 - `NearbyServiceRail({ rows, title, actionHref })` accepts the existing public discovery row shape and renders a horizontal rail that remains keyboard reachable.
@@ -147,12 +154,14 @@ git commit -m "feat(ui): add warm marketplace compositions"
 ### Task 3: Recompose the public home around user needs
 
 **Files:**
+
 - Modify: `apps/web/src/app/page.tsx`
 - Modify: `apps/web/src/components/discovery/location-picker.tsx`
 - Modify: `apps/web/src/components/ui/marketplace/search-field.tsx`
 - Test: `tests/e2e/marketplace-app-first.spec.ts`
 
 **Interfaces:**
+
 - `HomePage` continues to call the existing category query and `searchDiscovery({ query, filters })` flow.
 - Location remains optional and continues to use the existing `LocationPicker` contract.
 - Search still submits to `/buscar` with URL-addressable query state.
@@ -162,8 +171,12 @@ git commit -m "feat(ui): add warm marketplace compositions"
 Add assertions for the hero heading, category tiles, nearby rail, search label and remote entry. The test must also assert that anonymous browsing remains possible and that the document has no horizontal overflow at 320/360/390 px.
 
 ```ts
-await expect(page.getByRole("heading", { name: "¿Qué necesitás resolver?" })).toBeVisible();
-await expect(page.getByRole("searchbox", { name: /servicio|habilidad/i })).toBeVisible();
+await expect(
+  page.getByRole("heading", { name: "¿Qué necesitás resolver?" }),
+).toBeVisible();
+await expect(
+  page.getByRole("searchbox", { name: /servicio|habilidad/i }),
+).toBeVisible();
 await expect(page.getByRole("link", { name: /remoto/i })).toBeVisible();
 await expect(page.locator("body")).toHaveCSS("overflow-x", "visible");
 ```
@@ -201,6 +214,7 @@ git commit -m "feat(home): recompose marketplace around user needs"
 ### Task 4: Apply the visual hierarchy to search and discovery
 
 **Files:**
+
 - Modify: `apps/web/src/app/buscar/page.tsx`
 - Modify: `apps/web/src/components/discovery/discovery-results.tsx`
 - Modify: `apps/web/src/components/discovery/discovery-card.tsx`
@@ -212,6 +226,7 @@ git commit -m "feat(home): recompose marketplace around user needs"
 - Test: `tests/e2e/marketplace-app-first.spec.ts`
 
 **Interfaces:**
+
 - Preserve `DiscoveryFilters`, `ReputationDiscoveryServiceRow`, `searchHref()` and `/api/discovery` request payloads.
 - Preserve URL keys for query, category, skill, modality, location, radius, price, offers, price model, sort and pagination.
 - Keep the existing `hasMore`/pagination contract and safe public row fields.
@@ -254,6 +269,7 @@ git commit -m "feat(discovery): polish search and service results"
 ### Task 5: Redesign public provider and service detail surfaces
 
 **Files:**
+
 - Modify: `apps/web/src/app/p/[slug]/page.tsx`
 - Modify: `apps/web/src/app/p/[slug]/[serviceSlug]/page.tsx`
 - Modify: `apps/web/src/components/ui/marketplace/provider-card.tsx`
@@ -261,6 +277,7 @@ git commit -m "feat(discovery): polish search and service results"
 - Test: `tests/e2e/marketplace-app-first.spec.ts`
 
 **Interfaces:**
+
 - Keep the current public routes, metadata fields and public discovery data sources.
 - Keep provider favorite mutations and anonymous return-to-auth behavior unchanged.
 - Keep all private fields server-only and absent from rendered metadata/OG output.
@@ -300,6 +317,7 @@ git commit -m "feat(public): polish provider and service details"
 ### Task 6: Align authenticated consumer surfaces with the marketplace system
 
 **Files:**
+
 - Modify: `apps/web/src/app/(account)/layout.tsx`
 - Modify: `apps/web/src/app/(account)/account/page.tsx`
 - Modify: `apps/web/src/app/(account)/account/favorites/page.tsx`
@@ -313,6 +331,7 @@ git commit -m "feat(public): polish provider and service details"
 - Test: `tests/e2e/marketplace-app-first.spec.ts`
 
 **Interfaces:**
+
 - Preserve authentication redirects, notification semantics, conversation actions, favorites RLS and all server actions.
 - Preserve `MobileAppBar`, `AuthenticatedBottomNav`, unread count behavior and exact empty-state copy contracts.
 
@@ -356,6 +375,7 @@ git commit -m "feat(ui): align authenticated marketplace surfaces"
 ### Task 7: Run the complete local verification gate
 
 **Files:**
+
 - Test: `apps/web/src/lib/ui/marketplace-theme.test.ts`
 - Test: `apps/web/src/lib/ui/public-marketplace-ui.test.ts`
 - Test: `apps/web/src/lib/notifications/ui-contract.test.ts`
@@ -363,6 +383,7 @@ git commit -m "feat(ui): align authenticated marketplace surfaces"
 - Verify: all files changed by Tasks 1–6
 
 **Interfaces:**
+
 - No new interfaces. This task verifies the already-preserved routes, data contracts, accessibility constraints and responsive compositions.
 
 - [ ] **Step 1: Check the final diff and changed-file formatting**
@@ -441,4 +462,3 @@ Expected: local and remote HEAD match, divergence is `0 0`, and the working tree
 - Map-first discovery.
 - New backend migrations/RPCs/policies.
 - Generated or fake provider imagery/data.
-

@@ -25,7 +25,9 @@ export function CategoryTile({
       >
         <CategoryIcon slug={icon} className="h-6 w-6" />
       </span>
-      <span className="text-ink line-clamp-2 text-xs leading-4 font-bold">{label}</span>
+      <span className="text-ink line-clamp-2 text-xs leading-4 font-bold">
+        {label}
+      </span>
     </Link>
   );
 }

@@ -136,7 +136,7 @@ export default async function HomePage() {
                     className="min-h-14"
                     id="home-query"
                     name="q"
-                    placeholder="¿Qué ayuda necesitás? Ej: plomero, clases, paseo…"
+                    placeholder="Plomero, clases, paseo…"
                     aria-label="Buscar un servicio o habilidad"
                   />
                 </div>
@@ -150,19 +150,19 @@ export default async function HomePage() {
               <div className="mt-2 flex flex-wrap gap-2">
                 <Link
                   href="/buscar?offers=true"
-                  className="consumer-pressable text-ink/70 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full px-3 text-[13px] font-bold"
+                  className="consumer-pressable text-ink border-ink/10 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full border bg-white px-3 text-[13px] font-bold"
                 >
                   Acepta ofertas
                 </Link>
                 <Link
                   href="/buscar"
-                  className="consumer-pressable text-terracotta inline-flex min-h-9 items-center rounded-full px-3 text-[13px] font-extrabold"
+                  className="consumer-pressable text-ink border-ink/10 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full border bg-white px-3 text-[13px] font-bold"
                 >
                   Explorar servicios
                 </Link>
                 <Link
                   href="/provider/onboarding"
-                  className="consumer-pressable text-ink/70 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full px-3 text-[13px] font-bold"
+                  className="consumer-pressable text-ink border-ink/10 hover:bg-ink/[0.04] inline-flex min-h-9 items-center rounded-full border bg-white px-3 text-[13px] font-bold"
                 >
                   Ofrecer mis servicios
                 </Link>
@@ -267,7 +267,7 @@ export default async function HomePage() {
           </section>
 
           {!user ? (
-            <section className="consumer-card bg-ink mt-4 flex flex-col gap-3 p-5 text-white">
+            <section className="consumer-card bg-ink! mt-4 flex flex-col gap-3 p-5 text-white">
               <div>
                 <h2 className="text-base font-extrabold tracking-[-0.02em]">
                   Tu oficio merece un buen escaparate.

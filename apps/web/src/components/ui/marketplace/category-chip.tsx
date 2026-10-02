@@ -16,7 +16,9 @@ export function CategoryChip({
     >
       <span className="truncate text-sm font-bold">{label}</span>
       {description ? (
-        <span className="text-ink/48 mt-0.5 line-clamp-1 text-xs">{description}</span>
+        <span className="text-ink/48 mt-0.5 line-clamp-1 text-xs">
+          {description}
+        </span>
       ) : null}
     </Link>
   );

@@ -1,9 +1,5 @@
 export type AuthenticatedNavKey =
-  | "home"
-  | "search"
-  | "messages"
-  | "activity"
-  | "account";
+  "home" | "search" | "messages" | "activity" | "account";
 
 export function getAuthenticatedNavKey(pathname: string): AuthenticatedNavKey {
   if (

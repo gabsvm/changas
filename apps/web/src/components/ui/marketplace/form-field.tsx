@@ -19,11 +19,14 @@ export function FormField({
   className?: string;
 }) {
   return (
-    <label className={`block text-sm font-bold text-ink ${className}`}>
+    <label className={`text-ink block text-sm font-bold ${className}`}>
       {label}
       {children}
       {error ? (
-        <span className="text-danger mt-1.5 block text-[13px] leading-5" role="alert">
+        <span
+          className="text-danger mt-1.5 block text-[13px] leading-5"
+          role="alert"
+        >
           {error}
         </span>
       ) : helper ? (

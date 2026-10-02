@@ -18,8 +18,19 @@ export function SearchField({
         className="text-ink/50 h-5 w-5 shrink-0"
         fill="none"
       >
-        <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
-        <path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <circle
+          cx="11"
+          cy="11"
+          r="6.5"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <path
+          d="m16 16 4 4"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
       </svg>
       <span className="sr-only">Buscar</span>
       <input

@@ -54,8 +54,9 @@ export function AdminProviderControls({
 
       {providerStatus === "REJECTED" ? (
         <p className="rounded-2xl border border-[#ef5350]/25 bg-[#ef5350]/8 px-3 py-2 text-xs leading-5 text-[#ff7774]">
-          La revisión fue rechazada. Si existe una verificación alternativa válida,
-          podés resolver la excepción mediante activación manual auditada.
+          La revisión fue rechazada. Si existe una verificación alternativa
+          válida, podés resolver la excepción mediante activación manual
+          auditada.
         </p>
       ) : null}
 
@@ -90,8 +91,8 @@ export function AdminProviderControls({
 
       {blocked ? (
         <p className="rounded-2xl border border-[#ef5350]/25 bg-[#ef5350]/8 px-3 py-2 text-xs leading-5 text-[#ff7774]">
-          Esta cuenta tiene una restricción operativa. Restaurala primero con los
-          controles de cuenta antes de activarla como prestador.
+          Esta cuenta tiene una restricción operativa. Restaurala primero con
+          los controles de cuenta antes de activarla como prestador.
         </p>
       ) : null}
     </div>

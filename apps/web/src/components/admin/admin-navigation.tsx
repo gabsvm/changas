@@ -30,25 +30,86 @@ function NavIcon({ id }: { id: AdminNavigationId | "more" }) {
 
   switch (id) {
     case "overview":
-      return <svg {...common}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>;
+      return (
+        <svg {...common}>
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+        </svg>
+      );
     case "identity":
-      return <svg {...common}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>;
+      return (
+        <svg {...common}>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      );
     case "users":
-      return <svg {...common}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+      return (
+        <svg {...common}>
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      );
     case "providers":
-      return <svg {...common}><path d="M20 7h-4V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/><path d="M8 7h8"/><path d="M2 12h20"/></svg>;
+      return (
+        <svg {...common}>
+          <path d="M20 7h-4V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2" />
+          <path d="M8 7h8" />
+          <path d="M2 12h20" />
+        </svg>
+      );
     case "catalog":
-      return <svg {...common}><path d="m7 7 10 10"/><path d="M6 3h5l10 10-8 8L3 11V6a3 3 0 0 1 3-3"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>;
+      return (
+        <svg {...common}>
+          <path d="m7 7 10 10" />
+          <path d="M6 3h5l10 10-8 8L3 11V6a3 3 0 0 1 3-3" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+        </svg>
+      );
     case "reports":
-      return <svg {...common}><path d="M4 21V5a2 2 0 0 1 2-2h10l4 4v14"/><path d="M14 3v5h5"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>;
+      return (
+        <svg {...common}>
+          <path d="M4 21V5a2 2 0 0 1 2-2h10l4 4v14" />
+          <path d="M14 3v5h5" />
+          <path d="M8 13h8" />
+          <path d="M8 17h5" />
+        </svg>
+      );
     case "jobs":
-      return <svg {...common}><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>;
+      return (
+        <svg {...common}>
+          <rect x="3" y="7" width="18" height="13" rx="2" />
+          <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          <path d="M3 12h18" />
+        </svg>
+      );
     case "payments":
-      return <svg {...common}><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h2"/></svg>;
+      return (
+        <svg {...common}>
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+          <path d="M2 10h20" />
+          <path d="M6 15h2" />
+        </svg>
+      );
     case "audit":
-      return <svg {...common}><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>;
+      return (
+        <svg {...common}>
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+      );
     default:
-      return <svg {...common}><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>;
+      return (
+        <svg {...common}>
+          <circle cx="5" cy="12" r="1" />
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+        </svg>
+      );
   }
 }
 

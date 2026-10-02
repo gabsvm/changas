@@ -29,7 +29,9 @@ export default async function AdminReportsPage() {
         description="Casos abiertos primero, decisiones reversibles y evidencia preservada sin borrado destructivo."
         action={
           <div className="rounded-2xl border border-[#ef5350]/30 bg-[#ef5350]/10 px-4 py-3 text-center">
-            <p className="text-2xl font-extrabold text-[#ff7774]">{openReports.length}</p>
+            <p className="text-2xl font-extrabold text-[#ff7774]">
+              {openReports.length}
+            </p>
             <p className="text-[0.65rem] font-extrabold tracking-[0.08em] text-[#a98080] uppercase">
               abiertos
             </p>
@@ -43,7 +45,8 @@ export default async function AdminReportsPage() {
             Moderación puntual de mensaje
           </summary>
           <p className="mt-2 text-xs leading-5 text-[#7f8a9b]">
-            Usá esta herramienta cuando ya tengas el UUID exacto del mensaje y un motivo de política.
+            Usá esta herramienta cuando ya tengas el UUID exacto del mensaje y
+            un motivo de política.
           </p>
           <form
             action={setMessageModerationAction}
@@ -74,7 +77,9 @@ export default async function AdminReportsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">Necesitan decisión</h2>
+          <h2 className="text-base font-extrabold text-white">
+            Necesitan decisión
+          </h2>
           <AdminStatusBadge
             label={`${openReports.length} pendientes`}
             tone={openReports.length ? "danger" : "success"}
@@ -91,13 +96,16 @@ export default async function AdminReportsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <AdminStatusBadge label={reportTypeLabel(report.report_type)} tone="info" />
+                      <AdminStatusBadge
+                        label={reportTypeLabel(report.report_type)}
+                        tone="info"
+                      />
                       <AdminStatusBadge label="Abierto" tone="danger" />
                     </div>
                     <h3 className="mt-3 text-base font-extrabold text-white">
                       {report.category}
                     </h3>
-                    <p className="mt-1 break-all text-[0.68rem] text-[#697386]">
+                    <p className="mt-1 text-[0.68rem] break-all text-[#697386]">
                       Caso {report.report_id}
                     </p>
                   </div>
@@ -116,8 +124,16 @@ export default async function AdminReportsPage() {
                     </summary>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <form action={setReviewModerationAction}>
-                        <input type="hidden" name="reviewId" value={report.target_id} />
-                        <input type="hidden" name="disposition" value="HIDDEN_POLICY" />
+                        <input
+                          type="hidden"
+                          name="reviewId"
+                          value={report.target_id}
+                        />
+                        <input
+                          type="hidden"
+                          name="disposition"
+                          value="HIDDEN_POLICY"
+                        />
                         <input
                           className="w-full px-3 py-2 text-sm"
                           name="reason"
@@ -130,8 +146,16 @@ export default async function AdminReportsPage() {
                         </button>
                       </form>
                       <form action={setReviewModerationAction}>
-                        <input type="hidden" name="reviewId" value={report.target_id} />
-                        <input type="hidden" name="disposition" value="RESTORED" />
+                        <input
+                          type="hidden"
+                          name="reviewId"
+                          value={report.target_id}
+                        />
+                        <input
+                          type="hidden"
+                          name="disposition"
+                          value="RESTORED"
+                        />
                         <input
                           className="w-full px-3 py-2 text-sm"
                           name="reason"
@@ -146,8 +170,16 @@ export default async function AdminReportsPage() {
                 ) : null}
 
                 <form action={resolveReportAction} className="mt-4 space-y-2">
-                  <input type="hidden" name="reportType" value={report.report_type} />
-                  <input type="hidden" name="reportId" value={report.report_id} />
+                  <input
+                    type="hidden"
+                    name="reportType"
+                    value={report.report_type}
+                  />
+                  <input
+                    type="hidden"
+                    name="reportId"
+                    value={report.report_id}
+                  />
                   <label className="block text-xs font-bold text-[#8f99aa]">
                     Resolución del caso
                     <textarea
@@ -176,8 +208,12 @@ export default async function AdminReportsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">Historial resuelto</h2>
-          <span className="text-xs font-bold text-[#697386]">{resolvedReports.length} casos</span>
+          <h2 className="text-base font-extrabold text-white">
+            Historial resuelto
+          </h2>
+          <span className="text-xs font-bold text-[#697386]">
+            {resolvedReports.length} casos
+          </span>
         </div>
         {resolvedReports.length ? (
           <div className="grid gap-2 lg:grid-cols-2">
@@ -188,14 +224,16 @@ export default async function AdminReportsPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-extrabold text-white">{report.category}</p>
+                    <p className="text-sm font-extrabold text-white">
+                      {report.category}
+                    </p>
                     <p className="mt-1 text-xs leading-5 text-[#98a2b3]">
                       {report.resolution ?? "Resuelto"}
                     </p>
                   </div>
                   <AdminStatusBadge label="Resuelto" tone="success" />
                 </div>
-                <p className="mt-3 break-all text-[0.65rem] text-[#697386]">
+                <p className="mt-3 text-[0.65rem] break-all text-[#697386]">
                   {reportTypeLabel(report.report_type)} · {report.report_id}
                 </p>
               </article>

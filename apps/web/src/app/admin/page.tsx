@@ -15,7 +15,11 @@ import {
 } from "@/lib/admin/server";
 
 const tools = [
-  ["/admin/providers", "Prestadores", "Perfiles, servicios y estado operativo."],
+  [
+    "/admin/providers",
+    "Prestadores",
+    "Perfiles, servicios y estado operativo.",
+  ],
   ["/admin/catalog", "Catálogo", "Categorías, skills, tags y moderación."],
   ["/admin/reports", "Reportes", "Trust & Safety y resoluciones."],
   ["/admin/jobs", "Trabajos", "Estado y contexto de contrataciones."],
@@ -24,13 +28,14 @@ const tools = [
 ] as const;
 
 export default async function AdminPage() {
-  const [identityQueue, openReports, providers, users, jobs] = await Promise.all([
-    listAdminIdentityQueue(),
-    listAdminReports("OPEN"),
-    listAdminProviders(),
-    listAdminUsers(),
-    listAdminJobs(),
-  ]);
+  const [identityQueue, openReports, providers, users, jobs] =
+    await Promise.all([
+      listAdminIdentityQueue(),
+      listAdminReports("OPEN"),
+      listAdminProviders(),
+      listAdminUsers(),
+      listAdminJobs(),
+    ]);
 
   const incompleteProviders = providers.filter(
     (provider) => provider.status === "PROFILE_INCOMPLETE",
@@ -84,7 +89,9 @@ export default async function AdminPage() {
             <p className="text-[0.68rem] font-extrabold tracking-[0.14em] text-[#ff7b4c] uppercase">
               Prioridad
             </p>
-            <h2 className="mt-1 text-lg font-extrabold text-white">Necesita atención</h2>
+            <h2 className="mt-1 text-lg font-extrabold text-white">
+              Necesita atención
+            </h2>
           </div>
           {hasAttention ? (
             <span className="rounded-full border border-[#d60060]/30 bg-[#d60060]/12 px-2.5 py-1 text-xs font-extrabold text-[#ff79ad]">
@@ -102,10 +109,16 @@ export default async function AdminPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-extrabold text-[#ffd878]">Identidades por revisar</p>
-                    <p className="mt-2 text-3xl font-extrabold text-white">{identityQueue.length}</p>
+                    <p className="text-sm font-extrabold text-[#ffd878]">
+                      Identidades por revisar
+                    </p>
+                    <p className="mt-2 text-3xl font-extrabold text-white">
+                      {identityQueue.length}
+                    </p>
                   </div>
-                  <span className="text-xl text-[#ffd878]" aria-hidden="true">→</span>
+                  <span className="text-xl text-[#ffd878]" aria-hidden="true">
+                    →
+                  </span>
                 </div>
                 <p className="mt-3 text-xs leading-5 text-[#b6a479]">
                   Prestadores que ya enviaron documentación completa.
@@ -120,10 +133,16 @@ export default async function AdminPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-extrabold text-[#ff7774]">Reportes abiertos</p>
-                    <p className="mt-2 text-3xl font-extrabold text-white">{openReports.length}</p>
+                    <p className="text-sm font-extrabold text-[#ff7774]">
+                      Reportes abiertos
+                    </p>
+                    <p className="mt-2 text-3xl font-extrabold text-white">
+                      {openReports.length}
+                    </p>
                   </div>
-                  <span className="text-xl text-[#ff7774]" aria-hidden="true">→</span>
+                  <span className="text-xl text-[#ff7774]" aria-hidden="true">
+                    →
+                  </span>
                 </div>
                 <p className="mt-3 text-xs leading-5 text-[#a98080]">
                   Casos que todavía no tienen una resolución administrativa.
@@ -138,10 +157,16 @@ export default async function AdminPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-extrabold text-[#7ea2ff]">Onboarding incompleto</p>
-                    <p className="mt-2 text-3xl font-extrabold text-white">{incompleteProviders.length}</p>
+                    <p className="text-sm font-extrabold text-[#7ea2ff]">
+                      Onboarding incompleto
+                    </p>
+                    <p className="mt-2 text-3xl font-extrabold text-white">
+                      {incompleteProviders.length}
+                    </p>
                   </div>
-                  <span className="text-xl text-[#7ea2ff]" aria-hidden="true">→</span>
+                  <span className="text-xl text-[#7ea2ff]" aria-hidden="true">
+                    →
+                  </span>
                 </div>
                 <p className="mt-3 text-xs leading-5 text-[#8192bb]">
                   Perfiles creados que todavía no enviaron identidad a revisión.
@@ -162,7 +187,9 @@ export default async function AdminPage() {
           <p className="text-[0.68rem] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
             Herramientas
           </p>
-          <h2 className="mt-1 text-lg font-extrabold text-white">Administración completa</h2>
+          <h2 className="mt-1 text-lg font-extrabold text-white">
+            Administración completa
+          </h2>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {tools.map(([href, title, description]) => (
@@ -172,10 +199,16 @@ export default async function AdminPage() {
               key={href}
             >
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-extrabold text-[#e4e7ec]">{title}</h3>
-                <span className="text-[#596579]" aria-hidden="true">↗</span>
+                <h3 className="text-sm font-extrabold text-[#e4e7ec]">
+                  {title}
+                </h3>
+                <span className="text-[#596579]" aria-hidden="true">
+                  ↗
+                </span>
               </div>
-              <p className="mt-2 text-xs leading-5 text-[#7f8a9b]">{description}</p>
+              <p className="mt-2 text-xs leading-5 text-[#7f8a9b]">
+                {description}
+              </p>
             </Link>
           ))}
         </div>

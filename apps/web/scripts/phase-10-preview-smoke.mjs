@@ -6,21 +6,30 @@ if (!rawBaseUrl) {
 }
 
 const baseUrl = new URL(rawBaseUrl);
+// The smoke test must not depend on seeded content: the hosted database can be
+// empty, so a missing public provider page is expected to be a clean 404.
 const routes = [
-  "/health",
-  "/",
-  "/buscar",
-  "/p/demo-proveedor/demo-revision-pc",
-  "/manifest.webmanifest",
+  { path: "/health" },
+  { path: "/" },
+  { path: "/buscar" },
+  { path: "/login" },
+  { path: "/p/smoke-missing-provider/smoke-missing-service", status: 404 },
+  { path: "/manifest.webmanifest" },
 ];
 
-for (const route of routes) {
+for (const { path: route, status: expectedStatus = 200 } of routes) {
   const response = await fetch(new URL(route, baseUrl), {
     redirect: "follow",
     headers: { "User-Agent": "changas-phase10-preview-smoke" },
   });
-  if (!response.ok) {
-    throw new Error(`${route} returned HTTP ${response.status}`);
+  if (response.status !== expectedStatus) {
+    throw new Error(
+      `${route} returned HTTP ${response.status}, expected ${expectedStatus}`,
+    );
+  }
+  if (expectedStatus !== 200) {
+    console.log(`preview smoke PASS ${route} (${expectedStatus})`);
+    continue;
   }
 
   if (route === "/health") {

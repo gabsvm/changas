@@ -1,10 +1,5 @@
 export type JobStatusTone =
-  | "neutral"
-  | "info"
-  | "success"
-  | "warning"
-  | "danger"
-  | "brand";
+  "neutral" | "info" | "success" | "warning" | "danger" | "brand";
 
 export type JobStatusPresentation = {
   label: string;
@@ -29,6 +24,8 @@ const fallbackPresentation: JobStatusPresentation = {
   tone: "neutral",
 };
 
-export function getJobStatusPresentation(status: string): JobStatusPresentation {
+export function getJobStatusPresentation(
+  status: string,
+): JobStatusPresentation {
   return jobStatusPresentations[status] ?? fallbackPresentation;
 }

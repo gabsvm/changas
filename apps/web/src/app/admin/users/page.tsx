@@ -72,7 +72,10 @@ export default async function AdminUsersPage({
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <AdminStatusBadge label={detail.role === "admin" ? "Admin" : "Usuario"} tone={detail.role === "admin" ? "pink" : "neutral"} />
+              <AdminStatusBadge
+                label={detail.role === "admin" ? "Admin" : "Usuario"}
+                tone={detail.role === "admin" ? "pink" : "neutral"}
+              />
               <AdminStatusBadge
                 label={providerLabel(detail.provider_status)}
                 tone={providerTone(detail.provider_status)}
@@ -88,7 +91,9 @@ export default async function AdminUsersPage({
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-bold text-[#697386]">Estado de prestador</dt>
+              <dt className="text-xs font-bold text-[#697386]">
+                Estado de prestador
+              </dt>
               <dd className="mt-1 font-semibold text-[#d0d5dd]">
                 {providerLabel(detail.provider_status)}
               </dd>
@@ -97,9 +102,12 @@ export default async function AdminUsersPage({
 
           <div>
             <div className="mb-3">
-              <p className="text-sm font-extrabold text-white">Habilitación como prestador</p>
+              <p className="text-sm font-extrabold text-white">
+                Habilitación como prestador
+              </p>
               <p className="mt-1 text-xs leading-5 text-[#7f8a9b]">
-                El camino normal conserva onboarding y revisión. La activación manual es un bypass auditado.
+                El camino normal conserva onboarding y revisión. La activación
+                manual es un bypass auditado.
               </p>
             </div>
             <AdminProviderControls
@@ -128,7 +136,9 @@ export default async function AdminUsersPage({
                     minLength={3}
                     placeholder={`Motivo ${kind === "SUSPENDED" ? "de suspensión" : "de restricción"}`}
                   />
-                  <button className={`mt-2 min-h-11 w-full rounded-xl px-3 py-2 text-sm font-extrabold ${kind === "SUSPENDED" ? "bg-[#ef5350] text-white" : "bg-[#ffc857] text-[#10131a]"}`}>
+                  <button
+                    className={`mt-2 min-h-11 w-full rounded-xl px-3 py-2 text-sm font-extrabold ${kind === "SUSPENDED" ? "bg-[#ef5350] text-white" : "bg-[#ffc857] text-[#10131a]"}`}
+                  >
                     {kind === "SUSPENDED" ? "Suspender" : "Restringir"}
                   </button>
                 </form>
@@ -178,7 +188,9 @@ export default async function AdminUsersPage({
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1.5">
                   {user.role === "admin" ? (
-                    <span className="text-[0.62rem] font-extrabold text-[#ff79ad]">ADMIN</span>
+                    <span className="text-[0.62rem] font-extrabold text-[#ff79ad]">
+                      ADMIN
+                    </span>
                   ) : null}
                   <AdminStatusBadge
                     label={providerLabel(user.provider_status)}

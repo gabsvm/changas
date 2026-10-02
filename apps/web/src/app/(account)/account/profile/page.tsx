@@ -22,7 +22,8 @@ export default async function AccountProfilePage() {
     .select("display_name, public_zone, bio, avatar_url")
     .eq("id", user.id)
     .maybeSingle();
-  const displayName = profile?.display_name || user.email?.split("@")[0] || "Tu perfil";
+  const displayName =
+    profile?.display_name || user.email?.split("@")[0] || "Tu perfil";
 
   return (
     <section className="pb-4 sm:py-10">
@@ -37,7 +38,7 @@ export default async function AccountProfilePage() {
           </p>
         </header>
 
-        <section className="border-b border-ink/[0.07] pb-5">
+        <section className="border-ink/[0.07] border-b pb-5">
           <ProfileAvatarUploader
             displayName={displayName}
             initialAvatarUrl={profile?.avatar_url}

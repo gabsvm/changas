@@ -55,9 +55,7 @@ export function AppHeader({
       ) : null}
 
       {title ? (
-        <span
-          className="min-w-0 flex-1 truncate text-[17px] font-extrabold tracking-[-0.02em]"
-        >
+        <span className="min-w-0 flex-1 truncate text-[17px] font-extrabold tracking-[-0.02em]">
           {title}
         </span>
       ) : (

@@ -24,6 +24,7 @@
 ### Task 1: Fix truthful provider identity submission
 
 **Files:**
+
 - Create: `supabase/migrations/20260908173000_admin_provider_ops.sql`
 - Modify: `apps/web/src/app/(provider)/actions.ts`
 - Modify: `apps/web/src/app/(provider)/provider/onboarding/documents/page.tsx`
@@ -31,6 +32,7 @@
 - Test: `apps/web/src/lib/ui/provider-submission.test.ts`
 
 **Interfaces:**
+
 - Produces RPC `submit_provider_identity_review()` with no args, returning `void`.
 - Produces server action `submitProviderIdentityReview(previousState, formData): Promise<ActionState>`.
 
@@ -43,11 +45,13 @@
 ### Task 2: Add audited admin provider operations
 
 **Files:**
+
 - Same migration: `supabase/migrations/20260908173000_admin_provider_ops.sql`
 - Modify: `apps/web/src/app/admin/actions.ts`
 - Modify: `apps/web/src/lib/admin/server.ts`
 
 **Interfaces:**
+
 - RPC `admin_prepare_provider(target_user_id uuid) returns public.provider_status`.
 - RPC `admin_activate_provider(target_user_id uuid, requested_reason text) returns public.provider_status`.
 - Actions `prepareProviderAction(formData)` and `activateProviderAction(formData)`.
@@ -60,6 +64,7 @@
 ### Task 3: Build responsive admin shell
 
 **Files:**
+
 - Create: `apps/web/src/components/admin/admin-shell.tsx`
 - Create: `apps/web/src/components/admin/admin-nav.tsx`
 - Create: `apps/web/src/components/admin/admin-ui.tsx`
@@ -67,6 +72,7 @@
 - Test: `apps/web/src/lib/ui/admin-navigation.test.ts`
 
 **Interfaces:**
+
 - Shared `adminNavigation` descriptors used by mobile and desktop navigation.
 - Shared `AdminPageHeader`, `AdminCard`, `AdminStatusBadge`, `AdminEmptyState`.
 
@@ -79,6 +85,7 @@
 ### Task 4: Rebuild dashboard around pending operations
 
 **Files:**
+
 - Modify: `apps/web/src/app/admin/page.tsx`
 - Modify: `apps/web/src/lib/admin/server.ts`
 
@@ -90,6 +97,7 @@
 ### Task 5: Rebuild Users and Providers mobile-first
 
 **Files:**
+
 - Modify: `apps/web/src/app/admin/users/page.tsx`
 - Modify: `apps/web/src/app/admin/providers/page.tsx`
 
@@ -103,6 +111,7 @@
 ### Task 6: Rebuild Identity queue mobile-first
 
 **Files:**
+
 - Modify: `apps/web/src/app/admin/identity/page.tsx`
 
 - [ ] Put queue/pending count at top.
@@ -114,6 +123,7 @@
 ### Task 7: Apply shared admin design to remaining sections
 
 **Files:**
+
 - Modify: `apps/web/src/app/admin/catalog/page.tsx`
 - Modify: `apps/web/src/app/admin/reports/page.tsx`
 - Modify: `apps/web/src/app/admin/jobs/page.tsx`
@@ -128,6 +138,7 @@
 ### Task 8: Regression coverage and verification
 
 **Files:**
+
 - Create: `tests/e2e/admin-mobile-revamp.spec.ts`
 - Update tests only where real behavior changed.
 
