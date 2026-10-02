@@ -16,8 +16,7 @@ const icon = readFileSync(
 );
 const badgeSources = [
   "../../app/(account)/messages/page.tsx",
-  "../../app/(account)/layout.tsx",
-  "../../app/(provider)/layout.tsx",
+  "../../components/ui/nav-with-counts.tsx",
   "../../components/ui/authenticated-bottom-nav.tsx",
 ]
   .map((path) => readFileSync(new URL(path, import.meta.url), "utf8"))
@@ -56,7 +55,7 @@ describe("Changas brand theme", () => {
 
   it("uses the accessible pink derivative for unread-count badges", () => {
     expect(badgeSources).not.toMatch(/bg-brand-pink(?=\s|\")/);
-    expect(badgeSources.match(/bg-brand-pink-strong/g)).toHaveLength(4);
+    expect(badgeSources.match(/bg-brand-pink-strong/g)).toHaveLength(3);
   });
 
   it("uses the branded icon artwork for compact wordmarks", () => {

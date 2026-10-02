@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 import { parseDiscoveryFilters } from "@changas/domain";
 
-import { AuthenticatedBottomNav } from "@/components/ui/authenticated-bottom-nav";
+import { BottomNav } from "@/components/ui/nav-with-counts";
 import { Avatar } from "@/components/ui/marketplace/avatar";
 import { CategoryTile } from "@/components/ui/marketplace/category-tile";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
@@ -12,8 +12,6 @@ import { NearbyServiceRail } from "@/components/ui/marketplace/nearby-service-ra
 import { SearchField } from "@/components/ui/marketplace/search-field";
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { searchDiscovery } from "@/lib/discovery/server";
-import { getUnreadConversationCount } from "@/lib/conversations/server";
-import { getUnreadNotificationCount } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -43,8 +41,6 @@ export default async function HomePage() {
       .limit(8),
     searchDiscovery({ query: "", filters }),
   ]);
-  const unreadCount = user ? await getUnreadNotificationCount(supabase) : 0;
-  const unreadMessages = user ? await getUnreadConversationCount() : 0;
   const accountName = user?.email?.split("@")[0] || "Tu cuenta";
 
   return (
@@ -290,10 +286,7 @@ export default async function HomePage() {
           ) : null}
         </div>
       </div>
-      <AuthenticatedBottomNav
-        unreadCount={unreadCount}
-        unreadMessages={unreadMessages}
-      />
+      <BottomNav authenticated={Boolean(user)} />
     </main>
   );
 }
