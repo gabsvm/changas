@@ -6,7 +6,7 @@ const linkClass =
 export function DesktopNav({ authenticated }: { authenticated: boolean }) {
   return (
     <nav
-      aria-label="Navegación principal"
+      aria-label="Navegación del sitio"
       className="hidden items-center gap-1 sm:flex"
     >
       <Link className={linkClass} href="/buscar">
