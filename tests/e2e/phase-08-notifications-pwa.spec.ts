@@ -130,7 +130,7 @@ test.describe("Phase 08 notifications and PWA", () => {
       ).toBeVisible();
       await expectNoHorizontalOverflow(page);
 
-      await page.getByRole("button", { name: "Marcar como leída" }).click();
+      await page.getByRole("button", { name: "Marcar", exact: true }).click();
       await expect(page.getByText("Leída", { exact: true })).toBeVisible();
       await expect(
         page
@@ -183,7 +183,7 @@ test.describe("Phase 08 notifications and PWA", () => {
       await login(page, user, "/account/notifications");
       await expect(page.getByText(/El permiso está bloqueado/)).toBeVisible();
       await expect(
-        page.getByRole("button", { name: "Activar notificaciones push" }),
+        page.getByRole("switch", { name: "Notificaciones push" }),
       ).toBeDisabled();
       expect(
         await page.evaluate(

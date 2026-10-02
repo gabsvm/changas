@@ -52,16 +52,19 @@ test.describe("Phase 03 public discovery", () => {
     await expect(
       page.getByRole("link", { name: "Soporte técnico remoto" }).first(),
     ).toBeVisible();
-    await expect(page.locator("#search-category")).toHaveValue("tecnologia");
-    await expect(page.locator("#search-skill")).toHaveValue(
+    // Filters live in a bottom sheet; the URL state must hydrate its fields.
+    await page.getByRole("button", { name: "Filtros" }).click();
+    const sheet = page.getByRole("dialog", { name: "Filtros" });
+    await expect(sheet.locator('[name="category"]')).toHaveValue("tecnologia");
+    await expect(sheet.locator('[name="skill"]')).toHaveValue(
       "soporte-tecnico-remoto",
     );
-    await expect(page.locator("#search-price-model")).toHaveValue(
+    await expect(sheet.locator('[name="priceModel"]')).toHaveValue(
       "STARTING_AT",
     );
-    await expect(page.locator("#search-min")).toHaveValue("8000");
-    await expect(page.locator("#search-max")).toHaveValue("10000");
-    await expect(page.locator("#search-offers")).toBeChecked();
+    await expect(sheet.locator('[name="min"]')).toHaveValue("8000");
+    await expect(sheet.locator('[name="max"]')).toHaveValue("10000");
+    await expect(sheet.locator('[name="offers"]')).toBeChecked();
   });
 
   test("category browsing opens active technology results", async ({

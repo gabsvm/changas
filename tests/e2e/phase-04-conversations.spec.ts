@@ -130,7 +130,9 @@ test.describe("Phase 04 contextual conversations", () => {
 
       const composer = page.getByPlaceholder("Escribí un mensaje…");
       await composer.fill("Hola, quisiera coordinar el diagnóstico.");
-      await page.getByRole("button", { name: "Enviar", exact: true }).click();
+      await page
+        .getByRole("button", { name: "Enviar mensaje", exact: true })
+        .click();
       await expect(
         page.getByText("Hola, quisiera coordinar el diagnóstico.", {
           exact: true,
@@ -139,7 +141,9 @@ test.describe("Phase 04 contextual conversations", () => {
 
       const contactText = `Mi correo es phase04-${crypto.randomUUID()}@example.test`;
       await composer.fill(contactText);
-      await page.getByRole("button", { name: "Enviar", exact: true }).click();
+      await page
+        .getByRole("button", { name: "Enviar mensaje", exact: true })
+        .click();
       await expect(
         page.getByText("Revisá antes de enviar", { exact: true }),
       ).toBeVisible();
