@@ -222,6 +222,15 @@ jobs:
             exit 1
           fi
 
+      - name: Upload Playwright results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: Stop local Supabase
         if: always()
         run: pnpm dlx supabase@2.116.0 stop
