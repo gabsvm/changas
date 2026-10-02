@@ -1,8 +1,6 @@
 import Link from "next/link";
 
-import { AuthenticatedBottomNav } from "@/components/ui/authenticated-bottom-nav";
-import { getUnreadConversationCount } from "@/lib/conversations/server";
-import { getUnreadNotificationCount } from "@/lib/notifications/server";
+import { ActivityBadge, BottomNav } from "@/components/ui/nav-with-counts";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AccountLayout({
@@ -12,8 +10,6 @@ export default async function AccountLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const unreadCount = user ? await getUnreadNotificationCount(supabase) : 0;
-  const unreadMessages = user ? await getUnreadConversationCount() : 0;
 
   return (
     <main
@@ -42,14 +38,7 @@ export default async function AccountLayout({
             <DesktopNavLink href="/account/notifications">
               <span className="flex items-center gap-2">
                 Actividad
-                {unreadCount > 0 ? (
-                  <span
-                    aria-label={`${unreadCount} notificaciones sin leer`}
-                    className="bg-brand-pink-strong min-w-5 rounded-full px-1.5 py-0.5 text-center text-[0.65rem] leading-4 font-bold text-white"
-                  >
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                ) : null}
+                <ActivityBadge />
               </span>
             </DesktopNavLink>
             <DesktopNavLink href="/account">Cuenta</DesktopNavLink>
@@ -58,12 +47,7 @@ export default async function AccountLayout({
         </header>
         {children}
       </div>
-      {user ? (
-        <AuthenticatedBottomNav
-          unreadCount={unreadCount}
-          unreadMessages={unreadMessages}
-        />
-      ) : null}
+      {user ? <BottomNav authenticated /> : null}
     </main>
   );
 }

@@ -10,13 +10,11 @@ import {
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { LocationPicker } from "@/components/discovery/location-picker";
 import { SearchFiltersSheet } from "@/components/discovery/search-filters-sheet";
-import { AuthenticatedBottomNav } from "@/components/ui/authenticated-bottom-nav";
+import { BottomNav } from "@/components/ui/nav-with-counts";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { SearchField } from "@/components/ui/marketplace/search-field";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { searchDiscovery } from "@/lib/discovery/server";
-import { getUnreadConversationCount } from "@/lib/conversations/server";
-import { getUnreadNotificationCount } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -84,8 +82,6 @@ export default async function SearchPage({
   const activeSkill = skills.find(
     (item) => item.slug === filters.skillSlug,
   )?.name;
-  const unreadCount = user ? await getUnreadNotificationCount(supabase) : 0;
-  const unreadMessages = user ? await getUnreadConversationCount() : 0;
 
   const activeFilterCount =
     (filters.categorySlug ? 1 : 0) +
@@ -299,10 +295,7 @@ export default async function SearchPage({
           </div>
         </section>
       </div>
-      <AuthenticatedBottomNav
-        unreadCount={unreadCount}
-        unreadMessages={unreadMessages}
-      />
+      <BottomNav authenticated={Boolean(user)} />
     </main>
   );
 }

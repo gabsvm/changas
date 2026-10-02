@@ -22,8 +22,11 @@ describe("Phase 08 notification center UI contract", () => {
 
   it("shows an SSR unread badge in account navigation", () => {
     const layout = source("apps/web/src/app/(account)/layout.tsx");
+    const counts = source("apps/web/src/components/ui/nav-with-counts.tsx");
 
-    expect(layout).toContain("getUnreadNotificationCount");
+    // The counter is streamed behind Suspense so it never blocks the page.
+    expect(counts).toContain("getUnreadNotificationCount");
+    expect(layout).toContain("<ActivityBadge />");
     expect(layout).toContain('href="/account/notifications"');
     expect(layout).toContain("Actividad");
   });
