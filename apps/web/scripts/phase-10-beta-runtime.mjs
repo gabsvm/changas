@@ -128,11 +128,39 @@ async function onboardAndVerifyProvider({
   );
 
   // Submission goes through submit_provider_identity_review(), which requires
-  // the complete case (front, back and selfie); direct status updates are
-  // server-authoritative.
+  // a complete public profile, a complete private identity profile and all
+  // three documents; direct status updates are server-authoritative.
+  result = await service
+    .from("profiles")
+    .update({
+      display_name: "Proveedor Phase 10",
+      public_zone: "Buenos Aires",
+      bio: "Proveedor creado por el recorrido beta de Phase 10.",
+    })
+    .eq("id", user.id);
+  assert(
+    !result.error,
+    `Public profile completion failed: ${result.error?.message ?? "unknown"}`,
+  );
+
+  result = await service.from("profile_private").upsert({
+    user_id: user.id,
+    legal_name: "Proveedor Phase Diez",
+    private_phone: "+5491100000000",
+    date_of_birth: "1990-01-01",
+    exact_address: "Calle Falsa 123, Buenos Aires",
+    dni_number: user.id.replaceAll("-", "").slice(0, 12),
+  });
+  assert(
+    !result.error,
+    `Private profile completion failed: ${result.error?.message ?? "unknown"}`,
+  );
+
+  const documentPaths = [];
   const bytes = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
   for (const documentType of ["DNI_FRONT", "DNI_BACK", "SELFIE"]) {
     const documentPath = `${user.id}/${crypto.randomUUID()}-phase10-${documentType.toLowerCase()}.jpg`;
+    documentPaths.push(documentPath);
     const upload = await client.storage
       .from("identity-documents")
       .upload(documentPath, new Blob([bytes], { type: "image/jpeg" }), {
@@ -184,7 +212,7 @@ async function onboardAndVerifyProvider({
       state.data.onboarding_step === 4,
     `Provider did not become ACTIVE after admin verification: ${JSON.stringify(state.data)}`,
   );
-  return documentPath;
+  return documentPaths[0];
 }
 
 async function attachSkill(providerClient, providerUserId, skillId) {
