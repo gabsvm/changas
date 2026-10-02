@@ -121,9 +121,6 @@ test.describe("Phase 08 notifications and PWA", () => {
 
       await page.getByRole("link", { name: /Notificaciones/ }).click();
       await expect(page).toHaveURL(/\/account\/notifications$/);
-      await expect(
-        page.getByRole("heading", { name: "Notificaciones" }),
-      ).toBeVisible();
       await expect(page.getByText("Verificación aprobada")).toBeVisible();
       await expect(
         page.getByText("Tu perfil de prestador ya está habilitado."),
@@ -137,6 +134,13 @@ test.describe("Phase 08 notifications and PWA", () => {
           .getByLabel(/1 (notificaciones )?sin leer/)
           .filter({ visible: true }),
       ).toHaveCount(0);
+
+      // Push and preferences live on their own settings page.
+      await page.getByRole("link", { name: "Ajustes de avisos" }).click();
+      await expect(page).toHaveURL(/\/account\/settings\/notifications$/);
+      await expect(
+        page.getByRole("heading", { name: "Notificaciones" }),
+      ).toBeVisible();
 
       // Preferences auto-save when a switch changes; the switch input is
       // visually hidden behind its track, so toggle it with force.
@@ -181,7 +185,7 @@ test.describe("Phase 08 notifications and PWA", () => {
     const user = await createTestUser("Usuario Push Denegado Phase 08");
 
     try {
-      await login(page, user, "/account/notifications");
+      await login(page, user, "/account/settings/notifications");
       await expect(page.getByText(/El permiso está bloqueado/)).toBeVisible();
       await expect(
         page.getByRole("switch", { name: "Notificaciones push" }),

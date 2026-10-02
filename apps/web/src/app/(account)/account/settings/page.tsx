@@ -39,7 +39,7 @@ export default async function AccountSettingsPage() {
             description={user.email ?? "Sin correo disponible"}
           />
           <SettingsRow
-            href="/account/notifications"
+            href="/account/settings/notifications"
             title="Notificaciones"
             description="Alertas, recordatorios y preferencias"
           />
