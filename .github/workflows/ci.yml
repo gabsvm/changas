@@ -205,8 +205,9 @@ jobs:
       - name: Run mobile Lighthouse hardening audit
         run: |
           categories=performance,accessibility,best-practices,seo
+          # /buscar is noindex by design (search results), so skip is-crawlable there.
           pnpm dlx lighthouse@12.8.2 http://127.0.0.1:3000/ --only-categories="$categories" --form-factor=mobile --chrome-flags="--headless --no-sandbox" --output=json --output-path="$RUNNER_TEMP/home-lighthouse.json"
-          pnpm dlx lighthouse@12.8.2 http://127.0.0.1:3000/buscar --only-categories="$categories" --form-factor=mobile --chrome-flags="--headless --no-sandbox" --output=json --output-path="$RUNNER_TEMP/search-lighthouse.json"
+          pnpm dlx lighthouse@12.8.2 http://127.0.0.1:3000/buscar --only-categories="$categories" --skip-audits=is-crawlable --form-factor=mobile --chrome-flags="--headless --no-sandbox" --output=json --output-path="$RUNNER_TEMP/search-lighthouse.json"
           pnpm dlx lighthouse@12.8.2 http://127.0.0.1:3000/p/demo-proveedor/demo-revision-pc --only-categories="$categories" --form-factor=mobile --chrome-flags="--headless --no-sandbox" --output=json --output-path="$RUNNER_TEMP/service-lighthouse.json"
           node apps/web/scripts/check-mobile-performance.mjs "$RUNNER_TEMP/home-lighthouse.json" "$RUNNER_TEMP/search-lighthouse.json" "$RUNNER_TEMP/service-lighthouse.json"
 
