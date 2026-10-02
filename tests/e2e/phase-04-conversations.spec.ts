@@ -152,10 +152,19 @@ test.describe("Phase 04 contextual conversations", () => {
       await page.getByRole("button", { name: "Enviar de todos modos" }).click();
       await expect(page.getByText(contactText, { exact: true })).toBeVisible();
 
-      await page
-        .locator("summary", { hasText: "Opciones de conversación" })
-        .click();
-      await page.getByRole("button", { name: "Bloquear persona" }).click();
+      // The options menu is a <details>; reopen it if a tap did not toggle it.
+      const blockButton = page.getByRole("button", {
+        name: "Bloquear persona",
+      });
+      await expect(async () => {
+        if (!(await blockButton.isVisible())) {
+          await page
+            .locator("summary", { hasText: "Opciones de conversación" })
+            .click();
+        }
+        await expect(blockButton).toBeVisible({ timeout: 1000 });
+      }).toPass();
+      await blockButton.click();
       await expect(
         page.getByRole("button", {
           name: "Desbloquear para volver a escribir",

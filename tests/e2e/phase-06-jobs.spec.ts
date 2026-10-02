@@ -224,7 +224,7 @@ test.describe("Phase 06 Jobs", () => {
       ),
     ).toBeVisible();
     await expect(
-      page.getByText("AWAITING PAYMENT", { exact: true }),
+      page.getByText("Esperando pago", { exact: true }).first(),
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Simular pago aprobado" }),
