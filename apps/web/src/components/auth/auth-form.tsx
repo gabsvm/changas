@@ -161,6 +161,20 @@ export function AuthForm({
           </p>
         ) : null}
 
+        {mode === "signup" ? (
+          <p className="text-ink/70 text-xs leading-5">
+            Al crear tu cuenta aceptás los{" "}
+            <Link className="text-terracotta underline" href="/terminos">
+              Términos y condiciones
+            </Link>{" "}
+            y la{" "}
+            <Link className="text-terracotta underline" href="/privacidad">
+              Política de privacidad
+            </Link>
+            .
+          </p>
+        ) : null}
+
         <button
           className="button-primary w-full disabled:cursor-wait disabled:opacity-60"
           type="submit"

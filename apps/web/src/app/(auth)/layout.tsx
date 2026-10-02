@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/ui/site-footer";
 import Link from "next/link";
 
 export default function AuthLayout({
@@ -37,6 +38,7 @@ export default function AuthLayout({
           />
           <div className="relative z-10 w-full">{children}</div>
         </div>
+        <SiteFooter className="mt-0" />
       </div>
     </main>
   );

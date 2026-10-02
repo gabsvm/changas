@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/ui/site-footer";
 import { redirect } from "next/navigation";
 
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
@@ -54,6 +55,8 @@ export default async function AccountSettingsPage() {
             description="Datos legales que no se publican"
           />
         </section>
+
+        <SiteFooter className="mt-8" />
 
         <form action={signOut} className="border-ink/10 mt-7 border-t pt-5">
           <ActionButton
