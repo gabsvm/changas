@@ -63,11 +63,7 @@ for (const viewport of [
         sheet.getByRole("button", { name: "Cerrar Filtros" }),
       ).toBeFocused();
       await expect
-        .poll(() =>
-          sheet
-            .locator("[data-motion-panel]")
-            .evaluate((element) => element.getAnimations().length),
-        )
+        .poll(() => sheet.evaluate((element) => element.getAnimations().length))
         .toBeGreaterThan(0);
       await page.keyboard.press("Shift+Tab");
       await expect(

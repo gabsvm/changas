@@ -82,7 +82,7 @@ test.describe("Phase 05 structured proposals", () => {
       page.getByText("Reserva directa · v1", { exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText("Esperando pago", { exact: true }),
+      page.getByText("Esperando pago", { exact: true }).first(),
     ).toBeVisible();
     await expect(
       page.getByText(

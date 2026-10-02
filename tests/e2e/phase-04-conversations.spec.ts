@@ -152,7 +152,9 @@ test.describe("Phase 04 contextual conversations", () => {
       await page.getByRole("button", { name: "Enviar de todos modos" }).click();
       await expect(page.getByText(contactText, { exact: true })).toBeVisible();
 
-      await page.getByText("···", { exact: true }).click();
+      await page
+        .locator("summary", { hasText: "Opciones de conversación" })
+        .click();
       await page.getByRole("button", { name: "Bloquear persona" }).click();
       await expect(
         page.getByRole("button", {

@@ -194,7 +194,9 @@ test.describe("Phase 06 Jobs", () => {
     await expect(
       page.getByRole("heading", { name: "Mis trabajos" }),
     ).toBeVisible();
-    await expect(page.getByText("CONFIRMED", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("Confirmado", { exact: true }).first(),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
 
     await page.locator(`a[href="/jobs/${jobId}"]`).click();

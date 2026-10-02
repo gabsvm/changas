@@ -131,7 +131,7 @@ test.describe("Phase 08 notifications and PWA", () => {
       await expectNoHorizontalOverflow(page);
 
       await page.getByRole("button", { name: "Marcar", exact: true }).click();
-      await expect(page.getByText("Leída", { exact: true })).toBeVisible();
+      await expect(page.getByText("Nueva", { exact: true })).toHaveCount(0);
       await expect(
         page
           .getByLabel(/1 (notificaciones )?sin leer/)
@@ -199,13 +199,19 @@ test.describe("Phase 08 notifications and PWA", () => {
       await page.goto("/jobs");
       await expect(page).toHaveURL(/\/jobs$/);
       await expect(
-        page.getByRole("link", { name: "Notificaciones" }),
+        page
+          .getByRole("link", { name: /Actividad/ })
+          .filter({ visible: true })
+          .first(),
       ).toBeVisible();
 
       await page.goto("/messages");
       await expect(page).toHaveURL(/\/messages$/);
       await expect(
-        page.getByRole("link", { name: "Notificaciones" }),
+        page
+          .getByRole("link", { name: /Actividad/ })
+          .filter({ visible: true })
+          .first(),
       ).toBeVisible();
       await expectNoHorizontalOverflow(page);
     } finally {
