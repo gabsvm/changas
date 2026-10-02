@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { SettingsRow } from "@/components/ui/marketplace/settings-row";
 import { Switch } from "@/components/ui/marketplace/switch";
@@ -27,36 +27,44 @@ export function NotificationPreferencesForm({
     initialActionState,
   );
 
+  const [savedVisible, setSavedVisible] = useState(false);
+
+  useEffect(() => {
+    if (!state.success) return;
+    const show = window.setTimeout(() => setSavedVisible(true), 0);
+    const hide = window.setTimeout(() => setSavedVisible(false), 2500);
+    return () => {
+      window.clearTimeout(show);
+      window.clearTimeout(hide);
+    };
+  }, [state]);
+
   function persistChange() {
     window.setTimeout(() => formRef.current?.requestSubmit(), 0);
   }
 
   return (
     <form ref={formRef} action={formAction}>
-      {pending ? (
-        <p
-          className="bg-brand-orange/[0.08] text-terracotta px-4 py-2.5 text-sm font-semibold"
-          role="status"
-          aria-live="polite"
-        >
-          Guardando cambio…
-        </p>
-      ) : state.error ? (
+      {!pending && state.error ? (
         <p
           className="bg-danger/[0.07] text-danger px-4 py-2.5 text-sm font-semibold"
           role="alert"
         >
           {state.error}
         </p>
-      ) : state.success ? (
-        <p
-          className="bg-success/[0.07] text-success px-4 py-2.5 text-sm font-semibold"
-          role="status"
-          aria-live="polite"
-        >
-          Cambios guardados
-        </p>
       ) : null}
+      {/* A fixed toast avoids shifting the list when a change is saved. */}
+      <div
+        role="status"
+        aria-live="polite"
+        className="pointer-events-none fixed inset-x-4 bottom-[calc(var(--mobile-bottom-nav-height)+0.75rem)] z-40 flex justify-center sm:bottom-6"
+      >
+        {pending || savedVisible ? (
+          <p className="bg-ink rounded-full px-4 py-2 text-sm font-semibold text-white shadow-lg">
+            {pending ? "Guardando cambio…" : "Cambios guardados"}
+          </p>
+        ) : null}
+      </div>
 
       {NOTIFICATION_PREFERENCE_GROUPS.map((group) => (
         <fieldset key={group.id} className="px-0">

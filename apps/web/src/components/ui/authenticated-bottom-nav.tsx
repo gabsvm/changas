@@ -188,7 +188,7 @@ export function AuthenticatedBottomNav({
               key={item.key}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`consumer-pressable focus-visible:ring-moss/45 relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[0.68rem] font-bold outline-none focus-visible:ring-2 ${
+              className={`consumer-pressable focus-visible:ring-moss/45 relative flex min-h-12 flex-col items-center justify-end gap-1 rounded-xl px-1 pt-1 pb-2 text-[0.68rem] font-bold outline-none focus-visible:ring-2 ${
                 active ? "text-ink" : "text-ink/55 hover:text-ink/80"
               }`}
             >
@@ -197,7 +197,7 @@ export function AuthenticatedBottomNav({
                   item.central && active
                     ? "bg-ink h-12 w-12 text-white shadow-lg"
                     : item.central
-                      ? "bg-ink/[0.06] text-ink h-12 w-12"
+                      ? "border-ink/20 text-ink h-12 w-12 border"
                       : "h-6 w-6"
                 }`}
               >
