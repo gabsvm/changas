@@ -70,9 +70,7 @@ export default async function FavoritesPage() {
                 provider.public_headline ??
                 provider.public_zone ??
                 "Servicios publicados";
-              const meta = provider.public_zone
-                ? `${rating} · ${provider.public_zone}`
-                : `${rating} · ${reputation}`;
+              const meta = `${rating} · ${reputation}`;
 
               return (
                 <ProviderCard
