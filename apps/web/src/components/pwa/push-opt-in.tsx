@@ -197,13 +197,17 @@ export function PushOptIn({
     }
   }
 
-  const unavailable = capability === "unsupported" || capability === "denied";
+  const configured = Boolean(publicKey);
+  const unavailable =
+    !configured || capability === "unsupported" || capability === "denied";
   const description =
     capability === "unsupported"
       ? "Este navegador no ofrece Web Push en este contexto."
       : capability === "denied"
         ? "El permiso está bloqueado en la configuración del navegador."
-        : "Alertas importantes incluso cuando Changas está cerrado.";
+        : !configured
+          ? "Todavía no está disponible. Mientras tanto verás tus alertas dentro de Changas."
+          : "Alertas importantes incluso cuando Changas está cerrado.";
 
   return (
     <div>
