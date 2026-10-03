@@ -234,6 +234,13 @@ export default async function ProviderMarketplaceManagePage({
   }
   const displayName =
     profile?.display_name ?? user.email?.split("@")[0] ?? "proveedor";
+  const suggestedSlug = displayName
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
   const status = getProviderStatusPresentation(provider.status);
 
   return (
@@ -284,6 +291,9 @@ export default async function ProviderMarketplaceManagePage({
         <div className="mt-6">
           <MarketplaceManagement
             provider={provider}
+            suggestedSlug={
+              suggestedSlug.length >= 3 ? suggestedSlug : undefined
+            }
             catalogSkills={marketplaceSkills}
             skills={selectedSkills}
             providerSkills={providerSkills ?? []}

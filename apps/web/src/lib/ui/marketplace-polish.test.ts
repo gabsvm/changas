@@ -123,7 +123,7 @@ describe("marketplace polish contracts", () => {
   it("explains the public profile link without exposing technical slug jargon", () => {
     expect(marketplaceManagementSource).toContain("Enlace de tu perfil");
     expect(marketplaceManagementSource).toContain(
-      "Se usa para crear el enlace que vas a compartir",
+      "Es el enlace que vas a compartir",
     );
     expect(marketplaceManagementSource).not.toContain('label="Slug público"');
   });

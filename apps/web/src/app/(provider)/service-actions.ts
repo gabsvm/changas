@@ -130,6 +130,20 @@ export async function saveServiceTransactional(
     .maybeSingle();
   if (!provider) return errorState("Prepará primero tu perfil de proveedor.");
 
+  // Offering a service in a skill implies having that skill on the profile.
+  const { error: skillError } = await supabase.from("provider_skills").upsert(
+    {
+      provider_user_id: user.id,
+      skill_id: parsed.skillId,
+      is_featured: false,
+      sort_order: 0,
+    },
+    { onConflict: "provider_user_id,skill_id", ignoreDuplicates: true },
+  );
+  if (skillError) {
+    return errorState(saveServiceErrorMessage(skillError, parsed.isPublished));
+  }
+
   const args: SaveServiceRpcArgs = {
     target_service_id: getFormString(formData, "serviceId") || null,
     requested_skill_id: parsed.skillId,

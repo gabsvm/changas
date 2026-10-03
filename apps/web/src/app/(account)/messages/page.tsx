@@ -148,6 +148,20 @@ export default async function MessagesPage({
           ) : (
             <EmptyState
               className="empty-state-card py-16 sm:py-20"
+              icon={
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 5.5h16v10H9.5L5 19v-3.5H4z" />
+                </svg>
+              }
               title="Todavía no tenés conversaciones"
               description="Cuando consultes por un servicio, el chat va a aparecer acá."
               actionHref="/buscar"
