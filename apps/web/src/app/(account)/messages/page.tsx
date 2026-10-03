@@ -104,7 +104,7 @@ export default async function MessagesPage({
           </div>
           <Link
             href="/buscar"
-            className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.08] inline-flex min-h-11 items-center gap-1 self-start rounded-full px-3 text-sm font-bold whitespace-nowrap"
+            className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.08] -ml-3 inline-flex min-h-11 items-center gap-1 self-start rounded-full px-3 text-sm font-bold whitespace-nowrap sm:ml-0"
           >
             Buscar servicios
           </Link>

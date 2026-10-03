@@ -75,7 +75,7 @@ export default async function NotificationCenterPage() {
               Novedades de trabajos, propuestas, pagos y cuenta.
             </p>
           </div>
-          <div className="flex items-center gap-1 self-start">
+          <div className="-ml-2.5 flex items-center gap-1 self-start sm:ml-0">
             <Link
               href="/account/settings/notifications"
               className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold whitespace-nowrap"
