@@ -1,4 +1,5 @@
 import { SiteFooter } from "@/components/ui/site-footer";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
@@ -54,6 +55,11 @@ export default async function AccountSettingsPage() {
             title="Identidad privada"
             description="Datos legales que no se publican"
           />
+          <SettingsRow
+            href="/update-password"
+            title="Cambiar contraseña"
+            description="Elegí una nueva clave de acceso"
+          />
         </section>
 
         <SiteFooter className="mt-8" />
@@ -67,6 +73,12 @@ export default async function AccountSettingsPage() {
             Cerrar sesión
           </ActionButton>
         </form>
+        <Link
+          href="/account/settings/delete"
+          className="text-ink/60 hover:text-danger mt-4 inline-block text-sm font-semibold underline underline-offset-4"
+        >
+          Eliminar mi cuenta
+        </Link>
       </div>
     </section>
   );
