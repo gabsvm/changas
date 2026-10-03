@@ -25,7 +25,10 @@ test.describe("Phase 03 public discovery", () => {
       page.getByRole("heading", { name: /Resultados para/ }),
     ).toBeVisible();
     await expect(
-      page.getByText("Electricista", { exact: false }).first(),
+      page
+        .getByText("Electricista", { exact: false })
+        .filter({ visible: true })
+        .first(),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Instalación eléctrica del hogar" }),
