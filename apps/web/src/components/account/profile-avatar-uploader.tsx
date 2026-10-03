@@ -129,7 +129,7 @@ export function ProfileAvatarUploader({
               ? "Cambiar foto"
               : "Agregar foto"}
         </button>
-        <p className="text-ink/45 mt-0.5 text-xs leading-5">
+        <p className="text-ink/70 mt-0.5 text-xs leading-5">
           Se optimiza automáticamente antes de subirla.
         </p>
         {message ? (

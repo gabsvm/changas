@@ -36,13 +36,13 @@ export default async function ProviderOnboardingPage() {
       <section className="pb-6 sm:py-14">
         <MobileAppBar title="Ser proveedor" backHref="/account" />
         <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-          <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+          <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
             Proveedor
           </p>
           <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
             Empezá tu verificación
           </h1>
-          <p className="text-ink/58 mt-2 max-w-xl text-sm leading-6">
+          <p className="text-ink/70 mt-2 max-w-xl text-sm leading-6">
             Son cuatro pasos breves. Podés salir y volver cuando quieras; nada
             se publica ni se activa sin revisión.
           </p>
@@ -58,7 +58,7 @@ export default async function ProviderOnboardingPage() {
                 className="border-ink/10 flex min-h-12 items-center gap-3 border-b py-2 last:border-b-0"
                 key={number}
               >
-                <span className="bg-ink/[0.06] text-ink/60 grid h-8 w-8 place-items-center rounded-full text-xs font-extrabold">
+                <span className="bg-ink/[0.06] text-ink/70 grid h-8 w-8 place-items-center rounded-full text-xs font-extrabold">
                   {number}
                 </span>
                 <span className="text-sm font-semibold">{label}</span>
@@ -96,7 +96,7 @@ export default async function ProviderOnboardingPage() {
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Perfil de proveedor
             </p>
             <h1 className="mt-2 text-3xl leading-9 font-extrabold tracking-[-0.035em]">
@@ -106,14 +106,14 @@ export default async function ProviderOnboardingPage() {
           <StatusBadge label={presentation.label} tone={presentation.tone} />
         </div>
 
-        <p className="text-ink/58 mt-3 text-sm leading-7">
+        <p className="text-ink/70 mt-3 text-sm leading-7">
           {presentation.description}
         </p>
 
         <section className="border-ink/10 mt-6 border-y py-5">
           <div className="flex items-center justify-between gap-4 text-xs font-bold">
             <span>Progreso</span>
-            <span className="text-ink/45">
+            <span className="text-ink/70">
               Paso {current?.number ?? 1} de 4
             </span>
           </div>

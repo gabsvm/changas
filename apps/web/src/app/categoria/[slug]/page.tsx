@@ -1,3 +1,4 @@
+import { BottomNav } from "@/components/ui/nav-with-counts";
 import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -107,7 +108,10 @@ export default async function CategoryPage({
   const { rows, hasMore } = searchResult;
 
   return (
-    <main id="main-content" className="bg-canvas text-ink min-h-screen">
+    <main
+      id="main-content"
+      className="bg-canvas text-ink mobile-content-with-nav min-h-screen"
+    >
       <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-8 sm:pt-5">
         <AppHeader
           brand
@@ -123,7 +127,7 @@ export default async function CategoryPage({
           className="sm:flex"
         />
         <section className="pt-5 sm:pt-9">
-          <div className="discovery-hero border-brand-yellow/35 bg-surface-muted/55 rounded-[1.25rem] border p-5 shadow-[var(--consumer-shadow-card)] sm:p-6">
+          <div className="discovery-hero border-ink/[0.07] rounded-3xl border p-5 shadow-[var(--consumer-shadow-card)] sm:p-6">
             <p className="brand-kicker text-xs font-extrabold tracking-[0.14em] uppercase">
               Explorá por categoría
             </p>
@@ -131,7 +135,7 @@ export default async function CategoryPage({
               {category.name}
             </h1>
             {category.description ? (
-              <p className="text-ink/58 mt-2 max-w-2xl text-sm leading-6 sm:text-base">
+              <p className="text-ink/70 mt-2 max-w-2xl text-sm leading-6 sm:text-base">
                 {category.description}
               </p>
             ) : null}
@@ -244,6 +248,7 @@ export default async function CategoryPage({
           </div>
         </section>
       </div>
+      <BottomNav authenticated={Boolean(user)} />
     </main>
   );
 }

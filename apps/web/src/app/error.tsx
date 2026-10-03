@@ -24,11 +24,11 @@ export default function Error({
         <h1 className="font-display mt-4 text-4xl font-semibold">
           Algo no salió como esperábamos.
         </h1>
-        <p className="text-ink/65 mt-4">
+        <p className="text-ink/70 mt-4">
           Podés intentar cargar esta vista nuevamente.
         </p>
         {error.digest ? (
-          <p className="text-ink/55 mt-3 text-xs" data-testid="error-reference">
+          <p className="text-ink/70 mt-3 text-xs" data-testid="error-reference">
             Referencia: {error.digest}
           </p>
         ) : null}

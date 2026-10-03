@@ -47,7 +47,7 @@ async function ActivityBadgeCount() {
   return (
     <span
       aria-label={`${unreadCount} notificaciones sin leer`}
-      className="bg-brand-pink-strong min-w-5 rounded-full px-1.5 py-0.5 text-center text-[0.65rem] leading-4 font-bold text-white"
+      className="bg-brand-pink-strong min-w-5 rounded-full px-1.5 py-0.5 text-center text-[11px] leading-4 font-bold text-white"
     >
       {unreadCount > 99 ? "99+" : unreadCount}
     </span>

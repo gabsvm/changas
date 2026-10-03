@@ -163,7 +163,7 @@ export default async function PublicProviderPage({
               <div className="flex flex-wrap items-center gap-2">
                 <StatusChip tone="success">Identidad verificada</StatusChip>
                 {provider.public_zone ? (
-                  <span className="text-ink/60 text-[13px] font-medium">
+                  <span className="text-ink/70 text-[13px] font-medium">
                     {provider.public_zone}
                   </span>
                 ) : null}
@@ -172,7 +172,7 @@ export default async function PublicProviderPage({
                 {provider.display_name}
               </h1>
               {provider.public_headline ? (
-                <p className="text-ink/60 mt-1.5 text-[15px] leading-6 font-semibold">
+                <p className="text-ink/70 mt-1.5 text-[15px] leading-6 font-semibold">
                   {provider.public_headline}
                 </p>
               ) : null}
@@ -230,7 +230,7 @@ export default async function PublicProviderPage({
           ) : null}
 
           {provider.bio ? (
-            <p className="text-ink/62 mt-5 max-w-2xl text-sm leading-7">
+            <p className="text-ink/70 mt-5 max-w-2xl text-sm leading-7">
               {provider.bio}
             </p>
           ) : null}
@@ -246,7 +246,7 @@ export default async function PublicProviderPage({
               <p className="text-sm font-extrabold">
                 Información pública clara
               </p>
-              <p className="text-ink/55 mt-1 text-xs leading-6">
+              <p className="text-ink/70 mt-1 text-xs leading-6">
                 Conocé sus servicios, zona aproximada y experiencia antes de
                 escribirle.
               </p>
@@ -311,7 +311,7 @@ export default async function PublicProviderPage({
                   key={service.public_slug}
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="text-ink/60 text-[13px] font-semibold">
+                    <p className="text-ink/70 text-[13px] font-semibold">
                       {service.skill_name}
                     </p>
                     <h3 className="mt-1 line-clamp-2 text-[15px] leading-6 font-bold">
@@ -338,7 +338,7 @@ export default async function PublicProviderPage({
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 24 24"
-                      className="text-ink/50 h-5 w-5"
+                      className="text-ink/70 h-5 w-5"
                       fill="none"
                     >
                       <path
@@ -354,7 +354,7 @@ export default async function PublicProviderPage({
               ))}
             </div>
           ) : (
-            <p className="text-ink/50 py-3 text-sm">
+            <p className="text-ink/70 py-3 text-sm">
               No hay servicios publicados.
             </p>
           )}
@@ -381,7 +381,7 @@ export default async function PublicProviderPage({
                   key={`${area.label}-${area.radius_meters}`}
                 >
                   <span className="text-sm font-semibold">{area.label}</span>
-                  <span className="text-ink/48 text-xs">
+                  <span className="text-ink/70 text-xs">
                     Radio aprox. {area.radius_meters} m
                   </span>
                 </div>
@@ -419,7 +419,7 @@ export default async function PublicProviderPage({
                       {item.title}
                     </p>
                     {item.description ? (
-                      <p className="text-ink/55 mt-1.5 text-sm leading-6">
+                      <p className="text-ink/70 mt-1.5 text-sm leading-6">
                         {item.description}
                       </p>
                     ) : null}
@@ -438,11 +438,11 @@ export default async function PublicProviderPage({
                   <p className="text-sm leading-5 font-semibold">
                     {item.title}
                   </p>
-                  <p className="text-ink/48 mt-1 text-sm leading-5">
+                  <p className="text-ink/70 mt-1 text-sm leading-5">
                     {item.organization ?? "Experiencia independiente"}
                   </p>
                   {item.description ? (
-                    <p className="text-ink/58 mt-1.5 text-sm leading-7">
+                    <p className="text-ink/70 mt-1.5 text-sm leading-7">
                       {item.description}
                     </p>
                   ) : null}
@@ -463,7 +463,7 @@ export default async function PublicProviderPage({
                   <p className="text-sm leading-5 font-semibold">
                     {item.institution}
                   </p>
-                  <p className="text-ink/48 mt-1 text-sm leading-5">
+                  <p className="text-ink/70 mt-1 text-sm leading-5">
                     {item.field_of_study ?? "Formación"}
                   </p>
                 </div>
@@ -473,7 +473,7 @@ export default async function PublicProviderPage({
                   <p className="text-sm leading-5 font-semibold">
                     {item.title}
                   </p>
-                  <p className="text-ink/48 mt-1 text-sm leading-5">
+                  <p className="text-ink/70 mt-1 text-sm leading-5">
                     {item.issuer ?? "Emisor no especificado"}
                   </p>
                 </div>
@@ -513,7 +513,7 @@ function ProfileFact({ label, value }: { label: string; value: number }) {
       <p className="text-xl leading-7 font-extrabold tracking-[-0.03em]">
         {value}
       </p>
-      <p className="text-ink/48 mt-1 text-[0.68rem] leading-4 font-bold uppercase">
+      <p className="text-ink/70 mt-1 text-[11px] leading-4 font-bold uppercase">
         {label}
       </p>
     </div>

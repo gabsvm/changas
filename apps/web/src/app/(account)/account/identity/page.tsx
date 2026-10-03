@@ -33,7 +33,7 @@ export default async function AccountIdentityPage() {
           <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
             Identidad y seguridad
           </h1>
-          <p className="text-ink/52 text-sm leading-6 sm:mt-1 sm:max-w-xl">
+          <p className="text-ink/70 text-sm leading-6 sm:mt-1 sm:max-w-xl">
             Estos datos se usan sólo en procesos internos de identidad y
             seguridad.
           </p>

@@ -135,7 +135,7 @@ export default async function SearchPage({
           action={
             <Link
               href={user ? "/account" : "/login"}
-              className="consumer-pressable text-ink/60 hover:bg-ink/[0.04] inline-flex min-h-12 items-center rounded-full px-3 text-sm font-bold"
+              className="consumer-pressable text-ink/70 hover:bg-ink/[0.04] inline-flex min-h-12 items-center rounded-full px-3 text-sm font-bold"
             >
               {user ? "Cuenta" : "Ingresar"}
             </Link>
@@ -143,7 +143,7 @@ export default async function SearchPage({
         />
 
         <section className="pt-3 sm:pt-8">
-          <div className="discovery-hero border-ink/[0.07] bg-surface rounded-[1.25rem] border p-5 shadow-[var(--consumer-shadow-card)] sm:p-6">
+          <div className="discovery-hero border-ink/[0.07] bg-surface rounded-3xl border p-5 shadow-[var(--consumer-shadow-card)] sm:p-6">
             <h1 className="text-[22px] leading-8 font-extrabold tracking-[-0.025em] sm:text-3xl sm:leading-10">
               {query ? `Resultados para “${query}”` : "Explorar servicios"}
             </h1>
@@ -157,24 +157,24 @@ export default async function SearchPage({
                   placeholder="Electricista, clases de inglés…"
                   aria-label="Buscar un servicio o habilidad"
                 />
-                <div className="flex min-w-0 items-center gap-2">
+                <LocationPicker compact selected={filters.locationSlug} />
+                <div className="flex items-stretch gap-2">
                   <div className="min-w-0 flex-1">
-                    <LocationPicker compact selected={filters.locationSlug} />
+                    <SearchFiltersSheet
+                      query={query}
+                      filters={filters}
+                      categories={categories}
+                      skills={skills}
+                      activeCount={activeFilterCount}
+                    />
                   </div>
                   <button
-                    className="consumer-pressable cta-ink inline-flex min-h-[52px] shrink-0 items-center rounded-2xl px-5 text-[15px] font-extrabold"
+                    className="consumer-pressable cta-ink inline-flex min-h-12 shrink-0 items-center rounded-2xl px-7 text-[15px] font-extrabold"
                     type="submit"
                   >
                     Buscar
                   </button>
                 </div>
-                <SearchFiltersSheet
-                  query={query}
-                  filters={filters}
-                  categories={categories}
-                  skills={skills}
-                  activeCount={activeFilterCount}
-                />
               </div>
             </form>
 
@@ -286,7 +286,7 @@ export default async function SearchPage({
                 </Link>
               ) : null}
               {activeFilterCount === 0 ? (
-                <p className="text-ink/55 py-1 text-[13px] leading-5">
+                <p className="text-ink/70 py-1 text-[13px] leading-5">
                   Usá los filtros para afinar por zona, modalidad o precio.
                 </p>
               ) : null}

@@ -68,6 +68,9 @@ export function InstallPrompt() {
 
   useEffect(() => {
     if (isStandalone() || wasRecentlyDismissed()) return;
+    // Installing is a phone/tablet gesture; do not interrupt desktop browsing.
+    const touchDevice = window.matchMedia("(pointer: coarse)").matches;
+    if (!touchDevice && !isIosDevice()) return;
 
     if (isIosDevice()) {
       queueMicrotask(() => setShowIosGuide(true));
@@ -101,7 +104,7 @@ export function InstallPrompt() {
 
   return (
     <aside
-      className="border-ink/10 bg-canvas/96 text-ink fixed right-3 bottom-[calc(var(--mobile-bottom-nav-height)+0.5rem)] left-3 z-[60] mx-auto flex max-h-[calc(100dvh-1rem)] max-w-lg flex-col overflow-hidden rounded-[1.5rem] border shadow-[0_-18px_50px_rgba(32,33,36,0.18)] backdrop-blur-xl sm:right-4 sm:bottom-4 sm:left-4"
+      className="border-ink/10 bg-canvas/96 text-ink fixed right-3 bottom-[calc(var(--mobile-bottom-nav-height)+0.5rem)] left-3 z-[60] mx-auto flex max-h-[calc(100dvh-1rem)] max-w-lg flex-col overflow-hidden rounded-3xl border shadow-[0_-18px_50px_rgba(32,33,36,0.18)] backdrop-blur-xl sm:right-4 sm:bottom-4 sm:left-4"
       aria-label="Instalar Changas"
       role="dialog"
       aria-modal="false"
@@ -121,7 +124,7 @@ export function InstallPrompt() {
             </h2>
           </div>
           <button
-            className="consumer-pressable text-ink/55 hover:bg-ink/[0.05] inline-flex min-h-10 shrink-0 items-center rounded-full px-3 text-sm font-semibold"
+            className="consumer-pressable text-ink/70 hover:bg-ink/[0.05] inline-flex min-h-10 shrink-0 items-center rounded-full px-3 text-sm font-semibold"
             type="button"
             onClick={dismiss}
             aria-label="Cerrar sugerencia de instalación"
@@ -132,7 +135,7 @@ export function InstallPrompt() {
 
         {deferredPrompt ? (
           <>
-            <p className="text-ink/65 mt-3 text-sm leading-6">
+            <p className="text-ink/70 mt-3 text-sm leading-6">
               Instalá Changas desde el navegador para abrirla más rápido y
               usarla en modo standalone.
             </p>
@@ -145,7 +148,7 @@ export function InstallPrompt() {
             </button>
           </>
         ) : (
-          <p className="text-ink/65 mt-3 text-sm leading-6">
+          <p className="text-ink/70 mt-3 text-sm leading-6">
             En iPhone, tocá <strong>Compartir</strong> y después
             <strong> Agregar a pantalla de inicio</strong>. iOS no ofrece un
             botón de instalación web programático, por eso te mostramos estos

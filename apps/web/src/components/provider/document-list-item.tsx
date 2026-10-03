@@ -51,7 +51,7 @@ export async function DocumentListItem({
         <span className="block text-sm font-semibold">
           {getDocumentTypeLabel(documentType)}
         </span>
-        <span className="text-ink/45 mt-0.5 block text-xs">
+        <span className="text-ink/70 mt-0.5 block text-xs">
           Recibido {new Date(createdAt).toLocaleDateString("es-AR")}
           {typeof fileSizeBytes === "number"
             ? ` · ${formatFileSize(fileSizeBytes)}`

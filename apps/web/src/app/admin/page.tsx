@@ -86,7 +86,7 @@ export default async function AdminPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[0.68rem] font-extrabold tracking-[0.14em] text-[#ff7b4c] uppercase">
+            <p className="text-[11px] font-extrabold tracking-[0.14em] text-[#ff7b4c] uppercase">
               Prioridad
             </p>
             <h2 className="mt-1 text-lg font-extrabold text-white">
@@ -104,7 +104,7 @@ export default async function AdminPage() {
           <div className="grid gap-3 lg:grid-cols-3">
             {identityQueue.length ? (
               <Link
-                className="rounded-[1.6rem] border border-[#ffc857]/30 bg-[#ffc857]/10 p-5 transition-colors hover:bg-[#ffc857]/14"
+                className="rounded-3xl border border-[#ffc857]/30 bg-[#ffc857]/10 p-5 transition-colors hover:bg-[#ffc857]/14"
                 href="/admin/identity"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -128,7 +128,7 @@ export default async function AdminPage() {
 
             {openReports.length ? (
               <Link
-                className="rounded-[1.6rem] border border-[#ef5350]/30 bg-[#ef5350]/9 p-5 transition-colors hover:bg-[#ef5350]/13"
+                className="rounded-3xl border border-[#ef5350]/30 bg-[#ef5350]/9 p-5 transition-colors hover:bg-[#ef5350]/13"
                 href="/admin/reports"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -152,7 +152,7 @@ export default async function AdminPage() {
 
             {incompleteProviders.length ? (
               <Link
-                className="rounded-[1.6rem] border border-[#4f7dff]/30 bg-[#2563eb]/10 p-5 transition-colors hover:bg-[#2563eb]/14"
+                className="rounded-3xl border border-[#4f7dff]/30 bg-[#2563eb]/10 p-5 transition-colors hover:bg-[#2563eb]/14"
                 href="/admin/providers"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -184,7 +184,7 @@ export default async function AdminPage() {
 
       <AdminPanel>
         <div className="mb-4">
-          <p className="text-[0.68rem] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
+          <p className="text-[11px] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
             Herramientas
           </p>
           <h2 className="mt-1 text-lg font-extrabold text-white">

@@ -33,7 +33,7 @@ export default async function AccountProfilePage() {
           <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
             Perfil público
           </h1>
-          <p className="text-ink/52 text-sm leading-6 sm:mt-1 sm:max-w-xl">
+          <p className="text-ink/70 text-sm leading-6 sm:mt-1 sm:max-w-xl">
             Esta información puede aparecer en tus servicios y conversaciones.
           </p>
         </header>

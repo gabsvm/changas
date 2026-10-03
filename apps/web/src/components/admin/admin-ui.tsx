@@ -25,7 +25,7 @@ export function AdminPageHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <p className="text-[0.68rem] font-extrabold tracking-[0.16em] text-[#ff7b4c] uppercase">
+        <p className="text-[11px] font-extrabold tracking-[0.16em] text-[#ff7b4c] uppercase">
           {eyebrow}
         </p>
         <h1 className="mt-1 text-2xl font-extrabold tracking-[-0.03em] text-white sm:text-3xl">
@@ -51,7 +51,7 @@ export function AdminPanel({
 }) {
   return (
     <section
-      className={`rounded-[1.65rem] border border-[#273142] bg-[#151c27] p-4 shadow-[0_16px_42px_rgba(0,0,0,0.16)] sm:p-5 ${className}`}
+      className={`rounded-3xl border border-[#273142] bg-[#151c27] p-4 shadow-[0_16px_42px_rgba(0,0,0,0.16)] sm:p-5 ${className}`}
     >
       {children}
     </section>
@@ -67,7 +67,7 @@ export function AdminStatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex min-h-7 items-center rounded-full border px-2.5 py-1 text-[0.65rem] font-extrabold tracking-[0.04em] uppercase ${toneClasses[tone]}`}
+      className={`inline-flex min-h-7 items-center rounded-full border px-2.5 py-1 text-[11px] font-extrabold tracking-[0.04em] uppercase ${toneClasses[tone]}`}
     >
       {label}
     </span>
@@ -82,7 +82,7 @@ export function AdminEmptyState({
   description?: string;
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-dashed border-[#303b4d] bg-[#111822] px-5 py-8 text-center">
+    <div className="rounded-3xl border border-dashed border-[#303b4d] bg-[#111822] px-5 py-8 text-center">
       <div className="mx-auto grid h-11 w-11 place-items-center rounded-2xl border border-[#2a3445] bg-[#0d131d] text-lg text-[#596579]">
         ✓
       </div>
@@ -108,7 +108,7 @@ export function AdminMetricCard({
   tone?: Tone;
 }) {
   return (
-    <div className="rounded-[1.4rem] border border-[#273142] bg-[#151c27] p-4">
+    <div className="rounded-3xl border border-[#273142] bg-[#151c27] p-4">
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs font-bold text-[#8f99aa]">{label}</p>
         <span

@@ -216,7 +216,7 @@ export function DiscoveryResults({
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-2">
         <p
           aria-live="polite"
-          className={`text-sm font-semibold ${resultsError ? "text-danger" : "text-ink/60"} ${!resultsError && rows.length === 0 ? "sr-only" : ""}`}
+          className={`text-sm font-semibold ${resultsError ? "text-danger" : "text-ink/70"} ${!resultsError && rows.length === 0 ? "sr-only" : ""}`}
         >
           {resultsError
             ? resultsError
@@ -281,7 +281,7 @@ export function DiscoveryResults({
 
       {enableNearby && gpsMode && gpsPoint && !resultsError ? (
         <nav aria-label="Más resultados cercanos" className="mt-6 grid gap-2">
-          <p className="text-ink/60 text-center text-[13px] font-medium">
+          <p className="text-ink/70 text-center text-[13px] font-medium">
             Página {gpsPage}
             {hasMore ? " · hay más para explorar" : " · llegaste al final"}
           </p>
@@ -301,7 +301,7 @@ export function DiscoveryResults({
         </nav>
       ) : enableNearby && !resultsError ? (
         <nav aria-label="Más resultados" className="mt-6 grid gap-2">
-          <p className="text-ink/60 text-center text-[13px] font-medium">
+          <p className="text-ink/70 text-center text-[13px] font-medium">
             Página {filters.page}
             {hasMore
               ? " · hay más para explorar"

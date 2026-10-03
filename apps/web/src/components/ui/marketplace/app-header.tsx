@@ -23,7 +23,7 @@ export function AppHeader({
       {backHref ? (
         <Link
           href={backHref}
-          className="consumer-pressable text-ink hover:bg-ink/[0.05] -ml-2 grid h-12 w-12 shrink-0 place-items-center rounded-full"
+          className="consumer-pressable text-ink hover:bg-ink/[0.05] -ml-2 grid h-12 w-12 shrink-0 place-items-center rounded-full sm:hidden"
           aria-label="Volver"
         >
           <svg
@@ -56,8 +56,25 @@ export function AppHeader({
         </Link>
       ) : null}
 
+      {backHref ? (
+        <Link
+          href="/"
+          className="hidden min-w-0 items-center gap-2.5 sm:flex"
+          aria-label="Changas, inicio"
+        >
+          <span className="brand-mark h-9 w-9" aria-hidden="true">
+            C
+          </span>
+          <span className="truncate text-lg font-bold tracking-[-0.025em]">
+            Changas
+          </span>
+        </Link>
+      ) : null}
+
       {title ? (
-        <span className="min-w-0 flex-1 truncate text-[17px] font-extrabold tracking-[-0.02em]">
+        <span
+          className={`min-w-0 flex-1 truncate text-[17px] font-extrabold tracking-[-0.02em] ${backHref ? "sm:hidden" : ""}`}
+        >
           {title}
         </span>
       ) : (

@@ -184,7 +184,7 @@ export function DocumentUploader({
           <h2 className="text-base font-bold">Documentos privados</h2>
           <StatusChip tone="warning">Carga bloqueada</StatusChip>
         </div>
-        <p className="text-ink/55 mt-1 text-sm leading-6">
+        <p className="text-ink/70 mt-1 text-sm leading-6">
           Tu perfil está en un estado que no admite cambios. Los documentos ya
           recibidos siguen siendo privados.
         </p>
@@ -196,14 +196,14 @@ export function DocumentUploader({
     <section className="border-ink/10 border-y py-4">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
+          <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
             Privado
           </p>
           <h2 className="mt-1 text-lg font-bold">Subí un documento</h2>
         </div>
         <StatusChip tone="neutral">Máx. 10 MiB</StatusChip>
       </div>
-      <p className="text-ink/55 mt-1 text-sm leading-6">
+      <p className="text-ink/70 mt-1 text-sm leading-6">
         JPG, PNG o PDF. La ruta privada del archivo nunca se muestra
         públicamente.
       </p>
@@ -273,7 +273,7 @@ export function DocumentUploader({
             ) : null}
             <div className="flex min-h-14 items-center gap-3 px-3 py-2.5">
               <span
-                className="bg-moss/8 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-full text-[0.68rem] font-bold"
+                className="bg-moss/8 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-full text-[11px] font-bold"
                 aria-hidden="true"
               >
                 {selected.file.type === "application/pdf" ? "PDF" : "IMG"}
@@ -282,7 +282,7 @@ export function DocumentUploader({
                 <p className="truncate text-sm font-semibold">
                   {selected.file.name}
                 </p>
-                <p className="text-ink/45 mt-0.5 text-xs">
+                <p className="text-ink/70 mt-0.5 text-xs">
                   {getDocumentTypeLabel(documentType)} ·{" "}
                   {formatFileSize(selected.file.size)}
                 </p>
@@ -298,7 +298,7 @@ export function DocumentUploader({
             </div>
           </div>
         ) : (
-          <div className="border-ink/15 text-ink/52 rounded-xl border border-dashed px-4 py-5 text-center text-sm">
+          <div className="border-ink/15 text-ink/70 rounded-xl border border-dashed px-4 py-5 text-center text-sm">
             Tomá una foto o elegí un archivo guardado.
           </div>
         )}

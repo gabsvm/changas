@@ -9,7 +9,7 @@ export default function PaymentReturnFailurePage() {
       <h1 className="font-display mt-3 text-4xl font-semibold tracking-[-0.03em]">
         El pago no pudo completarse
       </h1>
-      <p className="text-ink/65 mt-5 text-sm leading-6">
+      <p className="text-ink/70 mt-5 text-sm leading-6">
         Esta pantalla sólo informa el regreso desde Mercado Pago. Changas no
         marca un pago como fallido ni aprobado por parámetros de redirección; el
         estado financiero se actualiza únicamente después de verificar al

@@ -24,13 +24,13 @@ export default async function AccountSettingsPage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Configuración" backHref="/account" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
           Cuenta
         </p>
         <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
           Configuración
         </h1>
-        <p className="text-ink/55 mt-1.5 text-sm leading-6">
+        <p className="text-ink/70 mt-1.5 text-sm leading-6">
           Acceso, preferencias y datos de tu cuenta.
         </p>
 

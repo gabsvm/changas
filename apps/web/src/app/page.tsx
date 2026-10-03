@@ -1,3 +1,5 @@
+import { HeroVisual } from "@/components/ui/marketplace/hero-visual";
+import { HowItWorks } from "@/components/ui/marketplace/how-it-works";
 import { SiteFooter } from "@/components/ui/site-footer";
 import Link from "next/link";
 import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
@@ -64,7 +66,7 @@ export default async function HomePage() {
               <span className="block truncate text-[17px] leading-5 font-extrabold tracking-[-0.02em]">
                 {user ? `Hola, ${accountName}` : "Changas"}
               </span>
-              <span className="text-ink/60 block truncate text-[13px] leading-4 font-medium">
+              <span className="text-ink/70 block truncate text-[13px] leading-4 font-medium">
                 {user ? "¿Qué resolvemos hoy?" : "Servicios cerca tuyo"}
               </span>
             </span>
@@ -95,64 +97,69 @@ export default async function HomePage() {
             aria-labelledby="home-search-title"
             className="brand-gradient-surface text-ink relative overflow-hidden rounded-[1.75rem] p-5 shadow-[var(--consumer-shadow-hero)] sm:p-9"
           >
-            <div className="relative z-10 max-w-2xl">
-              <p className="text-ink/80 text-xs font-extrabold tracking-[0.14em] uppercase">
-                Tu mercado de tareas rápidas
-              </p>
-              <h1
-                id="home-search-title"
-                className="mt-3 max-w-xl text-[2.5rem] leading-none font-extrabold tracking-[-0.04em] sm:text-6xl"
-              >
-                Encontrá a alguien que lo haga.
-              </h1>
-              <p className="text-ink/80 mt-3 max-w-lg text-[15px] leading-6 sm:text-lg">
-                Oficios verificables cerca tuyo o por videollamada. Buscá una
-                vez y elegí con precios claros.
-              </p>
-            </div>
-            <form
-              action="/buscar"
-              className="relative z-10 mt-6 flex flex-col gap-2.5 sm:max-w-2xl sm:flex-row sm:items-center"
-            >
-              <div className="min-w-0 flex-1">
-                <SearchField
-                  className="min-h-14 shadow-[var(--shadow-lg)]"
-                  id="home-query"
-                  name="q"
-                  placeholder="Plomero, clases, paseo…"
-                  aria-label="Buscar un servicio o habilidad"
-                />
+            <div className="relative z-10 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-10">
+              <div>
+                <div className="relative z-10 max-w-2xl">
+                  <p className="text-ink/80 text-xs font-extrabold tracking-[0.14em] uppercase">
+                    Tu mercado de tareas rápidas
+                  </p>
+                  <h1
+                    id="home-search-title"
+                    className="mt-3 max-w-xl text-[2.5rem] leading-none font-extrabold tracking-[-0.04em] sm:text-6xl"
+                  >
+                    Encontrá a alguien que lo haga.
+                  </h1>
+                  <p className="text-ink/80 mt-3 max-w-lg text-[15px] leading-6 sm:text-lg">
+                    Oficios verificables cerca tuyo o por videollamada. Buscá
+                    una vez y elegí con precios claros.
+                  </p>
+                </div>
+                <form
+                  action="/buscar"
+                  className="relative z-10 mt-6 flex flex-col gap-2.5 sm:max-w-2xl sm:flex-row sm:items-center"
+                >
+                  <div className="min-w-0 flex-1">
+                    <SearchField
+                      className="min-h-14 shadow-[var(--shadow-lg)]"
+                      id="home-query"
+                      name="q"
+                      placeholder="Plomero, clases, paseo…"
+                      aria-label="Buscar un servicio o habilidad"
+                    />
+                  </div>
+                  <button
+                    className="consumer-pressable cta-ink inline-flex min-h-14 w-full items-center justify-center rounded-2xl px-8 text-[15px] font-extrabold whitespace-nowrap sm:w-auto"
+                    type="submit"
+                  >
+                    Buscar
+                  </button>
+                </form>
+                <div
+                  className="relative z-10 mt-4 flex flex-wrap gap-2"
+                  role="group"
+                  aria-label="Atajos de búsqueda"
+                >
+                  <Link
+                    href="/buscar?mode=presencial"
+                    className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
+                  >
+                    Presencial
+                  </Link>
+                  <Link
+                    href="/buscar?mode=remoto"
+                    className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
+                  >
+                    Remoto
+                  </Link>
+                  <Link
+                    href="/buscar?offers=true"
+                    className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
+                  >
+                    Acepta ofertas
+                  </Link>
+                </div>
               </div>
-              <button
-                className="consumer-pressable cta-ink inline-flex min-h-14 w-full items-center justify-center rounded-2xl px-8 text-[15px] font-extrabold whitespace-nowrap sm:w-auto"
-                type="submit"
-              >
-                Buscar
-              </button>
-            </form>
-            <div
-              className="relative z-10 mt-4 flex flex-wrap gap-2"
-              role="group"
-              aria-label="Atajos de búsqueda"
-            >
-              <Link
-                href="/buscar?mode=presencial"
-                className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
-              >
-                Presencial
-              </Link>
-              <Link
-                href="/buscar?mode=remoto"
-                className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
-              >
-                Remoto
-              </Link>
-              <Link
-                href="/buscar?offers=true"
-                className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
-              >
-                Acepta ofertas
-              </Link>
+              <HeroVisual />
             </div>
           </section>
 
@@ -185,7 +192,7 @@ export default async function HomePage() {
                   actionHref="/buscar"
                   actionLabel="Explorar más"
                 />
-                <p className="text-ink/60 mt-3 text-sm" role="status">
+                <p className="text-ink/70 mt-3 text-sm" role="status">
                   La búsqueda está momentáneamente en mantenimiento.
                 </p>
               </div>
@@ -206,6 +213,8 @@ export default async function HomePage() {
               />
             )}
           </section>
+
+          <HowItWorks />
 
           <section className="consumer-card bg-surface mt-6 flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div className="flex items-start gap-3">
@@ -233,18 +242,14 @@ export default async function HomePage() {
                 <h2 className="text-[15px] font-extrabold">
                   Elegí con confianza
                 </h2>
-                <p className="text-ink/60 mt-1 text-[13px] leading-5">
-                  Perfiles públicos, precios claros y reseñas de trabajos
-                  reales.
+                <p className="text-ink/70 mt-1 text-[13px] leading-5">
+                  Cada proveedor verifica su identidad (DNI y selfie) antes de
+                  publicar. Perfiles públicos, precios claros y reseñas de
+                  trabajos reales. La verificación confirma quién es la persona;
+                  no certifica matrículas ni la calidad del trabajo.
                 </p>
               </div>
             </div>
-            <Link
-              href="/buscar"
-              className="text-terracotta consumer-pressable inline-flex min-h-11 items-center text-sm font-extrabold sm:shrink-0"
-            >
-              Cómo funciona
-            </Link>
           </section>
 
           {!user ? (

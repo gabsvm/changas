@@ -120,7 +120,7 @@ export default async function PublicServicePage({
           <h1 className="mt-4 text-[24px] leading-8 font-extrabold tracking-[-0.03em] sm:text-4xl sm:leading-10">
             {service.title}
           </h1>
-          <p className="text-ink/60 mt-3 max-w-2xl text-[15px] leading-7 sm:text-base">
+          <p className="text-ink/70 mt-3 max-w-2xl text-[15px] leading-7 sm:text-base">
             {service.description}
           </p>
 
@@ -184,14 +184,14 @@ export default async function PublicServicePage({
                 }
               />
               <span className="min-w-0 flex-1">
-                <span className="text-ink/45 block text-xs font-semibold">
+                <span className="text-ink/70 block text-xs font-semibold">
                   Ofrece
                 </span>
                 <span className="block truncate text-sm font-bold">
                   {provider.display_name}
                 </span>
                 {provider.public_headline ? (
-                  <span className="text-ink/52 mt-0.5 block truncate text-sm">
+                  <span className="text-ink/70 mt-0.5 block truncate text-sm">
                     {provider.public_headline}
                   </span>
                 ) : null}
@@ -206,7 +206,7 @@ export default async function PublicServicePage({
             <div className="mx-auto flex max-w-3xl items-stretch gap-3 sm:items-center sm:justify-between">
               <div className="bg-surface border-ink/[0.08] hidden min-w-40 flex-col justify-center rounded-2xl border px-4 py-2 sm:flex">
                 <p className="text-[15px] leading-5 font-extrabold">{price}</p>
-                <p className="text-ink/60 text-xs">
+                <p className="text-ink/70 text-xs">
                   Alcance y tiempos por chat
                 </p>
               </div>
@@ -220,7 +220,7 @@ export default async function PublicServicePage({
                   <p className="truncate text-[15px] leading-5 font-extrabold">
                     {price}
                   </p>
-                  <p className="text-ink/60 truncate text-xs">
+                  <p className="text-ink/70 truncate text-xs">
                     Por chat · responde rápido
                   </p>
                 </div>
@@ -237,7 +237,7 @@ export default async function PublicServicePage({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-ink/60 text-xs leading-5 font-bold tracking-[0.06em] uppercase">
+      <p className="text-ink/70 text-xs leading-5 font-bold tracking-[0.06em] uppercase">
         {label}
       </p>
       <p className="mt-1.5 text-[15px] leading-6 font-extrabold">{value}</p>
@@ -250,7 +250,7 @@ function Info({ title, value }: { title: string; value: string | null }) {
   return (
     <div className="py-4">
       <h3 className="text-sm leading-5 font-bold">{title}</h3>
-      <p className="text-ink/60 mt-1.5 text-sm leading-7">{value}</p>
+      <p className="text-ink/70 mt-1.5 text-sm leading-7">{value}</p>
     </div>
   );
 }

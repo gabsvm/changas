@@ -43,7 +43,7 @@ export async function ProviderReputation({
                 ? `★ ${summary.rating_average.toFixed(1)} de 5`
                 : "Nuevo proveedor"}
             </h2>
-            <p className="text-ink/55 mt-1 text-sm">
+            <p className="text-ink/70 mt-1 text-sm">
               {summary.review_count > 0
                 ? `${summary.review_count} ${summary.review_count === 1 ? "reseña" : "reseñas"} de trabajos completados`
                 : "Todavía no tiene reseñas verificadas en Changas."}
@@ -90,7 +90,7 @@ export async function ProviderReputation({
 
         {contexts.length > 0 ? (
           <div className="border-ink/10 mt-5 border-t pt-5">
-            <p className="text-ink/55 text-xs font-semibold tracking-wide uppercase">
+            <p className="text-ink/70 text-xs font-semibold tracking-wide uppercase">
               Historial por servicio y habilidad
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -134,7 +134,7 @@ export async function ProviderReputation({
                       {stars(review.rating)}
                     </p>
                   </div>
-                  <p className="text-ink/45 text-xs">
+                  <p className="text-ink/70 text-xs">
                     {review.service_title} · {review.skill_name}
                   </p>
                 </div>
@@ -145,7 +145,7 @@ export async function ProviderReputation({
                 ) : null}
                 {review.provider_reply ? (
                   <div className="bg-canvas mt-3 rounded-xl p-3 text-sm">
-                    <p className="text-ink/45 text-xs font-bold tracking-wide uppercase">
+                    <p className="text-ink/70 text-xs font-bold tracking-wide uppercase">
                       Respuesta del proveedor
                     </p>
                     <p className="mt-1 leading-6 whitespace-pre-wrap">
@@ -157,7 +157,7 @@ export async function ProviderReputation({
             ))}
           </div>
         ) : (
-          <p className="text-ink/55 mt-3 text-sm">
+          <p className="text-ink/70 mt-3 text-sm">
             Las primeras reseñas aparecerán después de trabajos completados y
             confirmados por clientes.
           </p>
@@ -171,7 +171,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-canvas min-w-24 rounded-xl px-3 py-2">
       <p className="font-display text-xl font-semibold">{value}</p>
-      <p className="text-ink/50 text-[10px] font-semibold tracking-wide uppercase">
+      <p className="text-ink/70 text-[10px] font-semibold tracking-wide uppercase">
         {label}
       </p>
     </div>
@@ -182,7 +182,7 @@ function Dimension({ label, value }: { label: string; value: number | null }) {
   if (value === null) return null;
   return (
     <div>
-      <p className="text-ink/50 text-xs font-semibold">{label}</p>
+      <p className="text-ink/70 text-xs font-semibold">{label}</p>
       <p className="mt-1 font-semibold">★ {value.toFixed(1)} / 5</p>
     </div>
   );

@@ -31,7 +31,7 @@ export default async function AdminLayout({
               aria-hidden="true"
             />
             <div className="min-w-0">
-              <p className="truncate text-[0.62rem] font-extrabold tracking-[0.19em] text-[#ff7b4c] uppercase">
+              <p className="truncate text-[11px] font-extrabold tracking-[0.19em] text-[#ff7b4c] uppercase">
                 Changas
               </p>
               <p className="truncate text-sm font-extrabold tracking-[-0.01em] text-white">

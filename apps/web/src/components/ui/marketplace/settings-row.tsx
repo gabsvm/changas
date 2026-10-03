@@ -24,7 +24,7 @@ export function SettingsRow({
           {title}
         </span>
         {description ? (
-          <span className="text-ink/52 mt-0.5 block text-sm leading-5">
+          <span className="text-ink/70 mt-0.5 block text-sm leading-5">
             {description}
           </span>
         ) : null}

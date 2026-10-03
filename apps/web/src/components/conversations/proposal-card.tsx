@@ -85,7 +85,7 @@ export function ProposalCard({
     <article className="border-brand-orange/20 bg-surface rounded-2xl border p-4 shadow-[var(--consumer-shadow-card)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-ink/60 text-xs font-bold tracking-[0.06em] uppercase">
+          <p className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
             {kindLabels[proposal.proposal_kind]} · v{proposal.version_number}
           </p>
           <h3 className="mt-1 truncate text-[15px] font-extrabold">
@@ -103,7 +103,7 @@ export function ProposalCard({
 
       <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
         <div className="bg-canvas rounded-xl p-3">
-          <dt className="text-ink/60 text-xs font-semibold">Precio total</dt>
+          <dt className="text-ink/70 text-xs font-semibold">Precio total</dt>
           <dd className="mt-1 text-[15px] font-extrabold">
             {proposal.price_amount === null
               ? "A cotizar"
@@ -111,7 +111,7 @@ export function ProposalCard({
           </dd>
         </div>
         <div className="bg-canvas rounded-xl p-3">
-          <dt className="text-ink/60 text-xs font-semibold">Modalidad</dt>
+          <dt className="text-ink/70 text-xs font-semibold">Modalidad</dt>
           <dd className="mt-1 text-[15px] font-extrabold">
             {proposal.modality === "REMOTE"
               ? "Remoto"
@@ -123,7 +123,7 @@ export function ProposalCard({
       </dl>
 
       {proposal.expires_at ? (
-        <p className="text-ink/60 mt-3 text-xs">
+        <p className="text-ink/70 mt-3 text-xs">
           Vigente hasta {expiresFormatter.format(new Date(proposal.expires_at))}
         </p>
       ) : null}
@@ -169,7 +169,7 @@ export function ProposalCard({
               </button>
               <button
                 type="button"
-                className="consumer-pressable text-ink/60 inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-bold"
+                className="consumer-pressable text-ink/70 inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-bold"
                 onClick={() =>
                   document
                     .getElementById(`counter-${proposal.proposal_id}`)

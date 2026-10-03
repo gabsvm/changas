@@ -231,7 +231,7 @@ function FilterGroup({
 }) {
   return (
     <fieldset className="grid gap-4 sm:col-span-2 sm:grid-cols-2">
-      <legend className="text-ink/48 mb-1 text-[0.68rem] font-bold tracking-[0.1em] uppercase">
+      <legend className="text-ink/70 mb-1 text-[11px] font-bold tracking-[0.1em] uppercase">
         {title}
       </legend>
       {children}

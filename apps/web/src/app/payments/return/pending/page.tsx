@@ -9,7 +9,7 @@ export default function PaymentReturnPendingPage() {
       <h1 className="font-display mt-3 text-4xl font-semibold tracking-[-0.03em]">
         El pago todavía está en proceso
       </h1>
-      <p className="text-ink/65 mt-5 text-sm leading-6">
+      <p className="text-ink/70 mt-5 text-sm leading-6">
         No hace falta volver a pagar. Changas actualizará el trabajo únicamente
         cuando reciba y verifique la confirmación segura de Mercado Pago.
       </p>

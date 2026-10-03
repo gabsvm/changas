@@ -15,7 +15,7 @@ export function SearchField({
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"
-        className="text-ink/50 h-5 w-5 shrink-0"
+        className="text-ink/70 h-5 w-5 shrink-0"
         fill="none"
       >
         <circle

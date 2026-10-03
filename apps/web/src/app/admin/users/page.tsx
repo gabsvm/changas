@@ -61,7 +61,7 @@ export default async function AdminUsersPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-[0.65rem] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
+              <p className="text-[11px] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
                 Cuenta seleccionada
               </p>
               <h2 className="mt-1 truncate text-xl font-extrabold text-white">
@@ -174,7 +174,7 @@ export default async function AdminUsersPage({
           <div className="grid gap-2 md:grid-cols-2">
             {users.map((user) => (
               <Link
-                className="group flex min-h-20 items-center justify-between gap-3 rounded-[1.4rem] border border-[#273142] bg-[#151c27] p-4 transition-colors hover:border-[#3a4659] hover:bg-[#192230]"
+                className="group flex min-h-20 items-center justify-between gap-3 rounded-3xl border border-[#273142] bg-[#151c27] p-4 transition-colors hover:border-[#3a4659] hover:bg-[#192230]"
                 href={`/admin/users?q=${encodeURIComponent(query)}&user=${user.user_id}`}
                 key={user.user_id}
               >
@@ -188,7 +188,7 @@ export default async function AdminUsersPage({
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1.5">
                   {user.role === "admin" ? (
-                    <span className="text-[0.62rem] font-extrabold text-[#ff79ad]">
+                    <span className="text-[11px] font-extrabold text-[#ff79ad]">
                       ADMIN
                     </span>
                   ) : null}

@@ -36,7 +36,7 @@ export function LegalPage({
           {title}
         </h1>
         <p className="text-ink/70 mt-2 text-sm leading-6">{intro}</p>
-        <p className="text-ink/60 mt-1 text-xs">
+        <p className="text-ink/70 mt-1 text-xs">
           Última actualización: {LEGAL_LAST_UPDATED}
         </p>
         {LEGAL_DOCUMENTS_ARE_DRAFT ? (

@@ -63,14 +63,14 @@ export function AuthForm({
     nextPath !== "/account" ? `?next=${encodeURIComponent(nextPath)}` : "";
 
   return (
-    <div className="border-ink/10 bg-surface w-full max-w-md rounded-[1.25rem] border p-5 sm:rounded-[2rem] sm:p-8 sm:shadow-[0_24px_70px_rgba(32,33,36,0.08)]">
+    <div className="border-ink/10 bg-surface w-full max-w-md rounded-3xl border p-5 sm:rounded-[1.75rem] sm:p-8 sm:shadow-[0_24px_70px_rgba(32,33,36,0.08)]">
       <p className="text-terracotta text-xs font-extrabold tracking-[0.18em] uppercase">
         Cuenta Changas
       </p>
       <h1 className="font-display mt-2 text-3xl leading-tight font-extrabold tracking-[-0.04em] sm:mt-3 sm:text-4xl">
         {modeCopy.title}
       </h1>
-      <p className="text-ink/65 mt-2 text-sm leading-6 sm:mt-3">
+      <p className="text-ink/70 mt-2 text-sm leading-6 sm:mt-3">
         {modeCopy.description}
       </p>
 
@@ -189,7 +189,7 @@ export function AuthForm({
       (mode === "login" || mode === "signup") ? (
         <>
           <div
-            className="text-ink/45 my-4 flex items-center gap-3 text-xs font-bold"
+            className="text-ink/70 my-4 flex items-center gap-3 text-xs font-bold"
             aria-hidden="true"
           >
             <span className="bg-ink/10 h-px flex-1" />
@@ -206,7 +206,7 @@ export function AuthForm({
       ) : null}
 
       <nav
-        className="text-ink/65 mt-6 flex flex-wrap gap-x-4 gap-y-2 text-sm"
+        className="text-ink/70 mt-6 flex flex-wrap gap-x-4 gap-y-2 text-sm"
         aria-label="Navegación de cuenta"
       >
         {mode === "login" ? (

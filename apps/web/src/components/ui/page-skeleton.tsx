@@ -12,7 +12,7 @@ export function PageSkeleton({
       <span className="sr-only">Cargando…</span>
       <Skeleton className="h-8 w-2/3 max-w-sm" />
       {variant === "hero" ? (
-        <Skeleton className="h-56 w-full rounded-[1.25rem]" />
+        <Skeleton className="h-56 w-full rounded-3xl" />
       ) : null}
       {variant === "form" ? (
         <div className="space-y-4">

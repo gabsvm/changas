@@ -24,13 +24,13 @@ export default async function NotificationSettingsPage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Notificaciones" backHref="/account/settings" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
           Configuración
         </p>
         <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
           Notificaciones
         </h1>
-        <p className="text-ink/60 mt-1.5 text-sm leading-6">
+        <p className="text-ink/70 mt-1.5 text-sm leading-6">
           Las alertas críticas dentro de Changas siguen disponibles aunque
           desactives canales externos.
         </p>

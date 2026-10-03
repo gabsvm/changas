@@ -33,7 +33,7 @@ export function ProviderPaymentAccount({
     <section aria-labelledby="provider-payment-account-title">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.14em] uppercase">
+          <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
             Cobros
           </p>
           <h2
@@ -42,7 +42,7 @@ export function ProviderPaymentAccount({
           >
             Mercado Pago
           </h2>
-          <p className="text-ink/55 mt-1.5 max-w-2xl text-sm leading-6">
+          <p className="text-ink/70 mt-1.5 max-w-2xl text-sm leading-6">
             Vinculá tu cuenta para recibir pagos del marketplace. Tus
             credenciales nunca se exponen al navegador.
           </p>
@@ -71,13 +71,13 @@ export function ProviderPaymentAccount({
 
         <dl className="divide-ink/[0.07] divide-y text-sm">
           <div className="flex min-h-12 items-center justify-between gap-4 py-2.5">
-            <dt className="text-ink/50">Cuenta</dt>
+            <dt className="text-ink/70">Cuenta</dt>
             <dd className="min-w-0 truncate text-right font-semibold">
               {account.providerAccountReference ?? "Todavía no vinculada"}
             </dd>
           </div>
           <div className="flex min-h-12 items-center justify-between gap-4 py-2.5">
-            <dt className="text-ink/50">Autorización</dt>
+            <dt className="text-ink/70">Autorización</dt>
             <dd className="text-right font-semibold">
               {account.tokenExpiresAt
                 ? new Intl.DateTimeFormat("es-AR", {
