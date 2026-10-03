@@ -40,7 +40,7 @@ export function SettingsRow({
     return (
       <Link
         href={href}
-        className={`${classes} hover:bg-brand-orange/[0.05] rounded-xl`}
+        className={`${classes} hover:bg-brand-orange/[0.05]`}
       >
         {content}
       </Link>

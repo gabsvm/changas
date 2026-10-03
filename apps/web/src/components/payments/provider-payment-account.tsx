@@ -47,7 +47,9 @@ export function ProviderPaymentAccount({
             credenciales nunca se exponen al navegador.
           </p>
         </div>
-        <StatusChip tone={status.tone}>{status.label}</StatusChip>
+        <span className="shrink-0 whitespace-nowrap">
+          <StatusChip tone={status.tone}>{status.label}</StatusChip>
+        </span>
       </div>
 
       <div className="consumer-card bg-surface mt-4 px-4 pb-4">

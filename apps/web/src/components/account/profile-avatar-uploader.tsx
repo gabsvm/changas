@@ -119,7 +119,7 @@ export function ProfileAvatarUploader({
         />
         <button
           type="button"
-          className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold disabled:opacity-50"
+          className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] -ml-2.5 inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold disabled:opacity-50"
           onClick={() => inputRef.current?.click()}
           disabled={pending}
         >

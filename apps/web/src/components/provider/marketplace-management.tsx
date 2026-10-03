@@ -675,7 +675,7 @@ export function MarketplaceManagement({
   return (
     <div className="space-y-6">
       <nav
-        className="consumer-scrollbar-none sticky top-16 z-20 -mx-1 flex gap-2 overflow-x-auto px-1 py-2 sm:static"
+        className="consumer-scrollbar-none bg-canvas/97 sticky top-14 z-20 -mx-4 flex gap-2 overflow-x-auto px-4 py-2 backdrop-blur-xl sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none"
         aria-label="Secciones de gestión"
       >
         {(
@@ -737,18 +737,18 @@ export function MarketplaceManagement({
             />
           </div>
           <p className="text-ink/70 text-xs">
-            Estado de identidad: <strong>{provider.status}</strong>. Sólo un
-            flujo server-side/admin controlado puede llevar un proveedor a
-            ACTIVE.
+            {provider.status === "ACTIVE"
+              ? "Tu identidad está verificada: podés publicar servicios."
+              : "Tu identidad todavía no está verificada: podés preparar servicios, pero se publican cuando la verificación esté aprobada."}
           </p>
         </ActionForm>
       </Section>
 
       <Section
         anchor="habilidades"
-        eyebrow="Catálogo controlado"
+        eyebrow="Lo que sabés hacer"
         title="Habilidades que ofrecés"
-        description="Una habilidad es una capacidad del catálogo; un servicio es una oferta concreta. Podés combinar habilidades no relacionadas sin convertirlas en servicios automáticamente."
+        description="Elegí tus habilidades de la lista. Después las usás para armar servicios concretos con precio."
       >
         <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
           <ActionForm
@@ -770,13 +770,7 @@ export function MarketplaceManagement({
                 ))}
               </select>
             </label>
-            <Field
-              label="Orden"
-              name="sortOrder"
-              type="number"
-              min={0}
-              defaultValue={10}
-            />
+            <input type="hidden" name="sortOrder" value="10" />
             <Check label="Destacar en mi perfil" name="isFeatured" />
           </ActionForm>
           <div className="space-y-3">
@@ -814,7 +808,7 @@ export function MarketplaceManagement({
         anchor="servicios"
         eyebrow="Servicios"
         title="Ofertas concretas"
-        description="Definí precio fijo, desde, por hora, por unidad o a cotizar; modalidad presencial/remota/ambas; propuestas y pausa. Publicar queda bloqueado hasta que el proveedor esté ACTIVE."
+        description="Cada servicio tiene su precio (fijo, desde, por hora, por unidad o a cotizar) y su modalidad (presencial, remota o ambas). Podés pausarlos cuando quieras."
       >
         <div className="space-y-5">
           {skills.length ? (
@@ -938,26 +932,34 @@ export function MarketplaceManagement({
               );
             }}
           />
-          <div className="border-ink/10 mt-5 border-t pt-5">
-            <ActionForm
-              action={actions.saveExperience}
-              submitLabel="Agregar experiencia"
-            >
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Puesto o rol" name="title" required />
-                <Field label="Organización" name="organization" />
-              </div>
-              <TextArea label="Descripción" name="description" />
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Desde" name="startedOn" type="date" required />
-                <Field label="Hasta" name="endedOn" type="date" />
-              </div>
-              <div className="flex flex-wrap gap-4">
-                <Check label="Actualmente" name="isCurrent" />
-                <Check label="Mostrar públicamente" name="isPublic" />
-              </div>
-            </ActionForm>
-          </div>
+          <details className="border-ink/10 mt-5 border-t pt-2">
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+              + Agregar experiencia
+              <span className="text-ink/40 text-xl" aria-hidden="true">
+                ›
+              </span>
+            </summary>
+            <div className="pt-3">
+              <ActionForm
+                action={actions.saveExperience}
+                submitLabel="Agregar experiencia"
+              >
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Puesto o rol" name="title" required />
+                  <Field label="Organización" name="organization" />
+                </div>
+                <TextArea label="Descripción" name="description" />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Desde" name="startedOn" type="date" required />
+                  <Field label="Hasta" name="endedOn" type="date" />
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  <Check label="Actualmente" name="isCurrent" />
+                  <Check label="Mostrar públicamente" name="isPublic" />
+                </div>
+              </ActionForm>
+            </div>
+          </details>
         </Section>
         <Section
           anchor="formacion"
@@ -982,23 +984,31 @@ export function MarketplaceManagement({
               );
             }}
           />
-          <div className="border-ink/10 mt-5 border-t pt-5">
-            <ActionForm
-              action={actions.saveEducation}
-              submitLabel="Agregar formación"
-            >
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Institución" name="institution" required />
-                <Field label="Campo de estudio" name="fieldOfStudy" />
-              </div>
-              <TextArea label="Descripción" name="description" />
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Desde" name="startedOn" type="date" required />
-                <Field label="Hasta" name="endedOn" type="date" />
-              </div>
-              <Check label="Mostrar públicamente" name="isPublic" />
-            </ActionForm>
-          </div>
+          <details className="border-ink/10 mt-5 border-t pt-2">
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+              + Agregar formación
+              <span className="text-ink/40 text-xl" aria-hidden="true">
+                ›
+              </span>
+            </summary>
+            <div className="pt-3">
+              <ActionForm
+                action={actions.saveEducation}
+                submitLabel="Agregar formación"
+              >
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Institución" name="institution" required />
+                  <Field label="Campo de estudio" name="fieldOfStudy" />
+                </div>
+                <TextArea label="Descripción" name="description" />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Desde" name="startedOn" type="date" required />
+                  <Field label="Hasta" name="endedOn" type="date" />
+                </div>
+                <Check label="Mostrar públicamente" name="isPublic" />
+              </ActionForm>
+            </div>
+          </details>
         </Section>
       </div>
 
@@ -1007,7 +1017,7 @@ export function MarketplaceManagement({
           anchor="certificaciones"
           eyebrow="Certificaciones"
           title="Credenciales"
-          description="La ficha pública puede mostrar el título y emisor; la evidencia binaria siempre queda en un bucket privado y separado."
+          description="La ficha pública puede mostrar el título y emisor; el archivo que adjuntes como prueba queda privado."
         >
           <ProfessionalRecordList
             records={certifications}
@@ -1031,41 +1041,49 @@ export function MarketplaceManagement({
               );
             }}
           />
-          <div className="border-ink/10 mt-5 border-t pt-5">
-            <ActionForm
-              action={actions.saveCertification}
-              submitLabel="Guardar certificación"
-              encType="multipart/form-data"
-              directUpload={{
-                bucket: "provider-certification-evidence",
-                fieldName: "evidence",
-              }}
-            >
-              <Field label="Título" name="title" required />
-              <Field label="Emisor" name="issuer" />
-              <TextArea label="Descripción" name="description" />
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Emitida" name="issuedOn" type="date" />
-                <Field label="Vence" name="expiresOn" type="date" />
-              </div>
-              <label className="text-sm font-semibold">
-                Evidencia privada
-                <input
-                  className="border-ink/20 mt-2 block w-full rounded-xl border border-dashed bg-white/70 px-3 py-3 text-sm"
-                  name="evidence"
-                  type="file"
-                  accept="image/jpeg,image/png,application/pdf"
-                />
-              </label>
-              <Check label="Mostrar ficha públicamente" name="isPublic" />
-            </ActionForm>
-          </div>
+          <details className="border-ink/10 mt-5 border-t pt-2">
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+              + Agregar certificación
+              <span className="text-ink/40 text-xl" aria-hidden="true">
+                ›
+              </span>
+            </summary>
+            <div className="pt-3">
+              <ActionForm
+                action={actions.saveCertification}
+                submitLabel="Guardar certificación"
+                encType="multipart/form-data"
+                directUpload={{
+                  bucket: "provider-certification-evidence",
+                  fieldName: "evidence",
+                }}
+              >
+                <Field label="Título" name="title" required />
+                <Field label="Emisor" name="issuer" />
+                <TextArea label="Descripción" name="description" />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Emitida" name="issuedOn" type="date" />
+                  <Field label="Vence" name="expiresOn" type="date" />
+                </div>
+                <label className="text-sm font-semibold">
+                  Evidencia privada
+                  <input
+                    className="border-ink/20 mt-2 block w-full rounded-xl border border-dashed bg-white/70 px-3 py-3 text-sm"
+                    name="evidence"
+                    type="file"
+                    accept="image/jpeg,image/png,application/pdf"
+                  />
+                </label>
+                <Check label="Mostrar ficha públicamente" name="isPublic" />
+              </ActionForm>
+            </div>
+          </details>
         </Section>
         <Section
           anchor="portfolio"
           eyebrow="Portfolio"
           title="Trabajo visible"
-          description="Las piezas de portfolio pueden ser públicas sólo cuando vos las marcás así. La media vive en un bucket distinto del de identidad."
+          description="Las piezas de portfolio pueden ser públicas sólo cuando vos las marcás así. Tus documentos de identidad nunca se mezclan con ellas."
         >
           <ProfessionalRecordList
             records={portfolioItems}
@@ -1087,30 +1105,38 @@ export function MarketplaceManagement({
               );
             }}
           />
-          <div className="border-ink/10 mt-5 border-t pt-5">
-            <ActionForm
-              action={actions.savePortfolio}
-              submitLabel="Guardar pieza"
-              encType="multipart/form-data"
-              directUpload={{
-                bucket: "provider-portfolio",
-                fieldName: "media",
-              }}
-            >
-              <Field label="Título" name="title" required />
-              <TextArea label="Descripción" name="description" />
-              <label className="text-sm font-semibold">
-                Imagen pública opcional
-                <input
-                  className="border-ink/20 mt-2 block w-full rounded-xl border border-dashed bg-white/70 px-3 py-3 text-sm"
-                  name="media"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                />
-              </label>
-              <Check label="Publicar esta pieza" name="isPublic" />
-            </ActionForm>
-          </div>
+          <details className="border-ink/10 mt-5 border-t pt-2">
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+              + Agregar pieza
+              <span className="text-ink/40 text-xl" aria-hidden="true">
+                ›
+              </span>
+            </summary>
+            <div className="pt-3">
+              <ActionForm
+                action={actions.savePortfolio}
+                submitLabel="Guardar pieza"
+                encType="multipart/form-data"
+                directUpload={{
+                  bucket: "provider-portfolio",
+                  fieldName: "media",
+                }}
+              >
+                <Field label="Título" name="title" required />
+                <TextArea label="Descripción" name="description" />
+                <label className="text-sm font-semibold">
+                  Imagen pública opcional
+                  <input
+                    className="border-ink/20 mt-2 block w-full rounded-xl border border-dashed bg-white/70 px-3 py-3 text-sm"
+                    name="media"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                  />
+                </label>
+                <Check label="Publicar esta pieza" name="isPublic" />
+              </ActionForm>
+            </div>
+          </details>
         </Section>
       </div>
 
