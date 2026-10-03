@@ -39,6 +39,39 @@ const copy = {
   { title: string; description: string; submit: string }
 >;
 
+function PasswordInput({
+  name,
+  autoComplete,
+}: {
+  name: string;
+  autoComplete: string;
+}) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <span className="relative mt-2 block">
+      <input
+        className="border-ink/15 focus:border-moss focus:ring-moss/20 w-full rounded-xl border bg-white py-3 pr-20 pl-4 font-normal outline-none focus:ring-2"
+        name={name}
+        type={visible ? "text" : "password"}
+        autoComplete={autoComplete}
+        autoCapitalize="none"
+        spellCheck={false}
+        minLength={8}
+        maxLength={128}
+        required
+      />
+      <button
+        type="button"
+        className="text-terracotta absolute inset-y-0 right-0 min-w-16 px-4 text-sm font-bold"
+        onClick={() => setVisible((value) => !value)}
+        aria-pressed={visible}
+      >
+        {visible ? "Ocultar" : "Mostrar"}
+      </button>
+    </span>
+  );
+}
+
 export function AuthForm({
   action,
   googleAction,
@@ -114,16 +147,11 @@ export function AuthForm({
         {mode === "login" || mode === "signup" || mode === "update" ? (
           <label className="block text-sm font-bold">
             Contraseña
-            <input
-              className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
+            <PasswordInput
               name="password"
-              type="password"
               autoComplete={
                 mode === "login" ? "current-password" : "new-password"
               }
-              minLength={8}
-              maxLength={128}
-              required
             />
           </label>
         ) : null}
@@ -131,15 +159,7 @@ export function AuthForm({
         {mode === "signup" || mode === "update" ? (
           <label className="block text-sm font-bold">
             Repetí la contraseña
-            <input
-              className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              maxLength={128}
-              required
-            />
+            <PasswordInput name="confirmPassword" autoComplete="new-password" />
           </label>
         ) : null}
 

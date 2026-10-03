@@ -628,8 +628,10 @@ export function MarketplaceManagement({
   serviceAreas,
   availabilityRules,
   availabilityBlocks,
+  suggestedSlug,
   actions,
 }: {
+  suggestedSlug?: string | undefined;
   provider: Provider;
   skills: Skill[];
   catalogSkills: Skill[];
@@ -714,9 +716,13 @@ export function MarketplaceManagement({
             <Field
               label="Enlace de tu perfil"
               name="publicSlug"
-              defaultValue={provider.public_slug}
+              defaultValue={
+                provider.public_slug.startsWith("provider-") && suggestedSlug
+                  ? suggestedSlug
+                  : provider.public_slug
+              }
               required
-              helper="Se usa para crear el enlace que vas a compartir: /p/tu-nombre."
+              helper="Es el enlace que vas a compartir: /p/tu-nombre. Guardá el perfil para usar el sugerido."
             />
             <Field
               label="Titular público"
@@ -811,31 +817,24 @@ export function MarketplaceManagement({
         description="Cada servicio tiene su precio (fijo, desde, por hora, por unidad o a cotizar) y su modalidad (presencial, remota o ambas). Podés pausarlos cuando quieras."
       >
         <div className="space-y-5">
-          {skills.length ? (
-            <details
-              open={services.length === 0}
-              className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3"
-            >
-              <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
-                + Nuevo servicio
-                <span className="text-ink/40 text-xl" aria-hidden="true">
-                  ›
-                </span>
-              </summary>
-              <div className="pt-2">
-                <ServiceForm
-                  action={actions.saveService}
-                  skills={skills}
-                  serviceTags={[]}
-                />
-              </div>
-            </details>
-          ) : (
-            <p className="text-ink/70 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
-              Primero agregá al menos una habilidad para poder crear un
-              servicio.
-            </p>
-          )}
+          <details
+            open={services.length === 0}
+            className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3"
+          >
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+              + Nuevo servicio
+              <span className="text-ink/40 text-xl" aria-hidden="true">
+                ›
+              </span>
+            </summary>
+            <div className="pt-2">
+              <ServiceForm
+                action={actions.saveService}
+                skills={catalogSkills}
+                serviceTags={[]}
+              />
+            </div>
+          </details>
           {services.map((service) => (
             <div
               className="border-ink/10 rounded-xl border bg-white/45 p-4"

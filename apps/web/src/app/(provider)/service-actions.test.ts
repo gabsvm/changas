@@ -15,7 +15,10 @@ class FakeSupabaseClient {
     getUser: async () => ({ data: { user: { id: "user-1" } } }),
   };
 
-  from() {
+  from(table?: string) {
+    if (table === "provider_skills") {
+      return { upsert: async () => ({ error: null }) };
+    }
     return {
       select: () => ({
         eq: () => ({
