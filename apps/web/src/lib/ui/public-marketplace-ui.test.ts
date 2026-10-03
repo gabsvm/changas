@@ -61,7 +61,7 @@ describe("public marketplace detail UI", () => {
     expect(categoryPage).toContain('"presencial"');
     expect(categoryPage).toContain('"remoto"');
     expect(categoryPage).toContain("categoryHref");
-    expect(categoryPage).toContain("rounded-[1.25rem]");
+    expect(categoryPage).toContain("rounded-3xl");
     expect(categoryPage).not.toContain("rounded-[1.75rem]");
     expect(categoryPage).toContain("pageHref");
   });
