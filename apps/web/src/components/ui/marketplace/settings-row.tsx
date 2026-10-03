@@ -38,10 +38,7 @@ export function SettingsRow({
 
   if (href) {
     return (
-      <Link
-        href={href}
-        className={`${classes} hover:bg-brand-orange/[0.05]`}
-      >
+      <Link href={href} className={`${classes} hover:bg-brand-orange/[0.05]`}>
         {content}
       </Link>
     );
