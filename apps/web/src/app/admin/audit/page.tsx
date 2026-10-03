@@ -28,7 +28,7 @@ export default async function AdminAuditPage() {
         <div className="space-y-2">
           {events.map((event) => (
             <article
-              className="rounded-[1.35rem] border border-[#273142] bg-[#151c27] p-4"
+              className="rounded-3xl border border-[#273142] bg-[#151c27] p-4"
               key={event.event_id}
             >
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -36,7 +36,7 @@ export default async function AdminAuditPage() {
                   <p className="text-sm font-extrabold text-white">
                     {humanAction(event.action_type)}
                   </p>
-                  <code className="mt-1 block truncate text-[0.62rem] font-bold tracking-[0.04em] text-[#596579]">
+                  <code className="mt-1 block truncate text-[11px] font-bold tracking-[0.04em] text-[#596579]">
                     {event.action_type}
                   </code>
                   <p className="mt-1 truncate text-xs text-[#7f8a9b]">

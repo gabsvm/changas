@@ -124,7 +124,7 @@ export function AccountMenuItem({
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-bold">{title}</span>
         {description ? (
-          <span className="text-ink/55 mt-0.5 block text-xs leading-5">
+          <span className="text-ink/70 mt-0.5 block text-xs leading-5">
             {description}
           </span>
         ) : null}

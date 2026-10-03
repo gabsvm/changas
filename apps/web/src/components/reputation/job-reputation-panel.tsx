@@ -66,7 +66,7 @@ export async function JobReputationPanel({
           >
             Reseña del trabajo
           </h2>
-          <p className="text-ink/55 mt-1 max-w-xl text-sm leading-6">
+          <p className="text-ink/70 mt-1 max-w-xl text-sm leading-6">
             La reseña queda vinculada a este trabajo completado y no puede ser
             eliminada por el proveedor.
           </p>
@@ -130,12 +130,12 @@ export async function JobReputationPanel({
               >
                 {stars(state.rating)}
               </p>
-              <p className="text-ink/50 mt-1 text-xs">
+              <p className="text-ink/70 mt-1 text-xs">
                 Reseña verificada de este Job
               </p>
             </div>
             {state.review_created_at ? (
-              <time className="text-ink/45 text-xs">
+              <time className="text-ink/70 text-xs">
                 {new Intl.DateTimeFormat("es-AR", {
                   dateStyle: "medium",
                 }).format(new Date(state.review_created_at))}
@@ -150,7 +150,7 @@ export async function JobReputationPanel({
 
           {state.provider_reply ? (
             <div className="border-ink/10 mt-4 rounded-xl border bg-white/70 p-3 text-sm">
-              <p className="text-ink/45 text-xs font-bold tracking-wide uppercase">
+              <p className="text-ink/70 text-xs font-bold tracking-wide uppercase">
                 Respuesta del proveedor
               </p>
               <p className="mt-1 leading-6 whitespace-pre-wrap">
@@ -224,7 +224,7 @@ export async function JobReputationPanel({
                   </button>
                 </form>
               ) : (
-                <p className="text-ink/55 self-center text-sm">
+                <p className="text-ink/70 self-center text-sm">
                   Ya reportaste esta reseña para revisión.
                 </p>
               )}

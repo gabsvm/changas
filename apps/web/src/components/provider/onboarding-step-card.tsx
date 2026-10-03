@@ -18,7 +18,7 @@ function StepBadge({ step }: { step: OnboardingStepPresentation }) {
           ? "cta-ink"
           : step.state === "complete"
             ? "bg-success/12 text-success"
-            : "bg-ink/[0.06] text-ink/45"
+            : "bg-ink/[0.06] text-ink/70"
       }`}
       aria-hidden="true"
     >

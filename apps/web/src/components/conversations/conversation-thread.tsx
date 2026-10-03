@@ -226,7 +226,7 @@ export function ConversationThread({
             <p className="truncate text-[15px] font-extrabold">{peerName}</p>
             <Link
               href={providerHref}
-              className="text-ink/60 block truncate text-[13px] underline-offset-4 hover:underline"
+              className="text-ink/70 block truncate text-[13px] underline-offset-4 hover:underline"
             >
               {serviceTitle}
             </Link>
@@ -303,7 +303,7 @@ export function ConversationThread({
         {messages.length === 0 ? (
           <div className="mx-auto mt-12 max-w-sm text-center">
             <p className="text-xl font-semibold">Empezá la conversación</p>
-            <p className="text-ink/60 mt-2 text-sm leading-6">
+            <p className="text-ink/70 mt-2 text-sm leading-6">
               Este chat está asociado a {serviceTitle}. Acordá alcance y tiempos
               antes de avanzar.
             </p>
@@ -419,7 +419,7 @@ function MessageBubble({
                 </span>
                 <span
                   className={`text-[11px] ${
-                    own ? "text-white/65" : "text-ink/50"
+                    own ? "text-white/65" : "text-ink/70"
                   }`}
                 >
                   {formatBytes(attachment.sizeBytes)}
@@ -428,12 +428,12 @@ function MessageBubble({
             ))}
           </div>
         ) : message.kind === "IMAGE" || message.kind === "FILE" ? (
-          <p className={own ? "text-white/65" : "text-ink/55"}>
+          <p className={own ? "text-white/65" : "text-ink/70"}>
             Preparando adjunto…
           </p>
         ) : null}
         <time
-          className="text-ink/60 mt-1 block text-right text-[11px] font-medium"
+          className="text-ink/70 mt-1 block text-right text-[11px] font-medium"
           dateTime={message.created_at}
         >
           {new Intl.DateTimeFormat("es-AR", {
@@ -539,7 +539,7 @@ function TextComposer({
           <p className="text-terracotta text-sm font-semibold">
             Revisá antes de enviar
           </p>
-          <p className="text-ink/65 mt-1 text-xs leading-5">{state.message}</p>
+          <p className="text-ink/70 mt-1 text-xs leading-5">{state.message}</p>
           <div className="mt-3 flex gap-2">
             <button
               type="submit"

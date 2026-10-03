@@ -84,7 +84,7 @@ export default async function JobsPage({
         <h1 className="mt-1.5 text-[24px] leading-8 font-extrabold tracking-[-0.03em]">
           Mis trabajos
         </h1>
-        <p className="text-ink/60 mt-1.5 max-w-md text-sm leading-6">
+        <p className="text-ink/70 mt-1.5 max-w-md text-sm leading-6">
           Confirmados, en curso o pendientes de cierre.
         </p>
 
@@ -149,7 +149,7 @@ export default async function JobsPage({
                     <span className="block truncate text-[15px] leading-6 font-bold">
                       {job.service_title}
                     </span>
-                    <span className="text-ink/60 mt-1 block truncate text-[13px]">
+                    <span className="text-ink/70 mt-1 block truncate text-[13px]">
                       {job.counterparty_name} · {scheduleLabel(job)}
                     </span>
                     <span className="mt-1.5 block">
@@ -173,7 +173,7 @@ export default async function JobsPage({
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 24 24"
-                      className="text-ink/50 h-5 w-5 shrink-0"
+                      className="text-ink/70 h-5 w-5 shrink-0"
                       fill="none"
                     >
                       <path

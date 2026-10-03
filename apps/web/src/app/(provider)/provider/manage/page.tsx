@@ -242,13 +242,13 @@ export default async function ProviderMarketplaceManagePage({
       <div className="pt-5 sm:pt-0">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
-            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Proveedor
             </p>
             <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
               Gestioná tu oferta
             </h1>
-            <p className="text-ink/55 mt-1 text-sm">
+            <p className="text-ink/70 mt-1 text-sm">
               {displayName} · habilidades, servicios y disponibilidad
             </p>
           </div>

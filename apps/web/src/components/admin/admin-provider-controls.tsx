@@ -71,7 +71,7 @@ export function AdminProviderControls({
           </p>
           <form action={activateProviderAction} className="mt-3 space-y-2">
             <input type="hidden" name="userId" value={userId} />
-            <label className="block text-[0.68rem] font-bold text-[#8f99aa]">
+            <label className="block text-[11px] font-bold text-[#8f99aa]">
               Motivo obligatorio
               <textarea
                 className="mt-1 w-full px-3 py-2 text-sm"

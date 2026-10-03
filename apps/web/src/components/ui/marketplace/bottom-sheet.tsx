@@ -66,7 +66,7 @@ export function BottomSheet({
           <button
             ref={closeRef}
             type="button"
-            className="consumer-pressable text-ink/60 hover:bg-ink/[0.05] grid h-12 w-12 shrink-0 place-items-center rounded-full text-2xl"
+            className="consumer-pressable text-ink/70 hover:bg-ink/[0.05] grid h-12 w-12 shrink-0 place-items-center rounded-full text-2xl"
             onClick={onClose}
             aria-label={closeLabel ?? `Cerrar ${title}`}
           >

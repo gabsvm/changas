@@ -60,7 +60,7 @@ export default async function AccountPage() {
               <span className="block truncate text-xl font-extrabold tracking-[-0.02em]">
                 {displayName}
               </span>
-              <span className="text-ink/48 mt-1 block truncate text-sm leading-5">
+              <span className="text-ink/70 mt-1 block truncate text-sm leading-5">
                 {user.email}
               </span>
             </span>
@@ -75,7 +75,7 @@ export default async function AccountPage() {
             <div>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-ink/45 text-xs font-semibold">
+                  <p className="text-ink/70 text-xs font-semibold">
                     Perfil de proveedor
                   </p>
                   <h2 className="mt-1 text-lg leading-7 font-bold tracking-[-0.02em]">
@@ -113,7 +113,7 @@ export default async function AccountPage() {
               <h2 className="text-lg leading-7 font-bold tracking-[-0.02em]">
                 ¿Querés ofrecer servicios?
               </h2>
-              <p className="text-ink/52 mt-1.5 text-sm leading-6">
+              <p className="text-ink/70 mt-1.5 text-sm leading-6">
                 Creá tu perfil profesional sin cambiar cómo usás Changas para
                 contratar.
               </p>

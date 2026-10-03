@@ -10,7 +10,7 @@ export default function NotFound() {
         <h1 className="font-display mt-4 text-4xl font-semibold">
           No encontramos esa página.
         </h1>
-        <p className="text-ink/65 mt-4">
+        <p className="text-ink/70 mt-4">
           La dirección puede haber cambiado o todavía no existir.
         </p>
         <Link className="button-primary mt-7" href="/">

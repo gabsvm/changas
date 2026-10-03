@@ -188,8 +188,8 @@ export function AuthenticatedBottomNav({
               key={item.key}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`consumer-pressable focus-visible:ring-moss/45 relative flex min-h-12 flex-col items-center justify-end gap-1 rounded-xl px-1 pt-1 pb-2 text-[0.68rem] font-bold outline-none focus-visible:ring-2 ${
-                active ? "text-ink" : "text-ink/55 hover:text-ink/80"
+              className={`consumer-pressable focus-visible:ring-moss/45 relative flex min-h-12 flex-col items-center justify-end gap-1 rounded-xl px-1 pt-1 pb-2 text-[11px] font-bold outline-none focus-visible:ring-2 ${
+                active ? "text-ink" : "text-ink/70 hover:text-ink/80"
               }`}
             >
               <span
@@ -204,7 +204,7 @@ export function AuthenticatedBottomNav({
                 <NavIcon name={item.icon} active={active} />
                 {badge > 0 ? (
                   <span
-                    className="bg-brand-pink-strong absolute -top-1 -right-2 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[0.68rem] leading-5 font-bold text-white"
+                    className="bg-brand-pink-strong absolute -top-1 -right-2 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] leading-5 font-bold text-white"
                     aria-label={`${badge} sin leer en ${item.label}`}
                   >
                     {badge > 99 ? "99+" : badge}

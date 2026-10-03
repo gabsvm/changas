@@ -32,7 +32,7 @@ export default async function AdminReportsPage() {
             <p className="text-2xl font-extrabold text-[#ff7774]">
               {openReports.length}
             </p>
-            <p className="text-[0.65rem] font-extrabold tracking-[0.08em] text-[#a98080] uppercase">
+            <p className="text-[11px] font-extrabold tracking-[0.08em] text-[#a98080] uppercase">
               abiertos
             </p>
           </div>
@@ -90,7 +90,7 @@ export default async function AdminReportsPage() {
           <div className="grid gap-3 lg:grid-cols-2">
             {openReports.map((report) => (
               <article
-                className="rounded-[1.5rem] border border-[#273142] bg-[#151c27] p-4 sm:p-5"
+                className="rounded-3xl border border-[#273142] bg-[#151c27] p-4 sm:p-5"
                 key={`${report.report_type}-${report.report_id}`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -105,7 +105,7 @@ export default async function AdminReportsPage() {
                     <h3 className="mt-3 text-base font-extrabold text-white">
                       {report.category}
                     </h3>
-                    <p className="mt-1 text-[0.68rem] break-all text-[#697386]">
+                    <p className="mt-1 text-[11px] break-all text-[#697386]">
                       Caso {report.report_id}
                     </p>
                   </div>
@@ -219,7 +219,7 @@ export default async function AdminReportsPage() {
           <div className="grid gap-2 lg:grid-cols-2">
             {resolvedReports.map((report) => (
               <article
-                className="rounded-[1.35rem] border border-[#273142] bg-[#151c27] p-4"
+                className="rounded-3xl border border-[#273142] bg-[#151c27] p-4"
                 key={`${report.report_type}-${report.report_id}`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -233,7 +233,7 @@ export default async function AdminReportsPage() {
                   </div>
                   <AdminStatusBadge label="Resuelto" tone="success" />
                 </div>
-                <p className="mt-3 text-[0.65rem] break-all text-[#697386]">
+                <p className="mt-3 text-[11px] break-all text-[#697386]">
                   {reportTypeLabel(report.report_type)} · {report.report_id}
                 </p>
               </article>

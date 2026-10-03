@@ -51,7 +51,7 @@ export function EmptyState({
         {title}
       </h2>
       {description ? (
-        <p className="text-ink/60 mx-auto mt-2 max-w-sm text-sm leading-6">
+        <p className="text-ink/70 mx-auto mt-2 max-w-sm text-sm leading-6">
           {description}
         </p>
       ) : null}

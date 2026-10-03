@@ -27,7 +27,7 @@ export function ListRow({
           {title}
         </span>
         {description ? (
-          <span className="text-ink/55 mt-0.5 block text-sm leading-5">
+          <span className="text-ink/70 mt-0.5 block text-sm leading-5">
             {description}
           </span>
         ) : null}

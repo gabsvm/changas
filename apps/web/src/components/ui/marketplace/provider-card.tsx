@@ -26,12 +26,12 @@ export function ProviderCard({
           {name}
         </span>
         {subtitle ? (
-          <span className="text-ink/60 mt-0.5 block truncate text-sm">
+          <span className="text-ink/70 mt-0.5 block truncate text-sm">
             {subtitle}
           </span>
         ) : null}
         {meta ? (
-          <span className="text-ink/60 mt-0.5 block truncate text-[13px]">
+          <span className="text-ink/70 mt-0.5 block truncate text-[13px]">
             {meta}
           </span>
         ) : null}
@@ -39,7 +39,7 @@ export function ProviderCard({
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"
-        className="text-ink/50 h-5 w-5 shrink-0"
+        className="text-ink/70 h-5 w-5 shrink-0"
         fill="none"
       >
         <path

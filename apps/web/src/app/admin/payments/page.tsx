@@ -97,7 +97,7 @@ export default async function AdminPaymentsPage() {
           <div className="grid gap-3 xl:grid-cols-2">
             {payments.map((payment) => (
               <article
-                className={`rounded-[1.5rem] border p-4 sm:p-5 ${
+                className={`rounded-3xl border p-4 sm:p-5 ${
                   payment.mismatchFlag
                     ? "border-[#ef5350]/35 bg-[#ef5350]/7"
                     : "border-[#273142] bg-[#151c27]"
@@ -109,7 +109,7 @@ export default async function AdminPaymentsPage() {
                     <p className="truncate text-sm font-extrabold text-white">
                       {payment.providerName}
                     </p>
-                    <p className="mt-1 text-[0.68rem] break-all text-[#697386]">
+                    <p className="mt-1 text-[11px] break-all text-[#697386]">
                       Ref. {payment.providerReference}
                     </p>
                   </div>
@@ -121,7 +121,7 @@ export default async function AdminPaymentsPage() {
 
                 <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
                   <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[0.68rem] font-bold text-[#697386]">
+                    <dt className="text-[11px] font-bold text-[#697386]">
                       Estado local
                     </dt>
                     <dd className="mt-1 font-extrabold text-[#d0d5dd]">
@@ -129,7 +129,7 @@ export default async function AdminPaymentsPage() {
                     </dd>
                   </div>
                   <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[0.68rem] font-bold text-[#697386]">
+                    <dt className="text-[11px] font-bold text-[#697386]">
                       Proveedor de pago
                     </dt>
                     <dd className="mt-1 font-extrabold text-[#d0d5dd]">
@@ -137,7 +137,7 @@ export default async function AdminPaymentsPage() {
                     </dd>
                   </div>
                   <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[0.68rem] font-bold text-[#697386]">
+                    <dt className="text-[11px] font-bold text-[#697386]">
                       Bruto
                     </dt>
                     <dd className="mt-1 font-extrabold text-white">
@@ -145,7 +145,7 @@ export default async function AdminPaymentsPage() {
                     </dd>
                   </div>
                   <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[0.68rem] font-bold text-[#697386]">
+                    <dt className="text-[11px] font-bold text-[#697386]">
                       Comisión Changas
                     </dt>
                     <dd className="mt-1 font-extrabold text-white">
@@ -195,7 +195,7 @@ export default async function AdminPaymentsPage() {
                   </dl>
                 </details>
 
-                <p className="mt-3 text-[0.68rem] leading-5 text-[#697386]">
+                <p className="mt-3 text-[11px] leading-5 text-[#697386]">
                   Settlement: {payment.settlementStatus ?? "—"} · Última
                   conciliación: {dateTime(payment.lastReconciledAt)}
                 </p>
@@ -224,7 +224,7 @@ export default async function AdminPaymentsPage() {
           <div className="grid gap-2 lg:grid-cols-2">
             {runs.map((run) => (
               <article
-                className="rounded-[1.35rem] border border-[#273142] bg-[#151c27] p-4"
+                className="rounded-3xl border border-[#273142] bg-[#151c27] p-4"
                 key={run.runId}
               >
                 <div className="flex items-start justify-between gap-3">

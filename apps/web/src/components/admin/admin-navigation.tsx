@@ -133,7 +133,7 @@ export function AdminNavigation() {
   return (
     <>
       <aside className="admin-sidebar fixed top-[4.5rem] bottom-0 left-0 z-30 hidden w-64 border-r border-[#273142] bg-[#0d131d]/95 p-4 backdrop-blur-xl lg:block">
-        <p className="px-3 pb-2 text-[0.65rem] font-extrabold tracking-[0.18em] text-[#697386] uppercase">
+        <p className="px-3 pb-2 text-[11px] font-extrabold tracking-[0.18em] text-[#697386] uppercase">
           Operación
         </p>
         <nav className="space-y-1" aria-label="Administración">
@@ -237,7 +237,7 @@ export function AdminNavigation() {
           return (
             <Link
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[0.65rem] font-extrabold ${
+              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
                 active ? "text-[#ff7b4c]" : "text-[#7f8a9b]"
               }`}
               href={item.href}
@@ -252,7 +252,7 @@ export function AdminNavigation() {
           aria-expanded={moreOpen}
           aria-controls="admin-more-menu"
           aria-haspopup="dialog"
-          className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[0.65rem] font-extrabold ${
+          className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
             moreActive || moreOpen ? "text-[#ff7b4c]" : "text-[#7f8a9b]"
           }`}
           onClick={() => setMoreOpen(true)}

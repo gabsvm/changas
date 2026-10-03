@@ -18,7 +18,7 @@ export default async function AdminJobsPage() {
         <div className="grid gap-2 lg:grid-cols-2">
           {jobs.map((job) => (
             <article
-              className="rounded-[1.4rem] border border-[#273142] bg-[#151c27] p-4"
+              className="rounded-3xl border border-[#273142] bg-[#151c27] p-4"
               key={job.job_id}
             >
               <div className="flex items-start justify-between gap-3">
@@ -26,7 +26,7 @@ export default async function AdminJobsPage() {
                   <p className="truncate text-sm font-extrabold text-white">
                     {job.service_title}
                   </p>
-                  <p className="mt-1 truncate text-[0.68rem] text-[#697386]">
+                  <p className="mt-1 truncate text-[11px] text-[#697386]">
                     {job.job_id}
                   </p>
                 </div>

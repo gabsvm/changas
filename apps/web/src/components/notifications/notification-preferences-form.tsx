@@ -68,7 +68,7 @@ export function NotificationPreferencesForm({
 
       {NOTIFICATION_PREFERENCE_GROUPS.map((group) => (
         <fieldset key={group.id} className="px-0">
-          <legend className="text-ink/48 px-0 pt-3 text-[0.68rem] font-bold tracking-[0.1em] uppercase">
+          <legend className="text-ink/70 px-0 pt-3 text-[11px] font-bold tracking-[0.1em] uppercase">
             {group.title}
           </legend>
           <div className="divide-ink/[0.07] divide-y">

@@ -9,8 +9,8 @@ const authForm = readFileSync(
 
 describe("auth form mobile contract", () => {
   it("keeps a compact sheet on mobile and the editorial card on desktop", () => {
-    expect(authForm).toContain("rounded-[1.25rem]");
-    expect(authForm).toContain("sm:rounded-[2rem]");
+    expect(authForm).toContain("rounded-3xl");
+    expect(authForm).toContain("sm:rounded-[1.75rem]");
     expect(authForm).toContain("text-3xl");
     expect(authForm).toContain("sm:text-4xl");
     expect(authForm).toContain("sm:p-8");

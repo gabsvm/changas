@@ -98,7 +98,7 @@ export default async function MessagesPage({
             <h1 className="hidden text-3xl font-extrabold tracking-[-0.03em] sm:block">
               Mensajes
             </h1>
-            <p className="text-ink/60 max-w-[20rem] text-sm leading-6 sm:mt-1">
+            <p className="text-ink/70 max-w-[20rem] text-sm leading-6 sm:mt-1">
               Tus conversaciones sobre servicios y trabajos.
             </p>
           </div>
@@ -192,13 +192,13 @@ function ConversationRow({
           <p className="text-ink truncate text-[15px] leading-6 font-bold">
             {conversation.peer_display_name}
           </p>
-          <time className="text-ink/60 shrink-0 text-xs font-medium">
+          <time className="text-ink/70 shrink-0 text-xs font-medium">
             {formatConversationTime(
               conversation.last_message_at ?? conversation.updated_at,
             )}
           </time>
         </div>
-        <p className="text-ink/60 mt-0.5 truncate text-[13px] font-semibold">
+        <p className="text-ink/70 mt-0.5 truncate text-[13px] font-semibold">
           {conversation.service_title}
         </p>
         {deal ? (
@@ -213,7 +213,7 @@ function ConversationRow({
             className={`min-w-0 flex-1 truncate text-sm leading-5 ${
               conversation.unread_count > 0
                 ? "text-ink font-bold"
-                : "text-ink/60"
+                : "text-ink/70"
             }`}
           >
             {conversationPreview(conversation)}

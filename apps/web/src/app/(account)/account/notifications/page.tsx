@@ -71,7 +71,7 @@ export default async function NotificationCenterPage() {
             <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
               Actividad
             </h1>
-            <p className="text-ink/52 max-w-[22rem] text-sm leading-5 sm:mt-1">
+            <p className="text-ink/70 max-w-[22rem] text-sm leading-5 sm:mt-1">
               Novedades de trabajos, propuestas, pagos y cuenta.
             </p>
           </div>
@@ -110,7 +110,7 @@ export default async function NotificationCenterPage() {
                   <section key={label} aria-labelledby={`activity-${label}`}>
                     <h2
                       id={`activity-${label}`}
-                      className="text-ink/48 mb-2 text-xs font-bold tracking-[0.1em] uppercase"
+                      className="text-ink/70 mb-2 text-xs font-bold tracking-[0.1em] uppercase"
                     >
                       {label}
                     </h2>
@@ -126,7 +126,7 @@ export default async function NotificationCenterPage() {
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
                                   <div className="flex flex-wrap items-center gap-1.5">
-                                    <span className="text-ink/45 text-[0.68rem] font-semibold">
+                                    <span className="text-ink/70 text-[11px] font-semibold">
                                       {getNotificationKindLabel(item.kind)}
                                     </span>
                                     {item.unread ? (
@@ -144,7 +144,7 @@ export default async function NotificationCenterPage() {
                                 </div>
                                 <div className="flex shrink-0 flex-col items-end gap-1">
                                   <time
-                                    className="text-ink/38 shrink-0 text-[0.68rem]"
+                                    className="text-ink/38 shrink-0 text-[11px]"
                                     dateTime={item.createdAt}
                                   >
                                     {timeFormatter.format(
@@ -168,7 +168,7 @@ export default async function NotificationCenterPage() {
                                   ) : null}
                                 </div>
                               </div>
-                              <p className="text-ink/55 mt-0.5 text-sm leading-5">
+                              <p className="text-ink/70 mt-0.5 text-sm leading-5">
                                 {item.body}
                               </p>
                             </div>

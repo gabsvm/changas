@@ -63,13 +63,13 @@ export default async function ProviderOnboardingDocumentsPage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Documentos" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
           Paso 3 de 4
         </p>
         <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
           Verificá tu identidad
         </h1>
-        <p className="text-ink/58 mt-2 text-sm leading-6">
+        <p className="text-ink/70 mt-2 text-sm leading-6">
           Necesitamos frente y dorso del DNI más una selfie. Subir archivos no
           envía el caso: vos decidís cuándo mandarlo a revisión.
         </p>
@@ -85,7 +85,7 @@ export default async function ProviderOnboardingDocumentsPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-bold">Requisitos</p>
-              <p className="text-ink/45 mt-0.5 text-xs">
+              <p className="text-ink/70 mt-0.5 text-xs">
                 {receivedDocuments.length}/3 recibidos
               </p>
             </div>
@@ -125,7 +125,7 @@ export default async function ProviderOnboardingDocumentsPage() {
         {submitted ? (
           <div className="border-moss/20 bg-moss/[0.06] mt-5 rounded-xl border px-4 py-3">
             <p className="text-moss text-sm font-bold">Identidad enviada</p>
-            <p className="text-ink/58 mt-1 text-sm leading-6">
+            <p className="text-ink/70 mt-1 text-sm leading-6">
               La evidencia queda bloqueada mientras un administrador revisa el
               caso.
             </p>
@@ -143,7 +143,7 @@ export default async function ProviderOnboardingDocumentsPage() {
         <section id="documentos" className="mt-6 scroll-mt-24">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-lg font-bold">Tus documentos</h2>
-            <span className="text-ink/45 text-xs font-semibold">
+            <span className="text-ink/70 text-xs font-semibold">
               {receivedDocuments.length}
             </span>
           </div>
@@ -162,7 +162,7 @@ export default async function ProviderOnboardingDocumentsPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-ink/50 border-ink/10 mt-2 border-y py-4 text-sm">
+            <p className="text-ink/70 border-ink/10 mt-2 border-y py-4 text-sm">
               Todavía no hay documentos registrados.
             </p>
           )}
@@ -172,7 +172,7 @@ export default async function ProviderOnboardingDocumentsPage() {
           <StickyActionBar className="mt-6">
             {documentsComplete ? (
               <div>
-                <p className="text-ink/50 mb-2 text-xs leading-5">
+                <p className="text-ink/70 mb-2 text-xs leading-5">
                   Al enviar, la evidencia entra en la cola administrativa de
                   revisión.
                 </p>
@@ -185,7 +185,7 @@ export default async function ProviderOnboardingDocumentsPage() {
               </div>
             ) : (
               <div>
-                <p className="text-ink/50 mb-2 text-xs leading-5">
+                <p className="text-ink/70 mb-2 text-xs leading-5">
                   Faltan:{" "}
                   {missingDocuments.map(getDocumentTypeLabel).join(", ")}.
                 </p>

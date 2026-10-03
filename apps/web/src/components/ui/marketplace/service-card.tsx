@@ -54,7 +54,7 @@ export function ServiceCard({
               size="md"
             />
             <div className="min-w-0 flex-1">
-              <p className="text-ink/60 flex items-center gap-1.5 truncate text-[13px] font-semibold">
+              <p className="text-ink/70 flex items-center gap-1.5 truncate text-[13px] font-semibold">
                 <span className="truncate">{row.provider_display_name}</span>
                 {row.provider_zone ? (
                   <span className="shrink-0 font-normal">
@@ -81,14 +81,14 @@ export function ServiceCard({
                   {hasRating ? row.rating_average!.toFixed(1) : "Nuevo"}
                 </span>
                 {hasRating ? (
-                  <span className="text-ink/60 font-medium">
+                  <span className="text-ink/70 font-medium">
                     ({row.review_count})
                     {row.completed_jobs > 0
                       ? ` · ${row.completed_jobs} hechos`
                       : ""}
                   </span>
                 ) : (
-                  <span className="text-ink/60 font-medium">
+                  <span className="text-ink/70 font-medium">
                     Sin reseñas aún
                   </span>
                 )}
@@ -131,7 +131,7 @@ export function ServiceCard({
               size="md"
             />
             <div className="min-w-0 flex-1">
-              <p className="text-ink/60 flex items-center gap-1.5 truncate text-[13px] font-semibold">
+              <p className="text-ink/70 flex items-center gap-1.5 truncate text-[13px] font-semibold">
                 <span className="truncate">{row.provider_display_name}</span>
                 {row.provider_zone ? (
                   <span className="shrink-0 font-normal">
@@ -158,14 +158,14 @@ export function ServiceCard({
                   {hasRating ? row.rating_average!.toFixed(1) : "Nuevo"}
                 </span>
                 {hasRating ? (
-                  <span className="text-ink/60 font-medium">
+                  <span className="text-ink/70 font-medium">
                     ({row.review_count})
                     {row.completed_jobs > 0
                       ? ` · ${row.completed_jobs} hechos`
                       : ""}
                   </span>
                 ) : (
-                  <span className="text-ink/60 font-medium">
+                  <span className="text-ink/70 font-medium">
                     Sin reseñas aún
                   </span>
                 )}

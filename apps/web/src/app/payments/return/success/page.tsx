@@ -9,7 +9,7 @@ export default function PaymentReturnSuccessPage() {
       <h1 className="font-display mt-3 text-4xl font-semibold tracking-[-0.03em]">
         Estamos confirmando el pago
       </h1>
-      <p className="text-ink/65 mt-5 text-sm leading-6">
+      <p className="text-ink/70 mt-5 text-sm leading-6">
         Mercado Pago te devolvió a Changas. La confirmación real llega por el
         canal seguro del proveedor de pagos; esta pantalla no modifica el estado
         del trabajo.

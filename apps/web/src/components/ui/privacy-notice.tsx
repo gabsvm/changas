@@ -35,7 +35,7 @@ export function PrivacyNotice({
         </span>
         <div>
           <p className="text-sm font-bold">{title}</p>
-          <div className="text-ink/60 mt-1 text-xs leading-5">{children}</div>
+          <div className="text-ink/70 mt-1 text-xs leading-5">{children}</div>
         </div>
       </div>
     </div>

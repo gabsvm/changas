@@ -168,7 +168,7 @@ export default async function ProviderOnboardingReviewPage() {
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Paso 4 de 4
             </p>
             <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
@@ -178,7 +178,7 @@ export default async function ProviderOnboardingReviewPage() {
           <StatusBadge label={presentation.label} tone={presentation.tone} />
         </div>
 
-        <p className="text-ink/58 mt-2 text-sm leading-6">{summary}</p>
+        <p className="text-ink/70 mt-2 text-sm leading-6">{summary}</p>
 
         <div className="consumer-card bg-surface mt-5 flex items-center gap-3 p-4">
           <Avatar
@@ -190,7 +190,7 @@ export default async function ProviderOnboardingReviewPage() {
             <p className="truncate text-[15px] font-bold">
               {profile?.display_name ?? "Sin nombre"}
             </p>
-            <p className="text-ink/60 mt-0.5 truncate text-[13px]">
+            <p className="text-ink/70 mt-0.5 truncate text-[13px]">
               {profile?.public_zone ?? "Sin zona"}
               {profile?.bio ? ` · ${profile.bio}` : null}
             </p>
@@ -229,7 +229,7 @@ export default async function ProviderOnboardingReviewPage() {
             </summary>
             <dl className="space-y-2.5 pb-4 text-sm">
               <div>
-                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
                   Nombre visible
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -237,7 +237,7 @@ export default async function ProviderOnboardingReviewPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
                   Zona
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -245,7 +245,7 @@ export default async function ProviderOnboardingReviewPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
                   Presentación
                 </dt>
                 <dd className="mt-0.5 leading-6">{profile?.bio ?? "—"}</dd>
@@ -269,7 +269,7 @@ export default async function ProviderOnboardingReviewPage() {
             </summary>
             <dl className="space-y-2.5 pb-4 text-sm">
               <div>
-                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
                   Nombre legal
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -277,7 +277,7 @@ export default async function ProviderOnboardingReviewPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
                   DNI
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -285,7 +285,7 @@ export default async function ProviderOnboardingReviewPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/48 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
                   Teléfono
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -306,7 +306,7 @@ export default async function ProviderOnboardingReviewPage() {
 
         <div className="border-ink/10 mt-5 rounded-xl border px-4 py-3">
           <StatusChip tone={stateTone}>{stateTitle}</StatusChip>
-          <p className="text-ink/58 mt-2 text-sm leading-6">
+          <p className="text-ink/70 mt-2 text-sm leading-6">
             {pendingReview
               ? "Un administrador puede revisar ahora la evidencia privada y decidir el estado del perfil."
               : approved
@@ -330,7 +330,7 @@ export default async function ProviderOnboardingReviewPage() {
         <section className="mt-6">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-lg font-bold">Archivos recibidos</h2>
-            <span className="text-ink/45 text-xs font-semibold">
+            <span className="text-ink/70 text-xs font-semibold">
               {receivedDocuments.length}
             </span>
           </div>
@@ -349,7 +349,7 @@ export default async function ProviderOnboardingReviewPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-ink/50 border-ink/10 mt-2 border-y py-4 text-sm">
+            <p className="text-ink/70 border-ink/10 mt-2 border-y py-4 text-sm">
               Todavía no hay documentos registrados.
             </p>
           )}

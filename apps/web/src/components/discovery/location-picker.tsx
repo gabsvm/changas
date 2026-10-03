@@ -109,7 +109,7 @@ export function LocationPicker({
     return (
       <div className="location-picker-compact">
         <div className="flex w-full items-center justify-between gap-2">
-          <label className="text-ink/58 flex min-h-11 min-w-0 items-center gap-2 text-sm font-semibold">
+          <label className="text-ink/70 flex min-h-11 min-w-0 items-center gap-2 text-sm font-semibold">
             <svg
               aria-hidden="true"
               viewBox="0 0 24 24"
@@ -165,7 +165,7 @@ export function LocationPicker({
         </div>
         {locationMessage ? (
           <span
-            className="text-ink/60 mt-2 block text-xs font-semibold"
+            className="text-ink/70 mt-2 block text-xs font-semibold"
             role="status"
           >
             {locationMessage}
@@ -179,7 +179,7 @@ export function LocationPicker({
           >
             <div
               ref={locationDialogRef}
-              className="location-picker-sheet bg-surface w-full max-w-lg overflow-y-auto rounded-[1.5rem] border border-white/80 p-5 shadow-[0_24px_70px_rgba(32,33,36,0.2)] sm:p-6"
+              className="location-picker-sheet bg-surface w-full max-w-lg overflow-y-auto rounded-3xl border border-white/80 p-5 shadow-[0_24px_70px_rgba(32,33,36,0.2)] sm:p-6"
               role="dialog"
               aria-modal="true"
               aria-labelledby="location-picker-title"
@@ -187,7 +187,7 @@ export function LocationPicker({
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+                  <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
                     Tu zona
                   </p>
                   <h2
@@ -199,7 +199,7 @@ export function LocationPicker({
                 </div>
                 <button
                   ref={locationCloseRef}
-                  className="consumer-pressable text-ink/55 hover:bg-ink/[0.05] grid h-10 w-10 shrink-0 place-items-center rounded-full text-2xl leading-none"
+                  className="consumer-pressable text-ink/70 hover:bg-ink/[0.05] grid h-10 w-10 shrink-0 place-items-center rounded-full text-2xl leading-none"
                   type="button"
                   onClick={() => setLocationSheetOpen(false)}
                   aria-label="Cerrar selector de ubicación"
@@ -207,7 +207,7 @@ export function LocationPicker({
                   ×
                 </button>
               </div>
-              <p className="text-ink/58 mt-2 max-w-[28rem] text-sm leading-5">
+              <p className="text-ink/70 mt-2 max-w-[28rem] text-sm leading-5">
                 Usamos una zona aproximada para mostrarte opciones relevantes.
                 Tu ubicación exacta nunca se publica.
               </p>
@@ -229,7 +229,7 @@ export function LocationPicker({
                   <span className="block text-sm font-bold">
                     Usar mi ubicación actual
                   </span>
-                  <span className="text-ink/55 mt-0.5 block text-xs">
+                  <span className="text-ink/70 mt-0.5 block text-xs">
                     Te pediremos permiso al dispositivo
                   </span>
                 </span>
@@ -258,7 +258,7 @@ export function LocationPicker({
                   </select>
                 </label>
               </div>
-              <p className="text-ink/45 mt-4 text-xs leading-5">
+              <p className="text-ink/70 mt-4 text-xs leading-5">
                 Podés cambiar esta elección cuando quieras desde la búsqueda.
               </p>
             </div>
@@ -270,7 +270,7 @@ export function LocationPicker({
 
   return (
     <div className="location-picker space-y-3">
-      <label className="text-ink/65 text-sm font-semibold" htmlFor="location">
+      <label className="text-ink/70 text-sm font-semibold" htmlFor="location">
         ¿Dónde lo necesitás?
       </label>
       <select
@@ -306,11 +306,11 @@ export function LocationPicker({
         </Link>
       </div>
       {locationMessage ? (
-        <p className="text-ink/55 text-xs" role="status">
+        <p className="text-ink/70 text-xs" role="status">
           {locationMessage}
         </p>
       ) : (
-        <p className="text-ink/50 text-xs">
+        <p className="text-ink/70 text-xs">
           Es opcional. Podés usar tu ubicación del dispositivo o elegir una
           zona.
         </p>

@@ -62,7 +62,7 @@ function DesktopNavLink({
   return (
     <Link
       href={href}
-      className="consumer-pressable hover:bg-ink/[0.04] text-ink/65 hover:text-ink inline-flex min-h-11 items-center rounded-lg px-3"
+      className="consumer-pressable hover:bg-ink/[0.04] text-ink/70 hover:text-ink inline-flex min-h-11 items-center rounded-lg px-3"
     >
       {children}
     </Link>

@@ -265,7 +265,7 @@ function Field({
         disabled={disabled}
       />
       {helper ? (
-        <span className="text-ink/48 mt-1.5 block text-xs leading-5 font-normal">
+        <span className="text-ink/70 mt-1.5 block text-xs leading-5 font-normal">
           {helper}
         </span>
       ) : null}
@@ -297,7 +297,7 @@ function TextArea({
         <span>{label}</span>
         {maxLength || minLength ? (
           <span
-            className={`text-xs font-normal ${length < (minLength ?? 0) ? "text-terracotta" : "text-ink/45"}`}
+            className={`text-xs font-normal ${length < (minLength ?? 0) ? "text-terracotta" : "text-ink/70"}`}
           >
             {length}
             {maxLength
@@ -318,7 +318,7 @@ function TextArea({
         onChange={(event) => setLength(event.target.value.length)}
       />
       {helper ? (
-        <span className="text-ink/48 mt-1.5 block text-xs leading-5 font-normal">
+        <span className="text-ink/70 mt-1.5 block text-xs leading-5 font-normal">
           {helper}
         </span>
       ) : null}
@@ -372,7 +372,7 @@ function Section({
       <h2 className="font-display mt-2 text-3xl font-semibold tracking-[-0.02em]">
         {title}
       </h2>
-      <p className="text-ink/60 mt-2 max-w-3xl text-sm leading-6">
+      <p className="text-ink/70 mt-2 max-w-3xl text-sm leading-6">
         {description}
       </p>
       <div className="mt-6">{children}</div>
@@ -608,7 +608,7 @@ function ProfessionalRecordList({
       ))}
     </div>
   ) : (
-    <p className="text-ink/55 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
+    <p className="text-ink/70 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
       {empty}
     </p>
   );
@@ -736,7 +736,7 @@ export function MarketplaceManagement({
               defaultChecked={provider.availability_paused}
             />
           </div>
-          <p className="text-ink/55 text-xs">
+          <p className="text-ink/70 text-xs">
             Estado de identidad: <strong>{provider.status}</strong>. Sólo un
             flujo server-side/admin controlado puede llevar un proveedor a
             ACTIVE.
@@ -790,7 +790,7 @@ export function MarketplaceManagement({
                     <p className="font-semibold">
                       {skillName.get(item.skill_id) ?? "Habilidad"}
                     </p>
-                    <p className="text-ink/55 text-xs">
+                    <p className="text-ink/70 text-xs">
                       {categoryName.get(item.skill_id) ?? "Catálogo"}
                       {item.is_featured ? " · destacada" : ""}
                     </p>
@@ -802,7 +802,7 @@ export function MarketplaceManagement({
                 </div>
               ))
             ) : (
-              <p className="text-ink/55 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
+              <p className="text-ink/70 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
                 Todavía no agregaste habilidades.
               </p>
             )}
@@ -837,7 +837,7 @@ export function MarketplaceManagement({
               </div>
             </details>
           ) : (
-            <p className="text-ink/55 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
+            <p className="text-ink/70 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
               Primero agregá al menos una habilidad para poder crear un
               servicio.
             </p>
@@ -850,7 +850,7 @@ export function MarketplaceManagement({
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="font-semibold">{service.title}</p>
-                  <p className="text-ink/55 text-xs">
+                  <p className="text-ink/70 text-xs">
                     {service.public_slug} ·{" "}
                     {service.is_published ? "publicado" : "borrador"}
                     {service.is_paused ? " · pausado" : ""}
@@ -865,7 +865,7 @@ export function MarketplaceManagement({
                   )}
                 </span>
                 {service.is_paused ? (
-                  <span className="bg-ink/[0.06] text-ink/60 rounded-full px-3 py-1 text-xs font-semibold">
+                  <span className="bg-ink/[0.06] text-ink/70 rounded-full px-3 py-1 text-xs font-semibold">
                     Pausado
                   </span>
                 ) : null}
@@ -929,11 +929,11 @@ export function MarketplaceManagement({
               return (
                 <>
                   <p className="font-semibold">{item.title}</p>
-                  <p className="text-ink/55 mt-1 text-sm">
+                  <p className="text-ink/70 mt-1 text-sm">
                     {item.organization ?? "Sin organización"} ·{" "}
                     {item.is_public ? "pública" : "privada"}
                   </p>
-                  <p className="text-ink/65 mt-2 text-sm">{item.description}</p>
+                  <p className="text-ink/70 mt-2 text-sm">{item.description}</p>
                 </>
               );
             }}
@@ -974,7 +974,7 @@ export function MarketplaceManagement({
               return (
                 <>
                   <p className="font-semibold">{item.institution}</p>
-                  <p className="text-ink/55 mt-1 text-sm">
+                  <p className="text-ink/70 mt-1 text-sm">
                     {item.field_of_study ?? "Campo no especificado"} ·{" "}
                     {item.is_public ? "pública" : "privada"}
                   </p>
@@ -1018,11 +1018,11 @@ export function MarketplaceManagement({
               return (
                 <>
                   <p className="font-semibold">{item.title}</p>
-                  <p className="text-ink/55 mt-1 text-sm">
+                  <p className="text-ink/70 mt-1 text-sm">
                     {item.issuer ?? "Emisor no especificado"} ·{" "}
                     {item.is_public ? "pública" : "privada"}
                   </p>
-                  <p className="text-ink/65 mt-2 text-xs">
+                  <p className="text-ink/70 mt-2 text-xs">
                     {item.evidence_path
                       ? "Evidencia privada guardada"
                       : "Sin evidencia adjunta"}
@@ -1076,13 +1076,13 @@ export function MarketplaceManagement({
               return (
                 <>
                   <p className="font-semibold">{item.title}</p>
-                  <p className="text-ink/55 mt-1 text-sm">
+                  <p className="text-ink/70 mt-1 text-sm">
                     {item.is_public ? "público" : "privado"}
                     {item.media_path
                       ? " · imagen guardada"
                       : " · ficha de texto"}
                   </p>
-                  <p className="text-ink/65 mt-2 text-sm">{item.description}</p>
+                  <p className="text-ink/70 mt-2 text-sm">{item.description}</p>
                 </>
               );
             }}
@@ -1130,7 +1130,7 @@ export function MarketplaceManagement({
               return (
                 <>
                   <p className="font-semibold">{item.label}</p>
-                  <p className="text-ink/55 mt-1 text-sm">
+                  <p className="text-ink/70 mt-1 text-sm">
                     Radio {item.radius_meters} m ·{" "}
                     {item.is_active ? "activa" : "inactiva"}
                   </p>
@@ -1189,7 +1189,7 @@ export function MarketplaceManagement({
                   Día {item.weekday} · {item.start_time.slice(0, 5)}–
                   {item.end_time.slice(0, 5)}
                 </p>
-                <p className="text-ink/55 mt-1 text-xs">
+                <p className="text-ink/70 mt-1 text-xs">
                   {item.timezone} · {item.is_active ? "activo" : "inactivo"}
                 </p>
                 <DeleteForm action={actions.deleteRule} recordId={item.id} />
@@ -1244,7 +1244,7 @@ export function MarketplaceManagement({
                   {new Date(item.starts_at).toLocaleString("es-AR")} →{" "}
                   {new Date(item.ends_at).toLocaleString("es-AR")}
                 </p>
-                <p className="text-ink/55 mt-1 text-xs">
+                <p className="text-ink/70 mt-1 text-xs">
                   {item.reason ?? "Sin motivo"}
                 </p>
                 <DeleteForm action={actions.deleteBlock} recordId={item.id} />

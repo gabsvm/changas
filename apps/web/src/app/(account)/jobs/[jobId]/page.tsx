@@ -187,7 +187,7 @@ export default async function JobPage({
 
       <div className="mx-auto max-w-4xl pt-5 sm:pt-0">
         <div className="hidden items-center justify-between gap-3 sm:flex">
-          <Link href="/jobs" className="text-ink/55 text-sm font-semibold">
+          <Link href="/jobs" className="text-ink/70 text-sm font-semibold">
             ← Mis trabajos
           </Link>
           <Link
@@ -208,12 +208,12 @@ export default async function JobPage({
           <h1 className="mt-3 text-[22px] leading-8 font-extrabold tracking-[-0.025em]">
             {detail.service_title}
           </h1>
-          <p className="text-ink/60 mt-1.5 text-sm leading-6">
+          <p className="text-ink/70 mt-1.5 text-sm leading-6">
             Con {detail.counterparty_name} · {price}
           </p>
           <div className="bg-canvas mt-4 grid grid-cols-2 gap-3 rounded-xl p-4 text-sm">
             <div>
-              <p className="text-ink/60 text-xs leading-4 font-semibold">
+              <p className="text-ink/70 text-xs leading-4 font-semibold">
                 Próxima fecha
               </p>
               <p className="mt-0.5 font-bold">
@@ -223,7 +223,7 @@ export default async function JobPage({
               </p>
             </div>
             <div>
-              <p className="text-ink/60 text-xs leading-4 font-semibold">
+              <p className="text-ink/70 text-xs leading-4 font-semibold">
                 Precio acordado
               </p>
               <p className="mt-0.5 font-extrabold">{price}</p>
@@ -236,7 +236,7 @@ export default async function JobPage({
             className="bg-ink mt-5 rounded-2xl p-5 text-white"
             aria-label="Próxima acción"
           >
-            <p className="text-[0.68rem] font-bold tracking-[0.08em] text-white/60 uppercase">
+            <p className="text-[11px] font-bold tracking-[0.08em] text-white/60 uppercase">
               Próxima acción
             </p>
             <h2 className="mt-1 text-lg leading-7 font-extrabold">
@@ -260,7 +260,7 @@ export default async function JobPage({
         ) : null}
 
         <section className="border-ink/10 mt-6 border-t pt-5">
-          <p className="text-ink/42 text-[0.68rem] font-bold tracking-[0.08em] uppercase">
+          <p className="text-ink/42 text-[11px] font-bold tracking-[0.08em] uppercase">
             Alcance acordado
           </p>
           <p className="mt-3 text-sm leading-7 whitespace-pre-wrap">
@@ -391,7 +391,7 @@ export default async function JobPage({
                               {state.label}
                             </StatusChip>
                           </div>
-                          <p className="text-ink/55 mt-1">
+                          <p className="text-ink/70 mt-1">
                             {dateTime(
                               request.starts_at ?? request.deadline_at,
                             ) ?? "A coordinar"}
@@ -475,14 +475,14 @@ export default async function JobPage({
                           <StatusChip tone={state.tone}>
                             {state.label}
                           </StatusChip>
-                          <span className="text-ink/45 text-xs">
+                          <span className="text-ink/70 text-xs">
                             {dateTime(change.created_at)}
                           </span>
                         </div>
                         <p className="mt-3 text-sm leading-7 whitespace-pre-wrap">
                           {change.scope_snapshot}
                         </p>
-                        <div className="text-ink/55 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                        <div className="text-ink/70 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                           <span>Actual: {price}</span>
                           <span>
                             Adicional:{" "}
@@ -578,7 +578,7 @@ export default async function JobPage({
                   <div className="text-sm leading-6">
                     <strong className="block">{detail.exact_address}</strong>
                     {detail.access_notes ? (
-                      <span className="text-ink/55">{detail.access_notes}</span>
+                      <span className="text-ink/70">{detail.access_notes}</span>
                     ) : null}
                   </div>
                 ) : isClient &&
@@ -605,7 +605,7 @@ export default async function JobPage({
                     </button>
                   </form>
                 ) : (
-                  <p className="text-ink/55 text-sm leading-6">
+                  <p className="text-ink/70 text-sm leading-6">
                     La dirección exacta se comparte sólo dentro del trabajo
                     confirmado y únicamente con sus participantes.
                   </p>
@@ -627,7 +627,7 @@ export default async function JobPage({
                           {dateTime(event.created_at)}
                         </time>
                         {event.reason ? (
-                          <p className="text-ink/58 mt-1.5 leading-6">
+                          <p className="text-ink/70 mt-1.5 leading-6">
                             {event.reason}
                           </p>
                         ) : null}
@@ -647,7 +647,7 @@ export default async function JobPage({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-ink/42 text-[0.68rem] font-bold tracking-[0.08em] uppercase">
+      <p className="text-ink/42 text-[11px] font-bold tracking-[0.08em] uppercase">
         {label}
       </p>
       <p className="mt-1 text-sm font-semibold">{value}</p>
@@ -676,7 +676,7 @@ function JobSection({
           </span>
         </summary>
         {description ? (
-          <p className="text-ink/52 mt-1.5 text-sm leading-6">{description}</p>
+          <p className="text-ink/70 mt-1.5 text-sm leading-6">{description}</p>
         ) : null}
         <div className="mt-3 pb-1">{children}</div>
       </details>
@@ -688,7 +688,7 @@ function JobSection({
         {title}
       </h2>
       {description ? (
-        <p className="text-ink/52 mt-1.5 text-sm leading-6">{description}</p>
+        <p className="text-ink/70 mt-1.5 text-sm leading-6">{description}</p>
       ) : null}
       <div className="mt-3">{children}</div>
     </section>

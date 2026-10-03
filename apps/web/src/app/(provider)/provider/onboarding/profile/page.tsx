@@ -46,13 +46,13 @@ export default async function ProviderOnboardingProfilePage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Datos básicos" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-        <p className="text-terracotta text-[0.68rem] font-extrabold tracking-[0.16em] uppercase">
+        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
           Paso 1 de 4
         </p>
         <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
           Prepará tu perfil público
         </h1>
-        <p className="text-ink/58 mt-2 text-sm leading-6">
+        <p className="text-ink/70 mt-2 text-sm leading-6">
           Mostrá lo esencial para que otras personas entiendan quién sos y cómo
           trabajás. Guardar este paso no publica servicios.
         </p>
@@ -68,7 +68,7 @@ export default async function ProviderOnboardingProfilePage() {
           />
           <div className="min-w-0">
             <p className="truncate text-[15px] font-bold">{displayName}</p>
-            <p className="text-ink/60 mt-0.5 truncate text-[13px]">
+            <p className="text-ink/70 mt-0.5 truncate text-[13px]">
               {profile?.public_zone ?? "Sin zona"}
               {profile?.bio ? ` · ${profile.bio}` : null}
             </p>
