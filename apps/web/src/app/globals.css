@@ -697,6 +697,41 @@ button:hover .chevron {
   animation: pop-in 260ms var(--ease-spring) both;
 }
 
+/* Confirmation moments: badge pops in, check stroke draws itself. */
+@keyframes check-draw {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.check-badge {
+  animation: pop-in 320ms var(--ease-spring) both;
+}
+
+.check-draw {
+  stroke-dasharray: 24;
+  animation: check-draw 420ms var(--ease-out) 160ms both;
+}
+
+@keyframes heart-pop {
+  0% {
+    transform: scale(0.7);
+  }
+  55% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.heart-pop {
+  animation: heart-pop 380ms var(--ease-spring) both;
+}
+
 /* Bottom navigation: lifted bar and a springy active icon. */
 .bottom-nav-shell {
   box-shadow:

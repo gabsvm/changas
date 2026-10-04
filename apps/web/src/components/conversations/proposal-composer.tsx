@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 
+import { SuccessCheck } from "@/components/ui/marketplace/success-check";
 import {
   createProposalAction,
   type ProposalActionState,
@@ -37,11 +38,12 @@ export function ProposalComposer({
           className={
             state.status === "ERROR"
               ? "bg-danger/[0.07] text-danger mt-3 rounded-xl px-3 py-2.5 text-sm font-semibold"
-              : "bg-success/[0.07] text-success mt-3 rounded-xl px-3 py-2.5 text-sm font-semibold"
+              : "bg-success/[0.07] text-success mt-3 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold"
           }
           role={state.status === "ERROR" ? "alert" : "status"}
           aria-live="polite"
         >
+          {state.status === "SUCCESS" ? <SuccessCheck /> : null}
           {state.message}
         </p>
       ) : null}
