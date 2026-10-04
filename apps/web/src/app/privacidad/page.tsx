@@ -84,6 +84,12 @@ export default function PrivacyPage() {
           documentos de identidad se conservan solo mientras sean necesarios
           para la verificación y su control posterior: [COMPLETAR: plazo].
         </p>
+        <p>
+          Si eliminás tu cuenta, borramos tus datos personales, tus documentos
+          de identidad y tus avisos, y dejamos de mostrar tus servicios. Los
+          trabajos, pagos y reseñas ya realizados se conservan sin tu nombre por
+          obligaciones contables y para resolver reclamos.
+        </p>
       </LegalSection>
 
       <LegalSection title="6. Seguridad">
