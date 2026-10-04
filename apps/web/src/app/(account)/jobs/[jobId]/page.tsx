@@ -13,6 +13,7 @@ import {
   transitionJobAction,
 } from "@/app/(account)/jobs/actions";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
+import { SuccessCheck } from "@/components/ui/marketplace/success-check";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import {
@@ -198,7 +199,21 @@ export default async function JobPage({
           </Link>
         </div>
 
-        <header className="consumer-card bg-surface mt-0 p-4 sm:mt-5">
+        {detail.job_status === "COMPLETED" ? (
+          <div className="bg-success/[0.08] text-success mt-0 flex items-center gap-3 rounded-2xl px-4 py-4 sm:mt-5">
+            <SuccessCheck className="h-10 w-10" />
+            <div>
+              <p className="text-[17px] leading-6 font-extrabold">
+                ¡Trabajo completado!
+              </p>
+              <p className="text-ink/70 text-sm leading-5">
+                Dejá tu reseña para ayudar a la próxima persona.
+              </p>
+            </div>
+          </div>
+        ) : null}
+
+        <header className="consumer-card bg-surface mt-3 p-4 sm:mt-5">
           <div className="flex flex-wrap items-center gap-1.5">
             <StatusChip tone={status.tone}>{status.label}</StatusChip>
             <StatusChip tone="neutral">

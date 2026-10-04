@@ -122,6 +122,12 @@ export default async function SearchPage({
     return queryString ? `/buscar?${queryString}` : "/buscar";
   }
 
+  function categoryHref(slug: string | null): string {
+    const base = clearHref(["category"]);
+    if (!slug) return base;
+    return `${base}${base.includes("?") ? "&" : "?"}category=${encodeURIComponent(slug)}`;
+  }
+
   return (
     <main
       id="main-content"
@@ -177,6 +183,28 @@ export default async function SearchPage({
                 </div>
               </div>
             </form>
+
+            {categories.length ? (
+              <nav
+                aria-label="Categorías"
+                className="consumer-scrollbar-none -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
+              >
+                {[{ slug: null, name: "Todas" }, ...categories].map((item) => {
+                  const selected =
+                    (item.slug ?? "") === (filters.categorySlug ?? "");
+                  return (
+                    <Link
+                      key={item.slug ?? "all"}
+                      href={categoryHref(item.slug)}
+                      aria-current={selected ? "true" : undefined}
+                      className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-sm font-bold ${selected ? "bg-brand-yellow text-ink border-transparent" : "border-ink/[0.08] text-ink/80 bg-white"}`}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </nav>
+            ) : null}
 
             <div
               className="consumer-scrollbar-none -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pt-1 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
