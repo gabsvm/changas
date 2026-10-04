@@ -30,14 +30,6 @@ export function ServiceRow({
     row.price_unit,
   );
   const hasRating = row.review_count > 0 && row.rating_average !== null;
-  const context = [
-    hasRating ? `★ ${row.rating_average!.toFixed(1)}` : "Nuevo",
-    row.provider_zone,
-    modalityLabels[row.modality],
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
   const content = (
     <div className="flex items-center gap-3.5 py-3.5">
       <Avatar
@@ -62,7 +54,41 @@ export function ServiceRow({
         <h3 className="text-ink line-clamp-2 text-[15px] leading-5 font-extrabold tracking-[-0.01em]">
           {row.service_title}
         </h3>
-        <p className="text-ink/70 mt-0.5 truncate text-[13px]">{context}</p>
+        <p className="text-ink/70 mt-0.5 flex items-center gap-x-2 truncate text-[13px]">
+          <span className="text-ink inline-flex shrink-0 items-center gap-1 font-bold">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="fill-brand-yellow stroke-warning h-3.5 w-3.5"
+              strokeWidth="1.5"
+            >
+              <path
+                d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {hasRating ? row.rating_average!.toFixed(1) : "Nuevo"}
+          </span>
+          {row.provider_zone ? (
+            <span className="inline-flex min-w-0 items-center gap-1">
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="h-3.5 w-3.5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 21s6-5.2 6-10a6 6 0 0 0-12 0c0 4.8 6 10 6 10Z" />
+                <circle cx="12" cy="11" r="2" />
+              </svg>
+              <span className="truncate">{row.provider_zone}</span>
+            </span>
+          ) : null}
+          <span className="shrink-0">{modalityLabels[row.modality]}</span>
+        </p>
       </div>
       <span className="text-ink shrink-0 text-[15px] font-extrabold">
         {price}

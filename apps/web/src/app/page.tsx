@@ -45,7 +45,17 @@ export default async function HomePage() {
       .limit(8),
     searchDiscovery({ query: "", filters }),
   ]);
-  const accountName = user?.email?.split("@")[0] || "Tu cuenta";
+  const { data: greetingProfile } = user
+    ? await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", user.id)
+        .maybeSingle()
+    : { data: null };
+  const accountName =
+    greetingProfile?.display_name?.trim().split(/\s+/)[0] ||
+    user?.email?.split("@")[0] ||
+    "Tu cuenta";
 
   return (
     <main
