@@ -112,7 +112,10 @@ export async function updateMarketplaceSettings(
     marketplacePaused: checkbox(formData, "marketplacePaused"),
     availabilityPaused: checkbox(formData, "availabilityPaused"),
   });
-  if (!parsed.success) return errorState("Revisá el slug y el texto público.");
+  if (!parsed.success)
+    return errorState(
+      "El enlace solo puede tener letras minúsculas, números y guiones (por ejemplo: gabriel-sanchez).",
+    );
 
   const { supabase, user, provider } = await getContext();
   if (!user) return errorState("Tu sesión expiró. Volvé a iniciar sesión.");
@@ -128,7 +131,13 @@ export async function updateMarketplaceSettings(
     })
     .eq("user_id", user.id);
 
-  if (error) return errorState("No pudimos guardar la configuración pública.");
+  if (error) {
+    return errorState(
+      error.code === "23505"
+        ? "Ese enlace ya está en uso. Probá con otro."
+        : "No pudimos guardar la configuración pública.",
+    );
+  }
   revalidateMarketplace(parsed.data.publicSlug);
   return { success: "Configuración pública guardada." };
 }

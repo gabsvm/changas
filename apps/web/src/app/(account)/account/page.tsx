@@ -42,6 +42,16 @@ export default async function AccountPage() {
     ? Math.min(4, Math.max(1, provider.onboarding_step))
     : 0;
 
+  const profileChecks = [
+    { label: "foto", done: Boolean(profile?.avatar_url) },
+    { label: "presentación", done: Boolean(profile?.bio?.trim()) },
+    { label: "zona", done: Boolean(profile?.public_zone?.trim()) },
+  ];
+  const missing = profileChecks.filter((check) => !check.done);
+  const completion = Math.round(
+    ((profileChecks.length - missing.length) / profileChecks.length) * 100,
+  );
+
   return (
     <section className="pt-5 pb-6 sm:py-10">
       <div className="mx-auto max-w-2xl">
@@ -69,6 +79,31 @@ export default async function AccountPage() {
             </span>
           </Link>
         </header>
+
+        {missing.length ? (
+          <Link
+            href="/account/profile"
+            className="consumer-pressable bg-brand-yellow/20 mt-5 block rounded-2xl px-4 py-3.5"
+          >
+            <span className="flex items-center justify-between gap-3 text-sm font-extrabold">
+              Completá tu perfil
+              <span className="text-ink/70 font-bold">{completion}%</span>
+            </span>
+            <span
+              className="bg-ink/10 mt-2 block h-1.5 overflow-hidden rounded-full"
+              aria-hidden="true"
+            >
+              <span
+                className="bg-brand-orange block h-full rounded-full"
+                style={{ width: `${Math.max(completion, 8)}%` }}
+              />
+            </span>
+            <span className="text-ink/70 mt-2 block text-[13px] leading-5">
+              Falta: {missing.map((check) => check.label).join(", ")}. Un perfil
+              completo genera más confianza.
+            </span>
+          </Link>
+        ) : null}
 
         <section className="consumer-card bg-surface mt-6 px-5 py-5">
           {provider ? (
@@ -100,9 +135,15 @@ export default async function AccountPage() {
               </div>
               <Link
                 className="consumer-pressable border-ink/[0.08] mt-4 flex min-h-12 items-center justify-between rounded-xl border px-4 text-sm font-bold"
-                href="/provider/onboarding"
+                href={
+                  provider.status === "ACTIVE"
+                    ? "/provider/manage"
+                    : "/provider/onboarding"
+                }
               >
-                Ver mi verificación
+                {provider.status === "ACTIVE"
+                  ? "Gestionar mis servicios"
+                  : "Ver mi verificación"}
                 <span className="text-ink/40 text-xl" aria-hidden="true">
                   ›
                 </span>
