@@ -209,7 +209,7 @@ export default async function PublicProviderPage({
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 24 24"
-                      className={`h-6 w-6 ${isFavorite ? "fill-danger stroke-danger" : "stroke-ink fill-none"}`}
+                      className={`h-6 w-6 ${isFavorite ? "heart-pop fill-danger stroke-danger" : "stroke-ink fill-none"}`}
                       strokeWidth="1.8"
                     >
                       <path
