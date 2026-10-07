@@ -34,7 +34,7 @@ export function SearchFiltersSheet({
     <>
       <button
         type="button"
-        className="consumer-pressable border-ink/[0.1] text-ink inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border bg-white px-4 text-[15px] font-bold sm:w-auto"
+        className="consumer-pressable border-ink/[0.1] text-ink inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border bg-white px-4 text-[15px] font-bold sm:w-auto dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -213,7 +213,7 @@ export function SearchFiltersSheet({
                   // El GPS guardado es opcional; si no se puede limpiar, igual navega.
                 }
               }}
-              className="consumer-pressable border-ink/10 inline-flex min-h-[52px] flex-1 items-center justify-center rounded-xl border bg-white px-4 text-[15px] font-bold"
+              className="consumer-pressable border-ink/10 inline-flex min-h-[52px] flex-1 items-center justify-center rounded-xl border bg-white px-4 text-[15px] font-bold dark:border-white/10 dark:bg-white/10 dark:text-white"
             >
               Limpiar
             </a>

@@ -263,7 +263,7 @@ export default async function HomePage() {
           </section>
 
           {!user ? (
-            <section className="consumer-card bg-ink! mt-4 flex flex-col gap-3 p-5 text-white">
+            <section className="consumer-card bg-ink! mt-4 flex flex-col gap-3 p-5 text-white dark:border-white/10 dark:bg-[#2a231c]! dark:text-[#f5efe8]">
               <div>
                 <h2 className="text-base font-extrabold tracking-[-0.02em]">
                   Tu oficio merece un buen escaparate.
@@ -273,7 +273,7 @@ export default async function HomePage() {
                 </p>
               </div>
               <Link
-                className="consumer-pressable text-ink inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-4 text-sm font-extrabold"
+                className="consumer-pressable text-ink inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-4 text-sm font-extrabold dark:border dark:border-white/15 dark:bg-white/10 dark:text-white"
                 href="/provider/onboarding"
               >
                 Ofrecer mis servicios

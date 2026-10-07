@@ -12,9 +12,9 @@ export function actionButtonClass(
   const tones: Record<ActionTone, string> = {
     primary: "cta-ink",
     secondary:
-      "border border-ink/10 bg-white text-ink hover:border-ink/16 hover:bg-surface",
+      "border border-ink/10 bg-white text-ink hover:border-ink/16 hover:bg-surface dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15",
     ghost: "bg-transparent text-ink/75 hover:bg-ink/[0.045] hover:text-ink",
-    danger: "bg-danger text-white hover:bg-[#b9342c]",
+    danger: "bg-danger text-white hover:bg-[#b9342c] dark:text-[#171310]",
   };
 
   return `${base} ${tones[tone]} ${className}`.trim();

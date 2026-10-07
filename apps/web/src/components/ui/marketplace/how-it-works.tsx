@@ -30,7 +30,7 @@ export function HowItWorks() {
         {steps.map((step, index) => (
           <li key={step.title} className="tile-soft rounded-2xl p-5">
             <span
-              className="bg-ink grid h-8 w-8 place-items-center rounded-full text-sm font-extrabold text-white"
+              className="bg-ink grid h-8 w-8 place-items-center rounded-full text-sm font-extrabold text-white dark:bg-[#f5efe8] dark:text-[#171310]"
               aria-hidden="true"
             >
               {index + 1}

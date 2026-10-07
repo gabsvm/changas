@@ -3,7 +3,7 @@ export function SuccessCheck({ className = "" }: { className?: string }) {
   return (
     <span
       aria-hidden="true"
-      className={`check-badge bg-success inline-grid h-7 w-7 shrink-0 place-items-center rounded-full text-white ${className}`}
+      className={`check-badge bg-success inline-grid h-7 w-7 shrink-0 place-items-center rounded-full text-white dark:text-[#171310] ${className}`}
     >
       <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
         <path

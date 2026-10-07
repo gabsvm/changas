@@ -55,9 +55,9 @@ export function HeroVisual() {
         <div
           key={card.title}
           style={{ animationDelay: `${index * 0.8}s` }}
-          className={`hero-float absolute flex w-64 items-center gap-3.5 rounded-3xl border border-white/60 bg-white/35 p-4 shadow-[0_24px_48px_-20px_rgba(23,20,15,0.35)] backdrop-blur-md ${card.className}`}
+          className={`hero-float absolute flex w-64 items-center gap-3.5 rounded-3xl border border-white/60 bg-white/35 p-4 shadow-[0_24px_48px_-20px_rgba(23,20,15,0.35)] backdrop-blur-md dark:border-white/15 dark:bg-white/10 ${card.className}`}
         >
-          <span className="text-ink grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/85">
+          <span className="text-ink grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/85 dark:bg-white/10">
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none">
               {card.icon}
             </svg>

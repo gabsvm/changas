@@ -937,6 +937,57 @@ a[aria-current="page"] .nav-icon {
       border-color: rgb(126 162 255 / 40%);
     }
   }
+  /* Dark-only surface fixes: hardcoded light slabs that tokens can't flip
+     (tile-soft, chip-glass, cta-ink, discovery-hero). Light is untouched. */
+  .tile-soft {
+    background: #2a231c;
+    border: 1px solid rgb(245 239 232 / 10%);
+  }
+
+  .chip-glass {
+    border-color: rgb(245 239 232 / 14%);
+    background: rgb(245 239 232 / 8%);
+    color: #f5efe8;
+  }
+
+  .cta-ink {
+    background: #f5efe8;
+    background-image: none;
+    color: #171310;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 12%),
+      0 1px 2px rgb(0 0 0 / 40%),
+      0 12px 24px -12px rgb(0 0 0 / 60%);
+  }
+
+  .discovery-hero {
+    background-color: #221c17;
+  }
+
+  .brand-gradient-surface::before {
+    background:
+      radial-gradient(120% 90% at 0% 0%, rgb(255 200 87 / 12%), transparent 55%),
+      radial-gradient(
+        70% 60% at 100% 100%,
+        rgb(255 255 255 / 6%),
+        transparent 60%
+      );
+    box-shadow: inset 0 1px 0 rgb(245 239 232 / 14%);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tile-soft:hover {
+      background: #33291f;
+    }
+
+    .chip-glass:hover {
+      background: rgb(245 239 232 / 14%);
+    }
+
+    .cta-ink:hover {
+      filter: none;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -10,7 +10,7 @@ export function SearchField({
 
   return (
     <label
-      className={`consumer-control focus-within:border-brand-orange/50 focus-within:ring-brand-orange/15 flex min-h-[52px] items-center gap-2.5 rounded-2xl bg-white px-3.5 transition focus-within:ring-4 ${className}`}
+      className={`consumer-control focus-within:border-brand-orange/50 focus-within:ring-brand-orange/15 flex min-h-[52px] items-center gap-2.5 rounded-2xl bg-white px-3.5 transition focus-within:ring-4 dark:bg-[#2a231c] ${className}`}
     >
       <svg
         aria-hidden="true"

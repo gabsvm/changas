@@ -197,7 +197,7 @@ export default async function SearchPage({
                       key={item.slug ?? "all"}
                       href={categoryHref(item.slug)}
                       aria-current={selected ? "true" : undefined}
-                      className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-sm font-bold ${selected ? "bg-brand-yellow text-ink border-transparent" : "border-ink/[0.08] text-ink/80 bg-white"}`}
+                      className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-sm font-bold ${selected ? "bg-brand-yellow text-ink border-transparent dark:text-[#171310]" : "border-ink/[0.08] text-ink/80 bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"}`}
                     >
                       {item.name}
                     </Link>

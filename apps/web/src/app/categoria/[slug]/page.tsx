@@ -187,8 +187,8 @@ export default async function CategoryPage({
                 aria-pressed={filters.modality === "IN_PERSON"}
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
                   filters.modality === "IN_PERSON"
-                    ? "bg-ink text-white"
-                    : "border-ink/[0.08] border bg-white"
+                    ? "bg-ink text-white dark:bg-[#f5efe8] dark:text-[#171310]"
+                    : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
                 Cerca mío
@@ -200,8 +200,8 @@ export default async function CategoryPage({
                 aria-pressed={filters.modality === "REMOTE"}
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
                   filters.modality === "REMOTE"
-                    ? "bg-ink text-white"
-                    : "border-ink/[0.08] border bg-white"
+                    ? "bg-ink text-white dark:bg-[#f5efe8] dark:text-[#171310]"
+                    : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
                 Remoto
@@ -213,8 +213,8 @@ export default async function CategoryPage({
                 aria-pressed={filters.acceptsOffers === true}
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
                   filters.acceptsOffers
-                    ? "bg-ink text-white"
-                    : "border-ink/[0.08] border bg-white"
+                    ? "bg-ink text-white dark:bg-[#f5efe8] dark:text-[#171310]"
+                    : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
                 Acepta ofertas
