@@ -23,11 +23,12 @@ const badgeSources = [
   .join("\n");
 
 describe("Changas brand theme", () => {
-  it("uses Plus Jakarta Sans as the self-hosted product typeface", () => {
+  it("uses Bricolage Grotesque + Hanken Grotesk as product typefaces", () => {
     expect(layout).toContain('from "next/font/google"');
-    expect(layout).toContain("Plus_Jakarta_Sans");
-    expect(globals).toMatch(/--font-display:\s*var\(--font-plus-jakarta\)/);
-    expect(globals).toMatch(/--font-sans:\s*var\(--font-plus-jakarta\)/);
+    expect(layout).toContain("Bricolage_Grotesque");
+    expect(layout).toContain("Hanken_Grotesk");
+    expect(globals).toMatch(/--font-display:\s*var\(--font-bricolage\)/);
+    expect(globals).toMatch(/--font-sans:\s*var\(--font-hanken\)/);
     expect(globals).not.toContain('"Inter"');
   });
 

@@ -21,9 +21,9 @@ function readStoredChoice(): ThemeChoice {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (isThemeChoice(stored)) return stored;
   } catch {
-    /* Sin almacenamiento: se respeta al sistema. */
+    /* Sin almacenamiento: tema claro. */
   }
-  return "system";
+  return "light";
 }
 
 function applyTheme(choice: ThemeChoice): void {

@@ -11,18 +11,18 @@ export const contentType = "image/png";
 
 async function loadBrandFonts() {
   const [mediumData, boldData] = await Promise.all([
-    readFile(join(process.cwd(), "public/fonts/plus-jakarta-sans-500.ttf")),
-    readFile(join(process.cwd(), "public/fonts/plus-jakarta-sans-700.ttf")),
+    readFile(join(process.cwd(), "public/fonts/hanken-grotesk-500.ttf")),
+    readFile(join(process.cwd(), "public/fonts/bricolage-grotesque-700.ttf")),
   ]);
   return [
     {
-      name: "Plus Jakarta Sans",
+      name: "Hanken Grotesk",
       data: mediumData,
       weight: 500 as const,
       style: "normal" as const,
     },
     {
-      name: "Plus Jakarta Sans",
+      name: "Bricolage Grotesque",
       data: boldData,
       weight: 700 as const,
       style: "normal" as const,
@@ -69,7 +69,7 @@ export default async function Image({
           display: "flex",
           flexDirection: "column",
           backgroundColor: "#FFF9F3",
-          fontFamily: '"Plus Jakarta Sans"',
+          fontFamily: '"Bricolage Grotesque", "Hanken Grotesk", sans-serif',
           overflow: "hidden",
         }}
       >

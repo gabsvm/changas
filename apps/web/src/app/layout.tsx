@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Bricolage_Grotesque, Hanken_Grotesk } from "next/font/google";
 import Script from "next/script";
 
 import { getPublicSiteUrl } from "@changas/config/public";
@@ -8,10 +8,16 @@ import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register"
 
 import "./globals.css";
 
-const plusJakarta = Plus_Jakarta_Sans({
+const displayFont = Bricolage_Grotesque({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-plus-jakarta",
+  variable: "--font-bricolage",
+});
+
+const bodyFont = Hanken_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-hanken",
 });
 
 export const metadata: Metadata = {
@@ -39,7 +45,7 @@ export const viewport: Viewport = {
 };
 
 const themeInitScript =
-  '(function(){try{var t=localStorage.getItem("changas-theme");if(t!=="light"&&t!=="dark"&&t!=="system")t="system";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var h=document.documentElement;h.classList.toggle("dark",d);h.style.colorScheme=t==="system"?"light dark":t;}catch(e){}})();';
+  '(function(){try{var t=localStorage.getItem("changas-theme");if(t!=="light"&&t!=="dark"&&t!=="system")t="light";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var h=document.documentElement;h.classList.toggle("dark",d);h.style.colorScheme=t==="system"?"light dark":t;}catch(e){}})();';
 
 export default function RootLayout({
   children,
@@ -51,7 +57,7 @@ export default function RootLayout({
       <Script id="changas-theme" strategy="beforeInteractive">
         {themeInitScript}
       </Script>
-      <body className={plusJakarta.variable}>
+      <body className={`${displayFont.variable} ${bodyFont.variable}`}>
         <a className="skip-link" href="#main-content">
           Ir al contenido principal
         </a>

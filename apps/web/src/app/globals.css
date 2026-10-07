@@ -17,11 +17,11 @@
   --color-warning: #9a6500;
   --color-danger: #c93c32;
   --font-display:
-    var(--font-plus-jakarta), ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
+    var(--font-bricolage), "Bricolage Grotesque", ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-sans:
-    var(--font-plus-jakarta), ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
+    var(--font-hanken), "Hanken Grotesk", ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 :root {
@@ -95,14 +95,7 @@ body {
   );
   background-repeat: no-repeat;
   color: #17140f;
-  font-family:
-    var(--font-plus-jakarta),
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
