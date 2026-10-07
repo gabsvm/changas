@@ -141,7 +141,7 @@ export default async function SearchPage({
           action={
             <Link
               href={user ? "/account" : "/login"}
-              className="consumer-pressable text-ink/75 hover:bg-ink/[0.04] inline-flex min-h-12 items-center rounded-full px-3 text-sm font-bold"
+              className={`consumer-pressable text-ink/75 hover:bg-ink/[0.04] inline-flex min-h-12 items-center rounded-full px-3 text-sm font-bold ${user ? "sm:hidden" : ""}`}
             >
               {user ? "Cuenta" : "Ingresar"}
             </Link>

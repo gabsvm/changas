@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { ActionButton } from "@/components/ui/marketplace/action-button";
+import { ThemeSelector } from "@/components/ui/marketplace/theme-selector";
 import { SettingsRow } from "@/components/ui/marketplace/settings-row";
 import { createClient } from "@/lib/supabase/server";
 
@@ -36,10 +37,14 @@ export default async function AccountSettingsPage() {
         </p>
 
         <section className="border-ink/10 divide-ink/10 mt-5 divide-y border-y">
-          <SettingsRow
-            title="Correo de acceso"
-            description={user.email ?? "Sin correo disponible"}
-          />
+          <div className="py-3">
+            <p className="text-ink text-[0.95rem] font-semibold">Apariencia</p>
+            <p className="text-ink/70 mt-0.5 text-sm leading-5">
+              Claro, oscuro o igual que tu sistema. Se guarda en este
+              dispositivo.
+            </p>
+            <ThemeSelector />
+          </div>
           <SettingsRow
             href="/account/settings/notifications"
             title="Notificaciones"

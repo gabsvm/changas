@@ -87,7 +87,7 @@ export default async function HomePage() {
           {user ? (
             <Link
               href="/account"
-              className="consumer-pressable hover:bg-ink/[0.04] flex h-12 w-12 items-center justify-center rounded-full"
+              className="consumer-pressable hover:bg-ink/[0.04] flex h-12 w-12 items-center justify-center rounded-full sm:hidden"
               aria-label="Abrir mi cuenta"
             >
               <Avatar name={accountName} size="sm" />

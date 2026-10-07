@@ -103,7 +103,7 @@ export default async function JobsPage({
                 aria-current={active ? "page" : undefined}
                 className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-bold ${
                   active
-                    ? "bg-ink text-white"
+                    ? "bg-ink text-white dark:bg-[#f5efe8] dark:text-[#171310]"
                     : "bg-surface border-ink/[0.08] border"
                 }`}
               >

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import Script from "next/script";
 
 import { getPublicSiteUrl } from "@changas/config/public";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
@@ -37,13 +38,19 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 };
 
+const themeInitScript =
+  '(function(){try{var t=localStorage.getItem("changas-theme");if(t!=="light"&&t!=="dark"&&t!=="system")t="system";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var h=document.documentElement;h.classList.toggle("dark",d);h.style.colorScheme=t==="system"?"light dark":t;}catch(e){}})();';
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es-AR">
+    <html lang="es-AR" suppressHydrationWarning>
+      <Script id="changas-theme" strategy="beforeInteractive">
+        {themeInitScript}
+      </Script>
       <body className={plusJakarta.variable}>
         <a className="skip-link" href="#main-content">
           Ir al contenido principal

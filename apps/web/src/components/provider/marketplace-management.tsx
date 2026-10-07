@@ -252,7 +252,7 @@ function Field({
     <label className="text-sm font-semibold">
       {label}
       <input
-        className="border-ink/15 focus:border-moss focus:ring-moss/20 disabled:bg-ink/[0.04] disabled:text-ink/40 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2"
+        className="border-ink/15 focus:border-moss focus:ring-moss/20 disabled:bg-ink/[0.04] disabled:text-ink/40 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
         name={name}
         type={type}
         defaultValue={defaultValue ?? ""}
@@ -309,7 +309,7 @@ function TextArea({
         ) : null}
       </span>
       <textarea
-        className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 min-h-24 w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2"
+        className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 min-h-24 w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
         name={name}
         defaultValue={defaultValue ?? ""}
         required={required}
@@ -364,7 +364,7 @@ function Section({
   return (
     <section
       id={anchor}
-      className="border-ink/10 scroll-mt-32 rounded-2xl border bg-white/65 p-5 sm:p-7"
+      className="border-ink/10 scroll-mt-32 rounded-2xl border bg-white/65 p-5 sm:p-7 dark:border-white/10 dark:bg-[#2a231c]"
     >
       <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
         {eyebrow}
@@ -408,7 +408,7 @@ function ServiceForm({
         <label className="text-sm font-semibold">
           Habilidad asociada
           <select
-            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
+            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
             name="skillId"
             defaultValue={service?.skill_id ?? skills[0]?.id}
             required
@@ -442,7 +442,7 @@ function ServiceForm({
         <label className="text-sm font-semibold">
           Modalidad
           <select
-            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
+            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
             name="modality"
             defaultValue={service?.modality ?? "REMOTE"}
           >
@@ -454,7 +454,7 @@ function ServiceForm({
         <label className="text-sm font-semibold">
           Modelo de precio
           <select
-            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
+            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
             name="priceModel"
             value={priceModel}
             onChange={(event) => setPriceModel(event.target.value)}
@@ -490,7 +490,7 @@ function ServiceForm({
         <label className="text-sm font-semibold">
           Moneda
           <select
-            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
+            className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
             name="currencyCode"
             defaultValue="ARS"
           >
@@ -531,7 +531,7 @@ function ServiceForm({
           defaultChecked={service?.is_paused}
         />
       </div>
-      <details className="border-ink/10 rounded-xl border bg-white/60 px-3 py-1">
+      <details className="border-ink/10 rounded-xl border bg-white/60 px-3 py-1 dark:border-white/10 dark:bg-[#2a231c]">
         <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center text-sm font-bold">
           Más detalles (opcional)
         </summary>
@@ -551,7 +551,7 @@ function ServiceForm({
           <label className="text-sm font-semibold">
             Agenda
             <select
-              className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
+              className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
               name="scheduleType"
               defaultValue={service?.schedule_type ?? "UNSCHEDULED"}
             >
@@ -599,7 +599,7 @@ function ProfessionalRecordList({
     <div className="grid gap-3 md:grid-cols-2">
       {records.map((record) => (
         <article
-          className="border-ink/10 rounded-xl border bg-white/60 p-4"
+          className="border-ink/10 rounded-xl border bg-white/60 p-4 dark:border-white/10 dark:bg-[#2a231c]"
           key={record.id}
         >
           {render(record)}
@@ -696,7 +696,7 @@ export function MarketplaceManagement({
           <a
             key={id}
             href={`#${id}`}
-            className="consumer-pressable border-ink/[0.08] inline-flex min-h-10 shrink-0 items-center rounded-full border bg-white px-4 text-[13px] font-bold"
+            className="consumer-pressable border-ink/[0.08] inline-flex min-h-10 shrink-0 items-center rounded-full border bg-white px-4 text-[13px] font-bold dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
           >
             {label}
           </a>
@@ -764,7 +764,7 @@ export function MarketplaceManagement({
             <label className="text-sm font-semibold">
               Habilidad
               <select
-                className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm"
+                className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="skillId"
                 defaultValue={catalogSkills[0]?.id}
                 required
@@ -783,7 +783,7 @@ export function MarketplaceManagement({
             {providerSkills.length ? (
               providerSkills.map((item) => (
                 <div
-                  className="border-ink/10 flex items-center justify-between gap-3 rounded-xl border bg-white/60 px-4 py-3"
+                  className="border-ink/10 flex items-center justify-between gap-3 rounded-xl border bg-white/60 px-4 py-3 dark:border-white/10 dark:bg-[#2a231c]"
                   key={item.skill_id}
                 >
                   <div>
@@ -819,7 +819,7 @@ export function MarketplaceManagement({
         <div className="space-y-5">
           <details
             open={services.length === 0}
-            className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3"
+            className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3 dark:border-white/10 dark:bg-[#2a231c]"
           >
             <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
               + Nuevo servicio
@@ -837,7 +837,7 @@ export function MarketplaceManagement({
           </details>
           {services.map((service) => (
             <div
-              className="border-ink/10 rounded-xl border bg-white/45 p-4"
+              className="border-ink/10 rounded-xl border bg-white/45 p-4 dark:border-white/10 dark:bg-[#2a231c]"
               key={service.id}
             >
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -1067,7 +1067,7 @@ export function MarketplaceManagement({
                 <label className="text-sm font-semibold">
                   Evidencia privada
                   <input
-                    className="border-ink/20 mt-2 block w-full rounded-xl border border-dashed bg-white/70 px-3 py-3 text-sm"
+                    className="border-ink/20 mt-2 block w-full rounded-xl border border-dashed bg-white/70 px-3 py-3 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                     name="evidence"
                     type="file"
                     accept="image/jpeg,image/png,application/pdf"
@@ -1126,7 +1126,7 @@ export function MarketplaceManagement({
                 <label className="text-sm font-semibold">
                   Imagen pública opcional
                   <input
-                    className="border-ink/20 mt-2 block w-full rounded-xl border border-dashed bg-white/70 px-3 py-3 text-sm"
+                    className="border-ink/20 mt-2 block w-full rounded-xl border border-dashed bg-white/70 px-3 py-3 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                     name="media"
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
@@ -1207,7 +1207,7 @@ export function MarketplaceManagement({
           <div className="space-y-3">
             {availabilityRules.map((item) => (
               <article
-                className="border-ink/10 rounded-xl border bg-white/60 p-4"
+                className="border-ink/10 rounded-xl border bg-white/60 p-4 dark:border-white/10 dark:bg-[#2a231c]"
                 key={item.id}
               >
                 <p className="font-semibold">
@@ -1262,7 +1262,7 @@ export function MarketplaceManagement({
             <p className="font-semibold">Bloqueos</p>
             {availabilityBlocks.map((item) => (
               <article
-                className="border-ink/10 mt-3 rounded-xl border bg-white/60 p-4"
+                className="border-ink/10 mt-3 rounded-xl border bg-white/60 p-4 dark:border-white/10 dark:bg-[#2a231c]"
                 key={item.id}
               >
                 <p className="text-sm">
