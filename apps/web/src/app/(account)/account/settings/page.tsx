@@ -6,6 +6,7 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { ActionButton } from "@/components/ui/marketplace/action-button";
 import { ThemeSelector } from "@/components/ui/marketplace/theme-selector";
 import { SettingsRow } from "@/components/ui/marketplace/settings-row";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { createClient } from "@/lib/supabase/server";
 
 import { signOut } from "../../../(auth)/actions";
@@ -49,21 +50,25 @@ export default async function AccountSettingsPage() {
             href="/account/settings/notifications"
             title="Notificaciones"
             description="Alertas, recordatorios y preferencias"
+            leading={<IllustratedBadge tone="gold" icon="bell" size="sm" />}
           />
           <SettingsRow
             href="/account/profile"
             title="Perfil público"
             description="Nombre, zona, foto y presentación"
+            leading={<IllustratedBadge tone="violet" icon="user" size="sm" />}
           />
           <SettingsRow
             href="/account/identity"
             title="Identidad privada"
             description="Datos legales que no se publican"
+            leading={<IllustratedBadge tone="green" icon="shield" size="sm" />}
           />
           <SettingsRow
             href="/update-password"
             title="Cambiar contraseña"
             description="Elegí una nueva clave de acceso"
+            leading={<IllustratedBadge tone="blue" icon="tag" size="sm" />}
           />
         </section>
 

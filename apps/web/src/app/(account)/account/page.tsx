@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { StartProviderForm } from "@/components/account/account-form";
 import { Avatar } from "@/components/ui/marketplace/avatar";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SettingsRow } from "@/components/ui/marketplace/settings-row";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { createClient } from "@/lib/supabase/server";
@@ -168,21 +169,25 @@ export default async function AccountPage() {
             href="/account/profile"
             title="Perfil público"
             description="Foto, nombre, zona y presentación"
+            leading={<IllustratedBadge tone="violet" icon="user" size="sm" />}
           />
           <SettingsRow
             href="/account/identity"
             title="Identidad y seguridad"
             description="Datos legales que no se publican"
+            leading={<IllustratedBadge tone="green" icon="shield" size="sm" />}
           />
           <SettingsRow
             href="/account/favorites"
             title="Guardados"
             description="Servicios y profesionales que marcaste"
+            leading={<IllustratedBadge tone="rose" icon="heart" size="sm" />}
           />
           <SettingsRow
             href="/account/notifications"
             title="Notificaciones"
             description="Actividad y preferencias de avisos"
+            leading={<IllustratedBadge tone="gold" icon="bell" size="sm" />}
           />
         </AccountGroup>
 
@@ -204,12 +209,18 @@ export default async function AccountPage() {
                   ? "Servicios, habilidades y disponibilidad"
                   : "Completá los pasos para publicar"
               }
+              leading={
+                <IllustratedBadge tone="orange" icon="briefcase" size="sm" />
+              }
             />
             {provider.status === "ACTIVE" ? (
               <SettingsRow
                 href="/provider/manage"
                 title="Disponibilidad"
                 description="Zonas, horarios y pausas"
+                leading={
+                  <IllustratedBadge tone="blue" icon="clock" size="sm" />
+                }
               />
             ) : null}
           </AccountGroup>
@@ -220,6 +231,7 @@ export default async function AccountPage() {
             href="/account/settings"
             title="Configuración"
             description="Cuenta, privacidad y sesión"
+            leading={<IllustratedBadge tone="neutral" icon="gear" size="sm" />}
           />
         </AccountGroup>
       </div>

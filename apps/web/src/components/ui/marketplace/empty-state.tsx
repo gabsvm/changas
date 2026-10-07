@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { ActionLink, type ActionTone } from "./action-button";
-
+import { IllustratedBadge } from "./illustrated-badge";
 export function EmptyState({
   icon,
   title,
@@ -20,31 +20,12 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div
+     <div
       className={`empty-state-card mx-auto max-w-md px-5 py-12 text-center ${className}`}
     >
-      <div className="bg-brand-yellow/20 text-terracotta mx-auto grid h-12 w-12 place-items-center rounded-2xl text-xl">
+      <div className="flex justify-center">
         {icon ?? (
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            className="h-6 w-6"
-            fill="none"
-          >
-            <circle
-              cx="11"
-              cy="11"
-              r="6.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <path
-              d="m16 16 4 4"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
+          <IllustratedBadge tone="orange" icon="sparkle" size="lg" />
         )}
       </div>
       <h2 className="mt-4 text-lg font-extrabold tracking-[-0.02em]">
