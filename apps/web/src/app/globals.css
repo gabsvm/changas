@@ -88,16 +88,39 @@ html {
 body {
   margin: 0;
   background: #fbf8f3;
-  background-image: radial-gradient(
-    90rem 28rem at 50% -14rem,
-    rgb(255 200 87 / 22%),
-    transparent 70%
-  );
+  background-image:
+    radial-gradient(
+      90rem 28rem at 50% -14rem,
+      rgb(255 200 87 / 24%),
+      transparent 70%
+    ),
+    radial-gradient(
+      60rem 30rem at 100% 40%,
+      rgb(255 107 53 / 7%),
+      transparent 65%
+    ),
+    radial-gradient(
+      55rem 26rem at 0% 75%,
+      rgb(255 10 120 / 5%),
+      transparent 65%
+    );
   background-repeat: no-repeat;
   color: #17140f;
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Film grain: unifies flat surfaces with a premium paper feel. Opacity stays
+   low so text contrast is unaffected. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
 }
 
 @layer base {
@@ -388,7 +411,10 @@ textarea {
 }
 
 .service-card-shell {
-  box-shadow: var(--consumer-shadow-card);
+  border: 1px solid rgb(23 20 15 / 8%);
+  box-shadow:
+    0 1px 2px rgb(23 20 15 / 5%),
+    0 12px 28px -12px rgb(23 20 15 / 14%);
 }
 
 .service-card-footer {
@@ -818,7 +844,23 @@ a[aria-current="page"] .nav-icon {
 
 .dark body {
   background: #171310;
+  background-image:
+    radial-gradient(
+      90rem 28rem at 50% -14rem,
+      rgb(255 107 53 / 12%),
+      transparent 70%
+    ),
+    radial-gradient(
+      55rem 26rem at 100% 60%,
+      rgb(255 10 120 / 7%),
+      transparent 65%
+    );
+  background-repeat: no-repeat;
   color: #f5efe8;
+}
+
+.dark body::after {
+  opacity: 0.07;
 }
 
 .dark ::focus-visible {
@@ -904,6 +946,7 @@ a[aria-current="page"] .nav-icon {
 }
 
 .dark .service-card-shell {
+  border: 1px solid rgb(245 239 232 / 10%);
   box-shadow: 0 10px 26px rgb(0 0 0 / 40%);
 }
 

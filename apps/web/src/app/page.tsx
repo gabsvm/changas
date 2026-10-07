@@ -211,7 +211,6 @@ export default async function HomePage() {
                 rows={discovery.rows.slice(0, 6)}
                 title="Profesionales destacados"
                 actionHref="/buscar"
-                layout="stack"
               />
             ) : (
               <ExampleServices

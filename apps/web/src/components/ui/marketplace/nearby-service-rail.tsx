@@ -4,18 +4,15 @@ import Link from "next/link";
 import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
 
 import { ServiceCard } from "./service-card";
-import { ServiceRow } from "./service-row";
 
 export function NearbyServiceRail({
   rows,
   title,
   actionHref,
-  layout = "rail",
 }: {
   rows: ReputationDiscoveryServiceRow[];
   title: string;
   actionHref: string;
-  layout?: "rail" | "stack";
 }) {
   if (rows.length === 0) return null;
 
@@ -49,26 +46,14 @@ export function NearbyServiceRail({
           </svg>
         </Link>
       </div>
-      <ul
-        className={
-          layout === "stack"
-            ? "mt-1 grid grid-cols-1 sm:grid-cols-2 sm:gap-x-8"
-            : "consumer-scrollbar-none consumer-snap-rail -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0"
-        }
-      >
+      <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {rows.map((row, index) => (
           <li
             key={`${row.provider_slug}/${row.service_slug}`}
             style={riseStyle(index)}
-            className={`rise-in ${
-              layout === "stack" ? "" : "w-[min(84vw,22rem)] shrink-0"
-            }`}
+            className="rise-in"
           >
-            {layout === "stack" ? (
-              <ServiceRow row={row} />
-            ) : (
-              <ServiceCard row={row} />
-            )}
+            <ServiceCard row={row} />
           </li>
         ))}
       </ul>

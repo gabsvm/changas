@@ -138,10 +138,11 @@ describe("marketplace polish contracts", () => {
     expect(rootSource).toContain("Oficios populares");
     expect(rootSource).toContain("Profesionales destacados");
     expect(rootSource).toContain("Ofrecer mis servicios");
-    expect(rootSource).toContain('layout="stack"');
+    expect(rootSource).toContain("NearbyServiceRail");
     expect(rootSource).toContain("Elegí con confianza");
     expect(rootSource).toContain('id="home-query"');
-    expect(nearbySource).toContain('layout?: "rail" | "stack"');
+    expect(nearbySource).toContain("ServiceCard");
+    expect(nearbySource).not.toContain('from "./service-row"');
   });
 
   it("uses premium action surfaces in authenticated empty states", () => {
