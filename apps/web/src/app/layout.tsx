@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Hanken_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import Script from "next/script";
 
 import { getPublicSiteUrl } from "@changas/config/public";
@@ -8,16 +8,16 @@ import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register"
 
 import "./globals.css";
 
-const displayFont = Bricolage_Grotesque({
+const displayFont = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-bricolage",
+  variable: "--font-space-grotesk",
 });
 
-const bodyFont = Hanken_Grotesk({
+const bodyFont = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-hanken",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {

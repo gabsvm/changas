@@ -23,13 +23,13 @@ const badgeSources = [
   .join("\n");
 
 describe("Changas brand theme", () => {
-  it("uses Bricolage Grotesque + Hanken Grotesk as product typefaces", () => {
+  it("uses Space Grotesk + Inter as product typefaces", () => {
     expect(layout).toContain('from "next/font/google"');
-    expect(layout).toContain("Bricolage_Grotesque");
-    expect(layout).toContain("Hanken_Grotesk");
-    expect(globals).toMatch(/--font-display:\s*var\(--font-bricolage\)/);
-    expect(globals).toMatch(/--font-sans:\s*var\(--font-hanken\)/);
-    expect(globals).not.toContain('"Inter"');
+    expect(layout).toContain("Space_Grotesk");
+    expect(layout).toContain("Inter");
+    expect(globals).toMatch(/--font-display:\s*var\(--font-space-grotesk\)/);
+    expect(globals).toMatch(/--font-sans:\s*var\(--font-inter\)/);
+    expect(globals).not.toContain("Bricolage");
   });
 
   it("uses the approved Changas palette as the global visual foundation", () => {

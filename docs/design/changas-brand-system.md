@@ -66,7 +66,7 @@ Avoid using it as a permanent background for forms, long reading surfaces, every
 
 ## Typography
 
-The visual language uses a friendly sans display treatment rather than the previous editorial serif direction. Strong headings should feel rounded and direct; body copy remains neutral and highly legible. Display: Bricolage Grotesque (`--font-display`); body: Hanken Grotesk (`--font-sans`).
+The visual language uses a friendly sans display treatment rather than the previous editorial serif direction. Strong headings should feel rounded and direct; body copy remains neutral and highly legible. Display: Space Grotesk (`--font-display`); body: Inter (`--font-sans`), matching the Shomer reference.
 
 ## Interaction hierarchy
 

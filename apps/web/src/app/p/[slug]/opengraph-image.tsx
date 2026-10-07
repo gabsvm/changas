@@ -11,18 +11,18 @@ export const contentType = "image/png";
 
 async function loadBrandFonts() {
   const [mediumData, boldData] = await Promise.all([
-    readFile(join(process.cwd(), "public/fonts/hanken-grotesk-500.ttf")),
-    readFile(join(process.cwd(), "public/fonts/bricolage-grotesque-700.ttf")),
+    readFile(join(process.cwd(), "public/fonts/inter-500.ttf")),
+    readFile(join(process.cwd(), "public/fonts/space-grotesk-700.ttf")),
   ]);
   return [
     {
-      name: "Hanken Grotesk",
+      name: "Inter",
       data: mediumData,
       weight: 500 as const,
       style: "normal" as const,
     },
     {
-      name: "Bricolage Grotesque",
+      name: "Space Grotesk",
       data: boldData,
       weight: 700 as const,
       style: "normal" as const,
@@ -69,7 +69,7 @@ export default async function Image({
           display: "flex",
           flexDirection: "column",
           backgroundColor: "#FFF9F3",
-          fontFamily: '"Bricolage Grotesque", "Hanken Grotesk", sans-serif',
+          fontFamily: '"Space Grotesk", "Inter", sans-serif',
           overflow: "hidden",
         }}
       >
