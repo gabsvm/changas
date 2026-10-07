@@ -29,7 +29,7 @@ export async function ProviderReputation({
 
   return (
     <section className="mt-6 space-y-6" aria-labelledby="reputation-title">
-      <div className="border-ink/10 rounded-3xl border bg-white/70 p-5 sm:p-6">
+      <div className="border-ink/10 rounded-3xl border bg-white/70 p-5 sm:p-6 dark:bg-white/[0.05]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
@@ -111,7 +111,7 @@ export async function ProviderReputation({
         ) : null}
       </div>
 
-      <div className="border-ink/10 rounded-3xl border bg-white/55 p-5 sm:p-6">
+      <div className="border-ink/10 rounded-3xl border bg-white/55 p-5 sm:p-6 dark:bg-white/[0.05]">
         <h2 className="font-display text-2xl font-semibold">
           Reseñas verificadas
         </h2>
@@ -120,7 +120,7 @@ export async function ProviderReputation({
             {reviews.map((review) => (
               <article
                 key={review.review_id}
-                className="border-ink/10 rounded-2xl border bg-white/75 p-4"
+                className="border-ink/10 rounded-2xl border bg-white/75 p-4 dark:bg-white/[0.05]"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
@@ -134,9 +134,19 @@ export async function ProviderReputation({
                       {stars(review.rating)}
                     </p>
                   </div>
-                  <p className="text-ink/70 text-xs">
-                    {review.service_title} · {review.skill_name}
-                  </p>
+                  <div className="text-right">
+                    <p className="text-ink/70 text-xs">
+                      {review.service_title} · {review.skill_name}
+                    </p>
+                    <time
+                      className="text-ink/70 mt-0.5 block text-xs"
+                      dateTime={review.created_at}
+                    >
+                      {new Intl.DateTimeFormat("es-AR", {
+                        dateStyle: "medium",
+                      }).format(new Date(review.created_at))}
+                    </time>
+                  </div>
                 </div>
                 {review.review_text ? (
                   <p className="text-ink/70 mt-3 text-sm leading-6 whitespace-pre-wrap">

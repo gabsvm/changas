@@ -7,4 +7,5 @@ export type ReputationDiscoveryServiceRow = DiscoveryServiceRow & {
   completed_jobs: number;
   completion_rate: number | null;
   repeat_client_count: number;
+  cover_image_url: string | null;
 };

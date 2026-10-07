@@ -52,7 +52,7 @@ export async function JobReputationPanel({
 
   return (
     <section
-      className="border-ink/10 rounded-3xl border bg-white/75 p-5 sm:p-6"
+      className="border-ink/10 rounded-3xl border bg-white/75 p-5 sm:p-6 dark:bg-white/[0.05]"
       aria-labelledby="job-reputation-title"
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -131,7 +131,7 @@ export async function JobReputationPanel({
                 {stars(state.rating)}
               </p>
               <p className="text-ink/70 mt-1 text-xs">
-                Reseña verificada de este Job
+                Reseña verificada de este trabajo
               </p>
             </div>
             {state.review_created_at ? (
@@ -149,7 +149,7 @@ export async function JobReputationPanel({
           ) : null}
 
           {state.provider_reply ? (
-            <div className="border-ink/10 mt-4 rounded-xl border bg-white/70 p-3 text-sm">
+            <div className="border-ink/10 mt-4 rounded-xl border bg-white/70 p-3 text-sm dark:bg-white/[0.05]">
               <p className="text-ink/70 text-xs font-bold tracking-wide uppercase">
                 Respuesta del proveedor
               </p>

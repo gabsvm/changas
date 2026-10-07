@@ -122,6 +122,41 @@ export function ProposalCard({
         </div>
       </dl>
 
+      {proposal.price_amount !== null ? (
+        <div
+          className="border-ink/[0.08] mt-3 rounded-xl border bg-white/70 px-3.5 py-3 text-sm dark:bg-white/[0.05]"
+          aria-label="Desglose del precio"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-ink/70 text-[13px] font-semibold">
+              Subtotal del servicio
+            </span>
+            <span className="font-bold">
+              {formatMinorUnits(proposal.price_amount, proposal.currency_code)}
+            </span>
+          </div>
+          <div className="mt-1.5 flex items-center justify-between gap-3">
+            <span className="text-ink/70 text-[13px] font-semibold">
+              Comisión de Changas
+            </span>
+            <span className="text-moss text-[13px] font-bold">
+              Incluida en el total
+            </span>
+          </div>
+          <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
+            <span className="text-[13px] font-extrabold">Total a pagar</span>
+            <span className="text-[15px] font-extrabold">
+              {formatMinorUnits(proposal.price_amount, proposal.currency_code)}
+            </span>
+          </div>
+          <p className="text-ink/70 mt-2 text-xs leading-5">
+            El pago queda retenido hasta que confirmás la entrega. La comisión
+            se descuenta antes de liberarle el pago al proveedor.
+          </p>
+        </div>
+      ) : null}
+
+
       {proposal.expires_at ? (
         <p className="text-ink/70 mt-3 text-xs">
           Vigente hasta {expiresFormatter.format(new Date(proposal.expires_at))}
@@ -164,7 +199,7 @@ export function ProposalCard({
                 value={proposal.proposal_id}
               />
               <input type="hidden" name="action" value="REJECT" />
-              <button className="consumer-pressable border-ink/[0.1] inline-flex min-h-12 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold">
+              <button className="consumer-pressable border-ink/[0.1] inline-flex min-h-12 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold dark:bg-white/[0.06]">
                 Rechazar
               </button>
               <button
@@ -192,7 +227,7 @@ export function ProposalCard({
                 value={proposal.proposal_id}
               />
               <input type="hidden" name="action" value="WITHDRAW" />
-              <button className="consumer-pressable border-ink/[0.1] inline-flex min-h-12 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold">
+              <button className="consumer-pressable border-ink/[0.1] inline-flex min-h-12 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold dark:bg-white/[0.06]">
                 Retirar propuesta
               </button>
             </form>
@@ -283,7 +318,7 @@ export function ProposalCard({
                   value={proposal.proposal_id}
                 />
                 <input type="hidden" name="outcome" value={outcome} />
-                <button className="consumer-pressable border-moss/20 inline-flex min-h-11 items-center rounded-full border bg-white px-4 text-[13px] font-bold">
+                <button className="consumer-pressable border-moss/20 inline-flex min-h-11 items-center rounded-full border bg-white px-4 text-[13px] font-bold dark:bg-white/[0.06]">
                   {outcome === "SUCCESS"
                     ? "Simular aprobado"
                     : outcome === "PENDING"

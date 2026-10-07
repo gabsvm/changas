@@ -1,7 +1,7 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
-
 import { reportClientError, type ClientError } from "@/lib/observability";
 
 export default function GlobalError({
@@ -27,17 +27,28 @@ export default function GlobalError({
               La aplicación necesita volver a intentarlo.
             </h1>
             {error.digest ? (
-              <p className="mt-3 text-xs text-[#163832]/60">
+              <p
+                className="mt-3 text-xs text-[#163832]/75"
+                data-testid="error-reference"
+              >
                 Referencia: {error.digest}
               </p>
             ) : null}
-            <button
-              className="mt-7 rounded-full bg-[#163832] px-5 py-3 text-sm font-bold text-white"
-              onClick={() => reset()}
-              type="button"
-            >
-              Intentar de nuevo
-            </button>
+            <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <button
+                className="mt-0 rounded-full bg-[#163832] px-5 py-3 text-sm font-bold text-white"
+                onClick={() => reset()}
+                type="button"
+              >
+                Intentar de nuevo
+              </button>
+              <Link
+                className="rounded-full border border-[#163832]/25 px-5 py-3 text-sm font-bold text-[#163832]"
+                href="/"
+              >
+                Volver al inicio
+              </Link>
+            </div>
           </div>
         </main>
       </body>

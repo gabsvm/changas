@@ -86,3 +86,14 @@ The bottom navigation stays visually quiet. The active destination uses a warm o
 ## Accessibility
 
 Exact logo colors are not automatically valid foreground colors. Small text uses accessible derivatives where needed. Keyboard focus is blue and visually explicit. Primary buttons use dark ink over orange rather than white because the exact brand orange does not provide sufficient normal-text contrast with white. Unread counters use `#D60060` with white text instead of the brighter logo pink.
+
+## Dark mode (sistema, sin toggle)
+
+El modo oscuro es automático vía `prefers-color-scheme`. No hay toggle manual: `:root` declara `color-scheme: light dark` y `apps/web/src/app/globals.css` remapea los tokens en `@media (prefers-color-scheme: dark)`.
+
+- Canvas: `#171310` (cálido oscuro); superficies elevadas `#221C17` / `#2A231C`; tinta `#F5EFE8`.
+- Los utilities de Tailwind v4 (`bg-surface`, `text-ink`, `border-ink/…`) resuelven vía `var()`, así que el remapeo de `--color-*` voltea cards, nav, header, sheets, inputs, skeletons y empty states sin variantes por archivo.
+- Excepciones con `dark:` puntual: blancos literales (`bg-white` → `dark:bg-white/[0.06]` aprox.), tiles inversos `bg-ink/text-white` (→ `dark:bg-[#2a231c] dark:text-[#f5efe8]` para no invertir el diseño) y paneles translúcidos.
+- Naranja primario `#FF6B35` se mantiene; sobre fondo oscuro el texto de botones primarios vuelve a tinta oscura (`#1D1512`) porque crema sobre naranja no contrasta. Terracotta de kickers y azul moss de foco/links se aclaran (`#FFA07A`, `#7EA2FF`) para seguir legibles.
+- Viewport: `colorScheme: "light dark"` y `themeColor` adaptativo (`#ff6b35` light, `#171310` dark).
+- Admin conserva su propio lenguaje visual oscuro y queda fuera de este sistema.

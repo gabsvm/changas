@@ -7,6 +7,7 @@ import { minorUnitsToMajorInput, type DiscoveryFilters } from "@changas/domain";
 import { ActionButton } from "@/components/ui/marketplace/action-button";
 import { BottomSheet } from "@/components/ui/marketplace/bottom-sheet";
 import { marketplaceInputClass } from "@/components/ui/marketplace/form-field";
+import { browserLocationStorageKey } from "./location-picker";
 
 export function SearchFiltersSheet({
   query,
@@ -205,6 +206,13 @@ export function SearchFiltersSheet({
               href={
                 query ? `/buscar?q=${encodeURIComponent(query)}` : "/buscar"
               }
+              onClick={() => {
+                try {
+                  window.sessionStorage.removeItem(browserLocationStorageKey);
+                } catch {
+                  // El GPS guardado es opcional; si no se puede limpiar, igual navega.
+                }
+              }}
               className="consumer-pressable border-ink/10 inline-flex min-h-[52px] flex-1 items-center justify-center rounded-xl border bg-white px-4 text-[15px] font-bold"
             >
               Limpiar

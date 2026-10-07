@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -45,6 +46,7 @@ function isIosDevice(): boolean {
 }
 
 export function InstallPrompt() {
+  const pathname = usePathname();
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showIosGuide, setShowIosGuide] = useState(false);
@@ -100,7 +102,8 @@ export function InstallPrompt() {
     };
   }, []);
 
-  if (dismissed || (!deferredPrompt && !showIosGuide)) return null;
+  if (dismissed || pathname === "/offline" || (!deferredPrompt && !showIosGuide))
+    return null;
 
   return (
     <aside
@@ -136,8 +139,9 @@ export function InstallPrompt() {
         {deferredPrompt ? (
           <>
             <p className="text-ink/70 mt-3 text-sm leading-6">
-              Instalá Changas desde el navegador para abrirla más rápido y
-              usarla en modo standalone.
+              Instalá Changas y abrila en un toque desde tu pantalla de
+              inicio: volvés a tus conversaciones y avisos más rápido, sin
+              buscar la pestaña del navegador.
             </p>
             <button
               className="button-primary mt-4 w-full whitespace-nowrap"

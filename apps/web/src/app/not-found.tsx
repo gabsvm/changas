@@ -10,12 +10,17 @@ export default function NotFound() {
         <h1 className="font-display mt-4 text-4xl font-semibold">
           No encontramos esa página.
         </h1>
-        <p className="text-ink/70 mt-4">
+        <p className="text-ink/75 mt-4">
           La dirección puede haber cambiado o todavía no existir.
         </p>
-        <Link className="button-primary mt-7" href="/">
-          Volver al inicio
-        </Link>
+        <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link className="button-primary w-full sm:w-auto" href="/">
+            Volver al inicio
+          </Link>
+          <Link className="button-secondary w-full sm:w-auto" href="/buscar">
+            Ir a buscar
+          </Link>
+        </div>
       </div>
     </main>
   );

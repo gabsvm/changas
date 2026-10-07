@@ -141,7 +141,7 @@ export default async function SearchPage({
           action={
             <Link
               href={user ? "/account" : "/login"}
-              className="consumer-pressable text-ink/70 hover:bg-ink/[0.04] inline-flex min-h-12 items-center rounded-full px-3 text-sm font-bold"
+              className="consumer-pressable text-ink/75 hover:bg-ink/[0.04] inline-flex min-h-12 items-center rounded-full px-3 text-sm font-bold"
             >
               {user ? "Cuenta" : "Ingresar"}
             </Link>
@@ -314,7 +314,7 @@ export default async function SearchPage({
                 </Link>
               ) : null}
               {activeFilterCount === 0 ? (
-                <p className="text-ink/70 py-1 text-[13px] leading-5">
+                <p className="text-ink/75 py-1 text-[13px] leading-5">
                   Usá los filtros para afinar por zona, modalidad o precio.
                 </p>
               ) : null}

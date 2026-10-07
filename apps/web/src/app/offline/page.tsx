@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 export default function OfflinePage() {
@@ -13,14 +15,23 @@ export default function OfflinePage() {
         <h1 className="font-display mt-3 text-4xl leading-none font-semibold tracking-[-0.04em] sm:text-5xl">
           Changas necesita internet para mostrar datos actualizados.
         </h1>
-        <p className="text-ink/70 mt-5 text-sm leading-6">
+        <p className="text-ink/75 mt-5 text-sm leading-6">
           No mostramos trabajos, pagos, mensajes ni datos privados desde una
           copia vieja. Cuando vuelva la conexión, recargá para continuar con
           información vigente.
         </p>
-        <Link className="button-primary mt-8" href="/">
-          Volver al inicio
-        </Link>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <button
+            className="button-primary w-full sm:w-auto"
+            onClick={() => window.location.reload()}
+            type="button"
+          >
+            Reintentar conexión
+          </button>
+          <Link className="button-secondary w-full sm:w-auto" href="/">
+            Volver al inicio
+          </Link>
+        </div>
       </section>
     </main>
   );

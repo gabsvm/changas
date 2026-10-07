@@ -9,7 +9,6 @@ import {
   parseDiscoveryFilters,
 } from "@changas/domain";
 
-import { DiscoveryPagination } from "@/components/discovery/discovery-pagination";
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { SearchField } from "@/components/ui/marketplace/search-field";
@@ -102,9 +101,6 @@ export default async function CategoryPage({
       : `/categoria/${categorySlug}`;
   }
 
-  function pageHref(page: number): string {
-    return categoryHref({ page: String(page) });
-  }
   const { rows, hasMore } = searchResult;
 
   return (
@@ -135,7 +131,7 @@ export default async function CategoryPage({
               {category.name}
             </h1>
             {category.description ? (
-              <p className="text-ink/70 mt-2 max-w-2xl text-sm leading-6 sm:text-base">
+              <p className="text-ink/75 mt-2 max-w-2xl text-sm leading-6 sm:text-base">
                 {category.description}
               </p>
             ) : null}
@@ -225,7 +221,7 @@ export default async function CategoryPage({
               </Link>
             </div>
           </div>
-          <p className="text-ink/42 mt-5 text-xs font-extrabold tracking-[0.12em] uppercase">
+          <p className="text-ink/75 mt-5 text-xs font-extrabold tracking-[0.12em] uppercase">
             Servicios publicados
           </p>
           <div className="discovery-results-shell mt-5">
@@ -237,14 +233,6 @@ export default async function CategoryPage({
               query={query}
               filters={filters}
             />
-            {!searchResult.error ? (
-              <DiscoveryPagination
-                previousHref={
-                  filters.page > 1 ? pageHref(filters.page - 1) : null
-                }
-                nextHref={hasMore ? pageHref(filters.page + 1) : null}
-              />
-            ) : null}
           </div>
         </section>
       </div>

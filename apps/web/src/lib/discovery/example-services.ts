@@ -14,6 +14,7 @@ const base = {
   adjusted_rating: null,
   completion_rate: null,
   repeat_client_count: 0,
+  cover_image_url: null,
 } as const;
 
 export const EXAMPLE_SERVICES: ReputationDiscoveryServiceRow[] = [

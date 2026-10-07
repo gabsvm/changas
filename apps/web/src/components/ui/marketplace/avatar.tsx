@@ -10,6 +10,21 @@ const sizeClasses: Record<AvatarSize, string> = {
   lg: "h-16 w-16 text-base",
 };
 
+const warmTones = [
+  "bg-brand-orange/15 text-terracotta",
+  "bg-brand-yellow/30 text-warning",
+  "bg-terracotta/10 text-terracotta",
+  "bg-moss/10 text-moss",
+] as const;
+
+function toneFor(name: string): (typeof warmTones)[number] {
+  let hash = 0;
+  for (let index = 0; index < name.length; index += 1) {
+    hash = (hash * 31 + name.charCodeAt(index)) >>> 0;
+  }
+  return warmTones[hash % warmTones.length] ?? warmTones[0];
+}
+
 function initials(name: string): string {
   const value = name.trim();
   if (!value) return "C";
@@ -33,7 +48,7 @@ export function Avatar({
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
-  const classes = `${sizeClasses[size]} bg-brand-orange/10 text-terracotta grid shrink-0 place-items-center overflow-hidden rounded-full font-bold ${className}`;
+  const classes = `${sizeClasses[size]} ${toneFor(name)} grid shrink-0 place-items-center overflow-hidden rounded-full font-bold ${className}`;
 
   if (src && !failed) {
     return (

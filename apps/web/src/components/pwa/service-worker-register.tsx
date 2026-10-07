@@ -65,6 +65,7 @@ export function ServiceWorkerRegister() {
     <aside
       className="bg-ink fixed right-4 bottom-4 left-4 z-50 mx-auto flex max-w-xl items-center justify-between gap-4 rounded-2xl px-5 py-4 text-sm text-white shadow-xl"
       role="status"
+      aria-live="polite"
     >
       <span>Hay una versión nueva de Changas lista para usar.</span>
       <button
@@ -75,7 +76,7 @@ export function ServiceWorkerRegister() {
           waitingWorker.postMessage({ type: "SKIP_WAITING" });
         }}
       >
-        Actualizar
+        Recargar
       </button>
     </aside>
   );

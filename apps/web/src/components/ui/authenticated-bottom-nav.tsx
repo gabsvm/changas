@@ -13,25 +13,13 @@ type NavItem = {
   label: string;
   href: string;
   icon: "home" | "search" | "messages" | "activity" | "account";
-  central?: boolean;
 };
 
 const items: NavItem[] = [
   { key: "home", label: "Inicio", href: "/", icon: "home" },
-  {
-    key: "search",
-    label: "Buscar",
-    href: "/buscar",
-    icon: "search",
-    central: true,
-  },
+  { key: "search", label: "Buscar", href: "/buscar", icon: "search" },
+  { key: "jobs", label: "Trabajos", href: "/jobs", icon: "activity" },
   { key: "messages", label: "Mensajes", href: "/messages", icon: "messages" },
-  {
-    key: "activity",
-    label: "Actividad",
-    href: "/account/notifications",
-    icon: "activity",
-  },
   { key: "account", label: "Cuenta", href: "/account", icon: "account" },
 ];
 
@@ -178,7 +166,7 @@ export function AuthenticatedBottomNav({
         {items.map((item) => {
           const active = item.key === activeKey;
           const badge =
-            item.key === "activity"
+            item.key === "account"
               ? unreadCount
               : item.key === "messages"
                 ? unreadMessages
@@ -192,15 +180,7 @@ export function AuthenticatedBottomNav({
                 active ? "text-ink" : "text-ink/70 hover:text-ink/80"
               }`}
             >
-              <span
-                className={`nav-icon relative grid place-items-center rounded-full transition-colors ${
-                  item.central && active
-                    ? "bg-ink h-12 w-12 text-white shadow-lg"
-                    : item.central
-                      ? "border-ink/20 text-ink h-12 w-12 border"
-                      : "h-6 w-6"
-                }`}
-              >
+              <span className="nav-icon relative grid h-6 w-6 place-items-center">
                 <NavIcon name={item.icon} active={active} />
                 {badge > 0 ? (
                   <span

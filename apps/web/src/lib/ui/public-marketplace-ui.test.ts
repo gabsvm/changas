@@ -63,7 +63,9 @@ describe("public marketplace detail UI", () => {
     expect(categoryPage).toContain("categoryHref");
     expect(categoryPage).toContain("rounded-3xl");
     expect(categoryPage).not.toContain("rounded-[1.75rem]");
-    expect(categoryPage).toContain("pageHref");
+    expect(categoryPage).toContain("DiscoveryResults");
+    expect(categoryPage).not.toContain("pageHref");
+    expect(categoryPage).not.toContain("DiscoveryPagination");
   });
 
   it("offers contact next to save on wide provider profiles", () => {

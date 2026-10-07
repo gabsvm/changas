@@ -248,7 +248,7 @@ export default async function JobPage({
 
         {nextTransition ? (
           <section
-            className="bg-ink mt-5 rounded-2xl p-5 text-white"
+            className="bg-ink mt-5 rounded-2xl p-5 text-white dark:bg-[#2a231c] dark:text-[#f5efe8]"
             aria-label="Próxima acción"
           >
             <p className="text-[11px] font-bold tracking-[0.08em] text-white/60 uppercase">
@@ -294,37 +294,57 @@ export default async function JobPage({
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_.8fr]">
           <div className="space-y-8">
-            <JobSection title="Acciones del trabajo">
+            <JobSection
+              title="Acciones del trabajo"
+              description="Si algo sale mal, reportalo: revisamos el caso con ambas partes."
+            >
               {["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
                 detail.job_status,
               ) ? (
-                <details className="border-ink/10 mt-3 border-t pt-3">
-                  <summary className="consumer-pressable min-h-11 cursor-pointer py-3 text-sm font-semibold">
-                    Cancelar o informar un problema
-                  </summary>
-                  <div className="grid gap-3 pb-2 sm:grid-cols-2">
-                    <ReasonTransitionForm
-                      jobId={jobId}
-                      expected={detail.job_status}
-                      requested="CANCELLED"
-                      label="Cancelar trabajo"
-                    />
-                    <ReasonTransitionForm
-                      jobId={jobId}
-                      expected={detail.job_status}
-                      requested="DISPUTED"
-                      label="Reportar problema"
-                    />
-                    {detail.job_status === "CONFIRMED" ? (
+                <>
+                  <div className="border-danger/25 bg-danger/[0.04] rounded-2xl border p-4">
+                    <h3 className="text-sm font-extrabold">
+                      ¿Algo salió mal con este trabajo?
+                    </h3>
+                    <ol className="text-ink/70 mt-2 list-decimal space-y-1 pl-5 text-[13px] leading-6">
+                      <li>Contanos qué pasó en el motivo de abajo.</li>
+                      <li>Revisamos el caso con ambas partes.</li>
+                      <li>
+                        Resolvemos: reprogramar, completar o cancelar con pago
+                        retenido.
+                      </li>
+                    </ol>
+                    <div className="mt-3">
                       <ReasonTransitionForm
                         jobId={jobId}
-                        expected="CONFIRMED"
-                        requested="NO_SHOW"
-                        label="Registrar ausencia"
+                        expected={detail.job_status}
+                        requested="DISPUTED"
+                        label="Reportar problema"
                       />
-                    ) : null}
+                    </div>
                   </div>
-                </details>
+                  <details className="border-ink/10 mt-3 border-t pt-3">
+                    <summary className="consumer-pressable min-h-11 cursor-pointer py-3 text-sm font-semibold">
+                      Cancelar o registrar ausencia
+                    </summary>
+                    <div className="grid gap-3 pb-2 sm:grid-cols-2">
+                      <ReasonTransitionForm
+                        jobId={jobId}
+                        expected={detail.job_status}
+                        requested="CANCELLED"
+                        label="Cancelar trabajo"
+                      />
+                      {detail.job_status === "CONFIRMED" ? (
+                        <ReasonTransitionForm
+                          jobId={jobId}
+                          expected="CONFIRMED"
+                          requested="NO_SHOW"
+                          label="Registrar ausencia"
+                        />
+                      ) : null}
+                    </div>
+                  </details>
+                </>
               ) : null}
             </JobSection>
 

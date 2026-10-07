@@ -23,17 +23,12 @@ export async function POST(request: Request) {
   }
 
   const filters = body.filters ?? {};
-  const latitude = body.latitude;
-  const longitude = body.longitude;
-  if (
-    !isValidCoordinate(latitude, -90, 90) ||
-    !isValidCoordinate(longitude, -180, 180)
-  ) {
-    return NextResponse.json(
-      { error: "La ubicación no es válida." },
-      { status: 400 },
-    );
-  }
+  const latitude = isValidCoordinate(body.latitude, -90, 90)
+    ? body.latitude
+    : null;
+  const longitude = isValidCoordinate(body.longitude, -180, 180)
+    ? body.longitude
+    : null;
 
   const { rows, hasMore, error } = await searchDiscovery({
     query:

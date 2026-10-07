@@ -1,5 +1,5 @@
 export type AuthenticatedNavKey =
-  "home" | "search" | "messages" | "activity" | "account";
+  "home" | "search" | "jobs" | "messages" | "account";
 
 export function getAuthenticatedNavKey(pathname: string): AuthenticatedNavKey {
   if (
@@ -10,13 +10,12 @@ export function getAuthenticatedNavKey(pathname: string): AuthenticatedNavKey {
   ) {
     return "search";
   }
-  if (pathname === "/account/notifications") return "activity";
   if (
     pathname === "/jobs" ||
     pathname.startsWith("/jobs/") ||
     pathname.startsWith("/account/jobs")
   )
-    return "activity";
+    return "jobs";
   if (pathname === "/messages" || pathname.startsWith("/messages/")) {
     return "messages";
   }

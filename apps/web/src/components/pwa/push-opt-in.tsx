@@ -207,7 +207,7 @@ export function PushOptIn({
         ? "El permiso está bloqueado en la configuración del navegador."
         : !configured
           ? "Todavía no está disponible. Mientras tanto verás tus alertas dentro de Changas."
-          : "Alertas importantes incluso cuando Changas está cerrado.";
+          : "Enterate al instante cuando te escriban, llegue una propuesta o cambie un trabajo, incluso con Changas cerrado.";
 
   return (
     <div>

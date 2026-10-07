@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 
 import { reportClientError, type ClientError } from "@/lib/observability";
@@ -24,21 +25,26 @@ export default function Error({
         <h1 className="font-display mt-4 text-4xl font-semibold">
           Algo no salió como esperábamos.
         </h1>
-        <p className="text-ink/70 mt-4">
+        <p className="text-ink/75 mt-4">
           Podés intentar cargar esta vista nuevamente.
         </p>
         {error.digest ? (
-          <p className="text-ink/70 mt-3 text-xs" data-testid="error-reference">
+          <p className="text-ink/75 mt-3 text-xs" data-testid="error-reference">
             Referencia: {error.digest}
           </p>
         ) : null}
-        <button
-          className="button-primary mt-7"
-          onClick={() => reset()}
-          type="button"
-        >
-          Intentar de nuevo
-        </button>
+        <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <button
+            className="button-primary w-full sm:w-auto"
+            onClick={() => reset()}
+            type="button"
+          >
+            Intentar de nuevo
+          </button>
+          <Link className="button-secondary w-full sm:w-auto" href="/">
+            Volver al inicio
+          </Link>
+        </div>
       </div>
     </main>
   );

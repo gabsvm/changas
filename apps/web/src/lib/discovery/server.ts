@@ -8,6 +8,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
 import type { ReputationDiscoveryServiceRow } from "./types";
+import { isValidPortfolioMediaPath } from "./public-media";
 import type { Database, ServiceModalityType } from "../supabase/database.types";
 
 export type DiscoverySearchInput = {
@@ -137,6 +138,9 @@ export function safeDiscoveryRows(
       nullableFiniteNumber(candidate.completion_rate) &&
       typeof candidate.repeat_client_count === "number" &&
       Number.isFinite(candidate.repeat_client_count) &&
+      (candidate.cover_image_url === null ||
+        candidate.cover_image_url === undefined ||
+        isValidPortfolioMediaPath(candidate.cover_image_url)) &&
       typeof candidate.has_more === "boolean"
     );
   });

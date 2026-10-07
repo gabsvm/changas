@@ -143,6 +143,37 @@ export default async function PublicServicePage({
             />
           </section>
 
+          {service.price_amount !== null ? (
+            <section
+              className="border-ink/[0.08] mt-4 rounded-2xl border bg-white/70 px-5 py-4 text-sm dark:bg-white/[0.05]"
+              aria-label="Desglose del precio"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-ink/70 text-[13px] font-semibold">
+                  Subtotal del servicio
+                </span>
+                <span className="font-bold">{price}</span>
+              </div>
+              <div className="mt-1.5 flex items-center justify-between gap-3">
+                <span className="text-ink/70 text-[13px] font-semibold">
+                  Comisión de Changas
+                </span>
+                <span className="text-moss text-[13px] font-bold">
+                  Incluida en el total
+                </span>
+              </div>
+              <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
+                <span className="text-[13px] font-extrabold">Total a pagar</span>
+                <span className="text-[15px] font-extrabold">{price}</span>
+              </div>
+              <p className="text-ink/70 mt-2 text-xs leading-5">
+                La comisión se descuenta antes de liberarle el pago al
+                proveedor. Nada extra al precio publicado.
+              </p>
+            </section>
+          ) : null}
+
+
           <section className="border-ink/10 mt-8 border-t pt-6">
             <h2 className="text-lg leading-7 font-bold">
               Detalles del servicio
@@ -202,6 +233,23 @@ export default async function PublicServicePage({
             </Link>
           </section>
 
+          <div className="border-moss/25 bg-moss/5 mt-8 flex items-start gap-3.5 rounded-2xl border p-4">
+            <span
+              className="bg-moss/10 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"
+              aria-hidden="true"
+            >
+              ✓
+            </span>
+            <div>
+              <p className="text-sm font-extrabold">
+                Pagos retenidos hasta la entrega + soporte
+              </p>
+              <p className="text-ink/70 mt-1 text-xs leading-6">
+                Tu pago queda retenido hasta que confirmás que el trabajo está
+                listo. Si algo sale mal, el equipo de Changas te acompaña.
+              </p>
+            </div>
+          </div>
           <div className="service-cta-bar service-cta-bar-no-nav bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:static sm:mx-0 sm:mt-8 sm:border-0 sm:bg-transparent sm:p-0">
             <div className="mx-auto flex max-w-3xl items-stretch gap-3 sm:items-center sm:justify-between">
               <div className="bg-surface border-ink/[0.08] hidden min-w-40 flex-col justify-center rounded-2xl border px-4 py-2 sm:flex">

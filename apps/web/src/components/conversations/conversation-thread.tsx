@@ -197,6 +197,8 @@ export function ConversationThread({
     }
     return map;
   }, [initialAttachments]);
+  const waitingForReply =
+    messages.length > 0 && messages.at(-1)?.sender_user_id === currentUserId;
 
   return (
     <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden sm:min-h-[calc(100dvh-4rem)]">
@@ -320,6 +322,20 @@ export function ConversationThread({
             ))}
           </div>
         )}
+        {waitingForReply ? (
+          <div className="mx-auto mt-5 max-w-sm text-center">
+            <Link
+              href="/account/notifications"
+              className="focus-visible:ring-2 focus-visible:ring-moss/45 bg-brand-yellow/25 text-ink inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[13px] font-bold"
+            >
+              Avisame cuando responda {peerName}
+              <span aria-hidden="true">→</span>
+            </Link>
+            <p className="text-ink/70 mt-2 text-xs leading-5">
+              Activá las notificaciones push para enterarte al instante.
+            </p>
+          </div>
+        ) : null}
       </main>
 
       <footer className="mobile-sticky-surface sticky z-10 border-t p-3 backdrop-blur sm:static sm:p-4">
@@ -342,7 +358,7 @@ export function ConversationThread({
                 aria-label={
                   showAttach ? "Ocultar adjuntos" : "Adjuntar archivo"
                 }
-                className="consumer-pressable border-ink/[0.1] grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl bg-white text-2xl font-bold"
+                className="consumer-pressable border-ink/[0.1] grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl bg-white text-2xl font-bold dark:bg-white/[0.07]"
               >
                 +
               </button>
@@ -390,8 +406,8 @@ function MessageBubble({
       <article
         className={`max-w-[78%] rounded-[1.125rem] px-3.5 py-2.5 text-[15px] leading-6 sm:max-w-[72%] ${
           own
-            ? "bg-ink rounded-br-md text-white"
-            : "border-ink/[0.08] text-ink rounded-bl-md border bg-white shadow-sm"
+            ? "bg-ink rounded-br-md text-white dark:bg-[#2a231c] dark:text-[#f5efe8]"
+            : "border-ink/[0.08] text-ink rounded-bl-md border bg-white shadow-sm dark:bg-white/[0.06] dark:shadow-none"
         }`}
       >
         {message.body ? (
@@ -508,7 +524,7 @@ function TextComposer({
         placeholder="Escribí un mensaje…"
         rows={1}
         maxLength={4000}
-        className="border-ink/[0.1] placeholder:text-ink/40 focus:border-moss/50 min-h-[52px] flex-1 resize-none rounded-2xl border bg-white px-4 py-3.5 text-base outline-none"
+        className="border-ink/[0.1] placeholder:text-ink/40 focus:border-moss/50 min-h-[52px] flex-1 resize-none rounded-2xl border bg-white px-4 py-3.5 text-base outline-none dark:bg-white/[0.06]"
       />
       <button
         type="submit"
@@ -689,7 +705,7 @@ function AttachmentComposer({
         name="kind"
         defaultValue="IMAGE"
         aria-label="Tipo de adjunto"
-        className="border-ink/[0.1] min-h-11 rounded-xl border bg-white px-3 text-sm font-semibold"
+        className="border-ink/[0.1] min-h-11 rounded-xl border bg-white px-3 text-sm font-semibold dark:bg-white/[0.06]"
       >
         <option value="IMAGE">Imagen</option>
         <option value="FILE">Archivo</option>
@@ -706,7 +722,7 @@ function AttachmentComposer({
       <button
         type="submit"
         disabled={pending || compressing}
-        className="consumer-pressable border-ink/[0.1] inline-flex min-h-11 items-center rounded-xl border bg-white px-4 text-sm font-bold disabled:opacity-40"
+        className="consumer-pressable border-ink/[0.1] inline-flex min-h-11 items-center rounded-xl border bg-white px-4 text-sm font-bold disabled:opacity-40 dark:bg-white/[0.06]"
       >
         {compressing ? "Optimizando…" : pending ? "Subiendo…" : "Adjuntar"}
       </button>
@@ -736,7 +752,7 @@ function ReportForm({ conversationId }: { conversationId: string }) {
           name="category"
           required
           defaultValue=""
-          className="border-ink/10 w-full rounded-xl border bg-white px-3 py-2 text-xs"
+          className="border-ink/10 w-full rounded-xl border bg-white px-3 py-2 text-xs dark:bg-white/[0.06]"
         >
           <option value="" disabled>
             Elegí un motivo
@@ -751,7 +767,7 @@ function ReportForm({ conversationId }: { conversationId: string }) {
           maxLength={2000}
           rows={3}
           placeholder="Detalle opcional"
-          className="border-ink/10 w-full resize-none rounded-xl border bg-white px-3 py-2 text-xs"
+          className="border-ink/10 w-full resize-none rounded-xl border bg-white px-3 py-2 text-xs dark:bg-white/[0.06]"
         />
         <button
           type="submit"

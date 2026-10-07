@@ -161,7 +161,7 @@ export default async function PublicProviderPage({
             />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <StatusChip tone="success">Identidad verificada</StatusChip>
+                <StatusChip tone="success">Perfil habilitado</StatusChip>
                 {provider.public_zone ? (
                   <span className="text-ink/70 text-[13px] font-medium">
                     {provider.public_zone}
@@ -199,7 +199,7 @@ export default async function PublicProviderPage({
                     value={String(!isFavorite)}
                   />
                   <button
-                    className="consumer-pressable border-ink/[0.1] grid h-[52px] w-[52px] place-items-center rounded-2xl border bg-white"
+                    className="consumer-pressable border-ink/[0.1] grid h-[52px] w-[52px] place-items-center rounded-2xl border bg-white dark:bg-white/[0.07]"
                     type="submit"
                     aria-label={
                       isFavorite ? "Quitar de guardados" : "Guardar proveedor"
@@ -249,6 +249,23 @@ export default async function PublicProviderPage({
               <p className="text-ink/70 mt-1 text-xs leading-6">
                 Conocé sus servicios, zona aproximada y experiencia antes de
                 escribirle.
+              </p>
+            </div>
+          </div>
+
+          <div className="profile-verification border-moss/25 bg-surface-muted mt-3 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
+            <span
+              className="bg-moss/10 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"
+              aria-hidden="true"
+            >
+              ✓
+            </span>
+            <div>
+              <p className="text-sm font-extrabold">Verificación de identidad</p>
+              <p className="text-ink/70 mt-1 text-xs leading-6">
+                Este perfil completó el alta de proveedor y está habilitado
+                para publicar. Por privacidad no mostramos documentos ni fechas
+                de revisión.
               </p>
             </div>
           </div>
@@ -408,7 +425,7 @@ export default async function PublicProviderPage({
                         .split("/")
                         .map(encodeURIComponent)
                         .join("/")}`}
-                      alt=""
+                      alt={`Trabajo real: ${item.title}`}
                       width={640}
                       height={360}
                       unoptimized
@@ -482,8 +499,14 @@ export default async function PublicProviderPage({
           </PublicSection>
         ) : null}
 
-        <footer className="text-ink/38 border-ink/10 mt-10 border-t py-6 text-center text-xs leading-5">
-          Changas · información publicada por el proveedor
+        <footer className="border-ink/10 mt-10 border-t py-6 text-center">
+          <p className="text-moss text-xs leading-5 font-extrabold">
+            Pagos retenidos hasta la entrega + soporte de Changas en cada
+            trabajo
+          </p>
+          <p className="text-ink/38 mt-1 text-xs leading-5">
+            Changas · información publicada por el proveedor
+          </p>
         </footer>
       </div>
     </main>

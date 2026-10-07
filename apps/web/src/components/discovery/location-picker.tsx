@@ -109,7 +109,7 @@ export function LocationPicker({
     return (
       <div className="location-picker-compact">
         <div className="flex w-full items-center justify-between gap-2">
-          <label className="text-ink/70 flex min-h-11 min-w-0 items-center gap-2 text-sm font-semibold">
+          <label className="text-ink/75 flex min-h-11 min-w-0 items-center gap-2 text-sm font-semibold">
             <svg
               aria-hidden="true"
               viewBox="0 0 24 24"
@@ -165,7 +165,7 @@ export function LocationPicker({
         </div>
         {locationMessage ? (
           <span
-            className="text-ink/70 mt-2 block text-xs font-semibold"
+            className="text-ink/75 mt-2 block text-xs font-semibold"
             role="status"
           >
             {locationMessage}
@@ -199,7 +199,7 @@ export function LocationPicker({
                 </div>
                 <button
                   ref={locationCloseRef}
-                  className="consumer-pressable text-ink/70 hover:bg-ink/[0.05] grid h-10 w-10 shrink-0 place-items-center rounded-full text-2xl leading-none"
+                  className="consumer-pressable text-ink/75 hover:bg-ink/[0.05] grid h-11 w-11 shrink-0 place-items-center rounded-full text-2xl leading-none"
                   type="button"
                   onClick={() => setLocationSheetOpen(false)}
                   aria-label="Cerrar selector de ubicación"
@@ -207,7 +207,7 @@ export function LocationPicker({
                   ×
                 </button>
               </div>
-              <p className="text-ink/70 mt-2 max-w-[28rem] text-sm leading-5">
+              <p className="text-ink/75 mt-2 max-w-[28rem] text-sm leading-5">
                 Usamos una zona aproximada para mostrarte opciones relevantes.
                 Tu ubicación exacta nunca se publica.
               </p>
@@ -229,7 +229,7 @@ export function LocationPicker({
                   <span className="block text-sm font-bold">
                     Usar mi ubicación actual
                   </span>
-                  <span className="text-ink/70 mt-0.5 block text-xs">
+                  <span className="text-ink/75 mt-0.5 block text-xs">
                     Te pediremos permiso al dispositivo
                   </span>
                 </span>
@@ -258,7 +258,7 @@ export function LocationPicker({
                   </select>
                 </label>
               </div>
-              <p className="text-ink/70 mt-4 text-xs leading-5">
+              <p className="text-ink/75 mt-4 text-xs leading-5">
                 Podés cambiar esta elección cuando quieras desde la búsqueda.
               </p>
             </div>
@@ -270,7 +270,7 @@ export function LocationPicker({
 
   return (
     <div className="location-picker space-y-3">
-      <label className="text-ink/70 text-sm font-semibold" htmlFor="location">
+      <label className="text-ink/75 text-sm font-semibold" htmlFor="location">
         ¿Dónde lo necesitás?
       </label>
       <select

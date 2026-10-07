@@ -29,12 +29,14 @@ export const NOTIFICATION_PREFERENCE_GROUPS: PreferenceGroupConfig[] = [
       {
         name: "proposalAlertsEnabled",
         title: "Propuestas",
-        description: "Cuando una propuesta requiere tu atención.",
+        description:
+          "Te avisamos cuando recibís una propuesta, contraoferta o respuesta en tus charlas.",
       },
       {
         name: "jobRemindersEnabled",
         title: "Recordatorios de trabajos",
-        description: "Avisos para trabajos programados próximos.",
+        description:
+          "Te recordamos tus trabajos de mañana y los que están por vencer.",
       },
     ],
   },
@@ -45,12 +47,14 @@ export const NOTIFICATION_PREFERENCE_GROUPS: PreferenceGroupConfig[] = [
       {
         name: "emailImportantEnabled",
         title: "Correos importantes",
-        description: "Cambios de trabajos, pagos y cuenta.",
+        description:
+          "Recibís por mail cada cambio de estado de tus trabajos, pagos y tu cuenta.",
       },
       {
         name: "verificationAlertsEnabled",
         title: "Verificación",
-        description: "Cambios relevantes de cuenta o perfil.",
+        description:
+          "Te avisamos cuando tu identidad o tu perfil de proveedor cambia de estado.",
       },
     ],
   },
@@ -61,7 +65,8 @@ export const NOTIFICATION_PREFERENCE_GROUPS: PreferenceGroupConfig[] = [
       {
         name: "promotionalEnabled",
         title: "Promociones",
-        description: "Novedades comerciales opcionales.",
+        description:
+          "Consejos y novedades de Changas, solo si querés recibirlos.",
       },
     ],
   },
