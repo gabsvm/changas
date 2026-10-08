@@ -80,6 +80,9 @@ export function PushOptIn({
       .then(async (registration) => {
         const subscription = await registration?.pushManager.getSubscription();
         if (!subscription && initialEnabled) setEnabled(false);
+      })
+      .catch((error) => {
+        console.error("[pwa] no pudimos leer la suscripción push.", error);
       });
   }, [initialEnabled]);
 

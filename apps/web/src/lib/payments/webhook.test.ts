@@ -171,11 +171,14 @@ describe("Phase 11 Mercado Pago webhook orchestration", () => {
 
     const result = await deps.processMercadoPagoWebhook(webhookInput);
 
-    expect(deps.verifyWebhook).toHaveBeenCalledWith({
-      xSignature: webhookInput.xSignature,
-      xRequestId: webhookInput.xRequestId,
-      dataId: PAYMENT_ID,
-    });
+    expect(deps.verifyWebhook).toHaveBeenCalledWith(
+      {
+        xSignature: webhookInput.xSignature,
+        xRequestId: webhookInput.xRequestId,
+        dataId: PAYMENT_ID,
+      },
+      { nowMs: expect.any(Number) },
+    );
     expect(deps.recordProviderEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         providerName: "MERCADO_PAGO",

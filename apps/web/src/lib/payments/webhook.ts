@@ -6,7 +6,10 @@ import { getPaymentServerEnv } from "@changas/config/server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 
-import { decryptPaymentToken, type PaymentTokenEnvelope } from "./crypto";
+import {
+  decryptPaymentTokenWithKeys,
+  type PaymentTokenEnvelope,
+} from "./crypto";
 import { MercadoPagoPaymentProvider } from "./mercado-pago";
 import type {
   AuthoritativeProviderPayment,
@@ -79,9 +82,13 @@ export type MercadoPagoWebhookInput = {
 type PaymentWebhookDependencies = {
   paymentEnv: {
     tokenEncryptionKey: string;
+    tokenEncryptionKeyV2?: string;
   };
   paymentProvider: {
-    verifyWebhook(input: WebhookVerificationInput): boolean;
+    verifyWebhook(
+      input: WebhookVerificationInput,
+      options?: { nowMs?: number; maxSkewMs?: number },
+    ): boolean;
     fetchPayment(input: {
       accessToken: string;
       paymentId: string;
@@ -318,11 +325,14 @@ export function createPaymentWebhookProcessor(
       );
     }
     if (
-      !dependencies.paymentProvider.verifyWebhook({
-        xSignature: input.xSignature,
-        xRequestId: input.xRequestId,
-        dataId,
-      })
+      !dependencies.paymentProvider.verifyWebhook(
+        {
+          xSignature: input.xSignature,
+          xRequestId: input.xRequestId,
+          dataId,
+        },
+        { nowMs: Date.now() },
+      )
     ) {
       throw new PaymentWebhookError(
         "INVALID_WEBHOOK_SIGNATURE",
@@ -382,18 +392,25 @@ export function createPaymentWebhookProcessor(
     let payment: AuthoritativeProviderPayment;
     try {
       payment = await dependencies.paymentProvider.fetchPayment({
-        accessToken: decryptPaymentToken(
-          seller.accessToken,
-          dependencies.paymentEnv.tokenEncryptionKey,
-        ),
+        accessToken: decryptPaymentTokenWithKeys(seller.accessToken, {
+          1: dependencies.paymentEnv.tokenEncryptionKey,
+          ...(dependencies.paymentEnv.tokenEncryptionKeyV2
+            ? { 2: dependencies.paymentEnv.tokenEncryptionKeyV2 }
+            : {}),
+        }),
         paymentId: dataId,
       });
     } catch (error) {
-      throw new PaymentWebhookError(
-        "PROVIDER_UNAVAILABLE",
-        "Unable to fetch authoritative Mercado Pago payment",
-        error,
-      );
+      const fetchError =
+        error instanceof PaymentWebhookError
+          ? error
+          : new PaymentWebhookError(
+              "PROVIDER_UNAVAILABLE",
+              "Unable to fetch authoritative Mercado Pago payment",
+              error,
+            );
+      await failEvent(dependencies, eventId, fetchError);
+      throw fetchError;
     }
 
     try {
@@ -649,7 +666,12 @@ export async function processMercadoPagoWebhook(
       webhookSecret: env.webhookSecret,
     });
     defaultProcessor = createPaymentWebhookProcessor({
-      paymentEnv: { tokenEncryptionKey: env.tokenEncryptionKey },
+      paymentEnv: {
+        tokenEncryptionKey: env.tokenEncryptionKey,
+        ...(env.tokenEncryptionKeyV2
+          ? { tokenEncryptionKeyV2: env.tokenEncryptionKeyV2 }
+          : {}),
+      },
       paymentProvider: provider,
       recordProviderEvent,
       getProviderEventProcessingStatus,

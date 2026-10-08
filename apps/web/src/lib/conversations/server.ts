@@ -53,6 +53,12 @@ export type ConversationContext = {
   last_message_at: string | null;
 };
 
+export type InboxOpenDealRow = {
+  conversation_id: string;
+  price_amount: number | null;
+  currency_code: string;
+};
+
 type RpcError = { code?: string | null } | null;
 
 type ConversationRpcClient = {
@@ -97,6 +103,13 @@ type ConversationRpcClient = {
       target_user_id: string;
     },
   ): Promise<{ data: string | null; error: RpcError }>;
+  rpc(
+    name: "list_inbox_open_deals",
+    args: { target_conversation_ids: string[] },
+  ): Promise<{
+    data: InboxOpenDealRow[] | null;
+    error: RpcError;
+  }>;
   rpc(
     name: "report_conversation",
     args: {
@@ -172,6 +185,20 @@ export async function listMyConversations(
     page_size: 20,
     before_updated_at: cursor.beforeUpdatedAt ?? null,
     before_id: cursor.beforeId ?? null,
+  });
+
+  if (error) throw mapRpcError(error);
+  return data ?? [];
+}
+
+/** Batched OPEN-proposal lookup for the inbox. Throws so callers can fall back. */
+export async function listInboxOpenDeals(
+  conversationIds: string[],
+): Promise<InboxOpenDealRow[]> {
+  if (conversationIds.length === 0) return [];
+  const rpc = await getRpcClient();
+  const { data, error } = await rpc.rpc("list_inbox_open_deals", {
+    target_conversation_ids: conversationIds,
   });
 
   if (error) throw mapRpcError(error);

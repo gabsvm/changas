@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 import { formatMinorUnits } from "@changas/domain";
 
 import {
+  listInboxOpenDeals,
   listMyConversations,
-  type ConversationSummary,
 } from "@/lib/conversations/server";
+import type { ConversationSummary } from "@/lib/conversations/server";
 import { listConversationProposals } from "@/lib/proposals/server";
 import { createClient } from "@/lib/supabase/server";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
@@ -22,6 +23,28 @@ type OpenDeal = {
 };
 
 async function loadOpenDeals(
+  conversationIds: string[],
+): Promise<Map<string, OpenDeal>> {
+  try {
+    const rows = await listInboxOpenDeals(conversationIds);
+    return new Map(
+      rows.map((row) => [
+        row.conversation_id,
+        {
+          statusLabel: "Acuerdo abierto",
+          amountLabel:
+            row.price_amount === null
+              ? "A cotizar"
+              : formatMinorUnits(row.price_amount, row.currency_code),
+        },
+      ]),
+    );
+  } catch {
+    return loadOpenDealsOneByOne(conversationIds);
+  }
+}
+
+async function loadOpenDealsOneByOne(
   conversationIds: string[],
 ): Promise<Map<string, OpenDeal>> {
   const settled = await Promise.all(

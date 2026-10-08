@@ -74,6 +74,22 @@ export async function deleteAccount(
   }
 
   const admin = createAdminClient();
+
+  // Los blobs viven en el bucket privado `identity-documents`; hay que
+  // borrarlos ANTES de borrar las filas de metadatos que guardan su path.
+  const { data: documents } = await admin
+    .from("provider_documents")
+    .select("storage_path")
+    .eq("user_id", user.id);
+  const blobPaths = (documents ?? [])
+    .map((document) => document.storage_path)
+    .filter(
+      (path): path is string => typeof path === "string" && path.length > 0,
+    );
+  if (blobPaths.length > 0) {
+    await admin.storage.from("identity-documents").remove(blobPaths);
+  }
+
   const steps = await Promise.all([
     admin
       .from("profiles")
@@ -104,6 +120,14 @@ export async function deleteAccount(
     .update({ status: "DEACTIVATED" })
     .eq("user_id", user.id);
 
+  // Revoca todos los refresh tokens del usuario para que ninguna sesión
+  // existente sobreviva a la eliminación.
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (session?.access_token) {
+    await admin.auth.admin.signOut(session.access_token, "global");
+  }
   const { error: banError } = await admin.auth.admin.updateUserById(user.id, {
     ban_duration: "876000h",
   });

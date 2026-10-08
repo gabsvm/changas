@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { actionButtonClass } from "@/components/ui/marketplace/action-button";
 import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
 import { riseStyle } from "@/lib/ui/motion";
-import { browserLocationStorageKey } from "./location-picker";
+import { readStoredLocation } from "./location-picker";
 
 import { DiscoveryCard } from "./discovery-card";
 
@@ -117,11 +117,16 @@ export function DiscoveryResults({
     longitude: number;
   } | null>(null);
   const signatureRef = useRef<string | null>(null);
-  const signature = signatureOf(query, filters);
+  const signature = JSON.stringify([query, filters]);
+  // Id monotónico: las respuestas que llegan tarde se descartan para que un
+  // request viejo no pise resultados más nuevos.
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     if (signatureRef.current === signature) return;
     signatureRef.current = signature;
+    // Invalida los requests en vuelo: sus respuestas se descartan al llegar.
+    requestIdRef.current += 1;
     setRows(initialRows);
     setHasMore(initialHasMore);
     setPage(filters.page);
@@ -178,6 +183,8 @@ export function DiscoveryResults({
       point: { latitude: number; longitude: number },
     ) {
       setGpsPoint(point);
+      const requestId = requestIdRef.current + 1;
+      requestIdRef.current = requestId;
       const append = nextPage > 1;
       if (append) {
         setLoadingMore(true);
@@ -191,6 +198,7 @@ export function DiscoveryResults({
           nextPage,
           point,
         );
+        if (requestIdRef.current !== requestId) return;
         setRows((current) =>
           append ? mergeRows(current, nextRows) : nextRows,
         );
@@ -200,6 +208,7 @@ export function DiscoveryResults({
         setResultsError(null);
         setLoadError(null);
       } catch {
+        if (requestIdRef.current !== requestId) return;
         if (append) {
           setLoadError(
             "No pudimos cargar más resultados cerca tuyo. Probá de nuevo.",
@@ -208,8 +217,10 @@ export function DiscoveryResults({
           setResultsError("No pudimos cargar los resultados cerca tuyo.");
         }
       } finally {
-        setNearbyLoading(false);
-        setLoadingMore(false);
+        if (requestIdRef.current === requestId) {
+          setNearbyLoading(false);
+          setLoadingMore(false);
+        }
       }
     },
     [requestDiscoveryPage],
@@ -227,19 +238,23 @@ export function DiscoveryResults({
         ? { latitude: manual.latitude, longitude: manual.longitude }
         : null;
       const nextPage = page + 1;
+      const requestId = requestIdRef.current + 1;
+      requestIdRef.current = requestId;
       setLoadingMore(true);
       setLoadError(null);
       void requestDiscoveryPage(nextPage, point)
         .then(({ nextRows, hasMore: more }) => {
+          if (requestIdRef.current !== requestId) return;
           setRows((current) => mergeRows(current, nextRows));
           setHasMore(more);
           setPage(nextPage);
         })
         .catch(() => {
+          if (requestIdRef.current !== requestId) return;
           setLoadError("No pudimos cargar más resultados. Probá de nuevo.");
         })
         .finally(() => {
-          setLoadingMore(false);
+          if (requestIdRef.current === requestId) setLoadingMore(false);
         });
     },
     [
@@ -258,29 +273,21 @@ export function DiscoveryResults({
 
   useEffect(() => {
     if (!enableNearby || gpsMode) return;
-    try {
-      const raw = window.sessionStorage.getItem(browserLocationStorageKey);
-      if (!raw) return;
-      const value = JSON.parse(raw) as {
-        latitude?: unknown;
-        longitude?: unknown;
-      };
-      if (
-        typeof value.latitude !== "number" ||
-        !Number.isFinite(value.latitude) ||
-        typeof value.longitude !== "number" ||
-        !Number.isFinite(value.longitude)
-      ) {
-        return;
-      }
-      const point = { latitude: value.latitude, longitude: value.longitude };
-      const request = window.setTimeout(() => {
-        void fetchNearbyPage(1, point);
-      }, 0);
-      return () => window.clearTimeout(request);
-    } catch {
-      // Ephemeral browser state is optional; malformed state falls back to manual search.
+    const value = readStoredLocation();
+    if (
+      !value ||
+      typeof value.latitude !== "number" ||
+      !Number.isFinite(value.latitude) ||
+      typeof value.longitude !== "number" ||
+      !Number.isFinite(value.longitude)
+    ) {
+      return;
     }
+    const point = { latitude: value.latitude, longitude: value.longitude };
+    const request = window.setTimeout(() => {
+      void fetchNearbyPage(1, point);
+    }, 0);
+    return () => window.clearTimeout(request);
   }, [enableNearby, fetchNearbyPage, gpsMode]);
 
   function searchNearby() {

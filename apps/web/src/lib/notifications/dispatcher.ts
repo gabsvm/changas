@@ -37,7 +37,16 @@ type DeliveryClaimRow = {
   auth_key: string | null;
   recipient_email: string | null;
   lease_token: string;
+  attempt_count: number | null;
 };
+
+/**
+ * Techo de reintentos del lado del dispatcher: pasado este número de
+ * intentos un delivery reintentable se marca como fallo permanente para
+ * que no envenene la cola (poison-queue). El backoff incremental lo
+ * maneja la DB; esto es el fusible final.
+ */
+export const MAX_DELIVERY_ATTEMPTS = 10;
 
 export type DispatchSummary = {
   materializedReminders: number;
@@ -172,6 +181,16 @@ export async function dispatchNotificationBatch({
       }
     } catch {
       result = permanentFailure("DELIVERY_PAYLOAD_INVALID");
+    }
+
+    // Fusible poison-queue: si ya se intentó demasiadas veces, el fallo
+    // pasa a permanente aunque el proveedor diga "reintentable".
+    if (
+      !result.ok &&
+      result.retryable &&
+      (row.attempt_count ?? 1) >= MAX_DELIVERY_ATTEMPTS
+    ) {
+      result = permanentFailure("DELIVERY_MAX_ATTEMPTS_EXCEEDED");
     }
 
     await removeStalePushEndpoint(admin, delivery, result);

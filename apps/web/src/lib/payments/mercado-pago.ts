@@ -437,7 +437,10 @@ export class MercadoPagoPaymentProvider {
     };
   }
 
-  verifyWebhook(input: WebhookVerificationInput): boolean {
+  verifyWebhook(
+    input: WebhookVerificationInput,
+    options?: { nowMs?: number; maxSkewMs?: number },
+  ): boolean {
     const signature = input.xSignature?.trim();
     if (!signature) return false;
 
@@ -457,6 +460,16 @@ export class MercadoPagoPaymentProvider {
       !/^[a-fA-F0-9]{64}$/.test(providedHash)
     ) {
       return false;
+    }
+
+    // Anti-replay: el ts firmado tiene que estar dentro de la ventana.
+    // Se exige solo cuando el caller pasa el reloj (el procesador real
+    // siempre lo pasa); así la verificación pura sigue siendo testeable.
+    if (options?.nowMs !== undefined) {
+      const maxSkewMs = options.maxSkewMs ?? 10 * 60 * 1000;
+      const tsSeconds = Number(timestamp);
+      if (!Number.isSafeInteger(tsSeconds) || tsSeconds <= 0) return false;
+      if (Math.abs(options.nowMs - tsSeconds * 1000) > maxSkewMs) return false;
     }
 
     const manifestParts: string[] = [];

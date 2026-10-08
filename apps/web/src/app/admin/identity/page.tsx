@@ -254,29 +254,51 @@ export default async function AdminIdentityPage({
         </div>
 
         {queue.length ? (
-          <div className="grid gap-2 md:grid-cols-2">
-            {queue.map((row) => (
-              <Link
-                className="flex min-h-24 items-center justify-between gap-3 rounded-3xl border border-[#273142] bg-[#151c27] p-4 transition-colors hover:border-[#ffc857]/35 hover:bg-[#192230]"
-                href={`/admin/identity?provider=${row.provider_user_id}`}
-                key={row.provider_user_id}
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-extrabold text-white">
-                    {row.display_name ?? row.email ?? row.provider_user_id}
-                  </p>
-                  <p className="mt-1 text-xs text-[#7f8a9b]">
+          <table className="w-full border-separate border-spacing-2">
+            <caption className="sr-only">
+              Cola de revisión de identidad ({queue.length})
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                  Prestador
+                </th>
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                  Evidencia
+                </th>
+                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                  Estado
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {queue.map((row) => (
+                <tr
+                  key={row.provider_user_id}
+                  className="rounded-3xl border border-[#273142] bg-[#151c27] transition-colors hover:border-[#ffc857]/35 hover:bg-[#192230]"
+                >
+                  <th scope="row" className="min-w-0 rounded-l-3xl p-4 text-left">
+                    <Link
+                      className="block truncate text-sm font-extrabold text-white hover:underline"
+                      href={`/admin/identity?provider=${row.provider_user_id}`}
+                    >
+                      {row.display_name ?? row.email ?? row.provider_user_id}
+                    </Link>
+                  </th>
+                  <td className="p-4 text-xs text-[#7f8a9b]">
                     {row.document_count} documentos · enviado{" "}
                     {dateTime(row.submitted_at ?? row.updated_at)}
-                  </p>
-                </div>
-                <AdminStatusBadge
-                  label={getProviderStatusPresentation(row.status).label}
-                  tone="pending"
-                />
-              </Link>
-            ))}
-          </div>
+                  </td>
+                  <td className="rounded-r-3xl p-4 text-right">
+                    <AdminStatusBadge
+                      label={getProviderStatusPresentation(row.status).label}
+                      tone="pending"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         ) : (
           <AdminEmptyState
             title="Todo al día"

@@ -23,29 +23,33 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const supabase = await createClient();
-  const { data: provider } = await supabase
-    .from("public_provider_profiles")
-    .select("public_slug, display_name, public_headline, bio")
-    .eq("public_slug", slug)
-    .maybeSingle();
-  if (!provider) return { title: "Proveedor no encontrado" };
-  const description =
-    provider.bio ??
-    provider.public_headline ??
-    "Servicios publicados en Changas.";
-  return {
-    title: provider.display_name,
-    description,
-    alternates: { canonical: "/p/" + provider.public_slug },
-    openGraph: {
-      title: provider.display_name + " · Changas",
+  try {
+    const { slug } = await params;
+    const supabase = await createClient();
+    const { data: provider } = await supabase
+      .from("public_provider_profiles")
+      .select("public_slug, display_name, public_headline, bio")
+      .eq("public_slug", slug)
+      .maybeSingle();
+    if (!provider) return { title: "Proveedor no encontrado" };
+    const description =
+      provider.bio ??
+      provider.public_headline ??
+      "Servicios publicados en Changas.";
+    return {
+      title: provider.display_name,
       description,
-      type: "profile",
-      url: "/p/" + provider.public_slug,
-    },
-  };
+      alternates: { canonical: "/p/" + provider.public_slug },
+      openGraph: {
+        title: provider.display_name + " · Changas",
+        description,
+        type: "profile",
+        url: "/p/" + provider.public_slug,
+      },
+    };
+  } catch {
+    return { title: "Proveedor · Changas" };
+  }
 }
 
 export default async function PublicProviderPage({
@@ -487,6 +491,7 @@ export default async function PublicProviderPage({
                       alt={`Trabajo real: ${item.title}`}
                       width={640}
                       height={360}
+                      sizes="(max-width: 640px) 100vw, 640px"
                       unoptimized
                     />
                   ) : null}

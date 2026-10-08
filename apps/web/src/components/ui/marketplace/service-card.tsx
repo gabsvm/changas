@@ -137,9 +137,10 @@ export function ServiceCard({
     <Image
       className="aspect-video w-full object-cover"
       src={coverSrc}
-      alt=""
+      alt={`${row.service_title} de ${row.provider_display_name}`}
       width={640}
       height={360}
+      sizes="(max-width: 640px) 100vw, 640px"
       loading="lazy"
       unoptimized
     />

@@ -17,6 +17,10 @@ function retryableProviderError(errorCode: string): DeliveryResult {
   return { ok: false, retryable: true, errorCode };
 }
 
+function nonRetryableProviderError(errorCode: string): DeliveryResult {
+  return { ok: false, retryable: false, errorCode };
+}
+
 export class WebPushProvider implements PushProvider {
   readonly available: boolean;
 
@@ -38,7 +42,7 @@ export class WebPushProvider implements PushProvider {
       !this.config.privateKey ||
       !this.config.subject
     ) {
-      return retryableProviderError("PUSH_PROVIDER_UNCONFIGURED");
+      return nonRetryableProviderError("PUSH_PROVIDER_UNCONFIGURED");
     }
 
     try {
@@ -77,7 +81,7 @@ export class ResendEmailProvider implements EmailProvider {
 
   async send(message: TransactionalEmail): Promise<DeliveryResult> {
     if (!this.config.apiKey || !this.config.from || !this.config.origin) {
-      return retryableProviderError("EMAIL_PROVIDER_UNCONFIGURED");
+      return nonRetryableProviderError("EMAIL_PROVIDER_UNCONFIGURED");
     }
 
     const request = buildResendRequest({

@@ -22,35 +22,39 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string; serviceSlug: string }>;
 }): Promise<Metadata> {
-  const { slug, serviceSlug } = await params;
-  const supabase = await createClient();
-  const [{ data: service }, { data: provider }] = await Promise.all([
-    supabase
-      .from("public_provider_services")
-      .select("public_slug, title, description, skill_name")
-      .eq("provider_slug", slug)
-      .eq("public_slug", serviceSlug)
-      .maybeSingle(),
-    supabase
-      .from("public_provider_profiles")
-      .select("public_slug, display_name")
-      .eq("public_slug", slug)
-      .maybeSingle(),
-  ]);
-  if (!service || !provider) return { title: "Servicio no encontrado" };
-  const description = service.description;
-  const canonical = "/p/" + provider.public_slug + "/" + service.public_slug;
-  return {
-    title: service.title,
-    description,
-    alternates: { canonical },
-    openGraph: {
-      title: service.title + " · " + provider.display_name,
+  try {
+    const { slug, serviceSlug } = await params;
+    const supabase = await createClient();
+    const [{ data: service }, { data: provider }] = await Promise.all([
+      supabase
+        .from("public_provider_services")
+        .select("public_slug, title, description, skill_name")
+        .eq("provider_slug", slug)
+        .eq("public_slug", serviceSlug)
+        .maybeSingle(),
+      supabase
+        .from("public_provider_profiles")
+        .select("public_slug, display_name")
+        .eq("public_slug", slug)
+        .maybeSingle(),
+    ]);
+    if (!service || !provider) return { title: "Servicio no encontrado" };
+    const description = service.description;
+    const canonical = "/p/" + provider.public_slug + "/" + service.public_slug;
+    return {
+      title: service.title,
       description,
-      type: "website",
-      url: canonical,
-    },
-  };
+      alternates: { canonical },
+      openGraph: {
+        title: service.title + " · " + provider.display_name,
+        description,
+        type: "website",
+        url: canonical,
+      },
+    };
+  } catch {
+    return { title: "Servicio · Changas" };
+  }
 }
 
 export default async function PublicServicePage({

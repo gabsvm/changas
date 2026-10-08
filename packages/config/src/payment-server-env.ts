@@ -5,12 +5,12 @@ export type PaymentServerEnv = {
   clientSecret: string;
   webhookSecret: string;
   tokenEncryptionKey: string;
+  tokenEncryptionKeyV2?: string;
   tokenEncryptionKeyVersion: number;
   oauthStateSecret: string;
   marketplaceFeeBps: number;
   providerMode: PaymentProviderMode;
 };
-
 type PaymentServerEnvSource = Record<string, string | undefined>;
 
 function requireValue(source: PaymentServerEnvSource, name: string): string {
@@ -78,6 +78,28 @@ export function parsePaymentServerEnv(
     );
   }
 
+  // Rotación: V2 es opcional. Si está seteada tiene que ser válida de verdad
+  // (32 bytes en base64 canónico) porque el descifrado la usa para
+  // envelopes con keyVersion 2.
+  const rawV2 = source["PAYMENT_TOKEN_ENCRYPTION_KEY_V2"]?.trim() || undefined;
+  let tokenEncryptionKeyV2: string | undefined;
+  if (rawV2 !== undefined) {
+    const v2Bytes = decodeCanonicalBase64(
+      rawV2,
+      "PAYMENT_TOKEN_ENCRYPTION_KEY_V2",
+    );
+    if (v2Bytes.length !== 32) {
+      throw new Error(
+        "PAYMENT_TOKEN_ENCRYPTION_KEY_V2 must decode to exactly 32 bytes.",
+      );
+    }
+    if (v2Bytes.equals(tokenKeyBytes)) {
+      throw new Error(
+        "PAYMENT_TOKEN_ENCRYPTION_KEY_V2 must differ from PAYMENT_TOKEN_ENCRYPTION_KEY_V1.",
+      );
+    }
+    tokenEncryptionKeyV2 = rawV2;
+  }
   const oauthStateSecretBytes = decodeCanonicalBase64(
     oauthStateSecret,
     "PAYMENT_OAUTH_STATE_SECRET",
@@ -108,16 +130,41 @@ export function parsePaymentServerEnv(
     throw new Error("MERCADO_PAGO_MODE must be either test or live.");
   }
 
+  if (tokenEncryptionKeyVersion >= 2 && tokenEncryptionKeyV2 === undefined) {
+    throw new Error(
+      "PAYMENT_TOKEN_ENCRYPTION_KEY_VERSION is 2 or higher but PAYMENT_TOKEN_ENCRYPTION_KEY_V2 is not set.",
+    );
+  }
+
   return {
     clientId,
     clientSecret,
     webhookSecret,
     tokenEncryptionKey,
+    ...(tokenEncryptionKeyV2 !== undefined ? { tokenEncryptionKeyV2 } : {}),
     tokenEncryptionKeyVersion,
     oauthStateSecret,
     marketplaceFeeBps,
     providerMode: providerModeValue,
   };
+}
+
+/**
+ * Elige la llave de descifrado según el keyVersion del envelope:
+ * versión 2+ usa V2 si está disponible, el resto cae a V1 real.
+ */
+export function resolveTokenDecryptionKey(
+  env: Pick<PaymentServerEnv, "tokenEncryptionKey" | "tokenEncryptionKeyV2">,
+  keyVersion: number,
+): string {
+  if (
+    keyVersion >= 2 &&
+    env.tokenEncryptionKeyV2 !== undefined &&
+    env.tokenEncryptionKeyV2.length > 0
+  ) {
+    return env.tokenEncryptionKeyV2;
+  }
+  return env.tokenEncryptionKey;
 }
 
 export function getPaymentServerEnv(): PaymentServerEnv {

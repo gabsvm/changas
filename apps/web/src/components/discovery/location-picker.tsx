@@ -10,6 +10,40 @@ export const browserLocationStorageKey = "changas:search-location";
 
 type BrowserLocation = { latitude: number; longitude: number };
 
+// sessionStorage puede fallar (modo privado, cookies bloqueadas); el fallback
+// en memoria mantiene la ubicación durante la sesión de la página.
+let memoryLocation: BrowserLocation | null = null;
+
+export function readStoredLocation(): BrowserLocation | null {
+  try {
+    const raw = window.sessionStorage.getItem(browserLocationStorageKey);
+    if (!raw) return memoryLocation;
+    return JSON.parse(raw) as BrowserLocation;
+  } catch {
+    return memoryLocation;
+  }
+}
+
+function writeStoredLocation(location: BrowserLocation): void {
+  memoryLocation = location;
+  try {
+    window.sessionStorage.setItem(
+      browserLocationStorageKey,
+      JSON.stringify(location),
+    );
+  } catch {
+    // Sin almacenamiento persistente; alcanza con el fallback en memoria.
+  }
+}
+
+function clearStoredLocation(): void {
+  memoryLocation = null;
+  try {
+    window.sessionStorage.removeItem(browserLocationStorageKey);
+  } catch {
+    // Sin almacenamiento persistente; alcanza con limpiar la memoria.
+  }
+}
 function findNearestManualLocation(
   latitude: number,
   longitude: number,
@@ -55,7 +89,7 @@ export function LocationPicker({
   );
 
   function clearDeviceLocation() {
-    window.sessionStorage.removeItem(browserLocationStorageKey);
+    clearStoredLocation();
     setUsingDeviceLocation(false);
   }
 
@@ -79,10 +113,7 @@ export function LocationPicker({
           latitude: coords.latitude,
           longitude: coords.longitude,
         };
-        window.sessionStorage.setItem(
-          browserLocationStorageKey,
-          JSON.stringify(location),
-        );
+        writeStoredLocation(location);
         const nearest = findNearestManualLocation(
           location.latitude,
           location.longitude,

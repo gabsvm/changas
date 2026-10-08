@@ -49,6 +49,17 @@ const nextConfig: NextConfig = {
     "@changas/domain",
     "@changas/validation",
   ],
+  // CSRF de Server Actions: solo el host propio y previews de Vercel
+  // pueden invocar actions cross-site. El dominio prod va por env para
+  // no hardcodearlo.
+  serverActions: {
+    allowedOrigins: [
+      "*.vercel.app",
+      ...(process.env.SITE_ALLOWED_ORIGIN
+        ? [process.env.SITE_ALLOWED_ORIGIN]
+        : []),
+    ],
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

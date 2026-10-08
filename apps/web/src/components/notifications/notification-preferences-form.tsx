@@ -40,12 +40,13 @@ export function NotificationPreferencesForm({
   }, [state]);
 
   function persistChange() {
+    if (pending) return;
     window.setTimeout(() => formRef.current?.requestSubmit(), 0);
   }
 
   return (
     <form ref={formRef} action={formAction}>
-      {!pending && state.error ? (
+      {state.error ? (
         <p
           className="bg-danger/[0.07] text-danger px-4 py-2.5 text-sm font-semibold"
           role="alert"

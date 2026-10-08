@@ -32,23 +32,27 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const { data: category } = await getCategory(slug);
-  if (!category) return { title: "Categoría no encontrada" };
-  return {
-    title: category.name,
-    description:
-      category.description ?? "Servicios y habilidades publicados en Changas.",
-    alternates: { canonical: `/categoria/${category.slug}` },
-    openGraph: {
-      title: `${category.name} · Changas`,
+  try {
+    const { slug } = await params;
+    const { data: category } = await getCategory(slug);
+    if (!category) return { title: "Categoría no encontrada" };
+    return {
+      title: category.name,
       description:
-        category.description ??
-        "Servicios y habilidades publicados en Changas.",
-      type: "website",
-      url: `/categoria/${category.slug}`,
-    },
-  };
+        category.description ?? "Servicios y habilidades publicados en Changas.",
+      alternates: { canonical: `/categoria/${category.slug}` },
+      openGraph: {
+        title: `${category.name} · Changas`,
+        description:
+          category.description ??
+          "Servicios y habilidades publicados en Changas.",
+        type: "website",
+        url: `/categoria/${category.slug}`,
+      },
+    };
+  } catch {
+    return { title: "Categoría · Changas" };
+  }
 }
 
 export default async function CategoryPage({

@@ -171,35 +171,55 @@ export default async function AdminUsersPage({
         </div>
 
         {users.length ? (
-          <div className="grid gap-2 md:grid-cols-2">
-            {users.map((user) => (
-              <Link
-                className="group flex min-h-20 items-center justify-between gap-3 rounded-3xl border border-[#273142] bg-[#151c27] p-4 transition-colors hover:border-[#3a4659] hover:bg-[#192230]"
-                href={`/admin/users?q=${encodeURIComponent(query)}&user=${user.user_id}`}
-                key={user.user_id}
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-extrabold text-white">
-                    {user.display_name ?? user.email ?? user.user_id}
-                  </p>
-                  <p className="mt-1 truncate text-xs text-[#7f8a9b]">
+          <table className="w-full border-separate border-spacing-2">
+            <caption className="sr-only">
+              Cuentas registradas ({users.length})
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                  Cuenta
+                </th>
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                  Contacto
+                </th>
+                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                  Estado
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr
+                  key={user.user_id}
+                  className="rounded-3xl border border-[#273142] bg-[#151c27] transition-colors hover:border-[#3a4659] hover:bg-[#192230]"
+                >
+                  <th scope="row" className="min-w-0 rounded-l-3xl p-4 text-left">
+                    <Link
+                      className="block truncate text-sm font-extrabold text-white hover:underline"
+                      href={`/admin/users?q=${encodeURIComponent(query)}&user=${user.user_id}`}
+                    >
+                      {user.display_name ?? user.email ?? user.user_id}
+                    </Link>
+                    {user.role === "admin" ? (
+                      <span className="text-[11px] font-extrabold text-[#ff79ad]">
+                        ADMIN
+                      </span>
+                    ) : null}
+                  </th>
+                  <td className="max-w-45 truncate p-4 text-xs text-[#7f8a9b]">
                     {user.email ?? user.user_id}
-                  </p>
-                </div>
-                <div className="flex shrink-0 flex-col items-end gap-1.5">
-                  {user.role === "admin" ? (
-                    <span className="text-[11px] font-extrabold text-[#ff79ad]">
-                      ADMIN
-                    </span>
-                  ) : null}
-                  <AdminStatusBadge
-                    label={providerLabel(user.provider_status)}
-                    tone={providerTone(user.provider_status)}
-                  />
-                </div>
-              </Link>
-            ))}
-          </div>
+                  </td>
+                  <td className="rounded-r-3xl p-4 text-right">
+                    <AdminStatusBadge
+                      label={providerLabel(user.provider_status)}
+                      tone={providerTone(user.provider_status)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         ) : (
           <AdminEmptyState
             title="No encontramos usuarios"

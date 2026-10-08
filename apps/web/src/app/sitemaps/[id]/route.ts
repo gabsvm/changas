@@ -27,7 +27,29 @@ export async function GET(
     const urls: SitemapUrl[] = [];
 
     if (plan.includeHome) {
-      urls.push({ loc: baseUrl, changeFrequency: "daily", priority: 1 });
+      urls.push(
+        { loc: baseUrl, changeFrequency: "daily", priority: 1 },
+        {
+          loc: `${baseUrl}/buscar`,
+          changeFrequency: "daily" as const,
+          priority: 0.9,
+        },
+        {
+          loc: `${baseUrl}/terminos`,
+          changeFrequency: "monthly" as const,
+          priority: 0.3,
+        },
+        {
+          loc: `${baseUrl}/privacidad`,
+          changeFrequency: "monthly" as const,
+          priority: 0.3,
+        },
+        {
+          loc: `${baseUrl}/cookies`,
+          changeFrequency: "monthly" as const,
+          priority: 0.3,
+        },
+      );
     }
     urls.push(
       ...data.categories.map((category) => ({
@@ -48,7 +70,8 @@ export async function GET(
       })),
     );
 
-    if (urls.length !== plan.expectedUrls) {
+    const expectedUrls = plan.expectedUrls + (plan.includeHome ? 4 : 0);
+    if (urls.length !== expectedUrls) {
       return new Response("Sitemap changed while generating", {
         status: 503,
         headers: { "Cache-Control": "no-store" },

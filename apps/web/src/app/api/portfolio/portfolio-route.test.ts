@@ -32,7 +32,7 @@ describe("portfolio media route", () => {
     });
   });
 
-  it("downloads only an exact public projection row and caches it publicly", async () => {
+  it("downloads only an exact public projection row without shared caching", async () => {
     const path = "owner-id/public.png";
     maybeSingle.mockResolvedValue({
       data: { media_path: path, media_mime_type: "image/png" },
@@ -49,9 +49,7 @@ describe("portfolio media route", () => {
 
     expect(response.status).toBe(200);
     expect(await response.text()).toBe("synthetic image");
-    expect(response.headers.get("Cache-Control")).toBe(
-      "public, max-age=300, s-maxage=300",
-    );
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Content-Type")).toBe("image/png");
     expect(download).toHaveBeenCalledWith(path);
   });

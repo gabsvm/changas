@@ -176,32 +176,54 @@ export default async function AdminProvidersPage({
         </div>
 
         {providers.length ? (
-          <div className="grid gap-2 md:grid-cols-2">
-            {providers.map((provider) => (
-              <Link
-                className="flex min-h-24 items-center justify-between gap-3 rounded-3xl border border-[#273142] bg-[#151c27] p-4 transition-colors hover:border-[#3a4659] hover:bg-[#192230]"
-                href={`/admin/providers?q=${encodeURIComponent(query)}&provider=${provider.provider_user_id}`}
-                key={provider.provider_user_id}
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-extrabold text-white">
-                    {provider.display_name ?? provider.public_slug}
-                  </p>
-                  <p className="mt-1 truncate text-xs text-[#7f8a9b]">
+          <table className="w-full border-separate border-spacing-2">
+            <caption className="sr-only">
+              Prestadores registrados ({providers.length})
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                  Prestador
+                </th>
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                  Contacto
+                </th>
+                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                  Estado
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {providers.map((provider) => (
+                <tr
+                  key={provider.provider_user_id}
+                  className="rounded-3xl border border-[#273142] bg-[#151c27] transition-colors hover:border-[#3a4659] hover:bg-[#192230]"
+                >
+                  <th scope="row" className="min-w-0 rounded-l-3xl p-4 text-left">
+                    <Link
+                      className="block truncate text-sm font-extrabold text-white hover:underline"
+                      href={`/admin/providers?q=${encodeURIComponent(query)}&provider=${provider.provider_user_id}`}
+                    >
+                      {provider.display_name ?? provider.public_slug}
+                    </Link>
+                    <span className="mt-2 block text-[11px] font-bold text-[#697386]">
+                      Paso {provider.onboarding_step}/4 ·{" "}
+                      {provider.document_count} docs
+                    </span>
+                  </th>
+                  <td className="max-w-45 truncate p-4 text-xs text-[#7f8a9b]">
                     {provider.email ?? provider.public_slug}
-                  </p>
-                  <p className="mt-2 text-[11px] font-bold text-[#697386]">
-                    Paso {provider.onboarding_step}/4 ·{" "}
-                    {provider.document_count} docs
-                  </p>
-                </div>
-                <AdminStatusBadge
-                  label={statusLabel(provider.status)}
-                  tone={providerTone(provider.status)}
-                />
-              </Link>
-            ))}
-          </div>
+                  </td>
+                  <td className="rounded-r-3xl p-4 text-right">
+                    <AdminStatusBadge
+                      label={statusLabel(provider.status)}
+                      tone={providerTone(provider.status)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         ) : (
           <AdminEmptyState
             title="No hay prestadores"

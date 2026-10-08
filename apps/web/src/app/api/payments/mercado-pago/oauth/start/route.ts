@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { buildMercadoPagoOAuthRedirect } from "@/lib/payments/server";
+import {
+  getClientIp,
+  oauthStartRateLimiter,
+  rateLimitKey,
+  rateLimitedResponse,
+} from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +17,13 @@ function noStore(response: NextResponse) {
 }
 
 export async function GET(request: Request) {
+  const decision = oauthStartRateLimiter.check(
+    rateLimitKey(getClientIp(request.headers), "oauth-start"),
+  );
+  if (!decision.allowed) {
+    return rateLimitedResponse(decision.retryAfterSeconds);
+  }
+
   try {
     const authorizationUrl = await buildMercadoPagoOAuthRedirect();
     return noStore(NextResponse.redirect(authorizationUrl, 302));

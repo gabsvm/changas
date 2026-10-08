@@ -18,27 +18,32 @@ export function ServiceWorkerRegister() {
 
     let cancelled = false;
 
-    void navigator.serviceWorker.register("/sw.js").then((registration) => {
-      if (cancelled) return;
+    void navigator.serviceWorker
+      .register("/sw.js")
+      .then((registration) => {
+        if (cancelled) return;
 
-      if (registration.waiting && navigator.serviceWorker.controller) {
-        setWaitingWorker(registration.waiting);
-      }
+        if (registration.waiting && navigator.serviceWorker.controller) {
+          setWaitingWorker(registration.waiting);
+        }
 
-      registration.addEventListener("updatefound", () => {
-        const installing = registration.installing;
-        if (!installing) return;
+        registration.addEventListener("updatefound", () => {
+          const installing = registration.installing;
+          if (!installing) return;
 
-        installing.addEventListener("statechange", () => {
-          if (
-            installing.state === "installed" &&
-            navigator.serviceWorker.controller
-          ) {
-            setWaitingWorker(installing);
-          }
+          installing.addEventListener("statechange", () => {
+            if (
+              installing.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
+              setWaitingWorker(installing);
+            }
+          });
         });
+      })
+      .catch((error) => {
+        console.error("[pwa] no pudimos registrar el service worker.", error);
       });
-    });
 
     const handleControllerChange = () => {
       if (reloadOnControllerChange.current) {

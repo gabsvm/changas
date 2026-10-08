@@ -163,7 +163,7 @@ export default async function NotificationCenterPage() {
                                         value={item.id}
                                       />
                                       <button
-                                        className="consumer-pressable text-moss hover:bg-moss/[0.07] inline-flex min-h-9 items-center rounded-lg px-2 text-[11px] font-bold"
+                                        className="consumer-pressable text-moss hover:bg-moss/[0.07] inline-flex min-h-11 items-center rounded-lg px-2 text-[11px] font-bold"
                                         type="submit"
                                       >
                                         Marcar

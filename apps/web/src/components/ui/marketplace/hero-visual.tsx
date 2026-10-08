@@ -74,6 +74,8 @@ export function HeroVisual() {
             />
             <svg
               viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
               className="relative h-6 w-6 drop-shadow-[0_1px_4px_rgb(0_0_0/30%)]"
               fill="none"
             >

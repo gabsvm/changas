@@ -67,6 +67,20 @@ export function encryptPaymentToken(
   };
 }
 
+export function decryptPaymentTokenWithKeys(
+  envelope: PaymentTokenEnvelope,
+  keysByVersion: Record<number, string | undefined>,
+): string {
+  assertKeyVersion(envelope.keyVersion);
+  const key = keysByVersion[envelope.keyVersion];
+  if (!key) {
+    throw new Error(
+      `No payment token encryption key available for version ${envelope.keyVersion}.`,
+    );
+  }
+  return decryptPaymentToken(envelope, key);
+}
+
 export function decryptPaymentToken(
   envelope: PaymentTokenEnvelope,
   key: string,

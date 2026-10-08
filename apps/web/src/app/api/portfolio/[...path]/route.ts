@@ -29,7 +29,7 @@ export async function GET(
   if (error || !data) return new Response("Not found", { status: 404 });
   return new Response(data, {
     headers: {
-      "Cache-Control": "public, max-age=300, s-maxage=300",
+      "Cache-Control": "private, no-store",
       "Content-Type":
         publicItem.media_mime_type || data.type || "application/octet-stream",
     },

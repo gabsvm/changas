@@ -72,17 +72,45 @@ export async function updateNotificationPreferencesAction(
 
 type PushActionResult = { ok: true } | { ok: false; error: string };
 
-function validPushSubscription(subscription: BrowserPushSubscription): boolean {
-  if (!subscription.endpoint.startsWith("https://")) return false;
-  if (subscription.endpoint.length < 8 || subscription.endpoint.length > 4096) {
+const PUSH_ENDPOINT_ALLOWLIST: Record<string, true> = {
+  "fcm.googleapis.com": true,
+  "updates.push.services.mozilla.com": true,
+  "web.push.apple.com": true,
+  "push.apple.com": true,
+};
+
+function decodedBase64UrlLength(value: string): number | null {
+  if (value.length === 0 || value.length > 512) return null;
+  if (!/^[A-Za-z0-9_-]+={0,2}$/.test(value)) return null;
+  try {
+    return Buffer.from(value, "base64url").length;
+  } catch {
+    return null;
+  }
+}
+
+function validPushSubscription(
+  subscription: BrowserPushSubscription,
+): boolean {
+  if (
+    subscription.endpoint.length < 8 ||
+    subscription.endpoint.length > 4096
+  ) {
     return false;
   }
-  if (subscription.p256dh.length < 8 || subscription.p256dh.length > 4096) {
+  let endpointHost: string;
+  try {
+    const url = new URL(subscription.endpoint);
+    if (url.protocol !== "https:") return false;
+    endpointHost = url.hostname.toLowerCase();
+  } catch {
     return false;
   }
-  if (subscription.auth.length < 4 || subscription.auth.length > 4096) {
-    return false;
-  }
+  if (!PUSH_ENDPOINT_ALLOWLIST[endpointHost]) return false;
+  // Claves Web Push reales: p256dh es un punto P-256 sin comprimir (65
+  // bytes) y auth un secreto de 16 bytes, ambos en base64url.
+  if (decodedBase64UrlLength(subscription.p256dh) !== 65) return false;
+  if (decodedBase64UrlLength(subscription.auth) !== 16) return false;
   return !subscription.userAgent || subscription.userAgent.length <= 512;
 }
 

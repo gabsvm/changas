@@ -1,5 +1,8 @@
 "use server";
 
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
 import { getPublicSiteUrl } from "@changas/config/public";
 import {
   loginSchema,
@@ -7,16 +10,30 @@ import {
   passwordUpdateSchema,
   signUpSchema,
 } from "@changas/validation";
-import { redirect } from "next/navigation";
 
 import { safeNextPath } from "@/lib/auth/redirect";
 import type { AuthActionState } from "@/lib/forms/action-state";
 import { getFormString } from "@/lib/forms/form-data";
+import {
+  authRateLimiter,
+  getClientIp,
+  rateLimitKey,
+} from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 const genericAuthError =
   "No pudimos completar la operación. Revisá los datos e intentá de nuevo.";
 
+const authThrottleMessage =
+  "Demasiados intentos. Esperá un minuto e intentá de nuevo.";
+
+async function authThrottleExceeded(identity: string): Promise<boolean> {
+  const headerList = await headers();
+  return (
+    !authRateLimiter.check(rateLimitKey(getClientIp(headerList), identity))
+      .allowed
+  );
+}
 function invalidForm(): AuthActionState {
   return { error: "Revisá los datos ingresados." };
 }
@@ -38,6 +55,10 @@ export async function signIn(
 
   if (!parsed.success) {
     return invalidForm();
+  }
+
+  if (await authThrottleExceeded(`sign-in::${parsed.data.email}`)) {
+    return { error: authThrottleMessage };
   }
 
   const supabase = await createClient();
@@ -63,6 +84,10 @@ export async function signUp(
 
   if (!parsed.success) {
     return invalidForm();
+  }
+
+  if (await authThrottleExceeded(`sign-up::${parsed.data.email}`)) {
+    return { error: authThrottleMessage };
   }
 
   const supabase = await createClient();
@@ -98,6 +123,9 @@ export async function requestPasswordReset(
 
   if (!parsed.success) {
     return invalidForm();
+  }
+  if (await authThrottleExceeded(`reset::${parsed.data.email}`)) {
+    return { error: authThrottleMessage };
   }
 
   const supabase = await createClient();

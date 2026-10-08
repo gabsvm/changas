@@ -115,9 +115,11 @@ export function ConversationThread({
   const [loadingOlder, startOlderTransition] = useTransition();
   const [blockedByMe, setBlockedByMe] = useState(initiallyBlockedByMe);
   const [changingBlock, startBlockTransition] = useTransition();
+  const [blockError, setBlockError] = useState<string | null>(null);
+  const [olderError, setOlderError] = useState<string | null>(null);
+  const [readError, setReadError] = useState<string | null>(null);
   const [showAttach, setShowAttach] = useState(false);
   const connectedOnce = useRef(false);
-
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
@@ -157,33 +159,61 @@ export function ConversationThread({
     };
   }, [conversationId, refreshThread]);
 
-  const latestMessageId = messages.at(-1)?.message_id;
+  const latestMessage = messages.at(-1);
+  const latestMessageId = latestMessage?.message_id;
+  const latestIsForeign = latestMessage
+    ? latestMessage.sender_user_id !== currentUserId
+    : false;
+  const markedReadRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!latestMessageId) return;
-    void markConversationReadAction(conversationId, latestMessageId).catch(
-      () => undefined,
+    if (
+      !latestMessageId ||
+      !latestIsForeign ||
+      markedReadRef.current === latestMessageId
+    )
+      return;
+    markedReadRef.current = latestMessageId;
+    void markConversationReadAction(conversationId, latestMessageId).then(
+      () => setReadError(null),
+      (error) => {
+        console.error("[messages] no pudimos marcar la conversación como leída.", error);
+        setReadError("No pudimos marcar los mensajes como leídos.");
+      },
     );
-  }, [conversationId, latestMessageId]);
+  }, [conversationId, latestMessageId, latestIsForeign]);
 
   function loadOlder() {
     const first = messages[0];
     if (!first || loadingOlder) return;
 
+    setOlderError(null);
     startOlderTransition(async () => {
-      const older = await loadOlderMessages(
-        conversationId,
-        first.created_at,
-        first.message_id,
-      );
-      setMessages((current) => mergeConversationMessages(older, current));
-      setHasOlder(older.length === 50);
+      try {
+        const older = await loadOlderMessages(
+          conversationId,
+          first.created_at,
+          first.message_id,
+        );
+        setMessages((current) => mergeConversationMessages(older, current));
+        setHasOlder(older.length === 50);
+      } catch (error) {
+        console.error("[messages] no pudimos cargar mensajes anteriores.", error);
+        setOlderError("No pudimos cargar los mensajes anteriores. Probá de nuevo.");
+      }
     });
   }
 
   function toggleBlock() {
+    setBlockError(null);
     startBlockTransition(async () => {
       const next = !blockedByMe;
-      await setConversationBlocked(conversationId, peerUserId, next);
+      try {
+        await setConversationBlocked(conversationId, peerUserId, next);
+      } catch (error) {
+        console.error("[messages] no pudimos cambiar el bloqueo.", error);
+        setBlockError("No pudimos cambiar el bloqueo. Probá de nuevo.");
+        return;
+      }
       setBlockedByMe(next);
       refreshThread();
     });
@@ -271,6 +301,11 @@ export function ConversationThread({
             </div>
           </details>
         </div>
+        {blockError ? (
+          <p role="alert" className="bg-terracotta/10 text-terracotta mt-3 rounded-xl px-3 py-2 text-xs leading-5">
+            {blockError}
+          </p>
+        ) : null}
         {blockedByMe ? (
           <div className="bg-terracotta/10 text-terracotta mt-3 rounded-xl px-3 py-2 text-xs leading-5">
             Bloqueaste a esta persona. El historial se conserva, pero no podés
@@ -310,7 +345,17 @@ export function ConversationThread({
             >
               {loadingOlder ? "Cargando…" : "Cargar mensajes anteriores"}
             </button>
+            {olderError ? (
+              <p role="alert" className="text-terracotta mt-2 text-xs font-semibold">
+                {olderError}
+              </p>
+            ) : null}
           </div>
+        ) : null}
+        {readError ? (
+          <p role="alert" className="text-terracotta mb-3 text-center text-xs font-semibold">
+            {readError}
+          </p>
         ) : null}
 
         {messages.length === 0 ? (
@@ -656,13 +701,15 @@ function AttachmentComposer({
     }
 
     startTransition(async () => {
+      const supabase = createClient();
+      let messageId: string | null = null;
+      const uploadedPaths: string[] = [];
       try {
-        const messageId = await prepareConversationAttachmentMessage(
+        messageId = await prepareConversationAttachmentMessage(
           conversationId,
           kind,
           nonceRef.current?.value ?? crypto.randomUUID(),
         );
-        const supabase = createClient();
         const uploaded = [];
         for (const file of files) {
           const safeName = sanitizeAttachmentFilename(file.name);
@@ -674,6 +721,7 @@ function AttachmentComposer({
               upsert: false,
             });
           if (upload.error) throw new Error("No pudimos subir el archivo.");
+          uploadedPaths.push(storagePath);
           uploaded.push(
             await registerConversationAttachmentUpload({
               messageId,
@@ -696,6 +744,27 @@ function AttachmentComposer({
         if (nonceRef.current) nonceRef.current.value = crypto.randomUUID();
         onSent();
       } catch (error) {
+        // Rollback: el mensaje se creó antes de subir los archivos, así que
+        // hay que borrarlo junto con lo que se haya llegado a subir para no
+        // dejar un mensaje vacío colgado en el hilo.
+        try {
+          if (uploadedPaths.length > 0) {
+            await supabase.storage
+              .from("conversation-attachments")
+              .remove(uploadedPaths);
+          }
+          if (messageId) {
+            // `messages` se accede por RPC y no está en los tipos generados.
+            const untyped = supabase as unknown as {
+              from(table: string): {
+                delete(): { eq(column: string, value: string): Promise<unknown> };
+              };
+            };
+            await untyped.from("messages").delete().eq("id", messageId);
+          }
+        } catch {
+          // Best-effort: el error original es el que importa.
+        }
         setState({
           status: "error",
           message:

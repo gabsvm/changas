@@ -33,7 +33,11 @@ export async function startServiceConversation(
       const next = `/p/${providerSlug}/${serviceSlug}`;
       redirect(`/login?next=${encodeURIComponent(next)}`);
     }
-    throw error;
+    const code =
+      error instanceof ConversationServerError ? error.code : "TRANSIENT";
+    redirect(
+      `/p/${providerSlug}/${serviceSlug}?consultError=${encodeURIComponent(code)}`,
+    );
   }
 
   redirect(`/messages/${conversationId}`);
