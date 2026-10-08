@@ -160,8 +160,8 @@ export async function respondScopeChangeAction(
 export async function fakeAdditionalPaymentAction(
   formData: FormData,
 ): Promise<void> {
-  if (process.env.NODE_ENV === "production")
-    throw new Error("No disponible en producción.");
+  // Production gating (with the admin exception) is enforced in
+  // applyFakeAdditionalPayment, the single choke point.
   const jobId = uuidField(formData, "jobId");
   const scopeChangeId = uuidField(formData, "scopeChangeId");
   const nonce = stringField(formData, "paymentNonce") || crypto.randomUUID();

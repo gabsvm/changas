@@ -123,6 +123,15 @@ export default async function JobPage({
 
   const isClient = user.id === detail.client_user_id;
   const isProvider = user.id === detail.provider_user_id;
+  // Untyped RPC (mirrors lib/admin/server.ts): generated Database types do
+  // not include is_current_user_admin.
+  const { data: adminFlag } = await (
+    supabase as unknown as {
+      rpc(name: string): Promise<{ data: unknown; error: unknown }>;
+    }
+  ).rpc("is_current_user_admin");
+  const canSimulatePayment =
+    process.env.NODE_ENV !== "production" || adminFlag === true;
   const schedulePrimary =
     detail.schedule_starts_at ?? detail.schedule_deadline_at ?? null;
   const status = getJobStatusPresentation(detail.job_status);
@@ -615,7 +624,7 @@ export default async function JobPage({
                           </form>
                         ) : null}
                         {isClient &&
-                        process.env.NODE_ENV !== "production" &&
+                        canSimulatePayment &&
                         ["AWAITING_PAYMENT", "PAYMENT_FAILED"].includes(
                           change.change_status,
                         ) ? (

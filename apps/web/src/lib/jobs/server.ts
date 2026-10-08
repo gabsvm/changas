@@ -341,14 +341,20 @@ export async function applyFakeAdditionalPayment(input: {
   nonce: string;
   outcome: "SUCCESS" | "PENDING" | "FAILURE";
 }): Promise<void> {
+  const { supabase, user } = await authenticatedClient();
   if (process.env.NODE_ENV === "production") {
-    throw new JobServerError(
-      "FORBIDDEN",
-      "Los pagos de prueba no están disponibles en producción.",
+    // Test affordance: admins resolve scope-change payments without money
+    // so the full hire flow stays testable in production.
+    const { data: isAdmin, error: adminError } = await supabase.rpc(
+      "is_current_user_admin",
     );
+    if (adminError || isAdmin !== true) {
+      throw new JobServerError(
+        "FORBIDDEN",
+        "Los pagos de prueba no están disponibles en producción.",
+      );
+    }
   }
-
-  const { user } = await authenticatedClient();
   const scopeChanges = await listJobScopeChanges(input.jobId);
   const targetChange = scopeChanges.find(
     (change) => change.scope_change_id === input.scopeChangeId,
