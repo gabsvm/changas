@@ -1,6 +1,6 @@
 # Changas
 
-Changas is a mobile-first marketplace for people who want to offer practical skills, trades, and knowledge. This checkout contains **Phase 00 — Foundation**, **Phase 01 — Accounts, auth and provider identity skeleton**, **Phase 02 — Provider marketplace data and public provider/service pages**, and **Phase 03 — Public discovery, search and SEO** from [`CHANGAS_MASTER_PLAN.md`](./CHANGAS_MASTER_PLAN.md). Later marketplace phases remain intentionally out of scope.
+Changas is a mobile-first marketplace PWA for offering and hiring practical skills and trades. Live product: public discovery with reputation-ranked search, provider profiles with portfolio covers, conversations with structured proposals, **hire-on-accept** (accepting hires instantly, no upfront payment; settled at completion), Web Push with rich content, manual Claro/Oscuro/Sistema theme, and Mercado Pago Split 1:1 + Checkout Pro (wired for completion-time charging). See [`docs/CONTEXTO.md`](./docs/CONTEXTO.md) for current state and roadmap, and [`CHANGAS_MASTER_PLAN.md`](./CHANGAS_MASTER_PLAN.md) for the original V1 vision (partially superseded).
 
 ## Prerequisites
 
@@ -85,4 +85,4 @@ supabase/          local config, migrations, and seed policy
 docs/              architecture and decision records
 ```
 
-Phase 03 work is isolated on `codex/phase-03-discovery`. It stops before AI, embeddings, chat, realtime messaging, offers, jobs, payments, reviews/reputation, notifications, admin dashboard, and all later phases.
+Implemented well beyond Phase 03: jobs, conversations, proposals, reputation, notifications with real Web Push, admin, payments backend, dark mode, and premium UI. Details in [`docs/CONTEXTO.md`](./docs/CONTEXTO.md).

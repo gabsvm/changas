@@ -1,5 +1,7 @@
 # Phase 10 beta operations runbook
 
+> NOTA (2026-10): reproducible como entorno beta histórico, pero los journeys de pago con fake-payment contradicen el modelo vigente **hire-on-accept** (sin pago por adelantado; cobro al cierre). No usar esos journeys como referencia del modelo actual.
+
 ## Purpose
 
 This runbook makes the beta environment reproducible and gives operators one deterministic smoke path before Phase 11.

@@ -124,7 +124,7 @@ export default async function JobsPage({
         {jobs.length === 0 ? (
           <EmptyState
             title="Todavía no hay trabajos activos"
-            description="Cuando una propuesta quede aceptada y el pago correspondiente se confirme, aparecerá acá."
+            description="Cuando aceptes o te acepten una propuesta, el trabajo aparecerá acá."
             actionHref="/buscar"
             actionLabel="Explorar servicios"
             className="pt-14"

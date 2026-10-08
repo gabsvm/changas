@@ -8,6 +8,7 @@
 **Planned future mobile:** React Native + Expo, reusing backend/domain contracts  
 **AI at launch:** explicitly OUT OF SCOPE  
 **Real payments:** intentionally deferred until the rest of the marketplace is working end-to-end with a fake payment provider.
+**ESTADO ACTUAL (2026-10):** fases 00–11 ejecutadas. Visión y principios (§§1–2) vigentes. **Superseded:** pagos por adelantado / AWAITING_PAYMENT→PAID obligatorio (reemplazado por **hire-on-accept**: aceptar contrata, trabajo CONFIRMED sin pago; cobro al cierre, auto-confirmación a 7 días, sin cobro con reclamo — `20261010000000_hire_on_accept.sql`); push como plan futuro (push real Web Push implementado). Agregados no documentados acá: Space Grotesk+Inter, dark con toggle, covers, tabs Trabajos. Detalle y pendientes: [`docs/CONTEXTO.md`](./docs/CONTEXTO.md).
 
 ---
 

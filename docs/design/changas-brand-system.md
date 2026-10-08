@@ -87,9 +87,9 @@ The bottom navigation stays visually quiet. The active destination uses a warm o
 
 Exact logo colors are not automatically valid foreground colors. Small text uses accessible derivatives where needed. Keyboard focus is blue and visually explicit. Primary buttons use dark ink over orange rather than white because the exact brand orange does not provide sufficient normal-text contrast with white. Unread counters use `#D60060` with white text instead of the brighter logo pink.
 
-## Dark mode (sistema, sin toggle)
+## Dark mode (manual con toggle + modo Sistema)
 
-El modo oscuro es automático vía `prefers-color-scheme`. No hay toggle manual: `:root` declara `color-scheme: light dark` y `apps/web/src/app/globals.css` remapea los tokens en `@media (prefers-color-scheme: dark)`.
+El tema se controla con clase `.dark` (ThemeSelector: Claro/Oscuro/Sistema; default Claro; `localStorage changas-theme`; script pre-paint sin FOUC) + variante `@custom-variant dark`. NUNCA reintroducir la media query como mecanismo. `:root` declara `color-scheme: light dark` y `apps/web/src/app/globals.css` remapea los tokens bajo `:root.dark`.
 
 - Canvas: `#171310` (cálido oscuro); superficies elevadas `#221C17` / `#2A231C`; tinta `#F5EFE8`.
 - Los utilities de Tailwind v4 (`bg-surface`, `text-ink`, `border-ink/…`) resuelven vía `var()`, así que el remapeo de `--color-*` voltea cards, nav, header, sheets, inputs, skeletons y empty states sin variantes por archivo.
