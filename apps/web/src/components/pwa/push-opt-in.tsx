@@ -125,18 +125,31 @@ export function PushOptIn({
       }
 
       const registration = await navigator.serviceWorker.register("/sw.js");
-      const existing = await registration.pushManager.getSubscription();
-      const subscription =
-        existing ??
-        (await registration.pushManager.subscribe({
+      let createdHere = false;
+      async function freshSubscription() {
+        createdHere = true;
+        return registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: base64UrlToUint8Array(publicKey),
-        }));
-      const p256dh = subscription.getKey("p256dh");
-      const auth = subscription.getKey("auth");
+        });
+      }
+      let subscription = await registration.pushManager.getSubscription();
+      let p256dh = subscription?.getKey("p256dh") ?? null;
+      let auth = subscription?.getKey("auth") ?? null;
+      if (subscription && (!p256dh || !auth)) {
+        // Suscripción colgada (sin material criptográfico, p.ej. de una
+        // llave VAPID anterior): se da de baja y se crea una nueva.
+        await subscription.unsubscribe().catch(() => undefined);
+        subscription = await freshSubscription();
+        p256dh = subscription.getKey("p256dh");
+        auth = subscription.getKey("auth");
+      }
+      subscription ??= await freshSubscription();
+      p256dh ??= subscription.getKey("p256dh");
+      auth ??= subscription.getKey("auth");
 
       if (!p256dh || !auth) {
-        if (!existing) await subscription.unsubscribe();
+        await subscription.unsubscribe().catch(() => undefined);
         setEnabled(false);
         notify(
           "El navegador no devolvió una suscripción push válida.",
@@ -153,7 +166,7 @@ export function PushOptIn({
       });
 
       if (!result.ok) {
-        if (!existing) await subscription.unsubscribe();
+        if (createdHere) await subscription.unsubscribe();
         setEnabled(false);
         notify(result.error, "save-failed");
         return;
