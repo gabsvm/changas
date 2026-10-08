@@ -210,7 +210,7 @@ export default async function PublicProviderPage({
                     </span>
                   ) : null}
                 </div>
-                <h1 className="mt-3 text-[26px] leading-8 font-extrabold tracking-[-0.03em]">
+                <h1 className="font-display mt-3 text-[26px] leading-8 font-extrabold tracking-[-0.03em]">
                   {provider.display_name}
                 </h1>
                 {provider.public_headline ? (
@@ -278,13 +278,8 @@ export default async function PublicProviderPage({
             </p>
           ) : null}
 
-          <div className="profile-trust-strip border-brand-yellow/35 bg-surface-muted mt-5 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
-            <span
-              className="bg-brand-yellow/30 text-warning grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"
-              aria-hidden="true"
-            >
-              ✦
-            </span>
+          <div className="profile-trust-strip border-brand-yellow/35 bg-surface-muted consumer-card mt-5 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
+            <IllustratedBadge tone="gold" icon="sparkle" size="md" label="Información pública clara" />
             <div>
               <p className="text-sm font-extrabold">
                 Información pública clara
@@ -296,13 +291,8 @@ export default async function PublicProviderPage({
             </div>
           </div>
 
-          <div className="profile-verification border-moss/25 bg-surface-muted mt-3 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
-            <span
-              className="bg-moss/10 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"
-              aria-hidden="true"
-            >
-              ✓
-            </span>
+          <div className="profile-verification border-moss/25 bg-surface-muted consumer-card mt-3 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
+            <IllustratedBadge tone="green" icon="check" size="md" label="Verificación de identidad" />
             <div>
               <p className="text-sm font-extrabold">Verificación de identidad</p>
               <p className="text-ink/70 mt-1 text-xs leading-6">
@@ -361,7 +351,7 @@ export default async function PublicProviderPage({
           <ProviderReputation providerSlug={provider.public_slug} />
         </div>
 
-        <PublicSection title="Servicios">
+        <PublicSection title="Servicios" badge={{ tone: "orange", icon: "tag" }}>
           {(services ?? []).length ? (
             <div className="grid gap-3">
               {(services ?? []).map((service) => (
@@ -438,7 +428,7 @@ export default async function PublicProviderPage({
         </PublicSection>
 
         {(skills ?? []).length ? (
-          <PublicSection title="Habilidades">
+          <PublicSection title="Habilidades" badge={{ tone: "blue", icon: "sparkle" }}>
             <div className="flex flex-wrap gap-2">
               {(skills ?? []).map((skill) => (
                 <StatusChip tone="neutral" key={skill.skill_slug}>
@@ -450,7 +440,7 @@ export default async function PublicProviderPage({
         ) : null}
 
         {(areas ?? []).length ? (
-          <PublicSection title="Zona de servicio">
+          <PublicSection title="Zona de servicio" badge={{ tone: "blue", icon: "pin" }}>
             <div className="grid gap-2">
               {(areas ?? []).map((area) => (
                 <div
@@ -474,7 +464,7 @@ export default async function PublicProviderPage({
         ) : null}
 
         {(portfolio ?? []).length ? (
-          <PublicSection title="Portfolio">
+          <PublicSection title="Portfolio" badge={{ tone: "violet", icon: "sparkle" }}>
             <div className="grid gap-4 sm:grid-cols-2">
               {(portfolio ?? []).map((item) => (
                 <article
@@ -512,7 +502,7 @@ export default async function PublicProviderPage({
         ) : null}
 
         {(experiences ?? []).length ? (
-          <PublicSection title="Experiencia">
+          <PublicSection title="Experiencia" badge={{ tone: "violet", icon: "briefcase" }}>
             <div className="grid gap-2">
               {(experiences ?? []).map((item) => (
                 <div className="border-ink/[0.08] bg-surface consumer-card flex items-start gap-3 rounded-2xl border px-4 py-3.5" key={`${item.title}-${item.started_on}`}>
@@ -537,7 +527,7 @@ export default async function PublicProviderPage({
         ) : null}
 
         {(education ?? []).length || (certifications ?? []).length ? (
-          <PublicSection title="Formación y credenciales">
+          <PublicSection title="Formación y credenciales" badge={{ tone: "gold", icon: "star" }}>
             <div className="grid gap-2">
               {(education ?? []).map((item) => (
                 <div
@@ -588,16 +578,21 @@ export default async function PublicProviderPage({
 
 function PublicSection({
   title,
+  badge,
   children,
 }: {
   title: string;
+  badge: { tone: "orange" | "blue" | "green" | "rose" | "violet" | "gold" | "neutral"; icon: "tag" | "sparkle" | "pin" | "briefcase" | "star" | "shield" | "check"; label?: string };
   children: ReactNode;
 }) {
   return (
     <section className="profile-section-card consumer-card bg-surface mt-6 p-5 sm:p-6">
-      <h2 className="text-lg leading-7 font-bold tracking-[-0.015em]">
-        {title}
-      </h2>
+      <span className="flex min-w-0 items-center gap-2.5">
+        <IllustratedBadge tone={badge.tone} icon={badge.icon} size="sm" label={badge.label ?? title} />
+        <h2 className="font-display truncate text-lg leading-7 font-bold tracking-[-0.015em]">
+          {title}
+        </h2>
+      </span>
       <div className="mt-4">{children}</div>
     </section>
   );

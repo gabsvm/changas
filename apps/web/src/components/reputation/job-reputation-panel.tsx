@@ -8,9 +8,34 @@ import {
 } from "@/app/(account)/jobs/actions";
 import { getJobReviewState } from "@/lib/reputation/server";
 import { createClient } from "@/lib/supabase/server";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+import { SectionHeader } from "@/components/ui/marketplace/section-header";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 
-function stars(value: number): string {
-  return "★".repeat(Math.max(1, Math.min(5, Math.round(value))));
+function StarRow({ value, label }: { value: number; label?: string }) {
+  const filled = Math.max(1, Math.min(5, Math.round(value)));
+  return (
+    <span
+      className="inline-flex items-center gap-0.5"
+      role="img"
+      aria-label={label ?? `${value} de 5 estrellas`}
+    >
+      {[1, 2, 3, 4, 5].map((index) => (
+        <svg
+          key={index}
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className={`h-4 w-4 ${index <= filled ? "fill-brand-yellow stroke-brand-yellow" : "fill-ink/[0.08] stroke-ink/20"}`}
+          strokeWidth="1.5"
+        >
+          <path
+            d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.3L12 17.1l-5.7 3.1 1.2-6.3L2.8 9.5l6.4-.8L12 2.8Z"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ))}
+    </span>
+  );
 }
 
 function DimensionSelect({ name, label }: { name: string; label: string }) {
@@ -19,11 +44,10 @@ function DimensionSelect({ name, label }: { name: string; label: string }) {
       {label}
       <select
         name={name}
-        defaultValue=""
-        className="border-ink/10 mt-1 block h-11 w-full rounded-xl border bg-white px-3 font-normal"
+        defaultValue="5"
+        className="border-ink/10 bg-surface mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
       >
-        <option value="">Sin calificar</option>
-        {[1, 2, 3, 4, 5].map((value) => (
+        {[5, 4, 3, 2, 1].map((value) => (
           <option key={value} value={value}>
             {value} / 5
           </option>
@@ -52,24 +76,29 @@ export async function JobReputationPanel({
 
   return (
     <section
-      className="border-ink/10 rounded-3xl border bg-white/75 p-5 sm:p-6 dark:bg-white/[0.05]"
+      className="border-ink/[0.08] consumer-card bg-surface rounded-3xl border p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-6 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
       aria-labelledby="job-reputation-title"
     >
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div id="job-reputation-title">
+        <SectionHeader
+          title="Reseña del trabajo"
+          badge={{ tone: "gold", icon: "star", label: "Reseña del trabajo" }}
+        />
+      </div>
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-terracotta text-xs font-bold tracking-[0.14em] uppercase">
             Reputación verificada
           </p>
-          <h2
-            id="job-reputation-title"
-            className="font-display mt-2 text-2xl font-semibold"
-          >
-            Reseña del trabajo
-          </h2>
           <p className="text-ink/70 mt-1 max-w-xl text-sm leading-6">
             La reseña queda vinculada a este trabajo completado y no puede ser
             eliminada por el proveedor.
           </p>
+          {state.review_id && state.rating ? (
+            <p className="mt-2">
+              <StatusChip tone="success">Reseña verificada de este trabajo</StatusChip>
+            </p>
+          ) : null}
         </div>
         {isClient ? (
           <form action={rehireJobAction}>
@@ -90,7 +119,7 @@ export async function JobReputationPanel({
               name="rating"
               required
               defaultValue="5"
-              className="border-ink/10 mt-1 block h-11 w-full rounded-xl border bg-white px-3 font-normal sm:max-w-xs"
+              className="border-ink/10 bg-surface mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none sm:max-w-xs dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
             >
               {[5, 4, 3, 2, 1].map((value) => (
                 <option key={value} value={value}>
@@ -110,7 +139,7 @@ export async function JobReputationPanel({
               name="reviewText"
               rows={4}
               maxLength={2000}
-              className="border-ink/10 mt-1 block w-full rounded-2xl border bg-white px-4 py-3 font-normal"
+              className="border-ink/10 bg-surface mt-1 block w-full rounded-2xl border px-4 py-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
               placeholder="Contá cómo fue el trabajo"
             />
           </label>
@@ -121,14 +150,12 @@ export async function JobReputationPanel({
       ) : null}
 
       {state.review_id && state.rating ? (
-        <article className="bg-canvas mt-5 rounded-2xl p-4">
+        <article className="border-ink/[0.08] bg-surface consumer-card mt-5 rounded-2xl border p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p
-                className="text-terracotta font-semibold"
-                aria-label={`${state.rating} de 5 estrellas`}
-              >
-                {stars(state.rating)}
+              <p className="flex items-center gap-2">
+                <IllustratedBadge tone="gold" icon="star" size="sm" label={`${state.rating} de 5 estrellas`} />
+                <StarRow value={state.rating} label={`${state.rating} de 5 estrellas`} />
               </p>
               <p className="text-ink/70 mt-1 text-xs">
                 Reseña verificada de este trabajo
@@ -149,7 +176,7 @@ export async function JobReputationPanel({
           ) : null}
 
           {state.provider_reply ? (
-            <div className="border-ink/10 mt-4 rounded-xl border bg-white/70 p-3 text-sm dark:bg-white/[0.05]">
+            <div className="border-ink/10 bg-canvas mt-4 rounded-xl border p-3 text-sm">
               <p className="text-ink/70 text-xs font-bold tracking-wide uppercase">
                 Respuesta del proveedor
               </p>
@@ -173,7 +200,7 @@ export async function JobReputationPanel({
                     required
                     defaultValue={state.provider_reply ?? ""}
                     rows={3}
-                    className="border-ink/10 mt-1 block w-full rounded-xl border bg-white px-3 py-2 font-normal"
+                    className="border-ink/10 bg-surface mt-1 block w-full rounded-xl border px-3 py-2 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
                   />
                 </label>
                 <button className="button-secondary w-fit" type="submit">
@@ -196,7 +223,7 @@ export async function JobReputationPanel({
                     <select
                       name="reason"
                       defaultValue="OTHER"
-                      className="border-ink/10 mt-1 block h-11 w-full rounded-xl border bg-white px-3 font-normal"
+                      className="border-ink/10 bg-surface mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
                     >
                       <option value="IRRELEVANT_CONTENT">
                         Contenido irrelevante
@@ -216,7 +243,7 @@ export async function JobReputationPanel({
                     name="details"
                     rows={2}
                     maxLength={1000}
-                    className="border-ink/10 rounded-xl border bg-white px-3 py-2 text-sm"
+                    className="border-ink/10 bg-surface rounded-xl border px-3 py-2 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
                     placeholder="Detalle opcional"
                   />
                   <button className="button-secondary w-fit" type="submit">

@@ -4,13 +4,38 @@ import {
   listPublicProviderReviews,
 } from "@/lib/reputation/server";
 import { createClient } from "@/lib/supabase/server";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+import { SectionHeader } from "@/components/ui/marketplace/section-header";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 
 function percent(value: number | null): string {
   return value === null ? "Sin datos" : `${Math.round(value * 100)}%`;
 }
 
-function stars(value: number): string {
-  return "★".repeat(Math.max(1, Math.min(5, Math.round(value))));
+function StarRow({ value, label }: { value: number; label?: string }) {
+  const filled = Math.max(1, Math.min(5, Math.round(value)));
+  return (
+    <span
+      className="inline-flex items-center gap-0.5"
+      role="img"
+      aria-label={label ?? `${value} de 5 estrellas`}
+    >
+      {[1, 2, 3, 4, 5].map((index) => (
+        <svg
+          key={index}
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className={`h-4 w-4 ${index <= filled ? "fill-brand-yellow stroke-brand-yellow" : "fill-ink/[0.08] stroke-ink/20"}`}
+          strokeWidth="1.5"
+        >
+          <path
+            d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.3L12 17.1l-5.7 3.1 1.2-6.3L2.8 9.5l6.4-.8L12 2.8Z"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ))}
+    </span>
+  );
 }
 
 export async function ProviderReputation({
@@ -29,20 +54,28 @@ export async function ProviderReputation({
 
   return (
     <section className="mt-6 space-y-6" aria-labelledby="reputation-title">
-      <div className="border-ink/[0.08] consumer-card rounded-3xl border bg-white/70 p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-6 dark:bg-white/[0.05] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="border-ink/[0.08] consumer-card bg-surface rounded-3xl border p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-6 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+        <div id="reputation-title">
+          <SectionHeader
+            title="Reputación"
+            badge={{ tone: "gold", icon: "star", label: "Reputación verificada" }}
+          />
+        </div>
+        <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
               Reputación verificada
             </p>
-            <h2
-              id="reputation-title"
-              className="font-display mt-2 text-3xl font-semibold"
-            >
-              {summary.review_count > 0 && summary.rating_average !== null
-                ? `★ ${summary.rating_average.toFixed(1)} de 5`
-                : "Nuevo proveedor"}
-            </h2>
+            <p className="font-display mt-2 flex flex-wrap items-center gap-2 text-3xl font-semibold">
+              {summary.review_count > 0 && summary.rating_average !== null ? (
+                <>
+                  <IllustratedBadge tone="gold" icon="star" size="sm" label={`Promedio ${summary.rating_average.toFixed(1)} de 5`} />
+                  <span>{summary.rating_average.toFixed(1)} de 5</span>
+                </>
+              ) : (
+                "Nuevo proveedor"
+              )}
+            </p>
             <p className="text-ink/70 mt-1 text-sm">
               {summary.review_count > 0
                 ? `${summary.review_count} ${summary.review_count === 1 ? "reseña" : "reseñas"} de trabajos completados`
@@ -67,8 +100,10 @@ export async function ProviderReputation({
         </div>
 
         {summary.repeat_client_count > 0 ? (
-          <p className="bg-moss/10 text-moss mt-4 inline-flex rounded-full px-3 py-1.5 text-xs font-semibold">
-            {summary.repeat_client_count} clientes volvieron a contratarlo
+          <p className="mt-4">
+            <StatusChip tone="success">
+              {summary.repeat_client_count} clientes volvieron a contratarlo
+            </StatusChip>
           </p>
         ) : null}
 
@@ -95,26 +130,29 @@ export async function ProviderReputation({
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {contexts.slice(0, 8).map((context) => (
-                <span
+                <StatusChip
+                  tone="neutral"
                   key={`${context.context_type}-${context.context_slug}`}
-                  className="border-ink/10 rounded-full border bg-white px-3 py-1.5 text-xs"
                 >
                   <strong>{context.context_name}</strong>
                   {context.rating_average !== null
-                    ? ` · ★ ${context.rating_average.toFixed(1)}`
+                    ? ` · ${context.rating_average.toFixed(1)} / 5`
                     : ""}
                   {` · ${context.completed_jobs} completados`}
-                </span>
+                </StatusChip>
               ))}
             </div>
           </div>
         ) : null}
       </div>
 
-      <div className="border-ink/[0.08] consumer-card rounded-3xl border bg-white/55 p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-6 dark:bg-white/[0.05] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-        <h2 className="font-display text-2xl font-semibold">
-          Reseñas verificadas
-        </h2>
+      <div className="border-ink/[0.08] consumer-card bg-surface rounded-3xl border p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-6 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+        <span className="flex min-w-0 items-center gap-2.5">
+          <IllustratedBadge tone="blue" icon="chat" size="sm" label="Reseñas verificadas" />
+          <h2 className="font-display text-2xl font-semibold">
+            Reseñas verificadas
+          </h2>
+        </span>
         {reviews.length > 0 ? (
           <div className="mt-4 space-y-4">
             {reviews.map((review) => (
@@ -138,12 +176,7 @@ export async function ProviderReputation({
                       <p className="truncate font-semibold">
                         {review.reviewer_display_name}
                       </p>
-                      <p
-                        className="text-terracotta text-sm"
-                        aria-label={`${review.rating} de 5 estrellas`}
-                      >
-                        {stars(review.rating)}
-                      </p>
+                      <StarRow value={review.rating} label={`${review.rating} de 5 estrellas`} />
                     </div>
                   </div>
                   <div className="shrink-0 text-right">
@@ -191,7 +224,7 @@ export async function ProviderReputation({
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-ink/[0.08] bg-surface min-w-24 rounded-2xl border px-3 py-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+    <div className="border-ink/[0.08] bg-surface consumer-card min-w-24 rounded-2xl border px-3 py-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
       <p className="font-display text-xl font-semibold">{value}</p>
       <p className="text-ink/70 text-[10px] font-semibold tracking-wide uppercase">
         {label}
@@ -204,10 +237,13 @@ function Dimension({ label, value }: { label: string; value: number | null }) {
   if (value === null) return null;
   const pct = Math.max(0, Math.min(100, (value / 5) * 100));
   return (
-    <div className="border-ink/[0.08] bg-surface rounded-2xl border px-3.5 py-3 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+    <div className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border px-3.5 py-3 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
       <div className="flex items-baseline justify-between gap-2">
         <p className="text-ink/70 text-xs font-semibold">{label}</p>
-        <p className="text-sm font-extrabold">★ {value.toFixed(1)} / 5</p>
+        <p className="flex items-center gap-1.5 text-sm font-extrabold">
+          <StarRow value={value} label={`${label}: ${value.toFixed(1)} de 5`} />
+          {value.toFixed(1)} / 5
+        </p>
       </div>
       <div
         className="bg-ink/[0.08] mt-2 h-2 overflow-hidden rounded-full"

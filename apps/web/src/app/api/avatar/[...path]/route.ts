@@ -7,7 +7,11 @@ export async function GET(
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await params;
-  if (path.length !== 2) return new Response("Not found", { status: 404 });
+  if (path.length !== 2)
+    return Response.json(
+      { error: "No encontramos esa imagen." },
+      { status: 404 },
+    );
 
   const objectPath = path.join("/");
   const avatarUrl = `/api/avatar/${objectPath}`;
@@ -19,13 +23,20 @@ export async function GET(
     .maybeSingle();
 
   if (profileError || !profile?.avatar_url) {
-    return new Response("Not found", { status: 404 });
+    return Response.json(
+      { error: "No encontramos esa imagen." },
+      { status: 404 },
+    );
   }
 
   const { data, error } = await admin.storage
     .from("profile-avatars")
     .download(objectPath);
-  if (error || !data) return new Response("Not found", { status: 404 });
+  if (error || !data)
+    return Response.json(
+      { error: "No encontramos esa imagen." },
+      { status: 404 },
+    );
 
   return new Response(data, {
     headers: {

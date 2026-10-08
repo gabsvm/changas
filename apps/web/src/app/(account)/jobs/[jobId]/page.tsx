@@ -13,6 +13,8 @@ import {
   transitionJobAction,
 } from "@/app/(account)/jobs/actions";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
+import type { IllustratedIconName, IllustratedTone } from "@/components/ui/marketplace/illustrated-badge";
+import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { SuccessCheck } from "@/components/ui/marketplace/success-check";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
@@ -248,7 +250,7 @@ export default async function JobPage({
               {getServiceModalityLabel(detail.modality)}
             </StatusChip>
           </div>
-          <h1 className="mt-3 text-[22px] leading-8 font-extrabold tracking-[-0.025em]">
+          <h1 className="font-display mt-3 text-[22px] leading-8 font-extrabold tracking-[-0.025em]">
             {detail.service_title}
           </h1>
           <p className="text-ink/70 mt-1.5 text-sm leading-6">
@@ -277,16 +279,33 @@ export default async function JobPage({
 
         {nextTransition ? (
           <section
-            className="bg-ink mt-5 rounded-2xl p-5 text-white dark:bg-[#2a231c] dark:text-[#f5efe8]"
+            className="brand-gradient-surface relative mt-5 overflow-hidden rounded-2xl p-5 text-white shadow-[0_4px_10px_rgb(255_107_53/14%),0_30px_64px_-18px_rgb(255_87_34/46%)] dark:shadow-[0_30px_64px_-18px_rgb(0_0_0/70%)]"
             aria-label="Próxima acción"
           >
-            <p className="text-[11px] font-bold tracking-[0.08em] text-white/60 uppercase">
+            <span
+              className="pointer-events-none absolute inset-0 opacity-25"
+              style={{
+                backgroundImage:
+                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                backgroundSize: "12px 12px",
+              }}
+              aria-hidden="true"
+            />
+            <span
+              className="pointer-events-none absolute -right-6 -bottom-8 h-24 w-24 rounded-full bg-white/20"
+              aria-hidden="true"
+            />
+            <span
+              className="pointer-events-none absolute -top-4 -left-4 h-14 w-14 rounded-full bg-white/15"
+              aria-hidden="true"
+            />
+            <p className="relative text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">
               Próxima acción
             </p>
-            <h2 className="mt-1 text-lg leading-7 font-extrabold">
+            <h2 className="font-display relative mt-1 text-lg leading-7 font-extrabold">
               {nextTransition.heading}
             </h2>
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            <div className="relative mt-4 grid gap-2 sm:grid-cols-2">
               <StatusButton
                 jobId={jobId}
                 expected={nextTransition.expected}
@@ -304,9 +323,10 @@ export default async function JobPage({
         ) : null}
 
         <section className="border-ink/[0.08] bg-surface consumer-card mt-6 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-          <p className="text-ink/42 text-[11px] font-bold tracking-[0.08em] uppercase">
-            Alcance acordado
-          </p>
+          <SectionHeader
+            title="Alcance acordado"
+            badge={{ tone: "gold", icon: "doc", label: "Alcance acordado" }}
+          />
           <p className="mt-3 text-sm leading-7 whitespace-pre-wrap">
             {detail.scope_snapshot}
           </p>
@@ -325,6 +345,7 @@ export default async function JobPage({
           <div className="space-y-8">
             <JobSection
               title="Acciones del trabajo"
+              badge={{ tone: "rose", icon: "alert" }}
               description="Si algo sale mal, reportalo: revisamos el caso con ambas partes."
             >
               {["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
@@ -380,6 +401,7 @@ export default async function JobPage({
             {detail.job_status === "CONFIRMED" ? (
               <JobSection
                 title="Reprogramar"
+                badge={{ tone: "blue", icon: "calendar" }}
                 collapsible
                 description="La otra parte debe aceptar el nuevo horario antes de reemplazar al actual."
               >
@@ -475,7 +497,7 @@ export default async function JobPage({
                               <button
                                 name="action"
                                 value="ACCEPT"
-                                className="button-primary text-xs"
+                                className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
                               >
                                 Aceptar
                               </button>
@@ -501,6 +523,7 @@ export default async function JobPage({
             isProvider ? (
               <JobSection
                 title="Cambio de alcance"
+                badge={{ tone: "violet", icon: "sliders" }}
                 collapsible
                 description="Un aumento de precio requiere aceptación del cliente y pago adicional confirmado."
               >
@@ -529,7 +552,7 @@ export default async function JobPage({
             ) : null}
 
             {scopeChanges.length > 0 ? (
-              <JobSection title="Cambios de alcance">
+              <JobSection title="Cambios de alcance" badge={{ tone: "gold", icon: "doc" }}>
                 <div className="divide-ink/10 divide-y">
                   {scopeChanges.map((change) => {
                     const state = scopeStatus(change.change_status);
@@ -578,7 +601,7 @@ export default async function JobPage({
                             <button
                               name="action"
                               value="ACCEPT"
-                              className="button-primary text-xs"
+                              className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
                             >
                               Aceptar cambio
                             </button>
@@ -614,7 +637,7 @@ export default async function JobPage({
                             <button
                               name="outcome"
                               value="SUCCESS"
-                              className="button-primary text-xs"
+                              className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
                             >
                               Simular pago aprobado
                             </button>
@@ -637,7 +660,7 @@ export default async function JobPage({
 
           <aside className="space-y-8">
             {detail.modality === "IN_PERSON" || detail.modality === "BOTH" ? (
-              <JobSection title="Ubicación del trabajo">
+              <JobSection title="Ubicación del trabajo" badge={{ tone: "green", icon: "pin" }}>
                 {detail.exact_address ? (
                   <div className="text-sm leading-6">
                     <strong className="block">{detail.exact_address}</strong>
@@ -677,7 +700,7 @@ export default async function JobPage({
               </JobSection>
             ) : null}
 
-            <JobSection title="Historial">
+            <JobSection title="Historial" badge={{ tone: "neutral", icon: "clock" }}>
               <ol className="border-ink/10 relative space-y-4 border-l-2 pl-4">
                 {events.map((event) => (
                   <li key={event.event_id} className="relative text-sm">
@@ -724,18 +747,23 @@ function JobSection({
   description,
   children,
   collapsible = false,
+  badge,
 }: {
   title: string;
   description?: string;
   children: React.ReactNode;
   collapsible?: boolean;
+  badge?: { tone: IllustratedTone; icon: IllustratedIconName };
 }) {
   if (collapsible) {
     return (
-      <details className="border-ink/10 border-t pt-4">
-        <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-lg leading-7 font-bold tracking-[-0.015em]">
-          {title}
-          <span className="text-ink/40 text-xl" aria-hidden="true">
+      <details className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+        <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3">
+          <SectionHeader
+            title={title}
+            badge={badge ?? { tone: "neutral", icon: "doc", label: title }}
+          />
+          <span className="text-ink/40 shrink-0 text-xl" aria-hidden="true">
             ›
           </span>
         </summary>
@@ -747,10 +775,11 @@ function JobSection({
     );
   }
   return (
-    <section className="border-ink/10 border-t pt-4">
-      <h2 className="text-lg leading-7 font-bold tracking-[-0.015em]">
-        {title}
-      </h2>
+    <section className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+      <SectionHeader
+        title={title}
+        badge={badge ?? { tone: "neutral", icon: "doc", label: title }}
+      />
       {description ? (
         <p className="text-ink/70 mt-1.5 text-sm leading-6">{description}</p>
       ) : null}
@@ -775,7 +804,7 @@ function StatusButton({
       <input type="hidden" name="jobId" value={jobId} />
       <input type="hidden" name="expectedStatus" value={expected} />
       <input type="hidden" name="requestedStatus" value={requested} />
-      <button className="button-primary w-full">{label}</button>
+      <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">{label}</button>
     </form>
   );
 }

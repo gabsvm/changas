@@ -12,6 +12,7 @@ import {
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { SearchField } from "@/components/ui/marketplace/search-field";
+import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -242,9 +243,9 @@ export default async function CategoryPage({
               </Link>
             </div>
           </div>
-          <p className="text-ink/75 mt-5 text-xs font-extrabold tracking-[0.12em] uppercase">
-            Servicios publicados
-          </p>
+          <div className="mt-5">
+            <SectionHeader title="Servicios publicados" badge={{ tone: "orange", icon: "star", label: "Servicios publicados" }} />
+          </div>
           <div className="discovery-results-shell mt-5">
             <DiscoveryResults
               enableNearby={false}

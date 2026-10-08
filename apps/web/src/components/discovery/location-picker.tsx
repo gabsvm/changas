@@ -138,7 +138,7 @@ export function LocationPicker({
 
   if (compact) {
     return (
-      <div className="location-picker-compact">
+      <div className="location-picker-compact border-ink/[0.08] rounded-2xl border bg-white/75 p-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] backdrop-blur-sm dark:border-white/10 dark:bg-[#2a231c]/85">
         <div className="flex w-full items-center justify-between gap-2">
           <label className="text-ink/75 flex min-h-11 min-w-0 items-center gap-2 text-sm font-semibold">
             <svg

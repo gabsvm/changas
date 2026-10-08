@@ -156,10 +156,19 @@ export function ProposalCard({
 
       {proposal.price_amount !== null ? (
         <div
-          className="border-ink/[0.08] bg-surface consumer-card mt-3 rounded-xl border px-3.5 py-3 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.05] dark:shadow-none"
+          className="border-ink/[0.08] bg-surface consumer-card relative mt-3 overflow-hidden rounded-xl border text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.05] dark:shadow-none"
           aria-label="Desglose del precio"
         >
-          <div className="flex items-center justify-between gap-3">
+          <span
+            className="brand-gradient-surface pointer-events-none absolute inset-x-0 top-0 h-1.5"
+            aria-hidden="true"
+          />
+          <div className="px-3.5 pt-4 pb-3">
+          <div className="flex items-center gap-2">
+            <IllustratedBadge tone="green" icon="shield" size="sm" label="Pago retenido" />
+            <span className="text-[13px] font-extrabold">Pago retenido</span>
+          </div>
+          <div className="mt-3 flex items-center justify-between gap-3">
             <span className="text-ink/70 text-[13px] font-semibold">
               Subtotal del servicio
             </span>
@@ -185,6 +194,7 @@ export function ProposalCard({
             El pago queda retenido hasta que confirmás la entrega. La comisión
             se descuenta antes de liberarle el pago al proveedor.
           </p>
+          </div>
         </div>
       ) : null}
 
@@ -210,7 +220,7 @@ export function ProposalCard({
                 value={proposal.proposal_id}
               />
               <input type="hidden" name="action" value="ACCEPT" />
-              <button className="consumer-pressable bg-ink inline-flex min-h-[52px] items-center justify-center rounded-xl px-4 text-[15px] font-extrabold text-white">
+              <button className="consumer-pressable cta-ink inline-flex min-h-[52px] items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
                 Aceptar propuesta
               </button>
             </form>
@@ -307,7 +317,7 @@ export function ProposalCard({
             <button
               type="submit"
               disabled={revising}
-              className="consumer-pressable bg-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold text-white disabled:opacity-50"
+              className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold disabled:opacity-50"
             >
               {revising ? "Enviando…" : "Enviar respuesta"}
             </button>

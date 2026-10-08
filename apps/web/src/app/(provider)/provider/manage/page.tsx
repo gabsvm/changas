@@ -257,7 +257,7 @@ export default async function ProviderMarketplaceManagePage({
               <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
                 Proveedor
               </p>
-              <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+              <h1 className="font-display mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
                 Gestioná tu oferta
               </h1>
               <p className="text-ink/70 mt-1 text-sm">
@@ -293,6 +293,12 @@ export default async function ProviderMarketplaceManagePage({
             feedback={paymentFeedback}
           />
         </div>
+
+        <div
+          className="mt-6 h-px bg-gradient-to-r from-transparent via-[#EE5A24]/40 to-transparent"
+          role="separator"
+          aria-orientation="horizontal"
+        />
 
         <div className="mt-6">
           <MarketplaceManagement

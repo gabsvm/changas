@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import type { ActionState } from "@/lib/forms/action-state";
 import { initialActionState } from "@/lib/forms/action-state";
 import { compressInputFiles } from "@/lib/media/image-compression";
@@ -179,9 +180,12 @@ export function DocumentUploader({
 
   if (!editable) {
     return (
-      <section className="border-ink/10 border-y py-4">
+      <section className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-bold">Documentos privados</h2>
+          <span className="flex min-w-0 items-center gap-2.5">
+            <IllustratedBadge tone="neutral" icon="doc" size="sm" label="Documentos privados" />
+            <h2 className="font-display truncate text-base font-bold">Documentos privados</h2>
+          </span>
           <StatusChip tone="warning">Carga bloqueada</StatusChip>
         </div>
         <p className="text-ink/70 mt-1 text-sm leading-6">
@@ -193,13 +197,21 @@ export function DocumentUploader({
   }
 
   return (
-    <section className="border-ink/10 border-y py-4">
+    <section className="border-ink/[0.08] bg-surface consumer-card overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+      <span
+        className="brand-gradient-surface pointer-events-none block h-1.5"
+        aria-hidden="true"
+      />
+      <div className="p-4">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
-            Privado
-          </p>
-          <h2 className="mt-1 text-lg font-bold">Subí un documento</h2>
+        <div className="flex min-w-0 items-start gap-2.5">
+          <IllustratedBadge tone="blue" icon="doc" size="sm" label="Subí un documento" />
+          <div className="min-w-0">
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
+              Privado
+            </p>
+            <h2 className="font-display mt-1 text-lg font-bold">Subí un documento</h2>
+          </div>
         </div>
         <StatusChip tone="neutral">Máx. 10 MiB</StatusChip>
       </div>
@@ -363,7 +375,7 @@ export function DocumentUploader({
         ) : null}
 
         <button
-          className="button-primary w-full disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          className="consumer-pressable cta-ink w-full disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto inline-flex min-h-[52px] items-center justify-center rounded-xl px-6 text-[15px] font-extrabold"
           type="submit"
           disabled={pending || compressing || uploading || !selected}
         >
@@ -376,6 +388,7 @@ export function DocumentUploader({
                 : "Subir documento privado"}
         </button>
       </form>
+      </div>
     </section>
   );
 }

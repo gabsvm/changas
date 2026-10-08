@@ -7,6 +7,7 @@ import { maskPrivateReference } from "@/lib/ui/documents";
 import { Avatar } from "@/components/ui/marketplace/avatar";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
@@ -174,7 +175,7 @@ export default async function ProviderOnboardingReviewPage() {
               <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
                 Paso 4 de 4
               </p>
-              <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+              <h1 className="font-display mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
                 Estado de tu verificación
               </h1>
             </div>
@@ -223,7 +224,10 @@ export default async function ProviderOnboardingReviewPage() {
         </section>
 
         <section className="mt-6" aria-label="Lo que cargaste">
-          <h2 className="text-lg leading-7 font-bold">Lo que cargaste</h2>
+          <div className="flex min-w-0 items-center gap-2.5">
+            <IllustratedBadge tone="violet" icon="user" size="sm" label="Lo que cargaste" />
+            <h2 className="font-display min-w-0 flex-1 truncate text-lg leading-7 font-bold">Lo que cargaste</h2>
+          </div>
           <details className="border-ink/10 mt-3 border-y">
             <summary className="consumer-pressable flex min-h-14 cursor-pointer items-center justify-between gap-3 py-3 text-sm font-bold">
               Perfil público
@@ -308,8 +312,16 @@ export default async function ProviderOnboardingReviewPage() {
           </details>
         </section>
 
-        <div className="border-ink/10 mt-5 rounded-xl border px-4 py-3">
-          <StatusChip tone={stateTone}>{stateTitle}</StatusChip>
+        <div className="border-ink/[0.08] bg-surface consumer-card mt-5 overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+          <span
+            className="brand-gradient-surface pointer-events-none block h-1.5"
+            aria-hidden="true"
+          />
+          <div className="p-4">
+          <span className="flex items-center gap-2">
+            <IllustratedBadge tone="gold" icon="shield" size="sm" label={stateTitle} />
+            <StatusChip tone={stateTone}>{stateTitle}</StatusChip>
+          </span>
           <p className="text-ink/70 mt-2 text-sm leading-6">
             {pendingReview
               ? "Un administrador puede revisar ahora la evidencia privada y decidir el estado del perfil."
@@ -323,24 +335,26 @@ export default async function ProviderOnboardingReviewPage() {
           </p>
           {!pendingReview && !approved && !rejected ? (
             <Link
-              className="button-primary mt-3 w-full sm:w-auto"
+              className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
               href="/provider/onboarding/documents"
             >
               Ir a documentos
             </Link>
           ) : null}
+          </div>
         </div>
 
         <section className="mt-6">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-bold">Archivos recibidos</h2>
-            <span className="text-ink/70 text-xs font-semibold">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <IllustratedBadge tone="green" icon="id" size="sm" label="Archivos recibidos" />
+            <h2 className="font-display min-w-0 flex-1 truncate text-lg font-bold">Archivos recibidos</h2>
+            <span className="text-ink/70 shrink-0 text-xs font-semibold">
               {receivedDocuments.length}
             </span>
           </div>
 
           {receivedDocuments.length > 0 ? (
-            <ul className="border-ink/10 divide-ink/10 mt-2 divide-y border-y">
+            <ul className="border-ink/[0.08] bg-surface consumer-card divide-ink/[0.07] mt-2 divide-y rounded-2xl border px-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
               {receivedDocuments.map((document) => (
                 <DocumentListItem
                   key={`${document.document_type}-${document.created_at}`}
@@ -353,15 +367,20 @@ export default async function ProviderOnboardingReviewPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-ink/70 border-ink/10 mt-2 border-y py-4 text-sm">
-              Todavía no hay documentos registrados.
-            </p>
+            <EmptyState
+              tone="blue"
+              title="Todavía no hay documentos registrados"
+              description="Subilos desde Documentos para completar la verificación."
+              actionHref="/provider/onboarding/documents"
+              actionLabel="Ir a documentos"
+              className="border-ink/[0.08] bg-surface consumer-card mt-2 rounded-2xl border shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+            />
           )}
         </section>
 
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
           <Link
-            className="button-primary w-full sm:w-auto"
+            className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
             href="/provider/onboarding"
           >
             Volver al resumen

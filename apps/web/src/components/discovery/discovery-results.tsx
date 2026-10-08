@@ -5,11 +5,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getManualLocation, type DiscoveryFilters } from "@changas/domain";
 
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { actionButtonClass } from "@/components/ui/marketplace/action-button";
 import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
 import { riseStyle } from "@/lib/ui/motion";
 import { readStoredLocation } from "./location-picker";
-
 import { DiscoveryCard } from "./discovery-card";
 
 function nullableFiniteNumber(value: unknown): boolean {
@@ -65,20 +66,49 @@ function signatureOf(query: string, filters: DiscoveryFilters): string {
   return JSON.stringify({ query, filters });
 }
 
+const DISCOVERY_COVERS = [
+  { css: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)", tone: "orange" },
+  { css: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)", tone: "blue" },
+  { css: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)", tone: "green" },
+  { css: "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)", tone: "rose" },
+  { css: "linear-gradient(135deg, #8B7CFF 0%, #5B4BD6 100%)", tone: "violet" },
+  { css: "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)", tone: "gold" },
+] as const;
+
+function coverForDiscovery(key: string | null): (typeof DISCOVERY_COVERS)[number] {
+  if (!key) return DISCOVERY_COVERS[0];
+  let hash = 0;
+  for (let i = 0; i < key.length; i += 1) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  return DISCOVERY_COVERS[hash % DISCOVERY_COVERS.length] ?? DISCOVERY_COVERS[0];
+}
+
 function LoadingSkeletons() {
   return (
     <div aria-hidden="true" className="mt-3 grid gap-3 md:grid-cols-2">
       {[0, 1, 2, 3].map((index) => (
         <div
           key={index}
-          className="border-ink/[0.07] bg-surface animate-pulse rounded-[1.25rem] border p-5"
+          className="border-ink/[0.07] bg-surface consumer-card animate-pulse overflow-hidden rounded-[1.25rem] border"
         >
-          <div className="bg-ink/[0.08] h-5 w-2/3 rounded-full" />
-          <div className="bg-ink/[0.06] mt-3 h-4 w-1/2 rounded-full" />
-          <div className="bg-ink/[0.06] mt-2 h-4 w-1/3 rounded-full" />
-          <div className="mt-4 flex gap-2">
-            <div className="bg-ink/[0.08] h-11 flex-1 rounded-xl" />
-            <div className="bg-ink/[0.08] h-11 flex-1 rounded-xl" />
+          <div className="brand-gradient-surface relative h-16 overflow-hidden opacity-60">
+            <span
+              className="absolute inset-0 opacity-25"
+              style={{
+                backgroundImage:
+                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                backgroundSize: "10px 10px",
+              }}
+            />
+            <span className="absolute -right-4 -bottom-6 h-20 w-20 rounded-full bg-white/20" />
+          </div>
+          <div className="p-5">
+            <div className="bg-ink/[0.08] h-5 w-2/3 rounded-full" />
+            <div className="bg-ink/[0.06] mt-3 h-4 w-1/2 rounded-full" />
+            <div className="bg-ink/[0.06] mt-2 h-4 w-1/3 rounded-full" />
+            <div className="mt-4 flex gap-2">
+              <div className="bg-ink/[0.08] h-11 flex-1 rounded-xl" />
+              <div className="bg-ink/[0.08] h-11 flex-1 rounded-xl" />
+            </div>
           </div>
         </div>
       ))}
@@ -315,12 +345,14 @@ export function DiscoveryResults({
     );
   }
 
+  const activeCover = coverForDiscovery(filters.categorySlug ?? filters.skillSlug ?? query ?? null);
   return (
     <section
       aria-label="Resultados de búsqueda"
       aria-busy={loadingMore || nearbyLoading}
     >
-      <div className="flex min-h-12 flex-wrap items-center justify-between gap-2">
+      <SectionHeader title="Resultados" badge={{ tone: "orange", icon: "star", label: "Resultados de búsqueda" }} />
+      <div className="mt-1 flex min-h-12 flex-wrap items-center justify-between gap-2">
         <p
           aria-live="polite"
           role="status"
@@ -377,14 +409,42 @@ export function DiscoveryResults({
           ))}
         </div>
       ) : !resultsError ? (
-        <EmptyState
-          className="py-10"
-          title="Probá otra búsqueda"
-          description="Podés cambiar la categoría, la zona o elegir servicios remotos."
-          actionHref="/buscar"
-          actionLabel="Limpiar filtros"
-          actionTone="secondary"
-        />
+        <div className="border-ink/[0.08] bg-surface consumer-card mt-3 overflow-hidden rounded-[1.25rem] border">
+          <div
+            className="relative flex h-24 items-end overflow-hidden p-4"
+            style={{ backgroundImage: activeCover.css }}
+            role="presentation"
+          >
+            <span
+              className="absolute inset-0 opacity-25"
+              style={{
+                backgroundImage:
+                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                backgroundSize: "12px 12px",
+              }}
+              aria-hidden="true"
+            />
+            <span
+              className="absolute -right-6 -bottom-10 h-28 w-28 rounded-full bg-white/20"
+              aria-hidden="true"
+            />
+            <span
+              className="absolute -top-6 -left-6 h-16 w-16 rounded-full bg-white/15"
+              aria-hidden="true"
+            />
+            <span className="relative">
+              <IllustratedBadge tone={activeCover.tone} icon="search" size="md" label="Sin resultados" />
+            </span>
+          </div>
+          <EmptyState
+            className="py-10"
+            title="Probá otra búsqueda"
+            description="Podés cambiar la categoría, la zona o elegir servicios remotos."
+            actionHref="/buscar"
+            actionLabel="Limpiar filtros"
+            actionTone="secondary"
+          />
+        </div>
       ) : null}
 
       {loadingMore && !resultsError ? <LoadingSkeletons /> : null}

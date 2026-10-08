@@ -142,9 +142,6 @@ export default async function PublicServicePage({
                 size="lg"
                 label={service.skill_name}
               />
-              <span className="rounded-full bg-black/25 px-3 py-1.5 text-xs font-bold tracking-wide text-white uppercase backdrop-blur-sm">
-                {service.skill_name}
-              </span>
             </span>
           </div>
           <div className="p-5 sm:p-8 sm:pt-6">
@@ -157,7 +154,7 @@ export default async function PublicServicePage({
             ) : null}
           </div>
 
-          <h1 className="mt-4 text-[24px] leading-8 font-extrabold tracking-[-0.03em] sm:text-4xl sm:leading-10">
+          <h1 className="font-display mt-4 text-[24px] leading-8 font-extrabold tracking-[-0.03em] sm:text-4xl sm:leading-10">
             {service.title}
           </h1>
           <p className="text-ink/70 mt-3 max-w-2xl text-[15px] leading-7 sm:text-base">
@@ -214,11 +211,14 @@ export default async function PublicServicePage({
           ) : null}
 
 
-          <section className="border-ink/10 mt-8 border-t pt-6">
-            <h2 className="text-lg leading-7 font-bold">
-              Detalles del servicio
-            </h2>
-            <div className="mt-3 grid gap-2">
+          <section className="border-ink/[0.08] bg-surface consumer-card mt-8 rounded-2xl border p-5 sm:p-6">
+            <span className="flex min-w-0 items-center gap-2.5">
+              <IllustratedBadge tone="blue" icon="doc" size="sm" label="Detalles del servicio" />
+              <h2 className="font-display text-lg leading-7 font-bold">
+                Detalles del servicio
+              </h2>
+            </span>
+            <div className="mt-4 grid gap-2">
               <Info title="Incluye" value={service.includes} />
               <Info title="No incluye" value={service.excludes} />
               <Info
@@ -229,8 +229,11 @@ export default async function PublicServicePage({
           </section>
 
           {(tags ?? []).length ? (
-            <section className="border-ink/10 mt-8 border-t pt-6">
-              <h2 className="text-lg leading-7 font-bold">Relacionado</h2>
+            <section className="border-ink/[0.08] bg-surface consumer-card mt-4 rounded-2xl border p-5 sm:p-6">
+              <span className="flex min-w-0 items-center gap-2.5">
+                <IllustratedBadge tone="violet" icon="tag" size="sm" label="Relacionado" />
+                <h2 className="font-display text-lg leading-7 font-bold">Relacionado</h2>
+              </span>
               <div className="mt-4 flex flex-wrap gap-2">
                 {(tags ?? []).map((tag) => (
                   <StatusChip tone="neutral" key={tag.tag}>

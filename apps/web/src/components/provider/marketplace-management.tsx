@@ -16,6 +16,11 @@ import { compressInputFiles } from "@/lib/media/image-compression";
 import { animateConfirmedSave } from "@/lib/ui/panel-motion";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/database.types";
+import {
+  IllustratedBadge,
+  type IllustratedIconName,
+  type IllustratedTone,
+} from "@/components/ui/marketplace/illustrated-badge";
 
 type ProviderAction = (
   previousState: ActionState,
@@ -348,6 +353,26 @@ function Check({
   );
 }
 
+const SECTION_BADGES: Record<string, { tone: IllustratedTone; icon: IllustratedIconName }> = {
+  perfil: { tone: "violet", icon: "user" },
+  habilidades: { tone: "blue", icon: "sparkle" },
+  servicios: { tone: "orange", icon: "briefcase" },
+  experiencia: { tone: "gold", icon: "star" },
+  formacion: { tone: "green", icon: "doc" },
+  certificaciones: { tone: "rose", icon: "check" },
+  portfolio: { tone: "orange", icon: "image" },
+  zonas: { tone: "green", icon: "pin" },
+  disponibilidad: { tone: "blue", icon: "calendar" },
+};
+const PORTFOLIO_COVERS = [
+  "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+  "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)",
+  "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)",
+  "linear-gradient(135deg, #8B7CFF 0%, #5B4BD6 100%)",
+  "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)",
+  "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)",
+];
+
 function Section({
   eyebrow,
   title,
@@ -361,14 +386,27 @@ function Section({
   anchor?: string;
   children: React.ReactNode;
 }) {
+  const badge: { tone: IllustratedTone; icon: IllustratedIconName } =
+    (anchor ? SECTION_BADGES[anchor] : undefined) ?? {
+      tone: "neutral",
+      icon: "sparkle",
+    };
   return (
     <section
       id={anchor}
-      className="border-ink/10 scroll-mt-32 rounded-2xl border bg-white/65 p-5 sm:p-7 dark:border-white/10 dark:bg-[#2a231c]"
+      className="border-ink/10 consumer-card scroll-mt-32 overflow-hidden rounded-2xl border bg-white/65 dark:border-white/10 dark:bg-[#2a231c]"
     >
-      <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
-        {eyebrow}
-      </p>
+      <span
+        className="brand-gradient-surface pointer-events-none block h-1.5"
+        aria-hidden="true"
+      />
+      <div className="p-5 sm:p-7">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <IllustratedBadge tone={badge.tone} icon={badge.icon} size="sm" label={title} />
+        <p className="text-terracotta min-w-0 truncate text-xs font-semibold tracking-[0.16em] uppercase">
+          {eyebrow}
+        </p>
+      </div>
       <h2 className="font-display mt-2 text-3xl font-semibold tracking-[-0.02em]">
         {title}
       </h2>
@@ -376,6 +414,7 @@ function Section({
         {description}
       </p>
       <div className="mt-6">{children}</div>
+      </div>
     </section>
   );
 }
@@ -674,6 +713,7 @@ export function MarketplaceManagement({
   const skillName = new Map(
     catalogSkills.map((skill) => [skill.id, skill.name]),
   );
+  const [activeSection, setActiveSection] = useState("perfil");
   return (
     <div className="space-y-6">
       <nav
@@ -692,15 +732,32 @@ export function MarketplaceManagement({
             ["zonas", "Zonas"],
             ["disponibilidad", "Disponibilidad"],
           ] as Array<[string, string]>
-        ).map(([id, label]) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            className="consumer-pressable border-ink/[0.08] inline-flex min-h-10 shrink-0 items-center rounded-full border bg-white px-4 text-[13px] font-bold dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
-          >
-            {label}
-          </a>
-        ))}
+        ).map(([id, label]) => {
+          const active = activeSection === id;
+          return (
+            <a
+              key={id}
+              href={`#${id}`}
+              onClick={() => setActiveSection(id)}
+              aria-current={active ? "true" : undefined}
+              className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-all duration-200 ${
+                active
+                  ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                  : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+              }`}
+              style={
+                active
+                  ? {
+                      backgroundImage:
+                        "linear-gradient(135deg, #FF9A3D 0%, #FF6B35 48%, #FF0A78 100%)",
+                    }
+                  : undefined
+              }
+            >
+              {label}
+            </a>
+          );
+        })}
       </nav>
       <Section
         anchor="perfil"
@@ -1084,26 +1141,51 @@ export function MarketplaceManagement({
           title="Trabajo visible"
           description="Las piezas de portfolio pueden ser públicas sólo cuando vos las marcás así. Tus documentos de identidad nunca se mezclan con ellas."
         >
-          <ProfessionalRecordList
-            records={portfolioItems}
-            deleteAction={actions.deletePortfolio}
-            empty="No hay piezas de portfolio cargadas."
-            render={(record) => {
-              const item = record as PortfolioItem;
-              return (
-                <>
-                  <p className="font-semibold">{item.title}</p>
-                  <p className="text-ink/70 mt-1 text-sm">
-                    {item.is_public ? "público" : "privado"}
-                    {item.media_path
-                      ? " · imagen guardada"
-                      : " · ficha de texto"}
-                  </p>
-                  <p className="text-ink/70 mt-2 text-sm">{item.description}</p>
-                </>
-              );
-            }}
-          />
+          {portfolioItems.length ? (
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {portfolioItems.map((item, index) => (
+                <li
+                  key={item.id}
+                  className="border-ink/[0.08] bg-surface consumer-card consumer-card-pressed consumer-pressable overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] transition-all duration-200 hover:-translate-y-0.5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+                >
+                  <span
+                    className="relative block h-16 overflow-hidden"
+                    style={{
+                      backgroundImage: PORTFOLIO_COVERS[index % PORTFOLIO_COVERS.length],
+                    }}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className="absolute inset-0 opacity-25"
+                      style={{
+                        backgroundImage:
+                          "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                        backgroundSize: "10px 10px",
+                      }}
+                    />
+                    <span className="absolute -right-4 -bottom-6 h-16 w-16 rounded-full bg-white/20" />
+                  </span>
+                  <span className="block p-4">
+                    <span className="block font-semibold">{item.title}</span>
+                    <span className="text-ink/70 mt-1 block text-sm">
+                      {item.is_public ? "público" : "privado"}
+                      {item.media_path
+                        ? " · imagen guardada"
+                        : " · ficha de texto"}
+                    </span>
+                    <span className="text-ink/70 mt-2 block text-sm">{item.description}</span>
+                    <span className="mt-3 block">
+                      <DeleteForm action={actions.deletePortfolio} recordId={item.id} />
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-ink/70 border-ink/15 rounded-xl border border-dashed px-4 py-5 text-sm">
+              No hay piezas de portfolio cargadas.
+            </p>
+          )}
           <details className="border-ink/10 mt-5 border-t pt-2">
             <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
               + Agregar pieza

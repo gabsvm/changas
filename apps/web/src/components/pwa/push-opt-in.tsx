@@ -6,6 +6,7 @@ import {
   disablePushSubscriptionAction,
   savePushSubscriptionAction,
 } from "@/app/(account)/account/notifications/actions";
+import { SuccessCheck } from "@/components/ui/marketplace/success-check";
 import { SettingsRow } from "@/components/ui/marketplace/settings-row";
 import { Switch } from "@/components/ui/marketplace/switch";
 import {
@@ -233,12 +234,13 @@ export function PushOptIn({
         <p
           className={
             message.tone === "error"
-              ? "bg-danger/[0.07] text-danger px-4 py-2.5 text-sm font-semibold"
-              : "bg-success/[0.07] text-success px-4 py-2.5 text-sm font-semibold"
+              ? "bg-danger/[0.07] text-danger pop-in flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-[0_1px_2px_rgb(23_20_15/10%),0_16px_36px_-10px_rgb(23_20_15/22%)]"
+              : "bg-success/[0.07] text-success pop-in flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-[0_1px_2px_rgb(23_20_15/10%),0_16px_36px_-10px_rgb(23_20_15/22%)]"
           }
           role={message.tone === "error" ? "alert" : "status"}
           aria-live="polite"
         >
+          {message.tone === "error" ? null : <SuccessCheck />}
           {message.text}
         </p>
       ) : null}

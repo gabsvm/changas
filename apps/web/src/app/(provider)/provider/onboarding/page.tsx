@@ -38,37 +38,30 @@ export default async function ProviderOnboardingPage() {
     .maybeSingle();
 
   if (!provider) {
+    const emptySteps = getOnboardingSteps(1);
     return (
       <section className="pb-6 sm:py-14">
         <MobileAppBar title="Ser proveedor" backHref="/account" />
         <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-          <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-            Proveedor
-          </p>
-          <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
-            Empezá tu verificación
-          </h1>
+          <div className="flex min-w-0 items-center gap-3">
+            <IllustratedBadge tone="orange" icon="briefcase" size="md" label="Ser proveedor" />
+            <div className="min-w-0">
+              <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+                Proveedor
+              </p>
+              <h1 className="font-display mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
+                Empezá tu verificación
+              </h1>
+            </div>
+          </div>
           <p className="text-ink/70 mt-2 max-w-xl text-sm leading-6">
             Son cuatro pasos breves. Podés salir y volver cuando quieras; nada
             se publica ni se activa sin revisión.
           </p>
 
-          <section className="border-ink/10 mt-6 border-y py-1">
-            {[
-              ["1", "Perfil público"],
-              ["2", "Identidad privada"],
-              ["3", "Documentos"],
-              ["4", "Revisión"],
-            ].map(([number, label]) => (
-              <div
-                className="border-ink/10 flex min-h-12 items-center gap-3 border-b py-2 last:border-b-0"
-                key={number}
-              >
-                <span className="bg-ink/[0.06] text-ink/70 grid h-8 w-8 place-items-center rounded-full text-xs font-extrabold">
-                  {number}
-                </span>
-                <span className="text-sm font-semibold">{label}</span>
-              </div>
+          <section className="border-ink/[0.08] bg-surface divide-ink/[0.07] consumer-card mt-6 divide-y rounded-2xl border px-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+            {emptySteps.map((step) => (
+              <OnboardingStepCard key={step.id} step={step} disabled />
             ))}
           </section>
 
@@ -105,7 +98,7 @@ export default async function ProviderOnboardingPage() {
             <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Perfil de proveedor
             </p>
-            <h1 className="mt-2 text-3xl leading-9 font-extrabold tracking-[-0.035em]">
+            <h1 className="font-display mt-2 text-3xl leading-9 font-extrabold tracking-[-0.035em]">
               Tu verificación
             </h1>
           </div>
@@ -144,7 +137,7 @@ export default async function ProviderOnboardingPage() {
             <ProgressBar value={progress} label="Progreso de verificación" />
           </div>
           <Link
-            className="button-primary mt-5 w-full sm:w-auto"
+            className="consumer-pressable cta-ink mt-5 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
             href={primaryHref}
           >
             {primaryLabel}

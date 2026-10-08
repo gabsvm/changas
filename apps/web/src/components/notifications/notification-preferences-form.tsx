@@ -1,11 +1,12 @@
-"use client";
+ "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+ import { useActionState, useEffect, useRef, useState } from "react";
 
-import { SettingsRow } from "@/components/ui/marketplace/settings-row";
-import { Switch } from "@/components/ui/marketplace/switch";
-import type { ActionState } from "@/lib/forms/action-state";
-import { initialActionState } from "@/lib/forms/action-state";
+ import { SuccessCheck } from "@/components/ui/marketplace/success-check";
+ import { SettingsRow } from "@/components/ui/marketplace/settings-row";
+ import { Switch } from "@/components/ui/marketplace/switch";
+ import type { ActionState } from "@/lib/forms/action-state";
+ import { initialActionState } from "@/lib/forms/action-state";
 import type { NotificationPreferences } from "@/lib/notifications/server";
 import { NOTIFICATION_PREFERENCE_GROUPS } from "@/lib/ui/account-settings";
 
@@ -61,7 +62,8 @@ export function NotificationPreferencesForm({
         className="pointer-events-none fixed inset-x-4 bottom-[calc(var(--mobile-bottom-nav-height)+0.75rem)] z-40 flex justify-center sm:bottom-6"
       >
         {pending || savedVisible ? (
-          <p className="bg-ink pop-in rounded-full px-4 py-2 text-sm font-semibold text-white shadow-lg">
+          <p className="bg-ink pop-in inline-flex items-center gap-2.5 rounded-full py-2 pr-5 pl-2 text-sm font-semibold text-white shadow-[0_1px_2px_rgb(23_20_15/12%),0_16px_36px_-10px_rgb(23_20_15/28%),0_24px_64px_-20px_rgb(255_107_53/40%)]">
+            {pending ? null : <SuccessCheck />}
             {pending ? "Guardando cambio…" : "Cambios guardados"}
           </p>
         ) : null}

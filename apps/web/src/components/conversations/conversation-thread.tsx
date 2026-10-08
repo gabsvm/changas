@@ -34,6 +34,7 @@ import {
 import type { ConversationAttachmentSummary } from "@/lib/conversations/attachments";
 import type { ConversationMessage } from "@/lib/conversations/messages";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { compressInputFiles } from "@/lib/media/image-compression";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeAttachmentFilename } from "@changas/validation";
@@ -101,7 +102,11 @@ export function ConversationThread({
   peerName: string;
   serviceTitle: string;
   providerHref: string;
-  deal: { statusLabel: string; amountLabel: string } | null;
+  deal: {
+    statusLabel: string;
+    statusTone: "neutral" | "success" | "warning" | "danger" | "brand" | "info";
+    amountLabel: string;
+  } | null;
   initialMessages: ConversationMessage[];
   initialAttachments: ConversationAttachmentSummary[];
   initiallyBlockedByMe: boolean;
@@ -233,7 +238,24 @@ export function ConversationThread({
 
   return (
     <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden sm:min-h-[calc(100dvh-4rem)]">
-      <header className="border-ink/[0.08] bg-canvas/95 sticky top-0 z-10 border-b px-4 py-3 backdrop-blur sm:px-6">
+      <header className="border-ink/[0.08] bg-canvas/95 sticky top-0 z-10 overflow-hidden border-b px-4 pt-0 pb-3 backdrop-blur sm:px-6">
+        <div
+          className="relative -mx-4 mb-3 h-1.5 overflow-hidden sm:-mx-6"
+          style={{
+            backgroundImage:
+              "linear-gradient(135deg, #FF9A3D 0%, #FF6B35 48%, #FF0A78 100%)",
+          }}
+          aria-hidden="true"
+        >
+          <span
+            className="absolute inset-0 opacity-25"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+              backgroundSize: "10px 10px",
+            }}
+          />
+        </div>
         <div className="flex min-h-12 items-center gap-2.5">
           <Link
             href="/messages"
@@ -315,12 +337,10 @@ export function ConversationThread({
         {deal ? (
           <a
             href="#propuestas"
-            className="border-ink/[0.08] bg-surface mt-3 flex items-center gap-2.5 rounded-2xl border px-3.5 py-2.5"
+            className="consumer-card consumer-card-pressed consumer-pressable border-ink/[0.08] bg-surface mt-3 flex items-center gap-2.5 rounded-2xl border px-3.5 py-2.5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] transition-all duration-200 hover:-translate-y-0.5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
             aria-label={`Ver acuerdo: ${deal.statusLabel}, ${deal.amountLabel}`}
           >
-            <span className="bg-brand-orange/12 text-terracotta shrink-0 rounded-full px-2.5 py-1 text-xs font-bold">
-              {deal.statusLabel}
-            </span>
+            <StatusChip tone={deal.statusTone}>{deal.statusLabel}</StatusChip>
             <span className="truncate text-sm font-extrabold">
               {deal.amountLabel}
             </span>

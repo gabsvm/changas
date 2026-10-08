@@ -33,7 +33,7 @@
 .admin-shell .admin-main > div > section > div:first-child > h2 + p {
   margin-top: 0.5rem;
   max-width: 42rem;
-  color: var(--admin-muted) !important;
+  color: var(--admin-muted);
   font-size: 0.875rem;
   line-height: 1.5rem;
 }
@@ -41,70 +41,70 @@
 .admin-shell .bg-white,
 .admin-shell .bg-slate-50,
 .admin-shell .bg-slate-100 {
-  background-color: var(--admin-surface) !important;
+  background-color: var(--admin-surface);
 }
 
 .admin-shell .text-slate-950,
 .admin-shell .text-slate-900,
 .admin-shell .text-slate-800 {
-  color: #f8fafc !important;
+  color: #f8fafc;
 }
 
 .admin-shell .text-slate-700,
 .admin-shell .text-slate-600,
 .admin-shell .text-slate-500 {
-  color: var(--admin-muted) !important;
+  color: var(--admin-muted);
 }
 
 .admin-shell .border-slate-200,
 .admin-shell .border-slate-300 {
-  border-color: var(--admin-border) !important;
+  border-color: var(--admin-border);
 }
 
 .admin-shell .bg-slate-950,
 .admin-shell .bg-slate-900 {
-  background-color: var(--admin-orange) !important;
-  color: #10131a !important;
+  background-color: var(--admin-orange);
+  color: #10131a;
 }
 
 .admin-shell .hover\:bg-slate-100:hover,
 .admin-shell .hover\:bg-slate-800:hover {
-  background-color: #1d2633 !important;
+  background-color: #1d2633;
 }
 
 .admin-shell .bg-amber-100 {
-  background-color: rgb(255 200 87 / 12%) !important;
+  background-color: rgb(255 200 87 / 12%);
 }
 
 .admin-shell .text-amber-900 {
-  color: #ffd878 !important;
+  color: #ffd878;
 }
 
 .admin-shell .bg-emerald-100 {
-  background-color: rgb(67 201 130 / 12%) !important;
+  background-color: rgb(67 201 130 / 12%);
 }
 
 .admin-shell .text-emerald-800 {
-  color: #66dda0 !important;
+  color: #66dda0;
 }
 
 .admin-shell .bg-red-100 {
-  background-color: rgb(239 83 80 / 12%) !important;
+  background-color: rgb(239 83 80 / 12%);
 }
 
 .admin-shell .text-red-800,
 .admin-shell .text-red-700 {
-  color: #ff7774 !important;
+  color: #ff7774;
 }
 
 .admin-shell input:not([type="hidden"]),
 .admin-shell select,
 .admin-shell textarea {
   min-height: 3rem;
-  border-color: #2c3748 !important;
-  background: #0d131d !important;
-  color: #f8fafc !important;
-  border-radius: 0.9rem !important;
+  border-color: #2c3748;
+  background: #0d131d;
+  color: #f8fafc;
+  border-radius: 0.9rem;
 }
 
 .admin-shell input::placeholder,
@@ -115,7 +115,7 @@
 .admin-shell input:focus,
 .admin-shell select:focus,
 .admin-shell textarea:focus {
-  border-color: rgb(255 107 53 / 70%) !important;
+  border-color: rgb(255 107 53 / 70%);
   outline: 2px solid rgb(255 107 53 / 18%);
   outline-offset: 1px;
 }

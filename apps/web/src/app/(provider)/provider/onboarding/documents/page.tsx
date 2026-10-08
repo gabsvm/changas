@@ -7,6 +7,7 @@ import { DocumentUploader } from "@/components/provider/document-uploader";
 import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { PrivacyNotice } from "@/components/ui/privacy-notice";
 import { StickyActionBar } from "@/components/ui/sticky-action-bar";
@@ -70,7 +71,7 @@ export default async function ProviderOnboardingDocumentsPage() {
             <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Paso 3 de 4
             </p>
-            <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+            <h1 className="font-display mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
               Verificá tu identidad
             </h1>
           </div>
@@ -147,15 +148,16 @@ export default async function ProviderOnboardingDocumentsPage() {
         )}
 
         <section id="documentos" className="mt-6 scroll-mt-24">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-bold">Tus documentos</h2>
-            <span className="text-ink/70 text-xs font-semibold">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <IllustratedBadge tone="green" icon="id" size="sm" label="Tus documentos" />
+            <h2 className="font-display min-w-0 flex-1 truncate text-lg font-bold">Tus documentos</h2>
+            <span className="text-ink/70 shrink-0 text-xs font-semibold">
               {receivedDocuments.length}
             </span>
           </div>
 
           {receivedDocuments.length > 0 ? (
-            <ul className="border-ink/[0.08] bg-surface divide-ink/[0.07] mt-2 divide-y rounded-2xl border px-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+            <ul className="border-ink/[0.08] bg-surface consumer-card divide-ink/[0.07] mt-2 divide-y rounded-2xl border px-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
               {receivedDocuments.map((document) => (
                 <DocumentListItem
                   key={`${document.document_type}-${document.created_at}`}
@@ -168,9 +170,12 @@ export default async function ProviderOnboardingDocumentsPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-ink/70 border-ink/10 mt-2 border-y py-4 text-sm">
-              Todavía no hay documentos registrados.
-            </p>
+            <EmptyState
+              tone="blue"
+              title="Todavía no hay documentos registrados"
+              description="Subí frente y dorso del DNI más una selfie desde el cargador de arriba."
+              className="border-ink/[0.08] bg-surface consumer-card mt-2 rounded-2xl border shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+            />
           )}
         </section>
 

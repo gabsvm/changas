@@ -71,6 +71,6 @@ describe("private avatar delivery", () => {
       params: Promise.resolve({ path: ["owner", "avatar.jpg"] }),
     });
     expect(response.status).toBe(404);
-    expect(await response.text()).toBe("Not found");
+    expect(await response.json()).toEqual({ error: "No encontramos esa imagen." });
   });
 });

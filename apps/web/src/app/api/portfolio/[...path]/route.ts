@@ -9,7 +9,10 @@ export async function GET(
 ) {
   const { path } = await params;
   if (!path.length || path.length > 3)
-    return new Response("Not found", { status: 404 });
+    return Response.json(
+      { error: "No encontramos ese archivo." },
+      { status: 404 },
+    );
   const objectPath = path.join("/");
   const supabase = await createClient();
   const { data: publicItem, error: projectionError } = await supabase
@@ -19,14 +22,21 @@ export async function GET(
     .maybeSingle();
 
   if (projectionError || !publicItem?.media_path) {
-    return new Response("Not found", { status: 404 });
+    return Response.json(
+      { error: "No encontramos ese archivo." },
+      { status: 404 },
+    );
   }
 
   const admin = createAdminClient();
   const { data, error } = await admin.storage
     .from("provider-portfolio")
     .download(objectPath);
-  if (error || !data) return new Response("Not found", { status: 404 });
+  if (error || !data)
+    return Response.json(
+      { error: "No encontramos ese archivo." },
+      { status: 404 },
+    );
   return new Response(data, {
     headers: {
       "Cache-Control": "private, no-store",

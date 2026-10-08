@@ -1,4 +1,5 @@
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+import { SettingsRow } from "@/components/ui/marketplace/settings-row";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import type { ProviderPaymentAccountState } from "@/lib/payments/server";
 
@@ -41,7 +42,7 @@ export function ProviderPaymentAccount({
             </p>
             <h2
               id="provider-payment-account-title"
-              className="mt-1 text-xl font-bold tracking-[-0.02em]"
+              className="font-display mt-1 text-xl font-bold tracking-[-0.02em]"
             >
               Mercado Pago
             </h2>
@@ -94,29 +95,31 @@ export function ProviderPaymentAccount({
           </p>
         ) : null}
 
-        <dl className="divide-ink/[0.07] divide-y text-sm">
-          <div className="flex min-h-12 items-center justify-between gap-4 py-2.5">
-            <dt className="text-ink/70">Cuenta</dt>
-            <dd className="min-w-0 truncate text-right font-semibold">
-              {account.providerAccountReference ?? "Todavía no vinculada"}
-            </dd>
+        <div className="mt-3 space-y-2">
+          <div className="border-ink/[0.08] bg-canvas rounded-xl border px-3">
+            <SettingsRow
+              title="Cuenta"
+              description={account.providerAccountReference ?? "Todavía no vinculada"}
+            />
           </div>
-          <div className="flex min-h-12 items-center justify-between gap-4 py-2.5">
-            <dt className="text-ink/70">Autorización</dt>
-            <dd className="text-right font-semibold">
-              {account.tokenExpiresAt
-                ? new Intl.DateTimeFormat("es-AR", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                    timeZone: "America/Argentina/Buenos_Aires",
-                  }).format(new Date(account.tokenExpiresAt))
-                : "Sin autorización activa"}
-            </dd>
+          <div className="border-ink/[0.08] bg-canvas rounded-xl border px-3">
+            <SettingsRow
+              title="Autorización"
+              description={
+                account.tokenExpiresAt
+                  ? new Intl.DateTimeFormat("es-AR", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                      timeZone: "America/Argentina/Buenos_Aires",
+                    }).format(new Date(account.tokenExpiresAt))
+                  : "Sin autorización activa"
+              }
+            />
           </div>
-        </dl>
+        </div>
 
         <a
-          className="button-primary mt-2 inline-flex w-full sm:w-auto"
+          className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
           href="/api/payments/mercado-pago/oauth/start"
         >
           {actionLabel}

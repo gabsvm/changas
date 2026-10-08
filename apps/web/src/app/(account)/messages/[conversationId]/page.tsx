@@ -5,6 +5,7 @@ import { formatMinorUnits } from "@changas/domain";
 import { ConversationThread } from "@/components/conversations/conversation-thread";
 import { ProposalCard } from "@/components/conversations/proposal-card";
 import { ProposalComposer } from "@/components/conversations/proposal-composer";
+import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { listConversationAttachments } from "@/lib/conversations/attachments";
 import { listConversationMessages } from "@/lib/conversations/messages";
 import {
@@ -93,6 +94,19 @@ export default async function ConversationPage({
     PAYMENT_FAILED: "Pago fallido",
     PAID: "Pagada",
   };
+  const proposalStatusTones: Record<
+    ProposalSummary["proposal_status"],
+    "neutral" | "success" | "warning" | "danger" | "brand" | "info"
+  > = {
+    OPEN: "brand",
+    ACCEPTED: "success",
+    REJECTED: "neutral",
+    WITHDRAWN: "neutral",
+    EXPIRED: "warning",
+    AWAITING_PAYMENT: "info",
+    PAYMENT_FAILED: "danger",
+    PAID: "success",
+  };
   const activeProposal =
     proposals.find((proposal) => proposal.proposal_status === "OPEN") ??
     proposals[0] ??
@@ -100,6 +114,7 @@ export default async function ConversationPage({
   const deal = activeProposal
     ? {
         statusLabel: proposalStatusLabels[activeProposal.proposal_status],
+        statusTone: proposalStatusTones[activeProposal.proposal_status],
         amountLabel:
           activeProposal.price_amount === null
             ? "A cotizar"
@@ -135,12 +150,23 @@ export default async function ConversationPage({
             id="propuestas"
             aria-label="Propuestas de la conversación"
           >
-            <h2 className="flex items-center gap-2 text-base font-extrabold tracking-[-0.02em]">
-              Propuestas
-              <span className="bg-ink text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
+            <div className="flex items-center justify-between gap-3">
+              <SectionHeader
+                title="Propuestas"
+                badge={{ tone: "gold", icon: "tag", label: "Propuestas" }}
+                className="min-w-0 flex-1"
+              />
+              <span
+                className="inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(238_90_36/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, #FF9A3D 0%, #FF6B35 48%, #FF0A78 100%)",
+                }}
+                aria-label={`${proposals.length} propuestas`}
+              >
                 {proposals.length}
               </span>
-            </h2>
+            </div>
             {proposals.map((proposal) => (
               <ProposalCard
                 key={`${proposal.proposal_id}:${proposal.current_version_id}:${proposal.proposal_status}`}
