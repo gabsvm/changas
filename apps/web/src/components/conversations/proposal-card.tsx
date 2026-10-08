@@ -13,6 +13,7 @@ import {
   fakePaymentAction,
   respondProposalAction,
   reviseProposalAction,
+  startProposalCheckoutAction,
   type ProposalActionState,
 } from "@/app/(account)/messages/proposal-actions";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
@@ -338,6 +339,32 @@ export function ProposalCard({
         </details>
       ) : null}
 
+      {(proposal.proposal_status === "AWAITING_PAYMENT" ||
+        proposal.proposal_status === "PAYMENT_FAILED") &&
+      currentUserIsClient ? (
+        <form action={startProposalCheckoutAction} className="mt-4 grid gap-2">
+          <input
+            type="hidden"
+            name="conversationId"
+            value={conversationId}
+          />
+          <input
+            type="hidden"
+            name="proposalId"
+            value={proposal.proposal_id}
+          />
+          <button className="consumer-pressable cta-ink inline-flex min-h-[52px] items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
+            {proposal.proposal_status === "PAYMENT_FAILED"
+              ? "Reintentar pago"
+              : proposal.price_amount !== null
+                ? `Pagar ${formatMinorUnits(proposal.price_amount, proposal.currency_code)} y contratar`
+                : "Pagar y contratar"}
+          </button>
+          <p className="text-ink/70 text-center text-xs leading-5">
+            Serás redirigido a Mercado Pago para completar el pago retenido.
+          </p>
+        </form>
+      ) : null}
       {(proposal.proposal_status === "AWAITING_PAYMENT" ||
         proposal.proposal_status === "PAYMENT_FAILED") &&
       currentUserIsClient &&

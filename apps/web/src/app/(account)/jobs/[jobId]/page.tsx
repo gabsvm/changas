@@ -10,6 +10,7 @@ import {
   respondRescheduleAction,
   respondScopeChangeAction,
   setJobLocationAction,
+  startScopeChangeCheckoutAction,
   transitionJobAction,
 } from "@/app/(account)/jobs/actions";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
@@ -611,6 +612,26 @@ export default async function JobPage({
                               className="button-secondary text-xs"
                             >
                               Rechazar
+                            </button>
+                          </form>
+                        ) : null}
+                        {isClient &&
+                        ["AWAITING_PAYMENT", "PAYMENT_FAILED"].includes(
+                          change.change_status,
+                        ) ? (
+                          <form
+                            action={startScopeChangeCheckoutAction}
+                            className="mt-3"
+                          >
+                            <input
+                              type="hidden"
+                              name="scopeChangeId"
+                              value={change.scope_change_id}
+                            />
+                            <button className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold">
+                              {change.change_status === "PAYMENT_FAILED"
+                                ? "Reintentar pago del adicional"
+                                : "Pagar adicional con Mercado Pago"}
                             </button>
                           </form>
                         ) : null}

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import {
   parseMajorAmountToMinor,
@@ -18,6 +19,7 @@ import {
   type FakePaymentOutcome,
   type ProposalResponseAction,
 } from "@/lib/proposals/server";
+import { createProposalCheckout } from "@/lib/payments/server";
 
 export type ProposalActionState = {
   status: "IDLE" | "SUCCESS" | "ERROR";
@@ -144,4 +146,15 @@ export async function fakePaymentAction(formData: FormData): Promise<void> {
   }
   await simulateFakeProposalPayment(conversationId, proposalId, nonce, outcome);
   revalidatePath(`/messages/${conversationId}`);
+}
+
+export async function startProposalCheckoutAction(
+  formData: FormData,
+): Promise<void> {
+  const proposalId = requiredUuid(formData, "proposalId");
+  const checkout = await createProposalCheckout(
+    proposalId,
+    crypto.randomUUID(),
+  );
+  redirect(checkout.checkoutUrl);
 }

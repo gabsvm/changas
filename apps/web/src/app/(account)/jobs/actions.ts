@@ -29,6 +29,7 @@ import {
   type ReviewReportReason,
 } from "@/lib/reputation/server";
 import { createClient } from "@/lib/supabase/server";
+import { createScopeChangeCheckout } from "@/lib/payments/server";
 
 const reviewReportReasons: ReviewReportReason[] = [
   "THREATS",
@@ -176,6 +177,17 @@ export async function fakeAdditionalPaymentAction(
     outcome,
   });
   revalidatePath(`/jobs/${jobId}`);
+}
+
+export async function startScopeChangeCheckoutAction(
+  formData: FormData,
+): Promise<void> {
+  const scopeChangeId = uuidField(formData, "scopeChangeId");
+  const checkout = await createScopeChangeCheckout(
+    scopeChangeId,
+    crypto.randomUUID(),
+  );
+  redirect(checkout.checkoutUrl);
 }
 
 export async function setJobLocationAction(formData: FormData): Promise<void> {
