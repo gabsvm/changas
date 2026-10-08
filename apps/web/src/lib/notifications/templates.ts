@@ -38,6 +38,17 @@ function escapeHtml(value: string): string {
     .replaceAll("'", "&#039;");
 }
 
+const PUSH_TITLE_MAX_LENGTH = 60;
+const PUSH_BODY_MAX_LENGTH = 140;
+
+function clampPushText(value: string, maxLength: number): string {
+  const normalized = value.trim().replaceAll(/\s+/g, " ");
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+  return `${normalized.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
 export function buildSafePushMessage(
   delivery: ClaimedDelivery,
 ): SafePushMessage {
@@ -45,13 +56,17 @@ export function buildSafePushMessage(
     throw new Error("Push delivery is missing subscription material.");
   }
 
+  // El copy ya es seguro en origen (las rutas de phase 08 nunca guardan texto
+  // privado del chat): el push lleva título/cuerpo reales con caps de display.
   return {
     deliveryId: delivery.deliveryId,
     endpoint: delivery.endpoint,
     p256dh: delivery.p256dh,
     authKey: delivery.authKey,
-    title: "Changas",
-    body: "Tenés una actualización importante.",
+    title: clampPushText(delivery.title, PUSH_TITLE_MAX_LENGTH) || "Changas",
+    body:
+      clampPushText(delivery.body, PUSH_BODY_MAX_LENGTH) ||
+      "Tenés una actualización importante.",
     actionUrl: sanitizeNotificationActionUrl(delivery.actionUrl),
   };
 }

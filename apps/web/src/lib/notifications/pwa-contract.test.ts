@@ -39,7 +39,7 @@ describe("Phase 08 PWA contract", () => {
     expect(register).toContain('postMessage({ type: "SKIP_WAITING" })');
   });
 
-  it("handles push and notification clicks without embedding private payload copy", () => {
+  it("renders the real push payload with a generic fallback and safe click roots", () => {
     const worker = readFileSync(
       join(process.cwd(), "apps/web/public/sw.js"),
       "utf8",
@@ -47,8 +47,14 @@ describe("Phase 08 PWA contract", () => {
 
     expect(worker).toContain('addEventListener("push"');
     expect(worker).toContain('addEventListener("notificationclick"');
+    expect(worker).toContain("event.data.json()");
+    expect(worker).toContain("showNotification(title");
+    expect(worker).toContain("data: { actionUrl }");
+    expect(worker).toContain(
+      'const SAFE_ACTION_ROOTS = ["/messages", "/jobs", "/account", "/provider"]',
+    );
     expect(worker).toContain("Tenés una actualización importante.");
-    expect(worker).not.toContain("event.data.text");
-    expect(worker).not.toContain("event.data.json");
+    expect(worker).toContain('matchAll({ type: "window"');
+    expect(worker).toContain("clients.openWindow(actionUrl)");
   });
 });

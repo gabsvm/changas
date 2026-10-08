@@ -40,20 +40,37 @@ describe("notification templates", () => {
     );
   });
 
-  it("keeps lock-screen push copy generic even when the stored center copy is specific", () => {
+  it("carries the real delivery title and body into the push payload", () => {
     const push = buildSafePushMessage({
       ...baseDelivery,
       channel: "PUSH",
-      body: "PRIVATE CHAT BODY SHOULD NEVER LEAK",
+      title: "Propuesta aceptada",
+      body: "Una propuesta fue aceptada.",
       endpoint: "https://push.example.test/subscription",
       p256dh: "key",
       authKey: "auth",
     });
 
-    expect(push.title).toBe("Changas");
-    expect(push.body).toBe("Tenés una actualización importante.");
-    expect(push.body).not.toContain("PRIVATE");
+    expect(push.title).toBe("Propuesta aceptada");
+    expect(push.body).toBe("Una propuesta fue aceptada.");
     expect(push.actionUrl).toBe(baseDelivery.actionUrl);
+  });
+
+  it("caps push copy for lock-screen display", () => {
+    const push = buildSafePushMessage({
+      ...baseDelivery,
+      channel: "PUSH",
+      title: `Título ${"muy largo ".repeat(10)}`,
+      body: `Cuerpo ${"con detalle ".repeat(20)}`,
+      endpoint: "https://push.example.test/subscription",
+      p256dh: "key",
+      authKey: "auth",
+    });
+
+    expect(push.title.length).toBeLessThanOrEqual(60);
+    expect(push.body.length).toBeLessThanOrEqual(140);
+    expect(push.title.startsWith("Título muy largo")).toBe(true);
+    expect(push.body.startsWith("Cuerpo con detalle")).toBe(true);
   });
 
   it("never creates transactional email for ordinary chat messages", () => {

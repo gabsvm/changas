@@ -1,10 +1,8 @@
 import "server-only";
 
-import {
-  buildResendRequest,
-  buildVapidAuthorization,
-  classifyDeliveryHttpStatus,
-} from "./delivery";
+import { sendNotification } from "web-push";
+
+import { buildResendRequest, classifyDeliveryHttpStatus } from "./delivery";
 import type {
   DeliveryResult,
   EmailProvider,
@@ -46,21 +44,39 @@ export class WebPushProvider implements PushProvider {
     }
 
     try {
-      const response = await fetch(message.endpoint, {
-        method: "POST",
-        headers: {
-          Authorization: buildVapidAuthorization({
-            endpoint: message.endpoint,
+      await sendNotification(
+        {
+          endpoint: message.endpoint,
+          keys: { p256dh: message.p256dh, auth: message.authKey },
+        },
+        JSON.stringify({
+          title: message.title,
+          body: message.body,
+          actionUrl: message.actionUrl,
+        }),
+        {
+          vapidDetails: {
+            subject: this.config.subject,
             publicKey: this.config.publicKey,
             privateKey: this.config.privateKey,
-            subject: this.config.subject,
-          }),
-          TTL: "300",
+          },
+          TTL: 300,
         },
-      });
+      );
 
-      return classifyDeliveryHttpStatus(response.status);
-    } catch {
+      return { ok: true, retryable: false, errorCode: null };
+    } catch (error) {
+      if (
+        error !== null &&
+        typeof error === "object" &&
+        "statusCode" in error &&
+        typeof error.statusCode === "number"
+      ) {
+        // Los 410/404 de WebPushError caen en HTTP_410/HTTP_404 no-retryable y
+        // el dispatcher purga el endpoint como hacía con el fetch manual.
+        return classifyDeliveryHttpStatus(error.statusCode);
+      }
+
       return retryableProviderError("PUSH_NETWORK_ERROR");
     }
   }

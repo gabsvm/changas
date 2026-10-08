@@ -14,6 +14,13 @@ const STATIC_URLS = [
 // Rutas con estado privado o autenticado: el worker nunca las lee ni las
 // escribe en ninguna caché (ni siquiera como fallback).
 const PRIVATE_ROOTS = ["/account", "/messages", "/jobs", "/provider", "/api"];
+// Raíces first-party válidas como destino de una notificación. safeActionUrl
+// las usa para validar el actionUrl del payload; sin esto el click revienta
+// con ReferenceError.
+const SAFE_ACTION_ROOTS = ["/messages", "/jobs", "/account", "/provider"];
+const FALLBACK_PUSH_TITLE = "Changas";
+const FALLBACK_PUSH_BODY = "Tenés una actualización importante.";
+const FALLBACK_ACTION_URL = "/account/notifications";
 // Únicas navegaciones públicas con revalidación en segundo plano.
 const SWR_PATHS = new Set(["/", "/buscar", "/offline"]);
 const RUNTIME_MAX_ENTRIES = 20;
@@ -166,12 +173,33 @@ self.addEventListener("fetch", (event) => {
 });
 
 self.addEventListener("push", (event) => {
+  let title = FALLBACK_PUSH_TITLE;
+  let body = FALLBACK_PUSH_BODY;
+  let actionUrl = FALLBACK_ACTION_URL;
+
+  if (event.data) {
+    try {
+      const payload = event.data.json();
+      if (payload && typeof payload === "object") {
+        if (typeof payload.title === "string" && payload.title.trim() !== "") {
+          title = payload.title;
+        }
+        if (typeof payload.body === "string" && payload.body.trim() !== "") {
+          body = payload.body;
+        }
+        actionUrl = safeActionUrl(payload.actionUrl);
+      }
+    } catch {
+      // Payload ilegible: se muestra el fallback genérico.
+    }
+  }
+
   event.waitUntil(
-    self.registration.showNotification("Changas", {
-      body: "Tenés una actualización importante.",
+    self.registration.showNotification(title, {
+      body,
       icon: "/icon-192.png",
       badge: "/icon-192.png",
-      data: { actionUrl: "/account/notifications" },
+      data: { actionUrl },
     }),
   );
 });
