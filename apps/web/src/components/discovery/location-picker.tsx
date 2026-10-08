@@ -152,7 +152,7 @@ export function LocationPicker({
             </select>
           </label>
           <button
-            className="location-picker-trigger consumer-pressable text-ink ml-auto inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-white/85 px-3 text-xs font-bold shadow-[0_5px_14px_rgba(32,33,36,0.1)] hover:bg-white dark:border dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+            className="location-picker-trigger consumer-pressable text-ink ml-auto inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-white/60 bg-white/85 px-3 text-xs font-bold shadow-[0_5px_14px_rgba(32,33,36,0.1)] transition-all duration-200 hover:-translate-y-px hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
             type="button"
             onClick={() => setLocationSheetOpen(true)}
             aria-haspopup="dialog"
@@ -179,12 +179,16 @@ export function LocationPicker({
           >
             <div
               ref={locationDialogRef}
-              className="location-picker-sheet bg-surface w-full max-w-lg overflow-y-auto rounded-3xl border border-white/80 p-5 shadow-[0_24px_70px_rgba(32,33,36,0.2)] sm:p-6 dark:border-white/10"
+              className="location-picker-sheet bg-surface relative w-full max-w-lg overflow-hidden overflow-y-auto rounded-3xl border border-white/80 p-5 shadow-[0_24px_70px_rgba(32,33,36,0.2)] sm:p-6 dark:border-white/10"
               role="dialog"
               aria-modal="true"
               aria-labelledby="location-picker-title"
               onClick={(event) => event.stopPropagation()}
             >
+              <span
+                className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)]"
+                aria-hidden="true"
+              />
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
@@ -289,7 +293,7 @@ export function LocationPicker({
       </select>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <button
-          className="location-picker-trigger consumer-pressable border-ink/10 hover:border-moss/30 inline-flex min-h-11 items-center gap-2 rounded-xl border bg-white px-3 text-sm font-bold shadow-[0_4px_14px_rgba(32,33,36,0.06)] dark:border-white/10 dark:bg-white/10 dark:text-white"
+          className="location-picker-trigger consumer-pressable border-ink/10 hover:border-brand-orange/30 inline-flex min-h-11 items-center gap-2 rounded-full border bg-white px-4 text-sm font-bold shadow-[0_4px_14px_rgba(32,33,36,0.06)] transition-all duration-200 hover:-translate-y-px dark:border-white/10 dark:bg-white/10 dark:text-white"
           type="button"
           onClick={requestDeviceLocation}
         >

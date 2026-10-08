@@ -14,7 +14,7 @@ describe("auth form mobile contract", () => {
     expect(authForm).toContain("text-3xl");
     expect(authForm).toContain("sm:text-4xl");
     expect(authForm).toContain("sm:p-8");
-    expect(authForm).toContain("sm:shadow-");
+    expect(authForm).toContain("brand-gradient-surface");
   });
 
   it("separates the Google action with an explicit divider", () => {

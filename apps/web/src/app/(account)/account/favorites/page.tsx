@@ -2,10 +2,10 @@ import { redirect } from "next/navigation";
 
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { ProviderCard } from "@/components/ui/marketplace/provider-card";
 import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { createClient } from "@/lib/supabase/server";
-
 export const dynamic = "force-dynamic";
 
 function percent(value: number | null): string {
@@ -44,12 +44,17 @@ export default async function FavoritesPage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Guardados" backHref="/account" />
       <div className="mx-auto max-w-3xl pt-5 sm:pt-0">
-        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-          Mi cuenta
-        </p>
-        <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
-          Proveedores guardados
-        </h1>
+        <div className="flex items-center gap-3">
+          <IllustratedBadge tone="rose" icon="heart" size="md" label="Guardados" />
+          <div>
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+              Mi cuenta
+            </p>
+            <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+              Proveedores guardados
+            </h1>
+          </div>
+        </div>
         <p className="text-ink/70 mt-1.5 text-sm leading-6">
           Volvé rápido a los profesionales que querés comparar o contratar.
         </p>
@@ -90,6 +95,7 @@ export default async function FavoritesPage() {
           </div>
         ) : (
           <EmptyState
+            tone="rose"
             title="Todavía no guardaste proveedores"
             description="Explorá servicios y guardá a quien quieras volver a encontrar."
             actionHref="/buscar"

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { PrivateIdentityForm } from "@/components/account/account-form";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { PrivacyNotice } from "@/components/ui/privacy-notice";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,14 +30,17 @@ export default async function AccountIdentityPage() {
     <section className="pb-4 sm:py-10">
       <MobileAppBar title="Identidad y seguridad" backHref="/account" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-        <header>
-          <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
-            Identidad y seguridad
-          </h1>
-          <p className="text-ink/70 text-sm leading-6 sm:mt-1 sm:max-w-xl">
-            Estos datos se usan sólo en procesos internos de identidad y
-            seguridad.
-          </p>
+        <header className="flex items-center gap-3">
+          <IllustratedBadge tone="green" icon="shield" size="md" label="Identidad y seguridad" />
+          <div>
+            <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
+              Identidad y seguridad
+            </h1>
+            <p className="text-ink/70 text-sm leading-6 sm:mt-1 sm:max-w-xl">
+              Estos datos se usan sólo en procesos internos de identidad y
+              seguridad.
+            </p>
+          </div>
         </header>
 
         <div className="mt-4">

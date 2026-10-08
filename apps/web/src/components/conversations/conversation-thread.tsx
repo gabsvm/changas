@@ -33,6 +33,7 @@ import {
 } from "@/app/(account)/messages/thread-actions";
 import type { ConversationAttachmentSummary } from "@/lib/conversations/attachments";
 import type { ConversationMessage } from "@/lib/conversations/messages";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { compressInputFiles } from "@/lib/media/image-compression";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeAttachmentFilename } from "@changas/validation";
@@ -224,6 +225,16 @@ export function ConversationThread({
               />
             </svg>
           </Link>
+          <span
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-[15px] font-extrabold text-white shadow-[0_6px_16px_-6px_rgb(23_20_15/40%)]"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+            }}
+            aria-hidden="true"
+          >
+            {peerName.trim().charAt(0).toUpperCase() || "C"}
+          </span>
           <div className="min-w-0 flex-1">
             <p className="truncate text-[15px] font-extrabold">{peerName}</p>
             <Link
@@ -304,7 +315,10 @@ export function ConversationThread({
 
         {messages.length === 0 ? (
           <div className="mx-auto mt-12 max-w-sm text-center">
-            <p className="text-xl font-semibold">Empezá la conversación</p>
+            <span className="mx-auto block w-fit">
+              <IllustratedBadge tone="orange" icon="chat" size="lg" label="Sin mensajes todavía" />
+            </span>
+            <p className="mt-4 text-xl font-semibold">Empezá la conversación</p>
             <p className="text-ink/70 mt-2 text-sm leading-6">
               Este chat está asociado a {serviceTitle}. Acordá alcance y tiempos
               antes de avanzar.
@@ -338,7 +352,7 @@ export function ConversationThread({
         ) : null}
       </main>
 
-      <footer className="mobile-sticky-surface sticky z-10 border-t p-3 backdrop-blur sm:static sm:p-4">
+      <footer className="mobile-sticky-surface border-ink/[0.08] bg-surface/95 sticky bottom-0 z-10 border-t p-3 shadow-[0_-8px_24px_-12px_rgb(23_20_15/25%)] backdrop-blur-xl sm:static sm:rounded-b-[1rem] sm:p-4 dark:shadow-[0_-8px_24px_-12px_rgb(0_0_0/70%)]">
         {blockedByMe ? (
           <button
             type="button"
@@ -406,9 +420,14 @@ function MessageBubble({
       <article
         className={`max-w-[78%] rounded-[1.125rem] px-3.5 py-2.5 text-[15px] leading-6 sm:max-w-[72%] ${
           own
-            ? "bg-ink rounded-br-md text-white dark:bg-[#2a231c] dark:text-[#f5efe8]"
-            : "border-ink/[0.08] text-ink rounded-bl-md border bg-white shadow-sm dark:bg-white/[0.06] dark:shadow-none"
+            ? "rounded-br-md text-white shadow-[0_8px_20px_-8px_rgb(238_90_36/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+            : "border-ink/[0.08] text-ink rounded-bl-md border bg-white shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.06] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
         }`}
+        style={
+          own
+            ? { backgroundImage: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)" }
+            : undefined
+        }
       >
         {message.body ? (
           <p className="whitespace-pre-wrap">{message.body}</p>
@@ -449,7 +468,7 @@ function MessageBubble({
           </p>
         ) : null}
         <time
-          className="text-ink/70 mt-1 block text-right text-[11px] font-medium"
+          className={`mt-1 block text-right text-[11px] font-medium ${own ? "text-white/75" : "text-ink/70"}`}
           dateTime={message.created_at}
         >
           {new Intl.DateTimeFormat("es-AR", {

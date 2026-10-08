@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SuccessCheck } from "@/components/ui/marketplace/success-check";
 import {
   createProposalAction,
@@ -24,13 +25,8 @@ export function ProposalComposer({
 
   return (
     <details className="border-ink/[0.08] bg-surface rounded-2xl border p-4 shadow-[var(--consumer-shadow-card)]">
-      <summary className="consumer-pressable inline-flex min-h-12 cursor-pointer items-center gap-2 text-[15px] font-extrabold">
-        <span
-          className="bg-brand-orange/15 text-terracotta grid h-9 w-9 place-items-center rounded-xl text-lg"
-          aria-hidden="true"
-        >
-          +
-        </span>
+      <summary className="consumer-pressable inline-flex min-h-12 cursor-pointer items-center gap-2.5 text-[15px] font-extrabold">
+        <IllustratedBadge tone="gold" icon="tag" size="sm" label="Nueva propuesta" />
         {currentUserIsClient ? "Proponer un acuerdo" : "Enviar una cotización"}
       </summary>
       {state.message ? (

@@ -40,7 +40,7 @@ describe("public marketplace detail UI", () => {
   });
 
   it("makes search filters removable without losing the query", () => {
-    expect(searchPage).toContain("discovery-hero");
+    expect(searchPage).toContain("brand-gradient-surface");
     expect(searchPage).toContain("discovery-results-shell");
     expect(searchPage).toContain("Filtros activos");
     expect(searchPage).toContain("Quitar filtro");
@@ -55,7 +55,7 @@ describe("public marketplace detail UI", () => {
   });
 
   it("lets category visitors refine without leaving", () => {
-    expect(categoryPage).toContain("discovery-hero");
+    expect(categoryPage).toContain("brand-gradient-surface");
     expect(categoryPage).toContain("discovery-results-shell");
     expect(categoryPage).toContain('name="q"');
     expect(categoryPage).toContain('"presencial"');

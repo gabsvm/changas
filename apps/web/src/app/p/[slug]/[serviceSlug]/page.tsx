@@ -7,6 +7,7 @@ import { formatServicePrice } from "@changas/domain";
 import { ConsultButton } from "@/components/service/consult-button";
 import { Avatar } from "@/components/ui/marketplace/avatar";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { createClient } from "@/lib/supabase/server";
@@ -106,9 +107,44 @@ export default async function PublicServicePage({
           className="sm:flex"
         />
 
-        <article className="service-hero-card consumer-card bg-surface mt-5 overflow-hidden p-5 sm:mt-8 sm:p-8">
+        <article className="service-hero-card consumer-card bg-surface mt-5 overflow-hidden sm:mt-8">
+          <div
+            className="relative flex min-h-44 items-end overflow-hidden p-5 sm:min-h-52 sm:p-8"
+            style={{ backgroundImage: coverFor(serviceSlug).css }}
+            role="img"
+            aria-label={`Portada ilustrada de ${service.title}`}
+          >
+            <span
+              className="absolute inset-0 opacity-25"
+              style={{
+                backgroundImage:
+                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                backgroundSize: "12px 12px",
+              }}
+              aria-hidden="true"
+            />
+            <span
+              className="absolute -right-10 -bottom-12 h-40 w-40 rounded-full bg-white/20"
+              aria-hidden="true"
+            />
+            <span
+              className="absolute -top-8 -left-8 h-24 w-24 rounded-full bg-white/15"
+              aria-hidden="true"
+            />
+            <span className="relative flex flex-wrap items-center gap-1.5">
+              <IllustratedBadge
+                tone={coverFor(serviceSlug).tone}
+                icon="tag"
+                size="lg"
+                label={service.skill_name}
+              />
+              <span className="rounded-full bg-black/25 px-3 py-1.5 text-xs font-bold tracking-wide text-white uppercase backdrop-blur-sm">
+                {service.skill_name}
+              </span>
+            </span>
+          </div>
+          <div className="p-5 sm:p-8 sm:pt-6">
           <div className="flex flex-wrap items-center gap-1.5">
-            <StatusChip tone="neutral">{service.skill_name}</StatusChip>
             <StatusChip tone="info">
               {getServiceModalityLabel(service.modality)}
             </StatusChip>
@@ -125,7 +161,7 @@ export default async function PublicServicePage({
           </p>
 
           <section
-            className="service-price-panel border-ink/[0.08] bg-surface-muted/70 mt-6 grid grid-cols-2 gap-x-4 gap-y-4 rounded-2xl border px-5 py-5 sm:grid-cols-3"
+            className="service-price-panel border-ink/[0.08] bg-surface consumer-card mt-6 grid grid-cols-2 gap-x-4 gap-y-4 rounded-2xl border px-5 py-5 shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] sm:grid-cols-3 dark:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
             aria-label="Precio y condiciones"
           >
             <Metric label="Precio" value={price} />
@@ -145,7 +181,7 @@ export default async function PublicServicePage({
 
           {service.price_amount !== null ? (
             <section
-              className="border-ink/[0.08] mt-4 rounded-2xl border bg-white/70 px-5 py-4 text-sm dark:bg-white/[0.05]"
+              className="border-ink/[0.08] bg-surface consumer-card mt-4 rounded-2xl border px-5 py-4 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.05] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
               aria-label="Desglose del precio"
             >
               <div className="flex items-center justify-between gap-3">
@@ -178,7 +214,7 @@ export default async function PublicServicePage({
             <h2 className="text-lg leading-7 font-bold">
               Detalles del servicio
             </h2>
-            <div className="divide-ink/10 mt-3 divide-y">
+            <div className="mt-3 grid gap-2">
               <Info title="Incluye" value={service.includes} />
               <Info title="No incluye" value={service.excludes} />
               <Info
@@ -204,7 +240,7 @@ export default async function PublicServicePage({
           <section className="border-ink/10 mt-8 border-t pt-6">
             <Link
               href={`/p/${providerSlug}`}
-              className="consumer-pressable hover:bg-ink/[0.035] flex min-h-14 items-center gap-4 rounded-lg px-2"
+              className="consumer-card consumer-pressable bg-surface border-ink/[0.08] flex min-h-14 items-center gap-4 rounded-2xl border p-3 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)]"
             >
               <Avatar
                 name={provider.display_name}
@@ -233,13 +269,8 @@ export default async function PublicServicePage({
             </Link>
           </section>
 
-          <div className="border-moss/25 bg-moss/5 mt-8 flex items-start gap-3.5 rounded-2xl border p-4">
-            <span
-              className="bg-moss/10 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"
-              aria-hidden="true"
-            >
-              ✓
-            </span>
+          <div className="border-moss/25 bg-moss/[0.07] consumer-card mt-8 flex items-start gap-3.5 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+            <IllustratedBadge tone="green" icon="shield" size="md" label="Garantía de Changas" />
             <div>
               <p className="text-sm font-extrabold">
                 Pagos retenidos hasta la entrega + soporte
@@ -249,6 +280,7 @@ export default async function PublicServicePage({
                 listo. Si algo sale mal, el equipo de Changas te acompaña.
               </p>
             </div>
+          </div>
           </div>
           <div className="service-cta-bar service-cta-bar-no-nav bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:static sm:mx-0 sm:mt-8 sm:border-0 sm:bg-transparent sm:p-0">
             <div className="mx-auto flex max-w-3xl items-stretch gap-3 sm:items-center sm:justify-between">
@@ -296,9 +328,24 @@ function Metric({ label, value }: { label: string; value: string }) {
 function Info({ title, value }: { title: string; value: string | null }) {
   if (!value) return null;
   return (
-    <div className="py-4">
+    <div className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border px-4 py-3.5">
       <h3 className="text-sm leading-5 font-bold">{title}</h3>
       <p className="text-ink/70 mt-1.5 text-sm leading-7">{value}</p>
     </div>
   );
+}
+
+const SERVICE_COVERS = [
+  { css: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)", tone: "orange" },
+  { css: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)", tone: "blue" },
+  { css: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)", tone: "green" },
+  { css: "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)", tone: "rose" },
+  { css: "linear-gradient(135deg, #8B7CFF 0%, #5B4BD6 100%)", tone: "violet" },
+  { css: "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)", tone: "gold" },
+] as const;
+
+function coverFor(slug: string) {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i += 1) hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
+  return SERVICE_COVERS[hash % SERVICE_COVERS.length] ?? SERVICE_COVERS[0];
 }

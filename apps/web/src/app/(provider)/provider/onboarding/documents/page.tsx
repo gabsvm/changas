@@ -6,6 +6,7 @@ import { DocumentListItem } from "@/components/provider/document-list-item";
 import { DocumentUploader } from "@/components/provider/document-uploader";
 import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { PrivacyNotice } from "@/components/ui/privacy-notice";
 import { StickyActionBar } from "@/components/ui/sticky-action-bar";
@@ -63,12 +64,17 @@ export default async function ProviderOnboardingDocumentsPage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Documentos" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-          Paso 3 de 4
-        </p>
-        <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
-          Verificá tu identidad
-        </h1>
+        <div className="flex items-center gap-3">
+          <IllustratedBadge tone="blue" icon="doc" size="md" label="Paso 3 de 4" />
+          <div>
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+              Paso 3 de 4
+            </p>
+            <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+              Verificá tu identidad
+            </h1>
+          </div>
+        </div>
         <p className="text-ink/70 mt-2 text-sm leading-6">
           Necesitamos frente y dorso del DNI más una selfie. Subir archivos no
           envía el caso: vos decidís cuándo mandarlo a revisión.
@@ -81,7 +87,7 @@ export default async function ProviderOnboardingDocumentsPage() {
           </PrivacyNotice>
         </div>
 
-        <section className="border-ink/10 mt-5 border-y py-3">
+        <section className="border-ink/[0.08] bg-surface mt-5 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-bold">Requisitos</p>
@@ -149,7 +155,7 @@ export default async function ProviderOnboardingDocumentsPage() {
           </div>
 
           {receivedDocuments.length > 0 ? (
-            <ul className="border-ink/10 divide-ink/10 mt-2 divide-y border-y">
+            <ul className="border-ink/[0.08] bg-surface divide-ink/[0.07] mt-2 divide-y rounded-2xl border px-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
               {receivedDocuments.map((document) => (
                 <DocumentListItem
                   key={`${document.document_type}-${document.created_at}`}

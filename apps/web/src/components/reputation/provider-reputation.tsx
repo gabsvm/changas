@@ -29,7 +29,7 @@ export async function ProviderReputation({
 
   return (
     <section className="mt-6 space-y-6" aria-labelledby="reputation-title">
-      <div className="border-ink/10 rounded-3xl border bg-white/70 p-5 sm:p-6 dark:bg-white/[0.05]">
+      <div className="border-ink/[0.08] consumer-card rounded-3xl border bg-white/70 p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-6 dark:bg-white/[0.05] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
@@ -111,7 +111,7 @@ export async function ProviderReputation({
         ) : null}
       </div>
 
-      <div className="border-ink/10 rounded-3xl border bg-white/55 p-5 sm:p-6 dark:bg-white/[0.05]">
+      <div className="border-ink/[0.08] consumer-card rounded-3xl border bg-white/55 p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-6 dark:bg-white/[0.05] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
         <h2 className="font-display text-2xl font-semibold">
           Reseñas verificadas
         </h2>
@@ -120,26 +120,38 @@ export async function ProviderReputation({
             {reviews.map((review) => (
               <article
                 key={review.review_id}
-                className="border-ink/10 rounded-2xl border bg-white/75 p-4 dark:bg-white/[0.05]"
+                className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="font-semibold">
-                      {review.reviewer_display_name}
-                    </p>
-                    <p
-                      className="text-terracotta text-sm"
-                      aria-label={`${review.rating} de 5 estrellas`}
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-extrabold text-white"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)",
+                      }}
+                      aria-hidden="true"
                     >
-                      {stars(review.rating)}
-                    </p>
+                      {review.reviewer_display_name.trim().charAt(0).toUpperCase() || "C"}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold">
+                        {review.reviewer_display_name}
+                      </p>
+                      <p
+                        className="text-terracotta text-sm"
+                        aria-label={`${review.rating} de 5 estrellas`}
+                      >
+                        {stars(review.rating)}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
+                  <div className="shrink-0 text-right">
                     <p className="text-ink/70 text-xs">
                       {review.service_title} · {review.skill_name}
                     </p>
                     <time
-                      className="text-ink/70 mt-0.5 block text-xs"
+                      className="text-ink/70 mt-0.5 block text-xs font-semibold"
                       dateTime={review.created_at}
                     >
                       {new Intl.DateTimeFormat("es-AR", {
@@ -179,7 +191,7 @@ export async function ProviderReputation({
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-canvas min-w-24 rounded-xl px-3 py-2">
+    <div className="border-ink/[0.08] bg-surface min-w-24 rounded-2xl border px-3 py-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
       <p className="font-display text-xl font-semibold">{value}</p>
       <p className="text-ink/70 text-[10px] font-semibold tracking-wide uppercase">
         {label}
@@ -190,10 +202,27 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 function Dimension({ label, value }: { label: string; value: number | null }) {
   if (value === null) return null;
+  const pct = Math.max(0, Math.min(100, (value / 5) * 100));
   return (
-    <div>
-      <p className="text-ink/70 text-xs font-semibold">{label}</p>
-      <p className="mt-1 font-semibold">★ {value.toFixed(1)} / 5</p>
+    <div className="border-ink/[0.08] bg-surface rounded-2xl border px-3.5 py-3 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-ink/70 text-xs font-semibold">{label}</p>
+        <p className="text-sm font-extrabold">★ {value.toFixed(1)} / 5</p>
+      </div>
+      <div
+        className="bg-ink/[0.08] mt-2 h-2 overflow-hidden rounded-full"
+        role="img"
+        aria-label={`${label}: ${value.toFixed(1)} de 5`}
+      >
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: `${pct}%`,
+            backgroundImage:
+              "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+          }}
+        />
+      </div>
     </div>
   );
 }

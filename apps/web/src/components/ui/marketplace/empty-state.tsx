@@ -1,7 +1,15 @@
 import type { ReactNode } from "react";
 
 import { ActionLink, type ActionTone } from "./action-button";
-import { IllustratedBadge } from "./illustrated-badge";
+import { IllustratedBadge, type IllustratedTone } from "./illustrated-badge";
+
+const ACTION_TONE_TO_BADGE: Record<ActionTone | "success", IllustratedTone> = {
+  primary: "orange",
+  secondary: "blue",
+  danger: "rose",
+  ghost: "neutral",
+  success: "green",
+};
 export function EmptyState({
   icon,
   title,
@@ -9,6 +17,7 @@ export function EmptyState({
   actionHref,
   actionLabel,
   actionTone = "primary",
+  tone,
   className = "",
 }: {
   icon?: ReactNode;
@@ -17,6 +26,7 @@ export function EmptyState({
   actionHref?: string;
   actionLabel?: string;
   actionTone?: ActionTone;
+  tone?: IllustratedTone;
   className?: string;
 }) {
   return (
@@ -25,7 +35,11 @@ export function EmptyState({
     >
       <div className="flex justify-center">
         {icon ?? (
-          <IllustratedBadge tone="orange" icon="sparkle" size="lg" />
+          <IllustratedBadge
+            tone={tone ?? ACTION_TONE_TO_BADGE[actionTone]}
+            icon="sparkle"
+            size="lg"
+          />
         )}
       </div>
       <h2 className="mt-4 text-lg font-extrabold tracking-[-0.02em]">

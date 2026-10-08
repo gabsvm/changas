@@ -15,6 +15,8 @@ import {
   reviseProposalAction,
   type ProposalActionState,
 } from "@/app/(account)/messages/proposal-actions";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import type { ProposalSummary } from "@/lib/proposals/server";
 
 const initialState: ProposalActionState = { status: "IDLE", message: "" };
@@ -36,6 +38,19 @@ const statusLabels: Record<ProposalSummary["proposal_status"], string> = {
   AWAITING_PAYMENT: "Esperando pago",
   PAYMENT_FAILED: "Pago fallido",
   PAID: "Pagada · trabajo confirmado",
+};
+const statusTones: Record<
+  ProposalSummary["proposal_status"],
+  "neutral" | "success" | "warning" | "danger" | "brand" | "info"
+> = {
+  OPEN: "brand",
+  ACCEPTED: "info",
+  REJECTED: "neutral",
+  WITHDRAWN: "neutral",
+  EXPIRED: "neutral",
+  AWAITING_PAYMENT: "warning",
+  PAYMENT_FAILED: "danger",
+  PAID: "success",
 };
 
 const expiresFormatter = new Intl.DateTimeFormat("es-AR", {
@@ -82,19 +97,36 @@ export function ProposalCard({
       : "COUNTEROFFER";
 
   return (
-    <article className="border-brand-orange/20 bg-surface rounded-2xl border p-4 shadow-[var(--consumer-shadow-card)]">
+    <article className="border-ink/[0.08] bg-surface consumer-card overflow-hidden rounded-2xl border shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]">
+      <div
+        className="relative flex items-center gap-3 overflow-hidden px-4 py-3"
+        style={{
+          backgroundImage:
+            "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+        }}
+      >
+        <span
+          className="absolute inset-0 opacity-25"
+          style={{
+            backgroundImage:
+              "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+            backgroundSize: "10px 10px",
+          }}
+          aria-hidden="true"
+        />
+        <IllustratedBadge tone="orange" icon="tag" size="sm" label={kindLabels[proposal.proposal_kind]} />
+        <p className="relative text-xs font-extrabold tracking-[0.06em] text-white uppercase drop-shadow-[0_1px_4px_rgb(0_0_0/30%)]">
+          {kindLabels[proposal.proposal_kind]} · v{proposal.version_number}
+        </p>
+      </div>
+      <div className="p-4 pt-3.5">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
-            {kindLabels[proposal.proposal_kind]} · v{proposal.version_number}
-          </p>
-          <h3 className="mt-1 truncate text-[15px] font-extrabold">
-            {proposal.service_title}
-          </h3>
-        </div>
-        <span className="bg-moss/10 text-moss shrink-0 rounded-full px-2.5 py-1 text-xs font-bold">
+        <h3 className="min-w-0 flex-1 truncate text-[15px] font-extrabold">
+          {proposal.service_title}
+        </h3>
+        <StatusChip tone={statusTones[proposal.proposal_status]}>
           {statusLabels[proposal.proposal_status]}
-        </span>
+        </StatusChip>
       </div>
 
       <p className="text-ink/70 mt-2.5 text-sm leading-6 whitespace-pre-wrap">
@@ -102,7 +134,7 @@ export function ProposalCard({
       </p>
 
       <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
-        <div className="bg-canvas rounded-xl p-3">
+        <div className="border-ink/[0.08] bg-canvas rounded-xl border p-3">
           <dt className="text-ink/70 text-xs font-semibold">Precio total</dt>
           <dd className="mt-1 text-[15px] font-extrabold">
             {proposal.price_amount === null
@@ -110,7 +142,7 @@ export function ProposalCard({
               : formatMinorUnits(proposal.price_amount, proposal.currency_code)}
           </dd>
         </div>
-        <div className="bg-canvas rounded-xl p-3">
+        <div className="border-ink/[0.08] bg-canvas rounded-xl border p-3">
           <dt className="text-ink/70 text-xs font-semibold">Modalidad</dt>
           <dd className="mt-1 text-[15px] font-extrabold">
             {proposal.modality === "REMOTE"
@@ -124,7 +156,7 @@ export function ProposalCard({
 
       {proposal.price_amount !== null ? (
         <div
-          className="border-ink/[0.08] mt-3 rounded-xl border bg-white/70 px-3.5 py-3 text-sm dark:bg-white/[0.05]"
+          className="border-ink/[0.08] bg-surface consumer-card mt-3 rounded-xl border px-3.5 py-3 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.05] dark:shadow-none"
           aria-label="Desglose del precio"
         >
           <div className="flex items-center justify-between gap-3">
@@ -330,6 +362,7 @@ export function ProposalCard({
           </div>
         </div>
       ) : null}
+      </div>
     </article>
   );
 }

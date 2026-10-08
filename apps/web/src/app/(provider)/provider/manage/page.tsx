@@ -5,6 +5,7 @@ import { ProviderPaymentAccount } from "@/components/payments/provider-payment-a
 import { MarketplaceManagement } from "@/components/provider/marketplace-management";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import {
   getProviderPaymentAccountState,
@@ -172,6 +173,7 @@ export default async function ProviderMarketplaceManagePage({
       <section className="pb-6 sm:py-14">
         <MobileAppBar title="Gestionar servicios" backHref="/account" />
         <EmptyState
+          tone="rose"
           title="No pudimos cargar tu perfil"
           description="Hubo un problema al leer tus datos. Recargá la página en unos segundos."
           actionHref="/provider/manage"
@@ -187,6 +189,7 @@ export default async function ProviderMarketplaceManagePage({
       <section className="pb-6 sm:py-14">
         <MobileAppBar title="Gestionar servicios" backHref="/account" />
         <EmptyState
+          tone="blue"
           title="Primero prepará tu perfil"
           description="Creá tu espacio de proveedor antes de administrar habilidades y servicios."
           actionHref="/provider/onboarding"
@@ -248,16 +251,19 @@ export default async function ProviderMarketplaceManagePage({
       <MobileAppBar title="Gestionar servicios" backHref="/account" />
       <div className="pt-5 sm:pt-0">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-              Proveedor
-            </p>
-            <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
-              Gestioná tu oferta
-            </h1>
-            <p className="text-ink/70 mt-1 text-sm">
-              {displayName} · habilidades, servicios y disponibilidad
-            </p>
+          <div className="flex min-w-0 items-center gap-3">
+            <IllustratedBadge tone="orange" icon="briefcase" size="md" label="Proveedor" />
+            <div className="min-w-0">
+              <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+                Proveedor
+              </p>
+              <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+                Gestioná tu oferta
+              </h1>
+              <p className="text-ink/70 mt-1 text-sm">
+                {displayName} · habilidades, servicios y disponibilidad
+              </p>
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone={status.tone}>{status.label}</StatusChip>

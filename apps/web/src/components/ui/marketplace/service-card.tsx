@@ -38,41 +38,80 @@ function categoryIconPath(categorySlug: string): string {
   }
 }
 
-function CoverFallback({
-  categorySlug,
-  categoryName,
-  serviceTitle,
-}: {
-  categorySlug: string;
-  categoryName: string;
-  serviceTitle: string;
-}) {
+const COVER_VISUALS: ReadonlyArray<{ match: RegExp; from: string; to: string }> = [
+  { match: /hogar/i, from: "#FF9A3D", to: "#EE5A24" },
+  { match: /tecnologia/i, from: "#4F8DFF", to: "#2F4BFE" },
+  { match: /educacion/i, from: "#2FBF71", to: "#0E7C46" },
+  { match: /mascotas/i, from: "#FB6F92", to: "#E14D7A" },
+  { match: /profesional|admin|contab|legal/i, from: "#8B7CFF", to: "#5B4BD6" },
+  { match: /belleza|bienestar|salud|pelu/i, from: "#F5B942", to: "#DE7E1F" },
+];
+
+const FALLBACK_COVER_VISUAL = { from: "#FF9A3D", to: "#EE5A24" };
+
+function coverVisual(categorySlug: string): { from: string; to: string } {
   return (
-    <span
-      className="from-brand-orange/25 via-brand-yellow/25 to-terracotta/20 grid aspect-video w-full place-items-center bg-linear-to-br"
-      role="img"
-      aria-label={`Imagen ilustrativa de ${serviceTitle}`}
-    >
-      <span className="flex flex-col items-center gap-1.5 px-4 text-center">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          className="text-terracotta h-8 w-8"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d={categoryIconPath(categorySlug)} />
-        </svg>
-        <span className="text-terracotta text-xs font-bold tracking-wide uppercase">
-          {categoryName}
-        </span>
-      </span>
-    </span>
+    COVER_VISUALS.find((entry) => entry.match.test(categorySlug)) ??
+    FALLBACK_COVER_VISUAL
   );
 }
+
+ function CoverFallback({
+   categorySlug,
+   categoryName,
+   serviceTitle,
+ }: {
+   categorySlug: string;
+   categoryName: string;
+   serviceTitle: string;
+ }) {
+  const visual = coverVisual(categorySlug);
+   return (
+     <span
+      className="relative grid aspect-video w-full place-items-center overflow-hidden"
+      style={{
+        backgroundImage: `linear-gradient(135deg, ${visual.from} 0%, ${visual.to} 100%)`,
+      }}
+       role="img"
+       aria-label={`Imagen ilustrativa de ${serviceTitle}`}
+     >
+      <span
+        className="absolute inset-0 opacity-25"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+          backgroundSize: "12px 12px",
+        }}
+        aria-hidden="true"
+      />
+      <span
+        className="absolute -right-6 -bottom-8 h-28 w-28 rounded-full bg-white/20"
+        aria-hidden="true"
+      />
+      <span
+        className="absolute -top-5 -left-5 h-16 w-16 rounded-full bg-white/15"
+        aria-hidden="true"
+      />
+      <span className="relative flex flex-col items-center gap-1.5 px-4 text-center">
+         <svg
+           aria-hidden="true"
+           viewBox="0 0 24 24"
+          className="h-8 w-8 text-white drop-shadow-[0_2px_6px_rgb(0_0_0/25%)]"
+           fill="none"
+           stroke="currentColor"
+           strokeWidth="1.8"
+           strokeLinecap="round"
+           strokeLinejoin="round"
+         >
+           <path d={categoryIconPath(categorySlug)} />
+         </svg>
+        <span className="text-xs font-bold tracking-wide text-white/90 uppercase drop-shadow-[0_1px_4px_rgb(0_0_0/25%)]">
+           {categoryName}
+         </span>
+       </span>
+     </span>
+   );
+ }
 
 export function ServiceCard({
   row,
@@ -114,7 +153,7 @@ export function ServiceCard({
 
   return (
     <article
-      className={`service-card-shell consumer-card ${example ? "border-ink/30! border-dashed!" : "consumer-card-pressed"} bg-surface relative overflow-hidden transition-colors`}
+      className={`service-card-shell consumer-card group bg-surface relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:border-brand-orange/30 hover:shadow-[0_4px_8px_rgb(23_20_15/7%),0_26px_52px_-14px_rgb(23_20_15/28%)] dark:hover:border-white/20 ${example ? "border-ink/30! border-dashed!" : "consumer-card-pressed"}`}
     >
       {example ? (
         <div

@@ -10,7 +10,7 @@ export function SearchField({
 
   return (
     <label
-      className={`consumer-control focus-within:border-brand-orange/50 focus-within:ring-brand-orange/15 flex min-h-[52px] items-center gap-2.5 rounded-2xl bg-white px-3.5 transition focus-within:ring-4 dark:bg-[#2a231c] ${className}`}
+      className={`consumer-control focus-within:border-brand-orange/50 focus-within:ring-brand-orange/15 flex min-h-[3.75rem] items-center gap-2.5 rounded-full border-white/70 bg-white py-1 pr-2 pl-4 shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] transition focus-within:ring-4 dark:border-white/10 dark:bg-[#2a231c] dark:shadow-[0_2px_4px_rgb(0_0_0/30%),0_16px_36px_-10px_rgb(0_0_0/60%)] ${className}`}
     >
       <svg
         aria-hidden="true"

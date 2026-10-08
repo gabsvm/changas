@@ -3,9 +3,9 @@ import { redirect } from "next/navigation";
 
 import { PrivateIdentityForm } from "@/components/account/account-form";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { PrivacyNotice } from "@/components/ui/privacy-notice";
 import { createClient } from "@/lib/supabase/server";
-
 import { saveProviderIdentityStep } from "../../../actions";
 
 export const dynamic = "force-dynamic";
@@ -45,12 +45,17 @@ export default async function ProviderOnboardingIdentityPage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Identidad privada" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-          Paso 2 de 4
-        </p>
-        <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
-          Confirmá tus datos privados
-        </h1>
+        <div className="flex items-center gap-3">
+          <IllustratedBadge tone="green" icon="shield" size="md" label="Paso 2 de 4" />
+          <div>
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+              Paso 2 de 4
+            </p>
+            <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+              Confirmá tus datos privados
+            </h1>
+          </div>
+        </div>
         <p className="text-ink/70 mt-2 text-sm leading-6">
           Estos datos sirven para identidad y seguridad. Nunca forman parte de
           tu perfil público.

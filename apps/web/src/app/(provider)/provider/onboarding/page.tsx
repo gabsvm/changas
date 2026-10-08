@@ -5,15 +5,21 @@ import { redirect } from "next/navigation";
 import { StartProviderForm } from "@/components/account/account-form";
 import { OnboardingStepCard } from "@/components/provider/onboarding-step-card";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { IllustratedBadge, type IllustratedTone } from "@/components/ui/marketplace/illustrated-badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
 import { getNextOnboardingHref, getOnboardingSteps } from "@/lib/ui/onboarding";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
-
 import { startProviderOnboarding } from "../../actions";
 
 export const dynamic = "force-dynamic";
+const STEP_VISUALS: Record<string, { tone: IllustratedTone; icon: "user" | "shield" | "doc" | "check" }> = {
+  profile: { tone: "violet", icon: "user" },
+  identity: { tone: "green", icon: "shield" },
+  documents: { tone: "blue", icon: "doc" },
+  review: { tone: "gold", icon: "check" },
+};
 
 export default async function ProviderOnboardingPage() {
   const supabase = await createClient();
@@ -110,8 +116,25 @@ export default async function ProviderOnboardingPage() {
           {presentation.description}
         </p>
 
-        <section className="border-ink/10 mt-6 border-y py-5">
-          <div className="flex items-center justify-between gap-4 text-xs font-bold">
+        <section className="border-ink/[0.08] bg-surface mt-6 rounded-2xl border px-4 py-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+          <ol className="flex items-center gap-1" aria-label="Pasos de verificación">
+            {steps.map((step) => {
+              const visual = STEP_VISUALS[step.id] ?? { tone: "neutral" as IllustratedTone, icon: "check" as const };
+              const done = step.state === "complete";
+              const isCurrent = step.state === "current";
+              return (
+                <li key={step.id} className="flex min-w-0 flex-1 flex-col items-center gap-1.5 text-center">
+                  <span className={done || isCurrent ? "" : "opacity-45 grayscale"}>
+                    <IllustratedBadge tone={visual.tone} icon={done ? "check" : visual.icon} size="sm" label={`${step.number}. ${step.title}`} />
+                  </span>
+                  <span className={`max-w-full truncate text-[11px] leading-4 font-bold ${isCurrent ? "text-ink" : "text-ink/60"}`}>
+                    {step.title}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+          <div className="mt-4 flex items-center justify-between gap-4 text-xs font-bold">
             <span>Progreso</span>
             <span className="text-ink/70">
               Paso {current?.number ?? 1} de 4
@@ -128,7 +151,7 @@ export default async function ProviderOnboardingPage() {
           </Link>
         </section>
 
-        <section className="border-ink/10 divide-ink/10 mt-5 divide-y border-y">
+        <section className="border-ink/[0.08] bg-surface divide-ink/[0.07] mt-5 divide-y rounded-2xl border px-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
           {steps.map((step) => (
             <OnboardingStepCard
               key={step.id}
@@ -137,7 +160,6 @@ export default async function ProviderOnboardingPage() {
             />
           ))}
         </section>
-
         {!editable && provider.status !== "ACTIVE" ? (
           <p className="bg-brand-yellow/14 text-warning mt-4 rounded-xl px-3 py-2.5 text-sm leading-6">
             Mientras el perfil está en revisión o requiere intervención, la

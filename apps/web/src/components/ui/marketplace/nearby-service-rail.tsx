@@ -27,7 +27,7 @@ export function NearbyServiceRail({
         </h2>
         <Link
           href={actionHref}
-          className="text-terracotta consumer-pressable hover:bg-brand-orange/[0.08] inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold"
+          className="text-terracotta consumer-pressable border-ink/[0.08] bg-surface inline-flex min-h-11 items-center gap-1 rounded-full border px-3 text-sm font-bold shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] hover:bg-brand-orange/[0.08] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
         >
           Ver todo
           <svg

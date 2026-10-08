@@ -135,8 +135,11 @@ export default async function ConversationPage({
             id="propuestas"
             aria-label="Propuestas de la conversación"
           >
-            <h2 className="text-base font-extrabold tracking-[-0.02em]">
-              Propuestas ({proposals.length})
+            <h2 className="flex items-center gap-2 text-base font-extrabold tracking-[-0.02em]">
+              Propuestas
+              <span className="bg-ink text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
+                {proposals.length}
+              </span>
             </h2>
             {proposals.map((proposal) => (
               <ProposalCard

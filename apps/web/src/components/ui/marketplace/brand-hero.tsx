@@ -13,6 +13,23 @@ export function BrandHero({
 }) {
   return (
     <section className="brand-gradient-surface relative overflow-hidden rounded-[1.75rem] px-5 pt-6 pb-8 text-white shadow-[var(--consumer-shadow-hero)] sm:px-8 sm:pt-8">
+      <span
+        className="pointer-events-none absolute inset-0 opacity-25"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+          backgroundSize: "12px 12px",
+        }}
+        aria-hidden="true"
+      />
+      <span
+        className="pointer-events-none absolute -right-10 -bottom-14 h-44 w-44 rounded-full bg-white/20"
+        aria-hidden="true"
+      />
+      <span
+        className="pointer-events-none absolute -top-8 -left-8 h-28 w-28 rounded-full bg-white/15"
+        aria-hidden="true"
+      />
       <div className="relative z-10">
         <p className="text-xs font-extrabold tracking-[0.1em] text-white/80 uppercase">
           {eyebrow}

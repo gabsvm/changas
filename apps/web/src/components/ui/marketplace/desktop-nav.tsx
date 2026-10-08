@@ -1,7 +1,9 @@
 import Link from "next/link";
 
 const linkClass =
-  "consumer-pressable text-ink/70 hover:bg-ink/[0.05] hover:text-ink inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold";
+  "consumer-pressable text-ink/70 hover:bg-ink/[0.05] hover:text-ink inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold dark:text-white/75 dark:hover:bg-white/10 dark:hover:text-white";
+const ctaClass =
+  "consumer-pressable brand-gradient-surface inline-flex min-h-11 items-center rounded-full px-4 text-sm font-extrabold text-white shadow-[0_10px_24px_-10px_rgb(255_107_53/70%)]";
 
 export function DesktopNav({ authenticated }: { authenticated: boolean }) {
   return (
@@ -28,7 +30,7 @@ export function DesktopNav({ authenticated }: { authenticated: boolean }) {
           </Link>
         </>
       ) : (
-        <Link className={linkClass} href="/provider/onboarding">
+        <Link className={ctaClass} href="/provider/onboarding">
           Ofrecer mis servicios
         </Link>
       )}

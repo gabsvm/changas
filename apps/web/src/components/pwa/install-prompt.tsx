@@ -107,25 +107,43 @@ export function InstallPrompt() {
 
   return (
     <aside
-      className="border-ink/10 bg-canvas/96 text-ink fixed right-3 bottom-[calc(var(--mobile-bottom-nav-height)+0.5rem)] left-3 z-[60] mx-auto flex max-h-[calc(100dvh-1rem)] max-w-lg flex-col overflow-hidden rounded-3xl border shadow-[0_-18px_50px_rgba(32,33,36,0.18)] backdrop-blur-xl sm:right-4 sm:bottom-4 sm:left-4"
+      className="border-ink/[0.08] bg-surface text-ink fixed right-3 bottom-[calc(var(--mobile-bottom-nav-height)+0.5rem)] left-3 z-[60] mx-auto flex max-h-[calc(100dvh-1rem)] max-w-lg flex-col overflow-hidden rounded-3xl border shadow-[0_1px_2px_rgb(23_20_15/8%),0_-18px_50px_rgba(32,33,36,0.18),0_24px_64px_-20px_rgb(255_107_53/35%)] backdrop-blur-xl sm:right-4 sm:bottom-4 sm:left-4 dark:shadow-[0_-18px_50px_rgba(0,0,0,0.5)]"
       aria-label="Instalar Changas"
       role="dialog"
       aria-modal="false"
     >
       <div
-        className="brand-gradient-surface h-1.5 shrink-0"
+        className="brand-gradient-surface relative shrink-0 overflow-hidden px-5 pt-5 pb-4"
         aria-hidden="true"
-      />
-      <div className="overflow-y-auto p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
+      >
+        <span
+          className="absolute inset-0 opacity-25"
+          style={{
+            backgroundImage:
+              "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+            backgroundSize: "12px 12px",
+          }}
+        />
+        <span className="absolute -right-6 -bottom-10 h-24 w-24 rounded-full bg-white/20" />
+        <span className="absolute -top-5 -left-5 h-16 w-16 rounded-full bg-white/15" />
+        <span className="relative flex items-center gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/20 text-white backdrop-blur-sm">
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 3.5V15M7.5 10.5 12 15l4.5-4.5M4.5 19.5h15" />
+            </svg>
+          </span>
+          <span>
+            <span className="block text-xs font-extrabold tracking-[0.16em] text-white/85 uppercase">
               App de Changas
-            </p>
-            <h2 className="font-display mt-1 text-xl font-semibold">
+            </span>
+            <span className="font-display mt-0.5 block text-xl leading-6 font-extrabold tracking-[-0.02em] text-white">
               Tenela a mano como una app
-            </h2>
-          </div>
+            </span>
+          </span>
+        </span>
+      </div>
+      <div className="overflow-y-auto p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+        <div className="flex items-start justify-end">
           <button
             className="consumer-pressable text-ink/70 hover:bg-ink/[0.05] inline-flex min-h-10 shrink-0 items-center rounded-full px-3 text-sm font-semibold"
             type="button"
@@ -135,10 +153,9 @@ export function InstallPrompt() {
             Cerrar
           </button>
         </div>
-
         {deferredPrompt ? (
           <>
-            <p className="text-ink/70 mt-3 text-sm leading-6">
+            <p className="text-ink/70 mt-1 text-sm leading-6">
               Instalá Changas y abrila en un toque desde tu pantalla de
               inicio: volvés a tus conversaciones y avisos más rápido, sin
               buscar la pestaña del navegador.

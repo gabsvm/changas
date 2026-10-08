@@ -17,7 +17,22 @@ export type IllustratedIconName =
   | "gear"
   | "chat"
   | "tag"
-  | "sparkle";
+  | "sparkle"
+  | "search"
+  | "check"
+  | "pin"
+  | "star"
+  | "compass"
+  | "sliders"
+  | "doc"
+  | "id"
+  | "image"
+  | "alert"
+  | "key"
+  | "download"
+  | "wifi"
+  | "wallet"
+  | "calendar";
 
 const TONES: Record<IllustratedTone, { from: string; to: string }> = {
   orange: { from: "#FF9A3D", to: "#EE5A24" },
@@ -44,6 +59,22 @@ const PATHS: Record<IllustratedIconName, string> = {
   tag: "M4 5h7l9 9-7 5-9-9V5Zm4.5 4.5h.01",
   sparkle:
     "M12 3v6M12 15v6M3 12h6M15 12h6M6 6l3.5 3.5M14.5 14.5 18 18M18 6l-3.5 3.5M9.5 14.5 6 18",
+  search: "M11 18.5a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15Zm5.2-2.2L21 21",
+  pin: "M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
+  star: "m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z",
+  check: "m5 12.5 4.5 4.5L19 7.5",
+  compass:
+    "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm3.5-12.5-2 5-5 2 2-5 5-2Z",
+  sliders: "M5 7h14M5 12h14M5 17h14M9 4.5v5M15 9.5v5M9 14.5v5",
+  doc: "M7 3.5h7l4 4v13H7v-17ZM14 3.5V8h4M10 12.5h5M10 16h5",
+  id: "M3.5 7h17v10h-17V7ZM7 11.2h3M7 14h5M16.5 10.5a1.5 1.5 0 1 0 0 .01M16.5 14a1.5 1.5 0 1 0 0 .01",
+  image: "M4 5.5h16v13H4v-13ZM4 16.5l4.5-4.5 3.5 3.5 2.5-2.5L20 18.5M9.5 10a1.5 1.5 0 1 0 0-.01",
+  alert: "M12 3.5 2.5 20h19L12 3.5ZM12 9.5v5M12 17.5h.01",
+  key: "M14 10a4 4 0 1 0-4 4c.4 0 .8-.1 1.1-.2L13 15.5h2v2h2v2h3v-3l-5.3-5.3c.1-.4.3-.8.3-1.2Z",
+  download: "M12 3.5V15M7.5 10.5 12 15l4.5-4.5M4.5 19.5h15",
+  wifi: "M4 10a12 12 0 0 1 16 0M7 13.5a7.5 7.5 0 0 1 10 0M9.8 17a3.5 3.5 0 0 1 4.4 0M12 20h.01",
+  wallet: "M4 7.5h16v11H4v-11ZM4 7.5V6a1.5 1.5 0 0 1 1.5-1.5h13L20 7.5M16.5 12.5h.01",
+  calendar: "M5 6.5h14v13H5v-13ZM5 10h14M9 3.5v4M15 3.5v4",
 };
 
 const SIZES = {

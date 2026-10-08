@@ -149,12 +149,28 @@ export default async function SearchPage({
         />
 
         <section className="pt-3 sm:pt-8">
-          <div className="discovery-hero border-ink/[0.07] bg-surface rounded-3xl border p-5 shadow-[var(--consumer-shadow-card)] sm:p-6">
-            <h1 className="text-[22px] leading-8 font-extrabold tracking-[-0.025em] sm:text-3xl sm:leading-10">
+          <div className="brand-gradient-surface text-ink relative overflow-hidden rounded-3xl p-5 shadow-[var(--consumer-shadow-hero)] sm:p-6">
+            <span
+              className="pointer-events-none absolute inset-0 opacity-25"
+              style={{
+                backgroundImage:
+                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                backgroundSize: "12px 12px",
+              }}
+              aria-hidden="true"
+            />
+            <span
+              className="pointer-events-none absolute -right-10 -bottom-16 h-48 w-48 rounded-full bg-white/20"
+              aria-hidden="true"
+            />
+            <span
+              className="pointer-events-none absolute -top-10 -left-10 h-32 w-32 rounded-full bg-white/15"
+              aria-hidden="true"
+            />
+            <h1 className="relative z-10 text-[22px] leading-8 font-extrabold tracking-[-0.025em] sm:text-3xl sm:leading-10">
               {query ? `Resultados para “${query}”` : "Explorar servicios"}
             </h1>
-
-            <form action="/buscar" className="mt-4">
+            <form action="/buscar" className="relative z-10 mt-4">
               <div className="grid gap-3">
                 <SearchField
                   defaultValue={query}
@@ -187,7 +203,7 @@ export default async function SearchPage({
             {categories.length ? (
               <nav
                 aria-label="Categorías"
-                className="consumer-scrollbar-none -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
+                className="consumer-scrollbar-none relative z-10 -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
               >
                 {[{ slug: null, name: "Todas" }, ...categories].map((item) => {
                   const selected =
@@ -197,7 +213,11 @@ export default async function SearchPage({
                       key={item.slug ?? "all"}
                       href={categoryHref(item.slug)}
                       aria-current={selected ? "true" : undefined}
-                      className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-sm font-bold ${selected ? "bg-brand-yellow text-ink border-transparent dark:text-[#171310]" : "border-ink/[0.08] text-ink/80 bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"}`}
+                      className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-sm font-bold transition-all duration-200 ${
+                        selected
+                          ? "border-transparent bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                          : "border-white/60 bg-white/70 text-ink/80 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                      }`}
                     >
                       {item.name}
                     </Link>
@@ -207,7 +227,7 @@ export default async function SearchPage({
             ) : null}
 
             <div
-              className="consumer-scrollbar-none -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pt-1 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
+              className="consumer-scrollbar-none relative z-10 -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pt-1 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
               role="group"
               aria-label="Filtros activos"
             >

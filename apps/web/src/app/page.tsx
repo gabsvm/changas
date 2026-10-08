@@ -14,6 +14,7 @@ import { CategoryTile } from "@/components/ui/marketplace/category-tile";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { NearbyServiceRail } from "@/components/ui/marketplace/nearby-service-rail";
 import { SearchField } from "@/components/ui/marketplace/search-field";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
@@ -107,6 +108,23 @@ export default async function HomePage() {
             aria-labelledby="home-search-title"
             className="brand-gradient-surface text-ink relative overflow-hidden rounded-[1.75rem] p-5 shadow-[var(--consumer-shadow-hero)] sm:p-9"
           >
+            <span
+              className="pointer-events-none absolute inset-0 opacity-25"
+              style={{
+                backgroundImage:
+                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                backgroundSize: "12px 12px",
+              }}
+              aria-hidden="true"
+            />
+            <span
+              className="pointer-events-none absolute -right-10 -bottom-16 h-48 w-48 rounded-full bg-white/20"
+              aria-hidden="true"
+            />
+            <span
+              className="pointer-events-none absolute -top-10 -left-10 h-32 w-32 rounded-full bg-white/15"
+              aria-hidden="true"
+            />
             <div className="relative z-10 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-10">
               <div>
                 <div className="relative z-10 max-w-2xl">
@@ -179,6 +197,7 @@ export default async function HomePage() {
                 title="Oficios populares"
                 actionHref="/buscar"
                 actionLabel="Ver todos"
+                badge={{ tone: "gold", icon: "compass" }}
               />
             </div>
             <div className="mt-2 grid grid-cols-4 gap-2.5 sm:grid-cols-7">
@@ -201,6 +220,7 @@ export default async function HomePage() {
                   title="Profesionales destacados"
                   actionHref="/buscar"
                   actionLabel="Explorar más"
+                  badge={{ tone: "orange", icon: "star" }}
                 />
                 <p className="text-ink/70 mt-3 text-sm" role="status">
                   La búsqueda está momentáneamente en mantenimiento.
@@ -225,28 +245,13 @@ export default async function HomePage() {
 
           <HowItWorks />
 
-          <section className="consumer-card bg-surface mt-6 flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <section className="consumer-card bg-surface relative mt-6 flex flex-col gap-3 overflow-hidden p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <span
+              className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)]"
+              aria-hidden="true"
+            />
             <div className="flex items-start gap-3">
-              <span
-                className="feed-trust-mark bg-brand-orange/15 text-terracotta grid h-10 w-10 shrink-0 place-items-center rounded-xl"
-                aria-hidden="true"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none">
-                  <path
-                    d="M12 3 4.5 6v5.5c0 4.5 3 8 7.5 9.5 4.5-1.5 7.5-5 7.5-9.5V6L12 3Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="m9 11.5 2.2 2.2L15.5 9"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
+              <IllustratedBadge tone="green" icon="shield" size="md" label="Identidad verificada" />
               <div>
                 <h2 className="text-[15px] font-extrabold">
                   Elegí con confianza
@@ -262,7 +267,20 @@ export default async function HomePage() {
           </section>
 
           {!user ? (
-            <section className="consumer-card bg-ink! mt-4 flex flex-col gap-3 p-5 text-white dark:border-white/10 dark:bg-[#2a231c]! dark:text-[#f5efe8]">
+            <section className="consumer-card bg-ink! relative mt-4 flex flex-col gap-3 overflow-hidden p-5 text-white dark:border-white/10 dark:bg-[#2a231c]! dark:text-[#f5efe8]">
+              <span
+                className="pointer-events-none absolute inset-0 opacity-20"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                  backgroundSize: "12px 12px",
+                }}
+                aria-hidden="true"
+              />
+              <span
+                className="pointer-events-none absolute -right-8 -bottom-12 h-36 w-36 rounded-full bg-white/10"
+                aria-hidden="true"
+              />
               <div>
                 <h2 className="text-base font-extrabold tracking-[-0.02em]">
                   Tu oficio merece un buen escaparate.

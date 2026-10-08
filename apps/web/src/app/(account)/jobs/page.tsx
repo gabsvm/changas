@@ -103,9 +103,17 @@ export default async function JobsPage({
                 aria-current={active ? "page" : undefined}
                 className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-bold ${
                   active
-                    ? "bg-ink text-white dark:bg-[#f5efe8] dark:text-[#171310]"
+                    ? "text-white shadow-[0_8px_20px_-8px_rgb(238_90_36/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                     : "bg-surface border-ink/[0.08] border"
                 }`}
+                style={
+                  active
+                    ? {
+                        backgroundImage:
+                          "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+                      }
+                    : undefined
+                }
               >
                 {option.label}
               </Link>
@@ -140,10 +148,27 @@ export default async function JobsPage({
                 <Link
                   key={job.job_id}
                   href={`/jobs/${job.job_id}`}
-                  className="consumer-card consumer-card-pressed consumer-pressable flex min-h-[76px] items-center gap-3 p-4"
+                  className="consumer-card consumer-card-pressed consumer-pressable group bg-surface flex min-h-[76px] items-center gap-3 p-4 transition-all duration-200 hover:-translate-y-0.5"
                 >
-                  <span className="bg-brand-orange/10 text-terracotta grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-base font-extrabold">
-                    {job.service_title.trim().charAt(0).toUpperCase() || "C"}
+                  <span
+                    className="relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl text-base font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)",
+                    }}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className="absolute inset-0 opacity-25"
+                      style={{
+                        backgroundImage:
+                          "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                        backgroundSize: "10px 10px",
+                      }}
+                    />
+                    <span className="relative drop-shadow-[0_2px_6px_rgb(0_0_0/25%)]">
+                      {job.service_title.trim().charAt(0).toUpperCase() || "C"}
+                    </span>
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[15px] leading-6 font-bold">

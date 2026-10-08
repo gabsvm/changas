@@ -18,8 +18,12 @@ export function AppHeader({
 }) {
   return (
     <header
-      className={`consumer-app-header bg-canvas/97 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-14 items-center gap-2.5 border-b px-4 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none ${className}`}
+      className={`consumer-app-header border-ink/[0.06] relative sticky top-0 z-30 -mx-4 flex min-h-14 items-center gap-2.5 overflow-hidden border-b bg-gradient-to-b from-white/95 via-[#fbf8f3]/92 to-[#fbf8f3]/85 px-4 backdrop-blur-xl sm:static sm:mx-0 sm:rounded-2xl sm:border sm:from-white/80 sm:via-white/60 sm:to-white/40 sm:px-4 sm:shadow-[0_8px_24px_-12px_rgb(23_20_15/18%)] dark:from-[#1c1917]/95 dark:via-[#1c1917]/90 dark:to-[#1c1917]/80 dark:sm:from-[#1c1917]/80 dark:sm:via-[#1c1917]/60 dark:sm:to-[#1c1917]/40 ${className}`}
     >
+      <span
+        aria-hidden="true"
+        className="brand-gradient-surface pointer-events-none absolute inset-x-0 bottom-0 h-[2px] opacity-70 sm:rounded-b-2xl"
+      />
       {backHref ? (
         <Link
           href={backHref}

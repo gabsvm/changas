@@ -9,6 +9,7 @@ import { formatServicePrice } from "@changas/domain";
 import { ProviderReputation } from "@/components/reputation/provider-reputation";
 import { Avatar } from "@/components/ui/marketplace/avatar";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { toggleProviderFavorite } from "@/lib/favorites/actions";
@@ -149,33 +150,71 @@ export default async function PublicProviderPage({
             </p>
           ) : null}
 
-          <div className="profile-hero-card consumer-card bg-surface flex items-start gap-5 p-5 sm:p-7">
-            <Avatar
-              name={provider.display_name}
-              src={
-                isTrustedPublicAvatarUrl(provider.avatar_url)
-                  ? provider.avatar_url
-                  : null
-              }
-              size="lg"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <StatusChip tone="success">Perfil habilitado</StatusChip>
-                {provider.public_zone ? (
-                  <span className="text-ink/70 text-[13px] font-medium">
-                    {provider.public_zone}
-                  </span>
+          <div className="consumer-card bg-surface overflow-hidden">
+            <div
+              className="relative h-28 overflow-hidden sm:h-36"
+              style={{ backgroundImage: coverFor(provider.public_slug).css }}
+              role="img"
+              aria-label={`Portada ilustrada de ${provider.display_name}`}
+            >
+              <span
+                className="absolute inset-0 opacity-25"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                  backgroundSize: "12px 12px",
+                }}
+                aria-hidden="true"
+              />
+              <span
+                className="absolute -right-8 -bottom-10 h-32 w-32 rounded-full bg-white/20"
+                aria-hidden="true"
+              />
+              <span
+                className="absolute -top-6 -left-6 h-20 w-20 rounded-full bg-white/15"
+                aria-hidden="true"
+              />
+              <span className="absolute top-3 right-4">
+                <IllustratedBadge
+                  tone={coverFor(provider.public_slug).tone}
+                  icon="sparkle"
+                  size="sm"
+                  label="Proveedor verificado de Changas"
+                />
+              </span>
+            </div>
+            <div className="flex items-start gap-5 p-5 sm:p-7">
+              <span className="-mt-12 sm:-mt-14">
+                <span className="block rounded-full ring-4 ring-white dark:ring-[#1c1712]">
+                  <Avatar
+                    name={provider.display_name}
+                    src={
+                      isTrustedPublicAvatarUrl(provider.avatar_url)
+                        ? provider.avatar_url
+                        : null
+                    }
+                    size="lg"
+                  />
+                </span>
+              </span>
+              <div className="min-w-0 flex-1 pt-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusChip tone="success">Perfil habilitado</StatusChip>
+                  {provider.public_zone ? (
+                    <span className="text-ink/70 text-[13px] font-medium">
+                      {provider.public_zone}
+                    </span>
+                  ) : null}
+                </div>
+                <h1 className="mt-3 text-[26px] leading-8 font-extrabold tracking-[-0.03em]">
+                  {provider.display_name}
+                </h1>
+                {provider.public_headline ? (
+                  <p className="text-ink/70 mt-1.5 text-[15px] leading-6 font-semibold">
+                    {provider.public_headline}
+                  </p>
                 ) : null}
               </div>
-              <h1 className="mt-3 text-[26px] leading-8 font-extrabold tracking-[-0.03em]">
-                {provider.display_name}
-              </h1>
-              {provider.public_headline ? (
-                <p className="text-ink/70 mt-1.5 text-[15px] leading-6 font-semibold">
-                  {provider.public_headline}
-                </p>
-              ) : null}
             </div>
           </div>
 
@@ -320,13 +359,30 @@ export default async function PublicProviderPage({
 
         <PublicSection title="Servicios">
           {(services ?? []).length ? (
-            <div className="consumer-card bg-surface divide-ink/10 divide-y overflow-hidden px-4">
+            <div className="grid gap-3">
               {(services ?? []).map((service) => (
                 <Link
-                  className="consumer-pressable hover:bg-ink/[0.035] flex min-h-[5.25rem] items-start gap-4 rounded-lg px-2 py-4"
+                  className="consumer-card consumer-pressable bg-surface group flex min-h-[5.25rem] items-start gap-4 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:hover:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
                   href={`/p/${slug}/${service.public_slug}`}
                   key={service.public_slug}
                 >
+                  <span
+                    className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl text-lg font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                    style={{ backgroundImage: coverFor(service.public_slug).css }}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className="absolute inset-0 opacity-25"
+                      style={{
+                        backgroundImage:
+                          "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                        backgroundSize: "10px 10px",
+                      }}
+                    />
+                    <span className="relative drop-shadow-[0_2px_6px_rgb(0_0_0/25%)]">
+                      {service.title.trim().charAt(0).toUpperCase() || "C"}
+                    </span>
+                  </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-ink/70 text-[13px] font-semibold">
                       {service.skill_name}
@@ -355,7 +411,7 @@ export default async function PublicProviderPage({
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 24 24"
-                      className="text-ink/70 h-5 w-5"
+                      className="text-ink/70 h-5 w-5 transition-transform duration-200 group-hover:translate-x-0.5"
                       fill="none"
                     >
                       <path
@@ -391,14 +447,17 @@ export default async function PublicProviderPage({
 
         {(areas ?? []).length ? (
           <PublicSection title="Zona de servicio">
-            <div className="divide-ink/10 divide-y">
+            <div className="grid gap-2">
               {(areas ?? []).map((area) => (
                 <div
-                  className="flex min-h-12 items-center justify-between gap-4 py-3"
+                  className="border-ink/[0.08] bg-surface consumer-card flex min-h-12 items-center justify-between gap-4 rounded-2xl border px-4 py-3"
                   key={`${area.label}-${area.radius_meters}`}
                 >
-                  <span className="text-sm font-semibold">{area.label}</span>
-                  <span className="text-ink/70 text-xs">
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <IllustratedBadge tone="blue" icon="pin" size="sm" label="Zona de servicio" />
+                    <span className="truncate text-sm font-semibold">{area.label}</span>
+                  </span>
+                  <span className="text-ink/70 shrink-0 text-xs">
                     Radio aprox. {area.radius_meters} m
                   </span>
                 </div>
@@ -415,12 +474,12 @@ export default async function PublicProviderPage({
             <div className="grid gap-4 sm:grid-cols-2">
               {(portfolio ?? []).map((item) => (
                 <article
-                  className="border-ink/10 bg-surface overflow-hidden rounded-xl border"
+                  className="border-ink/[0.08] bg-surface consumer-card group overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:hover:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
                   key={item.id}
                 >
                   {item.media_path ? (
                     <Image
-                      className="aspect-video w-full object-cover"
+                      className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                       src={`/api/portfolio/${item.media_path
                         .split("/")
                         .map(encodeURIComponent)
@@ -449,20 +508,23 @@ export default async function PublicProviderPage({
 
         {(experiences ?? []).length ? (
           <PublicSection title="Experiencia">
-            <div className="divide-ink/10 divide-y">
+            <div className="grid gap-2">
               {(experiences ?? []).map((item) => (
-                <div className="py-4" key={`${item.title}-${item.started_on}`}>
-                  <p className="text-sm leading-5 font-semibold">
-                    {item.title}
-                  </p>
-                  <p className="text-ink/70 mt-1 text-sm leading-5">
-                    {item.organization ?? "Experiencia independiente"}
-                  </p>
-                  {item.description ? (
-                    <p className="text-ink/70 mt-1.5 text-sm leading-7">
-                      {item.description}
+                <div className="border-ink/[0.08] bg-surface consumer-card flex items-start gap-3 rounded-2xl border px-4 py-3.5" key={`${item.title}-${item.started_on}`}>
+                  <IllustratedBadge tone="violet" icon="briefcase" size="sm" label="Experiencia laboral" />
+                  <div className="min-w-0">
+                    <p className="text-sm leading-5 font-semibold">
+                      {item.title}
                     </p>
-                  ) : null}
+                    <p className="text-ink/70 mt-1 text-sm leading-5">
+                      {item.organization ?? "Experiencia independiente"}
+                    </p>
+                    {item.description ? (
+                      <p className="text-ink/70 mt-1.5 text-sm leading-7">
+                        {item.description}
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
               ))}
             </div>
@@ -471,28 +533,34 @@ export default async function PublicProviderPage({
 
         {(education ?? []).length || (certifications ?? []).length ? (
           <PublicSection title="Formación y credenciales">
-            <div className="divide-ink/10 divide-y">
+            <div className="grid gap-2">
               {(education ?? []).map((item) => (
                 <div
-                  className="py-4"
+                  className="border-ink/[0.08] bg-surface consumer-card flex items-start gap-3 rounded-2xl border px-4 py-3.5"
                   key={`${item.institution}-${item.started_on}`}
                 >
-                  <p className="text-sm leading-5 font-semibold">
-                    {item.institution}
-                  </p>
-                  <p className="text-ink/70 mt-1 text-sm leading-5">
-                    {item.field_of_study ?? "Formación"}
-                  </p>
+                  <IllustratedBadge tone="gold" icon="star" size="sm" label="Formación" />
+                  <div className="min-w-0">
+                    <p className="text-sm leading-5 font-semibold">
+                      {item.institution}
+                    </p>
+                    <p className="text-ink/70 mt-1 text-sm leading-5">
+                      {item.field_of_study ?? "Formación"}
+                    </p>
+                  </div>
                 </div>
               ))}
               {(certifications ?? []).map((item) => (
-                <div className="py-4" key={`${item.title}-${item.issued_on}`}>
-                  <p className="text-sm leading-5 font-semibold">
-                    {item.title}
-                  </p>
-                  <p className="text-ink/70 mt-1 text-sm leading-5">
-                    {item.issuer ?? "Emisor no especificado"}
-                  </p>
+                <div className="border-ink/[0.08] bg-surface consumer-card flex items-start gap-3 rounded-2xl border px-4 py-3.5" key={`${item.title}-${item.issued_on}`}>
+                  <IllustratedBadge tone="green" icon="shield" size="sm" label="Certificación" />
+                  <div className="min-w-0">
+                    <p className="text-sm leading-5 font-semibold">
+                      {item.title}
+                    </p>
+                    <p className="text-ink/70 mt-1 text-sm leading-5">
+                      {item.issuer ?? "Emisor no especificado"}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -532,7 +600,7 @@ function PublicSection({
 
 function ProfileFact({ label, value }: { label: string; value: number }) {
   return (
-    <div className="border-ink/8 bg-surface-muted/55 rounded-xl border px-3 py-4 text-center">
+    <div className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border px-3 py-4 text-center shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
       <p className="text-xl leading-7 font-extrabold tracking-[-0.03em]">
         {value}
       </p>
@@ -541,4 +609,19 @@ function ProfileFact({ label, value }: { label: string; value: number }) {
       </p>
     </div>
   );
+}
+
+const PROFILE_COVERS = [
+  { css: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)", tone: "orange" },
+  { css: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)", tone: "blue" },
+  { css: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)", tone: "green" },
+  { css: "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)", tone: "rose" },
+  { css: "linear-gradient(135deg, #8B7CFF 0%, #5B4BD6 100%)", tone: "violet" },
+  { css: "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)", tone: "gold" },
+] as const;
+
+function coverFor(slug: string) {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i += 1) hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
+  return PROFILE_COVERS[hash % PROFILE_COVERS.length] ?? PROFILE_COVERS[0];
 }

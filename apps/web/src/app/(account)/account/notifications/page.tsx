@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { listNotifications } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
@@ -67,13 +68,16 @@ export default async function NotificationCenterPage() {
       <MobileAppBar title="Actividad" />
       <div className="pt-4 sm:pt-0">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div className="min-w-0">
-            <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
-              Actividad
-            </h1>
-            <p className="text-ink/70 max-w-[22rem] text-sm leading-5 sm:mt-1">
-              Novedades de trabajos, propuestas, pagos y cuenta.
-            </p>
+          <div className="flex min-w-0 items-center gap-3">
+            <IllustratedBadge tone="gold" icon="bell" size="md" label="Actividad" />
+            <div className="min-w-0">
+              <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
+                Actividad
+              </h1>
+              <p className="text-ink/70 max-w-[22rem] text-sm leading-5 sm:mt-1">
+                Novedades de trabajos, propuestas, pagos y cuenta.
+              </p>
+            </div>
           </div>
           <div className="-ml-2.5 flex items-center gap-1 self-start sm:ml-0">
             <Link
@@ -100,7 +104,7 @@ export default async function NotificationCenterPage() {
             {notifications.length === 0 ? (
               <EmptyState
                 className="empty-state-card py-12"
-                icon={<span aria-hidden="true">✓</span>}
+                tone="green"
                 title="Todo al día"
                 description="No tenés novedades pendientes. Cuando algo requiera tu atención va a aparecer acá."
               />
@@ -114,12 +118,12 @@ export default async function NotificationCenterPage() {
                     >
                       {label}
                     </h2>
-                    <ol className="consumer-card bg-surface divide-ink/[0.07] divide-y px-3">
+                    <ol className="consumer-card bg-surface divide-ink/[0.07] border-ink/[0.08] divide-y border px-3 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
                       {items.map((item) => (
                         <li key={item.id} className="py-3.5 sm:px-1">
                           <div className="flex gap-3">
                             <span
-                              className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.unread ? "bg-brand-orange" : "bg-ink/18"}`}
+                              className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.unread ? "brand-gradient-surface" : "bg-ink/18"}`}
                               aria-hidden="true"
                             />
                             <div className="min-w-0 flex-1">

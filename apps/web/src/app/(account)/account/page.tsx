@@ -56,26 +56,45 @@ export default async function AccountPage() {
   return (
     <section className="pt-5 pb-6 sm:py-10">
       <div className="mx-auto max-w-2xl">
-        <header>
+        <header className="brand-gradient-surface relative overflow-hidden rounded-[1.75rem] p-5 shadow-[0_4px_10px_rgb(255_107_53/14%),0_30px_64px_-18px_rgb(255_87_34/46%)] dark:shadow-[0_30px_64px_-18px_rgb(0_0_0/70%)]">
+          <span
+            className="absolute inset-0 opacity-25"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+              backgroundSize: "12px 12px",
+            }}
+            aria-hidden="true"
+          />
+          <span
+            className="absolute -right-8 -bottom-12 h-32 w-32 rounded-full bg-white/20"
+            aria-hidden="true"
+          />
+          <span
+            className="absolute -top-6 -left-6 h-20 w-20 rounded-full bg-white/15"
+            aria-hidden="true"
+          />
           <Link
             href="/account/profile"
-            className="consumer-pressable flex items-center gap-4 rounded-2xl"
+            className="consumer-pressable relative flex items-center gap-4 rounded-2xl"
             aria-label="Ver perfil público"
           >
-            <Avatar
-              name={displayName}
-              src={profile?.avatar_url ?? null}
-              size="lg"
-            />
+            <span className="rounded-full ring-2 ring-white/70">
+              <Avatar
+                name={displayName}
+                src={profile?.avatar_url ?? null}
+                size="lg"
+              />
+            </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-xl font-extrabold tracking-[-0.02em]">
+              <span className="block truncate text-xl font-extrabold tracking-[-0.02em] text-white">
                 {displayName}
               </span>
-              <span className="text-ink/70 mt-1 block truncate text-sm leading-5">
+              <span className="mt-1 block truncate text-sm leading-5 text-white/85">
                 {user.email}
               </span>
             </span>
-            <span className="text-ink/28 text-2xl" aria-hidden="true">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/20 text-xl text-white" aria-hidden="true">
               ›
             </span>
           </Link>
@@ -84,7 +103,7 @@ export default async function AccountPage() {
         {missing.length ? (
           <Link
             href="/account/profile"
-            className="consumer-pressable bg-brand-yellow/20 mt-5 block rounded-2xl px-4 py-3.5"
+            className="consumer-pressable border-ink/[0.08] bg-surface mt-5 block rounded-2xl border px-4 py-3.5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
           >
             <span className="flex items-center justify-between gap-3 text-sm font-extrabold">
               Completá tu perfil
@@ -95,7 +114,7 @@ export default async function AccountPage() {
               aria-hidden="true"
             >
               <span
-                className="bg-brand-orange block h-full rounded-full"
+                className="brand-gradient-surface block h-full rounded-full"
                 style={{ width: `${Math.max(completion, 8)}%` }}
               />
             </span>
@@ -106,7 +125,7 @@ export default async function AccountPage() {
           </Link>
         ) : null}
 
-        <section className="consumer-card bg-surface mt-6 px-5 py-5">
+        <section className="consumer-card bg-surface border-ink/[0.08] mt-6 border px-5 py-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
           {provider ? (
             <div>
               <div className="flex items-start justify-between gap-3">
@@ -251,7 +270,7 @@ function AccountGroup({
       <h2 className="text-ink/42 px-1 text-xs leading-5 font-bold tracking-[0.08em] uppercase">
         {title}
       </h2>
-      <div className="consumer-card bg-surface divide-ink/[0.07] mt-2 divide-y px-4">
+      <div className="consumer-card bg-surface divide-ink/[0.07] border-ink/[0.08] mt-2 divide-y border px-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
         {children}
       </div>
     </section>

@@ -213,7 +213,35 @@ export default async function JobPage({
           </div>
         ) : null}
 
-        <header className="consumer-card bg-surface mt-3 p-4 sm:mt-5">
+        <header className="consumer-card bg-surface mt-3 overflow-hidden sm:mt-5">
+          <div
+            className="relative h-20 overflow-hidden sm:h-24"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)",
+            }}
+            role="img"
+            aria-label={`Ficha ilustrada de ${detail.service_title}`}
+          >
+            <span
+              className="absolute inset-0 opacity-25"
+              style={{
+                backgroundImage:
+                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                backgroundSize: "12px 12px",
+              }}
+              aria-hidden="true"
+            />
+            <span
+              className="absolute -right-6 -bottom-8 h-24 w-24 rounded-full bg-white/20"
+              aria-hidden="true"
+            />
+            <span
+              className="absolute -top-4 -left-4 h-14 w-14 rounded-full bg-white/15"
+              aria-hidden="true"
+            />
+          </div>
+          <div className="p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-1.5">
             <StatusChip tone={status.tone}>{status.label}</StatusChip>
             <StatusChip tone="neutral">
@@ -226,8 +254,8 @@ export default async function JobPage({
           <p className="text-ink/70 mt-1.5 text-sm leading-6">
             Con {detail.counterparty_name} · {price}
           </p>
-          <div className="bg-canvas mt-4 grid grid-cols-2 gap-3 rounded-xl p-4 text-sm">
-            <div>
+          <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+            <div className="border-ink/[0.08] bg-canvas rounded-2xl border p-3.5">
               <p className="text-ink/70 text-xs leading-4 font-semibold">
                 Próxima fecha
               </p>
@@ -237,12 +265,13 @@ export default async function JobPage({
                   : "A coordinar"}
               </p>
             </div>
-            <div>
+            <div className="border-ink/[0.08] bg-canvas rounded-2xl border p-3.5">
               <p className="text-ink/70 text-xs leading-4 font-semibold">
                 Precio acordado
               </p>
               <p className="mt-0.5 font-extrabold">{price}</p>
             </div>
+          </div>
           </div>
         </header>
 
@@ -274,7 +303,7 @@ export default async function JobPage({
           </section>
         ) : null}
 
-        <section className="border-ink/10 mt-6 border-t pt-5">
+        <section className="border-ink/[0.08] bg-surface consumer-card mt-6 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
           <p className="text-ink/42 text-[11px] font-bold tracking-[0.08em] uppercase">
             Alcance acordado
           </p>

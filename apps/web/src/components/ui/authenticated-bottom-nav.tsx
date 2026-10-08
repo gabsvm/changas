@@ -159,9 +159,13 @@ export function AuthenticatedBottomNav({
 
   return (
     <nav
-      className="bottom-nav-shell mobile-safe-bottom bg-surface/90 border-ink/[0.07] fixed inset-x-0 bottom-0 z-50 border-t px-2 pt-1 backdrop-blur-xl sm:hidden"
+      className="bottom-nav-shell mobile-safe-bottom border-ink/[0.07] fixed inset-x-0 bottom-0 z-50 border-t bg-gradient-to-t from-white via-[#fbf8f3]/95 to-white/85 px-2 pt-1 shadow-[0_-12px_32px_-16px_rgb(23_20_15/25%)] backdrop-blur-xl dark:from-[#1c1917] dark:via-[#1c1917]/95 dark:to-[#1c1917]/85"
       aria-label="Navegación principal"
     >
+      <span
+        aria-hidden="true"
+        className="brand-gradient-surface pointer-events-none absolute inset-x-0 top-0 h-[2px] opacity-70"
+      />
       <div className="mx-auto grid h-[var(--consumer-nav-height)] max-w-md grid-cols-5">
         {items.map((item) => {
           const active = item.key === activeKey;
@@ -180,11 +184,13 @@ export function AuthenticatedBottomNav({
                 active ? "text-ink" : "text-ink/70 hover:text-ink/80"
               }`}
             >
-              <span className="nav-icon relative grid h-6 w-6 place-items-center">
+              <span
+                className={`nav-icon relative grid h-8 min-w-11 place-items-center rounded-full px-2.5 ${active ? "brand-gradient-surface text-white shadow-[0_8px_20px_-8px_rgb(255_107_53/70%)]" : ""}`}
+              >
                 <NavIcon name={item.icon} active={active} />
                 {badge > 0 ? (
                   <span
-                    className="bg-brand-pink-strong absolute -top-1 -right-2 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] leading-5 font-bold text-white"
+                    className="bg-brand-pink-strong absolute -top-1 -right-2 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] leading-5 font-bold text-white ring-2 ring-white dark:ring-[#1c1917]"
                     aria-label={`${badge} sin leer en ${item.label}`}
                   >
                     {badge > 99 ? "99+" : badge}
@@ -194,12 +200,6 @@ export function AuthenticatedBottomNav({
               <span className={active ? "font-extrabold" : undefined}>
                 {item.label}
               </span>
-              {active ? (
-                <span
-                  className="bg-brand-orange absolute bottom-0.5 h-1 w-1 rounded-full"
-                  aria-hidden="true"
-                />
-              ) : null}
             </Link>
           );
         })}

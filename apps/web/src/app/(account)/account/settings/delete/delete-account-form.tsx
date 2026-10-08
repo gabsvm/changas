@@ -19,7 +19,7 @@ export function DeleteAccountForm({
     initialActionState,
   );
   const input =
-    "border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-3 text-base";
+    "border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-3 text-base dark:border-white/15 dark:bg-white/5";
 
   return (
     <form action={formAction} className="mt-6 space-y-4">

@@ -27,17 +27,22 @@ export default async function AccountSettingsPage() {
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Configuración" backHref="/account" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-          Cuenta
-        </p>
-        <h1 className="mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
-          Configuración
-        </h1>
+        <div className="flex items-center gap-3">
+          <IllustratedBadge tone="neutral" icon="gear" size="md" label="Configuración" />
+          <div>
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+              Cuenta
+            </p>
+            <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+              Configuración
+            </h1>
+          </div>
+        </div>
         <p className="text-ink/70 mt-1.5 text-sm leading-6">
           Acceso, preferencias y datos de tu cuenta.
         </p>
 
-        <section className="border-ink/10 divide-ink/10 mt-5 divide-y border-y">
+        <section className="border-ink/[0.08] bg-surface divide-ink/[0.07] mt-5 divide-y rounded-2xl border px-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
           <div className="py-3">
             <p className="text-ink text-[0.95rem] font-semibold">Apariencia</p>
             <p className="text-ink/70 mt-0.5 text-sm leading-5">

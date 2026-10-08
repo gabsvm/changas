@@ -123,15 +123,32 @@ export default async function CategoryPage({
           className="sm:flex"
         />
         <section className="pt-5 sm:pt-9">
-          <div className="discovery-hero border-ink/[0.07] rounded-3xl border p-5 shadow-[var(--consumer-shadow-card)] sm:p-6">
-            <p className="brand-kicker text-xs font-extrabold tracking-[0.14em] uppercase">
+          <div className="brand-gradient-surface text-ink relative overflow-hidden rounded-3xl p-5 shadow-[var(--consumer-shadow-hero)] sm:p-6">
+            <span
+              className="pointer-events-none absolute inset-0 opacity-25"
+              style={{
+                backgroundImage:
+                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+                backgroundSize: "12px 12px",
+              }}
+              aria-hidden="true"
+            />
+            <span
+              className="pointer-events-none absolute -right-10 -bottom-16 h-48 w-48 rounded-full bg-white/20"
+              aria-hidden="true"
+            />
+            <span
+              className="pointer-events-none absolute -top-10 -left-10 h-32 w-32 rounded-full bg-white/15"
+              aria-hidden="true"
+            />
+            <p className="brand-kicker relative z-10 text-xs font-extrabold tracking-[0.14em] uppercase">
               Explorá por categoría
             </p>
-            <h1 className="mt-2 text-3xl leading-9 font-bold tracking-[-0.04em] sm:text-4xl">
+            <h1 className="relative z-10 mt-2 text-3xl leading-9 font-bold tracking-[-0.04em] sm:text-4xl">
               {category.name}
             </h1>
             {category.description ? (
-              <p className="text-ink/75 mt-2 max-w-2xl text-sm leading-6 sm:text-base">
+              <p className="text-ink/80 relative z-10 mt-2 max-w-2xl text-sm leading-6 sm:text-base">
                 {category.description}
               </p>
             ) : null}
@@ -140,7 +157,7 @@ export default async function CategoryPage({
                 query ? `/buscar?q=${encodeURIComponent(query)}` : "/buscar"
               }
               aria-label={`Quitar filtro de categoría ${category.name}`}
-              className="consumer-pressable bg-brand-orange/12 text-terracotta mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-bold"
+              className="consumer-pressable relative z-10 mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-white/60 bg-white/70 px-3.5 text-[13px] font-bold text-ink backdrop-blur-sm hover:bg-white"
             >
               {category.name}
               <span aria-hidden="true" className="text-sm leading-none">
@@ -149,7 +166,7 @@ export default async function CategoryPage({
             </Link>
             <form
               action={`/categoria/${categorySlug}`}
-              className="mt-3 flex gap-2"
+              className="relative z-10 mt-3 flex gap-2"
             >
               {raw.mode ? (
                 <input type="hidden" name="mode" value={raw.mode} />
@@ -177,7 +194,7 @@ export default async function CategoryPage({
               </button>
             </form>
             <div
-              className="mt-3 flex flex-wrap gap-2"
+              className="relative z-10 mt-3 flex flex-wrap gap-2"
               aria-label="Refinar por modalidad"
             >
               <Link
@@ -185,10 +202,10 @@ export default async function CategoryPage({
                   mode: filters.modality === "IN_PERSON" ? null : "presencial",
                 })}
                 aria-pressed={filters.modality === "IN_PERSON"}
-                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
+                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.modality === "IN_PERSON"
-                    ? "bg-ink text-white dark:bg-[#f5efe8] dark:text-[#171310]"
-                    : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                    ? "border-transparent bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                    : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
                 Cerca mío
@@ -198,10 +215,10 @@ export default async function CategoryPage({
                   mode: filters.modality === "REMOTE" ? null : "remoto",
                 })}
                 aria-pressed={filters.modality === "REMOTE"}
-                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
+                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.modality === "REMOTE"
-                    ? "bg-ink text-white dark:bg-[#f5efe8] dark:text-[#171310]"
-                    : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                    ? "border-transparent bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                    : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
                 Remoto
@@ -211,10 +228,10 @@ export default async function CategoryPage({
                   offers: filters.acceptsOffers ? null : "true",
                 })}
                 aria-pressed={filters.acceptsOffers === true}
-                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
+                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.acceptsOffers
-                    ? "bg-ink text-white dark:bg-[#f5efe8] dark:text-[#171310]"
-                    : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                    ? "border-transparent bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                    : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
                 Acepta ofertas

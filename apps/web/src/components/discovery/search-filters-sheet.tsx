@@ -34,7 +34,7 @@ export function SearchFiltersSheet({
     <>
       <button
         type="button"
-        className="consumer-pressable border-ink/[0.1] text-ink inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border bg-white px-4 text-[15px] font-bold sm:w-auto dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+        className="consumer-pressable border-ink/[0.1] text-ink inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border bg-white px-4 text-[15px] font-bold shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] transition-all duration-200 hover:-translate-y-px hover:border-brand-orange/30 hover:shadow-[0_2px_4px_rgb(23_20_15/6%),0_14px_30px_-8px_rgb(23_20_15/18%)] sm:w-auto dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -54,7 +54,7 @@ export function SearchFiltersSheet({
         </svg>
         Filtros
         {activeCount > 0 ? (
-          <span className="bg-ink text-surface grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-xs font-extrabold">
+          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] px-1.5 text-xs font-extrabold text-white shadow-[0_6px_16px_-6px_rgb(255_107_53/60%)]">
             {activeCount}
           </span>
         ) : null}
@@ -239,7 +239,11 @@ function FilterGroup({
 }) {
   return (
     <fieldset className="grid gap-4 sm:col-span-2 sm:grid-cols-2">
-      <legend className="text-ink/70 mb-1 text-[11px] font-bold tracking-[0.1em] uppercase">
+      <legend className="mb-1 flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] text-ink/70 uppercase">
+        <span
+          className="h-4 w-1.5 rounded-full bg-[linear-gradient(180deg,#FF9A3D_0%,#FF0A78_100%)]"
+          aria-hidden="true"
+        />
         {title}
       </legend>
       {children}

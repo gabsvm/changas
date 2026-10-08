@@ -50,7 +50,7 @@ function PasswordInput({
   return (
     <span className="relative mt-2 block">
       <input
-        className="border-ink/15 focus:border-moss focus:ring-moss/20 w-full rounded-xl border bg-white py-3 pr-20 pl-4 font-normal outline-none focus:ring-2"
+        className="border-ink/15 focus:border-moss focus:ring-moss/20 w-full rounded-xl border bg-white py-3 pr-20 pl-4 dark:border-white/15 dark:bg-white/5 font-normal outline-none focus:ring-2"
         name={name}
         type={visible ? "text" : "password"}
         autoComplete={autoComplete}
@@ -96,7 +96,8 @@ export function AuthForm({
     nextPath !== "/account" ? `?next=${encodeURIComponent(nextPath)}` : "";
 
   return (
-    <div className="border-ink/10 bg-surface w-full max-w-md rounded-3xl border p-5 sm:rounded-[1.75rem] sm:p-8 sm:shadow-[0_24px_70px_rgba(32,33,36,0.08)]">
+    <div className="border-ink/[0.08] bg-surface relative w-full max-w-md overflow-hidden rounded-3xl border p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%),0_24px_70px_-20px_rgb(255_107_53/28%)] sm:rounded-[1.75rem] sm:p-8 dark:shadow-[0_24px_70px_-20px_rgb(0_0_0/70%)]">
+      <span aria-hidden="true" className="brand-gradient-surface pointer-events-none absolute inset-x-0 top-0 h-1.5" />
       <p className="text-terracotta text-xs font-extrabold tracking-[0.18em] uppercase">
         Cuenta Changas
       </p>
@@ -114,7 +115,7 @@ export function AuthForm({
           <label className="block text-sm font-bold">
             Nombre visible
             <input
-              className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
+              className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 dark:border-white/15 dark:bg-white/5 font-normal outline-none focus:ring-2"
               name="displayName"
               value={displayName}
               onChange={(event) => setDisplayName(event.target.value)}
@@ -130,7 +131,7 @@ export function AuthForm({
           <label className="block text-sm font-bold">
             Correo electrónico
             <input
-              className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 font-normal outline-none focus:ring-2"
+              className="border-ink/15 focus:border-moss focus:ring-moss/20 mt-2 w-full rounded-xl border bg-white px-4 py-3 dark:border-white/15 dark:bg-white/5 font-normal outline-none focus:ring-2"
               name="email"
               type="email"
               value={email}

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { PublicProfileForm } from "@/components/account/account-form";
 import { ProfileAvatarUploader } from "@/components/account/profile-avatar-uploader";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { createClient } from "@/lib/supabase/server";
 
 import { updatePublicProfile } from "../../actions";
@@ -29,16 +30,19 @@ export default async function AccountProfilePage() {
     <section className="pb-4 sm:py-10">
       <MobileAppBar title="Perfil público" backHref="/account" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
-        <header className="mb-6">
-          <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
-            Perfil público
-          </h1>
-          <p className="text-ink/70 text-sm leading-6 sm:mt-1 sm:max-w-xl">
-            Esta información puede aparecer en tus servicios y conversaciones.
-          </p>
+        <header className="mb-6 flex items-center gap-3">
+          <IllustratedBadge tone="violet" icon="user" size="md" label="Perfil público" />
+          <div>
+            <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
+              Perfil público
+            </h1>
+            <p className="text-ink/70 text-sm leading-6 sm:mt-1 sm:max-w-xl">
+              Esta información puede aparecer en tus servicios y conversaciones.
+            </p>
+          </div>
         </header>
 
-        <section className="border-ink/[0.07] border-b pb-5">
+        <section className="border-ink/[0.08] bg-surface rounded-2xl border px-4 py-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
           <ProfileAvatarUploader
             displayName={displayName}
             initialAvatarUrl={profile?.avatar_url}
