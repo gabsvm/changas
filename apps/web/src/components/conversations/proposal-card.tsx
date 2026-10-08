@@ -10,10 +10,8 @@ import {
 } from "@changas/domain";
 
 import {
-  fakePaymentAction,
   respondProposalAction,
   reviseProposalAction,
-  startProposalCheckoutAction,
   type ProposalActionState,
 } from "@/app/(account)/messages/proposal-actions";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
@@ -66,14 +64,12 @@ export function ProposalCard({
   currentUserId,
   clientUserId,
   providerUserId,
-  allowFakePayments,
 }: {
   proposal: ProposalSummary;
   conversationId: string;
   currentUserId: string;
   clientUserId: string;
   providerUserId: string;
-  allowFakePayments: boolean;
 }) {
   const ownTerms = proposal.authored_by_user_id === currentUserId;
   const currentUserIsClient = currentUserId === clientUserId;
@@ -222,7 +218,7 @@ export function ProposalCard({
               />
               <input type="hidden" name="action" value="ACCEPT" />
               <button className="consumer-pressable cta-ink inline-flex min-h-[52px] items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
-                Aceptar propuesta
+                Contratar
               </button>
             </form>
           ) : null}
@@ -339,66 +335,6 @@ export function ProposalCard({
         </details>
       ) : null}
 
-      {(proposal.proposal_status === "AWAITING_PAYMENT" ||
-        proposal.proposal_status === "PAYMENT_FAILED") &&
-      currentUserIsClient ? (
-        <form action={startProposalCheckoutAction} className="mt-4 grid gap-2">
-          <input
-            type="hidden"
-            name="conversationId"
-            value={conversationId}
-          />
-          <input
-            type="hidden"
-            name="proposalId"
-            value={proposal.proposal_id}
-          />
-          <button className="consumer-pressable cta-ink inline-flex min-h-[52px] items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
-            {proposal.proposal_status === "PAYMENT_FAILED"
-              ? "Reintentar pago"
-              : proposal.price_amount !== null
-                ? `Pagar ${formatMinorUnits(proposal.price_amount, proposal.currency_code)} y contratar`
-                : "Pagar y contratar"}
-          </button>
-          <p className="text-ink/70 text-center text-xs leading-5">
-            Serás redirigido a Mercado Pago para completar el pago retenido.
-          </p>
-        </form>
-      ) : null}
-      {(proposal.proposal_status === "AWAITING_PAYMENT" ||
-        proposal.proposal_status === "PAYMENT_FAILED") &&
-      currentUserIsClient &&
-      allowFakePayments ? (
-        <div className="border-moss/20 bg-moss/5 mt-4 rounded-lg border p-3">
-          <p className="text-moss text-xs font-bold">
-            Pago simulado · solo desarrollo
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {(["SUCCESS", "PENDING", "FAILURE"] as const).map((outcome) => (
-              <form key={outcome} action={fakePaymentAction}>
-                <input
-                  type="hidden"
-                  name="conversationId"
-                  value={conversationId}
-                />
-                <input
-                  type="hidden"
-                  name="proposalId"
-                  value={proposal.proposal_id}
-                />
-                <input type="hidden" name="outcome" value={outcome} />
-                <button className="consumer-pressable border-moss/20 inline-flex min-h-11 items-center rounded-full border bg-white px-4 text-[13px] font-bold dark:bg-white/[0.06]">
-                  {outcome === "SUCCESS"
-                    ? "Simular aprobado"
-                    : outcome === "PENDING"
-                      ? "Simular pendiente"
-                      : "Simular fallo"}
-                </button>
-              </form>
-            ))}
-          </div>
-        </div>
-      ) : null}
       </div>
     </article>
   );

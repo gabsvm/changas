@@ -79,7 +79,7 @@ export default async function ConversationPage({
   const threadVersion = `${messages.at(-1)?.message_id ?? "empty"}:${attachments.length}:${blockedUserId ?? "none"}`;
   const initialTextNonce = crypto.randomUUID();
   const initialAttachmentNonce = crypto.randomUUID();
-  const allowFakePayments = process.env.NODE_ENV !== "production";
+
 
   const proposalStatusLabels: Record<
     ProposalSummary["proposal_status"],
@@ -175,7 +175,6 @@ export default async function ConversationPage({
                 currentUserId={user.id}
                 clientUserId={context.client_user_id}
                 providerUserId={context.provider_user_id}
-                allowFakePayments={allowFakePayments}
               />
             ))}
           </section>
