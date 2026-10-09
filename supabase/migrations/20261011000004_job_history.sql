@@ -15,10 +15,10 @@ returns table (
   updated_at timestamptz,
   base_price_amount bigint,
   currency_code text,
-  is_client boolean
-),
+  is_client boolean,
   paid_additional_amount bigint,
   total_price_amount bigint
+)
 language plpgsql
 stable
 security definer
