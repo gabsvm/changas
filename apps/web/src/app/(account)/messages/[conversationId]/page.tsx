@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { formatMinorUnits } from "@changas/domain";
@@ -19,6 +20,10 @@ import {
   type ProposalSummary,
 } from "@/lib/proposals/server";
 import { createClient } from "@/lib/supabase/server";
+import {
+  listConversationJobs,
+  type ConversationJob,
+} from "@/lib/jobs/server";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +74,16 @@ export default async function ConversationPage({
 
   const { context, messages, blockedUserId, attachments, proposals } =
     await loadThreadData(conversationId);
+  // Graceful when the jobs read model is unavailable: cards just lack links.
+  let conversationJobs: ConversationJob[] = [];
+  try {
+    conversationJobs = await listConversationJobs(conversationId);
+  } catch {
+    conversationJobs = [];
+  }
+  const jobByVersion = new Map(
+    conversationJobs.map((job) => [job.accepted_proposal_version_id, job.job_id]),
+  );
   const currentUserIsClient = user.id === context.client_user_id;
   const peerUserId = currentUserIsClient
     ? context.provider_user_id
@@ -143,6 +158,27 @@ export default async function ConversationPage({
         deal={deal}
       />
 
+      {conversationJobs.length > 0 ? (
+        <div className="mx-auto w-full max-w-4xl px-4 sm:px-0">
+          <div className="border-moss/20 bg-moss/[0.06] flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border px-4 py-3">
+            <p className="text-sm font-bold">
+              {conversationJobs.length === 1
+                ? "Esta conversación ya tiene un trabajo."
+                : "Esta conversación ya tiene trabajos."}
+            </p>
+            {conversationJobs.map((job) => (
+              <Link
+                key={job.job_id}
+                href={`/jobs/${job.job_id}`}
+                className="consumer-pressable text-moss inline-flex min-h-11 items-center text-sm font-extrabold"
+              >
+                Ver trabajo →
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       <div className="mx-auto w-full max-w-4xl space-y-3 px-4 sm:px-0">
         {proposals.length > 0 ? (
           <section
@@ -175,6 +211,11 @@ export default async function ConversationPage({
                 currentUserId={user.id}
                 clientUserId={context.client_user_id}
                 providerUserId={context.provider_user_id}
+                jobId={
+                  proposal.accepted_version_id
+                    ? (jobByVersion.get(proposal.accepted_version_id) ?? null)
+                    : null
+                }
               />
             ))}
           </section>

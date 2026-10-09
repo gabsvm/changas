@@ -19,6 +19,8 @@ const PAYMENT_ACCOUNT_ID = "71160000-0000-4000-8000-000000000001";
 const CHECKOUT_ID = "71170000-0000-4000-8000-000000000001";
 const PROPOSAL_NONCE = "71180000-0000-4000-8000-000000000001";
 const SCOPE_NONCE = "71180000-0000-4000-8000-000000000002";
+const SETTLEMENT_NONCE = "71180000-0000-4000-8000-000000000003";
+const OTHER_JOB_ID = "71150000-0000-4000-8000-000000000009";
 const NOW = Date.UTC(2026, 8, 5, 21, 45, 0);
 const TOKEN_KEY = Buffer.alloc(32, 7).toString("base64");
 const STATE_SECRET = Buffer.alloc(32, 9).toString("base64");
@@ -329,6 +331,8 @@ type CheckoutRow = {
   status: "CREATED" | "REDIRECT_READY";
   providerCheckoutReference: string | null;
   checkoutUrl: string | null;
+  jobId?: string | null;
+  includedScopeChangeIds?: string[];
 };
 
 function makeCheckoutServer(
@@ -336,6 +340,7 @@ function makeCheckoutServer(
     currentUserId?: string | null;
     proposalSnapshot?: Record<string, unknown> | null;
     scopeSnapshot?: Record<string, unknown> | null;
+    settlementSnapshot?: Record<string, unknown> | null;
     providerAccount?: Record<string, unknown> | null;
     existingCheckout?: CheckoutRow | null;
   } = {},
@@ -386,6 +391,20 @@ function makeCheckoutServer(
           currencyCode: "ARS",
         }
       : overrides.scopeSnapshot;
+  const settlementSnapshot =
+    overrides.settlementSnapshot === undefined
+      ? {
+          jobId: JOB_ID,
+          proposalId: PROPOSAL_ID,
+          clientUserId: CLIENT_USER_ID,
+          providerUserId: PROVIDER_USER_ID,
+          serviceTitle: "Instalación eléctrica",
+          scopeSnapshot: "Instalación y revisión del tablero",
+          amountMinor: 140000,
+          currencyCode: "ARS",
+          includedScopeChangeIds: [SCOPE_CHANGE_ID],
+        }
+      : overrides.settlementSnapshot;
   const providerAccount =
     overrides.providerAccount === undefined
       ? {
@@ -415,6 +434,7 @@ function makeCheckoutServer(
     upsertAccount: async () => undefined,
     loadProposalCheckoutSnapshot: async () => proposalSnapshot,
     loadScopeChangeCheckoutSnapshot: async () => scopeSnapshot,
+    loadSettlementCheckoutSnapshot: async () => settlementSnapshot,
     loadConnectedProviderAccount: async () => providerAccount,
     findCheckoutByNonce: async () => overrides.existingCheckout ?? null,
     createCheckoutRecord: async (input: CheckoutRow) => {
@@ -597,8 +617,117 @@ describe("Phase 11 durable real checkout creation", () => {
       expect(source).not.toContain("processMercadoPagoWebhook");
       expect(source).not.toContain("createProposalCheckout");
       expect(source).not.toContain("createScopeChangeCheckout");
+      expect(source).not.toContain("createJobSettlementCheckout");
+      expect(source).not.toContain("apply_job_settlement_result");
       expect(source).not.toContain("providerPaymentReference");
       expect(source).not.toContain("payment_id");
     }
+  });
+});
+
+describe("Job settlement checkout at close", () => {
+  it("creates a settlement checkout for the consolidated close total", async () => {
+    const { server, createdRows, createCheckoutSession } = makeCheckoutServer();
+
+    const result = await server.createJobSettlementCheckout(
+      JOB_ID,
+      SETTLEMENT_NONCE,
+    );
+
+    expect(createCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amountMinor: 140000,
+        currencyCode: "ARS",
+        marketplaceFeeMinor: 14000,
+        idempotencyKey: SETTLEMENT_NONCE,
+      }),
+    );
+    expect(createdRows[0]).toMatchObject({
+      purpose: "PROPOSAL",
+      targetId: PROPOSAL_ID,
+      jobId: JOB_ID,
+      includedScopeChangeIds: [SCOPE_CHANGE_ID],
+      amountMinor: 140000,
+      marketplaceFeeMinor: 14000,
+      providerNetExpectedMinor: 126000,
+      currencyCode: "ARS",
+      status: "CREATED",
+    });
+    expect(result.checkoutSessionId).toBe(CHECKOUT_ID);
+  });
+
+  it("rejects a settlement snapshot bound to another job", async () => {
+    const { server } = makeCheckoutServer({
+      settlementSnapshot: {
+        jobId: OTHER_JOB_ID,
+        proposalId: PROPOSAL_ID,
+        clientUserId: CLIENT_USER_ID,
+        providerUserId: PROVIDER_USER_ID,
+        serviceTitle: "Instalación eléctrica",
+        scopeSnapshot: "Instalación y revisión del tablero",
+        amountMinor: 140000,
+        currencyCode: "ARS",
+        includedScopeChangeIds: [],
+      },
+    });
+
+    await expectPaymentError(
+      () => server.createJobSettlementCheckout(JOB_ID, SETTLEMENT_NONCE),
+      "INVALID_PROVIDER_STATE",
+    );
+  });
+
+  it("requires the job client to create the settlement checkout", async () => {
+    const { server } = makeCheckoutServer({
+      currentUserId: OTHER_PROVIDER_USER_ID,
+    });
+
+    await expectPaymentError(
+      () => server.createJobSettlementCheckout(JOB_ID, SETTLEMENT_NONCE),
+      "FORBIDDEN",
+    );
+  });
+
+  it("reuses a redirect-ready settlement session and rejects a nonce bound to another settlement", async () => {
+    const existingCheckout: CheckoutRow = {
+      id: CHECKOUT_ID,
+      requestNonce: SETTLEMENT_NONCE,
+      purpose: "PROPOSAL",
+      targetId: PROPOSAL_ID,
+      clientUserId: CLIENT_USER_ID,
+      providerUserId: PROVIDER_USER_ID,
+      paymentProviderAccountId: PAYMENT_ACCOUNT_ID,
+      providerName: "MERCADO_PAGO",
+      externalReference: `changas:checkout:${SETTLEMENT_NONCE}`,
+      amountMinor: 140000,
+      marketplaceFeeMinor: 14000,
+      providerNetExpectedMinor: 126000,
+      currencyCode: "ARS",
+      status: "REDIRECT_READY",
+      providerCheckoutReference: "pref-settlement",
+      checkoutUrl:
+        "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pref-settlement",
+      jobId: JOB_ID,
+      includedScopeChangeIds: [SCOPE_CHANGE_ID],
+    };
+    const reused = makeCheckoutServer({ existingCheckout });
+    const result = await reused.server.createJobSettlementCheckout(
+      JOB_ID,
+      SETTLEMENT_NONCE,
+    );
+    expect(result).toEqual({
+      checkoutSessionId: CHECKOUT_ID,
+      checkoutUrl: existingCheckout.checkoutUrl,
+    });
+    expect(reused.createdRows).toHaveLength(0);
+
+    const conflicted = makeCheckoutServer({
+      existingCheckout: { ...existingCheckout, jobId: OTHER_JOB_ID },
+    });
+    await expectPaymentError(
+      () =>
+        conflicted.server.createJobSettlementCheckout(JOB_ID, SETTLEMENT_NONCE),
+      "CONFLICT",
+    );
   });
 });

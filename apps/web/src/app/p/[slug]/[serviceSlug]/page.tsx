@@ -57,12 +57,27 @@ export async function generateMetadata({
   }
 }
 
+const CONSULT_ERROR_MESSAGES: Record<string, string> = {
+  FORBIDDEN: "No tenés permiso para consultar por este servicio.",
+  NOT_FOUND: "Este servicio ya no está disponible.",
+  CONFLICT: "Este servicio ya no está disponible.",
+};
+
 export default async function PublicServicePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string; serviceSlug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug: providerSlug, serviceSlug } = await params;
+  const query = await searchParams;
+  const rawError = query.consultError;
+  const consultErrorCode = Array.isArray(rawError) ? rawError[0] : rawError;
+  const consultErrorMessage = consultErrorCode
+    ? (CONSULT_ERROR_MESSAGES[consultErrorCode] ??
+      "Ocurrió un problema temporal. Probá de nuevo.")
+    : null;
   const supabase = await createClient();
   const [{ data: service }, { data: provider }, { data: tags }] =
     await Promise.all([
@@ -98,6 +113,15 @@ export default async function PublicServicePage({
       className="bg-canvas text-ink min-h-screen px-4 pt-4 pb-28 sm:px-8 sm:pb-10"
     >
       <div className="mx-auto max-w-3xl">
+        {consultErrorMessage ? (
+          <div
+            role="alert"
+            className="border-danger/25 bg-danger/[0.06] mb-4 rounded-2xl border px-4 py-3"
+          >
+            <p className="text-sm font-extrabold">No pudimos abrir el chat</p>
+            <p className="text-ink/70 mt-0.5 text-sm">{consultErrorMessage}</p>
+          </div>
+        ) : null}
         <AppHeader
           brand
           action={
@@ -283,8 +307,7 @@ export default async function PublicServicePage({
                 Pagos retenidos hasta la entrega + soporte
               </p>
               <p className="text-ink/70 mt-1 text-xs leading-6">
-                Tu pago queda retenido hasta que confirmás que el trabajo está
-                listo. Si algo sale mal, el equipo de Changas te acompaña.
+                Sin pago por adelantado: coordinás por chat y se liquida al finalizar. Si algo sale mal, el equipo de Changas te acompaña.
               </p>
             </div>
           </div>

@@ -53,7 +53,9 @@ export async function updateNotificationPreferencesAction(
 
     await updateNotificationPreferences(supabase, {
       pushActionableEnabled: current.pushActionableEnabled,
-      emailImportantEnabled: checkbox(formData, "emailImportantEnabled"),
+      // Email channel not wired yet: the toggle is disabled, so a missing
+      // checkbox must not wipe the stored preference.
+      emailImportantEnabled: current.emailImportantEnabled,
       jobRemindersEnabled: checkbox(formData, "jobRemindersEnabled"),
       proposalAlertsEnabled: checkbox(formData, "proposalAlertsEnabled"),
       verificationAlertsEnabled: checkbox(

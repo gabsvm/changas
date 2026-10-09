@@ -1,3 +1,4 @@
+import { resolveJobDisputeAction } from "@/app/admin/actions";
 import {
   AdminEmptyState,
   AdminPageHeader,
@@ -46,6 +47,39 @@ export default async function AdminJobsPage() {
                   </p>
                 </div>
               </div>
+              {job.status === "DISPUTED" ? (
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {(
+                    [
+                      ["COMPLETED", "Completar"],
+                      ["CANCELLED", "Cancelar"],
+                    ] as const
+                  ).map(([resolution, label]) => (
+                    <form
+                      key={resolution}
+                      action={resolveJobDisputeAction}
+                      className="rounded-2xl border border-[#273142] bg-[#101720] p-3"
+                    >
+                      <input type="hidden" name="jobId" value={job.job_id} />
+                      <input
+                        type="hidden"
+                        name="resolution"
+                        value={resolution}
+                      />
+                      <input
+                        className="w-full rounded-md border border-slate-600 bg-[#0d131d] px-2 py-2 text-sm text-[#d0d5dd]"
+                        name="reason"
+                        required
+                        minLength={2}
+                        placeholder="Motivo de la resolución"
+                      />
+                      <button className="mt-2 w-full rounded-xl border border-[#3a4659] px-2 py-2 text-sm font-extrabold text-[#d0d5dd]">
+                        {label}
+                      </button>
+                    </form>
+                  ))}
+                </div>
+              ) : null}
             </article>
           ))}
         </div>

@@ -5,11 +5,13 @@ import { formatMinorUnits, type JobStatus } from "@changas/domain";
 
 import {
   fakeAdditionalPaymentAction,
+  fakeSettlementPaymentAction,
   requestRescheduleAction,
   requestScopeChangeAction,
   respondRescheduleAction,
   respondScopeChangeAction,
   setJobLocationAction,
+  startJobSettlementCheckoutAction,
   transitionJobAction,
 } from "@/app/(account)/jobs/actions";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
@@ -164,8 +166,11 @@ export default async function JobPage({
             }
           : null;
   const price = formatMinorUnits(
-    detail.base_price_amount,
+    detail.total_price_amount,
     detail.currency_code as "ARS",
+  );
+  const paidChanges = scopeChanges.filter(
+    (change) => change.change_status === "PAID",
   );
 
   return (
@@ -339,7 +344,138 @@ export default async function JobPage({
           <p className="mt-3 text-sm leading-7 whitespace-pre-wrap">
             {detail.scope_snapshot}
           </p>
+          {paidChanges.length > 0 ? (
+            <div className="mt-3 space-y-2">
+              {paidChanges.map((change) => (
+                <p
+                  key={change.scope_change_id}
+                  className="border-ink/[0.08] bg-ink/[0.03] rounded-xl border px-3 py-2 text-sm leading-6 whitespace-pre-wrap dark:bg-white/[0.04]"
+                >
+                  <span className="text-moss text-xs font-extrabold tracking-[0.06em] uppercase">Acordado después · </span>
+                  {change.scope_snapshot}
+                </p>
+              ))}
+              <p className="text-ink/70 text-xs leading-5">
+                Base {formatMinorUnits(detail.base_price_amount, detail.currency_code as "ARS")} + adicionales pagados{" "}
+                {formatMinorUnits(detail.paid_additional_amount, detail.currency_code as "ARS")} ={" "}
+                <strong className="text-ink">total {price}</strong>
+              </p>
+            </div>
+          ) : null}
         </section>
+
+        {detail.settlement_status !== "NOT_DUE" ? (
+          <div className="mt-5">
+            <JobSection
+              title="Pago del trabajo"
+              badge={{ tone: "green", icon: "tag" }}
+            >
+              {detail.settlement_status === "SETTLED" ? (
+                <p className="text-sm leading-7">
+                  <strong>
+                    Pagado{" "}
+                    {formatMinorUnits(
+                      detail.settlement_total_minor,
+                      detail.currency_code as "ARS",
+                    )}
+                  </strong>
+                  {isClient
+                    ? " · Gracias por tu pago."
+                    : " · El cliente completó el pago."}
+                </p>
+              ) : detail.settlement_status === "NOT_REQUIRED" ? (
+                <p className="text-ink/70 text-sm leading-7">
+                  Este trabajo no tiene cargos a cobrar.
+                </p>
+              ) : isClient ? (
+                <>
+                  <dl className="space-y-1 text-sm leading-6">
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-ink/70">Precio base</dt>
+                      <dd className="font-bold">
+                        {formatMinorUnits(
+                          detail.base_price_amount,
+                          detail.currency_code as "ARS",
+                        )}
+                      </dd>
+                    </div>
+                    {detail.settlement_unpaid_extras_minor > 0 ? (
+                      <div className="flex justify-between gap-3">
+                        <dt className="text-ink/70">Adicionales pendientes</dt>
+                        <dd className="font-bold">
+                          {formatMinorUnits(
+                            detail.settlement_unpaid_extras_minor,
+                            detail.currency_code as "ARS",
+                          )}
+                        </dd>
+                      </div>
+                    ) : null}
+                    <div className="border-ink/10 flex justify-between gap-3 border-t pt-1">
+                      <dt className="font-extrabold">Total a pagar</dt>
+                      <dd className="font-extrabold">
+                        {formatMinorUnits(
+                          detail.settlement_total_minor,
+                          detail.currency_code as "ARS",
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+                  <form
+                    action={startJobSettlementCheckoutAction}
+                    className="mt-3"
+                  >
+                    <input type="hidden" name="jobId" value={jobId} />
+                    <button className="consumer-pressable cta-ink inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-extrabold">
+                      Pagar con Mercado Pago
+                    </button>
+                  </form>
+                  <p className="text-ink/70 mt-2 text-xs leading-5">
+                    Serás redirigido a Mercado Pago para completar el pago de
+                    forma segura.
+                  </p>
+                  {canSimulatePayment ? (
+                    <form
+                      action={fakeSettlementPaymentAction}
+                      className="mt-3 flex flex-wrap gap-2"
+                    >
+                      <input type="hidden" name="jobId" value={jobId} />
+                      <input
+                        type="hidden"
+                        name="paymentNonce"
+                        value={crypto.randomUUID()}
+                      />
+                      <button
+                        name="outcome"
+                        value="SUCCESS"
+                        className="button-secondary text-xs"
+                      >
+                        Simular pago aprobado
+                      </button>
+                      <button
+                        name="outcome"
+                        value="FAILURE"
+                        className="button-secondary text-xs"
+                      >
+                        Simular fallo
+                      </button>
+                    </form>
+                  ) : null}
+                </>
+              ) : (
+                <p className="text-sm leading-7">
+                  Pendiente de cobro:{" "}
+                  <strong>
+                    {formatMinorUnits(
+                      detail.settlement_total_minor,
+                      detail.currency_code as "ARS",
+                    )}
+                  </strong>{" "}
+                  · el cliente lo paga al completar el trabajo.
+                </p>
+              )}
+            </JobSection>
+          </div>
+        ) : null}
 
         <div className="mt-5">
           <JobReputationPanel
@@ -368,10 +504,7 @@ export default async function JobPage({
                     <ol className="text-ink/70 mt-2 list-decimal space-y-1 pl-5 text-[13px] leading-6">
                       <li>Contanos qué pasó en el motivo de abajo.</li>
                       <li>Revisamos el caso con ambas partes.</li>
-                      <li>
-                        Resolvemos: reprogramar, completar o cancelar con pago
-                        retenido.
-                      </li>
+                      <li>Definimos el cierre: completar o cancelar el trabajo.</li>
                     </ol>
                     <div className="mt-3">
                       <ReasonTransitionForm
@@ -404,6 +537,14 @@ export default async function JobPage({
                     </div>
                   </details>
                 </>
+              ) : null}
+              {detail.job_status === "DISPUTED" ? (
+                <div className="border-warning/25 bg-warning/[0.06] rounded-2xl border p-4">
+                  <h3 className="text-sm font-extrabold">Caso en revisión</h3>
+                  <p className="text-ink/70 mt-1 text-[13px] leading-6">
+                    El equipo de Changas está revisando lo reportado y va a definir el cierre: completar o cancelar el trabajo.
+                  </p>
+                </div>
               ) : null}
             </JobSection>
 
@@ -590,7 +731,7 @@ export default async function JobPage({
                           <strong className="text-ink">
                             Nuevo total:{" "}
                             {formatMinorUnits(
-                              detail.base_price_amount +
+                              detail.total_price_amount +
                                 change.additional_amount_minor,
                               detail.currency_code as "ARS",
                             )}

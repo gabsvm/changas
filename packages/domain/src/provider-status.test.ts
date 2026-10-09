@@ -8,6 +8,10 @@ describe("canSelfManageProviderStatus", () => {
     expect(canSelfManageProviderStatus("IDENTITY_PENDING")).toBe(true);
   });
 
+  it("allows rejected providers to fix and resubmit", () => {
+    expect(canSelfManageProviderStatus("REJECTED")).toBe(true);
+  });
+
   it("does not allow protected or terminal states", () => {
     expect(canSelfManageProviderStatus("ACTIVE")).toBe(false);
     expect(canSelfManageProviderStatus("UNDER_REVIEW")).toBe(false);

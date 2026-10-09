@@ -251,16 +251,21 @@ export default async function AdminCatalogPage() {
                 </form>
 
                 {category.skill_count === 0 ? (
-                  <form action={deleteCategoryAction}>
-                    <input
-                      type="hidden"
-                      name="categoryId"
-                      value={category.category_id}
-                    />
-                    <button className="rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
+                  <details>
+                    <summary className="inline-block cursor-pointer rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
                       Eliminar
-                    </button>
-                  </form>
+                    </summary>
+                    <form action={deleteCategoryAction} className="mt-2">
+                      <input
+                        type="hidden"
+                        name="categoryId"
+                        value={category.category_id}
+                      />
+                      <button className="rounded-xl border border-[#ef5350] px-3 py-2 text-sm font-extrabold text-[#ef5350]">
+                        Confirmar eliminación
+                      </button>
+                    </form>
+                  </details>
                 ) : null}
               </div>
 
@@ -367,16 +372,21 @@ export default async function AdminCatalogPage() {
                 </form>
 
                 {skill.service_count === 0 ? (
-                  <form action={deleteSkillAction}>
-                    <input
-                      type="hidden"
-                      name="skillId"
-                      value={skill.skill_id}
-                    />
-                    <button className="rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
+                  <details>
+                    <summary className="inline-block cursor-pointer rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
                       Eliminar
-                    </button>
-                  </form>
+                    </summary>
+                    <form action={deleteSkillAction} className="mt-2">
+                      <input
+                        type="hidden"
+                        name="skillId"
+                        value={skill.skill_id}
+                      />
+                      <button className="rounded-xl border border-[#ef5350] px-3 py-2 text-sm font-extrabold text-[#ef5350]">
+                        Confirmar eliminación
+                      </button>
+                    </form>
+                  </details>
                 ) : null}
               </div>
 
@@ -474,16 +484,21 @@ export default async function AdminCatalogPage() {
                   Actualizar
                 </button>
               </form>
-              <form action={deleteSkillSynonymAction} className="mt-2">
-                <input
-                  type="hidden"
-                  name="synonymId"
-                  value={synonym.synonym_id}
-                />
-                <button className="rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
+              <details className="mt-2">
+                <summary className="inline-block cursor-pointer rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
                   Eliminar
-                </button>
-              </form>
+                </summary>
+                <form action={deleteSkillSynonymAction} className="mt-2">
+                  <input
+                    type="hidden"
+                    name="synonymId"
+                    value={synonym.synonym_id}
+                  />
+                  <button className="rounded-xl border border-[#ef5350] px-3 py-2 text-sm font-extrabold text-[#ef5350]">
+                    Confirmar eliminación
+                  </button>
+                </form>
+              </details>
             </article>
           ))}
         </div>
@@ -522,17 +537,22 @@ export default async function AdminCatalogPage() {
                   Actualizar
                 </button>
               </form>
-              <form action={deleteServiceTagAction} className="mt-2">
-                <input type="hidden" name="serviceId" value={tag.service_id} />
-                <input
-                  type="hidden"
-                  name="normalizedTag"
-                  value={tag.normalized_tag}
-                />
-                <button className="rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
+              <details className="mt-2">
+                <summary className="inline-block cursor-pointer rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
                   Eliminar
-                </button>
-              </form>
+                </summary>
+                <form action={deleteServiceTagAction} className="mt-2">
+                  <input type="hidden" name="serviceId" value={tag.service_id} />
+                  <input
+                    type="hidden"
+                    name="normalizedTag"
+                    value={tag.normalized_tag}
+                  />
+                  <button className="rounded-xl border border-[#ef5350] px-3 py-2 text-sm font-extrabold text-[#ef5350]">
+                    Confirmar eliminación
+                  </button>
+                </form>
+              </details>
             </article>
           ))}
         </div>

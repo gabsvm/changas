@@ -5,7 +5,11 @@ import { formatMinorUnits } from "@changas/domain";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
-import { listMyUpcomingJobs, type UpcomingJob } from "@/lib/jobs/server";
+import {
+  listMyPastJobs,
+  listMyUpcomingJobs,
+  type UpcomingJob,
+} from "@/lib/jobs/server";
 import { getJobStatusPresentation } from "@/lib/ui/job-status";
 
 function scheduleLabel(job: UpcomingJob) {
@@ -32,8 +36,20 @@ function nextAction(job: UpcomingJob): string | null {
 }
 
 function jobAmount(job: UpcomingJob): string | null {
-  if (job.base_price_amount === null || !job.currency_code) return null;
-  return formatMinorUnits(job.base_price_amount, job.currency_code);
+  const total = job.total_price_amount ?? job.base_price_amount;
+  if (total === null || !job.currency_code) return null;
+  return formatMinorUnits(total, job.currency_code);
+}
+
+function hasPaidExtras(job: UpcomingJob): boolean {
+  return job.paid_additional_amount !== null && job.paid_additional_amount > 0;
+}
+
+function settlementLabel(job: UpcomingJob): string | null {
+  if (job.settlement_status === "DUE")
+    return job.is_client ? "Pendiente de pago" : "Pendiente de cobro";
+  if (job.settlement_status === "SETTLED") return "Pagado";
+  return null;
 }
 
 const statusFilters = [
@@ -41,6 +57,7 @@ const statusFilters = [
   { key: "confirmed", label: "Confirmados" },
   { key: "in_progress", label: "En curso" },
   { key: "closing", label: "Por cerrar" },
+  { key: "history", label: "Historial" },
 ] as const;
 
 type StatusFilter = (typeof statusFilters)[number]["key"];
@@ -56,6 +73,8 @@ function matchesFilter(job: UpcomingJob, filter: StatusFilter): boolean {
         job.job_status === "COMPLETION_REQUESTED" ||
         job.job_status === "DISPUTED"
       );
+    case "history":
+      return true;
     default:
       return true;
   }
@@ -74,7 +93,10 @@ export default async function JobsPage({
   )
     ? ((Array.isArray(rawStatus) ? rawStatus[0] : rawStatus) as StatusFilter)
     : "all";
-  const jobs = await listMyUpcomingJobs();
+  const jobs =
+    activeFilter === "history"
+      ? await listMyPastJobs()
+      : await listMyUpcomingJobs();
   const visible = jobs.filter((job) => matchesFilter(job, activeFilter));
 
   return (
@@ -85,7 +107,7 @@ export default async function JobsPage({
           Mis trabajos
         </h1>
         <p className="text-ink/70 mt-1.5 max-w-md text-sm leading-6">
-          Confirmados, en curso o pendientes de cierre.
+          Tus contrataciones activas e historial.
         </p>
 
         <nav
@@ -122,13 +144,23 @@ export default async function JobsPage({
         </nav>
 
         {jobs.length === 0 ? (
-          <EmptyState
-            title="Todavía no hay trabajos activos"
-            description="Cuando aceptes o te acepten una propuesta, el trabajo aparecerá acá."
-            actionHref="/buscar"
-            actionLabel="Explorar servicios"
-            className="pt-14"
-          />
+          activeFilter === "history" ? (
+            <EmptyState
+              title="Sin trabajos anteriores"
+              description="Cuando completes, canceles o registres ausencias, van a aparecer acá."
+              actionHref="/buscar"
+              actionLabel="Explorar servicios"
+              className="pt-14"
+            />
+          ) : (
+            <EmptyState
+              title="Todavía no hay trabajos activos"
+              description="Cuando aceptes o te acepten una propuesta, el trabajo aparecerá acá."
+              actionHref="/buscar"
+              actionLabel="Explorar servicios"
+              className="pt-14"
+            />
+          )
         ) : visible.length === 0 ? (
           <EmptyState
             title="Sin trabajos en este estado"
@@ -186,6 +218,16 @@ export default async function JobsPage({
                       {amount ? (
                         <span className="text-[15px] font-extrabold">
                           {amount}
+                        </span>
+                      ) : null}
+                      {hasPaidExtras(job) ? (
+                        <span className="text-ink/60 text-[11px] font-semibold">
+                          incluye adicionales
+                        </span>
+                      ) : null}
+                      {settlementLabel(job) ? (
+                        <span className="text-ink/60 text-[11px] font-semibold">
+                          {settlementLabel(job)}
                         </span>
                       ) : null}
                       {action ? (

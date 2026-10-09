@@ -4,7 +4,10 @@ import type { JobStatus, ScheduleType } from "@changas/domain";
 import { jobStatuses, scheduleTypes } from "@changas/domain";
 import { isUuid } from "@changas/validation";
 
-import { createFakeAdditionalPaymentRecord } from "@/lib/jobs/payment-adapter";
+import {
+  createFakeAdditionalPaymentRecord,
+  createFakeSettlementPaymentRecord,
+} from "@/lib/jobs/payment-adapter";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -21,6 +24,8 @@ export class JobServerError extends Error {
   }
 }
 
+export type SettlementStatus = "NOT_DUE" | "DUE" | "SETTLED" | "NOT_REQUIRED";
+
 export type UpcomingJob = {
   job_id: string;
   job_status: JobStatus;
@@ -32,8 +37,12 @@ export type UpcomingJob = {
   deadline_at: string | null;
   updated_at: string;
   base_price_amount: number | null;
+  paid_additional_amount: number | null;
+  total_price_amount: number | null;
   currency_code: string | null;
   is_client: boolean | null;
+  settlement_status: SettlementStatus | null;
+  settlement_total_minor: number | null;
 };
 
 export type JobDetail = {
@@ -46,6 +55,8 @@ export type JobDetail = {
   service_title: string;
   scope_snapshot: string;
   base_price_amount: number;
+  paid_additional_amount: number;
+  total_price_amount: number;
   currency_code: string;
   modality: "IN_PERSON" | "REMOTE" | "BOTH";
   schedule_type: ScheduleType;
@@ -60,6 +71,10 @@ export type JobDetail = {
   access_notes: string | null;
   confirmed_at: string;
   updated_at: string;
+  settlement_status: SettlementStatus;
+  settlement_total_minor: number;
+  settlement_unpaid_extras_minor: number;
+  settlement_unpaid_extra_ids: string[];
 };
 
 export type JobEvent = {
@@ -157,13 +172,41 @@ function requireRows<T>(value: unknown): T[] {
   return value as T[];
 }
 
-export async function listMyUpcomingJobs(limit = 20): Promise<UpcomingJob[]> {
-  const { supabase } = await authenticatedClient();
-  const { data, error } = await supabase.rpc("list_my_upcoming_jobs", {
-    limit_count: Math.min(Math.max(limit, 1), 50),
-  });
-  if (error) throw mapError(error.code);
-  const rows = requireRows<UpcomingJob>(data);
+function finiteNumberOrNull(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function normalizeSettlementStatus(value: unknown): SettlementStatus | null {
+  return value === "NOT_DUE" ||
+    value === "DUE" ||
+    value === "SETTLED" ||
+    value === "NOT_REQUIRED"
+    ? value
+    : null;
+}
+
+function normalizeUuidList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (entry): entry is string => typeof entry === "string" && isUuid(entry),
+  );
+}
+
+function normalizeJobRow(row: UpcomingJob): UpcomingJob {
+  return {
+    ...row,
+    base_price_amount: finiteNumberOrNull(row.base_price_amount),
+    paid_additional_amount: finiteNumberOrNull(row.paid_additional_amount),
+    total_price_amount: finiteNumberOrNull(row.total_price_amount),
+    currency_code:
+      typeof row.currency_code === "string" ? row.currency_code : null,
+    is_client: typeof row.is_client === "boolean" ? row.is_client : null,
+    settlement_status: normalizeSettlementStatus(row.settlement_status),
+    settlement_total_minor: finiteNumberOrNull(row.settlement_total_minor),
+  };
+}
+
+function filterValidJobRows(rows: UpcomingJob[]): UpcomingJob[] {
   return rows
     .filter(
       (row) =>
@@ -171,17 +214,25 @@ export async function listMyUpcomingJobs(limit = 20): Promise<UpcomingJob[]> {
         jobStatuses.includes(row.job_status) &&
         scheduleTypes.includes(row.schedule_type),
     )
-    .map((row) => ({
-      ...row,
-      base_price_amount:
-        typeof row.base_price_amount === "number" &&
-        Number.isFinite(row.base_price_amount)
-          ? row.base_price_amount
-          : null,
-      currency_code:
-        typeof row.currency_code === "string" ? row.currency_code : null,
-      is_client: typeof row.is_client === "boolean" ? row.is_client : null,
-    }));
+    .map(normalizeJobRow);
+}
+
+export async function listMyUpcomingJobs(limit = 20): Promise<UpcomingJob[]> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("list_my_upcoming_jobs", {
+    limit_count: Math.min(Math.max(limit, 1), 50),
+  });
+  if (error) throw mapError(error.code);
+  return filterValidJobRows(requireRows<UpcomingJob>(data));
+}
+
+export async function listMyPastJobs(limit = 20): Promise<UpcomingJob[]> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("list_my_past_jobs", {
+    limit_count: Math.min(Math.max(limit, 1), 50),
+  });
+  if (error) throw mapError(error.code);
+  return filterValidJobRows(requireRows<UpcomingJob>(data));
 }
 
 export async function getJobDetail(jobId: string): Promise<JobDetail> {
@@ -196,7 +247,66 @@ export async function getJobDetail(jobId: string): Promise<JobDetail> {
   if (!row || !isUuid(row.job_id) || !jobStatuses.includes(row.job_status)) {
     throw new JobServerError("NOT_FOUND", "No encontramos ese trabajo.");
   }
-  return row;
+  // Totals land with the paid-totals migration; fall back to base + paid
+  // so the page survives any deploy/migration ordering.
+  const paid =
+    typeof row.paid_additional_amount === "number" &&
+    Number.isFinite(row.paid_additional_amount)
+      ? row.paid_additional_amount
+      : 0;
+  const total =
+    typeof row.total_price_amount === "number" &&
+    Number.isFinite(row.total_price_amount)
+      ? row.total_price_amount
+      : row.base_price_amount + paid;
+  // Settlement lands with the job-settlement migration; default to NOT_DUE
+  // so the pay affordance stays hidden until the columns exist.
+  const settlementStatus =
+    normalizeSettlementStatus(row.settlement_status) ?? "NOT_DUE";
+  const settlementTotal =
+    typeof row.settlement_total_minor === "number" &&
+    Number.isFinite(row.settlement_total_minor)
+      ? row.settlement_total_minor
+      : row.base_price_amount;
+  const settlementExtras =
+    typeof row.settlement_unpaid_extras_minor === "number" &&
+    Number.isFinite(row.settlement_unpaid_extras_minor)
+      ? row.settlement_unpaid_extras_minor
+      : 0;
+  return {
+    ...row,
+    paid_additional_amount: paid,
+    total_price_amount: total,
+    settlement_status: settlementStatus,
+    settlement_total_minor: settlementTotal,
+    settlement_unpaid_extras_minor: settlementExtras,
+    settlement_unpaid_extra_ids: normalizeUuidList(
+      row.settlement_unpaid_extra_ids,
+    ),
+  };
+}
+
+export type ConversationJob = {
+  job_id: string;
+  accepted_proposal_version_id: string;
+  job_status: JobStatus;
+};
+
+export async function listConversationJobs(
+  conversationId: string,
+): Promise<ConversationJob[]> {
+  if (!isUuid(conversationId)) return [];
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("list_conversation_jobs", {
+    target_conversation_id: conversationId,
+  });
+  if (error) throw mapError(error.code);
+  return requireRows<ConversationJob>(data).filter(
+    (row) =>
+      isUuid(row.job_id) &&
+      isUuid(row.accepted_proposal_version_id) &&
+      jobStatuses.includes(row.job_status),
+  );
 }
 
 export async function listJobEvents(jobId: string): Promise<JobEvent[]> {
@@ -335,6 +445,23 @@ export async function setJobExactLocation(input: {
   if (error) throw mapError(error.code);
 }
 
+async function requireFakePaymentAllowed(
+  supabase: JobsRpcClient,
+): Promise<void> {
+  if (process.env.NODE_ENV !== "production") return;
+  // Test affordance: admins resolve payments without money so the full
+  // hire flow stays testable in production.
+  const { data: isAdmin, error: adminError } = await supabase.rpc(
+    "is_current_user_admin",
+  );
+  if (adminError || isAdmin !== true) {
+    throw new JobServerError(
+      "FORBIDDEN",
+      "Los pagos de prueba no están disponibles en producción.",
+    );
+  }
+}
+
 export async function applyFakeAdditionalPayment(input: {
   jobId: string;
   scopeChangeId: string;
@@ -342,19 +469,7 @@ export async function applyFakeAdditionalPayment(input: {
   outcome: "SUCCESS" | "PENDING" | "FAILURE";
 }): Promise<void> {
   const { supabase, user } = await authenticatedClient();
-  if (process.env.NODE_ENV === "production") {
-    // Test affordance: admins resolve scope-change payments without money
-    // so the full hire flow stays testable in production.
-    const { data: isAdmin, error: adminError } = await supabase.rpc(
-      "is_current_user_admin",
-    );
-    if (adminError || isAdmin !== true) {
-      throw new JobServerError(
-        "FORBIDDEN",
-        "Los pagos de prueba no están disponibles en producción.",
-      );
-    }
-  }
+  await requireFakePaymentAllowed(supabase);
   const scopeChanges = await listJobScopeChanges(input.jobId);
   const targetChange = scopeChanges.find(
     (change) => change.scope_change_id === input.scopeChangeId,
@@ -390,6 +505,42 @@ export async function applyFakeAdditionalPayment(input: {
     payment_provider_reference: payment.id,
     payment_result_status: payment.status,
     actor_client_user_id: user.id,
+  });
+  if (error) throw mapError(error.code);
+}
+export async function applyFakeSettlementPayment(input: {
+  jobId: string;
+  nonce: string;
+  outcome: "SUCCESS" | "PENDING" | "FAILURE";
+}): Promise<void> {
+  const { supabase, user } = await authenticatedClient();
+  await requireFakePaymentAllowed(supabase);
+
+  const detail = await getJobDetail(input.jobId);
+  if (detail.job_status !== "COMPLETED") {
+    throw new JobServerError("CONFLICT", "El trabajo aún no está completo.");
+  }
+  if (detail.settlement_status !== "DUE") {
+    throw new JobServerError("CONFLICT", "El trabajo no admite cobro.");
+  }
+
+  const payment = await createFakeSettlementPaymentRecord({
+    paymentNonce: input.nonce,
+    amountMinor: detail.settlement_total_minor,
+    currencyCode: detail.currency_code,
+    outcome: input.outcome,
+  });
+
+  const admin = createAdminClient() as unknown as JobsRpcClient;
+  const { error } = await admin.rpc("apply_job_settlement_result", {
+    target_job_id: input.jobId,
+    settlement_nonce: input.nonce,
+    settlement_provider_name: "FAKE",
+    settlement_provider_reference: payment.id,
+    settlement_result_status: payment.status,
+    settlement_actor_user_id: user.id,
+    included_scope_change_ids: detail.settlement_unpaid_extra_ids,
+    assert_total_minor: detail.settlement_total_minor,
   });
   if (error) throw mapError(error.code);
 }

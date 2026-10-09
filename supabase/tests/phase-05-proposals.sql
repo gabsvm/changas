@@ -1,6 +1,6 @@
 begin;
 
-select plan(19);
+select plan(22);
 
 select ok(to_regclass('public.proposals') is not null, 'proposals table exists');
 select ok(to_regclass('public.proposal_versions') is not null, 'proposal versions table exists');
@@ -91,6 +91,24 @@ select ok(
       and not tgisinternal
   ),
   'accepted proposal versions are guarded against mutation'
+);
+
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.create_conversation_proposal(uuid,public.proposal_kind,text,bigint,timestamptz,timestamptz,timestamptz,timestamptz)')))
+  like '%user_blocks%',
+  'proposal creation enforces conversation blocks'
+);
+
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.respond_to_proposal(uuid,text)')))
+  like '%user_blocks%',
+  'proposal response enforces conversation blocks'
+);
+
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.revise_conversation_proposal(uuid,public.proposal_kind,text,bigint,timestamptz,timestamptz,timestamptz,timestamptz)')))
+  like '%user_blocks%',
+  'proposal revision enforces conversation blocks'
 );
 
 select * from finish();

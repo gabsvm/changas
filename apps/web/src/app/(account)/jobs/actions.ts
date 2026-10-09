@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import {
   jobStatuses,
-  parseMajorAmountToMinor,
+  parseOptionalAdditionalAmount,
   scheduleTypes,
   type JobStatus,
   type ScheduleType,
@@ -14,6 +14,7 @@ import { isUuid } from "@changas/validation";
 
 import {
   applyFakeAdditionalPayment,
+  applyFakeSettlementPayment,
   requestJobReschedule,
   requestJobScopeChange,
   respondJobReschedule,
@@ -29,7 +30,10 @@ import {
   type ReviewReportReason,
 } from "@/lib/reputation/server";
 import { createClient } from "@/lib/supabase/server";
-import { createScopeChangeCheckout } from "@/lib/payments/server";
+import {
+  createJobSettlementCheckout,
+  createScopeChangeCheckout,
+} from "@/lib/payments/server";
 
 const reviewReportReasons: ReviewReportReason[] = [
   "THREATS",
@@ -139,8 +143,10 @@ export async function requestScopeChangeAction(
   const jobId = uuidField(formData, "jobId");
   const scope = stringField(formData, "scope");
   if (scope.length < 3) throw new Error("Describí el nuevo alcance.");
-  const price = stringField(formData, "additionalPrice");
-  const amountMinor = price ? parseMajorAmountToMinor(price, "ARS") : 0;
+  const amountMinor = parseOptionalAdditionalAmount(
+    stringField(formData, "additionalPrice"),
+    "ARS",
+  );
   await requestJobScopeChange(jobId, scope, amountMinor);
   revalidatePath(`/jobs/${jobId}`);
 }
@@ -188,6 +194,34 @@ export async function startScopeChangeCheckoutAction(
     crypto.randomUUID(),
   );
   redirect(checkout.checkoutUrl);
+}
+
+export async function startJobSettlementCheckoutAction(
+  formData: FormData,
+): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const checkout = await createJobSettlementCheckout(
+    jobId,
+    crypto.randomUUID(),
+  );
+  redirect(checkout.checkoutUrl);
+}
+
+export async function fakeSettlementPaymentAction(
+  formData: FormData,
+): Promise<void> {
+  // Production gating (with the admin exception) is enforced in
+  // applyFakeSettlementPayment, the single choke point.
+  const jobId = uuidField(formData, "jobId");
+  const nonce = stringField(formData, "paymentNonce") || crypto.randomUUID();
+  if (!isUuid(nonce)) throw new Error("Pago inválido.");
+  const outcome = stringField(formData, "outcome");
+  if (outcome !== "SUCCESS" && outcome !== "PENDING" && outcome !== "FAILURE") {
+    throw new Error("Resultado inválido.");
+  }
+  await applyFakeSettlementPayment({ jobId, nonce, outcome });
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs");
 }
 
 export async function setJobLocationAction(formData: FormData): Promise<void> {

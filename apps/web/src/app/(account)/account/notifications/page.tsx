@@ -5,7 +5,8 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
-import { listNotifications } from "@/lib/notifications/server";
+import { listNotificationsThrough } from "@/lib/notifications/server";
+import { parsePageCursor } from "@/lib/cursor-pages";
 import { createClient } from "@/lib/supabase/server";
 import { getNotificationKindLabel } from "@/lib/ui/notifications";
 
@@ -46,7 +47,11 @@ function activityGroupLabel(value: Date, now = new Date()): string {
   return dateFormatter.format(value);
 }
 
-export default async function NotificationCenterPage() {
+export default async function NotificationCenterPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -54,7 +59,14 @@ export default async function NotificationCenterPage() {
 
   if (!user) redirect("/login?next=/account/notifications");
 
-  const notifications = await listNotifications(supabase);
+  const params = await searchParams;
+  const { items: notifications, next } = await listNotificationsThrough(
+    supabase,
+    parsePageCursor(params),
+  );
+  const moreHref = next
+    ? `/account/notifications?before=${encodeURIComponent(next.at)}&beforeId=${next.id}`
+    : null;
   const unreadCount = notifications.filter((item) => item.unread).length;
   const groups = new Map<string, typeof notifications>();
 
@@ -182,6 +194,14 @@ export default async function NotificationCenterPage() {
                     </ol>
                   </section>
                 ))}
+                {moreHref ? (
+                  <Link
+                    href={moreHref}
+                    className="button-secondary w-full sm:w-auto"
+                  >
+                    Mostrar más
+                  </Link>
+                ) : null}
               </div>
             )}
           </section>

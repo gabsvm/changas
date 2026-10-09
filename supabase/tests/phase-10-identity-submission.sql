@@ -1,6 +1,6 @@
 begin;
 
-select plan(5);
+select plan(11);
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
@@ -150,6 +150,81 @@ select is(
    where user_id = '00000000-0000-0000-0000-000000001002'),
   'PROFILE_INCOMPLETE',
   'owner cannot transition another provider through RLS'
+);
+
+set local role postgres;
+
+-- Simulate an admin rejection for the owner (complete case already exists).
+update public.provider_profiles
+set status = 'REJECTED'
+where user_id = '00000000-0000-0000-0000-000000001001';
+
+insert into public.provider_identity_reviews (
+  provider_user_id, reviewer_user_id, decision, previous_status, new_status, reason
+) values (
+  '00000000-0000-0000-0000-000000001001',
+  '00000000-0000-0000-0000-000000001002',
+  'REJECT',
+  'IDENTITY_PENDING',
+  'REJECTED',
+  'DNI ilegible, reintentar.'
+);
+
+-- A second rejected provider without documents (RLS behavior only).
+update public.provider_profiles
+set status = 'REJECTED'
+where user_id = '00000000-0000-0000-0000-000000001002';
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000001001', true);
+select set_config('request.jwt.claim.role', 'authenticated', true);
+
+select lives_ok(
+  $
+    select public.submit_provider_identity_review()
+  $,
+  'rejected owner can resubmit a complete case for review'
+);
+
+select is(
+  (select status::text from public.provider_profiles
+   where user_id = '00000000-0000-0000-0000-000000001001'),
+  'IDENTITY_PENDING',
+  'resubmit from REJECTED persists IDENTITY_PENDING'
+);
+
+select is(
+  (select reason from public.get_my_latest_identity_review()),
+  'DNI ilegible, reintentar.',
+  'owner can read their own rejection reason'
+);
+
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000001002', true);
+
+select is(
+  (select count(*) from public.get_my_latest_identity_review()),
+  0::bigint,
+  'provider cannot read another provider review'
+);
+
+select lives_ok(
+  $
+    update public.provider_profiles
+    set onboarding_step = 2
+    where user_id = '00000000-0000-0000-0000-000000001002'
+  $,
+  'rejected owner can save onboarding progress'
+);
+
+select throws_ok(
+  $
+    update public.provider_profiles
+    set status = 'PROFILE_INCOMPLETE'
+    where user_id = '00000000-0000-0000-0000-000000001002'
+  $,
+  '42501',
+  null,
+  'rejected owner still cannot flip status directly'
 );
 
 select * from finish();

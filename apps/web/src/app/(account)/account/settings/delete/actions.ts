@@ -75,6 +75,20 @@ export async function deleteAccount(
 
   const admin = createAdminClient();
 
+  // Lock the account first: a ban failure retries cleanly with zero data
+  // loss, while a wipe failure after the ban still leaves access revoked.
+  // (Banned-but-not-anonymized accounts mark an interrupted deletion.)
+  const { error: banError } = await admin.auth.admin.updateUserById(user.id, {
+    ban_duration: "876000h",
+  });
+  if (banError) {
+    return { error: "No pudimos eliminar la cuenta. Intentá de nuevo." };
+  }
+
+  // Best-effort wipe: collect failures instead of aborting midway so one
+  // broken step cannot strand the rest of the personal data.
+  const wipeFailures: string[] = [];
+
   // Los blobs viven en el bucket privado `identity-documents`; hay que
   // borrarlos ANTES de borrar las filas de metadatos que guardan su path.
   const { data: documents } = await admin
@@ -87,7 +101,10 @@ export async function deleteAccount(
       (path): path is string => typeof path === "string" && path.length > 0,
     );
   if (blobPaths.length > 0) {
-    await admin.storage.from("identity-documents").remove(blobPaths);
+    const { error: blobError } = await admin.storage
+      .from("identity-documents")
+      .remove(blobPaths);
+    if (blobError) wipeFailures.push("identity_blobs");
   }
 
   const steps = await Promise.all([
@@ -112,13 +129,14 @@ export async function deleteAccount(
       .eq("provider_user_id", user.id),
   ]);
   if (steps.some((step) => step.error)) {
-    return { error: "No pudimos eliminar la cuenta. Intentá de nuevo." };
+    wipeFailures.push("records");
   }
 
-  await admin
+  const { error: providerError } = await admin
     .from("provider_profiles")
     .update({ status: "DEACTIVATED" })
     .eq("user_id", user.id);
+  if (providerError) wipeFailures.push("provider_profile");
 
   // Revoca todos los refresh tokens del usuario para que ninguna sesión
   // existente sobreviva a la eliminación.
@@ -126,13 +144,22 @@ export async function deleteAccount(
     data: { session },
   } = await supabase.auth.getSession();
   if (session?.access_token) {
-    await admin.auth.admin.signOut(session.access_token, "global");
+    const { error: revokeError } = await admin.auth.admin.signOut(
+      session.access_token,
+      "global",
+    );
+    if (revokeError) wipeFailures.push("session_revoke");
   }
-  const { error: banError } = await admin.auth.admin.updateUserById(user.id, {
-    ban_duration: "876000h",
-  });
-  if (banError) {
-    return { error: "No pudimos eliminar la cuenta. Intentá de nuevo." };
+
+  if (wipeFailures.length > 0) {
+    console.error("account deletion partially failed", {
+      userId: user.id,
+      steps: wipeFailures,
+    });
+    return {
+      error:
+        "Tu acceso fue eliminado, pero algunos datos no se pudieron borrar automáticamente. Escribinos para completarlo.",
+    };
   }
 
   await supabase.auth.signOut();

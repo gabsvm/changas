@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import Link from "next/link";
+import { useActionState, useState } from "react";
 
 import {
   canActorTransitionProposal,
@@ -64,12 +65,14 @@ export function ProposalCard({
   currentUserId,
   clientUserId,
   providerUserId,
+  jobId,
 }: {
   proposal: ProposalSummary;
   conversationId: string;
   currentUserId: string;
   clientUserId: string;
   providerUserId: string;
+  jobId: string | null;
 }) {
   const ownTerms = proposal.authored_by_user_id === currentUserId;
   const currentUserIsClient = currentUserId === clientUserId;
@@ -78,6 +81,7 @@ export function ProposalCard({
     reviseProposalAction,
     initialState,
   );
+  const [confirmingHire, setConfirmingHire] = useState(false);
   const priced = proposal.price_amount !== null;
   const canAccept =
     priced &&
@@ -154,7 +158,7 @@ export function ProposalCard({
       {proposal.price_amount !== null ? (
         <div
           className="border-ink/[0.08] bg-surface consumer-card relative mt-3 overflow-hidden rounded-xl border text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.05] dark:shadow-none"
-          aria-label="Desglose del precio"
+          aria-label="Condiciones de contratación"
         >
           <span
             className="brand-gradient-surface pointer-events-none absolute inset-x-0 top-0 h-1.5"
@@ -162,34 +166,19 @@ export function ProposalCard({
           />
           <div className="px-3.5 pt-4 pb-3">
           <div className="flex items-center gap-2">
-            <IllustratedBadge tone="green" icon="shield" size="sm" label="Pago retenido" />
-            <span className="text-[13px] font-extrabold">Pago retenido</span>
+            <IllustratedBadge tone="green" icon="shield" size="sm" label="Condiciones" />
+            <span className="text-[13px] font-extrabold">Sin pago por adelantado</span>
           </div>
           <div className="mt-3 flex items-center justify-between gap-3">
             <span className="text-ink/70 text-[13px] font-semibold">
-              Subtotal del servicio
+              Total acordado
             </span>
             <span className="font-bold">
               {formatMinorUnits(proposal.price_amount, proposal.currency_code)}
             </span>
           </div>
-          <div className="mt-1.5 flex items-center justify-between gap-3">
-            <span className="text-ink/70 text-[13px] font-semibold">
-              Comisión de Changas
-            </span>
-            <span className="text-moss text-[13px] font-bold">
-              Incluida en el total
-            </span>
-          </div>
-          <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
-            <span className="text-[13px] font-extrabold">Total a pagar</span>
-            <span className="text-[15px] font-extrabold">
-              {formatMinorUnits(proposal.price_amount, proposal.currency_code)}
-            </span>
-          </div>
           <p className="text-ink/70 mt-2 text-xs leading-5">
-            El pago queda retenido hasta que confirmás la entrega. La comisión
-            se descuenta antes de liberarle el pago al proveedor.
+            Aceptar contrata el trabajo sin pago por adelantado. Se liquida al finalizar.
           </p>
           </div>
         </div>
@@ -205,22 +194,50 @@ export function ProposalCard({
       {proposal.proposal_status === "OPEN" ? (
         <div className="mt-4 grid gap-2">
           {canAccept ? (
-            <form action={respondProposalAction} className="grid">
-              <input
-                type="hidden"
-                name="conversationId"
-                value={conversationId}
-              />
-              <input
-                type="hidden"
-                name="proposalId"
-                value={proposal.proposal_id}
-              />
-              <input type="hidden" name="action" value="ACCEPT" />
-              <button className="consumer-pressable cta-ink inline-flex min-h-[52px] items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
+            confirmingHire ? (
+              <form action={respondProposalAction} className="grid gap-2">
+                <input
+                  type="hidden"
+                  name="conversationId"
+                  value={conversationId}
+                />
+                <input
+                  type="hidden"
+                  name="proposalId"
+                  value={proposal.proposal_id}
+                />
+                <input type="hidden" name="action" value="ACCEPT" />
+                <p className="border-ink/[0.08] bg-ink/[0.03] rounded-xl border px-3 py-2.5 text-sm leading-6 dark:bg-white/[0.04]">
+                  Vas a contratar <strong>{proposal.service_title}</strong> por{" "}
+                  <strong>
+                    {proposal.price_amount === null
+                      ? "monto a cotizar"
+                      : formatMinorUnits(proposal.price_amount, proposal.currency_code)}
+                  </strong>
+                  . Sin pago por adelantado.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingHire(false)}
+                    className="consumer-pressable border-ink/[0.1] inline-flex min-h-12 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold dark:bg-white/[0.06]"
+                  >
+                    Volver
+                  </button>
+                  <button className="consumer-pressable cta-ink inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-extrabold">
+                    Confirmar contratación
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmingHire(true)}
+                className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+              >
                 Contratar
               </button>
-            </form>
+            )
           ) : null}
           {!ownTerms ? (
             <form
@@ -272,6 +289,15 @@ export function ProposalCard({
             </form>
           )}
         </div>
+      ) : null}
+
+      {proposal.proposal_status === "ACCEPTED" && jobId ? (
+        <Link
+          href={`/jobs/${jobId}`}
+          className="consumer-pressable cta-ink mt-4 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+        >
+          Ver trabajo
+        </Link>
       ) : null}
 
       {canCounter ? (

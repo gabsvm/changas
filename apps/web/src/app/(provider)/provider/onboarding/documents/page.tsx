@@ -54,6 +54,7 @@ export default async function ProviderOnboardingDocumentsPage() {
     provider.status === "IDENTITY_PENDING" ||
     provider.status === "UNDER_REVIEW";
   const editable = canSelfManageProviderStatus(provider.status) && !submitted;
+  const rejected = provider.status === "REJECTED";
   const receivedDocuments = documents ?? [];
   const documentsComplete = hasRequiredIdentityDocuments(receivedDocuments);
   const missingDocuments = missingRequiredIdentityDocuments(receivedDocuments);
@@ -191,7 +192,7 @@ export default async function ProviderOnboardingDocumentsPage() {
                   action={submitProviderIdentityReview}
                   nextStep={4}
                   nextHref="/provider/onboarding/review"
-                  label="Enviar a revisión"
+                  label={rejected ? "Reenviar a revisión" : "Enviar a revisión"}
                 />
               </div>
             ) : (
@@ -205,7 +206,7 @@ export default async function ProviderOnboardingDocumentsPage() {
                   type="button"
                   disabled
                 >
-                  Enviar a revisión
+                  {rejected ? "Reenviar a revisión" : "Enviar a revisión"}
                 </button>
               </div>
             )}

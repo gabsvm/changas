@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatMinorUnits,
   formatServicePrice,
   minorUnitsToMajorInput,
   parseMajorAmountToMinor,
+  parseOptionalAdditionalAmount,
   parseServicePrice,
 } from "./money";
 
@@ -33,6 +35,20 @@ describe("money helpers", () => {
     expect(parseMajorAmountToMinor("12500,50", "ARS")).toBe(1_250_050);
     expect(parseMajorAmountToMinor("  99,9  ", "ARS")).toBe(9_990);
     expect(parseServicePrice("FIXED", "1500,50", "ARS")).toBe(150_050);
+  });
+
+  it("formats zero without crashing display surfaces", () => {
+    expect(formatMinorUnits(0, "ARS")).toBe("$0");
+  });
+
+  it("parses optional additional amounts with zero allowed", () => {
+    expect(parseOptionalAdditionalAmount("", "ARS")).toBe(0);
+    expect(parseOptionalAdditionalAmount("0", "ARS")).toBe(0);
+    expect(parseOptionalAdditionalAmount("0.00", "ARS")).toBe(0);
+    expect(parseOptionalAdditionalAmount("1500,50", "ARS")).toBe(150_050);
+    expect(() => parseOptionalAdditionalAmount("-1", "ARS")).toThrow();
+    expect(() => parseOptionalAdditionalAmount("1.234", "ARS")).toThrow();
+    expect(parseMajorAmountToMinor("0", "ARS", { allowZero: true })).toBe(0);
   });
 
   it("parses quote and rejects invalid, negative, unsupported, or unsafe values", () => {

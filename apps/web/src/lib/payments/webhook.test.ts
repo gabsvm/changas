@@ -59,6 +59,11 @@ function makeWebhookProcessor(
     TOKEN_KEY,
     1,
   );
+  const refreshToken = encryptPaymentToken(
+    "APP_USR-seller-webhook-refresh",
+    TOKEN_KEY,
+    1,
+  );
   const loadProviderAccountByReference = vi.fn(async () =>
     overrides.seller === undefined
       ? {
@@ -68,6 +73,8 @@ function makeWebhookProcessor(
           providerAccountReference: "123456",
           status: "CONNECTED",
           accessToken,
+          refreshToken,
+          scope: null,
           encryptionKeyVersion: 1,
         }
       : overrides.seller,
@@ -104,6 +111,10 @@ function makeWebhookProcessor(
     proposalStatus: "PAID",
     jobId: "72270000-0000-4000-8000-000000000001",
   }));
+  const recordRefundObservation = vi.fn(async () => undefined);
+  const refreshSellerAccessToken = vi.fn(async () => ({
+    accessToken: "APP_USR-seller-webhook-token-rotated",
+  }));
 
   const dependencies = {
     paymentEnv: { tokenEncryptionKey: TOKEN_KEY },
@@ -114,6 +125,8 @@ function makeWebhookProcessor(
     getProviderEventProcessingStatus,
     updateProviderEventProcessing,
     reconcileProviderPayment,
+    recordRefundObservation,
+    refreshSellerAccessToken,
   };
 
   const processMercadoPagoWebhook = createPaymentWebhookProcessor(
@@ -132,6 +145,8 @@ function makeWebhookProcessor(
     getProviderEventProcessingStatus,
     updateProviderEventProcessing,
     reconcileProviderPayment,
+    recordRefundObservation,
+    refreshSellerAccessToken,
   };
 }
 
@@ -288,4 +303,96 @@ describe("Phase 11 Mercado Pago webhook orchestration", () => {
       );
     },
   );
+
+  it("records a refund observation for REFUNDED payments without financial reconciliation", async () => {
+    const deps = makeWebhookProcessor({
+      payment: {
+        providerPaymentReference: PAYMENT_ID,
+        status: "REFUNDED",
+        rawStatus: "refunded",
+        statusDetail: "refunded",
+        amountMinor: 125000,
+        refundedAmountMinor: 125000,
+        currencyCode: "ARS",
+        providerAccountReference: "123456",
+        externalReference: EXTERNAL_REFERENCE,
+        providerNetReceivedMinor: 0,
+      },
+    });
+
+    const result = await deps.processMercadoPagoWebhook(webhookInput);
+
+    expect(deps.recordRefundObservation).toHaveBeenCalledWith({
+      checkoutSessionId: CHECKOUT_ID,
+      providerStatus: "REFUNDED",
+      providerStatusDetail: "refunded",
+      providerAmountMinor: 125000,
+      providerCurrencyCode: "ARS",
+      providerAccountReference: "123456",
+      refundedAmountMinor: 125000,
+      providerNetReceivedMinor: 0,
+    });
+    expect(deps.reconcileProviderPayment).not.toHaveBeenCalled();
+    expect(deps.updateProviderEventProcessing).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      status: "PROCESSED",
+    });
+    expect(result).toEqual({ processed: true, duplicate: false });
+  });
+
+  it("refreshes the seller token once on AUTH_REQUIRED and retries the authoritative fetch", async () => {
+    const deps = makeWebhookProcessor();
+    deps.fetchPayment.mockRejectedValueOnce(
+      Object.assign(new Error("token expired"), { code: "AUTH_REQUIRED" }),
+    );
+
+    const result = await deps.processMercadoPagoWebhook(webhookInput);
+
+    expect(deps.refreshSellerAccessToken).toHaveBeenCalledTimes(1);
+    expect(deps.fetchPayment).toHaveBeenCalledTimes(2);
+    expect(deps.fetchPayment).toHaveBeenNthCalledWith(1, {
+      accessToken: "APP_USR-seller-webhook-token",
+      paymentId: PAYMENT_ID,
+    });
+    expect(deps.fetchPayment).toHaveBeenNthCalledWith(2, {
+      accessToken: "APP_USR-seller-webhook-token-rotated",
+      paymentId: PAYMENT_ID,
+    });
+    expect(deps.reconcileProviderPayment).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ processed: true, duplicate: false });
+  });
+
+  it("fails the event when the seller token refresh fails", async () => {
+    const deps = makeWebhookProcessor();
+    deps.fetchPayment.mockRejectedValueOnce(
+      Object.assign(new Error("token expired"), { code: "AUTH_REQUIRED" }),
+    );
+    deps.refreshSellerAccessToken.mockRejectedValueOnce(
+      new Error("refresh denied"),
+    );
+
+    await expectPaymentError(
+      () => deps.processMercadoPagoWebhook(webhookInput),
+      "PROVIDER_UNAVAILABLE",
+    );
+
+    expect(deps.fetchPayment).toHaveBeenCalledTimes(1);
+    expect(deps.reconcileProviderPayment).not.toHaveBeenCalled();
+    expect(deps.updateProviderEventProcessing).toHaveBeenCalledWith(
+      expect.objectContaining({ eventId: EVENT_ID, status: "FAILED" }),
+    );
+  });
+
+  it("does not refresh the seller token for non-auth fetch failures", async () => {
+    const deps = makeWebhookProcessor();
+    deps.fetchPayment.mockRejectedValueOnce(new Error("provider down"));
+
+    await expectPaymentError(
+      () => deps.processMercadoPagoWebhook(webhookInput),
+      "PROVIDER_UNAVAILABLE",
+    );
+
+    expect(deps.refreshSellerAccessToken).not.toHaveBeenCalled();
+    expect(deps.fetchPayment).toHaveBeenCalledTimes(1);
+  });
 });

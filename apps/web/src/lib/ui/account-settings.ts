@@ -13,6 +13,7 @@ export type PreferenceToggleConfig = {
   name: PreferenceToggleName;
   title: string;
   description: string;
+  disabledNote?: string;
 };
 
 export type PreferenceGroupConfig = {
@@ -49,6 +50,7 @@ export const NOTIFICATION_PREFERENCE_GROUPS: PreferenceGroupConfig[] = [
         title: "Correos importantes",
         description:
           "Recibís por mail cada cambio de estado de tus trabajos, pagos y tu cuenta.",
+        disabledNote: "Los mails todavía no están disponibles.",
       },
       {
         name: "verificationAlertsEnabled",

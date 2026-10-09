@@ -2,12 +2,16 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 
-import { getPaymentServerEnv } from "@changas/config/server";
+import {
+  getPaymentServerEnv,
+  type PaymentServerEnv,
+} from "@changas/config/server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import {
   decryptPaymentTokenWithKeys,
+  encryptPaymentToken,
   type PaymentTokenEnvelope,
 } from "./crypto";
 import { MercadoPagoPaymentProvider } from "./mercado-pago";
@@ -29,6 +33,8 @@ type ConnectedSellerAccount = {
   providerAccountReference: string;
   status: "CONNECTED";
   accessToken: PaymentTokenEnvelope;
+  refreshToken: PaymentTokenEnvelope;
+  scope: string | null;
   encryptionKeyVersion: number;
 };
 
@@ -72,6 +78,25 @@ type ReconcileProviderPaymentInput = {
   providerEventId: string;
 };
 
+type RefundObservationInput = {
+  checkoutSessionId: string;
+  providerStatus: "REFUNDED";
+  providerStatusDetail: string | null;
+  providerAmountMinor: number;
+  providerCurrencyCode: string;
+  providerAccountReference: string;
+  refundedAmountMinor: number;
+  providerNetReceivedMinor: number | null;
+};
+
+type RefreshSellerAccessTokenInput = {
+  seller: ConnectedSellerAccount;
+};
+
+type RefreshSellerAccessTokenResult = {
+  accessToken: string;
+};
+
 export type MercadoPagoWebhookInput = {
   xSignature: string | null;
   xRequestId: string | null;
@@ -106,6 +131,10 @@ type PaymentWebhookDependencies = {
   reconcileProviderPayment(
     input: ReconcileProviderPaymentInput,
   ): Promise<unknown>;
+  recordRefundObservation(input: RefundObservationInput): Promise<void>;
+  refreshSellerAccessToken(
+    input: RefreshSellerAccessTokenInput,
+  ): Promise<RefreshSellerAccessTokenResult>;
 };
 
 export type PaymentWebhookErrorCode =
@@ -193,7 +222,9 @@ function normalizeSellerAccount(value: unknown): ConnectedSellerAccount {
     typeof value.providerUserId !== "string" ||
     value.providerName !== MERCADO_PAGO_PROVIDER ||
     typeof value.providerAccountReference !== "string" ||
-    !isRecord(value.accessToken) ||
+    (value.scope !== null &&
+      value.scope !== undefined &&
+      typeof value.scope !== "string") ||
     typeof value.encryptionKeyVersion !== "number"
   ) {
     throw new PaymentWebhookError(
@@ -202,19 +233,16 @@ function normalizeSellerAccount(value: unknown): ConnectedSellerAccount {
     );
   }
 
-  const accessToken = value.accessToken;
-  if (
-    typeof accessToken.ciphertext !== "string" ||
-    typeof accessToken.iv !== "string" ||
-    typeof accessToken.authTag !== "string" ||
-    typeof accessToken.keyVersion !== "number" ||
-    accessToken.keyVersion !== value.encryptionKeyVersion
-  ) {
-    throw new PaymentWebhookError(
-      "PERSISTENCE_ERROR",
-      "Stored Mercado Pago access-token envelope is malformed",
-    );
-  }
+  const accessToken = normalizeTokenEnvelope(
+    value.accessToken,
+    value.encryptionKeyVersion,
+    "access-token",
+  );
+  const refreshToken = normalizeTokenEnvelope(
+    value.refreshToken,
+    value.encryptionKeyVersion,
+    "refresh-token",
+  );
 
   return {
     id: value.id,
@@ -222,13 +250,39 @@ function normalizeSellerAccount(value: unknown): ConnectedSellerAccount {
     providerName: MERCADO_PAGO_PROVIDER,
     providerAccountReference: value.providerAccountReference,
     status: "CONNECTED",
-    accessToken: {
-      ciphertext: accessToken.ciphertext,
-      iv: accessToken.iv,
-      authTag: accessToken.authTag,
-      keyVersion: accessToken.keyVersion,
-    },
+    accessToken,
+    refreshToken,
+    scope:
+      typeof value.scope === "string" && value.scope.length > 0
+        ? value.scope
+        : null,
     encryptionKeyVersion: value.encryptionKeyVersion,
+  };
+}
+
+function normalizeTokenEnvelope(
+  value: unknown,
+  encryptionKeyVersion: number,
+  label: string,
+): PaymentTokenEnvelope {
+  if (
+    !isRecord(value) ||
+    typeof value.ciphertext !== "string" ||
+    typeof value.iv !== "string" ||
+    typeof value.authTag !== "string" ||
+    typeof value.keyVersion !== "number" ||
+    value.keyVersion !== encryptionKeyVersion
+  ) {
+    throw new PaymentWebhookError(
+      "PERSISTENCE_ERROR",
+      `Stored Mercado Pago ${label} envelope is malformed`,
+    );
+  }
+  return {
+    ciphertext: value.ciphertext,
+    iv: value.iv,
+    authTag: value.authTag,
+    keyVersion: value.keyVersion,
   };
 }
 
@@ -268,7 +322,7 @@ function assertAuthoritativePaymentMatches(
   seller: ConnectedSellerAccount,
   paymentId: string,
 ): asserts payment is AuthoritativeProviderPayment & {
-  status: "PENDING" | "SUCCEEDED" | "FAILED";
+  status: "PENDING" | "SUCCEEDED" | "FAILED" | "REFUNDED";
   externalReference: string;
 } {
   if (
@@ -281,7 +335,8 @@ function assertAuthoritativePaymentMatches(
     checkout.providerUserId !== seller.providerUserId ||
     (payment.status !== "PENDING" &&
       payment.status !== "SUCCEEDED" &&
-      payment.status !== "FAILED")
+      payment.status !== "FAILED" &&
+      payment.status !== "REFUNDED")
   ) {
     throw new PaymentWebhookError(
       "RECONCILIATION_MISMATCH",
@@ -308,6 +363,81 @@ async function failEvent(
       "Unable to record failed Mercado Pago webhook processing",
       persistenceError,
     );
+  }
+}
+
+function isAuthRequiredError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: unknown }).code === "AUTH_REQUIRED"
+  );
+}
+
+function toFetchError(error: unknown): PaymentWebhookError {
+  if (error instanceof PaymentWebhookError) return error;
+  return new PaymentWebhookError(
+    "PROVIDER_UNAVAILABLE",
+    "Unable to fetch authoritative Mercado Pago payment",
+    error,
+  );
+}
+
+async function fetchAuthoritativePaymentWithRefresh(
+  dependencies: PaymentWebhookDependencies,
+  seller: ConnectedSellerAccount,
+  eventId: string,
+  dataId: string,
+): Promise<AuthoritativeProviderPayment> {
+  const decryptionKeys = {
+    1: dependencies.paymentEnv.tokenEncryptionKey,
+    ...(dependencies.paymentEnv.tokenEncryptionKeyV2
+      ? { 2: dependencies.paymentEnv.tokenEncryptionKeyV2 }
+      : {}),
+  };
+  const fetchWithToken = (accessToken: string) =>
+    dependencies.paymentProvider.fetchPayment({
+      accessToken,
+      paymentId: dataId,
+    });
+
+  try {
+    return await fetchWithToken(
+      decryptPaymentTokenWithKeys(seller.accessToken, decryptionKeys),
+    );
+  } catch (error) {
+    if (!isAuthRequiredError(error)) {
+      const fetchError = toFetchError(error);
+      await failEvent(dependencies, eventId, fetchError);
+      throw fetchError;
+    }
+  }
+
+  let refreshedAccessToken: string;
+  try {
+    refreshedAccessToken = (
+      await dependencies.refreshSellerAccessToken({ seller })
+    ).accessToken;
+  } catch (error) {
+    const refreshError =
+      error instanceof PaymentWebhookError
+        ? error
+        : new PaymentWebhookError(
+            "PROVIDER_UNAVAILABLE",
+            "Unable to refresh Mercado Pago seller token",
+            error,
+          );
+    await failEvent(dependencies, eventId, refreshError);
+    throw refreshError;
+  }
+
+  try {
+    return await fetchWithToken(refreshedAccessToken);
+  } catch (error) {
+    const fetchError = toFetchError(error);
+    await failEvent(dependencies, eventId, fetchError);
+    throw fetchError;
   }
 }
 
@@ -389,29 +519,12 @@ export function createPaymentWebhookProcessor(
       throw normalized;
     }
 
-    let payment: AuthoritativeProviderPayment;
-    try {
-      payment = await dependencies.paymentProvider.fetchPayment({
-        accessToken: decryptPaymentTokenWithKeys(seller.accessToken, {
-          1: dependencies.paymentEnv.tokenEncryptionKey,
-          ...(dependencies.paymentEnv.tokenEncryptionKeyV2
-            ? { 2: dependencies.paymentEnv.tokenEncryptionKeyV2 }
-            : {}),
-        }),
-        paymentId: dataId,
-      });
-    } catch (error) {
-      const fetchError =
-        error instanceof PaymentWebhookError
-          ? error
-          : new PaymentWebhookError(
-              "PROVIDER_UNAVAILABLE",
-              "Unable to fetch authoritative Mercado Pago payment",
-              error,
-            );
-      await failEvent(dependencies, eventId, fetchError);
-      throw fetchError;
-    }
+    const payment = await fetchAuthoritativePaymentWithRefresh(
+      dependencies,
+      seller,
+      eventId,
+      dataId,
+    );
 
     try {
       if (!payment.externalReference) {
@@ -426,6 +539,24 @@ export function createPaymentWebhookProcessor(
         ),
       );
       assertAuthoritativePaymentMatches(payment, checkout, seller, dataId);
+
+      if (payment.status === "REFUNDED") {
+        await dependencies.recordRefundObservation({
+          checkoutSessionId: checkout.id,
+          providerStatus: payment.status,
+          providerStatusDetail: payment.statusDetail,
+          providerAmountMinor: payment.amountMinor,
+          providerCurrencyCode: payment.currencyCode,
+          providerAccountReference: payment.providerAccountReference,
+          refundedAmountMinor: payment.refundedAmountMinor,
+          providerNetReceivedMinor: payment.providerNetReceivedMinor,
+        });
+        await dependencies.updateProviderEventProcessing({
+          eventId,
+          status: "PROCESSED",
+        });
+        return { processed: true, duplicate: false };
+      }
 
       await dependencies.reconcileProviderPayment({
         checkoutSessionId: checkout.id,
@@ -569,7 +700,7 @@ async function loadProviderAccountByReference(
   const { data, error } = await admin
     .from("payment_provider_accounts")
     .select(
-      "id,provider_user_id,provider_name,provider_account_reference,status,access_token_ciphertext,access_token_iv,access_token_auth_tag,encryption_key_version",
+      "id,provider_user_id,provider_name,provider_account_reference,status,access_token_ciphertext,access_token_iv,access_token_auth_tag,refresh_token_ciphertext,refresh_token_iv,refresh_token_auth_tag,scope,encryption_key_version",
     )
     .eq("provider_name", MERCADO_PAGO_PROVIDER)
     .eq("provider_account_reference", providerAccountReference)
@@ -594,6 +725,13 @@ async function loadProviderAccountByReference(
       authTag: data.access_token_auth_tag,
       keyVersion: data.encryption_key_version,
     },
+    refreshToken: {
+      ciphertext: data.refresh_token_ciphertext,
+      iv: data.refresh_token_iv,
+      authTag: data.refresh_token_auth_tag,
+      keyVersion: data.encryption_key_version,
+    },
+    scope: data.scope,
     encryptionKeyVersion: data.encryption_key_version,
   };
 }
@@ -652,6 +790,108 @@ async function reconcileProviderPayment(
   return data;
 }
 
+async function recordRefundObservation(
+  input: RefundObservationInput,
+): Promise<void> {
+  const admin = createAdminClient() as unknown as RpcClient;
+  const { error } = await admin.rpc(
+    "record_payment_reconciliation_observation",
+    {
+      target_checkout_session_id: input.checkoutSessionId,
+      observed_provider_status: input.providerStatus,
+      observed_provider_status_detail: input.providerStatusDetail,
+      observed_amount_minor: input.providerAmountMinor,
+      observed_currency_code: input.providerCurrencyCode,
+      observed_provider_account_reference: input.providerAccountReference,
+      observed_refunded_minor: input.refundedAmountMinor,
+      observed_provider_net_received_minor: input.providerNetReceivedMinor,
+    },
+  );
+  if (error) {
+    throw new PaymentWebhookError(
+      "PERSISTENCE_ERROR",
+      "Unable to record Mercado Pago refund observation",
+      error,
+    );
+  }
+}
+
+async function refreshSellerAccessToken(input: {
+  env: PaymentServerEnv;
+  provider: MercadoPagoPaymentProvider;
+  seller: ConnectedSellerAccount;
+}): Promise<RefreshSellerAccessTokenResult> {
+  const refreshToken = decryptPaymentTokenWithKeys(input.seller.refreshToken, {
+    1: input.env.tokenEncryptionKey,
+    ...(input.env.tokenEncryptionKeyV2
+      ? { 2: input.env.tokenEncryptionKeyV2 }
+      : {}),
+  });
+
+  let credentials;
+  try {
+    credentials = await input.provider.refreshOAuthToken({ refreshToken });
+  } catch (error) {
+    throw new PaymentWebhookError(
+      "PROVIDER_UNAVAILABLE",
+      "Mercado Pago seller token refresh failed",
+      error,
+    );
+  }
+  if (
+    credentials.providerAccountReference !==
+    input.seller.providerAccountReference
+  ) {
+    throw new PaymentWebhookError(
+      "RECONCILIATION_MISMATCH",
+      "Mercado Pago refresh returned a different seller account",
+    );
+  }
+
+  const now = Date.now();
+  const expiresAtMs = now + credentials.expiresInSeconds * 1000;
+  if (!Number.isSafeInteger(expiresAtMs) || expiresAtMs <= now) {
+    throw new PaymentWebhookError(
+      "RECONCILIATION_MISMATCH",
+      "Mercado Pago refresh returned an unusable token expiry",
+    );
+  }
+  const rotatedAccessToken = encryptPaymentToken(
+    credentials.accessToken,
+    input.env.tokenEncryptionKey,
+    input.env.tokenEncryptionKeyVersion,
+  );
+  const rotatedRefreshToken = encryptPaymentToken(
+    credentials.refreshToken,
+    input.env.tokenEncryptionKey,
+    input.env.tokenEncryptionKeyVersion,
+  );
+  const admin = createAdminClient() as unknown as RpcClient;
+  const { error } = await admin.rpc("upsert_payment_provider_account", {
+    target_provider_user_id: input.seller.providerUserId,
+    payment_provider_name: input.seller.providerName,
+    payment_provider_account_reference: input.seller.providerAccountReference,
+    encrypted_access_token_ciphertext: rotatedAccessToken.ciphertext,
+    encrypted_access_token_iv: rotatedAccessToken.iv,
+    encrypted_access_token_auth_tag: rotatedAccessToken.authTag,
+    encrypted_refresh_token_ciphertext: rotatedRefreshToken.ciphertext,
+    encrypted_refresh_token_iv: rotatedRefreshToken.iv,
+    encrypted_refresh_token_auth_tag: rotatedRefreshToken.authTag,
+    token_encryption_key_version: input.env.tokenEncryptionKeyVersion,
+    granted_scope: credentials.scope ?? input.seller.scope,
+    access_token_expires_at: new Date(expiresAtMs).toISOString(),
+    account_status: "CONNECTED",
+  });
+  if (error) {
+    throw new PaymentWebhookError(
+      "PERSISTENCE_ERROR",
+      "Unable to persist refreshed Mercado Pago seller token",
+      error,
+    );
+  }
+  return { accessToken: credentials.accessToken };
+}
+
 let defaultProcessor:
   ReturnType<typeof createPaymentWebhookProcessor> | undefined;
 
@@ -679,6 +919,9 @@ export async function processMercadoPagoWebhook(
       loadProviderAccountByReference,
       findCheckoutByExternalReference,
       reconcileProviderPayment,
+      recordRefundObservation,
+      refreshSellerAccessToken: ({ seller }) =>
+        refreshSellerAccessToken({ env, provider, seller }),
     });
   }
   return defaultProcessor(input);

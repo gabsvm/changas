@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { isUuid } from "@changas/validation";
+
 import {
   restoreAccountAction,
   setAccountRestrictionAction,
@@ -33,8 +35,11 @@ export default async function AdminUsersPage({
   const selectedUserId = first(params.user);
   const [users, detail] = await Promise.all([
     listAdminUsers(query),
-    selectedUserId ? getAdminUserDetail(selectedUserId) : Promise.resolve(null),
+    selectedUserId && isUuid(selectedUserId)
+      ? getAdminUserDetail(selectedUserId).catch(() => null)
+      : Promise.resolve(null),
   ]);
+  const invalidSelection = Boolean(selectedUserId) && !detail;
 
   return (
     <section className="space-y-6">
@@ -56,6 +61,17 @@ export default async function AdminUsersPage({
           Buscar
         </button>
       </form>
+
+      {invalidSelection ? (
+        <AdminPanel>
+          <p className="text-sm font-bold text-white">
+            No pudimos cargar esa cuenta.
+          </p>
+          <p className="mt-1 text-sm text-[#98a2b3]">
+            Verificá el identificador o elegí una cuenta desde la lista.
+          </p>
+        </AdminPanel>
+      ) : null}
 
       {detail ? (
         <AdminPanel className="space-y-5">

@@ -3,12 +3,37 @@ import { FakePaymentProvider, supportedCurrencyCodes } from "@changas/domain";
 
 export type FakeAdditionalPaymentOutcome = "SUCCESS" | "PENDING" | "FAILURE";
 
+export type FakeSettlementPaymentOutcome = "SUCCESS" | "PENDING" | "FAILURE";
+
 export type FakeAdditionalPaymentRecordInput = {
   paymentNonce: string;
   amountMinor: number;
   currencyCode: string;
   outcome: FakeAdditionalPaymentOutcome;
 };
+
+export type FakeSettlementPaymentRecordInput = {
+  paymentNonce: string;
+  amountMinor: number;
+  currencyCode: string;
+  outcome: FakeSettlementPaymentOutcome;
+};
+
+export async function createFakeSettlementPaymentRecord(
+  input: FakeSettlementPaymentRecordInput,
+): Promise<PaymentRecord> {
+  if (!supportedCurrencyCodes.includes(input.currencyCode as CurrencyCode)) {
+    throw new Error("Unsupported settlement currency.");
+  }
+
+  const provider = new FakePaymentProvider();
+  return provider.createPayment({
+    idempotencyKey: input.paymentNonce,
+    amountMinor: input.amountMinor,
+    currencyCode: input.currencyCode as CurrencyCode,
+    outcome: input.outcome,
+  });
+}
 
 export async function createFakeAdditionalPaymentRecord(
   input: FakeAdditionalPaymentRecordInput,

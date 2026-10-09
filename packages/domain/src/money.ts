@@ -17,16 +17,21 @@ function assertSupportedCurrency(
 function assertSafeMinorUnits(minorUnits: number): void {
   if (
     !Number.isSafeInteger(minorUnits) ||
-    minorUnits <= 0 ||
+    minorUnits < 0 ||
     BigInt(minorUnits) > MAX_SAFE_MINOR_UNITS
   ) {
-    throw new Error("Minor units must be a positive safe integer");
+    throw new Error("Minor units must be a non-negative safe integer");
   }
 }
+
+export type ParseAmountOptions = {
+  allowZero?: boolean;
+};
 
 export function parseMajorAmountToMinor(
   input: string,
   currency = "ARS",
+  options: ParseAmountOptions = {},
 ): number {
   assertSupportedCurrency(currency);
   // Teclados es-AR suelen emitir coma decimal ("1500,50"). Si no hay punto,
@@ -43,10 +48,21 @@ export function parseMajorAmountToMinor(
   if (!wholePart) throw new Error("Invalid major amount");
   const minorUnits =
     BigInt(wholePart) * 100n + BigInt(fractionPart.padEnd(2, "0") || "0");
-  if (minorUnits <= 0n || minorUnits > MAX_SAFE_MINOR_UNITS) {
+  if (minorUnits > MAX_SAFE_MINOR_UNITS) {
+    throw new Error("Amount is outside the safe range");
+  }
+  if (minorUnits < 0n || (minorUnits === 0n && !options.allowZero)) {
     throw new Error("Amount is outside the safe range");
   }
   return Number(minorUnits);
+}
+
+export function parseOptionalAdditionalAmount(
+  input: string,
+  currency = "ARS",
+): number {
+  if (!input.trim()) return 0;
+  return parseMajorAmountToMinor(input, currency, { allowZero: true });
 }
 
 export function parseServicePrice(

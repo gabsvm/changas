@@ -53,9 +53,12 @@ export async function startProviderOnboarding(
   const { error } = await supabase.from("provider_profiles").upsert(
     {
       user_id: user.id,
+      // Status flips are server-side only (guard trigger): rejected
+      // providers keep REJECTED until they resubmit for review.
       status:
-        existing?.status === "IDENTITY_PENDING"
-          ? "IDENTITY_PENDING"
+        existing?.status === "IDENTITY_PENDING" ||
+        existing?.status === "REJECTED"
+          ? existing.status
           : "PROFILE_INCOMPLETE",
       onboarding_step: 1,
     },
@@ -102,9 +105,12 @@ export async function saveProviderOnboarding(
   const { error } = await supabase.from("provider_profiles").upsert(
     {
       user_id: user.id,
+      // Status flips are server-side only (guard trigger): rejected
+      // providers keep REJECTED until they resubmit for review.
       status:
-        existing?.status === "IDENTITY_PENDING"
-          ? "IDENTITY_PENDING"
+        existing?.status === "IDENTITY_PENDING" ||
+        existing?.status === "REJECTED"
+          ? existing.status
           : "PROFILE_INCOMPLETE",
       onboarding_step: step,
     },

@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 import { formatMinorUnits } from "@changas/domain";
 
 import {
+  listConversationsThrough,
   listInboxOpenDeals,
-  listMyConversations,
 } from "@/lib/conversations/server";
+import { parsePageCursor } from "@/lib/cursor-pages";
 import type { ConversationSummary } from "@/lib/conversations/server";
 import { listConversationProposals } from "@/lib/proposals/server";
 import { createClient } from "@/lib/supabase/server";
@@ -102,7 +103,12 @@ export default async function MessagesPage({
 
   if (!user) redirect("/login?next=/messages");
 
-  const conversations = await listMyConversations();
+  const through = parsePageCursor(params);
+  const { items: conversations, next } =
+    await listConversationsThrough(through);
+  const moreHref = next
+    ? `/messages?${showUnreadOnly ? "filter=unread&" : ""}before=${encodeURIComponent(next.at)}&beforeId=${next.id}`
+    : null;
   const deals = await loadOpenDeals(
     conversations.map((conversation) => conversation.conversation_id),
   );
@@ -217,6 +223,14 @@ export default async function MessagesPage({
                 deal={deals.get(conversation.conversation_id) ?? null}
               />
             ))}
+            {moreHref ? (
+              <Link
+                href={moreHref}
+                className="button-secondary w-full sm:w-auto"
+              >
+                Mostrar más
+              </Link>
+            ) : null}
           </div>
         )}
       </div>

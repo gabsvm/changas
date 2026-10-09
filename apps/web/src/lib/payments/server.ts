@@ -76,6 +76,24 @@ type CheckoutAuthoritySnapshot = {
   currencyCode: string;
 };
 
+type SettlementCheckoutSnapshot = {
+  jobId: string;
+  proposalId: string;
+  clientUserId: string;
+  providerUserId: string;
+  serviceTitle: string;
+  scopeSnapshot: string;
+  amountMinor: number;
+  currencyCode: string;
+  includedScopeChangeIds: string[];
+};
+
+type HostedCheckoutPreset = {
+  snapshot: CheckoutAuthoritySnapshot;
+  settlementJobId: string;
+  includedScopeChangeIds: string[];
+};
+
 type ConnectedProviderAccount = {
   id: string;
   providerUserId: string;
@@ -103,12 +121,19 @@ type CheckoutRecord = {
   status: CheckoutStatus;
   providerCheckoutReference: string | null;
   checkoutUrl: string | null;
+  jobId: string | null;
+  includedScopeChangeIds: string[];
 };
 
-type CheckoutRecordInput = CheckoutRecord & {
+type CheckoutRecordInput = Omit<
+  CheckoutRecord,
+  "jobId" | "includedScopeChangeIds"
+> & {
   status: "CREATED";
   providerCheckoutReference: null;
   checkoutUrl: null;
+  jobId?: string | null;
+  includedScopeChangeIds?: string[];
 };
 
 type CheckoutRedirectResult = {
@@ -147,6 +172,7 @@ type PaymentServerDependencies = {
   upsertAccount: (input: PersistPaymentProviderAccountInput) => Promise<void>;
   loadProposalCheckoutSnapshot?: (proposalId: string) => Promise<unknown>;
   loadScopeChangeCheckoutSnapshot?: (scopeChangeId: string) => Promise<unknown>;
+  loadSettlementCheckoutSnapshot?: (jobId: string) => Promise<unknown>;
   loadConnectedProviderAccount?: (providerUserId: string) => Promise<unknown>;
   findCheckoutByNonce?: (requestNonce: string) => Promise<unknown>;
   createCheckoutRecord?: (input: CheckoutRecordInput) => Promise<unknown>;
@@ -394,6 +420,39 @@ function normalizeCheckoutSnapshot(
   };
 }
 
+function normalizeSettlementSnapshot(
+  value: unknown,
+  expectedJobId: string,
+): SettlementCheckoutSnapshot {
+  if (!isRecord(value)) {
+    throw new PaymentServerError(
+      "NOT_FOUND",
+      "Settlement snapshot was not found",
+    );
+  }
+  const jobId = requireNonEmptyString(value.jobId, "jobId");
+  if (jobId !== expectedJobId) {
+    throw new PaymentServerError(
+      "INVALID_PROVIDER_STATE",
+      "Settlement snapshot target mismatch",
+    );
+  }
+  return {
+    jobId,
+    proposalId: requireNonEmptyString(value.proposalId, "proposalId"),
+    clientUserId: requireNonEmptyString(value.clientUserId, "clientUserId"),
+    providerUserId: requireNonEmptyString(
+      value.providerUserId,
+      "providerUserId",
+    ),
+    serviceTitle: requireNonEmptyString(value.serviceTitle, "serviceTitle"),
+    scopeSnapshot: requireNonEmptyString(value.scopeSnapshot, "scopeSnapshot"),
+    amountMinor: requirePositiveSafeInteger(value.amountMinor, "amountMinor"),
+    currencyCode: requireCurrency(value.currencyCode),
+    includedScopeChangeIds: normalizeIdList(value.includedScopeChangeIds),
+  };
+}
+
 function normalizeProviderCheckoutAccount(
   value: unknown,
 ): ConnectedProviderAccount {
@@ -524,7 +583,33 @@ function normalizeCheckoutRecord(value: unknown): CheckoutRecord {
       "providerCheckoutReference",
     ),
     checkoutUrl: requireNullableString(value.checkoutUrl, "checkoutUrl"),
+    jobId:
+      value.jobId === null || value.jobId === undefined
+        ? null
+        : requireNonEmptyString(value.jobId, "jobId"),
+    includedScopeChangeIds: normalizeIdList(value.includedScopeChangeIds),
   };
+}
+
+function normalizeIdList(value: unknown): string[] {
+  if (value === null || value === undefined) return [];
+  if (
+    !Array.isArray(value) ||
+    value.some((entry) => typeof entry !== "string" || entry.length === 0)
+  ) {
+    throw new PaymentServerError(
+      "INVALID_PROVIDER_STATE",
+      "Checkout settlement ids are invalid",
+    );
+  }
+  return [...value];
+}
+
+function sameIdSet(left: string[], right: string[]): boolean {
+  if (left.length !== right.length) return false;
+  const sortedLeft = [...left].sort();
+  const sortedRight = [...right].sort();
+  return sortedLeft.every((entry, index) => entry === sortedRight[index]);
 }
 
 function resolveValue<T>(value: T | (() => T)): T {
@@ -733,6 +818,7 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
     purpose: CheckoutPurpose,
     targetId: string,
     requestNonce: string,
+    preset?: HostedCheckoutPreset,
   ): Promise<CheckoutRedirectResult> {
     const checkoutDependencies = getCheckoutDependencies(dependencies);
     const user = await requireCurrentUser();
@@ -756,6 +842,19 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
           "Checkout nonce is already bound to another economic snapshot",
         );
       }
+      if (
+        preset &&
+        (checkout.jobId !== preset.settlementJobId ||
+          !sameIdSet(
+            checkout.includedScopeChangeIds,
+            preset.includedScopeChangeIds,
+          ))
+      ) {
+        throw new PaymentServerError(
+          "CONFLICT",
+          "Checkout nonce is already bound to another settlement",
+        );
+      }
       if (checkout.status === "REDIRECT_READY" && checkout.checkoutUrl) {
         return {
           checkoutSessionId: checkout.id,
@@ -770,11 +869,16 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
       }
     }
 
-    const rawSnapshot =
-      purpose === "PROPOSAL"
-        ? await checkoutDependencies.loadProposalCheckoutSnapshot(targetId)
-        : await checkoutDependencies.loadScopeChangeCheckoutSnapshot(targetId);
-    const snapshot = normalizeCheckoutSnapshot(rawSnapshot, targetId);
+    const snapshot = preset
+      ? preset.snapshot
+      : normalizeCheckoutSnapshot(
+          purpose === "PROPOSAL"
+            ? await checkoutDependencies.loadProposalCheckoutSnapshot(targetId)
+            : await checkoutDependencies.loadScopeChangeCheckoutSnapshot(
+                targetId,
+              ),
+          targetId,
+        );
     if (snapshot.clientUserId !== user.id) {
       throw new PaymentServerError(
         "FORBIDDEN",
@@ -837,7 +941,13 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
         checkout.marketplaceFeeMinor !== marketplaceFeeMinor ||
         checkout.providerNetExpectedMinor !== providerNetExpectedMinor ||
         checkout.currencyCode !== snapshot.currencyCode ||
-        checkout.externalReference !== externalReference
+        checkout.externalReference !== externalReference ||
+        (preset !== undefined &&
+          (checkout.jobId !== preset.settlementJobId ||
+            !sameIdSet(
+              checkout.includedScopeChangeIds,
+              preset.includedScopeChangeIds,
+            )))
       ) {
         throw new PaymentServerError(
           "CONFLICT",
@@ -862,6 +972,12 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
         status: "CREATED",
         providerCheckoutReference: null,
         checkoutUrl: null,
+        ...(preset
+          ? {
+              jobId: preset.settlementJobId,
+              includedScopeChangeIds: preset.includedScopeChangeIds,
+            }
+          : {}),
       };
       try {
         checkout = normalizeCheckoutRecord(
@@ -931,12 +1047,46 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
     return createHostedCheckout("SCOPE_CHANGE", scopeChangeId, requestNonce);
   }
 
+  async function createJobSettlementCheckout(
+    jobId: string,
+    requestNonce: string,
+  ) {
+    const loader = dependencies.loadSettlementCheckoutSnapshot;
+    if (!loader) {
+      throw new PaymentServerError(
+        "INVALID_PROVIDER_STATE",
+        "Settlement checkout is not configured",
+      );
+    }
+    const settlement = normalizeSettlementSnapshot(await loader(jobId), jobId);
+    return createHostedCheckout(
+      "PROPOSAL",
+      settlement.proposalId,
+      requestNonce,
+      {
+        snapshot: {
+          targetId: settlement.proposalId,
+          clientUserId: settlement.clientUserId,
+          providerUserId: settlement.providerUserId,
+          status: "SETTLEMENT",
+          serviceTitle: settlement.serviceTitle,
+          scopeSnapshot: settlement.scopeSnapshot,
+          amountMinor: settlement.amountMinor,
+          currencyCode: settlement.currencyCode,
+        },
+        settlementJobId: settlement.jobId,
+        includedScopeChangeIds: settlement.includedScopeChangeIds,
+      },
+    );
+  }
+
   return {
     getProviderPaymentAccountState,
     buildMercadoPagoOAuthRedirect,
     completeMercadoPagoOAuthCallback,
     createProposalCheckout,
     createScopeChangeCheckout,
+    createJobSettlementCheckout,
   };
 }
 
@@ -1183,6 +1333,57 @@ async function loadScopeChangeCheckoutSnapshot(
   };
 }
 
+async function loadSettlementCheckoutSnapshot(jobId: string): Promise<unknown> {
+  const admin = createAdminClient() as unknown as RpcClient;
+  const { data, error } = await admin.rpc("get_job_settlement_snapshot", {
+    target_job_id: jobId,
+  });
+  if (error) {
+    if (error.code === "P0002") {
+      throw new PaymentServerError("NOT_FOUND", "Job was not found", error);
+    }
+    if (error.code === "40001") {
+      throw new PaymentServerError("CONFLICT", "Job is already settled", error);
+    }
+    if (error.code === "42501") {
+      throw new PaymentServerError(
+        "FORBIDDEN",
+        "Job settlement requires a completed job",
+        error,
+      );
+    }
+    if (error.code === "22023") {
+      throw new PaymentServerError(
+        "FORBIDDEN",
+        error.message || "Job cannot be settled",
+        error,
+      );
+    }
+    throwDatabaseError("Unable to load settlement snapshot", error);
+  }
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!isRecord(row)) {
+    throw new PaymentServerError(
+      "NOT_FOUND",
+      "Settlement snapshot was not found",
+    );
+  }
+  return {
+    jobId: row.job_id,
+    proposalId: row.proposal_id,
+    clientUserId: row.client_user_id,
+    providerUserId: row.provider_user_id,
+    serviceTitle: row.service_title,
+    scopeSnapshot: row.scope_snapshot,
+    amountMinor:
+      typeof row.amount_minor === "bigint"
+        ? Number(row.amount_minor)
+        : row.amount_minor,
+    currencyCode: row.currency_code,
+    includedScopeChangeIds: row.included_scope_change_ids,
+  };
+}
+
 async function loadConnectedProviderAccount(
   providerUserId: string,
 ): Promise<ConnectedProviderAccount | null> {
@@ -1272,6 +1473,8 @@ function mapCheckoutDatabaseRow(value: unknown): CheckoutRecord {
     status: value.status,
     providerCheckoutReference: value.provider_checkout_reference,
     checkoutUrl: value.checkout_url,
+    jobId: value.job_id,
+    includedScopeChangeIds: value.settlement_scope_change_ids,
   });
 }
 
@@ -1314,6 +1517,11 @@ async function createCheckoutRecord(
       currency_code: input.currencyCode,
       status: "CREATED",
       checkout_url: null,
+      ...(input.jobId ? { job_id: input.jobId } : {}),
+      ...(input.includedScopeChangeIds &&
+      input.includedScopeChangeIds.length > 0
+        ? { settlement_scope_change_ids: input.includedScopeChangeIds }
+        : {}),
     })
     .select("*")
     .single();
@@ -1365,6 +1573,7 @@ function getDefaultPaymentServer() {
     upsertAccount,
     loadProposalCheckoutSnapshot,
     loadScopeChangeCheckoutSnapshot,
+    loadSettlementCheckoutSnapshot,
     loadConnectedProviderAccount,
     findCheckoutByNonce,
     createCheckoutRecord,
@@ -1424,6 +1633,16 @@ export async function createScopeChangeCheckout(
 ) {
   return getDefaultPaymentServer().createScopeChangeCheckout(
     scopeChangeId,
+    requestNonce,
+  );
+}
+
+export async function createJobSettlementCheckout(
+  jobId: string,
+  requestNonce: string,
+) {
+  return getDefaultPaymentServer().createJobSettlementCheckout(
+    jobId,
     requestNonce,
   );
 }

@@ -1,6 +1,6 @@
 begin;
 
-select plan(16);
+select plan(17);
 
 select ok(
   to_regclass('public.provider_identity_reviews') is not null,
@@ -164,6 +164,11 @@ select ok(
       and not t.tgisinternal
   ),
   'identity review history has an immutability guard'
+);
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.decide_provider_identity_review(uuid,text,text)')))
+  like '%IDENTITY_REVIEW_DECIDED%',
+  'identity decisions notify the provider'
 );
 
 select * from finish();

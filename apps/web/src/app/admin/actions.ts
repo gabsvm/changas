@@ -58,6 +58,20 @@ export async function restoreAccountAction(formData: FormData) {
   revalidatePath("/admin/audit");
 }
 
+export async function resolveJobDisputeAction(formData: FormData) {
+  const resolution = requiredText(formData, "resolution");
+  if (resolution !== "COMPLETED" && resolution !== "CANCELLED") {
+    throw new Error("Resolución de disputa inválida.");
+  }
+  await adminRpc("admin_resolve_job_dispute", {
+    target_job_id: requiredText(formData, "jobId"),
+    requested_resolution: resolution,
+    requested_reason: requiredText(formData, "reason"),
+  });
+  revalidatePath("/admin/jobs");
+  revalidatePath("/admin/audit");
+}
+
 export async function resolveReportAction(formData: FormData) {
   await adminRpc("admin_resolve_report", {
     requested_report_type: requiredText(formData, "reportType"),

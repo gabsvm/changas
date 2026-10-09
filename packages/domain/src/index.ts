@@ -23,6 +23,7 @@ export {
   formatServicePrice,
   minorUnitsToMajorInput,
   parseMajorAmountToMinor,
+  parseOptionalAdditionalAmount,
   parseServicePrice,
   supportedCurrencyCodes,
   type CurrencyCode,

@@ -1,5 +1,10 @@
 import type { LeakageSignalType } from "@changas/domain";
 
+import {
+  accumulateThrough,
+  type PagedResult,
+  type PageKey,
+} from "@/lib/cursor-pages";
 import { createClient } from "@/lib/supabase/server";
 
 export type ConversationErrorCode =
@@ -179,16 +184,33 @@ export async function startConversationFromService(
 
 export async function listMyConversations(
   cursor: ConversationCursor = {},
+  pageSize = 20,
 ): Promise<ConversationSummary[]> {
   const rpc = await getRpcClient();
   const { data, error } = await rpc.rpc("list_my_conversations", {
-    page_size: 20,
+    page_size: pageSize,
     before_updated_at: cursor.beforeUpdatedAt ?? null,
     before_id: cursor.beforeId ?? null,
   });
 
   if (error) throw mapRpcError(error);
   return data ?? [];
+}
+
+export async function listConversationsThrough(
+  through: PageKey | null,
+): Promise<PagedResult<ConversationSummary>> {
+  return accumulateThrough(
+    (cursor, limit) =>
+      listMyConversations(
+        cursor ? { beforeUpdatedAt: cursor.at, beforeId: cursor.id } : {},
+        limit,
+      ),
+    (row) => ({ at: row.updated_at, id: row.conversation_id }),
+    (row) => row.conversation_id,
+    through,
+    20,
+  );
 }
 
 /** Batched OPEN-proposal lookup for the inbox. Throws so callers can fall back. */

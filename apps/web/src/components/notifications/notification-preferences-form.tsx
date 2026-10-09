@@ -79,13 +79,17 @@ export function NotificationPreferencesForm({
               <SettingsRow
                 key={toggle.name}
                 title={toggle.title}
-                description={toggle.description}
+                description={
+                  toggle.disabledNote
+                    ? `${toggle.description} ${toggle.disabledNote}`
+                    : toggle.description
+                }
                 trailing={
                   <Switch
                     name={toggle.name}
                     defaultChecked={initialValues[toggle.name]}
                     onChange={persistChange}
-                    disabled={pending}
+                    disabled={pending || toggle.disabledNote !== undefined}
                     ariaLabel={toggle.title}
                   />
                 }

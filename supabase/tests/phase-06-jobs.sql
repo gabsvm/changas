@@ -1,6 +1,6 @@
 begin;
 
-select plan(27);
+select plan(40);
 
 select ok(to_regclass('public.job_events') is not null, 'job events table exists');
 select ok(to_regclass('public.job_schedule_versions') is not null, 'job schedule versions table exists');
@@ -86,6 +86,57 @@ select ok(
   not has_function_privilege('anon', 'public.transition_job_status(uuid,public.job_status,public.job_status,text)', 'EXECUTE')
   and has_function_privilege('authenticated', 'public.transition_job_status(uuid,public.job_status,public.job_status,text)', 'EXECUTE'),
   'job transition execution is authenticated-only'
+);
+
+select ok(to_regprocedure('public.admin_resolve_job_dispute(uuid,text,text)') is not null, 'dispute resolution rpc exists');
+select ok(
+  not has_function_privilege('anon', 'public.admin_resolve_job_dispute(uuid,text,text)', 'EXECUTE')
+  and has_function_privilege('authenticated', 'public.admin_resolve_job_dispute(uuid,text,text)', 'EXECUTE'),
+  'dispute resolution execution is authenticated-only (admin enforced inside)'
+);
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.admin_resolve_job_dispute(uuid,text,text)')))
+  like '%require_admin()%',
+  'dispute resolution requires admin'
+);
+
+select ok(to_regprocedure('public.paid_scope_additional_for_job(uuid)') is not null, 'paid additional helper exists');
+select ok(
+  not has_function_privilege('authenticated', 'public.paid_scope_additional_for_job(uuid)', 'EXECUTE')
+  and has_function_privilege('service_role', 'public.paid_scope_additional_for_job(uuid)', 'EXECUTE'),
+  'paid additional helper stays out of direct client reach'
+);
+select ok(
+  (select proargnames::text from pg_proc where oid = to_regprocedure('public.get_job_detail(uuid)'))
+  like '%total_price_amount%',
+  'job detail exposes the agreed total'
+);
+select ok(
+  (select proargnames::text from pg_proc where oid = to_regprocedure('public.list_my_upcoming_jobs(integer)'))
+  like '%paid_additional_amount%',
+  'upcoming work exposes paid additionals'
+);
+select ok(to_regprocedure('public.list_my_past_jobs(integer)') is not null, 'past work read model exists');
+select ok(
+  not has_function_privilege('anon', 'public.list_my_past_jobs(integer)', 'EXECUTE')
+  and has_function_privilege('authenticated', 'public.list_my_past_jobs(integer)', 'EXECUTE'),
+  'past work read model stays authenticated-only'
+);
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.list_my_past_jobs(integer)')))
+  like '%''COMPLETED'', ''CANCELLED'', ''NO_SHOW''%',
+  'past work covers terminal states'
+);
+select ok(to_regprocedure('public.list_conversation_jobs(uuid)') is not null, 'conversation jobs read model exists');
+select ok(
+  not has_function_privilege('anon', 'public.list_conversation_jobs(uuid)', 'EXECUTE')
+  and has_function_privilege('authenticated', 'public.list_conversation_jobs(uuid)', 'EXECUTE'),
+  'conversation jobs read model stays authenticated-only'
+);
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.list_conversation_jobs(uuid)')))
+  like '%conversation access denied%',
+  'conversation jobs stay participant-only'
 );
 
 select * from finish();

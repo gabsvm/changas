@@ -128,6 +128,17 @@ export default async function ProviderOnboardingReviewPage() {
     provider.status === "UNDER_REVIEW";
   const approved = provider.status === "ACTIVE";
   const rejected = provider.status === "REJECTED";
+  const { data: latestReview } = rejected
+    ? await (
+        supabase as unknown as {
+          rpc(name: string): Promise<{
+            data: Array<{ reason: string | null }> | null;
+            error: unknown;
+          }>;
+        }
+      ).rpc("get_my_latest_identity_review")
+    : { data: null };
+  const rejectionReason = latestReview?.[0]?.reason ?? null;
   const editable =
     canSelfManageProviderStatus(provider.status) && !pendingReview;
 
@@ -141,7 +152,7 @@ export default async function ProviderOnboardingReviewPage() {
       "Tu identidad fue aprobada y el perfil de proveedor está habilitado.";
   } else if (rejected) {
     summary =
-      "La revisión requiere intervención antes de que el perfil pueda habilitarse.";
+      "Tu identidad fue rechazada. Revisá el motivo, corregí lo observado y reenviala a revisión.";
   } else if (readyForSubmission) {
     summary =
       "Los requisitos están completos. Falta enviarlos desde Documentos para entrar en revisión.";
@@ -328,17 +339,23 @@ export default async function ProviderOnboardingReviewPage() {
               : approved
                 ? "No necesitás volver a enviar documentación desde este flujo."
                 : rejected
-                  ? "La documentación se conserva y queda sujeta a una nueva decisión administrativa."
+                  ? "La documentación se conserva. Corregí lo observado y reenviala desde Documentos para una nueva revisión."
                   : readyForSubmission
                     ? "Volvé a Documentos y tocá “Enviar a revisión”."
                     : "Completá los elementos marcados como Revisar antes de enviar."}
           </p>
-          {!pendingReview && !approved && !rejected ? (
+          {rejected && rejectionReason ? (
+            <div className="border-danger/25 bg-danger/[0.04] mt-3 rounded-2xl border p-4">
+              <p className="text-sm font-extrabold">Motivo del rechazo</p>
+              <p className="text-ink/70 mt-1 text-sm leading-6">{rejectionReason}</p>
+            </div>
+          ) : null}
+          {!pendingReview && !approved ? (
             <Link
               className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
               href="/provider/onboarding/documents"
             >
-              Ir a documentos
+              {rejected ? "Corregir y reenviar" : "Ir a documentos"}
             </Link>
           ) : null}
           </div>

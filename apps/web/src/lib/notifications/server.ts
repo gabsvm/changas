@@ -4,6 +4,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/lib/supabase/database.types";
 
+import {
+  accumulateThrough,
+  type PagedResult,
+  type PageKey,
+} from "@/lib/cursor-pages";
+
 import { sanitizeNotificationActionUrl } from "./templates";
 import type { NotificationKind } from "./types";
 
@@ -106,13 +112,20 @@ function firstRow<T>(data: unknown): T | null {
   return Array.isArray(data) && data.length > 0 ? (data[0] as T) : null;
 }
 
+export type NotificationCursor = {
+  beforeCreatedAt?: string;
+  beforeId?: string;
+};
+
 export async function listNotifications(
   client: SupabaseClient<Database>,
+  cursor: NotificationCursor = {},
+  pageSize = 30,
 ): Promise<NotificationItem[]> {
   const { data, error } = await rpcClient(client).rpc("list_my_notifications", {
-    page_size: 30,
-    before_created_at: null,
-    before_id: null,
+    page_size: pageSize,
+    before_created_at: cursor.beforeCreatedAt ?? null,
+    before_id: cursor.beforeId ?? null,
   });
 
   if (error) {
@@ -122,6 +135,24 @@ export async function listNotifications(
   return Array.isArray(data)
     ? (data as NotificationRow[]).map(asNotificationItem)
     : [];
+}
+
+export async function listNotificationsThrough(
+  client: SupabaseClient<Database>,
+  through: PageKey | null,
+): Promise<PagedResult<NotificationItem>> {
+  return accumulateThrough(
+    (cursor, limit) =>
+      listNotifications(
+        client,
+        cursor ? { beforeCreatedAt: cursor.at, beforeId: cursor.id } : {},
+        limit,
+      ),
+    (item) => ({ at: item.createdAt, id: item.id }),
+    (item) => item.id,
+    through,
+    30,
+  );
 }
 
 export async function getUnreadNotificationCount(

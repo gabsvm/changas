@@ -7,6 +7,7 @@ import {
   getNotificationPreferences,
   getUnreadNotificationCount,
   listNotifications,
+  listNotificationsThrough,
   markAllNotificationsRead,
   markNotificationRead,
   updateNotificationPreferences,
@@ -183,5 +184,66 @@ describe("Phase 08 notification server boundary", () => {
     await expect(listNotifications(client as never)).rejects.toThrow(
       "No pudimos cargar tus notificaciones.",
     );
+  });
+});
+
+describe("listNotificationsThrough", () => {
+  function pagingClient(total: number) {
+    const rows = Array.from({ length: total }, (_, index) => ({
+      notification_id: `n-${String(index).padStart(3, "0")}`,
+      kind: "JOB",
+      title: `t-${index}`,
+      body: `b-${index}`,
+      action_url: "/account/notifications",
+      entity_type: null,
+      entity_id: null,
+      created_at: `2026-02-01T00:${String(index).padStart(2, "0")}:00.000Z`,
+      read_at: null,
+    }));
+    return rpcClient((_name, args = {}) => {
+      const beforeId = args.before_id;
+      const start =
+        typeof beforeId === "string"
+          ? rows.findIndex((row) => row.notification_id === beforeId) + 1
+          : 0;
+      const size = typeof args.page_size === "number" ? args.page_size : 30;
+      return rows.slice(start, start + size);
+    });
+  }
+
+  it("pages from the start and reports the next cursor", async () => {
+    const { items, next } = await listNotificationsThrough(
+      pagingClient(65) as never,
+      null,
+    );
+
+    expect(items).toHaveLength(30);
+    expect(items[0]?.id).toBe("n-000");
+    expect(next).toEqual({
+      at: "2026-02-01T00:29:00.000Z",
+      id: "n-029",
+    });
+  });
+
+  it("accumulates through the visible cursor", async () => {
+    const client = pagingClient(65);
+    const first = await listNotificationsThrough(client as never, null);
+    const second = await listNotificationsThrough(client as never, first.next);
+
+    expect(second.items).toHaveLength(60);
+    expect(second.items[59]?.id).toBe("n-059");
+    expect(second.next?.id).toBe("n-059");
+  });
+
+  it("ends with a null cursor on the final page", async () => {
+    const client = pagingClient(65);
+    const second = await listNotificationsThrough(client as never, {
+      at: "2026-02-01T00:29:00.000Z",
+      id: "n-029",
+    });
+    const third = await listNotificationsThrough(client as never, second.next);
+
+    expect(third.items).toHaveLength(65);
+    expect(third.next).toBeNull();
   });
 });
