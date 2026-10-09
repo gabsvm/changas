@@ -1,4 +1,4 @@
-# Changas — Contexto de trabajo (2026-10-08)
+# Changas — Contexto de trabajo (2026-10-09)
 
 Documento vivo: qué se hizo, en qué estado está producción y qué falta.
 Repo: `gabsvm/changas` (main). Stack: Next.js 16 + Tailwind v4 + Supabase (Postgres 17 + pg_cron + Vault).
@@ -37,7 +37,7 @@ Contratar = aceptar. El trabajo nace `CONFIRMED` sin pago (`20261010000000_hire_
 ## Pendiente (orden sugerido)
 
 1. **Cobro al cierre con MP** (HECHO, pendiente deploy): checkout Checkout Pro al completar — `createJobSettlementCheckout` cobra base + adicionales aprobados impagos (`20261011000007`, rama settlement en reconcile por `job_id`, sin tocar enums). Solo `COMPLETED` liquida; `DISPUTED`/`CANCELLED` nunca; idempotente + índice anti-doble-cobro; UI "Pagar con Mercado Pago" + sim admin. Tokenización/auto-charge queda como fase 2 (requiere validar Split 1:1 + card storage con MP).
-2. **Push a prod + migraciones quirúrgicas** (a confirmar): commit worktree (P0+P1 + settlement), push main, `vercel --prod`, aplicar `20261011000000..07` vía `db query --file` + `migration repair`, verificar `/health`.
+2. **Push a prod + migraciones quirúrgicas** (HECHO 2026-10-09): `800aceb` + fix `84c3bc3` en main, deploy Vercel prod Ready (`/health` → `84c3bc391e88`), migraciones `20261011000000..07` aplicadas + repaired + objetos verificados en prod.
 3. **Email (Resend):** pasar `RESEND_API_KEY`/`RESEND_FROM_EMAIL`; hay 3+ avisos EMAIL trabados históricos.
 4. **E2E Playwright** de flujos core (necesita entorno staging con backend).
 5. **Restos conocidos:** paneles provider-dashboard con `bg-white` literales fuera del alcance priorizado; footer sobrio por decisión; `AGENTS.md`/`CLAUDE.md` autogenerados por Next (untracked, no commitear); prettier `format:check` falla en 12 archivos desde HEAD (drift pre-existente, no bloquear).
