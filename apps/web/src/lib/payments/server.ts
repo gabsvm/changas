@@ -1004,6 +1004,14 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
     }
 
     const siteUrl = resolveValue(dependencies.siteUrl);
+    // El cierre siempre vuelve al Seguimiento del trabajo: Mercado Pago
+    // conserva los query params de back_urls en la redirección.
+    const returnJobId = preset?.settlementJobId ?? null;
+    const returnUrl = (path: string) => {
+      const url = new URL(path, siteUrl);
+      if (returnJobId) url.searchParams.set("job", returnJobId);
+      return url.toString();
+    };
     const providerSession = await checkoutDependencies.createCheckoutSession({
       accessToken,
       title: snapshot.serviceTitle,
@@ -1014,9 +1022,9 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
       externalReference,
       notificationUrl: new URL(WEBHOOK_PATH, siteUrl).toString(),
       backUrls: {
-        success: new URL(RETURN_SUCCESS_PATH, siteUrl).toString(),
-        pending: new URL(RETURN_PENDING_PATH, siteUrl).toString(),
-        failure: new URL(RETURN_FAILURE_PATH, siteUrl).toString(),
+        success: returnUrl(RETURN_SUCCESS_PATH),
+        pending: returnUrl(RETURN_PENDING_PATH),
+        failure: returnUrl(RETURN_FAILURE_PATH),
       },
       idempotencyKey: requestNonce,
     });

@@ -640,6 +640,11 @@ describe("Job settlement checkout at close", () => {
         currencyCode: "ARS",
         marketplaceFeeMinor: 14000,
         idempotencyKey: SETTLEMENT_NONCE,
+        backUrls: {
+          success: `https://changas.test/payments/return/success?job=${JOB_ID}`,
+          pending: `https://changas.test/payments/return/pending?job=${JOB_ID}`,
+          failure: `https://changas.test/payments/return/failure?job=${JOB_ID}`,
+        },
       }),
     );
     expect(createdRows[0]).toMatchObject({
