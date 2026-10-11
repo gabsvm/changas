@@ -296,7 +296,7 @@ export function ProposalCard({
           href={`/jobs/${jobId}`}
           className="consumer-pressable cta-ink mt-4 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
         >
-          Ver trabajo
+          Ver seguimiento del servicio
         </Link>
       ) : null}
 

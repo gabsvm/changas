@@ -18,12 +18,30 @@ describe("job detail marketplace UI", () => {
     expect(source).not.toContain('detail.modality.replaceAll("_", " ")');
   });
 
-  it("leads with the next action and collapses secondary sections", () => {
-    expect(source).toContain("Próxima acción");
-    expect(source).toContain("nextTransition");
+  it("leads with the tracker and a single next action", () => {
+    expect(source).toContain("Seguimiento");
+    expect(source).toContain("JobTracker");
+    expect(source).toContain("Qué sigue");
+    expect(source).toContain("nextAction");
+    expect(source).toContain("PrimaryAction");
     expect(source).toContain("Ver chat");
     expect(source).toContain("collapsible");
     expect(source).toContain("border-l-2");
+  });
+
+  it("shows payment before scope and collapses secondary sections", () => {
+    expect(source.indexOf("Pago del trabajo")).toBeLessThan(
+      source.indexOf("Alcance acordado"),
+    );
+    expect(source).toContain("needsScopeAttention");
+    expect(source).toContain("needsRescheduleAttention");
+    expect(source).toContain("showHelp");
+  });
+
+  it("gates completion behind the client confirmation code", () => {
+    expect(source).toContain("Código para el prestador");
+    expect(source).toContain("confirmationCode");
+    expect(source).toContain("Ingresar código");
   });
 
   it("shows amounts, next actions and status filters in the job list", () => {

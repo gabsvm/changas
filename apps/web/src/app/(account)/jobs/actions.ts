@@ -99,6 +99,7 @@ export async function transitionJobAction(formData: FormData): Promise<void> {
     expected,
     requested,
     stringField(formData, "reason"),
+    stringField(formData, "confirmationCode") || null,
   );
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");

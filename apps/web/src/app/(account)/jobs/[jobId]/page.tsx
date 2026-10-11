@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { formatMinorUnits, type JobStatus } from "@changas/domain";
 
@@ -15,6 +15,12 @@ import {
   transitionJobAction,
 } from "@/app/(account)/jobs/actions";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
+import { JobTracker } from "@/components/jobs/job-tracker";
+import {
+  getJobNextAction,
+  getJobTracking,
+  type NextAction,
+} from "@/components/jobs/job-tracking";
 import type { IllustratedIconName, IllustratedTone } from "@/components/ui/marketplace/illustrated-badge";
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { SuccessCheck } from "@/components/ui/marketplace/success-check";
@@ -102,7 +108,7 @@ export default async function JobPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) notFound();
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/jobs/${jobId}`)}`);
 
   let detail;
   try {
@@ -137,34 +143,36 @@ export default async function JobPage({
   const schedulePrimary =
     detail.schedule_starts_at ?? detail.schedule_deadline_at ?? null;
   const status = getJobStatusPresentation(detail.job_status);
-  const nextTransition: {
-    expected: JobStatus;
-    requested: JobStatus;
-    heading: string;
-    label: string;
-  } | null =
-    isProvider && detail.job_status === "CONFIRMED"
-      ? {
-          expected: "CONFIRMED",
-          requested: "IN_PROGRESS",
-          heading: "Iniciá el trabajo cuando llegues",
-          label: "Iniciar trabajo",
-        }
-      : isProvider && detail.job_status === "IN_PROGRESS"
-        ? {
-            expected: "IN_PROGRESS",
-            requested: "COMPLETION_REQUESTED",
-            heading: "Pedí la finalización al terminar",
-            label: "Solicitar finalización",
-          }
-        : isClient && detail.job_status === "COMPLETION_REQUESTED"
-          ? {
-              expected: "COMPLETION_REQUESTED",
-              requested: "COMPLETED",
-              heading: "Confirmá que el trabajo está listo",
-              label: "Confirmar finalización",
-            }
-          : null;
+  const settlementPending = detail.settlement_status === "DUE";
+  const tracking = getJobTracking(detail.job_status, detail.settlement_status);
+  const nextAction = getJobNextAction({
+    status: detail.job_status,
+    isClient,
+    isProvider,
+    settlementPending,
+  });
+  const needsRescheduleAttention = reschedules.some(
+    (request) =>
+      request.request_status === "OPEN" &&
+      request.requested_by_user_id !== user.id,
+  );
+  const needsScopeAttention = scopeChanges.some((change) =>
+    ["OPEN", "AWAITING_PAYMENT", "PAYMENT_FAILED"].includes(
+      change.change_status,
+    ),
+  );
+  const needsLocationAttention =
+    isClient &&
+    !detail.exact_address &&
+    ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
+      detail.job_status,
+    );
+  const showHelp = [
+    "CONFIRMED",
+    "IN_PROGRESS",
+    "COMPLETION_REQUESTED",
+    "DISPUTED",
+  ].includes(detail.job_status);
   const price = formatMinorUnits(
     detail.total_price_amount,
     detail.currency_code as "ARS",
@@ -174,9 +182,9 @@ export default async function JobPage({
   );
 
   return (
-    <section className="pb-8 sm:py-14">
+    <section className="pb-28 sm:py-14">
       <MobileAppBar
-        title="Trabajo"
+        title="Seguimiento"
         backHref="/jobs"
         trailing={
           <Link
@@ -291,77 +299,94 @@ export default async function JobPage({
           </div>
         </header>
 
-        {nextTransition ? (
-          <section
-            className="brand-gradient-surface relative mt-5 overflow-hidden rounded-2xl p-5 text-white shadow-[0_4px_10px_rgb(255_107_53/14%),0_30px_64px_-18px_rgb(255_87_34/46%)] dark:shadow-[0_30px_64px_-18px_rgb(0_0_0/70%)]"
-            aria-label="Próxima acción"
-          >
-            <span
-              className="pointer-events-none absolute inset-0 opacity-25"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                backgroundSize: "12px 12px",
-              }}
-              aria-hidden="true"
-            />
-            <span
-              className="pointer-events-none absolute -right-6 -bottom-8 h-24 w-24 rounded-full bg-white/20"
-              aria-hidden="true"
-            />
-            <span
-              className="pointer-events-none absolute -top-4 -left-4 h-14 w-14 rounded-full bg-white/15"
-              aria-hidden="true"
-            />
-            <p className="relative text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">
-              Próxima acción
-            </p>
-            <h2 className="font-display relative mt-1 text-lg leading-7 font-extrabold">
-              {nextTransition.heading}
-            </h2>
-            <div className="relative mt-4 grid gap-2 sm:grid-cols-2">
-              <StatusButton
-                jobId={jobId}
-                expected={nextTransition.expected}
-                requested={nextTransition.requested}
-                label={nextTransition.label}
-              />
-              <Link
-                href={`/messages/${detail.conversation_id}`}
-                className="consumer-pressable inline-flex min-h-[52px] items-center justify-center rounded-xl border border-white/25 px-4 text-sm font-bold text-white"
-              >
-                Ver chat
-              </Link>
-            </div>
-          </section>
-        ) : null}
-
-        <section className="border-ink/[0.08] bg-surface consumer-card mt-6 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+        <section
+          className="border-ink/[0.08] bg-surface consumer-card mt-5 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+          aria-label="Seguimiento del servicio"
+        >
           <SectionHeader
-            title="Alcance acordado"
-            badge={{ tone: "gold", icon: "doc", label: "Alcance acordado" }}
+            title="Seguimiento"
+            badge={{ tone: "blue", icon: "clock", label: "Seguimiento" }}
           />
-          <p className="mt-3 text-sm leading-7 whitespace-pre-wrap">
-            {detail.scope_snapshot}
-          </p>
-          {paidChanges.length > 0 ? (
-            <div className="mt-3 space-y-2">
-              {paidChanges.map((change) => (
-                <p
-                  key={change.scope_change_id}
-                  className="border-ink/[0.08] bg-ink/[0.03] rounded-xl border px-3 py-2 text-sm leading-6 whitespace-pre-wrap dark:bg-white/[0.04]"
-                >
-                  <span className="text-moss text-xs font-extrabold tracking-[0.06em] uppercase">Acordado después · </span>
-                  {change.scope_snapshot}
-                </p>
-              ))}
-              <p className="text-ink/70 text-xs leading-5">
-                Base {formatMinorUnits(detail.base_price_amount, detail.currency_code as "ARS")} + adicionales pagados{" "}
-                {formatMinorUnits(detail.paid_additional_amount, detail.currency_code as "ARS")} ={" "}
-                <strong className="text-ink">total {price}</strong>
+          <div className="mt-3">
+            <JobTracker tracking={tracking} />
+          </div>
+          {isClient &&
+          detail.confirmation_code &&
+          ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
+            detail.job_status,
+          ) ? (
+            <div className="border-ink/[0.08] bg-canvas mt-3 rounded-2xl border p-4 text-center">
+              <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.12em] uppercase">
+                Código para el prestador
+              </p>
+              <p
+                className="font-display mt-1 text-3xl font-extrabold tracking-[0.25em]"
+                aria-label={`Código de confirmación ${detail.confirmation_code}`}
+              >
+                {detail.confirmation_code}
+              </p>
+              <p className="text-ink/70 mt-1 text-xs leading-5">
+                Compartilo cuando el trabajo esté terminado. Sin este código no
+                se puede cerrar.
               </p>
             </div>
           ) : null}
+          {isProvider && detail.job_status === "IN_PROGRESS" ? (
+            <p className="text-ink/70 mt-3 text-xs leading-5">
+              Para solicitar la finalización vas a necesitar el código de 4
+              dígitos del cliente.
+            </p>
+          ) : null}
+          {tracking.exception ? (
+            <div className="border-warning/25 bg-warning/[0.06] mt-3 rounded-2xl border p-4">
+              <h3 className="text-sm font-extrabold">{tracking.exception.title}</h3>
+              <p className="text-ink/70 mt-1 text-[13px] leading-6">
+                {tracking.exception.description}
+              </p>
+            </div>
+          ) : null}
+        </section>
+
+        <section
+          id="proxima-accion"
+          className="brand-gradient-surface relative mt-5 scroll-mt-20 overflow-hidden rounded-2xl p-5 text-white shadow-[0_4px_10px_rgb(255_107_53/14%),0_30px_64px_-18px_rgb(255_87_34/46%)] dark:shadow-[0_30px_64px_-18px_rgb(0_0_0/70%)]"
+          aria-label="Qué sigue"
+        >
+          <span
+            className="pointer-events-none absolute inset-0 opacity-25"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
+              backgroundSize: "12px 12px",
+            }}
+            aria-hidden="true"
+          />
+          <span
+            className="pointer-events-none absolute -right-6 -bottom-8 h-24 w-24 rounded-full bg-white/20"
+            aria-hidden="true"
+          />
+          <span
+            className="pointer-events-none absolute -top-4 -left-4 h-14 w-14 rounded-full bg-white/15"
+            aria-hidden="true"
+          />
+          <p className="relative text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">
+            Qué sigue
+          </p>
+          <h2 className="font-display relative mt-1 text-lg leading-7 font-extrabold">
+            {nextAction.heading}
+          </h2>
+          <p className="relative mt-1 text-sm leading-6 text-white/85">
+            {nextAction.sub}
+          </p>
+          <div className="relative mt-4 grid gap-2 sm:grid-cols-2">
+            <PrimaryAction jobId={jobId} kind={nextAction.kind} />
+            <Link
+              href={`/messages/${detail.conversation_id}`}
+              className="consumer-pressable inline-flex min-h-[52px] items-center justify-center rounded-xl border border-white/25 px-4 text-sm font-bold text-white"
+            >
+              Ver chat
+            </Link>
+          </div>
         </section>
 
         {detail.settlement_status !== "NOT_DUE" ? (
@@ -478,6 +503,37 @@ export default async function JobPage({
         ) : null}
 
         <div className="mt-5">
+          <JobSection
+            title="Alcance acordado"
+            badge={{ tone: "gold", icon: "doc" }}
+            collapsible
+            description="Lo acordado al contratar. Solo cambia si aceptás un adicional."
+          >
+            <p className="text-sm leading-7 whitespace-pre-wrap">
+              {detail.scope_snapshot}
+            </p>
+            {paidChanges.length > 0 ? (
+              <div className="mt-3 space-y-2">
+                {paidChanges.map((change) => (
+                  <p
+                    key={change.scope_change_id}
+                    className="border-ink/[0.08] bg-ink/[0.03] rounded-xl border px-3 py-2 text-sm leading-6 whitespace-pre-wrap dark:bg-white/[0.04]"
+                  >
+                    <span className="text-moss text-xs font-extrabold tracking-[0.06em] uppercase">Acordado después · </span>
+                    {change.scope_snapshot}
+                  </p>
+                ))}
+                <p className="text-ink/70 text-xs leading-5">
+                  Base {formatMinorUnits(detail.base_price_amount, detail.currency_code as "ARS")} + adicionales pagados{" "}
+                  {formatMinorUnits(detail.paid_additional_amount, detail.currency_code as "ARS")} ={" "}
+                  <strong className="text-ink">total {price}</strong>
+                </p>
+              </div>
+            ) : null}
+          </JobSection>
+        </div>
+
+        <div id="resena" className="mt-5 scroll-mt-20">
           <JobReputationPanel
             jobId={jobId}
             status={detail.job_status}
@@ -488,11 +544,13 @@ export default async function JobPage({
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_.8fr]">
           <div className="space-y-8">
-            <JobSection
-              title="Acciones del trabajo"
-              badge={{ tone: "rose", icon: "alert" }}
-              description="Si algo sale mal, reportalo: revisamos el caso con ambas partes."
-            >
+            {showHelp ? (
+              <JobSection
+                title="Ayuda con este servicio"
+                badge={{ tone: "rose", icon: "alert" }}
+                description="Si algo sale mal, reportalo: revisamos el caso con ambas partes."
+                collapsible={detail.job_status !== "DISPUTED"}
+              >
               {["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
                 detail.job_status,
               ) ? (
@@ -547,12 +605,14 @@ export default async function JobPage({
                 </div>
               ) : null}
             </JobSection>
+            ) : null}
 
             {detail.job_status === "CONFIRMED" ? (
               <JobSection
                 title="Reprogramar"
                 badge={{ tone: "blue", icon: "calendar" }}
                 collapsible
+                defaultOpen={needsRescheduleAttention}
                 description="La otra parte debe aceptar el nuevo horario antes de reemplazar al actual."
               >
                 <form
@@ -702,7 +762,13 @@ export default async function JobPage({
             ) : null}
 
             {scopeChanges.length > 0 ? (
-              <JobSection title="Cambios de alcance" badge={{ tone: "gold", icon: "doc" }}>
+              <JobSection
+                title="Adicionales y cambios"
+                badge={{ tone: "gold", icon: "doc" }}
+                collapsible
+                defaultOpen={needsScopeAttention}
+                description="Cambios de alcance propuestos y su estado de pago."
+              >
                 <div className="divide-ink/10 divide-y">
                   {scopeChanges.map((change) => {
                     const state = scopeStatus(change.change_status);
@@ -810,7 +876,11 @@ export default async function JobPage({
 
           <aside className="space-y-8">
             {detail.modality === "IN_PERSON" || detail.modality === "BOTH" ? (
-              <JobSection title="Ubicación del trabajo" badge={{ tone: "green", icon: "pin" }}>
+              <JobSection
+                title="Ubicación del trabajo"
+                badge={{ tone: "green", icon: "pin" }}
+                collapsible={!needsLocationAttention}
+              >
                 {detail.exact_address ? (
                   <div className="text-sm leading-6">
                     <strong className="block">{detail.exact_address}</strong>
@@ -850,7 +920,12 @@ export default async function JobPage({
               </JobSection>
             ) : null}
 
-            <JobSection title="Historial" badge={{ tone: "neutral", icon: "clock" }}>
+            <JobSection
+              title="Historial"
+              badge={{ tone: "neutral", icon: "clock" }}
+              collapsible
+              description="Todo lo que pasó en este servicio, en orden."
+            >
               <ol className="border-ink/10 relative space-y-4 border-l-2 pl-4">
                 {events.map((event) => (
                   <li key={event.event_id} className="relative text-sm">
@@ -877,6 +952,29 @@ export default async function JobPage({
           </aside>
         </div>
       </div>
+      <div className="bg-surface/95 border-ink/10 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur md:hidden">
+        <div className="mx-auto grid max-w-4xl grid-cols-[1fr_auto] items-center gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <div className="min-w-0">
+            {nextAction.kind ? (
+              <PrimaryAction jobId={jobId} kind={nextAction.kind} compact />
+            ) : (
+              <a
+                href="#proxima-accion"
+                className="consumer-pressable inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-sm font-bold"
+              >
+                Ver qué sigue
+              </a>
+            )}
+          </div>
+          <Link
+            href={`/messages/${detail.conversation_id}`}
+            className="consumer-pressable inline-flex min-h-[52px] items-center justify-center rounded-xl border border-ink/10 px-4 text-sm font-bold"
+            aria-label="Abrir chat del servicio"
+          >
+            Chat
+          </Link>
+        </div>
+      </div>
     </section>
   );
 }
@@ -897,17 +995,22 @@ function JobSection({
   description,
   children,
   collapsible = false,
+  defaultOpen = false,
   badge,
 }: {
   title: string;
   description?: string;
   children: React.ReactNode;
   collapsible?: boolean;
+  defaultOpen?: boolean;
   badge?: { tone: IllustratedTone; icon: IllustratedIconName };
 }) {
   if (collapsible) {
     return (
-      <details className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+      <details
+        open={defaultOpen || undefined}
+        className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+      >
         <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3">
           <SectionHeader
             title={title}
@@ -957,6 +1060,93 @@ function StatusButton({
       <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">{label}</button>
     </form>
   );
+}
+
+function PrimaryAction({
+  jobId,
+  kind,
+  compact = false,
+}: {
+  jobId: string;
+  kind: NextAction["kind"];
+  compact?: boolean;
+}) {
+  if (kind === "start") {
+    return (
+      <StatusButton
+        jobId={jobId}
+        expected="CONFIRMED"
+        requested="IN_PROGRESS"
+        label="Iniciar trabajo"
+      />
+    );
+  }
+  if (kind === "request_completion") {
+    if (compact) {
+      return (
+        <a
+          href="#proxima-accion"
+          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+        >
+          Ingresar código
+        </a>
+      );
+    }
+    return (
+      <form action={transitionJobAction} className="grid gap-2">
+        <input type="hidden" name="jobId" value={jobId} />
+        <input type="hidden" name="expectedStatus" value="IN_PROGRESS" />
+        <input type="hidden" name="requestedStatus" value="COMPLETION_REQUESTED" />
+        <label className="text-[13px] font-bold text-white/90">
+          Código del cliente
+          <input
+            name="confirmationCode"
+            required
+            inputMode="numeric"
+            autoComplete="off"
+            maxLength={4}
+            pattern="[0-9]{4}"
+            placeholder="4 dígitos"
+            className="mt-1.5 h-[52px] w-full rounded-xl border border-white/25 bg-white/10 px-4 text-center text-lg font-extrabold tracking-[0.3em] text-white placeholder:font-normal placeholder:tracking-normal placeholder:text-white/50"
+          />
+        </label>
+        <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
+          Solicitar finalización
+        </button>
+      </form>
+    );
+  }
+  if (kind === "confirm_completion") {
+    return (
+      <StatusButton
+        jobId={jobId}
+        expected="COMPLETION_REQUESTED"
+        requested="COMPLETED"
+        label="Confirmar finalización"
+      />
+    );
+  }
+  if (kind === "pay") {
+    return (
+      <form action={startJobSettlementCheckoutAction}>
+        <input type="hidden" name="jobId" value={jobId} />
+        <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
+          Pagar con Mercado Pago
+        </button>
+      </form>
+    );
+  }
+  if (kind === "review") {
+    return (
+      <Link
+        href="#resena"
+        className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+      >
+        Dejar reseña
+      </Link>
+    );
+  }
+  return null;
 }
 
 function ReasonTransitionForm({

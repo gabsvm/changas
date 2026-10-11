@@ -36,7 +36,7 @@ select ok(
   'new confirmed jobs initialize a schedule snapshot'
 );
 
-select ok(to_regprocedure('public.transition_job_status(uuid,public.job_status,public.job_status,text)') is not null, 'job transition rpc exists');
+select ok(to_regprocedure('public.transition_job_status(uuid,public.job_status,public.job_status,text,text)') is not null, 'job transition rpc exists');
 select ok(to_regprocedure('public.request_job_reschedule(uuid,public.schedule_type,timestamp with time zone,timestamp with time zone,timestamp with time zone,integer,text)') is not null, 'reschedule request rpc exists');
 select ok(to_regprocedure('public.respond_job_reschedule(uuid,text)') is not null, 'reschedule response rpc exists');
 select ok(to_regprocedure('public.request_job_scope_change(uuid,text,bigint)') is not null, 'scope change request rpc exists');
@@ -83,8 +83,8 @@ select ok(
 );
 
 select ok(
-  not has_function_privilege('anon', 'public.transition_job_status(uuid,public.job_status,public.job_status,text)', 'EXECUTE')
-  and has_function_privilege('authenticated', 'public.transition_job_status(uuid,public.job_status,public.job_status,text)', 'EXECUTE'),
+  not has_function_privilege('anon', 'public.transition_job_status(uuid,public.job_status,public.job_status,text,text)', 'EXECUTE')
+  and has_function_privilege('authenticated', 'public.transition_job_status(uuid,public.job_status,public.job_status,text,text)', 'EXECUTE'),
   'job transition execution is authenticated-only'
 );
 

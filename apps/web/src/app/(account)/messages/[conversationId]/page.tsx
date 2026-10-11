@@ -24,6 +24,8 @@ import {
   listConversationJobs,
   type ConversationJob,
 } from "@/lib/jobs/server";
+import { getJobTracking } from "@/components/jobs/job-tracking";
+import { getJobStatusPresentation } from "@/lib/ui/job-status";
 
 export const dynamic = "force-dynamic";
 
@@ -160,21 +162,34 @@ export default async function ConversationPage({
 
       {conversationJobs.length > 0 ? (
         <div className="mx-auto w-full max-w-4xl px-4 sm:px-0">
-          <div className="border-moss/20 bg-moss/[0.06] flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border px-4 py-3">
+          <div className="border-moss/20 bg-moss/[0.06] space-y-2 rounded-2xl border px-4 py-3">
             <p className="text-sm font-bold">
               {conversationJobs.length === 1
-                ? "Esta conversación ya tiene un trabajo."
-                : "Esta conversación ya tiene trabajos."}
+                ? "Este chat ya tiene un servicio en marcha."
+                : "Este chat ya tiene servicios en marcha."}
             </p>
-            {conversationJobs.map((job) => (
-              <Link
-                key={job.job_id}
-                href={`/jobs/${job.job_id}`}
-                className="consumer-pressable text-moss inline-flex min-h-11 items-center text-sm font-extrabold"
-              >
-                Ver trabajo →
-              </Link>
-            ))}
+            {conversationJobs.map((job) => {
+              const tracking = getJobTracking(job.job_status, null);
+              const status = getJobStatusPresentation(job.job_status);
+              return (
+                <div
+                  key={job.job_id}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-1"
+                >
+                  <span className="text-ink/70 text-[13px] font-semibold">
+                    {tracking.exception
+                      ? status.label
+                      : `Paso ${tracking.currentIndex + 1} de ${tracking.steps.length} · ${status.label}`}
+                  </span>
+                  <Link
+                    href={`/jobs/${job.job_id}`}
+                    className="consumer-pressable text-moss inline-flex min-h-11 items-center text-sm font-extrabold"
+                  >
+                    Ver seguimiento →
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : null}

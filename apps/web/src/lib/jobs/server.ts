@@ -46,6 +46,7 @@ export type UpcomingJob = {
 };
 
 export type JobDetail = {
+  confirmation_code: string | null;
   job_id: string;
   conversation_id: string;
   job_status: JobStatus;
@@ -275,6 +276,11 @@ export async function getJobDetail(jobId: string): Promise<JobDetail> {
       : 0;
   return {
     ...row,
+    confirmation_code:
+      typeof row.confirmation_code === "string" &&
+      row.confirmation_code.length > 0
+        ? row.confirmation_code
+        : null,
     paid_additional_amount: paid,
     total_price_amount: total,
     settlement_status: settlementStatus,
@@ -346,6 +352,7 @@ export async function transitionJob(
   expectedStatus: JobStatus,
   requestedStatus: JobStatus,
   reason?: string | null,
+  confirmationCode?: string | null,
 ): Promise<JobStatus> {
   const { supabase } = await authenticatedClient();
   const { data, error } = await supabase.rpc("transition_job_status", {
@@ -353,6 +360,7 @@ export async function transitionJob(
     expected_status: expectedStatus,
     requested_status: requestedStatus,
     transition_reason: reason?.trim() || null,
+    confirmation_code: confirmationCode?.trim() || null,
   });
   if (error) throw mapError(error.code);
   if (typeof data !== "string" || !jobStatuses.includes(data as JobStatus)) {
