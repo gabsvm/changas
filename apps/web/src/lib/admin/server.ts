@@ -297,3 +297,19 @@ export async function listAdminServiceTags(serviceId: string | null = null) {
     target_service_id: serviceId,
   });
 }
+
+export type AdminSkillRequestRow = {
+  request_id: string;
+  requester_user_id: string;
+  requester_name: string;
+  name: string;
+  category_name: string;
+  description: string | null;
+  service_title: string;
+  status: string;
+  created_at: string;
+};
+
+export async function listSkillRequestQueue() {
+  return adminRpc<AdminSkillRequestRow[]>("list_skill_request_queue");
+}

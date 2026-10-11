@@ -203,6 +203,49 @@ type CategoriesInsert = Omit<
 type CategoriesUpdate = Partial<CategoriesInsert>;
 
 type SkillsRow = CategoriesRow & { category_id: string };
+
+type SkillRequestsRow = {
+  id: string;
+  requester_user_id: string;
+  name: string;
+  category_id: string;
+  description: string | null;
+  service_title: string;
+  service_description: string;
+  service_modality: ServiceModality;
+  service_price_model: PriceModel;
+  service_price_amount: number | null;
+  service_price_unit: string | null;
+  status: string;
+  matched_skill_id: string | null;
+  reviewer_note: string | null;
+  decided_by: string | null;
+  decided_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type SkillRequestsInsert = {
+  requester_user_id: string;
+  name: string;
+  category_id: string;
+  description?: string | null;
+  service_title: string;
+  service_description: string;
+  service_modality: ServiceModality;
+  service_price_model: PriceModel;
+  service_price_amount?: number | null;
+  service_price_unit?: string | null;
+};
+
+type SkillRequestsUpdate = {
+  status?: string;
+  matched_skill_id?: string | null;
+  reviewer_note?: string | null;
+  decided_by?: string | null;
+  decided_at?: string | null;
+  updated_at?: string;
+};
 type SkillsInsert = Omit<SkillsRow, "id" | "created_at" | "updated_at"> & {
   id?: string;
   created_at?: string;
@@ -591,6 +634,11 @@ export type Database = {
         CategoriesUpdate
       >;
       skills: TableDefinition<SkillsRow, SkillsInsert, SkillsUpdate>;
+      skill_requests: TableDefinition<
+        SkillRequestsRow,
+        SkillRequestsInsert,
+        SkillRequestsUpdate
+      >;
       skill_synonyms: TableDefinition<
         SkillSynonymsRow,
         SkillSynonymsInsert,
@@ -704,6 +752,23 @@ export type Database = {
           public_zone: string | null;
           public_headline: string | null;
           bio: string | null;
+        }>;
+      };
+      submit_skill_request: {
+        Args: {
+          requested_name: string;
+          requested_category_id: string | null;
+          requested_description: string | null;
+          requested_service_title: string;
+          requested_service_description: string;
+          requested_service_modality: string;
+          requested_service_price_model: string;
+          requested_service_price_amount: number | null;
+          requested_service_price_unit: string | null;
+        };
+        Returns: Array<{
+          request_id: string | null;
+          attached_skill_id: string | null;
         }>;
       };
     };

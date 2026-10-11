@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { ProviderPaymentAccount } from "@/components/payments/provider-payment-account";
 import { MarketplaceManagement } from "@/components/provider/marketplace-management";
+import { ProviderPaymentAccount } from "@/components/payments/provider-payment-account";
+import { SkillRequestSection } from "@/components/provider/skill-request-section";
+import type { SkillRequestSummary } from "@/components/provider/skill-request-section";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
@@ -62,6 +64,7 @@ export default async function ProviderMarketplaceManagePage({
     categoriesResult,
     providerSkillsResult,
     servicesResult,
+    skillRequestsResult,
     serviceTagsResult,
     experiencesResult,
     educationResult,
@@ -103,6 +106,11 @@ export default async function ProviderMarketplaceManagePage({
       .select("*")
       .eq("provider_user_id", user.id)
       .order("sort_order"),
+    supabase
+      .from("skill_requests")
+      .select("id, name, status, created_at")
+      .eq("requester_user_id", user.id)
+      .order("created_at", { ascending: false }),
     supabase.from("service_tags").select("service_id, tag"),
     supabase
       .from("experiences")
@@ -144,6 +152,7 @@ export default async function ProviderMarketplaceManagePage({
   const providerSkills = providerSkillsResult.data;
   const services = servicesResult.data;
   const serviceTags = serviceTagsResult.data;
+  const skillRequests = skillRequestsResult.data ?? [];
   const experiences = experiencesResult.data;
   const education = educationResult.data;
   const certifications = certificationsResult.data;
@@ -342,6 +351,19 @@ export default async function ProviderMarketplaceManagePage({
             }}
           />
         </div>
+
+        <SkillRequestSection
+          categories={(categories ?? []).map((category) => ({
+            id: category.id,
+            name: category.name,
+          }))}
+          requests={skillRequests.map((request) => ({
+            id: request.id,
+            name: request.name,
+            status: request.status as SkillRequestSummary["status"],
+            created_at: request.created_at,
+          }))}
+        />
       </div>
     </section>
   );

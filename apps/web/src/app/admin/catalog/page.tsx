@@ -12,6 +12,7 @@ import {
   updateServiceTagAction,
   updateSkillStateAction,
   updateSkillSynonymAction,
+  reviewSkillRequestAction,
 } from "@/app/admin/actions";
 import {
   AdminPageHeader,
@@ -24,6 +25,7 @@ import {
   listAdminServiceTags,
   listAdminSkills,
   listAdminSkillSynonyms,
+  listSkillRequestQueue,
 } from "@/lib/admin/server";
 
 function moderationTone(state: string): "success" | "pending" | "danger" | "info" {
@@ -34,13 +36,15 @@ function moderationTone(state: string): "success" | "pending" | "danger" | "info
 }
 
 export default async function AdminCatalogPage() {
-  const [categories, skills, services, synonyms, tags] = await Promise.all([
-    listAdminCategories(),
-    listAdminSkills(),
-    listAdminServices(),
-    listAdminSkillSynonyms(),
-    listAdminServiceTags(),
-  ]);
+  const [categories, skills, services, synonyms, tags, skillRequests] =
+    await Promise.all([
+      listAdminCategories(),
+      listAdminSkills(),
+      listAdminServices(),
+      listAdminSkillSynonyms(),
+      listAdminServiceTags(),
+      listSkillRequestQueue(),
+    ]);
 
   return (
     <section className="space-y-6">
@@ -198,6 +202,120 @@ export default async function AdminCatalogPage() {
             </div>
           </form>
         </AdminPanel>
+      </div>
+
+      <div>
+        <h3 className="mb-3 text-base font-extrabold text-white">
+          Solicitudes de habilidades
+        </h3>
+        {skillRequests.length === 0 ? (
+          <p className="text-sm text-[#697386]">
+            Sin solicitudes. Cuando un prestador proponga algo nuevo aparece acá.
+          </p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {skillRequests.map((request) => (
+              <article
+                className="rounded-3xl border border-[#273142] bg-[#151c27] p-4 sm:p-5"
+                key={request.request_id}
+              >
+                <div className="flex justify-between gap-3">
+                  <div>
+                    <p className="font-extrabold text-white">{request.name}</p>
+                    <p className="text-xs text-[#697386]">
+                      {request.requester_name} · {request.category_name} ·{" "}
+                      {request.service_title}
+                    </p>
+                    {request.description ? (
+                      <p className="mt-1 text-xs text-[#697386]">
+                        {request.description}
+                      </p>
+                    ) : null}
+                  </div>
+                  <AdminStatusBadge
+                    label={
+                      request.status === "PENDING"
+                        ? "Pendiente"
+                        : request.status === "APPROVED"
+                          ? "Aprobada"
+                          : request.status === "MERGED"
+                            ? "Fusionada"
+                            : "Rechazada"
+                    }
+                    tone={
+                      request.status === "PENDING"
+                        ? "pending"
+                        : request.status === "APPROVED"
+                          ? "success"
+                          : request.status === "MERGED"
+                            ? "info"
+                            : "danger"
+                    }
+                  />
+                </div>
+                {request.status === "PENDING" ? (
+                  <div className="mt-3 grid gap-2">
+                    <form action={reviewSkillRequestAction}>
+                      <input
+                        type="hidden"
+                        name="requestId"
+                        value={request.request_id}
+                      />
+                      <input type="hidden" name="decision" value="APPROVE_NEW" />
+                      <button className="min-h-11 w-full rounded-xl bg-[#ff6b35] px-3 py-2 text-sm font-extrabold text-[#10131a]">
+                        Aprobar como nueva
+                      </button>
+                    </form>
+                    <form action={reviewSkillRequestAction}>
+                      <input
+                        type="hidden"
+                        name="requestId"
+                        value={request.request_id}
+                      />
+                      <input type="hidden" name="decision" value="MERGE" />
+                      <select
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                        name="matchedSkillId"
+                        required
+                        defaultValue=""
+                      >
+                        <option value="" disabled>
+                          Fusionar a…
+                        </option>
+                        {skills.map((skill) => (
+                          <option value={skill.skill_id} key={skill.skill_id}>
+                            {skill.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button className="mt-2 min-h-11 w-full rounded-xl border border-[#3a4659] px-3 py-2 text-sm font-extrabold text-[#d0d5dd]">
+                        Fusionar a existente
+                      </button>
+                    </form>
+                    <form action={reviewSkillRequestAction}>
+                      <input
+                        type="hidden"
+                        name="requestId"
+                        value={request.request_id}
+                      />
+                      <input type="hidden" name="decision" value="REJECT" />
+                      <input
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                        name="reviewerNote"
+                        required
+                        minLength={2}
+                        placeholder="Motivo del rechazo"
+                      />
+                      <button className="mt-2 min-h-11 w-full rounded-xl border border-[#ef5350] px-3 py-2 text-sm font-extrabold text-[#ef5350]">
+                        Rechazar
+                      </button>
+                    </form>
+                  </div>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>

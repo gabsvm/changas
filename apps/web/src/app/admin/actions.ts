@@ -157,6 +157,26 @@ export async function createSkillAction(formData: FormData) {
   revalidatePath("/admin/catalog");
 }
 
+export async function reviewSkillRequestAction(formData: FormData) {
+  const decision = requiredText(formData, "decision");
+  if (
+    decision !== "APPROVE_NEW" &&
+    decision !== "MERGE" &&
+    decision !== "REJECT"
+  ) {
+    throw new Error("Decisión de solicitud inválida.");
+  }
+  await adminRpc("review_skill_request", {
+    target_request_id: requiredText(formData, "requestId"),
+    decision,
+    matched_skill_id: optionalText(formData, "matchedSkillId"),
+    reviewer_note: optionalText(formData, "reviewerNote"),
+  });
+  revalidatePath("/admin/catalog");
+  revalidatePath("/buscar");
+  revalidatePath("/admin/audit");
+}
+
 export async function updateSkillStateAction(formData: FormData) {
   await adminRpc("admin_update_skill", {
     target_skill_id: requiredText(formData, "skillId"),
