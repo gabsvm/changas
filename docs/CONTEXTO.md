@@ -1,16 +1,18 @@
-# Changas — Contexto de trabajo (2026-10-09)
+# Changas — Contexto de trabajo (2026-10-11)
 
 Documento vivo: estado de producción, qué se hizo y qué falta. Para reanudar: leer este archivo + `## Reanudar`.
 
-Repo: `gabsvm/changas` (main @ `d4f8b7f`). Stack: Next.js 16 + Tailwind v4 + Supabase (Postgres 17 + pg_cron + Vault).
+Repo: `gabsvm/changas` (main @ serie `04a36b9..4d590c5` + fix `04`). Stack: Next.js 16 + Tailwind v4 + Supabase (Postgres 17 + pg_cron + Vault).
 
-## Producción (verificado 2026-10-09)
+## Producción (verificado 2026-10-11)
 
-- Web: https://changas-web-gray.vercel.app — deploy prod `Ready`, `/health` → `revision: 84c3bc391e88`.
-- Supabase: `krjbpcnjhckqgwlqliyq` (Changas, sa-east-1, ACTIVE_HEALTHY). Migraciones `20261011000000..07` aplicadas + repaired + objetos verificados (RPCs settlement, `job_settlement_attempts`, columnas `job_id`/`settlement_scope_change_ids`).
-- OJO divergencia histórica: el remoto tiene 58 migraciones aplicadas que no existen en el repo (2026-10-02, de otro checkout). **NUNCA `supabase db push`**: cambios quirúrgicos con `db query --file` + `migration repair <versión> --status applied`.
+- Web: https://changas-web-gray.vercel.app — deploy prod `Ready` del SHA `4d590c5`.
+- Supabase: `krjbpcnjhckqgwlqliyq` (Changas, sa-east-1, ACTIVE_HEALTHY). Migraciones `20261012000000..04` aplicadas + repaired + objetos verificados uno por uno (columna `confirmation_code`, `transition_job_status` 5 args, `get_job_detail` con código solo-cliente, cron `job-reminders-24h`, trigger nudge reseña, `skill_requests` + RPCs con RLS).
+- Fix P0-01 (auditoría 2): el `REVOKE SELECT (confirmation_code)` de la migración 00 era inefectivo (el `GRANT SELECT` a nivel tabla autoriza todo). Migración `20261012000004`: revoke de tabla + grant por columna de todo excepto el código. Verificado: código oculto + controles positivos (`id`, `status`, `client/provider_user_id`, `service_role`) intactos. Rollback: `grant select on public.jobs to authenticated`.
+- OJO divergencia histórica: el remoto tiene 58 migraciones aplicadas que no existen en el repo. **NUNCA `supabase db push`**: cambios quirúrgicos con `db query --file` + `migration repair <versión> --status applied`. OJO CLI: `db query` solo muestra el ÚLTIMO result set (unificar checks en un SELECT) y no acepta `--query` (usar `--file`).
 - Env prod: `NEXT_PUBLIC_SITE_URL=https://changas-web-gray.vercel.app`, VAPID completo, `NOTIFICATION_DISPATCH_SECRET` + Vault seteados. **Falta `RESEND_*`** (email muerto a propósito; solo push).
-- Gates en main: typecheck 0, lint 0, 390 tests verdes; prettier sin issues nuevos (12 pre-existentes en HEAD); pgTAP `phase-11-payment-reconciliation` 29→45 tests (corre en CI, no local: sin Docker).
+- Gates en main: typecheck 0, lint 0, 403 tests verdes; prettier sin issues nuevos (12 pre-existentes en HEAD); pgTAP corre en CI, no local (sin Docker).
+- **CI ROJO (P1-01 auditoría 2):** job `validate` falla en `pnpm audit --prod --audit-level high` (8 vulns: next SSRF GHSA-cjq9-62q9-8jv4, sharp, source-map-js); `supabase-integration` queda skipped. Vercel publica igual (sin gate de CI).
 - Cuentas admin prueban el flujo completo sin dinero (simulación de pagos scope + settlement solo `is_current_user_admin` en prod).
 
 ## Modelo de dinero vigente: hire-on-accept + cobro al cierre
@@ -23,7 +25,7 @@ Contratar = aceptar. El trabajo nace `CONFIRMED` sin pago (`20261010000000_hire_
 - Auto-confirmación a 7 días (cron `jobs-auto-complete` diario 04:00) — solo cambia estado, el cliente paga después desde `/jobs/[id]`.
 - Fase 2 (no hecha): tokenización/auto-charge (card guardada al contratar, cargo automático al completar). Requiere validar Split 1:1 + card storage con cuentas test de MP.
 
-## Hecho (sesiones 2026-10-07/09)
+## Hecho (sesiones 2026-10-07/11)
 
 1. **Búsqueda:** "publicado que no aparece" = servicio en borrador; RLS owner-only, visibilidad solo vía RPC definer.
 2. **Auditoría UX + roadmap P0–P2:** manifest instalable, foco visible, contraste AA, retry, covers por portfolio, precio con desglose, verificación honesta, SW selectivo, tabs Trabajos, badge real, append sin perder scroll, priming push, OG images, dark mode.
@@ -37,21 +39,26 @@ Contratar = aceptar. El trabajo nace `CONFIRMED` sin pago (`20261010000000_hire_
 10. **Fixes auditoría de flujos P0+P1** (desplegado `800aceb`): scope $0 sin crash, `formatMinorUnits(0)`, REJECTED reenvío + motivo, guards `user_blocks` en propuestas, PAID aplica precio/alcance, DISPUTED con resolución admin, historial jobs, proposal-card honesta + "Ver trabajo", banner jobs en chat, paginación acumuladora, consultError, toggle email honesto, notificación identidad, fix `?user` 500, confirm catálogo, webhook REFUNDED por observación, refresh-on-401 token seller, borrado baneo-primero.
 11. **Cobro al cierre** (desplegado `800aceb`, diseño A aprobado): settlement checkout + total consolidado, UI "Pagar con Mercado Pago" + sim admin, pgTAP 29→45.
 12. **Fix SQL deploy** (`84c3bc3`): sintaxis `RETURNS TABLE` válida en 03/04/07 (falló el primer apply, se corrigió y aplicó).
+13. **6 commits features** (`04a36b9..4d590c5`, desplegado): Seguimiento + código de confirmación, solicitudes de habilidades provider→admin, retorno post-pago al trabajo, recordatorio 24h + nudge de reseña, polish UI, CONTEXTO.
+14. **Deploy SQL + fix P0-01** (2026-10-11): verificado 00–03 activos en prod; revoke por columna inefectivo → migración 04 (allowlist por columna) aplicada + repaired + verificada con controles negativo/positivo.
+15. **Segunda auditoría recibida** (2026-10-11, sobre `4d590c5`): confirma P0-01 (ya fixeado), P1-08 despejado por verificación directa; nuevo bloqueador P1-01 (CI rojo por advisories). P2-01 parcialmente inexacto (settlement sí manda `?job=`).
 
 ## Pendiente (orden sugerido)
 
-1. **Email (Resend):** pasar `RESEND_API_KEY`/`RESEND_FROM_EMAIL`; 3+ avisos EMAIL trabados históricos.
-2. **E2E Playwright** de flujos core (contratar → scope-change → completar → pagar), necesita staging con backend.
-3. **Fase 2 cobro:** tokenización/auto-charge si se valida con MP (ver arriba).
-4. **Contenido:** publicar el primer servicio real (todo sigue en borrador/ejemplos).
-5. **Restos conocidos (no bloquear):** paneles provider-dashboard con `bg-white` literales; footer sobrio por decisión; `AGENTS.md`/`CLAUDE.md` autogenerados (untracked, no commitear); `redesign/` untracked ajeno; prettier `format:check` falla en 12 archivos desde HEAD; pgTAP sin Docker local (solo CI).
+1. **CI verde (P1-01):** update Next.js + deps compatibles, regenerar `pnpm-lock.yaml`, audit + gates + CI+Supabase verdes. Evaluar protección de `main` y gate Vercel.
+2. **Auditoría 2, resto:** P0-02 idempotencia checkout antes de dinero real; P1-07 anti-brute-force código; P1-02 flag `PAYMENTS_ENABLED`; P1-06 copy failure neutral; P2-02 `reviewer_note` visible; P2-03 índice único skill requests; P1-03 SW; P1-04 total settled; P1-05 redirect `/jobs`; P2-04/05 paginación+unread; P2-06/07/08.
+3. **Email (Resend):** pasar `RESEND_API_KEY`/`RESEND_FROM_EMAIL`; 3+ avisos EMAIL trabados históricos.
+4. **E2E Playwright** de flujos core (contratar → scope-change → completar → pagar), necesita staging con backend.
+5. **Fase 2 cobro:** tokenización/auto-charge si se valida con MP (ver arriba).
+6. **Contenido:** publicar el primer servicio real (todo sigue en borrador/ejemplos).
+7. **Restos conocidos (no bloquear):** paneles provider-dashboard con `bg-white` literales; footer sobrio por decisión; `AGENTS.md`/`CLAUDE.md` autogenerados (untracked, no commitear); `redesign/` untracked ajeno; prettier `format:check` falla en 12 archivos desde HEAD; pgTAP sin Docker local (solo CI).
 
 ## Reanudar (próxima sesión)
 
-- `git pull` en main (último: `d4f8b7f`). Worktree limpio salvo los 3 untracked ajenos.
-- Riesgos abiertos: RPC reales en prod podrían diferir de los auditados (divergencia 58 migraciones); sin reproducción runtime de varios fixes (solo estático + tests); `.env.local` con secretos reales nunca leído.
-- Flujo de prueba completo (admin, sin dinero): contratar desde publicación → chatear → aceptar propuesta (contrata) → scope-change con repuesto (simular pago) → provider marca completo → cliente confirma → cliente paga cierre (simular pago) o deja pendiente.
-- Dónde está cada cosa: settlement `supabase/migrations/20261011000007_job_settlement.sql` + `apps/web/src/lib/payments/server.ts` (`createJobSettlementCheckout`) + `apps/web/src/app/(account)/jobs/[jobId]/page.tsx` (sección "Pago del trabajo") + `applyFakeSettlementPayment` en `apps/web/src/lib/jobs/server.ts`.
+- `git pull` en main (último: serie `04a36b9..4d590c5` + fix `04`, pusheado).
+- Riesgos abiertos: código de 4 dígitos sin throttle (P1-07); CI rojo (P1-01) con Vercel sin gate; RPC reales en prod podrían diferir de los auditados (divergencia 58 migraciones); sin reproducción runtime de varios fixes (solo estático + tests); `.env.local` con secretos reales nunca leído.
+- Flujo de prueba completo (admin, sin dinero): contratar desde publicación → chatear → aceptar propuesta (contrata) → scope-change con repuesto (simular pago) → provider marca completo → cliente confirma (con código) → cliente paga cierre (simular pago) o deja pendiente.
+- Dónde está cada cosa: settlement `supabase/migrations/20261011000007_job_settlement.sql` + `apps/web/src/lib/payments/server.ts` (`createJobSettlementCheckout`) + `apps/web/src/app/(account)/jobs/[jobId]/page.tsx` (sección "Pago del trabajo") + `applyFakeSettlementPayment` en `apps/web/src/lib/jobs/server.ts`; código confirmación `20261012000000` + `20261012000004` (grants) + `job-tracking.ts`.
 
 ## Comandos
 
