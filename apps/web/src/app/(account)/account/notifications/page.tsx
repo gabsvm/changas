@@ -132,7 +132,7 @@ export default async function NotificationCenterPage({
                     </h2>
                     <ol className="consumer-card bg-surface divide-ink/[0.07] border-ink/[0.08] divide-y border px-3 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
                       {items.map((item) => (
-                        <li key={item.id} className="py-3.5 sm:px-1">
+                        <li key={item.id} className="relative py-3.5 sm:px-1">
                           <div className="flex gap-3">
                             <span
                               className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.unread ? "brand-gradient-surface" : "bg-ink/18"}`}
@@ -153,12 +153,12 @@ export default async function NotificationCenterPage({
                                   </div>
                                   <Link
                                     href={item.actionUrl}
-                                    className="text-ink hover:text-terracotta mt-1 block text-[0.98rem] leading-6 font-semibold"
+                                    className="text-ink hover:text-terracotta mt-1 block text-[0.98rem] leading-6 font-semibold before:absolute before:inset-0"
                                   >
                                     {item.title}
                                   </Link>
                                 </div>
-                                <div className="flex shrink-0 flex-col items-end gap-1">
+                                <div className="relative z-10 flex shrink-0 flex-col items-end gap-1">
                                   <time
                                     className="text-ink/38 shrink-0 text-[11px]"
                                     dateTime={item.createdAt}

@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import { getAuthenticatedNavKey } from "./navigation";
@@ -19,5 +21,19 @@ describe("getAuthenticatedNavKey", () => {
     ["/provider/manage", "account"],
   ])("maps %s to %s", (pathname, expected) => {
     expect(getAuthenticatedNavKey(pathname)).toBe(expected);
+  });
+});
+
+describe("authenticated bottom nav icons", () => {
+  it("uses a briefcase for jobs so it never looks like the activity bell", () => {
+    const source = readFileSync(
+      new URL(
+        "../../components/ui/authenticated-bottom-nav.tsx",
+        import.meta.url,
+      ),
+      "utf8",
+    );
+    expect(source).toContain('"briefcase"');
+    expect(source).not.toContain('href: "/jobs", icon: "activity"');
   });
 });

@@ -12,13 +12,13 @@ type NavItem = {
   key: AuthenticatedNavKey;
   label: string;
   href: string;
-  icon: "home" | "search" | "messages" | "activity" | "account";
+  icon: "home" | "search" | "messages" | "briefcase" | "account";
 };
 
 const items: NavItem[] = [
   { key: "home", label: "Inicio", href: "/", icon: "home" },
   { key: "search", label: "Buscar", href: "/buscar", icon: "search" },
-  { key: "jobs", label: "Trabajos", href: "/jobs", icon: "activity" },
+  { key: "jobs", label: "Trabajos", href: "/jobs", icon: "briefcase" },
   { key: "messages", label: "Mensajes", href: "/messages", icon: "messages" },
   { key: "account", label: "Cuenta", href: "/account", icon: "account" },
 ];
@@ -101,7 +101,7 @@ function NavIcon({ name, active }: { name: NavItem["icon"]; active: boolean }) {
       </svg>
     );
   }
-  if (name === "activity") {
+  if (name === "briefcase") {
     return (
       <svg
         aria-hidden="true"
@@ -109,8 +109,12 @@ function NavIcon({ name, active }: { name: NavItem["icon"]; active: boolean }) {
         className="h-6 w-6"
         fill="none"
       >
-        <path
-          d="M6.5 9a5.5 5.5 0 0 1 11 0v3.5l2 3H4.5l2-3V9Z"
+        <rect
+          x="4"
+          y="8"
+          width="16"
+          height="11"
+          rx="2.5"
           fill={fill}
           fillOpacity={fillOpacity}
           stroke="currentColor"
@@ -118,7 +122,13 @@ function NavIcon({ name, active }: { name: NavItem["icon"]; active: boolean }) {
           strokeLinejoin="round"
         />
         <path
-          d="M10 19a2 2 0 0 0 4 0"
+          d="M9 8V6.5A1.5 1.5 0 0 1 10.5 5h3A1.5 1.5 0 0 1 15 6.5V8"
+          stroke="currentColor"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+        />
+        <path
+          d="M4 12.5h16"
           stroke="currentColor"
           strokeWidth={stroke}
           strokeLinecap="round"
