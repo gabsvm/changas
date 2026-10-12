@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { submitSkillRequestAction } from "@/app/(provider)/skill-request-actions";
 import { initialActionState } from "@/lib/forms/action-state";
@@ -16,9 +16,18 @@ export function SkillRequestForm({
     submitSkillRequestAction,
     initialActionState,
   );
+  const [open, setOpen] = useState(false);
+  // La respuesta (éxito o error) siempre queda visible: deriva de la
+  // respuesta en vez de efecto, así ningún re-render la oculta.
+  const hasFeedback = state.error != null || state.success != null;
 
   return (
-    <details className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 sm:p-5">
+    <details
+      id="proponer-habilidad"
+      open={open || hasFeedback}
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+      className="border-ink/[0.08] bg-surface consumer-card scroll-mt-24 rounded-2xl border p-4 sm:p-5"
+    >
       <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3">
         <span className="text-[15px] font-extrabold">
           Proponer una habilidad nueva
@@ -79,7 +88,8 @@ export function SkillRequestForm({
           </select>
         </label>
         <label className="text-sm font-bold sm:col-span-2">
-          ¿Qué incluye? <span className="text-ink/50 font-normal">(opcional)</span>
+          ¿Qué incluye?{" "}
+          <span className="text-ink/50 font-normal">(opcional)</span>
           <textarea
             name="description"
             rows={2}
@@ -137,7 +147,10 @@ export function SkillRequestForm({
           </select>
         </label>
         <label className="text-sm font-bold">
-          Monto en ARS <span className="text-ink/50 font-normal">(vacío si es a convenir)</span>
+          Monto en ARS{" "}
+          <span className="text-ink/50 font-normal">
+            (vacío si es a convenir)
+          </span>
           <input
             name="priceAmount"
             inputMode="numeric"
@@ -146,7 +159,8 @@ export function SkillRequestForm({
           />
         </label>
         <label className="text-sm font-bold">
-          Unidad <span className="text-ink/50 font-normal">(solo por unidad)</span>
+          Unidad{" "}
+          <span className="text-ink/50 font-normal">(solo por unidad)</span>
           <input
             name="priceUnit"
             maxLength={60}

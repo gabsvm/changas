@@ -5,7 +5,6 @@ import { formatMinorUnits } from "@changas/domain";
 
 import { MarketplaceManagement } from "@/components/provider/marketplace-management";
 import { ProviderPaymentAccount } from "@/components/payments/provider-payment-account";
-import { SkillRequestSection } from "@/components/provider/skill-request-section";
 import type { SkillRequestSummary } from "@/components/provider/skill-request-section";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
@@ -238,9 +237,7 @@ export default async function ProviderMarketplaceManagePage({
     const mine = [...past, ...upcoming].filter(
       (job) => job.is_client === false,
     );
-    const settled = mine.filter(
-      (job) => job.settlement_status === "SETTLED",
-    );
+    const settled = mine.filter((job) => job.settlement_status === "SETTLED");
     const due = mine.filter((job) => job.settlement_status === "DUE");
     const inProgress = mine.filter((job) =>
       ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
@@ -297,7 +294,12 @@ export default async function ProviderMarketplaceManagePage({
       <div className="pt-5 sm:pt-0">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
-            <IllustratedBadge tone="orange" icon="briefcase" size="md" label="Proveedor" />
+            <IllustratedBadge
+              tone="orange"
+              icon="briefcase"
+              size="md"
+              label="Proveedor"
+            />
             <div className="min-w-0">
               <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
                 Proveedor
@@ -355,9 +357,12 @@ export default async function ProviderMarketplaceManagePage({
             </div>
           </div>
           <p className="text-ink/60 mt-3 text-xs leading-5">
-            Se calcula desde tus trabajos como prestador (hasta 50 por
-            listado). El detalle está en{" "}
-            <Link href="/jobs?status=history" className="font-bold underline underline-offset-4">
+            Se calcula desde tus trabajos como prestador (hasta 50 por listado).
+            El detalle está en{" "}
+            <Link
+              href="/jobs?status=history"
+              className="font-bold underline underline-offset-4"
+            >
               Mis trabajos
             </Link>
             .
@@ -397,6 +402,16 @@ export default async function ProviderMarketplaceManagePage({
             skills={selectedSkills}
             providerSkills={providerSkills ?? []}
             services={services ?? []}
+            skillRequestCategories={(categories ?? []).map((category) => ({
+              id: category.id,
+              name: category.name,
+            }))}
+            skillRequests={skillRequests.map((request) => ({
+              id: request.id,
+              name: request.name,
+              status: request.status as SkillRequestSummary["status"],
+              created_at: request.created_at,
+            }))}
             serviceTagsByServiceId={serviceTagsByServiceId}
             experiences={experiences ?? []}
             education={education ?? []}
@@ -429,19 +444,6 @@ export default async function ProviderMarketplaceManagePage({
             }}
           />
         </div>
-
-        <SkillRequestSection
-          categories={(categories ?? []).map((category) => ({
-            id: category.id,
-            name: category.name,
-          }))}
-          requests={skillRequests.map((request) => ({
-            id: request.id,
-            name: request.name,
-            status: request.status as SkillRequestSummary["status"],
-            created_at: request.created_at,
-          }))}
-        />
       </div>
     </section>
   );

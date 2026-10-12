@@ -22,6 +22,11 @@ import {
   type IllustratedTone,
 } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
+import {
+  SkillRequestSection,
+  type SkillRequestSummary,
+} from "@/components/provider/skill-request-section";
+import type { RequestCategory } from "@/components/provider/skill-request-form";
 
 type ProviderAction = (
   previousState: ActionState,
@@ -362,7 +367,10 @@ function Check({
   );
 }
 
-const SECTION_BADGES: Record<string, { tone: IllustratedTone; icon: IllustratedIconName }> = {
+const SECTION_BADGES: Record<
+  string,
+  { tone: IllustratedTone; icon: IllustratedIconName }
+> = {
   perfil: { tone: "violet", icon: "user" },
   habilidades: { tone: "blue", icon: "sparkle" },
   servicios: { tone: "orange", icon: "briefcase" },
@@ -395,11 +403,12 @@ function Section({
   anchor?: string;
   children: React.ReactNode;
 }) {
-  const badge: { tone: IllustratedTone; icon: IllustratedIconName } =
-    (anchor ? SECTION_BADGES[anchor] : undefined) ?? {
-      tone: "neutral",
-      icon: "sparkle",
-    };
+  const badge: { tone: IllustratedTone; icon: IllustratedIconName } = (anchor
+    ? SECTION_BADGES[anchor]
+    : undefined) ?? {
+    tone: "neutral",
+    icon: "sparkle",
+  };
   return (
     <section
       id={anchor}
@@ -410,19 +419,24 @@ function Section({
         aria-hidden="true"
       />
       <div className="p-5 sm:p-7">
-      <div className="flex min-w-0 items-center gap-2.5">
-        <IllustratedBadge tone={badge.tone} icon={badge.icon} size="sm" label={title} />
-        <p className="text-terracotta min-w-0 truncate text-xs font-semibold tracking-[0.16em] uppercase">
-          {eyebrow}
+        <div className="flex min-w-0 items-center gap-2.5">
+          <IllustratedBadge
+            tone={badge.tone}
+            icon={badge.icon}
+            size="sm"
+            label={title}
+          />
+          <p className="text-terracotta min-w-0 truncate text-xs font-semibold tracking-[0.16em] uppercase">
+            {eyebrow}
+          </p>
+        </div>
+        <h2 className="font-display mt-2 text-3xl font-semibold tracking-[-0.02em]">
+          {title}
+        </h2>
+        <p className="text-ink/70 mt-2 max-w-3xl text-sm leading-6">
+          {description}
         </p>
-      </div>
-      <h2 className="font-display mt-2 text-3xl font-semibold tracking-[-0.02em]">
-        {title}
-      </h2>
-      <p className="text-ink/70 mt-2 max-w-3xl text-sm leading-6">
-        {description}
-      </p>
-      <div className="mt-6">{children}</div>
+        <div className="mt-6">{children}</div>
       </div>
     </section>
   );
@@ -675,6 +689,8 @@ export function MarketplaceManagement({
   skills,
   catalogSkills,
   providerSkills,
+  skillRequestCategories,
+  skillRequests,
   services,
   serviceTagsByServiceId,
   experiences,
@@ -692,6 +708,8 @@ export function MarketplaceManagement({
   skills: Skill[];
   catalogSkills: Skill[];
   providerSkills: ProviderSkill[];
+  skillRequestCategories: RequestCategory[];
+  skillRequests: SkillRequestSummary[];
   services: Service[];
   serviceTagsByServiceId: Record<string, string[]>;
   experiences: Experience[];
@@ -882,6 +900,10 @@ export function MarketplaceManagement({
             )}
           </div>
         </div>
+        <SkillRequestSection
+          categories={skillRequestCategories}
+          requests={skillRequests}
+        />
       </Section>
 
       <Section
@@ -1177,7 +1199,8 @@ export function MarketplaceManagement({
                   <span
                     className="relative block h-16 overflow-hidden"
                     style={{
-                      backgroundImage: PORTFOLIO_COVERS[index % PORTFOLIO_COVERS.length],
+                      backgroundImage:
+                        PORTFOLIO_COVERS[index % PORTFOLIO_COVERS.length],
                     }}
                     aria-hidden="true"
                   >
@@ -1199,9 +1222,14 @@ export function MarketplaceManagement({
                         ? " · imagen guardada"
                         : " · ficha de texto"}
                     </span>
-                    <span className="text-ink/70 mt-2 block text-sm">{item.description}</span>
+                    <span className="text-ink/70 mt-2 block text-sm">
+                      {item.description}
+                    </span>
                     <span className="mt-3 block">
-                      <DeleteForm action={actions.deletePortfolio} recordId={item.id} />
+                      <DeleteForm
+                        action={actions.deletePortfolio}
+                        recordId={item.id}
+                      />
                     </span>
                   </span>
                 </li>
