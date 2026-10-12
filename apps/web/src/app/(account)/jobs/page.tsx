@@ -11,6 +11,8 @@ import {
   type UpcomingJob,
 } from "@/lib/jobs/server";
 import { getJobStatusPresentation } from "@/lib/ui/job-status";
+import { NextStepBanner } from "@/components/ui/guided";
+import { getClientNextAction } from "@/lib/ui/guided";
 
 function scheduleLabel(job: UpcomingJob) {
   if (job.starts_at) {
@@ -126,8 +128,19 @@ export default async function JobsPage({
           Mis trabajos
         </h1>
         <p className="text-ink/70 mt-1.5 max-w-md text-sm leading-6">
-          Tus contrataciones activas e historial.
+          Tocá un trabajo. Mirá qué sigue.
         </p>
+        {(() => {
+          const next = getClientNextAction({
+            activeJobs: jobs.filter((job) =>
+              ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(job.job_status),
+            ).length,
+            pendingPayment: jobs.some((job) => job.settlement_status === "DUE"),
+          });
+          return (
+            <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-4" />
+          );
+        })()}
 
         <nav
           className="mt-4 flex gap-2 overflow-x-auto"

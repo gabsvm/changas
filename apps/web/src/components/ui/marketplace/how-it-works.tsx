@@ -1,17 +1,17 @@
 const steps = [
   {
-    title: "Buscá lo que necesitás",
-    body: "Por servicio, zona o modalidad. Mirá perfiles públicos, reseñas y precios antes de escribir.",
+    title: "Buscá",
+    body: "Tocá una categoría. Mirá precio y reseñas.",
     gradient: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
   },
   {
-    title: "Hablá y acordá",
-    body: "Chateá con la persona y cerrá una propuesta con alcance y precio claros. Todo queda registrado.",
+    title: "Chateá",
+    body: "Acordá día y precio por chat.",
     gradient: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)",
   },
   {
-    title: "Coordiná y reseñá",
-    body: "Confirmá el trabajo y, cuando termina, dejá tu reseña. Solo opinan quienes lo hicieron.",
+    title: "Pagá y calificá",
+    body: "Pagás al terminar. Después calificás.",
     gradient: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)",
   },
 ] as const;

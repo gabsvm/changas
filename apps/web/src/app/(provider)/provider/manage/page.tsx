@@ -17,6 +17,8 @@ import {
 } from "@/lib/payments/server";
 import { createClient } from "@/lib/supabase/server";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
+import { NextStepBanner } from "@/components/ui/guided";
+import { getProviderNextAction } from "@/lib/ui/guided";
 
 import {
   deleteAvailabilityBlock,
@@ -323,6 +325,18 @@ export default async function ProviderMarketplaceManagePage({
             </Link>
           </div>
         </div>
+        {(() => {
+          const next = getProviderNextAction({
+            isProvider: true,
+            providerActive: provider.status === "ACTIVE",
+            onboardingStep: 4,
+            hasServices: (services ?? []).length > 0,
+            paymentConnected: paymentAccount.status === "CONNECTED",
+          });
+          return (
+            <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-6" />
+          );
+        })()}
         <div
           className="border-ink/10 bg-surface mt-6 rounded-2xl border p-5"
           aria-label="Resumen de ingresos"

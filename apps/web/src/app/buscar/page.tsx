@@ -14,6 +14,8 @@ import { SearchFiltersSheet } from "@/components/discovery/search-filters-sheet"
 import { BottomNav } from "@/components/ui/nav-with-counts";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { SearchField } from "@/components/ui/marketplace/search-field";
+import { GuideHeader } from "@/components/ui/guided";
+import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
@@ -147,6 +149,8 @@ export default async function SearchPage({
             </Link>
           }
         />
+
+        <GuideHeader step={1} steps={CLIENT_HIRE_STEPS} className="mt-4 sm:mt-6" />
 
         <section className="pt-3 sm:pt-8">
           <div className="brand-gradient-surface text-ink relative overflow-hidden rounded-3xl p-5 shadow-[var(--consumer-shadow-hero)] sm:p-6">

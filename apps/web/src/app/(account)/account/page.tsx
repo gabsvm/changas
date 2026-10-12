@@ -8,6 +8,8 @@ import { SettingsRow } from "@/components/ui/marketplace/settings-row";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { createClient } from "@/lib/supabase/server";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
+import { NextStepBanner } from "@/components/ui/guided";
+import { getProviderNextAction } from "@/lib/ui/guided";
 
 import { startProviderOnboarding } from "../../(provider)/actions";
 
@@ -99,6 +101,20 @@ export default async function AccountPage() {
             </span>
           </Link>
         </header>
+
+        {(() => {
+          const next = getProviderNextAction({
+            isProvider: Boolean(provider),
+            providerActive: provider?.status === "ACTIVE",
+            onboardingStep: step,
+            hasServices: false,
+            paymentConnected: false,
+          });
+          if (provider?.status === "ACTIVE") return null;
+          return (
+            <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-5" />
+          );
+        })()}
 
         {missing.length ? (
           <Link

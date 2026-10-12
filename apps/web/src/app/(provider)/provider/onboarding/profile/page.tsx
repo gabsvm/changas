@@ -45,7 +45,7 @@ export default async function ProviderOnboardingProfilePage() {
 
   return (
     <section className="pb-6 sm:py-14">
-      <MobileAppBar title="Datos básicos" backHref="/provider/onboarding" />
+      <MobileAppBar title="Tus datos" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-center gap-3">
           <IllustratedBadge tone="violet" icon="user" size="md" label="Paso 1 de 4" />
@@ -59,8 +59,7 @@ export default async function ProviderOnboardingProfilePage() {
           </div>
         </div>
         <p className="text-ink/70 mt-2 text-sm leading-6">
-          Mostrá lo esencial para que otras personas entiendan quién sos y cómo
-          trabajás. Guardar este paso no publica servicios.
+          Nombre y zona. Nada más.
         </p>
 
         <div

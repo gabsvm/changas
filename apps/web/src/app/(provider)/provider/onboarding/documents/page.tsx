@@ -64,7 +64,7 @@ export default async function ProviderOnboardingDocumentsPage() {
 
   return (
     <section className="pb-6 sm:py-14">
-      <MobileAppBar title="Documentos" backHref="/provider/onboarding" />
+      <MobileAppBar title="Tus papeles" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-center gap-3">
           <IllustratedBadge tone="blue" icon="doc" size="md" label="Paso 3 de 4" />
@@ -73,13 +73,12 @@ export default async function ProviderOnboardingDocumentsPage() {
               Paso 3 de 4
             </p>
             <h1 className="font-display mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
-              Verificá tu identidad
+              Tus papeles
             </h1>
           </div>
         </div>
         <p className="text-ink/70 mt-2 text-sm leading-6">
-          Necesitamos frente y dorso del DNI más una selfie. Subir archivos no
-          envía el caso: vos decidís cuándo mandarlo a revisión.
+          Subí: DNI frente, DNI dorso y selfie.
         </p>
 
         <div className="mt-4">

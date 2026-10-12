@@ -15,6 +15,8 @@ import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { toggleProviderFavorite } from "@/lib/favorites/actions";
 import { createClient } from "@/lib/supabase/server";
 import { getServiceModalityLabel } from "@/lib/ui/service-modality";
+import { GuideHeader } from "@/components/ui/guided";
+import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 
 export const dynamic = "force-dynamic";
 
@@ -143,6 +145,8 @@ export default async function PublicProviderPage({
           }
           className="sm:flex"
         />
+
+        <GuideHeader step={2} steps={CLIENT_HIRE_STEPS} className="mt-5" />
 
         <section className="pt-6 sm:pt-8">
           {pageSearchParams.favoriteError ? (

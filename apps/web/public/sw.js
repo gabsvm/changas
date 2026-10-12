@@ -107,7 +107,7 @@ function cacheFirstImage(request) {
       }
       return response;
     } catch {
-      return cache.match(STATIC_URLS[2]);
+      return caches.match("/icon-192.png");
     }
   });
 }

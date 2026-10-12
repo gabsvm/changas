@@ -12,6 +12,8 @@ import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { createClient } from "@/lib/supabase/server";
 import { getServiceModalityLabel } from "@/lib/ui/service-modality";
+import { GuideHeader } from "@/components/ui/guided";
+import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 
 import { startServiceConversation } from "./actions";
 
@@ -135,6 +137,8 @@ export default async function PublicServicePage({
           }
           className="sm:flex"
         />
+
+        <GuideHeader step={2} steps={CLIENT_HIRE_STEPS} className="mt-5" />
 
         <article className="service-hero-card consumer-card bg-surface mt-5 overflow-hidden sm:mt-8">
           <div

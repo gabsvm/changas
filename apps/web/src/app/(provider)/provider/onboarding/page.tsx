@@ -10,6 +10,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
 import { getNextOnboardingHref, getOnboardingSteps } from "@/lib/ui/onboarding";
+import { NextStepBanner } from "@/components/ui/guided";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 import { startProviderOnboarding } from "../../actions";
 
@@ -54,9 +55,9 @@ export default async function ProviderOnboardingPage() {
               </h1>
             </div>
           </div>
+          <NextStepBanner title="Paso 1: Tus datos" hint="Nombre y zona. Nada más." cta="Empezar ahora" href="/provider/onboarding/profile" className="mt-5" />
           <p className="text-ink/70 mt-2 max-w-xl text-sm leading-6">
-            Son cuatro pasos breves. Podés salir y volver cuando quieras; nada
-            se publica ni se activa sin revisión.
+            Son 4 pasos cortos. Empezá ahora.
           </p>
 
           <section className="border-ink/[0.08] bg-surface divide-ink/[0.07] consumer-card mt-6 divide-y rounded-2xl border px-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
@@ -108,6 +109,9 @@ export default async function ProviderOnboardingPage() {
         <p className="text-ink/70 mt-3 text-sm leading-7">
           {presentation.description}
         </p>
+        {current ? (
+          <NextStepBanner title={`Paso ${current.number}: ${current.title}`} hint={current.description} cta={primaryLabel} href={primaryHref} className="mt-5" />
+        ) : null}
 
         <section className="border-ink/[0.08] bg-surface mt-6 rounded-2xl border px-4 py-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
           <ol className="flex items-center gap-1" aria-label="Pasos de verificación">

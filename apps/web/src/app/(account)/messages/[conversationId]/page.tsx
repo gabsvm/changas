@@ -26,6 +26,8 @@ import {
 } from "@/lib/jobs/server";
 import { getJobTracking } from "@/components/jobs/job-tracking";
 import { getJobStatusPresentation } from "@/lib/ui/job-status";
+import { GuideHeader } from "@/components/ui/guided";
+import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 
 export const dynamic = "force-dynamic";
 
@@ -144,6 +146,7 @@ export default async function ConversationPage({
 
   return (
     <section className="space-y-4 py-4 sm:py-6">
+      <GuideHeader step={3} steps={CLIENT_HIRE_STEPS} />
       <ConversationThread
         key={threadVersion}
         conversationId={conversationId}

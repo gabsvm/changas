@@ -14,26 +14,26 @@ export type OnboardingStepPresentation = {
 const stepDefinitions = [
   {
     id: "profile",
-    title: "Datos básicos",
-    description: "Completá cómo te van a ver y tu zona aproximada.",
+    title: "Tus datos",
+    description: "Nombre y zona. Nada más.",
     href: "/provider/onboarding/profile",
   },
   {
     id: "identity",
-    title: "Identidad privada",
-    description: "Guardá tus datos legales en un espacio privado.",
+    title: "Tu identidad",
+    description: "Tu DNI. Solo vos lo ves.",
     href: "/provider/onboarding/identity",
   },
   {
     id: "documents",
-    title: "Documentos",
-    description: "Subí los archivos necesarios para la revisión.",
+    title: "Tus papeles",
+    description: "Fotos claras de tus papeles.",
     href: "/provider/onboarding/documents",
   },
   {
     id: "review",
-    title: "Revisión",
-    description: "Revisá lo completado y el estado actual del perfil.",
+    title: "Revisá y enviá",
+    description: "Mirá todo. Tocá Enviar.",
     href: "/provider/onboarding/review",
   },
 ] as const satisfies ReadonlyArray<{

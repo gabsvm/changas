@@ -57,4 +57,30 @@ describe("Phase 08 PWA contract", () => {
     expect(worker).toContain('matchAll({ type: "window"');
     expect(worker).toContain("clients.openWindow(actionUrl)");
   });
+
+  it("resolves the offline image fallback across all caches, not only the image cache", () => {
+    const worker = readFileSync(
+      join(process.cwd(), "apps/web/public/sw.js"),
+      "utf8",
+    );
+
+    expect(worker).toContain('caches.match("/icon-192.png")');
+    expect(worker).not.toContain("cache.match(STATIC_URLS[2])");
+  });
+
+  it("regenerates the maskable icon under the filename the manifest references", () => {
+    const generator = readFileSync(
+      join(process.cwd(), "apps/web/scripts/generate-pwa-assets.mjs"),
+      "utf8",
+    );
+    const appManifest = manifest();
+    const maskable = appManifest.icons?.find(
+      (icon) => icon.purpose === "maskable",
+    );
+
+    expect(maskable?.src).toBe("/icon-maskable-512.png");
+    expect(generator).toContain('"icon-maskable-512.png"');
+    expect(generator).not.toContain('"maskable-512.png"');
+  });
 });
+

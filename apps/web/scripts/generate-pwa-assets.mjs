@@ -7,7 +7,7 @@
 //
 // Salidas:
 // - public/icon-512.png, public/icon-192.png (purpose "any")
-// - public/maskable-512.png (purpose "maskable", arte al ~78% centrado)
+// - public/icon-maskable-512.png (purpose "maskable", arte al ~78% centrado)
 // - public/screenshots/inicio-390x844.png (form_factor "narrow")
 // - public/screenshots/buscar-1280x720.png (form_factor "wide")
 
@@ -413,6 +413,6 @@ function save(img, rel) {
 const iconMaster = renderIcon(512);
 save(iconMaster, "icon-512.png");
 save(downsample(iconMaster, 192, 192), "icon-192.png");
-save(renderIcon(512, { maskable: true }), "maskable-512.png");
+save(renderIcon(512, { maskable: true }), "icon-maskable-512.png");
 save(renderMobileShot(), "screenshots/inicio-390x844.png");
 save(renderWideShot(), "screenshots/buscar-1280x720.png");

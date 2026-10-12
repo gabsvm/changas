@@ -43,7 +43,7 @@ export default async function ProviderOnboardingIdentityPage() {
 
   return (
     <section className="pb-6 sm:py-14">
-      <MobileAppBar title="Identidad privada" backHref="/provider/onboarding" />
+      <MobileAppBar title="Tu identidad" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-center gap-3">
           <IllustratedBadge tone="green" icon="shield" size="md" label="Paso 2 de 4" />
@@ -52,13 +52,12 @@ export default async function ProviderOnboardingIdentityPage() {
               Paso 2 de 4
             </p>
             <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
-              Confirmá tus datos privados
+              Tu identidad
             </h1>
           </div>
         </div>
         <p className="text-ink/70 mt-2 text-sm leading-6">
-          Estos datos sirven para identidad y seguridad. Nunca forman parte de
-          tu perfil público.
+          Solo vos ves esto. Nadie más.
         </p>
 
         <div className="mt-4">
