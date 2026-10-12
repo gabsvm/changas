@@ -180,9 +180,9 @@ select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000001001
 select set_config('request.jwt.claim.role', 'authenticated', true);
 
 select lives_ok(
-  $
+  $$
     select public.submit_provider_identity_review()
-  $,
+  $$,
   'rejected owner can resubmit a complete case for review'
 );
 
@@ -208,20 +208,20 @@ select is(
 );
 
 select lives_ok(
-  $
+  $$
     update public.provider_profiles
     set onboarding_step = 2
     where user_id = '00000000-0000-0000-0000-000000001002'
-  $,
+  $$,
   'rejected owner can save onboarding progress'
 );
 
 select throws_ok(
-  $
+  $$
     update public.provider_profiles
     set status = 'PROFILE_INCOMPLETE'
     where user_id = '00000000-0000-0000-0000-000000001002'
-  $,
+  $$,
   '42501',
   null,
   'rejected owner still cannot flip status directly'

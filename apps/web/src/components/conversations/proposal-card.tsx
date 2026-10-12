@@ -239,37 +239,46 @@ export function ProposalCard({
               </button>
             )
           ) : null}
-          {!ownTerms ? (
-            <form
-              action={respondProposalAction}
-              className="grid grid-cols-2 gap-2"
+      {!ownTerms ? (
+        <form action={respondProposalAction} className="grid gap-2">
+          <input
+            type="hidden"
+            name="conversationId"
+            value={conversationId}
+          />
+          <input
+            type="hidden"
+            name="proposalId"
+            value={proposal.proposal_id}
+          />
+          <input type="hidden" name="action" value="REJECT" />
+          <label className="text-xs font-semibold">
+            Motivo del rechazo (opcional)
+            <input
+              name="responseReason"
+              minLength={2}
+              maxLength={1000}
+              placeholder="Contale por qué no te sirve"
+              className="consumer-control mt-1 w-full px-3 py-2 text-sm font-normal"
+            />
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button className="consumer-pressable border-ink/[0.1] inline-flex min-h-12 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold dark:bg-white/[0.06]">
+              Rechazar
+            </button>
+            <button
+              type="button"
+              className="consumer-pressable text-ink/70 inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-bold"
+              onClick={() =>
+                document
+                  .getElementById(`counter-${proposal.proposal_id}`)
+                  ?.toggleAttribute("open")
+              }
             >
-              <input
-                type="hidden"
-                name="conversationId"
-                value={conversationId}
-              />
-              <input
-                type="hidden"
-                name="proposalId"
-                value={proposal.proposal_id}
-              />
-              <input type="hidden" name="action" value="REJECT" />
-              <button className="consumer-pressable border-ink/[0.1] inline-flex min-h-12 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold dark:bg-white/[0.06]">
-                Rechazar
-              </button>
-              <button
-                type="button"
-                className="consumer-pressable text-ink/70 inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-bold"
-                onClick={() =>
-                  document
-                    .getElementById(`counter-${proposal.proposal_id}`)
-                    ?.toggleAttribute("open")
-                }
-              >
-                Contraofertar
-              </button>
-            </form>
+              Contraofertar
+            </button>
+          </div>
+        </form>
           ) : (
             <form action={respondProposalAction} className="grid">
               <input
@@ -288,6 +297,21 @@ export function ProposalCard({
               </button>
             </form>
           )}
+        </div>
+      ) : null}
+
+      {proposal.proposal_status === "REJECTED" ? (
+        <div className="border-ink/[0.08] bg-ink/[0.03] mt-4 rounded-xl border px-3 py-2.5 text-sm leading-6 dark:bg-white/[0.04]">
+          {proposal.response_reason ? (
+            <p>
+              <strong>Motivo del rechazo:</strong> {proposal.response_reason}
+            </p>
+          ) : (
+            <p>Esta propuesta fue rechazada sin motivo.</p>
+          )}
+          <p className="text-ink/70 mt-1 text-[13px]">
+            Podés ajustar los términos y enviar una nueva propuesta en esta misma conversación.
+          </p>
         </div>
       ) : null}
 

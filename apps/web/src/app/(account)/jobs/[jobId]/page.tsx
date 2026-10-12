@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { formatMinorUnits, type JobStatus } from "@changas/domain";
+import { isPaymentsEnabled } from "@changas/config/server";
 
 import {
   fakeAdditionalPaymentAction,
@@ -12,8 +13,11 @@ import {
   respondScopeChangeAction,
   setJobLocationAction,
   startJobSettlementCheckoutAction,
+  startScopeChangeCheckoutAction,
   transitionJobAction,
 } from "@/app/(account)/jobs/actions";
+import { ConfirmationCodeForm } from "@/app/(account)/jobs/[jobId]/confirmation-code-form";
+import { PaymentSubmitButton } from "@/components/jobs/payment-submit-button";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
 import { JobTracker } from "@/components/jobs/job-tracker";
 import {
@@ -140,6 +144,7 @@ export default async function JobPage({
   ).rpc("is_current_user_admin");
   const canSimulatePayment =
     process.env.NODE_ENV !== "production" || adminFlag === true;
+  const paymentsEnabled = isPaymentsEnabled();
   const schedulePrimary =
     detail.schedule_starts_at ?? detail.schedule_deadline_at ?? null;
   const status = getJobStatusPresentation(detail.job_status);
@@ -390,7 +395,7 @@ export default async function JobPage({
         </section>
 
         {detail.settlement_status !== "NOT_DUE" ? (
-          <div className="mt-5">
+          <div className="mt-5 scroll-mt-24" id="pago">
             <JobSection
               title="Pago del trabajo"
               badge={{ tone: "green", icon: "tag" }}
@@ -445,19 +450,31 @@ export default async function JobPage({
                       </dd>
                     </div>
                   </dl>
-                  <form
-                    action={startJobSettlementCheckoutAction}
-                    className="mt-3"
-                  >
-                    <input type="hidden" name="jobId" value={jobId} />
-                    <button className="consumer-pressable cta-ink inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-extrabold">
-                      Pagar con Mercado Pago
-                    </button>
-                  </form>
-                  <p className="text-ink/70 mt-2 text-xs leading-5">
-                    Serás redirigido a Mercado Pago para completar el pago de
-                    forma segura.
-                  </p>
+                  {paymentsEnabled ? (
+                    <>
+                      <form
+                        action={startJobSettlementCheckoutAction}
+                        className="mt-3"
+                      >
+                        <input type="hidden" name="jobId" value={jobId} />
+                        <PaymentSubmitButton
+                          idleLabel="Pagar con Mercado Pago"
+                          pendingLabel="Redirigiendo…"
+                          className="consumer-pressable cta-ink inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-extrabold"
+                        />
+                      </form>
+                      <p className="text-ink/70 mt-2 text-xs leading-5">
+                        Serás redirigido a Mercado Pago para completar el pago de
+                        forma segura.
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-ink/70 mt-3 text-xs leading-5">
+                      El pago online todavía no está disponible. El monto queda
+                      pendiente y te vamos a avisar cuando puedas pagarlo por
+                      acá.
+                    </p>
+                  )}
                   {canSimulatePayment ? (
                     <form
                       action={fakeSettlementPaymentAction}
@@ -469,20 +486,20 @@ export default async function JobPage({
                         name="paymentNonce"
                         value={crypto.randomUUID()}
                       />
-                      <button
+                      <PaymentSubmitButton
                         name="outcome"
                         value="SUCCESS"
+                        idleLabel="Simular pago aprobado"
+                        pendingLabel="Simulando…"
                         className="button-secondary text-xs"
-                      >
-                        Simular pago aprobado
-                      </button>
-                      <button
+                      />
+                      <PaymentSubmitButton
                         name="outcome"
                         value="FAILURE"
+                        idleLabel="Simular fallo"
+                        pendingLabel="Simulando…"
                         className="button-secondary text-xs"
-                      >
-                        Simular fallo
-                      </button>
+                      />
                     </form>
                   ) : null}
                 </>
@@ -561,8 +578,8 @@ export default async function JobPage({
                     </h3>
                     <ol className="text-ink/70 mt-2 list-decimal space-y-1 pl-5 text-[13px] leading-6">
                       <li>Contanos qué pasó en el motivo de abajo.</li>
-                      <li>Revisamos el caso con ambas partes.</li>
-                      <li>Definimos el cierre: completar o cancelar el trabajo.</li>
+                      <li>El equipo de Changas revisa el caso con ambas partes.</li>
+                      <li>Te avisamos por acá cuando haya novedades.</li>
                     </ol>
                     <div className="mt-3">
                       <ReasonTransitionForm
@@ -600,7 +617,7 @@ export default async function JobPage({
                 <div className="border-warning/25 bg-warning/[0.06] rounded-2xl border p-4">
                   <h3 className="text-sm font-extrabold">Caso en revisión</h3>
                   <p className="text-ink/70 mt-1 text-[13px] leading-6">
-                    El equipo de Changas está revisando lo reportado y va a definir el cierre: completar o cancelar el trabajo.
+                    El equipo de Changas está revisando lo reportado con ambas partes. Te avisamos por acá cuando haya novedades.
                   </p>
                 </div>
               ) : null}
@@ -803,10 +820,27 @@ export default async function JobPage({
                             )}
                           </strong>
                         </div>
+                        {change.change_status === "REJECTED" ? (
+                          <div className="border-ink/[0.08] bg-ink/[0.03] mt-2 rounded-xl border px-3 py-2 text-[13px] leading-6 dark:bg-white/[0.04]">
+                            {change.response_reason ? (
+                              <p>
+                                <strong>Motivo del rechazo:</strong>{" "}
+                                {change.response_reason}
+                              </p>
+                            ) : (
+                              <p>Este cambio fue rechazado sin motivo.</p>
+                            )}
+                            {isProvider ? (
+                              <p className="text-ink/70 mt-1 text-xs">
+                                Podés ajustar el alcance y proponer un nuevo cambio.
+                              </p>
+                            ) : null}
+                          </div>
+                        ) : null}
                         {isClient && change.change_status === "OPEN" ? (
                           <form
                             action={respondScopeChangeAction}
-                            className="mt-3 flex flex-wrap gap-2"
+                            className="mt-3 grid gap-2"
                           >
                             <input type="hidden" name="jobId" value={jobId} />
                             <input
@@ -814,57 +848,101 @@ export default async function JobPage({
                               name="scopeChangeId"
                               value={change.scope_change_id}
                             />
-                            <button
-                              name="action"
-                              value="ACCEPT"
-                              className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
-                            >
-                              Aceptar cambio
-                            </button>
-                            <button
-                              name="action"
-                              value="REJECT"
-                              className="button-secondary text-xs"
-                            >
-                              Rechazar
-                            </button>
+                            <label className="text-xs font-semibold">
+                              Motivo del rechazo (opcional, solo si rechazás)
+                              <input
+                                name="responseReason"
+                                minLength={2}
+                                maxLength={1000}
+                                placeholder="Contale al prestador por qué no te sirve"
+                                className="border-ink/10 mt-1 h-11 w-full rounded-xl border bg-white px-3 font-normal"
+                              />
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                name="action"
+                                value="ACCEPT"
+                                className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
+                              >
+                                Aceptar cambio
+                              </button>
+                              <button
+                                name="action"
+                                value="REJECT"
+                                className="button-secondary text-xs"
+                              >
+                                Rechazar
+                              </button>
+                            </div>
                           </form>
                         ) : null}
                         {isClient &&
-                        canSimulatePayment &&
                         ["AWAITING_PAYMENT", "PAYMENT_FAILED"].includes(
                           change.change_status,
                         ) ? (
-                          <form
-                            action={fakeAdditionalPaymentAction}
-                            className="mt-3 flex flex-wrap gap-2"
-                          >
-                            <input type="hidden" name="jobId" value={jobId} />
-                            <input
-                              type="hidden"
-                              name="scopeChangeId"
-                              value={change.scope_change_id}
-                            />
-                            <input
-                              type="hidden"
-                              name="paymentNonce"
-                              value={crypto.randomUUID()}
-                            />
-                            <button
-                              name="outcome"
-                              value="SUCCESS"
-                              className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
-                            >
-                              Simular pago aprobado
-                            </button>
-                            <button
-                              name="outcome"
-                              value="FAILURE"
-                              className="button-secondary text-xs"
-                            >
-                              Simular fallo
-                            </button>
-                          </form>
+                          <>
+                            {paymentsEnabled ? (
+                              <>
+                                <form
+                                  action={startScopeChangeCheckoutAction}
+                                  className="mt-3"
+                                >
+                                  <input
+                                    type="hidden"
+                                    name="scopeChangeId"
+                                    value={change.scope_change_id}
+                                  />
+                                  <PaymentSubmitButton
+                                    idleLabel="Pagar adicional con Mercado Pago"
+                                    pendingLabel="Redirigiendo…"
+                                    className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-sm font-extrabold"
+                                  />
+                                </form>
+                                <p className="text-ink/70 mt-2 text-xs leading-5">
+                                  Serás redirigido a Mercado Pago para completar
+                                  el pago de forma segura.
+                                </p>
+                              </>
+                            ) : (
+                              <p className="text-ink/70 mt-3 text-xs leading-5">
+                                Este adicional está pendiente de pago. El cobro
+                                online todavía no está disponible y te vamos a
+                                avisar cuando puedas pagarlo por acá.
+                              </p>
+                            )}
+                            {canSimulatePayment ? (
+                              <form
+                                action={fakeAdditionalPaymentAction}
+                                className="mt-3 flex flex-wrap gap-2"
+                              >
+                                <input type="hidden" name="jobId" value={jobId} />
+                                <input
+                                  type="hidden"
+                                  name="scopeChangeId"
+                                  value={change.scope_change_id}
+                                />
+                                <input
+                                  type="hidden"
+                                  name="paymentNonce"
+                                  value={crypto.randomUUID()}
+                                />
+                                <PaymentSubmitButton
+                                  name="outcome"
+                                  value="SUCCESS"
+                                  idleLabel="Simular pago aprobado"
+                                  pendingLabel="Simulando…"
+                                  className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
+                                />
+                                <PaymentSubmitButton
+                                  name="outcome"
+                                  value="FAILURE"
+                                  idleLabel="Simular fallo"
+                                  pendingLabel="Simulando…"
+                                  className="button-secondary text-xs"
+                                />
+                              </form>
+                            ) : null}
+                          </>
                         ) : null}
                       </article>
                     );
@@ -1092,29 +1170,9 @@ function PrimaryAction({
         </a>
       );
     }
-    return (
-      <form action={transitionJobAction} className="grid gap-2">
-        <input type="hidden" name="jobId" value={jobId} />
-        <input type="hidden" name="expectedStatus" value="IN_PROGRESS" />
-        <input type="hidden" name="requestedStatus" value="COMPLETION_REQUESTED" />
-        <label className="text-[13px] font-bold text-white/90">
-          Código del cliente
-          <input
-            name="confirmationCode"
-            required
-            inputMode="numeric"
-            autoComplete="off"
-            maxLength={4}
-            pattern="[0-9]{4}"
-            placeholder="4 dígitos"
-            className="mt-1.5 h-[52px] w-full rounded-xl border border-white/25 bg-white/10 px-4 text-center text-lg font-extrabold tracking-[0.3em] text-white placeholder:font-normal placeholder:tracking-normal placeholder:text-white/50"
-          />
-        </label>
-        <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
-          Solicitar finalización
-        </button>
-      </form>
-    );
+    // El error del código se muestra junto al input (sin excepción
+    // genérica) mediante requestCompletionAction + useActionState.
+    return <ConfirmationCodeForm jobId={jobId} />;
   }
   if (kind === "confirm_completion") {
     return (
@@ -1127,12 +1185,24 @@ function PrimaryAction({
     );
   }
   if (kind === "pay") {
+    if (!isPaymentsEnabled()) {
+      return (
+        <Link
+          href="#pago"
+          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+        >
+          Ver pendiente de pago
+        </Link>
+      );
+    }
     return (
       <form action={startJobSettlementCheckoutAction}>
         <input type="hidden" name="jobId" value={jobId} />
-        <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
-          Pagar con Mercado Pago
-        </button>
+        <PaymentSubmitButton
+          idleLabel="Pagar con Mercado Pago"
+          pendingLabel="Redirigiendo…"
+          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+        />
       </form>
     );
   }
@@ -1160,12 +1230,21 @@ function ReasonTransitionForm({
   requested: "CANCELLED" | "DISPUTED" | "NO_SHOW";
   label: string;
 }) {
+  const irreversibleCopy =
+    requested === "DISPUTED"
+      ? "No se puede deshacer desde acá: el caso pasa a revisión del equipo de Changas."
+      : requested === "CANCELLED"
+        ? "No se puede deshacer: el trabajo se cierra como cancelado."
+        : "No se puede deshacer: queda registrada la ausencia.";
   return (
     <form action={transitionJobAction} className="border-ink/10 border-t pt-3">
       <input type="hidden" name="jobId" value={jobId} />
       <input type="hidden" name="expectedStatus" value={expected} />
       <input type="hidden" name="requestedStatus" value={requested} />
-      <label className="text-xs font-semibold">
+      <p className="text-danger text-xs leading-5 font-bold">
+        {irreversibleCopy}
+      </p>
+      <label className="mt-2 block text-xs font-semibold">
         Motivo
         <textarea
           name="reason"

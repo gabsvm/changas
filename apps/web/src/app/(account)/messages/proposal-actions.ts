@@ -124,7 +124,11 @@ export async function respondProposalAction(formData: FormData): Promise<void> {
   if (!["ACCEPT", "REJECT", "WITHDRAW"].includes(action)) {
     throw new Error("Acción de propuesta inválida.");
   }
-  await respondToProposal(proposalId, action);
+  await respondToProposal(
+    proposalId,
+    action,
+    stringField(formData, "responseReason") || null,
+  );
   revalidatePath(`/messages/${conversationId}`);
 }
 

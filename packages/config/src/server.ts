@@ -6,6 +6,7 @@ export {
   type PaymentProviderMode,
   type PaymentServerEnv,
 } from "./payment-server-env";
+export { isPaymentsEnabled, parsePaymentsEnabled } from "./payments-flag";
 
 export type ServiceRoleEnv = {
   url: string;

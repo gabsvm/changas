@@ -40,7 +40,7 @@ describe("job detail marketplace UI", () => {
 
   it("gates completion behind the client confirmation code", () => {
     expect(source).toContain("Código para el prestador");
-    expect(source).toContain("confirmationCode");
+    expect(source).toContain("ConfirmationCodeForm");
     expect(source).toContain("Ingresar código");
   });
 

@@ -30,6 +30,7 @@ const rawSummary: ProposalSummary = {
   expected_duration_minutes: 180,
   includes_text: "Mano de obra",
   materials_notes_text: "Materiales aparte",
+  response_reason: null,
   expires_at: null,
   created_at: "2026-09-01T12:00:00.000Z",
   updated_at: "2026-09-01T12:00:00.000Z",

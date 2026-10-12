@@ -21,6 +21,7 @@ import {
   type IllustratedIconName,
   type IllustratedTone,
 } from "@/components/ui/marketplace/illustrated-badge";
+import { StatusChip } from "@/components/ui/marketplace/status-chip";
 
 type ProviderAction = (
   previousState: ActionState,
@@ -335,21 +336,29 @@ function Check({
   label,
   name,
   defaultChecked = false,
+  disabled = false,
+  hint,
 }: {
   label: string;
   name: string;
   defaultChecked?: boolean | undefined;
+  disabled?: boolean;
+  hint?: string;
 }) {
   return (
-    <label className="text-ink/75 flex items-center gap-2 text-sm">
-      <input
-        className="accent-moss h-4 w-4"
-        type="checkbox"
-        name={name}
-        defaultChecked={defaultChecked}
-      />
-      {label}
-    </label>
+    <span className="text-ink/75 flex flex-wrap items-center gap-2 text-sm">
+      <label className="flex items-center gap-2">
+        <input
+          className="accent-moss h-4 w-4"
+          type="checkbox"
+          name={name}
+          defaultChecked={defaultChecked}
+          disabled={disabled}
+        />
+        {label}
+      </label>
+      {hint ? <span className="text-ink/60 text-xs">{hint}</span> : null}
+    </span>
   );
 }
 
@@ -424,11 +433,13 @@ function ServiceForm({
   service,
   skills,
   serviceTags,
+  canPublish,
 }: {
   action: ProviderAction;
   service?: Service;
   skills: Skill[];
   serviceTags: string[];
+  canPublish: boolean;
 }) {
   const [priceModel, setPriceModel] = useState<string>(
     service?.price_model ?? "FIXED",
@@ -563,6 +574,12 @@ function ServiceForm({
           label="Publicado"
           name="isPublished"
           defaultChecked={service?.is_published}
+          disabled={!canPublish}
+          {...(canPublish
+            ? {}
+            : {
+                hint: "Se habilita cuando tu identidad esté verificada. Podés guardarlo como borrador.",
+              })}
         />
         <Check
           label="Pausado"
@@ -889,6 +906,7 @@ export function MarketplaceManagement({
                 action={actions.saveService}
                 skills={catalogSkills}
                 serviceTags={[]}
+                canPublish={provider.status === "ACTIVE"}
               />
             </div>
           </details>
@@ -899,7 +917,14 @@ export function MarketplaceManagement({
             >
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="font-semibold">{service.title}</p>
+                  <p className="flex flex-wrap items-center gap-2 font-semibold">
+                    {service.title}
+                    {service.is_published ? null : (
+                      <StatusChip tone="warning">
+                        Borrador: solo vos lo ves
+                      </StatusChip>
+                    )}
+                  </p>
                   <p className="text-ink/70 text-xs">
                     {service.public_slug} ·{" "}
                     {service.is_published ? "publicado" : "borrador"}
@@ -949,6 +974,7 @@ export function MarketplaceManagement({
                     service={service}
                     skills={skills}
                     serviceTags={serviceTagsByServiceId[service.id] ?? []}
+                    canPublish={provider.status === "ACTIVE"}
                   />
                   <div className="border-ink/10 mt-3 border-t pt-2">
                     <DeleteForm

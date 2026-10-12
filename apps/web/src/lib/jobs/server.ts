@@ -72,6 +72,7 @@ export type JobDetail = {
   access_notes: string | null;
   confirmed_at: string;
   updated_at: string;
+  completion_requested_at: string | null;
   settlement_status: SettlementStatus;
   settlement_total_minor: number;
   settlement_unpaid_extras_minor: number;
@@ -117,12 +118,13 @@ export type JobScopeChange = {
   scope_snapshot: string;
   additional_amount_minor: number;
   currency_code: string;
+  response_reason: string | null;
   client_responded_at: string | null;
   created_at: string;
   updated_at: string;
 };
 
-type RpcError = { code?: string | null } | null;
+type RpcError = { code?: string | null; message?: string | null } | null;
 type RpcResult<T> = Promise<{ data: T | null; error: RpcError }>;
 type JobsRpcClient = {
   rpc(name: string, args?: Record<string, unknown>): RpcResult<unknown>;
@@ -150,7 +152,42 @@ function mapError(code?: string | null): JobServerError {
         "TRANSIENT",
         "No pudimos completar la acción. Intentá nuevamente.",
       );
+}
+}
+
+function mapTransitionError(code?: string | null, message?: string | null): JobServerError {
+  const detail = (message ?? "").toLowerCase();
+  if (detail.includes("confirmation code is required")) {
+    return new JobServerError(
+      "CONFLICT",
+      "Ingresá el código de 4 dígitos que el cliente ve en su Seguimiento.",
+    );
   }
+  if (detail.includes("confirmation code does not match")) {
+    return new JobServerError(
+      "CONFLICT",
+      "Ese código no coincide. Pedile al cliente que lo revise en su Seguimiento e intentá de nuevo.",
+    );
+  }
+  if (detail.includes("confirmation code locked")) {
+    return new JobServerError(
+      "CONFLICT",
+      "Demasiados intentos con un código incorrecto. Esperá unos minutos antes de probar de nuevo.",
+    );
+  }
+  if (detail.includes("job can no longer be disputed")) {
+    return new JobServerError(
+      "CONFLICT",
+      "Este trabajo ya no admite disputa: el cierre quedó firme.",
+    );
+  }
+  if (detail.includes("rejection reason is too short")) {
+    return new JobServerError(
+      "CONFLICT",
+      "El motivo es demasiado corto: agregá un poco más de detalle.",
+    );
+  }
+  return mapError(code);
 }
 
 async function authenticatedClient() {
@@ -281,6 +318,13 @@ export async function getJobDetail(jobId: string): Promise<JobDetail> {
       row.confirmation_code.length > 0
         ? row.confirmation_code
         : null,
+    // El reloj dedicado aterriza con la migración de lifecycle; hasta
+    // entonces la UI lo trata como ausente.
+    completion_requested_at:
+      typeof row.completion_requested_at === "string" &&
+      row.completion_requested_at.length > 0
+        ? row.completion_requested_at
+        : null,
     paid_additional_amount: paid,
     total_price_amount: total,
     settlement_status: settlementStatus,
@@ -344,7 +388,13 @@ export async function listJobScopeChanges(
     target_job_id: jobId,
   });
   if (error) throw mapError(error.code);
-  return requireRows<JobScopeChange>(data);
+  return requireRows<JobScopeChange>(data).map((row) => ({
+    ...row,
+    response_reason:
+      typeof row.response_reason === "string" && row.response_reason.length > 0
+        ? row.response_reason
+        : null,
+  }));
 }
 
 export async function transitionJob(
@@ -362,7 +412,7 @@ export async function transitionJob(
     transition_reason: reason?.trim() || null,
     confirmation_code: confirmationCode?.trim() || null,
   });
-  if (error) throw mapError(error.code);
+  if (error) throw mapTransitionError(error.code, error.message);
   if (typeof data !== "string" || !jobStatuses.includes(data as JobStatus)) {
     throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
   }
@@ -426,13 +476,15 @@ export async function requestJobScopeChange(
 export async function respondJobScopeChange(
   scopeChangeId: string,
   action: "ACCEPT" | "REJECT",
+  reason?: string | null,
 ): Promise<void> {
   const { supabase } = await authenticatedClient();
   const { error } = await supabase.rpc("respond_job_scope_change", {
     target_scope_change_id: scopeChangeId,
     response_action: action,
+    response_reason: reason?.trim() || null,
   });
-  if (error) throw mapError(error.code);
+  if (error) throw mapTransitionError(error.code, error.message);
 }
 
 export async function setJobExactLocation(input: {

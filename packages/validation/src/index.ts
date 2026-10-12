@@ -64,11 +64,31 @@ export const profileUpdateSchema = z.object({
 });
 
 export const privateProfileUpdateSchema = z.object({
-  legalName: optionalText(160),
-  privatePhone: optionalText(40),
-  dateOfBirth: z.iso.date().optional(),
-  exactAddress: optionalText(240),
-  dniNumber: optionalText(40),
+  legalName: z
+    .string({ error: "Contanos tu nombre legal completo." })
+    .trim()
+    .min(2, "Contanos tu nombre legal completo.")
+    .max(160, "El nombre legal no puede superar los 160 caracteres."),
+  privatePhone: z
+    .string({ error: "Dejanos un teléfono válido para contactarte." })
+    .trim()
+    .min(6, "Dejanos un teléfono válido para contactarte.")
+    .max(40, "El teléfono no puede superar los 40 caracteres."),
+  dateOfBirth: z
+    .iso.date("Indicá tu fecha de nacimiento con un día válido.")
+    .refine((value) => new Date(`${value}T00:00:00Z`) <= new Date(), {
+      message: "La fecha de nacimiento no puede estar en el futuro.",
+    }),
+  exactAddress: z
+    .string({ error: "Indicá tu domicilio exacto (solo lo ve Changas)." })
+    .trim()
+    .min(4, "Indicá tu domicilio exacto (solo lo ve Changas).")
+    .max(240, "El domicilio no puede superar los 240 caracteres."),
+  dniNumber: z
+    .string({ error: "Indicá tu número de DNI." })
+    .trim()
+    .min(6, "Indicá tu número de DNI.")
+    .max(40, "El DNI no puede superar los 40 caracteres."),
 });
 
 export const identityDocumentSchema = z.object({

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { formatMinorUnits } from "@changas/domain";
+
 import { MarketplaceManagement } from "@/components/provider/marketplace-management";
 import { ProviderPaymentAccount } from "@/components/payments/provider-payment-account";
 import { SkillRequestSection } from "@/components/provider/skill-request-section";
@@ -9,6 +11,7 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
+import { listMyPastJobs, listMyUpcomingJobs } from "@/lib/jobs/server";
 import {
   getProviderPaymentAccountState,
   type ProviderPaymentAccountState,
@@ -226,6 +229,39 @@ export default async function ProviderMarketplaceManagePage({
       ? paymentParam
       : null;
 
+  // Resumen de ingresos, solo lectura: reutiliza los listados de trabajos
+  // existentes. Una falla acá no voltea la página.
+  const income = await Promise.all([
+    listMyPastJobs(50).catch(() => []),
+    listMyUpcomingJobs(50).catch(() => []),
+  ]).then(([past, upcoming]) => {
+    const mine = [...past, ...upcoming].filter(
+      (job) => job.is_client === false,
+    );
+    const settled = mine.filter(
+      (job) => job.settlement_status === "SETTLED",
+    );
+    const due = mine.filter((job) => job.settlement_status === "DUE");
+    const inProgress = mine.filter((job) =>
+      ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
+        job.job_status,
+      ),
+    );
+    return {
+      settledCount: settled.length,
+      settledTotal: settled.reduce(
+        (sum, job) => sum + (job.settlement_total_minor ?? 0),
+        0,
+      ),
+      dueCount: due.length,
+      dueTotal: due.reduce(
+        (sum, job) => sum + (job.settlement_total_minor ?? 0),
+        0,
+      ),
+      inProgressCount: inProgress.length,
+    };
+  });
+
   const categoryNames = new Map(
     (categories ?? []).map((category) => [category.id, category.name]),
   );
@@ -284,6 +320,48 @@ export default async function ProviderMarketplaceManagePage({
               Ver perfil público ↗
             </Link>
           </div>
+        </div>
+        <div
+          className="border-ink/10 bg-surface mt-6 rounded-2xl border p-5"
+          aria-label="Resumen de ingresos"
+        >
+          <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+            Resumen de ingresos
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            <div>
+              <p className="text-[22px] leading-7 font-extrabold">
+                {formatMinorUnits(income.settledTotal, "ARS")}
+              </p>
+              <p className="text-ink/70 mt-0.5 text-[13px]">
+                Cobrado · {income.settledCount}{" "}
+                {income.settledCount === 1 ? "trabajo" : "trabajos"}
+              </p>
+            </div>
+            <div>
+              <p className="text-[22px] leading-7 font-extrabold">
+                {formatMinorUnits(income.dueTotal, "ARS")}
+              </p>
+              <p className="text-ink/70 mt-0.5 text-[13px]">
+                Pendiente de cobro · {income.dueCount}{" "}
+                {income.dueCount === 1 ? "trabajo" : "trabajos"}
+              </p>
+            </div>
+            <div>
+              <p className="text-[22px] leading-7 font-extrabold">
+                {income.inProgressCount}
+              </p>
+              <p className="text-ink/70 mt-0.5 text-[13px]">En curso</p>
+            </div>
+          </div>
+          <p className="text-ink/60 mt-3 text-xs leading-5">
+            Se calcula desde tus trabajos como prestador (hasta 50 por
+            listado). El detalle está en{" "}
+            <Link href="/jobs?status=history" className="font-bold underline underline-offset-4">
+              Mis trabajos
+            </Link>
+            .
+          </p>
         </div>
 
         {loadFailed ? (

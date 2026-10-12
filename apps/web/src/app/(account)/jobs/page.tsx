@@ -57,6 +57,7 @@ const statusFilters = [
   { key: "confirmed", label: "Confirmados" },
   { key: "in_progress", label: "En curso" },
   { key: "closing", label: "Por cerrar" },
+  { key: "pending", label: "Pendientes de pago" },
   { key: "history", label: "Historial" },
 ] as const;
 
@@ -73,11 +74,23 @@ function matchesFilter(job: UpcomingJob, filter: StatusFilter): boolean {
         job.job_status === "COMPLETION_REQUESTED" ||
         job.job_status === "DISPUTED"
       );
+    case "pending":
+      return job.settlement_status === "DUE";
     case "history":
       return true;
     default:
       return true;
   }
+}
+
+const DEFAULT_PAGE_SIZE = 20;
+const MAX_PAGE_SIZE = 50;
+
+function parsePageSize(value: string | string[] | undefined): number {
+  const raw = Array.isArray(value) ? value[0] : value;
+  const parsed = Number.parseInt(raw ?? "", 10);
+  if (!Number.isInteger(parsed)) return DEFAULT_PAGE_SIZE;
+  return Math.min(Math.max(parsed, 1), MAX_PAGE_SIZE);
 }
 
 export default async function JobsPage({
@@ -93,11 +106,17 @@ export default async function JobsPage({
   )
     ? ((Array.isArray(rawStatus) ? rawStatus[0] : rawStatus) as StatusFilter)
     : "all";
+  const pageSize = parsePageSize(params.n);
   const jobs =
-    activeFilter === "history"
-      ? await listMyPastJobs()
-      : await listMyUpcomingJobs();
+    activeFilter === "history" || activeFilter === "pending"
+      ? await listMyPastJobs(pageSize)
+      : await listMyUpcomingJobs(pageSize);
   const visible = jobs.filter((job) => matchesFilter(job, activeFilter));
+  const statusQuery = activeFilter === "all" ? "" : `status=${activeFilter}&`;
+  const moreHref =
+    jobs.length >= pageSize && pageSize < MAX_PAGE_SIZE
+      ? `/jobs?${statusQuery}n=${MAX_PAGE_SIZE}`
+      : null;
 
   return (
     <section className="pb-6 sm:py-14">
@@ -150,6 +169,15 @@ export default async function JobsPage({
               description="Cuando completes, canceles o registres ausencias, van a aparecer acá."
               actionHref="/buscar"
               actionLabel="Explorar servicios"
+              className="pt-14"
+            />
+          ) : activeFilter === "pending" ? (
+            <EmptyState
+              title="Sin pagos pendientes"
+              description="Cuando un trabajo completado quede pendiente de pago o cobro, va a aparecer acá."
+              actionHref="/jobs"
+              actionLabel="Ver todos"
+              actionTone="secondary"
               className="pt-14"
             />
           ) : (
@@ -255,6 +283,14 @@ export default async function JobsPage({
                 </Link>
               );
             })}
+            {moreHref ? (
+              <Link
+                href={moreHref}
+                className="button-secondary w-full sm:w-auto"
+              >
+                Mostrar más
+              </Link>
+            ) : null}
           </div>
         )}
       </div>

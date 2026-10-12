@@ -15,6 +15,7 @@ import { isUuid } from "@changas/validation";
 import {
   applyFakeAdditionalPayment,
   applyFakeSettlementPayment,
+  JobServerError,
   requestJobReschedule,
   requestJobScopeChange,
   respondJobReschedule,
@@ -30,6 +31,7 @@ import {
   type ReviewReportReason,
 } from "@/lib/reputation/server";
 import { createClient } from "@/lib/supabase/server";
+import { isPaymentsEnabled } from "@changas/config/server";
 import {
   createJobSettlementCheckout,
   createScopeChangeCheckout,
@@ -105,6 +107,39 @@ export async function transitionJobAction(formData: FormData): Promise<void> {
   revalidatePath("/jobs");
 }
 
+export type CompletionCodeState = { error: string | null };
+
+// Pedido de finalización con el código del cliente: devuelve el error
+// como estado para mostrarlo junto al input en vez de una excepción
+// genérica. Solo la usa el formulario del código.
+export async function requestCompletionAction(
+  _previousState: CompletionCodeState,
+  formData: FormData,
+): Promise<CompletionCodeState> {
+  const jobId = uuidField(formData, "jobId");
+  const code = stringField(formData, "confirmationCode");
+  if (!/^[0-9]{4}$/.test(code)) {
+    return {
+      error: "Ingresá los 4 dígitos que el cliente ve en su Seguimiento.",
+    };
+  }
+  try {
+    await transitionJob(
+      jobId,
+      "IN_PROGRESS",
+      "COMPLETION_REQUESTED",
+      null,
+      code,
+    );
+  } catch (error) {
+    if (error instanceof JobServerError) return { error: error.message };
+    return { error: "No pudimos completar la acción. Intentá nuevamente." };
+  }
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs");
+  return { error: null };
+}
+
 export async function requestRescheduleAction(
   formData: FormData,
 ): Promise<void> {
@@ -160,7 +195,11 @@ export async function respondScopeChangeAction(
   const action = stringField(formData, "action");
   if (action !== "ACCEPT" && action !== "REJECT")
     throw new Error("Acción inválida.");
-  await respondJobScopeChange(scopeChangeId, action);
+  await respondJobScopeChange(
+    scopeChangeId,
+    action,
+    stringField(formData, "responseReason") || null,
+  );
   revalidatePath(`/jobs/${jobId}`);
 }
 
@@ -189,6 +228,9 @@ export async function fakeAdditionalPaymentAction(
 export async function startScopeChangeCheckoutAction(
   formData: FormData,
 ): Promise<void> {
+  if (!isPaymentsEnabled()) {
+    throw new Error("El pago online todavía no está habilitado.");
+  }
   const scopeChangeId = uuidField(formData, "scopeChangeId");
   const checkout = await createScopeChangeCheckout(
     scopeChangeId,
@@ -200,6 +242,9 @@ export async function startScopeChangeCheckoutAction(
 export async function startJobSettlementCheckoutAction(
   formData: FormData,
 ): Promise<void> {
+  if (!isPaymentsEnabled()) {
+    throw new Error("El pago online todavía no está habilitado.");
+  }
   const jobId = uuidField(formData, "jobId");
   const checkout = await createJobSettlementCheckout(
     jobId,

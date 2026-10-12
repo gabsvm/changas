@@ -53,6 +53,7 @@ export type ProposalSummary = {
   expected_duration_minutes: number | null;
   includes_text: string | null;
   materials_notes_text: string | null;
+  response_reason: string | null;
   expires_at: string | null;
   created_at: string;
   updated_at: string;
@@ -126,6 +127,7 @@ type ProposalRpcClient = {
     args: {
       target_proposal_id: string;
       response_action: ProposalResponseAction;
+      response_reason?: string | null;
     },
   ): Promise<{ data: ProposalStatus | null; error: RpcError }>;
   rpc(
@@ -264,6 +266,7 @@ export function normalizeProposalSummary(value: unknown): ProposalSummary {
     ) ||
     !isNullableString(row.includes_text) ||
     !isNullableString(row.materials_notes_text) ||
+    !(row.response_reason === null || row.response_reason === undefined || typeof row.response_reason === "string") ||
     !isDateLike(row.expires_at) ||
     !isDateLike(row.created_at) ||
     row.created_at === null ||
@@ -273,7 +276,15 @@ export function normalizeProposalSummary(value: unknown): ProposalSummary {
     throw new Error("Invalid proposal summary");
   }
 
-  return row as unknown as ProposalSummary;
+  return {
+    ...(row as unknown as ProposalSummary),
+    // El motivo aterriza con la migración de lifecycle; hasta entonces
+    // llega ausente y se trata como nulo.
+    response_reason:
+      typeof row.response_reason === "string" && row.response_reason.length > 0
+        ? row.response_reason
+        : null,
+  };
 }
 
 async function getRpcClient(): Promise<{
@@ -357,11 +368,13 @@ export async function reviseConversationProposal(
 export async function respondToProposal(
   proposalId: string,
   action: ProposalResponseAction,
+  reason?: string | null,
 ): Promise<ProposalStatus> {
   const { rpc } = await getRpcClient();
   const { data, error } = await rpc.rpc("respond_to_proposal", {
     target_proposal_id: proposalId,
     response_action: action,
+    response_reason: reason?.trim() || null,
   });
 
   if (error) throw proposalError(error);

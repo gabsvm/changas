@@ -6,12 +6,14 @@ import {
   replyToJobReviewAction,
   reportJobReviewAction,
 } from "@/app/(account)/jobs/actions";
+import { getJobDetail } from "@/lib/jobs/server";
 import { getJobReviewState } from "@/lib/reputation/server";
 import { createClient } from "@/lib/supabase/server";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 
+import { requestJobReviewNudgeAction } from "./actions";
 function StarRow({ value, label }: { value: number; label?: string }) {
   const filled = Math.max(1, Math.min(5, Math.round(value)));
   return (
@@ -74,6 +76,14 @@ export async function JobReputationPanel({
   const state = await getJobReviewState(supabase, jobId);
   if (!state) return null;
 
+  // El prestador puede pedir reseña solo si el trabajo ya está cobrado
+  // (COMPLETED+SETTLED) y todavía no hay reseña. Solo lectura.
+  const settlementStatus =
+    isProvider && !state.review_id
+      ? (await getJobDetail(jobId).catch(() => null))?.settlement_status ?? null
+      : null;
+  const showReviewRequest = settlementStatus === "SETTLED";
+
   return (
     <section
       className="border-ink/[0.08] consumer-card bg-surface rounded-3xl border p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-6 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
@@ -110,6 +120,23 @@ export async function JobReputationPanel({
         ) : null}
       </div>
 
+      {showReviewRequest ? (
+        <div className="border-ink/[0.08] bg-canvas mt-4 rounded-2xl border p-4">
+          <p className="text-sm leading-6 font-semibold">
+            Este trabajo ya está cobrado y todavía no tiene reseña.
+          </p>
+          <p className="text-ink/70 mt-1 text-sm leading-6">
+            Pedile al cliente que cuente cómo le fue: le llega un aviso a su
+            actividad.
+          </p>
+          <form action={requestJobReviewNudgeAction} className="mt-3">
+            <input type="hidden" name="jobId" value={jobId} />
+            <button className="button-secondary w-fit" type="submit">
+              Pedir reseña
+            </button>
+          </form>
+        </div>
+      ) : null}
       {isClient && state.can_review ? (
         <form action={createJobReviewAction} className="mt-5 grid gap-4">
           <input type="hidden" name="jobId" value={jobId} />

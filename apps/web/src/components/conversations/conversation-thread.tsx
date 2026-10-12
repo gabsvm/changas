@@ -330,8 +330,9 @@ export function ConversationThread({
         ) : null}
         {blockedByMe ? (
           <div className="bg-terracotta/10 text-terracotta mt-3 rounded-xl px-3 py-2 text-xs leading-5">
-            Bloqueaste a esta persona. El historial se conserva, pero no podés
-            enviar nuevos mensajes hasta desbloquearla.
+            Bloqueaste a esta persona solo en esta conversación. El historial
+            se conserva, pero acá no pueden enviarse mensajes ni propuestas
+            nuevas hasta desbloquearla.
           </div>
         ) : null}
         {deal ? (

@@ -222,7 +222,7 @@ export default async function PublicProviderPage({
             </div>
           </div>
 
-          {services?.[0]?.public_slug ? (
+          {(services?.length ?? 0) > 0 ? (
             <div className="service-cta-bar bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:hidden">
               <div className="mx-auto flex max-w-4xl items-center gap-3">
                 <form action={toggleProviderFavorite} className="shrink-0">
@@ -263,7 +263,11 @@ export default async function PublicProviderPage({
                   </button>
                 </form>
                 <Link
-                  href={`/p/${slug}/${services?.[0]?.public_slug ?? ""}`}
+                  href={
+                    (services?.length ?? 0) > 1 || !services?.[0]?.public_slug
+                      ? `/p/${slug}#servicios`
+                      : `/p/${slug}/${services?.[0]?.public_slug ?? ""}`
+                  }
                   className="consumer-pressable cta-ink inline-flex min-h-[52px] flex-1 items-center justify-center rounded-2xl px-5 text-[15px] font-extrabold shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
                 >
                   Contactar
@@ -336,9 +340,13 @@ export default async function PublicProviderPage({
                 {isFavorite ? "Quitar de guardados" : "Guardar proveedor"}
               </button>
             </form>
-            {services?.[0]?.public_slug ? (
+            {(services?.length ?? 0) > 0 ? (
               <Link
-                href={`/p/${slug}/${services?.[0]?.public_slug ?? ""}`}
+                href={
+                  (services?.length ?? 0) > 1 || !services?.[0]?.public_slug
+                    ? `/p/${slug}#servicios`
+                    : `/p/${slug}/${services?.[0]?.public_slug ?? ""}`
+                }
                 className="consumer-pressable cta-ink inline-flex min-h-12 flex-1 items-center justify-center rounded-xl px-5 text-sm font-extrabold shadow-md"
               >
                 Contactar
@@ -351,7 +359,7 @@ export default async function PublicProviderPage({
           <ProviderReputation providerSlug={provider.public_slug} />
         </div>
 
-        <PublicSection title="Servicios" badge={{ tone: "orange", icon: "tag" }}>
+        <PublicSection title="Servicios" badge={{ tone: "orange", icon: "tag" }} id="servicios">
           {(services ?? []).length ? (
             <div className="grid gap-3">
               {(services ?? []).map((service) => (
@@ -580,13 +588,15 @@ function PublicSection({
   title,
   badge,
   children,
+  id,
 }: {
   title: string;
   badge: { tone: "orange" | "blue" | "green" | "rose" | "violet" | "gold" | "neutral"; icon: "tag" | "sparkle" | "pin" | "briefcase" | "star" | "shield" | "check"; label?: string };
   children: ReactNode;
+  id?: string;
 }) {
   return (
-    <section className="profile-section-card consumer-card bg-surface mt-6 p-5 sm:p-6">
+    <section id={id} className="profile-section-card consumer-card bg-surface mt-6 scroll-mt-24 p-5 sm:p-6">
       <span className="flex min-w-0 items-center gap-2.5">
         <IllustratedBadge tone={badge.tone} icon={badge.icon} size="sm" label={badge.label ?? title} />
         <h2 className="font-display truncate text-lg leading-7 font-bold tracking-[-0.015em]">

@@ -60,7 +60,8 @@ export async function generateMetadata({
 const CONSULT_ERROR_MESSAGES: Record<string, string> = {
   FORBIDDEN: "No tenés permiso para consultar por este servicio.",
   NOT_FOUND: "Este servicio ya no está disponible.",
-  CONFLICT: "Este servicio ya no está disponible.",
+  CONFLICT:
+    "No podés contactarte con vos mismo. Si el servicio no es tuyo, es probable que ya no esté disponible.",
 };
 
 export default async function PublicServicePage({
@@ -229,7 +230,7 @@ export default async function PublicServicePage({
               </div>
               <p className="text-ink/70 mt-2 text-xs leading-5">
                 La comisión se descuenta antes de liberarle el pago al
-                proveedor. Nada extra al precio publicado.
+                proveedor, sin cargos extra sobre el precio publicado.
               </p>
             </section>
           ) : null}

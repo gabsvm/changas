@@ -668,11 +668,11 @@ select is(
 );
 
 select lives_ok(
-  $select * from public.reconcile_provider_payment(
+  $$select * from public.reconcile_provider_payment(
     '11000000-0000-4000-8000-000000000084', 'MERCADO_PAGO',
     'payment-settlement-001', 'SUCCEEDED', 115000, 'ARS',
     'seller-phase11-001', null
-  )$,
+  )$$,
   'settlement checkout reconciles through the job settlement branch'
 );
 select is(
@@ -710,11 +710,11 @@ select ok(
 );
 
 select lives_ok(
-  $select * from public.reconcile_provider_payment(
+  $$select * from public.reconcile_provider_payment(
     '11000000-0000-4000-8000-000000000084', 'MERCADO_PAGO',
     'payment-settlement-001', 'SUCCEEDED', 115000, 'ARS',
     'seller-phase11-001', null
-  )$,
+  )$$,
   'replaying the same terminal settlement is idempotent'
 );
 select ok(
@@ -724,34 +724,34 @@ select ok(
 );
 
 select throws_ok(
-  $select * from public.reconcile_provider_payment(
+  $$select * from public.reconcile_provider_payment(
     '11000000-0000-4000-8000-000000000086', 'MERCADO_PAGO',
     'payment-settlement-002', 'SUCCEEDED', 115000, 'ARS',
     'seller-phase11-001', null
-  )$,
+  )$$,
   '40001', null,
   'a second settlement checkout for a settled job is rejected'
 );
 select throws_ok(
-  $select * from public.reconcile_provider_payment(
+  $$select * from public.reconcile_provider_payment(
     '11000000-0000-4000-8000-000000000093', 'MERCADO_PAGO',
     'payment-settlement-003', 'SUCCEEDED', 100000, 'ARS',
     'seller-phase11-001', null
-  )$,
+  )$$,
   '42501', null,
   'settlement for a non-completed job is rejected'
 );
 select throws_ok(
-  $select * from public.reconcile_provider_payment(
+  $$select * from public.reconcile_provider_payment(
     '11000000-0000-4000-8000-000000000098', 'MERCADO_PAGO',
     'payment-settlement-004', 'SUCCEEDED', 115000, 'ARS',
     'seller-phase11-001', null
-  )$,
+  )$$,
   '22023', null,
   'settlement with a stale included-additionals set is rejected'
 );
 select throws_ok(
-  $select * from public.get_job_settlement_snapshot('11000000-0000-4000-8000-000000000082')$,
+  $$select * from public.get_job_settlement_snapshot('11000000-0000-4000-8000-000000000082')$$,
   '40001', null,
   'settlement snapshot for a settled job is rejected'
 );
