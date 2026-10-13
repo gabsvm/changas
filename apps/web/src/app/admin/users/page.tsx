@@ -44,7 +44,7 @@ export default async function AdminUsersPage({
   return (
     <section className="space-y-6">
       <AdminPageHeader
-        eyebrow="Cuentas"
+        eyebrow="Personas · Cuentas"
         title="Usuarios"
         description="Buscá una cuenta, revisá su rol y estado, habilitala como prestador o aplicá controles operativos sin salir del mismo flujo."
       />

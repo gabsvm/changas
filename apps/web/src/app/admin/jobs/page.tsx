@@ -12,7 +12,7 @@ export default async function AdminJobsPage() {
   return (
     <section className="space-y-6">
       <AdminPageHeader
-        eyebrow="Operación"
+        eyebrow="Operación · Trabajos"
         title="Trabajos"
         description="Inspección rápida del estado de las contrataciones. Los datos sensibles siguen detrás de RPCs administrativos."
       />

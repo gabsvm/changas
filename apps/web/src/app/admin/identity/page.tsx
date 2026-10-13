@@ -70,7 +70,7 @@ export default async function AdminIdentityPage({
   return (
     <section className="space-y-6">
       <AdminPageHeader
-        eyebrow="Trust & Safety"
+        eyebrow="Personas · Verificación"
         title="Revisión de identidad"
         description="Sólo aparecen en la cola los prestadores que realmente enviaron su identidad. Los archivos siguen privados y cada apertura genera acceso temporal al documento exacto."
         action={

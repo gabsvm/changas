@@ -23,7 +23,7 @@ export default async function AdminAuditPage() {
   return (
     <section className="space-y-6">
       <AdminPageHeader
-        eyebrow="Trazabilidad"
+        eyebrow="Sistema · Trazabilidad"
         title="Auditoría"
         description="Historial append-only de decisiones administrativas. Acá vas a ver también las activaciones manuales de prestadores y su motivo."
       />

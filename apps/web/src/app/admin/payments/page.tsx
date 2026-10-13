@@ -50,7 +50,7 @@ export default async function AdminPaymentsPage() {
   return (
     <section className="space-y-6">
       <AdminPageHeader
-        eyebrow="Finanzas"
+        eyebrow="Operación · Finanzas"
         title="Pagos y conciliación"
         description="Primero los pendientes y desajustes; debajo queda el detalle financiero y el historial de conciliaciones."
         action={
