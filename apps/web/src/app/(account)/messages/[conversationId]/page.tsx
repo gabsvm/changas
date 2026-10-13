@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { formatMinorUnits } from "@changas/domain";
+import {
+  canActorTransitionProposal,
+  formatMinorUnits,
+} from "@changas/domain";
 
 import { ConversationThread } from "@/components/conversations/conversation-thread";
 import { ProposalCard } from "@/components/conversations/proposal-card";
@@ -24,7 +27,10 @@ import {
   listConversationJobs,
   type ConversationJob,
 } from "@/lib/jobs/server";
-import { getJobTracking } from "@/components/jobs/job-tracking";
+import {
+  getJobNextAction,
+  getJobTracking,
+} from "@/components/jobs/job-tracking";
 import { getJobStatusPresentation } from "@/lib/ui/job-status";
 import { GuideHeader } from "@/components/ui/guided";
 import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
@@ -143,6 +149,62 @@ export default async function ConversationPage({
               ),
       }
     : null;
+  const openProposal =
+    proposals.find((proposal) => proposal.proposal_status === "OPEN") ?? null;
+  const hireSpotlight =
+    openProposal !== null &&
+    openProposal.price_amount !== null &&
+    canActorTransitionProposal({
+      actorRole: currentUserIsClient ? "CLIENT" : "PROVIDER",
+      actorIsAuthor: openProposal.authored_by_user_id === user.id,
+      from: openProposal.proposal_status,
+      to: "ACCEPTED",
+    })
+      ? {
+          kind: "hire" as const,
+          title: `Contratar · ${formatMinorUnits(openProposal.price_amount, openProposal.currency_code)}`,
+          sub: "Sin pago por adelantado. Tocá para revisar y confirmar.",
+          cta: "Contratar",
+          href: "#propuestas",
+        }
+      : null;
+  const TERMINAL_JOB_STATUSES = [
+    "COMPLETED",
+    "CANCELLED",
+    "REFUNDED",
+    "PARTIALLY_REFUNDED",
+  ];
+  const spotlightJob =
+    conversationJobs.find(
+      (job) => !TERMINAL_JOB_STATUSES.includes(job.job_status),
+    ) ?? null;
+  const spotlightTracking = spotlightJob
+    ? getJobTracking(spotlightJob.job_status, null)
+    : null;
+  const spotlightStatus = spotlightJob
+    ? getJobStatusPresentation(spotlightJob.job_status)
+    : null;
+  const spotlightNext = spotlightJob
+    ? getJobNextAction({
+        status: spotlightJob.job_status,
+        isClient: currentUserIsClient,
+        isProvider: !currentUserIsClient,
+        settlementPending: false,
+      })
+    : null;
+  const jobSpotlight =
+    spotlightJob && spotlightTracking && spotlightStatus && spotlightNext
+      ? {
+          kind: "job" as const,
+          title: spotlightTracking.exception
+            ? spotlightStatus.label
+            : `Paso ${spotlightTracking.currentIndex + 1} de ${spotlightTracking.steps.length} · ${spotlightStatus.label}`,
+          sub: spotlightNext.heading,
+          cta: "Ver seguimiento",
+          href: `/jobs/${spotlightJob.job_id}`,
+        }
+      : null;
+  const spotlight = hireSpotlight ?? jobSpotlight;
 
   return (
     <section className="space-y-4 py-4 sm:py-6">
@@ -161,6 +223,7 @@ export default async function ConversationPage({
         initialTextNonce={initialTextNonce}
         initialAttachmentNonce={initialAttachmentNonce}
         deal={deal}
+        spotlight={spotlight}
       />
 
       {conversationJobs.length > 0 ? (
@@ -200,7 +263,7 @@ export default async function ConversationPage({
       <div className="mx-auto w-full max-w-4xl space-y-3 px-4 sm:px-0">
         {proposals.length > 0 ? (
           <section
-            className="space-y-3"
+            className="scroll-mt-56 space-y-3"
             id="propuestas"
             aria-label="Propuestas de la conversación"
           >

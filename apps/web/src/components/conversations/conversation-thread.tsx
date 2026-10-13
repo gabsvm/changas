@@ -90,6 +90,7 @@ export function ConversationThread({
   serviceTitle,
   providerHref,
   deal,
+  spotlight,
   initialMessages,
   initialAttachments,
   initiallyBlockedByMe,
@@ -106,6 +107,13 @@ export function ConversationThread({
     statusLabel: string;
     statusTone: "neutral" | "success" | "warning" | "danger" | "brand" | "info";
     amountLabel: string;
+  } | null;
+  spotlight: {
+    kind: "hire" | "job";
+    title: string;
+    sub: string;
+    cta: string;
+    href: string;
   } | null;
   initialMessages: ConversationMessage[];
   initialAttachments: ConversationAttachmentSummary[];
@@ -323,6 +331,29 @@ export function ConversationThread({
             </div>
           </details>
         </div>
+        {spotlight ? (
+          <a
+            href={spotlight.href}
+            aria-label={`${spotlight.title}. ${spotlight.sub}`}
+            className="consumer-pressable mt-3 flex items-center gap-3 rounded-2xl bg-[#17140f] px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(23_20_15/50%)]"
+          >
+            <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2fbf71] opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#2fbf71]" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-extrabold">
+                {spotlight.title}
+              </span>
+              <span className="block truncate text-xs text-white/70">
+                {spotlight.sub}
+              </span>
+            </span>
+            <span className="shrink-0 rounded-full bg-white px-3.5 py-2 text-[13px] font-extrabold text-[#17140f]">
+              {spotlight.cta}
+            </span>
+          </a>
+        ) : null}
         {blockError ? (
           <p role="alert" className="bg-terracotta/10 text-terracotta mt-3 rounded-xl px-3 py-2 text-xs leading-5">
             {blockError}
