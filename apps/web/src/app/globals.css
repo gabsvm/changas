@@ -904,10 +904,6 @@ a[aria-current="page"] .nav-icon {
   color: #7ea2ff;
 }
 
-.dark .button-primary {
-  /* Crema sobre naranja (~2.5:1) no alcanza; en oscuro el texto vuelve a tinta oscura. */
-  color: #1d1512;
-}
 
 .dark .button-secondary {
   border-color: rgb(245 239 232 / 16%);

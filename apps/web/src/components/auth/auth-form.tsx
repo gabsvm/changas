@@ -240,7 +240,7 @@ export function AuthForm({
             </Link>
             <Link
               className="hover:text-terracotta decoration-ink/20 inline-flex min-h-11 items-center underline underline-offset-4 transition-colors"
-              href="/forgot-password"
+              href={`/forgot-password${nextQuery}`}
             >
               Olvidé mi contraseña
             </Link>

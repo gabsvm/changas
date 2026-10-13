@@ -12,7 +12,6 @@ import {
 import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { SearchField } from "@/components/ui/marketplace/search-field";
-import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -213,7 +212,7 @@ export default async function CategoryPage({
                     : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
-                Cerca mío
+                Presencial
               </Link>
               <Link
                 href={categoryHref({
@@ -242,9 +241,6 @@ export default async function CategoryPage({
                 Acepta ofertas
               </Link>
             </div>
-          </div>
-          <div className="mt-5">
-            <SectionHeader title="Servicios publicados" badge={{ tone: "orange", icon: "star", label: "Servicios publicados" }} />
           </div>
           <div className="discovery-results-shell mt-5">
             <DiscoveryResults
