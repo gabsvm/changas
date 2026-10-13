@@ -17,6 +17,12 @@ import { SearchField } from "@/components/ui/marketplace/search-field";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { searchDiscovery } from "@/lib/discovery/server";
+import { listMyUpcomingJobs, type UpcomingJob } from "@/lib/jobs/server";
+import { getJobTracking } from "@/components/jobs/job-tracking";
+import {
+  JOB_TERMINAL_STATUSES,
+  getJobStatusPresentation,
+} from "@/lib/ui/job-status";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -57,6 +63,24 @@ export default async function HomePage() {
     greetingProfile?.display_name?.trim().split(/\s+/)[0] ||
     user?.email?.split("@")[0] ||
     "Tu cuenta";
+  let activeJobs: UpcomingJob[] = [];
+  if (user) {
+    try {
+      const upcoming = await listMyUpcomingJobs(5);
+      activeJobs = upcoming.filter(
+        (job) => !JOB_TERMINAL_STATUSES.includes(job.job_status),
+      );
+    } catch {
+      activeJobs = [];
+    }
+  }
+  const heroJob = activeJobs[0] ?? null;
+  const heroTracking = heroJob
+    ? getJobTracking(heroJob.job_status, null)
+    : null;
+  const heroStatus = heroJob
+    ? getJobStatusPresentation(heroJob.job_status)
+    : null;
 
   return (
     <main
@@ -102,7 +126,31 @@ export default async function HomePage() {
             </Link>
           )}
         </header>
-
+        {heroJob && heroTracking && heroStatus ? (
+          <Link
+            href={`/jobs/${heroJob.job_id}`}
+            aria-label={`Tenés un servicio en marcha: ${heroJob.service_title}. Ver seguimiento.`}
+            className="consumer-pressable mt-4 flex items-center gap-3 rounded-2xl bg-[#17140f] px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(23_20_15/50%)]"
+          >
+            <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2fbf71] opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#2fbf71]" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-extrabold">
+                {activeJobs.length > 1
+                  ? `Tenés ${activeJobs.length} servicios en marcha`
+                  : "Tenés un servicio en marcha"}
+              </span>
+              <span className="block truncate text-xs text-white/70">
+                {heroJob.service_title} · {heroTracking.exception ? heroStatus.label : `Paso ${heroTracking.currentIndex + 1} de ${heroTracking.steps.length} · ${heroStatus.label}`}
+              </span>
+            </span>
+            <span className="shrink-0 rounded-full bg-white px-3.5 py-2 text-[13px] font-extrabold text-[#17140f]">
+              Ver seguimiento
+            </span>
+          </Link>
+        ) : null}
         <div className="pt-4 sm:pt-9">
           <section
             aria-labelledby="home-search-title"

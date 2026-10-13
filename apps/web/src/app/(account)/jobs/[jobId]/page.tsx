@@ -563,6 +563,7 @@ export default async function JobPage({
           <div className="space-y-8">
             {showHelp ? (
               <JobSection
+                id="ayuda"
                 title="Ayuda con este servicio"
                 badge={{ tone: "rose", icon: "alert" }}
                 description="Si algo sale mal, reportalo: revisamos el caso con ambas partes."
@@ -1075,6 +1076,7 @@ function JobSection({
   collapsible = false,
   defaultOpen = false,
   badge,
+  id,
 }: {
   title: string;
   description?: string;
@@ -1082,12 +1084,14 @@ function JobSection({
   collapsible?: boolean;
   defaultOpen?: boolean;
   badge?: { tone: IllustratedTone; icon: IllustratedIconName };
+  id?: string;
 }) {
   if (collapsible) {
     return (
       <details
+        id={id}
         open={defaultOpen || undefined}
-        className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+        className="border-ink/[0.08] bg-surface consumer-card scroll-mt-24 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/70%)]"
       >
         <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3">
           <SectionHeader
@@ -1106,7 +1110,7 @@ function JobSection({
     );
   }
   return (
-    <section className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+    <section id={id} className="border-ink/[0.08] bg-surface consumer-card scroll-mt-24 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/70%)]">
       <SectionHeader
         title={title}
         badge={badge ?? { tone: "neutral", icon: "doc", label: title }}
@@ -1234,8 +1238,8 @@ function ReasonTransitionForm({
     requested === "DISPUTED"
       ? "No se puede deshacer desde acá: el caso pasa a revisión del equipo de Changas."
       : requested === "CANCELLED"
-        ? "No se puede deshacer: el trabajo se cierra como cancelado."
-        : "No se puede deshacer: queda registrada la ausencia.";
+        ? "No se puede deshacer: el trabajo se cierra como cancelado y suma una cancelación a tu reputación."
+        : "No se puede deshacer: queda registrada la ausencia en tu reputación.";
   return (
     <form action={transitionJobAction} className="border-ink/10 border-t pt-3">
       <input type="hidden" name="jobId" value={jobId} />

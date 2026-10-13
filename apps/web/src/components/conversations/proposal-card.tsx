@@ -58,6 +58,14 @@ const expiresFormatter = new Intl.DateTimeFormat("es-AR", {
   timeStyle: "short",
   timeZone: "America/Argentina/Buenos_Aires",
 });
+const scheduleFormatter = new Intl.DateTimeFormat("es-AR", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "America/Argentina/Buenos_Aires",
+});
 
 export function ProposalCard({
   proposal,
@@ -153,6 +161,20 @@ export function ProposalCard({
                 : "Ambas"}
           </dd>
         </div>
+        {proposal.schedule_start_at ? (
+          <div className="border-ink/[0.08] bg-canvas col-span-2 rounded-xl border p-3">
+            <dt className="text-ink/70 text-xs font-semibold">
+              Fecha acordada
+            </dt>
+            <dd className="mt-1 text-[15px] font-extrabold">
+              {scheduleFormatter.format(new Date(proposal.schedule_start_at))}
+              {proposal.schedule_end_at &&
+              proposal.schedule_end_at !== proposal.schedule_start_at
+                ? ` → ${scheduleFormatter.format(new Date(proposal.schedule_end_at))}`
+                : null}
+            </dd>
+          </div>
+        ) : null}
       </dl>
 
       {proposal.price_amount !== null ? (
