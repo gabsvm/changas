@@ -24,7 +24,7 @@ export default async function AdminReportsPage() {
   return (
     <section className="space-y-6">
       <AdminPageHeader
-        eyebrow="Trust & Safety"
+        eyebrow="Operación · Reportes"
         title="Reportes"
         description="Casos abiertos primero, decisiones reversibles y evidencia preservada sin borrado destructivo."
         action={

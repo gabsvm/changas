@@ -11,6 +11,9 @@ function humanAction(action: string) {
     PROVIDER_MANUALLY_ACTIVATED: "Prestador activado manualmente",
     IDENTITY_REVIEW_APPROVED: "Identidad aprobada",
     IDENTITY_REVIEW_REJECTED: "Identidad rechazada",
+    JOB_DISPUTE_RESOLVED: "Disputa de trabajo resuelta",
+    SKILL_REQUEST_APPROVE_NEW: "Habilidad nueva aprobada",
+    CATALOG_CATEGORY_CREATED: "Categoría creada",
   };
   return labels[action] ?? action.replaceAll("_", " ");
 }
@@ -20,7 +23,7 @@ export default async function AdminAuditPage() {
   return (
     <section className="space-y-6">
       <AdminPageHeader
-        eyebrow="Trazabilidad"
+        eyebrow="Sistema · Trazabilidad"
         title="Auditoría"
         description="Historial append-only de decisiones administrativas. Acá vas a ver también las activaciones manuales de prestadores y su motivo."
       />

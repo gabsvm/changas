@@ -5,19 +5,22 @@ import {
   AdminStatusBadge,
 } from "@/components/admin/admin-ui";
 import { listAdminJobs } from "@/lib/admin/server";
+import { getJobStatusPresentation } from "@/lib/ui/job-status";
 
 export default async function AdminJobsPage() {
   const jobs = await listAdminJobs();
   return (
     <section className="space-y-6">
       <AdminPageHeader
-        eyebrow="Operación"
+        eyebrow="Operación · Trabajos"
         title="Trabajos"
         description="Inspección rápida del estado de las contrataciones. Los datos sensibles siguen detrás de RPCs administrativos."
       />
       {jobs.length ? (
         <div className="grid gap-2 lg:grid-cols-2">
-          {jobs.map((job) => (
+          {jobs.map((job) => {
+            const presentation = getJobStatusPresentation(job.status);
+            return (
             <article
               className="rounded-3xl border border-ink/[0.08] bg-surface p-4"
               key={job.job_id}
@@ -31,7 +34,16 @@ export default async function AdminJobsPage() {
                     {job.job_id}
                   </p>
                 </div>
-                <AdminStatusBadge label={job.status} tone="info" />
+                <AdminStatusBadge
+                  label={presentation.label}
+                  tone={
+                    presentation.tone === "warning"
+                      ? "pending"
+                      : presentation.tone === "brand"
+                        ? "pink"
+                        : presentation.tone
+                  }
+                />
               </div>
               <div className="mt-4 grid gap-2 rounded-2xl border border-ink/[0.08] bg-surface p-3 text-xs sm:grid-cols-2">
                 <div>
@@ -81,7 +93,8 @@ export default async function AdminJobsPage() {
                 </div>
               ) : null}
             </article>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <AdminEmptyState

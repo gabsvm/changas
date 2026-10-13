@@ -14,52 +14,60 @@ export type AdminNavigationItem = {
   href: string;
   label: string;
   mobileGroup: "primary" | "more";
+  navGroup: "Principal" | "Operación" | "Personas" | "Catálogo" | "Sistema";
 };
 
 export const adminNavigationItems: readonly AdminNavigationItem[] = [
-  { id: "overview", href: "/admin", label: "Resumen", mobileGroup: "primary" },
+  { id: "overview", href: "/admin", label: "Resumen", mobileGroup: "primary", navGroup: "Principal" },
   {
     id: "identity",
     href: "/admin/identity",
     label: "Identidad",
     mobileGroup: "primary",
+    navGroup: "Principal",
   },
   {
     id: "users",
     href: "/admin/users",
     label: "Usuarios",
     mobileGroup: "primary",
+    navGroup: "Principal",
+  },
+  { id: "jobs", href: "/admin/jobs", label: "Trabajos", mobileGroup: "more", navGroup: "Operación" },
+  {
+    id: "reports",
+    href: "/admin/reports",
+    label: "Reportes",
+    mobileGroup: "more",
+    navGroup: "Operación",
+  },
+  {
+    id: "payments",
+    href: "/admin/payments",
+    label: "Pagos",
+    mobileGroup: "more",
+    navGroup: "Operación",
   },
   {
     id: "providers",
     href: "/admin/providers",
     label: "Prestadores",
     mobileGroup: "more",
+    navGroup: "Personas",
   },
   {
     id: "catalog",
     href: "/admin/catalog",
     label: "Catálogo",
     mobileGroup: "more",
-  },
-  {
-    id: "reports",
-    href: "/admin/reports",
-    label: "Reportes",
-    mobileGroup: "more",
-  },
-  { id: "jobs", href: "/admin/jobs", label: "Trabajos", mobileGroup: "more" },
-  {
-    id: "payments",
-    href: "/admin/payments",
-    label: "Pagos",
-    mobileGroup: "more",
+    navGroup: "Catálogo",
   },
   {
     id: "audit",
     href: "/admin/audit",
     label: "Auditoría",
     mobileGroup: "more",
+    navGroup: "Sistema",
   },
 ] as const;
 

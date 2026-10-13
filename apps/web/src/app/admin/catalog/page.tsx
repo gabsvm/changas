@@ -53,8 +53,31 @@ export default async function AdminCatalogPage() {
         title="Catálogo y servicios"
         description="CRUD administrativo con desactivación reversible como camino normal."
       />
-
-      <div className="grid gap-4 lg:grid-cols-2">
+      <nav
+        aria-label="Secciones del catálogo"
+        className="consumer-scrollbar-none bg-canvas/95 border-ink/[0.06] sticky top-[4.5rem] z-20 -mx-1 flex gap-2 overflow-x-auto px-1 py-2 backdrop-blur-xl"
+      >
+        {(
+          [
+            ["crear", "Crear"],
+            ["solicitudes", "Solicitudes"],
+            ["categorias", "Categorías"],
+            ["skills", "Skills"],
+            ["sinonimos", "Sinónimos"],
+            ["tags", "Tags"],
+            ["moderacion", "Moderación"],
+          ] as Array<[string, string]>
+        ).map(([id, label]) => (
+          <a
+            key={id}
+            href={`#${id}`}
+            className="consumer-pressable border-ink/[0.08] bg-surface text-ink inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-[13px] font-bold"
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+      <div id="crear" className="grid scroll-mt-40 gap-4 lg:grid-cols-2">
         <AdminPanel>
           <form action={createCategoryAction}>
             <h3 className="text-base font-extrabold text-ink">
@@ -204,7 +227,7 @@ export default async function AdminCatalogPage() {
         </AdminPanel>
       </div>
 
-      <div>
+      <div id="solicitudes" className="scroll-mt-40">
         <h3 className="mb-3 text-base font-extrabold text-ink">
           Solicitudes de habilidades
         </h3>
@@ -318,7 +341,7 @@ export default async function AdminCatalogPage() {
         )}
       </div>
 
-      <div>
+      <div id="categorias" className="scroll-mt-40">
         <h3 className="mb-3 text-base font-extrabold text-ink">Categorías</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           {categories.map((category) => (
@@ -438,7 +461,7 @@ export default async function AdminCatalogPage() {
         </div>
       </div>
 
-      <div>
+      <div id="skills" className="scroll-mt-40">
         <h3 className="mb-3 text-base font-extrabold text-ink">Skills</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           {skills.map((skill) => (
@@ -569,7 +592,7 @@ export default async function AdminCatalogPage() {
         </div>
       </div>
 
-      <div>
+      <div id="sinonimos" className="scroll-mt-40">
         <h3 className="mb-3 text-base font-extrabold text-ink">Sinónimos</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           {synonyms.map((synonym) => (
@@ -622,7 +645,7 @@ export default async function AdminCatalogPage() {
         </div>
       </div>
 
-      <div>
+      <div id="tags" className="scroll-mt-40">
         <h3 className="mb-3 text-base font-extrabold text-ink">
           Tags de servicios
         </h3>
@@ -676,7 +699,7 @@ export default async function AdminCatalogPage() {
         </div>
       </div>
 
-      <div>
+      <div id="moderacion" className="scroll-mt-40">
         <h3 className="mb-3 text-base font-extrabold text-ink">
           Moderación de servicios
         </h3>

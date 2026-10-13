@@ -14,12 +14,23 @@ describe("admin navigation", () => {
       "Usuarios",
     ]);
     expect(adminMoreItems.map((item) => item.label)).toEqual([
+      "Trabajos",
+      "Reportes",
+      "Pagos",
       "Prestadores",
       "Catálogo",
-      "Reportes",
-      "Trabajos",
-      "Pagos",
       "Auditoría",
+    ]);
+  });
+
+  it("groups secondary destinations by workflow", () => {
+    expect(adminMoreItems.map((item) => item.navGroup)).toEqual([
+      "Operación",
+      "Operación",
+      "Operación",
+      "Personas",
+      "Catálogo",
+      "Sistema",
     ]);
   });
 

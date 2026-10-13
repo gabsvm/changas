@@ -39,7 +39,7 @@ export default async function AdminProvidersPage({
   return (
     <section className="space-y-6">
       <AdminPageHeader
-        eyebrow="Marketplace"
+        eyebrow="Personas · Prestadores"
         title="Prestadores"
         description="Estado de verificación, progreso de onboarding, documentos, servicios y controles operativos en una sola vista."
       />
