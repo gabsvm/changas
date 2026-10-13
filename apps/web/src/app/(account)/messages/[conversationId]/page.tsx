@@ -196,10 +196,10 @@ export default async function ConversationPage({
     spotlightJob && spotlightTracking && spotlightStatus && spotlightNext
       ? {
           kind: "job" as const,
-          title: spotlightTracking.exception
-            ? spotlightStatus.label
-            : `Paso ${spotlightTracking.currentIndex + 1} de ${spotlightTracking.steps.length} · ${spotlightStatus.label}`,
-          sub: spotlightNext.heading,
+          title: spotlightStatus.label,
+          sub: spotlightTracking.exception
+            ? spotlightNext.heading
+            : `Paso ${spotlightTracking.currentIndex + 1} de ${spotlightTracking.steps.length} · ${spotlightNext.heading}`,
           cta: "Ver seguimiento",
           href: `/jobs/${spotlightJob.job_id}`,
         }
