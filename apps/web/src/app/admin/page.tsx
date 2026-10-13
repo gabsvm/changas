@@ -43,10 +43,12 @@ export default async function AdminPage() {
   const activeProviders = providers.filter(
     (provider) => provider.status === "ACTIVE",
   );
+  const disputedJobs = jobs.filter((job) => job.status === "DISPUTED");
   const hasAttention =
     identityQueue.length > 0 ||
     openReports.length > 0 ||
-    incompleteProviders.length > 0;
+    incompleteProviders.length > 0 ||
+    disputedJobs.length > 0;
 
   return (
     <section className="space-y-7">
@@ -86,15 +88,15 @@ export default async function AdminPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] font-extrabold tracking-[0.14em] text-[#ff7b4c] uppercase">
-              Prioridad
-            </p>
-            <h2 className="mt-1 text-lg font-extrabold text-white">
-              Necesita atención
-            </h2>
+              <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
+                Prioridad
+              </p>
+              <h2 className="font-display mt-1 text-lg font-extrabold text-ink">
+                Necesita atención
+              </h2>
           </div>
           {hasAttention ? (
-            <span className="rounded-full border border-[#d60060]/30 bg-[#d60060]/12 px-2.5 py-1 text-xs font-extrabold text-[#ff79ad]">
+            <span className="border-brand-orange/25 bg-brand-orange/10 text-terracotta rounded-full border px-2.5 py-1 text-xs font-extrabold">
               Acción requerida
             </span>
           ) : null}
@@ -104,23 +106,23 @@ export default async function AdminPage() {
           <div className="grid gap-3 lg:grid-cols-3">
             {identityQueue.length ? (
               <Link
-                className="rounded-3xl border border-[#ffc857]/30 bg-[#ffc857]/10 p-5 transition-colors hover:bg-[#ffc857]/14"
+                className="border-brand-yellow/30 bg-brand-yellow/15 rounded-3xl border p-5 transition-colors"
                 href="/admin/identity"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-extrabold text-[#ffd878]">
+                    <p className="text-warning text-sm font-extrabold">
                       Identidades por revisar
                     </p>
-                    <p className="mt-2 text-3xl font-extrabold text-white">
+                    <p className="text-ink mt-2 text-3xl font-extrabold">
                       {identityQueue.length}
                     </p>
                   </div>
-                  <span className="text-xl text-[#ffd878]" aria-hidden="true">
+                  <span className="text-warning text-xl" aria-hidden="true">
                     →
                   </span>
                 </div>
-                <p className="mt-3 text-xs leading-5 text-[#b6a479]">
+                <p className="text-ink/70 mt-3 text-xs leading-5">
                   Prestadores que ya enviaron documentación completa.
                 </p>
               </Link>
@@ -128,47 +130,71 @@ export default async function AdminPage() {
 
             {openReports.length ? (
               <Link
-                className="rounded-3xl border border-[#ef5350]/30 bg-[#ef5350]/9 p-5 transition-colors hover:bg-[#ef5350]/13"
+                className="border-danger/25 bg-danger/10 rounded-3xl border p-5 transition-colors"
                 href="/admin/reports"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-extrabold text-[#ff7774]">
+                    <p className="text-danger text-sm font-extrabold">
                       Reportes abiertos
                     </p>
-                    <p className="mt-2 text-3xl font-extrabold text-white">
+                    <p className="text-ink mt-2 text-3xl font-extrabold">
                       {openReports.length}
                     </p>
                   </div>
-                  <span className="text-xl text-[#ff7774]" aria-hidden="true">
+                  <span className="text-danger text-xl" aria-hidden="true">
                     →
                   </span>
                 </div>
-                <p className="mt-3 text-xs leading-5 text-[#a98080]">
+                <p className="text-ink/70 mt-3 text-xs leading-5">
                   Casos que todavía no tienen una resolución administrativa.
+                </p>
+              </Link>
+            ) : null}
+
+            {disputedJobs.length ? (
+              <Link
+                className="border-danger/25 bg-danger/10 rounded-3xl border p-5 transition-colors"
+                href="/admin/jobs"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-danger text-sm font-extrabold">
+                      Disputas por resolver
+                    </p>
+                    <p className="text-ink mt-2 text-3xl font-extrabold">
+                      {disputedJobs.length}
+                    </p>
+                  </div>
+                  <span className="text-danger text-xl" aria-hidden="true">
+                    →
+                  </span>
+                </div>
+                <p className="text-ink/70 mt-3 text-xs leading-5">
+                  Trabajos en disputa que esperan resolución con las partes.
                 </p>
               </Link>
             ) : null}
 
             {incompleteProviders.length ? (
               <Link
-                className="rounded-3xl border border-[#4f7dff]/30 bg-[#2563eb]/10 p-5 transition-colors hover:bg-[#2563eb]/14"
+                className="border-moss/25 bg-moss/10 rounded-3xl border p-5 transition-colors"
                 href="/admin/providers"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-extrabold text-[#7ea2ff]">
+                    <p className="text-moss text-sm font-extrabold">
                       Onboarding incompleto
                     </p>
-                    <p className="mt-2 text-3xl font-extrabold text-white">
+                    <p className="text-ink mt-2 text-3xl font-extrabold">
                       {incompleteProviders.length}
                     </p>
                   </div>
-                  <span className="text-xl text-[#7ea2ff]" aria-hidden="true">
+                  <span className="text-moss text-xl" aria-hidden="true">
                     →
                   </span>
                 </div>
-                <p className="mt-3 text-xs leading-5 text-[#8192bb]">
+                <p className="text-ink/70 mt-3 text-xs leading-5">
                   Perfiles creados que todavía no enviaron identidad a revisión.
                 </p>
               </Link>
@@ -177,36 +203,36 @@ export default async function AdminPage() {
         ) : (
           <AdminEmptyState
             title="Todo al día"
-            description="No hay identidades, reportes ni onboardings pendientes que requieran una decisión inmediata."
+            description="No hay identidades, reportes, disputas ni onboardings pendientes que requieran una decisión inmediata."
           />
         )}
       </div>
 
       <AdminPanel>
         <div className="mb-4">
-          <p className="text-[11px] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
+          <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.14em] uppercase">
             Herramientas
           </p>
-          <h2 className="mt-1 text-lg font-extrabold text-white">
+          <h2 className="font-display text-ink mt-1 text-lg font-extrabold">
             Administración completa
           </h2>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {tools.map(([href, title, description]) => (
             <Link
-              className="min-h-24 rounded-2xl border border-[#273142] bg-[#101720] p-4 transition-colors hover:border-[#3a4659] hover:bg-[#17202c]"
+              className="border-ink/[0.08] hover:border-brand-orange/30 min-h-24 rounded-2xl border bg-white p-4 transition-colors dark:border-white/10 dark:bg-[#2a231c]"
               href={href}
               key={href}
             >
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-extrabold text-[#e4e7ec]">
+                <h3 className="text-ink text-sm font-extrabold">
                   {title}
                 </h3>
-                <span className="text-[#596579]" aria-hidden="true">
+                <span className="text-ink/40" aria-hidden="true">
                   ↗
                 </span>
               </div>
-              <p className="mt-2 text-xs leading-5 text-[#7f8a9b]">
+              <p className="text-ink/70 mt-2 text-xs leading-5">
                 {description}
               </p>
             </Link>

@@ -14,12 +14,12 @@ export default async function AdminLayout({
   await requireAdminPage();
 
   return (
-    <div className="admin-shell min-h-dvh bg-[#0b1018] text-white">
+    <div className="admin-shell bg-canvas text-ink min-h-dvh">
       <a className="skip-link" href="#admin-main">
         Ir al contenido
       </a>
 
-      <header className="sticky top-0 z-40 h-[4.5rem] border-b border-[#273142] bg-[#0b1018]/92 backdrop-blur-xl">
+      <header className="bg-canvas/90 border-ink/[0.06] sticky top-0 z-40 h-[4.5rem] border-b backdrop-blur-xl">
         <div className="flex h-full items-center gap-3 px-4 sm:px-6 lg:px-7">
           <Link
             className="flex min-h-12 min-w-0 items-center gap-3 rounded-2xl"
@@ -31,10 +31,10 @@ export default async function AdminLayout({
               aria-hidden="true"
             />
             <div className="min-w-0">
-              <p className="truncate text-[11px] font-extrabold tracking-[0.19em] text-[#ff7b4c] uppercase">
+              <p className="text-terracotta truncate text-[11px] font-extrabold tracking-[0.19em] uppercase">
                 Changas
               </p>
-              <p className="truncate text-sm font-extrabold tracking-[-0.01em] text-white">
+              <p className="text-ink truncate text-sm font-extrabold tracking-[-0.01em]">
                 Administración
               </p>
             </div>
@@ -43,7 +43,7 @@ export default async function AdminLayout({
           <div className="flex-1" />
 
           <Link
-            className="flex min-h-12 items-center gap-2 rounded-xl border border-[#273142] bg-[#121923] px-3 text-xs font-bold text-[#98a2b3] transition-colors hover:border-[#3a4659] hover:text-white"
+            className="border-ink/[0.08] bg-surface text-ink/70 hover:text-ink flex min-h-12 items-center gap-2 rounded-xl border px-3 text-xs font-bold transition-colors"
             href="/"
           >
             <span aria-hidden="true">←</span>

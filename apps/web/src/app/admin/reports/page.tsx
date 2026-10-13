@@ -28,11 +28,11 @@ export default async function AdminReportsPage() {
         title="Reportes"
         description="Casos abiertos primero, decisiones reversibles y evidencia preservada sin borrado destructivo."
         action={
-          <div className="rounded-2xl border border-[#ef5350]/30 bg-[#ef5350]/10 px-4 py-3 text-center">
-            <p className="text-2xl font-extrabold text-[#ff7774]">
+          <div className="rounded-2xl border border-danger/25 bg-danger/10 px-4 py-3 text-center">
+            <p className="text-2xl font-extrabold text-danger">
               {openReports.length}
             </p>
-            <p className="text-[11px] font-extrabold tracking-[0.08em] text-[#a98080] uppercase">
+            <p className="text-[11px] font-extrabold tracking-[0.08em] text-danger uppercase">
               abiertos
             </p>
           </div>
@@ -41,10 +41,10 @@ export default async function AdminReportsPage() {
 
       <AdminPanel>
         <details>
-          <summary className="cursor-pointer text-sm font-extrabold text-[#d0d5dd]">
+          <summary className="cursor-pointer text-sm font-extrabold text-ink">
             Moderación puntual de mensaje
           </summary>
-          <p className="mt-2 text-xs leading-5 text-[#7f8a9b]">
+          <p className="mt-2 text-xs leading-5 text-ink/70">
             Usá esta herramienta cuando ya tengas el UUID exacto del mensaje y
             un motivo de política.
           </p>
@@ -53,14 +53,14 @@ export default async function AdminReportsPage() {
             className="mt-4 grid gap-2 lg:grid-cols-[1fr_1fr_auto]"
           >
             <input
-              className="min-w-0 px-3 py-2 text-sm"
+              className="min-w-0 rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
               name="messageId"
               required
               placeholder="UUID del mensaje"
               aria-label="UUID del mensaje"
             />
             <input
-              className="min-w-0 px-3 py-2 text-sm"
+              className="min-w-0 rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
               name="reason"
               required
               minLength={2}
@@ -68,7 +68,7 @@ export default async function AdminReportsPage() {
               aria-label="Motivo de política"
             />
             <input type="hidden" name="disposition" value="HIDDEN_POLICY" />
-            <button className="min-h-12 rounded-2xl bg-[#ef5350] px-4 py-3 text-sm font-extrabold text-white">
+            <button className="min-h-12 rounded-2xl bg-danger px-4 py-3 text-sm font-extrabold text-white">
               Ocultar mensaje
             </button>
           </form>
@@ -77,7 +77,7 @@ export default async function AdminReportsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">
+          <h2 className="font-display text-base font-extrabold text-ink">
             Necesitan decisión
           </h2>
           <AdminStatusBadge
@@ -90,7 +90,7 @@ export default async function AdminReportsPage() {
           <div className="grid gap-3 lg:grid-cols-2">
             {openReports.map((report) => (
               <article
-                className="rounded-3xl border border-[#273142] bg-[#151c27] p-4 sm:p-5"
+                className="rounded-3xl border border-ink/[0.08] bg-surface p-4 sm:p-5"
                 key={`${report.report_type}-${report.report_id}`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -102,24 +102,24 @@ export default async function AdminReportsPage() {
                       />
                       <AdminStatusBadge label="Abierto" tone="danger" />
                     </div>
-                    <h3 className="mt-3 text-base font-extrabold text-white">
+                    <h3 className="mt-3 text-base font-extrabold text-ink">
                       {report.category}
                     </h3>
-                    <p className="mt-1 text-[11px] break-all text-[#697386]">
+                    <p className="mt-1 text-[11px] break-all text-ink/60">
                       Caso {report.report_id}
                     </p>
                   </div>
                 </div>
 
                 {report.reason ? (
-                  <p className="mt-4 rounded-2xl border border-[#273142] bg-[#101720] p-3 text-sm leading-6 text-[#c5cbd4]">
+                  <p className="mt-4 rounded-2xl border border-ink/[0.08] bg-surface p-3 text-sm leading-6 text-ink">
                     {report.reason}
                   </p>
                 ) : null}
 
                 {report.report_type === "REVIEW_REPORT" ? (
-                  <details className="mt-4 rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <summary className="cursor-pointer text-sm font-extrabold text-[#d0d5dd]">
+                  <details className="mt-4 rounded-2xl border border-ink/[0.08] bg-surface p-3">
+                    <summary className="cursor-pointer text-sm font-extrabold text-ink">
                       Moderar reseña reportada
                     </summary>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -135,13 +135,13 @@ export default async function AdminReportsPage() {
                           value="HIDDEN_POLICY"
                         />
                         <input
-                          className="w-full px-3 py-2 text-sm"
+                          className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                           name="reason"
                           required
                           minLength={2}
                           placeholder="Motivo de ocultación"
                         />
-                        <button className="mt-2 min-h-12 w-full rounded-2xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
+                        <button className="mt-2 min-h-12 w-full rounded-2xl bg-danger px-3 py-2 text-sm font-extrabold text-white">
                           Ocultar reseña
                         </button>
                       </form>
@@ -157,11 +157,11 @@ export default async function AdminReportsPage() {
                           value="RESTORED"
                         />
                         <input
-                          className="w-full px-3 py-2 text-sm"
+                          className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                           name="reason"
                           placeholder="Nota de restauración"
                         />
-                        <button className="mt-2 min-h-12 w-full rounded-2xl border border-[#3a4659] px-3 py-2 text-sm font-extrabold text-[#d0d5dd]">
+                        <button className="mt-2 min-h-12 w-full rounded-2xl border border-ink/[0.08] px-3 py-2 text-sm font-extrabold text-ink">
                           Restaurar reseña
                         </button>
                       </form>
@@ -180,10 +180,10 @@ export default async function AdminReportsPage() {
                     name="reportId"
                     value={report.report_id}
                   />
-                  <label className="block text-xs font-bold text-[#8f99aa]">
+                  <label className="block text-xs font-bold text-ink/70">
                     Resolución del caso
                     <textarea
-                      className="mt-1 min-h-24 w-full px-3 py-2 text-sm"
+                      className="mt-1 min-h-24 w-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                       name="resolution"
                       required
                       minLength={2}
@@ -208,10 +208,10 @@ export default async function AdminReportsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">
+          <h2 className="font-display text-base font-extrabold text-ink">
             Historial resuelto
           </h2>
-          <span className="text-xs font-bold text-[#697386]">
+          <span className="text-xs font-bold text-ink/60">
             {resolvedReports.length} casos
           </span>
         </div>
@@ -219,21 +219,21 @@ export default async function AdminReportsPage() {
           <div className="grid gap-2 lg:grid-cols-2">
             {resolvedReports.map((report) => (
               <article
-                className="rounded-3xl border border-[#273142] bg-[#151c27] p-4"
+                className="rounded-3xl border border-ink/[0.08] bg-surface p-4"
                 key={`${report.report_type}-${report.report_id}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-extrabold text-white">
+                    <p className="text-sm font-extrabold text-ink">
                       {report.category}
                     </p>
-                    <p className="mt-1 text-xs leading-5 text-[#98a2b3]">
+                    <p className="mt-1 text-xs leading-5 text-ink/70">
                       {report.resolution ?? "Resuelto"}
                     </p>
                   </div>
                   <AdminStatusBadge label="Resuelto" tone="success" />
                 </div>
-                <p className="mt-3 text-[11px] break-all text-[#697386]">
+                <p className="mt-3 text-[11px] break-all text-ink/60">
                   {reportTypeLabel(report.report_type)} · {report.report_id}
                 </p>
               </article>

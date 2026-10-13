@@ -74,11 +74,11 @@ export default async function AdminIdentityPage({
         title="Revisión de identidad"
         description="Sólo aparecen en la cola los prestadores que realmente enviaron su identidad. Los archivos siguen privados y cada apertura genera acceso temporal al documento exacto."
         action={
-          <div className="rounded-2xl border border-[#ffc857]/30 bg-[#ffc857]/10 px-4 py-3 text-center">
-            <p className="text-2xl font-extrabold text-[#ffd878]">
+          <div className="rounded-2xl border border-brand-yellow/30 bg-brand-yellow/15 px-4 py-3 text-center">
+            <p className="text-2xl font-extrabold text-warning">
               {queue.length}
             </p>
-            <p className="text-[11px] font-extrabold tracking-[0.08em] text-[#b99a53] uppercase">
+            <p className="text-[11px] font-extrabold tracking-[0.08em] text-ink/60 uppercase">
               pendientes
             </p>
           </div>
@@ -89,15 +89,15 @@ export default async function AdminIdentityPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-[11px] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
+              <p className="text-[11px] font-extrabold tracking-[0.14em] text-ink/60 uppercase">
                 Caso seleccionado
               </p>
-              <h2 className="mt-1 truncate text-xl font-extrabold text-white">
+              <h2 className="mt-1 truncate font-display text-xl font-extrabold text-ink">
                 {identityCase.display_name ??
                   identityCase.email ??
                   identityCase.provider_user_id}
               </h2>
-              <p className="mt-1 truncate text-sm text-[#98a2b3]">
+              <p className="mt-1 truncate text-sm text-ink/70">
                 {identityCase.email ?? identityCase.provider_user_id}
               </p>
             </div>
@@ -107,14 +107,14 @@ export default async function AdminIdentityPage({
             />
           </div>
 
-          <div className="rounded-2xl border border-[#273142] bg-[#101720] p-4">
-            <p className="text-xs font-bold text-[#697386]">
+          <div className="rounded-2xl border border-ink/[0.08] bg-surface p-4">
+            <p className="text-xs font-bold text-ink/60">
               Identidad declarada
             </p>
-            <p className="mt-1 text-sm font-extrabold text-[#d0d5dd]">
+            <p className="mt-1 text-sm font-extrabold text-ink">
               {identityCase.legal_name ?? "Sin nombre legal"}
             </p>
-            <p className="mt-1 text-xs text-[#7f8a9b]">
+            <p className="mt-1 text-xs text-ink/70">
               DNI y fecha de nacimiento se consultan sólo dentro de este
               contexto administrativo.
             </p>
@@ -122,10 +122,10 @@ export default async function AdminIdentityPage({
 
           <div>
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h3 className="text-sm font-extrabold text-white">
+              <h3 className="text-sm font-extrabold text-ink">
                 Evidencia privada
               </h3>
-              <span className="text-xs font-bold text-[#697386]">
+              <span className="text-xs font-bold text-ink/60">
                 {documents.length} archivos
               </span>
             </div>
@@ -143,7 +143,7 @@ export default async function AdminIdentityPage({
             <div className="grid gap-3 sm:grid-cols-2">
               <form
                 action={decideIdentityAction}
-                className="rounded-2xl border border-[#43c982]/25 bg-[#43c982]/8 p-3"
+                className="rounded-2xl border border-success/25 bg-success/10 p-3"
               >
                 <input
                   type="hidden"
@@ -151,10 +151,10 @@ export default async function AdminIdentityPage({
                   value={identityCase.provider_user_id}
                 />
                 <input type="hidden" name="decision" value="APPROVE" />
-                <label className="text-xs font-bold text-[#8f99aa]">
+                <label className="text-xs font-bold text-ink/70">
                   Nota opcional
                   <input
-                    className="mt-1 w-full px-3 py-2 text-sm"
+                    className="mt-1 w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                     name="reason"
                     placeholder="Ej: documentación coincidente"
                   />
@@ -165,7 +165,7 @@ export default async function AdminIdentityPage({
               </form>
               <form
                 action={decideIdentityAction}
-                className="rounded-2xl border border-[#ef5350]/25 bg-[#ef5350]/8 p-3"
+                className="rounded-2xl border border-danger/25 bg-danger/10 p-3"
               >
                 <input
                   type="hidden"
@@ -173,10 +173,10 @@ export default async function AdminIdentityPage({
                   value={identityCase.provider_user_id}
                 />
                 <input type="hidden" name="decision" value="REJECT" />
-                <label className="text-xs font-bold text-[#8f99aa]">
+                <label className="text-xs font-bold text-ink/70">
                   Motivo obligatorio
                   <input
-                    className="mt-1 w-full px-3 py-2 text-sm"
+                    className="mt-1 w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                     name="reason"
                     required
                     minLength={2}
@@ -189,18 +189,18 @@ export default async function AdminIdentityPage({
               </form>
             </div>
           ) : (
-            <div className="rounded-2xl border border-[#273142] bg-[#101720] p-4">
-              <p className="text-sm font-extrabold text-[#d0d5dd]">
+            <div className="rounded-2xl border border-ink/[0.08] bg-surface p-4">
+              <p className="text-sm font-extrabold text-ink">
                 Caso sin decisión pendiente
               </p>
-              <p className="mt-1 text-xs leading-5 text-[#7f8a9b]">
+              <p className="mt-1 text-xs leading-5 text-ink/70">
                 Los controles de decisión quedan bloqueados una vez resuelto el
                 caso. El historial permanece disponible abajo para trazabilidad.
               </p>
               {identityCase.status === "ACTIVE" ? (
                 <button
                   aria-label="Aprobar identidad"
-                  className="mt-3 min-h-12 w-full rounded-2xl border border-[#43c982]/25 bg-[#43c982]/8 px-4 py-3 text-sm font-extrabold text-[#66dda0]"
+                  className="mt-3 min-h-12 w-full rounded-2xl border border-success/25 bg-success/10 px-4 py-3 text-sm font-extrabold text-success"
                   disabled
                   type="button"
                 >
@@ -209,7 +209,7 @@ export default async function AdminIdentityPage({
               ) : identityCase.status === "REJECTED" ? (
                 <button
                   aria-label="Rechazar identidad"
-                  className="mt-3 min-h-12 w-full rounded-2xl border border-[#ef5350]/25 bg-[#ef5350]/8 px-4 py-3 text-sm font-extrabold text-[#ff7774]"
+                  className="mt-3 min-h-12 w-full rounded-2xl border border-danger/25 bg-danger/10 px-4 py-3 text-sm font-extrabold text-danger"
                   disabled
                   type="button"
                 >
@@ -220,17 +220,17 @@ export default async function AdminIdentityPage({
           )}
 
           {history.length ? (
-            <details className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-              <summary className="cursor-pointer text-sm font-extrabold text-[#d0d5dd]">
+            <details className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
+              <summary className="cursor-pointer text-sm font-extrabold text-ink">
                 Historial de decisiones ({history.length})
               </summary>
               <ul className="mt-3 space-y-2">
                 {history.map((item) => (
                   <li
-                    className="rounded-xl border border-[#273142] bg-[#0d131d] p-3 text-xs text-[#98a2b3]"
+                    className="rounded-xl border border-ink/[0.08] bg-surface p-3 text-xs text-ink/70"
                     key={String(item.id ?? item.created_at)}
                   >
-                    <span className="font-extrabold text-[#d0d5dd]">
+                    <span className="font-extrabold text-ink">
                       {String(item.decision ?? "DECISIÓN")}
                     </span>{" "}
                     · {dateTime(item.created_at)}
@@ -245,10 +245,10 @@ export default async function AdminIdentityPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">
+          <h2 className="font-display text-base font-extrabold text-ink">
             Cola de revisión
           </h2>
-          <span className="text-xs font-bold text-[#697386]">
+          <span className="text-xs font-bold text-ink/60">
             Más antiguos primero
           </span>
         </div>
@@ -261,13 +261,13 @@ export default async function AdminIdentityPage({
             </caption>
             <thead>
               <tr>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
                   Prestador
                 </th>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
                   Evidencia
                 </th>
-                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
                   Estado
                 </th>
               </tr>
@@ -276,17 +276,17 @@ export default async function AdminIdentityPage({
               {queue.map((row) => (
                 <tr
                   key={row.provider_user_id}
-                  className="rounded-3xl border border-[#273142] bg-[#151c27] transition-colors hover:border-[#ffc857]/35 hover:bg-[#192230]"
+                  className="rounded-3xl border border-ink/[0.08] bg-surface transition-colors hover:border-brand-yellow/30 hover:bg-ink/[0.04]"
                 >
                   <th scope="row" className="min-w-0 rounded-l-3xl p-4 text-left">
                     <Link
-                      className="block truncate text-sm font-extrabold text-white hover:underline"
+                      className="block truncate text-sm font-extrabold text-ink hover:underline"
                       href={`/admin/identity?provider=${row.provider_user_id}`}
                     >
                       {row.display_name ?? row.email ?? row.provider_user_id}
                     </Link>
                   </th>
-                  <td className="p-4 text-xs text-[#7f8a9b]">
+                  <td className="p-4 text-xs text-ink/70">
                     {row.document_count} documentos · enviado{" "}
                     {dateTime(row.submitted_at ?? row.updated_at)}
                   </td>

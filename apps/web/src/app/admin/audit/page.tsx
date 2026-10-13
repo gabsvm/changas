@@ -28,22 +28,22 @@ export default async function AdminAuditPage() {
         <div className="space-y-2">
           {events.map((event) => (
             <article
-              className="rounded-3xl border border-[#273142] bg-[#151c27] p-4"
+              className="rounded-3xl border border-ink/[0.08] bg-surface p-4"
               key={event.event_id}
             >
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-sm font-extrabold text-white">
+                  <p className="text-sm font-extrabold text-ink">
                     {humanAction(event.action_type)}
                   </p>
-                  <code className="mt-1 block truncate text-[11px] font-bold tracking-[0.04em] text-[#596579]">
+                  <code className="mt-1 block truncate text-[11px] font-bold tracking-[0.04em] text-ink/40">
                     {event.action_type}
                   </code>
-                  <p className="mt-1 truncate text-xs text-[#7f8a9b]">
+                  <p className="mt-1 truncate text-xs text-ink/70">
                     {event.target_type} · {event.target_id ?? "sin target"}
                   </p>
                 </div>
-                <time className="shrink-0 text-xs font-semibold text-[#697386]">
+                <time className="shrink-0 text-xs font-semibold text-ink/60">
                   {new Date(event.created_at).toLocaleString("es-AR")}
                 </time>
               </div>

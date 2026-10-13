@@ -87,8 +87,8 @@ export default async function AdminPaymentsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">Movimientos</h2>
-          <span className="text-xs font-bold text-[#697386]">
+          <h2 className="text-base font-display font-extrabold text-ink">Movimientos</h2>
+          <span className="text-xs font-bold text-ink/60">
             {payments.length} registros
           </span>
         </div>
@@ -99,17 +99,17 @@ export default async function AdminPaymentsPage() {
               <article
                 className={`rounded-3xl border p-4 sm:p-5 ${
                   payment.mismatchFlag
-                    ? "border-[#ef5350]/35 bg-[#ef5350]/7"
-                    : "border-[#273142] bg-[#151c27]"
+                    ? "border-danger/25 bg-danger/10"
+                    : "border-ink/[0.08] bg-surface"
                 }`}
                 key={payment.paymentAttemptId}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-extrabold text-white">
+                    <p className="truncate text-sm font-extrabold text-ink">
                       {payment.providerName}
                     </p>
-                    <p className="mt-1 text-[11px] break-all text-[#697386]">
+                    <p className="mt-1 text-[11px] break-all text-ink/60">
                       Ref. {payment.providerReference}
                     </p>
                   </div>
@@ -120,72 +120,72 @@ export default async function AdminPaymentsPage() {
                 </div>
 
                 <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                  <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[11px] font-bold text-[#697386]">
+                  <div className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
+                    <dt className="text-[11px] font-bold text-ink/60">
                       Estado local
                     </dt>
-                    <dd className="mt-1 font-extrabold text-[#d0d5dd]">
+                    <dd className="mt-1 font-extrabold text-ink">
                       {paymentStatusLabel(payment.localStatus)}
                     </dd>
                   </div>
-                  <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[11px] font-bold text-[#697386]">
+                  <div className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
+                    <dt className="text-[11px] font-bold text-ink/60">
                       Proveedor de pago
                     </dt>
-                    <dd className="mt-1 font-extrabold text-[#d0d5dd]">
+                    <dd className="mt-1 font-extrabold text-ink">
                       {paymentStatusLabel(payment.providerStatus)}
                     </dd>
                   </div>
-                  <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[11px] font-bold text-[#697386]">
+                  <div className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
+                    <dt className="text-[11px] font-bold text-ink/60">
                       Bruto
                     </dt>
-                    <dd className="mt-1 font-extrabold text-white">
+                    <dd className="mt-1 font-extrabold text-ink">
                       {money(payment.grossMinor)}
                     </dd>
                   </div>
-                  <div className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                    <dt className="text-[11px] font-bold text-[#697386]">
+                  <div className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
+                    <dt className="text-[11px] font-bold text-ink/60">
                       Comisión Changas
                     </dt>
-                    <dd className="mt-1 font-extrabold text-white">
+                    <dd className="mt-1 font-extrabold text-ink">
                       {money(payment.marketplaceFeeMinor)}
                     </dd>
                   </div>
                 </dl>
 
-                <details className="mt-3 rounded-2xl border border-[#273142] bg-[#101720] p-3">
-                  <summary className="cursor-pointer text-sm font-extrabold text-[#d0d5dd]">
+                <details className="mt-3 rounded-2xl border border-ink/[0.08] bg-surface p-3">
+                  <summary className="cursor-pointer text-sm font-extrabold text-ink">
                     Ver detalle financiero
                   </summary>
                   <dl className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
                     <div>
-                      <dt className="font-bold text-[#697386]">
+                      <dt className="font-bold text-ink/60">
                         Neto esperado prestador
                       </dt>
-                      <dd className="mt-1 font-semibold text-[#d0d5dd]">
+                      <dd className="mt-1 font-semibold text-ink">
                         {money(payment.providerExpectedNetMinor)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-bold text-[#697386]">
+                      <dt className="font-bold text-ink/60">
                         Costo proveedor de pago
                       </dt>
-                      <dd className="mt-1 font-semibold text-[#d0d5dd]">
+                      <dd className="mt-1 font-semibold text-ink">
                         {money(payment.providerFeeMinor)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-bold text-[#697386]">
+                      <dt className="font-bold text-ink/60">
                         Neto observado
                       </dt>
-                      <dd className="mt-1 font-semibold text-[#d0d5dd]">
+                      <dd className="mt-1 font-semibold text-ink">
                         {money(payment.providerNetReceivedMinor)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-bold text-[#697386]">Reembolsado</dt>
-                      <dd className="mt-1 font-semibold text-[#d0d5dd]">
+                      <dt className="font-bold text-ink/60">Reembolsado</dt>
+                      <dd className="mt-1 font-semibold text-ink">
                         {money(payment.refundedMinor)}
                         {payment.refundStatus
                           ? ` · ${payment.refundStatus}`
@@ -195,7 +195,7 @@ export default async function AdminPaymentsPage() {
                   </dl>
                 </details>
 
-                <p className="mt-3 text-[11px] leading-5 text-[#697386]">
+                <p className="mt-3 text-[11px] leading-5 text-ink/60">
                   Settlement: {payment.settlementStatus ?? "—"} · Última
                   conciliación: {dateTime(payment.lastReconciledAt)}
                 </p>
@@ -212,10 +212,10 @@ export default async function AdminPaymentsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">
+          <h2 className="text-base font-display font-extrabold text-ink">
             Ejecuciones de conciliación
           </h2>
-          <span className="text-xs font-bold text-[#697386]">
+          <span className="text-xs font-bold text-ink/60">
             {runs.length} ejecuciones
           </span>
         </div>
@@ -224,15 +224,15 @@ export default async function AdminPaymentsPage() {
           <div className="grid gap-2 lg:grid-cols-2">
             {runs.map((run) => (
               <article
-                className="rounded-3xl border border-[#273142] bg-[#151c27] p-4"
+                className="rounded-3xl border border-ink/[0.08] bg-surface p-4"
                 key={run.runId}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-extrabold text-white">
+                    <p className="truncate text-sm font-extrabold text-ink">
                       {run.providerName ?? "Proveedor de pago"}
                     </p>
-                    <p className="mt-1 text-xs text-[#697386]">
+                    <p className="mt-1 text-xs text-ink/60">
                       {dateTime(run.startedAt)}
                     </p>
                   </div>
@@ -253,18 +253,18 @@ export default async function AdminPaymentsPage() {
                     ["Fallos", run.failedCount],
                   ].map(([label, value]) => (
                     <div
-                      className="rounded-xl border border-[#273142] bg-[#101720] p-2.5"
+                      className="rounded-xl border border-ink/[0.08] bg-surface p-2.5"
                       key={label}
                     >
-                      <p className="font-bold text-[#697386]">{label}</p>
-                      <p className="mt-1 text-base font-extrabold text-[#d0d5dd]">
+                      <p className="font-bold text-ink/60">{label}</p>
+                      <p className="mt-1 text-base font-extrabold text-ink">
                         {value}
                       </p>
                     </div>
                   ))}
                 </div>
                 {run.errorSummary ? (
-                  <p className="mt-3 rounded-xl border border-[#ef5350]/25 bg-[#ef5350]/8 p-3 text-xs leading-5 text-[#ff7774]">
+                  <p className="mt-3 rounded-xl border border-danger/25 bg-danger/10 p-3 text-xs leading-5 text-danger">
                     {run.errorSummary}
                   </p>
                 ) : null}

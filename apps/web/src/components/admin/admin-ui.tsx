@@ -3,12 +3,12 @@ import type { ReactNode } from "react";
 type Tone = "neutral" | "pending" | "success" | "info" | "danger" | "pink";
 
 const toneClasses: Record<Tone, string> = {
-  neutral: "border-[#334055] bg-[#1a2330] text-[#a7b0bf]",
-  pending: "border-[#ffc857]/30 bg-[#ffc857]/10 text-[#ffd878]",
-  success: "border-[#43c982]/30 bg-[#43c982]/10 text-[#66dda0]",
-  info: "border-[#4f7dff]/30 bg-[#2563eb]/12 text-[#7ea2ff]",
-  danger: "border-[#ef5350]/30 bg-[#ef5350]/10 text-[#ff7774]",
-  pink: "border-[#d60060]/30 bg-[#d60060]/12 text-[#ff6aa5]",
+  neutral: "border-ink/10 bg-ink/[0.04] text-ink/70",
+  pending: "border-brand-yellow/30 bg-brand-yellow/15 text-warning",
+  success: "border-success/25 bg-success/10 text-success",
+  info: "border-moss/25 bg-moss/10 text-moss",
+  danger: "border-danger/25 bg-danger/10 text-danger",
+  pink: "border-brand-orange/25 bg-brand-orange/10 text-terracotta",
 };
 
 export function AdminPageHeader({
@@ -25,14 +25,14 @@ export function AdminPageHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <p className="text-[11px] font-extrabold tracking-[0.16em] text-[#ff7b4c] uppercase">
+        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
           {eyebrow}
         </p>
-        <h1 className="mt-1 text-2xl font-extrabold tracking-[-0.03em] text-white sm:text-3xl">
+        <h1 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.03em] text-ink sm:text-3xl">
           {title}
         </h1>
         {description ? (
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#98a2b3]">
+          <p className="text-ink/70 mt-2 max-w-2xl text-sm leading-6">
             {description}
           </p>
         ) : null}
@@ -51,7 +51,7 @@ export function AdminPanel({
 }) {
   return (
     <section
-      className={`rounded-3xl border border-[#273142] bg-[#151c27] p-4 shadow-[0_16px_42px_rgba(0,0,0,0.16)] sm:p-5 ${className}`}
+      className={`border-ink/[0.08] bg-surface consumer-card rounded-3xl border p-4 sm:p-5 ${className}`}
     >
       {children}
     </section>
@@ -82,13 +82,13 @@ export function AdminEmptyState({
   description?: string;
 }) {
   return (
-    <div className="rounded-3xl border border-dashed border-[#303b4d] bg-[#111822] px-5 py-8 text-center">
-      <div className="mx-auto grid h-11 w-11 place-items-center rounded-2xl border border-[#2a3445] bg-[#0d131d] text-lg text-[#596579]">
+    <div className="border-ink/[0.08] rounded-3xl border border-dashed px-5 py-8 text-center">
+      <div className="bg-ink/[0.04] text-ink/40 mx-auto grid h-11 w-11 place-items-center rounded-2xl text-lg">
         ✓
       </div>
-      <p className="mt-3 text-sm font-extrabold text-[#d0d5dd]">{title}</p>
+      <p className="text-ink mt-3 text-sm font-extrabold">{title}</p>
       {description ? (
-        <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-[#7f8a9b]">
+        <p className="text-ink/70 mx-auto mt-1 max-w-md text-xs leading-5">
           {description}
         </p>
       ) : null}
@@ -108,17 +108,17 @@ export function AdminMetricCard({
   tone?: Tone;
 }) {
   return (
-    <div className="rounded-3xl border border-[#273142] bg-[#151c27] p-4">
+    <div className="border-ink/[0.08] bg-surface consumer-card rounded-3xl border p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-bold text-[#8f99aa]">{label}</p>
+        <p className="text-ink/70 text-xs font-bold">{label}</p>
         <span
           className={`mt-1 h-2.5 w-2.5 rounded-full border ${toneClasses[tone]}`}
         />
       </div>
-      <p className="mt-2 text-3xl font-extrabold tracking-[-0.04em] text-white">
+      <p className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] text-ink">
         {value}
       </p>
-      {hint ? <p className="mt-1 text-xs text-[#697386]">{hint}</p> : null}
+      {hint ? <p className="text-ink/60 mt-1 text-xs">{hint}</p> : null}
     </div>
   );
 }
