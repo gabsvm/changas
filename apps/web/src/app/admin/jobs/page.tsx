@@ -19,30 +19,30 @@ export default async function AdminJobsPage() {
         <div className="grid gap-2 lg:grid-cols-2">
           {jobs.map((job) => (
             <article
-              className="rounded-3xl border border-[#273142] bg-[#151c27] p-4"
+              className="rounded-3xl border border-ink/[0.08] bg-surface p-4"
               key={job.job_id}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-extrabold text-white">
+                  <p className="truncate text-sm font-extrabold text-ink">
                     {job.service_title}
                   </p>
-                  <p className="mt-1 truncate text-[11px] text-[#697386]">
+                  <p className="mt-1 truncate text-[11px] text-ink/60">
                     {job.job_id}
                   </p>
                 </div>
                 <AdminStatusBadge label={job.status} tone="info" />
               </div>
-              <div className="mt-4 grid gap-2 rounded-2xl border border-[#273142] bg-[#101720] p-3 text-xs sm:grid-cols-2">
+              <div className="mt-4 grid gap-2 rounded-2xl border border-ink/[0.08] bg-surface p-3 text-xs sm:grid-cols-2">
                 <div>
-                  <p className="font-bold text-[#697386]">Cliente</p>
-                  <p className="mt-1 truncate font-semibold text-[#d0d5dd]">
+                  <p className="font-bold text-ink/60">Cliente</p>
+                  <p className="mt-1 truncate font-semibold text-ink">
                     {job.client_display_name ?? job.client_user_id}
                   </p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#697386]">Prestador</p>
-                  <p className="mt-1 truncate font-semibold text-[#d0d5dd]">
+                  <p className="font-bold text-ink/60">Prestador</p>
+                  <p className="mt-1 truncate font-semibold text-ink">
                     {job.provider_display_name ?? job.provider_user_id}
                   </p>
                 </div>
@@ -58,7 +58,7 @@ export default async function AdminJobsPage() {
                     <form
                       key={resolution}
                       action={resolveJobDisputeAction}
-                      className="rounded-2xl border border-[#273142] bg-[#101720] p-3"
+                      className="rounded-2xl border border-ink/[0.08] bg-surface p-3"
                     >
                       <input type="hidden" name="jobId" value={job.job_id} />
                       <input
@@ -67,13 +67,13 @@ export default async function AdminJobsPage() {
                         value={resolution}
                       />
                       <input
-                        className="w-full rounded-md border border-slate-600 bg-[#0d131d] px-2 py-2 text-sm text-[#d0d5dd]"
+                        className="w-full rounded-md border border-ink/10 bg-white px-2 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                         name="reason"
                         required
                         minLength={2}
                         placeholder="Motivo de la resolución"
                       />
-                      <button className="mt-2 w-full rounded-xl border border-[#3a4659] px-2 py-2 text-sm font-extrabold text-[#d0d5dd]">
+                      <button className="mt-2 w-full rounded-xl border border-ink/[0.08] px-2 py-2 text-sm font-extrabold text-ink">
                         {label}
                       </button>
                     </form>

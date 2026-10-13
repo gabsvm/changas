@@ -51,7 +51,7 @@ export default async function AdminUsersPage({
 
       <form className="flex gap-2" method="get">
         <input
-          className="min-w-0 flex-1 px-4 py-3"
+          className="min-w-0 flex-1 border border-ink/10 bg-white px-4 py-3 text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
           name="q"
           defaultValue={query}
           placeholder="Email o nombre"
@@ -64,10 +64,10 @@ export default async function AdminUsersPage({
 
       {invalidSelection ? (
         <AdminPanel>
-          <p className="text-sm font-bold text-white">
+          <p className="text-sm font-bold text-ink">
             No pudimos cargar esa cuenta.
           </p>
-          <p className="mt-1 text-sm text-[#98a2b3]">
+          <p className="mt-1 text-sm text-ink/70">
             Verificá el identificador o elegí una cuenta desde la lista.
           </p>
         </AdminPanel>
@@ -77,13 +77,13 @@ export default async function AdminUsersPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-[11px] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
+              <p className="text-[11px] font-extrabold tracking-[0.14em] text-ink/60 uppercase">
                 Cuenta seleccionada
               </p>
-              <h2 className="mt-1 truncate text-xl font-extrabold text-white">
+              <h2 className="mt-1 truncate font-display text-xl font-extrabold text-ink">
                 {detail.display_name ?? detail.email ?? detail.user_id}
               </h2>
-              <p className="mt-1 truncate text-sm text-[#98a2b3]">
+              <p className="mt-1 truncate text-sm text-ink/70">
                 {detail.email ?? "Sin email"}
               </p>
             </div>
@@ -99,18 +99,18 @@ export default async function AdminUsersPage({
             </div>
           </div>
 
-          <dl className="grid gap-3 rounded-2xl border border-[#273142] bg-[#101720] p-4 text-sm sm:grid-cols-2">
+          <dl className="grid gap-3 rounded-2xl border border-ink/[0.08] bg-surface p-4 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-xs font-bold text-[#697386]">Nombre legal</dt>
-              <dd className="mt-1 font-semibold text-[#d0d5dd]">
+              <dt className="text-xs font-bold text-ink/60">Nombre legal</dt>
+              <dd className="mt-1 font-semibold text-ink">
                 {detail.legal_name ?? "No cargado"}
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-bold text-[#697386]">
+              <dt className="text-xs font-bold text-ink/60">
                 Estado de prestador
               </dt>
-              <dd className="mt-1 font-semibold text-[#d0d5dd]">
+              <dd className="mt-1 font-semibold text-ink">
                 {providerLabel(detail.provider_status)}
               </dd>
             </div>
@@ -118,10 +118,10 @@ export default async function AdminUsersPage({
 
           <div>
             <div className="mb-3">
-              <p className="text-sm font-extrabold text-white">
+              <p className="text-sm font-extrabold text-ink">
                 Habilitación como prestador
               </p>
-              <p className="mt-1 text-xs leading-5 text-[#7f8a9b]">
+              <p className="mt-1 text-xs leading-5 text-ink/70">
                 El camino normal conserva onboarding y revisión. La activación
                 manual es un bypass auditado.
               </p>
@@ -132,21 +132,21 @@ export default async function AdminUsersPage({
             />
           </div>
 
-          <details className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-            <summary className="cursor-pointer text-sm font-extrabold text-[#d0d5dd]">
+          <details className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
+            <summary className="cursor-pointer text-sm font-extrabold text-ink">
               Restricciones de cuenta
             </summary>
             <div className="mt-3 grid gap-3 lg:grid-cols-3">
               {(["RESTRICTED", "SUSPENDED"] as const).map((kind) => (
                 <form
                   action={setAccountRestrictionAction}
-                  className="rounded-2xl border border-[#273142] bg-[#0d131d] p-3"
+                  className="rounded-2xl border border-ink/[0.08] bg-surface p-3"
                   key={kind}
                 >
                   <input type="hidden" name="userId" value={detail.user_id} />
                   <input type="hidden" name="kind" value={kind} />
                   <input
-                    className="w-full px-3 py-2 text-sm"
+                    className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                     name="reason"
                     required
                     minLength={3}
@@ -161,15 +161,15 @@ export default async function AdminUsersPage({
               ))}
               <form
                 action={restoreAccountAction}
-                className="rounded-2xl border border-[#273142] bg-[#0d131d] p-3"
+                className="rounded-2xl border border-ink/[0.08] bg-surface p-3"
               >
                 <input type="hidden" name="userId" value={detail.user_id} />
                 <input
-                  className="w-full px-3 py-2 text-sm"
+                  className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="reason"
                   placeholder="Motivo de restauración"
                 />
-                <button className="mt-2 min-h-11 w-full rounded-xl border border-[#3a4659] px-3 py-2 text-sm font-extrabold text-[#d0d5dd]">
+                <button className="mt-2 min-h-11 w-full rounded-xl border border-ink/[0.08] px-3 py-2 text-sm font-extrabold text-ink">
                   Restaurar cuenta
                 </button>
               </form>
@@ -180,8 +180,8 @@ export default async function AdminUsersPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">Cuentas</h2>
-          <span className="rounded-full border border-[#273142] bg-[#151c27] px-2.5 py-1 text-xs font-bold text-[#8f99aa]">
+          <h2 className="font-display text-base font-extrabold text-ink">Cuentas</h2>
+          <span className="rounded-full border border-ink/[0.08] bg-surface px-2.5 py-1 text-xs font-bold text-ink/70">
             {users.length}
           </span>
         </div>
@@ -194,13 +194,13 @@ export default async function AdminUsersPage({
             </caption>
             <thead>
               <tr>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
                   Cuenta
                 </th>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
                   Contacto
                 </th>
-                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
                   Estado
                 </th>
               </tr>
@@ -209,22 +209,22 @@ export default async function AdminUsersPage({
               {users.map((user) => (
                 <tr
                   key={user.user_id}
-                  className="rounded-3xl border border-[#273142] bg-[#151c27] transition-colors hover:border-[#3a4659] hover:bg-[#192230]"
+                  className="rounded-3xl border border-ink/[0.08] bg-surface transition-colors hover:border-brand-orange/30 hover:bg-ink/[0.04]"
                 >
                   <th scope="row" className="min-w-0 rounded-l-3xl p-4 text-left">
                     <Link
-                      className="block truncate text-sm font-extrabold text-white hover:underline"
+                      className="block truncate text-sm font-extrabold text-ink hover:underline"
                       href={`/admin/users?q=${encodeURIComponent(query)}&user=${user.user_id}`}
                     >
                       {user.display_name ?? user.email ?? user.user_id}
                     </Link>
                     {user.role === "admin" ? (
-                      <span className="text-[11px] font-extrabold text-[#ff79ad]">
+                      <span className="text-[11px] font-extrabold text-terracotta">
                         ADMIN
                       </span>
                     ) : null}
                   </th>
-                  <td className="max-w-45 truncate p-4 text-xs text-[#7f8a9b]">
+                  <td className="max-w-45 truncate p-4 text-xs text-ink/70">
                     {user.email ?? user.user_id}
                   </td>
                   <td className="rounded-r-3xl p-4 text-right">

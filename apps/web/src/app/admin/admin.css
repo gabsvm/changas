@@ -1,13 +1,23 @@
 .admin-shell {
+  --admin-bg: #fbf8f3;
+  --admin-surface: #ffffff;
+  --admin-surface-2: #f3efe9;
+  --admin-border: rgb(23 20 15 / 8%);
+  --admin-muted: rgb(23 20 15 / 65%);
+  --admin-orange: #ff6b35;
+  --admin-yellow: #ffc857;
+  --admin-blue: #2563eb;
+  --admin-pink: #d60060;
+  color-scheme: light;
+  background: var(--admin-bg);
+}
+
+.dark .admin-shell {
   --admin-bg: #0b1018;
   --admin-surface: #151c27;
   --admin-surface-2: #111822;
   --admin-border: #273142;
   --admin-muted: #98a2b3;
-  --admin-orange: #ff6b35;
-  --admin-yellow: #ffc857;
-  --admin-blue: #2563eb;
-  --admin-pink: #d60060;
   color-scheme: dark;
   background:
     radial-gradient(circle at 92% 4%, rgb(255 107 53 / 8%), transparent 28rem),
@@ -23,7 +33,7 @@
    the same page-heading hierarchy while they migrate to shared primitives. */
 .admin-shell .admin-main > div > section > div:first-child > h2 {
   margin: 0;
-  color: #fff;
+  color: #17140f;
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.03em;
@@ -47,7 +57,7 @@
 .admin-shell .text-slate-950,
 .admin-shell .text-slate-900,
 .admin-shell .text-slate-800 {
-  color: #f8fafc;
+  color: #17140f;
 }
 
 .admin-shell .text-slate-700,
@@ -69,47 +79,47 @@
 
 .admin-shell .hover\:bg-slate-100:hover,
 .admin-shell .hover\:bg-slate-800:hover {
-  background-color: #1d2633;
+  background-color: rgb(23 20 15 / 5%);
 }
 
 .admin-shell .bg-amber-100 {
-  background-color: rgb(255 200 87 / 12%);
+  background-color: rgb(255 200 87 / 22%);
 }
 
 .admin-shell .text-amber-900 {
-  color: #ffd878;
+  color: #9a6500;
 }
 
 .admin-shell .bg-emerald-100 {
-  background-color: rgb(67 201 130 / 12%);
+  background-color: rgb(47 125 74 / 12%);
 }
 
 .admin-shell .text-emerald-800 {
-  color: #66dda0;
+  color: #2f7d4a;
 }
 
 .admin-shell .bg-red-100 {
-  background-color: rgb(239 83 80 / 12%);
+  background-color: rgb(201 60 50 / 8%);
 }
 
 .admin-shell .text-red-800,
 .admin-shell .text-red-700 {
-  color: #ff7774;
+  color: #c93c32;
 }
 
 .admin-shell input:not([type="hidden"]),
 .admin-shell select,
 .admin-shell textarea {
   min-height: 3rem;
-  border-color: #2c3748;
-  background: #0d131d;
-  color: #f8fafc;
+  border-color: rgb(23 20 15 / 12%);
+  background: #ffffff;
+  color: #17140f;
   border-radius: 0.9rem;
 }
 
 .admin-shell input::placeholder,
 .admin-shell textarea::placeholder {
-  color: #596579;
+  color: rgb(23 20 15 / 40%);
 }
 
 .admin-shell input:focus,
@@ -148,11 +158,11 @@
 }
 
 .admin-shell th {
-  color: #697386;
+  color: rgb(23 20 15 / 55%);
 }
 
 .admin-shell td {
-  border-color: rgb(39 49 66 / 75%);
+  border-color: rgb(23 20 15 / 7%);
 }
 
 @keyframes admin-enter {
@@ -170,4 +180,53 @@
   .admin-shell .admin-main > div > section {
     animation: none;
   }
+}
+
+.dark .admin-shell .admin-main > div > section > div:first-child > h2 {
+  color: #fff;
+}
+.dark .admin-shell .text-slate-950,
+.dark .admin-shell .text-slate-900,
+.dark .admin-shell .text-slate-800 {
+  color: #f8fafc;
+}
+.dark .admin-shell .hover\:bg-slate-100:hover,
+.dark .admin-shell .hover\:bg-slate-800:hover {
+  background-color: #1d2633;
+}
+.dark .admin-shell .bg-amber-100 {
+  background-color: rgb(255 200 87 / 12%);
+}
+.dark .admin-shell .text-amber-900 {
+  color: #ffd878;
+}
+.dark .admin-shell .bg-emerald-100 {
+  background-color: rgb(67 201 130 / 12%);
+}
+.dark .admin-shell .text-emerald-800 {
+  color: #66dda0;
+}
+.dark .admin-shell .bg-red-100 {
+  background-color: rgb(239 83 80 / 12%);
+}
+.dark .admin-shell .text-red-800,
+.dark .admin-shell .text-red-700 {
+  color: #ff7774;
+}
+.dark .admin-shell input:not([type="hidden"]),
+.dark .admin-shell select,
+.dark .admin-shell textarea {
+  border-color: #2c3748;
+  background: #0d131d;
+  color: #f8fafc;
+}
+.dark .admin-shell input::placeholder,
+.dark .admin-shell textarea::placeholder {
+  color: #596579;
+}
+.dark .admin-shell th {
+  color: #697386;
+}
+.dark .admin-shell td {
+  border-color: rgb(39 49 66 / 75%);
 }

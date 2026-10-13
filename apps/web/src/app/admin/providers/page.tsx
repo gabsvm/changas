@@ -46,7 +46,7 @@ export default async function AdminProvidersPage({
 
       <form className="flex gap-2" method="get">
         <input
-          className="min-w-0 flex-1 px-4 py-3"
+          className="min-w-0 flex-1 border border-ink/10 bg-white px-4 py-3 text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
           name="q"
           defaultValue={query}
           placeholder="Nombre, email o slug"
@@ -61,13 +61,13 @@ export default async function AdminProvidersPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-[11px] font-extrabold tracking-[0.14em] text-[#697386] uppercase">
+              <p className="text-[11px] font-extrabold tracking-[0.14em] text-ink/60 uppercase">
                 Prestador seleccionado
               </p>
-              <h2 className="mt-1 truncate text-xl font-extrabold text-white">
+              <h2 className="mt-1 truncate font-display text-xl font-extrabold text-ink">
                 {detail.display_name ?? detail.public_slug}
               </h2>
-              <p className="mt-1 truncate text-sm text-[#98a2b3]">
+              <p className="mt-1 truncate text-sm text-ink/70">
                 {detail.email ?? "Sin email"}
               </p>
             </div>
@@ -88,11 +88,11 @@ export default async function AdminProvidersPage({
               ],
             ].map(([label, value]) => (
               <div
-                className="rounded-2xl border border-[#273142] bg-[#101720] p-3"
+                className="rounded-2xl border border-ink/[0.08] bg-surface p-3"
                 key={label}
               >
-                <p className="text-[11px] font-bold text-[#697386]">{label}</p>
-                <p className="mt-1 text-sm font-extrabold text-[#d0d5dd]">
+                <p className="text-[11px] font-bold text-ink/60">{label}</p>
+                <p className="mt-1 text-sm font-extrabold text-ink">
                   {value}
                 </p>
               </div>
@@ -104,8 +104,8 @@ export default async function AdminProvidersPage({
             providerStatus={detail.status}
           />
 
-          <details className="rounded-2xl border border-[#273142] bg-[#101720] p-3">
-            <summary className="cursor-pointer text-sm font-extrabold text-[#d0d5dd]">
+          <details className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
+            <summary className="cursor-pointer text-sm font-extrabold text-ink">
               Restricciones operativas
             </summary>
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -117,7 +117,7 @@ export default async function AdminProvidersPage({
                 />
                 <input type="hidden" name="kind" value="RESTRICTED" />
                 <input
-                  className="w-full px-3 py-2 text-sm"
+                  className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="reason"
                   required
                   minLength={3}
@@ -135,7 +135,7 @@ export default async function AdminProvidersPage({
                 />
                 <input type="hidden" name="kind" value="SUSPENDED" />
                 <input
-                  className="w-full px-3 py-2 text-sm"
+                  className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="reason"
                   required
                   minLength={3}
@@ -152,11 +152,11 @@ export default async function AdminProvidersPage({
                   value={detail.provider_user_id}
                 />
                 <input
-                  className="w-full px-3 py-2 text-sm"
+                  className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="reason"
                   placeholder="Motivo"
                 />
-                <button className="mt-2 min-h-11 w-full rounded-xl border border-[#3a4659] px-3 py-2 text-sm font-extrabold text-[#d0d5dd]">
+                <button className="mt-2 min-h-11 w-full rounded-xl border border-ink/[0.08] px-3 py-2 text-sm font-extrabold text-ink">
                   Restaurar
                 </button>
               </form>
@@ -167,10 +167,10 @@ export default async function AdminProvidersPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-extrabold text-white">
+          <h2 className="font-display text-base font-extrabold text-ink">
             Prestadores registrados
           </h2>
-          <span className="rounded-full border border-[#273142] bg-[#151c27] px-2.5 py-1 text-xs font-bold text-[#8f99aa]">
+          <span className="rounded-full border border-ink/[0.08] bg-surface px-2.5 py-1 text-xs font-bold text-ink/70">
             {providers.length}
           </span>
         </div>
@@ -183,13 +183,13 @@ export default async function AdminProvidersPage({
             </caption>
             <thead>
               <tr>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
                   Prestador
                 </th>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
                   Contacto
                 </th>
-                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-[#8f99aa] uppercase">
+                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
                   Estado
                 </th>
               </tr>
@@ -198,21 +198,21 @@ export default async function AdminProvidersPage({
               {providers.map((provider) => (
                 <tr
                   key={provider.provider_user_id}
-                  className="rounded-3xl border border-[#273142] bg-[#151c27] transition-colors hover:border-[#3a4659] hover:bg-[#192230]"
+                  className="rounded-3xl border border-ink/[0.08] bg-surface transition-colors hover:border-brand-orange/30 hover:bg-ink/[0.04]"
                 >
                   <th scope="row" className="min-w-0 rounded-l-3xl p-4 text-left">
                     <Link
-                      className="block truncate text-sm font-extrabold text-white hover:underline"
+                      className="block truncate text-sm font-extrabold text-ink hover:underline"
                       href={`/admin/providers?q=${encodeURIComponent(query)}&provider=${provider.provider_user_id}`}
                     >
                       {provider.display_name ?? provider.public_slug}
                     </Link>
-                    <span className="mt-2 block text-[11px] font-bold text-[#697386]">
+                    <span className="mt-2 block text-[11px] font-bold text-ink/60">
                       Paso {provider.onboarding_step}/4 ·{" "}
                       {provider.document_count} docs
                     </span>
                   </th>
-                  <td className="max-w-45 truncate p-4 text-xs text-[#7f8a9b]">
+                  <td className="max-w-45 truncate p-4 text-xs text-ink/70">
                     {provider.email ?? provider.public_slug}
                   </td>
                   <td className="rounded-r-3xl p-4 text-right">

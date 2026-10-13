@@ -132,8 +132,8 @@ export function AdminNavigation() {
 
   return (
     <>
-      <aside className="admin-sidebar fixed top-[4.5rem] bottom-0 left-0 z-30 hidden w-64 border-r border-[#273142] bg-[#0d131d]/95 p-4 backdrop-blur-xl lg:block">
-        <p className="px-3 pb-2 text-[11px] font-extrabold tracking-[0.18em] text-[#697386] uppercase">
+      <aside className="admin-sidebar bg-canvas/95 border-ink/[0.06] fixed top-[4.5rem] bottom-0 left-0 z-30 hidden w-64 border-r p-4 backdrop-blur-xl lg:block">
+        <p className="text-ink/60 px-3 pb-2 text-[11px] font-extrabold tracking-[0.18em] uppercase">
           Operación
         </p>
         <nav className="space-y-1" aria-label="Administración">
@@ -142,11 +142,19 @@ export function AdminNavigation() {
             return (
               <Link
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-12 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition-colors ${
+                className={`consumer-pressable flex min-h-12 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition-colors ${
                   active
-                    ? "bg-[#ff6b35] text-[#10131a] shadow-[0_8px_24px_rgba(255,107,53,0.2)]"
-                    : "text-[#98a2b3] hover:bg-[#171f2c] hover:text-white"
+                    ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                    : "text-ink/70 hover:bg-ink/[0.04] hover:text-ink"
                 }`}
+                style={
+                  active
+                    ? {
+                        backgroundImage:
+                          "linear-gradient(135deg, #FF9A3D 0%, #FF6B35 48%, #FF0A78 100%)",
+                      }
+                    : undefined
+                }
                 href={item.href}
                 key={item.id}
               >
@@ -178,24 +186,24 @@ export function AdminNavigation() {
             aria-modal="true"
             aria-labelledby="admin-more-menu-title"
             data-motion-panel
-            className="mobile-safe-bottom absolute right-0 bottom-0 left-0 rounded-t-[2rem] border-t border-[#2a3445] bg-[#121923] px-4 pt-4 pb-[calc(5rem+env(safe-area-inset-bottom))] shadow-2xl"
+            className="mobile-safe-bottom border-ink/[0.08] bg-surface absolute right-0 bottom-0 left-0 rounded-t-[2rem] border-t px-4 pt-4 pb-[calc(5rem+env(safe-area-inset-bottom))] shadow-2xl"
           >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#3a4557]" />
+            <div className="bg-ink/15 mx-auto mb-4 h-1 w-10 rounded-full" />
             <div className="mb-4 flex items-center justify-between gap-3 px-1">
               <div>
-                <p className="text-xs font-extrabold tracking-[0.14em] text-[#ff6b35] uppercase">
+                <p className="text-terracotta text-xs font-extrabold tracking-[0.14em] uppercase">
                   Administración
                 </p>
                 <h2
                   id="admin-more-menu-title"
-                  className="mt-1 text-xl font-extrabold text-white"
+                  className="text-ink mt-1 text-xl font-extrabold"
                 >
                   Más herramientas
                 </h2>
               </div>
               <button
                 ref={closeRef}
-                className="grid min-h-12 min-w-12 place-items-center rounded-2xl border border-[#2a3445] bg-[#0d131d] text-[#98a2b3]"
+                className="border-ink/[0.08] bg-surface text-ink/70 grid min-h-12 min-w-12 place-items-center rounded-2xl border"
                 onClick={() => setMoreOpen(false)}
                 type="button"
                 aria-label="Cerrar"
@@ -211,8 +219,8 @@ export function AdminNavigation() {
                     aria-current={active ? "page" : undefined}
                     className={`flex min-h-16 items-center gap-3 rounded-2xl border px-3 py-3 text-sm font-bold ${
                       active
-                        ? "border-[#ff6b35]/50 bg-[#ff6b35]/12 text-[#ff8b63]"
-                        : "border-[#273142] bg-[#171f2c] text-[#d0d5dd]"
+                        ? "border-brand-orange/30 bg-brand-orange/10 text-terracotta"
+                        : "border-ink/[0.08] bg-surface text-ink"
                     }`}
                     href={item.href}
                     key={item.id}
@@ -229,7 +237,7 @@ export function AdminNavigation() {
       ) : null}
 
       <nav
-        className="mobile-safe-bottom fixed right-0 bottom-0 left-0 z-40 grid grid-cols-4 border-t border-[#273142] bg-[#0d131d]/96 px-2 pt-2 shadow-[0_-12px_32px_rgba(0,0,0,0.28)] backdrop-blur-xl lg:hidden"
+        className="mobile-safe-bottom border-ink/[0.06] bg-canvas/95 fixed right-0 bottom-0 left-0 z-40 grid grid-cols-4 border-t px-2 pt-2 shadow-[0_-12px_32px_rgba(0,0,0,0.12)] backdrop-blur-xl lg:hidden"
         aria-label="Administración móvil"
       >
         {adminPrimaryMobileItems.map((item) => {
@@ -238,7 +246,7 @@ export function AdminNavigation() {
             <Link
               aria-current={active ? "page" : undefined}
               className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
-                active ? "text-[#ff7b4c]" : "text-[#7f8a9b]"
+                active ? "text-terracotta" : "text-ink/60"
               }`}
               href={item.href}
               key={item.id}
@@ -253,7 +261,7 @@ export function AdminNavigation() {
           aria-controls="admin-more-menu"
           aria-haspopup="dialog"
           className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
-            moreActive || moreOpen ? "text-[#ff7b4c]" : "text-[#7f8a9b]"
+            moreActive || moreOpen ? "text-terracotta" : "text-ink/60"
           }`}
           onClick={() => setMoreOpen(true)}
           type="button"
