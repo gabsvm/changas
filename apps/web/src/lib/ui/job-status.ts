@@ -19,6 +19,12 @@ const jobStatusPresentations: Record<string, JobStatusPresentation> = {
   NO_SHOW: { label: "No se presentó", tone: "danger" },
 };
 
+export const JOB_TERMINAL_STATUSES = [
+  "COMPLETED",
+  "CANCELLED",
+  "REFUNDED",
+  "PARTIALLY_REFUNDED",
+];
 const fallbackPresentation: JobStatusPresentation = {
   label: "Estado del trabajo",
   tone: "neutral",

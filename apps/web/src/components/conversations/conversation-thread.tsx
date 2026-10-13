@@ -114,6 +114,7 @@ export function ConversationThread({
     sub: string;
     cta: string;
     href: string;
+    helpHref?: string;
   } | null;
   initialMessages: ConversationMessage[];
   initialAttachments: ConversationAttachmentSummary[];
@@ -332,10 +333,10 @@ export function ConversationThread({
           </details>
         </div>
         {spotlight ? (
-          <a
-            href={spotlight.href}
+          <div
             aria-label={`${spotlight.title}. ${spotlight.sub}`}
-            className="consumer-pressable mt-3 flex items-center gap-3 rounded-2xl bg-[#17140f] px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(23_20_15/50%)]"
+            role="group"
+            className="mt-3 flex items-center gap-3 rounded-2xl bg-[#17140f] px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(23_20_15/50%)]"
           >
             <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2fbf71] opacity-75" />
@@ -349,10 +350,21 @@ export function ConversationThread({
                 {spotlight.sub}
               </span>
             </span>
-            <span className="shrink-0 rounded-full bg-white px-3.5 py-2 text-[13px] font-extrabold text-[#17140f]">
+            {spotlight.helpHref ? (
+              <Link
+                href={spotlight.helpHref}
+                className="consumer-pressable inline-flex min-h-11 shrink-0 items-center text-[13px] font-bold text-white/80 underline underline-offset-4"
+              >
+                Ayuda
+              </Link>
+            ) : null}
+            <Link
+              href={spotlight.href}
+              className="consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-3.5 text-[13px] font-extrabold text-[#17140f]"
+            >
               {spotlight.cta}
-            </span>
-          </a>
+            </Link>
+          </div>
         ) : null}
         {blockError ? (
           <p role="alert" className="bg-terracotta/10 text-terracotta mt-3 rounded-xl px-3 py-2 text-xs leading-5">

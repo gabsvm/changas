@@ -31,7 +31,7 @@ import {
   getJobNextAction,
   getJobTracking,
 } from "@/components/jobs/job-tracking";
-import { getJobStatusPresentation } from "@/lib/ui/job-status";
+import { JOB_TERMINAL_STATUSES, getJobStatusPresentation } from "@/lib/ui/job-status";
 import { GuideHeader } from "@/components/ui/guided";
 import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 
@@ -168,15 +168,9 @@ export default async function ConversationPage({
           href: "#propuestas",
         }
       : null;
-  const TERMINAL_JOB_STATUSES = [
-    "COMPLETED",
-    "CANCELLED",
-    "REFUNDED",
-    "PARTIALLY_REFUNDED",
-  ];
   const spotlightJob =
     conversationJobs.find(
-      (job) => !TERMINAL_JOB_STATUSES.includes(job.job_status),
+      (job) => !JOB_TERMINAL_STATUSES.includes(job.job_status),
     ) ?? null;
   const spotlightTracking = spotlightJob
     ? getJobTracking(spotlightJob.job_status, null)
@@ -202,6 +196,7 @@ export default async function ConversationPage({
             : `Paso ${spotlightTracking.currentIndex + 1} de ${spotlightTracking.steps.length} · ${spotlightNext.heading}`,
           cta: "Ver seguimiento",
           href: `/jobs/${spotlightJob.job_id}`,
+          helpHref: `/jobs/${spotlightJob.job_id}#ayuda`,
         }
       : null;
   const spotlight = hireSpotlight ?? jobSpotlight;
