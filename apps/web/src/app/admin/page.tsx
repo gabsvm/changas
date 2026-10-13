@@ -72,13 +72,13 @@ export default async function AdminPage() {
         <AdminMetricCard
           label="Prestadores activos"
           value={activeProviders.length}
-          hint={`${providers.length} perfiles totales`}
+          hint={`${providers.length} ${providers.length === 1 ? "perfil total" : "perfiles totales"}`}
           tone="success"
         />
         <AdminMetricCard
           label="Usuarios"
           value={users.length}
-          hint={`${jobs.length} trabajos visibles`}
+          hint={`${jobs.length} ${jobs.length === 1 ? "trabajo visible" : "trabajos visibles"}`}
           tone="info"
         />
       </div>

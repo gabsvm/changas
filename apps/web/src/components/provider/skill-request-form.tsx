@@ -16,26 +16,40 @@ export function SkillRequestForm({
     submitSkillRequestAction,
     initialActionState,
   );
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.location.hash === "#proponer-habilidad",
+  );
   // La respuesta (éxito o error) siempre queda visible: deriva de la
-  // respuesta en vez de efecto, así ningún re-render la oculta.
+  // respuesta, así ningún re-render la oculta.
   const hasFeedback = state.error != null || state.success != null;
+  const expanded = open || hasFeedback;
 
   return (
-    <details
+    <div
       id="proponer-habilidad"
-      open={open || hasFeedback}
-      onToggle={(event) => setOpen(event.currentTarget.open)}
       className="border-ink/[0.08] bg-surface consumer-card scroll-mt-24 rounded-2xl border p-4 sm:p-5"
     >
-      <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-expanded={expanded}
+        aria-controls="proponer-habilidad-form"
+        className="consumer-pressable flex min-h-11 w-full cursor-pointer items-center justify-between gap-3"
+      >
         <span className="text-[15px] font-extrabold">
           Proponer una habilidad nueva
         </span>
-        <span className="text-ink/40 shrink-0 text-xl" aria-hidden="true">
+        <span
+          aria-hidden="true"
+          className={`text-ink/40 shrink-0 text-xl transition-transform duration-200 ${expanded ? "rotate-90" : ""}`}
+        >
           ›
         </span>
-      </summary>
+      </button>
+      {expanded ? (
+        <>
       <p className="text-ink/70 mt-1.5 text-sm leading-6">
         Si lo que sabés hacer no está en el catálogo, proponelo con tu servicio
         armado. Lo revisamos y te avisamos; si se aprueba, todo queda creado
@@ -176,6 +190,8 @@ export function SkillRequestForm({
           {pending ? "Enviando…" : "Enviar propuesta"}
         </button>
       </form>
-    </details>
+        </>
+      ) : null}
+    </div>
   );
 }

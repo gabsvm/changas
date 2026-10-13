@@ -239,6 +239,8 @@ function Field({
   type = "text",
   required = false,
   helper,
+  placeholder,
+  inputMode,
   min,
   max,
   step,
@@ -252,6 +254,8 @@ function Field({
   type?: string;
   required?: boolean;
   helper?: string | undefined;
+  placeholder?: string | undefined;
+  inputMode?: "decimal" | "none" | "numeric" | "search" | "tel" | "text" | "url" | undefined;
   min?: string | number;
   max?: string | number;
   step?: string | number;
@@ -267,7 +271,8 @@ function Field({
         name={name}
         type={type}
         defaultValue={defaultValue ?? ""}
-        required={required}
+        placeholder={placeholder}
+        inputMode={inputMode}
         min={min}
         max={max}
         step={step}
@@ -354,7 +359,7 @@ function Check({
     <span className="text-ink/75 flex flex-wrap items-center gap-2 text-sm">
       <label className="flex items-center gap-2">
         <input
-          className="accent-moss h-4 w-4"
+          className="accent-moss h-6 w-6 shrink-0"
           type="checkbox"
           name={name}
           defaultChecked={defaultChecked}
@@ -366,6 +371,49 @@ function Check({
     </span>
   );
 }
+
+function UseLocationButton() {
+  const [status, setStatus] = useState<"idle" | "loading" | "denied">("idle");
+  return (
+    <span className="block">
+      <button
+        type="button"
+        disabled={status === "loading"}
+        onClick={(event) => {
+          const form = event.currentTarget.closest("form");
+          const set = (name: string, value: string) => {
+            const input = form?.querySelector(`input[name="${name}"]`);
+            if (input instanceof HTMLInputElement) input.value = value;
+          };
+          if (!("geolocation" in navigator)) {
+            setStatus("denied");
+            return;
+          }
+          setStatus("loading");
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              set("latitude", String(position.coords.latitude));
+              set("longitude", String(position.coords.longitude));
+              setStatus("idle");
+            },
+            () => setStatus("denied"),
+            { timeout: 10000 },
+          );
+        }}
+        className="consumer-pressable border-ink/[0.08] inline-flex min-h-11 items-center gap-2 rounded-full border bg-white px-4 text-[13px] font-bold dark:border-white/10 dark:bg-[#2a231c]"
+      >
+        {status === "loading" ? "Buscando tu ubicación…" : "Usar mi ubicación"}
+      </button>
+      {status === "denied" ? (
+        <span className="text-ink/70 mt-1.5 block text-xs leading-5">
+          No pudimos obtener tu ubicación: revisá el permiso del navegador o
+          cargá latitud y longitud a mano.
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 
 const SECTION_BADGES: Record<
   string,
@@ -381,6 +429,27 @@ const SECTION_BADGES: Record<
   zonas: { tone: "green", icon: "pin" },
   disponibilidad: { tone: "blue", icon: "calendar" },
 };
+const MANAGE_SECTIONS: Array<[string, string]> = [
+  ["perfil", "Perfil"],
+  ["habilidades", "Habilidades"],
+  ["servicios", "Servicios"],
+  ["experiencia", "Experiencia"],
+  ["formacion", "Formación"],
+  ["certificaciones", "Certificaciones"],
+  ["portfolio", "Portfolio"],
+  ["zonas", "Zonas"],
+  ["disponibilidad", "Disponibilidad"],
+];
+const MANAGE_SECTION_IDS = MANAGE_SECTIONS.map(([id]) => id);
+const WEEKDAY_NAMES = [
+  "Domingo",
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+];
 const PORTFOLIO_COVERS = [
   "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
   "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)",
@@ -749,25 +818,22 @@ export function MarketplaceManagement({
     catalogSkills.map((skill) => [skill.id, skill.name]),
   );
   const [activeSection, setActiveSection] = useState("perfil");
+  useEffect(() => {
+    const applyHash = () => {
+      const id = window.location.hash.replace("#", "");
+      if (MANAGE_SECTION_IDS.includes(id)) setActiveSection(id);
+    };
+    applyHash();
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
+  }, []);
   return (
     <div className="space-y-6">
       <nav
         className="consumer-scrollbar-none bg-canvas/97 sticky top-14 z-20 -mx-4 flex gap-2 overflow-x-auto px-4 py-2 backdrop-blur-xl sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none"
         aria-label="Secciones de gestión"
       >
-        {(
-          [
-            ["perfil", "Perfil"],
-            ["habilidades", "Habilidades"],
-            ["servicios", "Servicios"],
-            ["experiencia", "Experiencia"],
-            ["formacion", "Formación"],
-            ["certificaciones", "Certificaciones"],
-            ["portfolio", "Portfolio"],
-            ["zonas", "Zonas"],
-            ["disponibilidad", "Disponibilidad"],
-          ] as Array<[string, string]>
-        ).map(([id, label]) => {
+        {MANAGE_SECTIONS.map(([id, label]) => {
           const active = activeSection === id;
           return (
             <a
@@ -1302,6 +1368,7 @@ export function MarketplaceManagement({
           <div className="border-ink/10 mt-5 border-t pt-5">
             <ActionForm action={actions.saveArea} submitLabel="Agregar zona">
               <Field label="Etiqueta pública" name="label" required />
+              <UseLocationButton />
               <div className="grid gap-4 md:grid-cols-3">
                 <Field
                   label="Latitud privada"
@@ -1310,6 +1377,8 @@ export function MarketplaceManagement({
                   min={-90}
                   max={90}
                   step="any"
+                  inputMode="decimal"
+                  placeholder="Ej: -34.6037"
                   required
                 />
                 <Field
@@ -1319,6 +1388,8 @@ export function MarketplaceManagement({
                   min={-180}
                   max={180}
                   step="any"
+                  inputMode="decimal"
+                  placeholder="Ej: -58.3816"
                   required
                 />
                 <Field
@@ -1327,6 +1398,8 @@ export function MarketplaceManagement({
                   type="number"
                   min={100}
                   max={100000}
+                  inputMode="numeric"
+                  placeholder="Ej: 5000"
                   required
                 />
               </div>
@@ -1347,7 +1420,7 @@ export function MarketplaceManagement({
                 key={item.id}
               >
                 <p className="font-semibold">
-                  Día {item.weekday} · {item.start_time.slice(0, 5)}–
+                  Día {WEEKDAY_NAMES[item.weekday] ?? `día ${item.weekday}`} · {item.start_time.slice(0, 5)}–
                   {item.end_time.slice(0, 5)}
                 </p>
                 <p className="text-ink/70 mt-1 text-xs">
@@ -1359,22 +1432,26 @@ export function MarketplaceManagement({
           </div>
           <div className="border-ink/10 mt-5 border-t pt-5">
             <ActionForm action={actions.saveRule} submitLabel="Agregar regla">
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field
-                  label="Día (0 domingo – 6 sábado)"
+              <input
+                type="hidden"
+                name="timezone"
+                value="America/Argentina/Buenos_Aires"
+              />
+              <label className="text-sm font-semibold">
+                Día
+                <select
+                  className="border-ink/15 mt-2 w-full rounded-xl border bg-white px-3 py-2.5 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="weekday"
-                  type="number"
-                  min={0}
-                  max={6}
+                  defaultValue="1"
                   required
-                />
-                <Field
-                  label="Zona horaria"
-                  name="timezone"
-                  defaultValue="America/Argentina/Buenos_Aires"
-                  required
-                />
-              </div>
+                >
+                  {WEEKDAY_NAMES.map((day, index) => (
+                    <option key={day} value={index}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <div className="grid gap-4 md:grid-cols-2">
                 <Field
                   label="Desde"

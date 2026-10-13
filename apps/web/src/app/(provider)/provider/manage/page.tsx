@@ -393,7 +393,7 @@ export default async function ProviderMarketplaceManagePage({
           </p>
         ) : null}
 
-        <div className="border-ink/10 mt-6 border-t pt-5">
+        <div id="cobros" className="border-ink/10 mt-6 scroll-mt-32 border-t pt-5">
           <ProviderPaymentAccount
             account={paymentAccount}
             feedback={paymentFeedback}

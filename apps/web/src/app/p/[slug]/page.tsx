@@ -576,8 +576,8 @@ export default async function PublicProviderPage({
 
         <footer className="border-ink/10 mt-10 border-t py-6 text-center">
           <p className="text-moss text-xs leading-5 font-extrabold">
-            Pagos retenidos hasta la entrega + soporte de Changas en cada
-            trabajo
+            Sin pago por adelantado: coordinás por chat y pagás al finalizar
+            desde acá + soporte de Changas en cada trabajo
           </p>
           <p className="text-ink/38 mt-1 text-xs leading-5">
             Changas · información publicada por el proveedor

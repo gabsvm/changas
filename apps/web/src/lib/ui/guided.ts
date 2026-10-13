@@ -79,7 +79,7 @@ export function getProviderNextAction(args: {
       title: "Publicá tu primer servicio",
       hint: "Decí qué hacés y cuánto sale.",
       cta: "Publicar servicio",
-      href: "/provider/manage",
+      href: "/provider/manage#servicios",
     };
   }
 
@@ -88,7 +88,7 @@ export function getProviderNextAction(args: {
       title: "Conectá tu cobro",
       hint: "Sin esto no podés cobrar.",
       cta: "Conectar Mercado Pago",
-      href: "/provider/manage",
+      href: "/provider/manage#cobros",
     };
   }
 
@@ -96,7 +96,7 @@ export function getProviderNextAction(args: {
     title: "Todo listo para trabajar",
     hint: "Te avisamos cuando te escriban.",
     cta: "Ver mis servicios",
-    href: "/provider/manage",
+    href: "/provider/manage#servicios",
   };
 }
 

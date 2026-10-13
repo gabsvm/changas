@@ -254,7 +254,8 @@ export default async function AdminIdentityPage({
         </div>
 
         {queue.length ? (
-          <table className="w-full border-separate border-spacing-2">
+          <div className="consumer-scrollbar-none -mx-1 overflow-x-auto px-1">
+          <table className="w-full min-w-[640px] border-separate border-spacing-2">
             <caption className="sr-only">
               Cola de revisión de identidad ({queue.length})
             </caption>
@@ -299,6 +300,7 @@ export default async function AdminIdentityPage({
               ))}
             </tbody>
           </table>
+          </div>
         ) : (
           <AdminEmptyState
             title="Todo al día"

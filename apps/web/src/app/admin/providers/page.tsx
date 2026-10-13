@@ -176,7 +176,8 @@ export default async function AdminProvidersPage({
         </div>
 
         {providers.length ? (
-          <table className="w-full border-separate border-spacing-2">
+          <div className="consumer-scrollbar-none -mx-1 overflow-x-auto px-1">
+          <table className="w-full min-w-[640px] border-separate border-spacing-2">
             <caption className="sr-only">
               Prestadores registrados ({providers.length})
             </caption>
@@ -224,6 +225,7 @@ export default async function AdminProvidersPage({
               ))}
             </tbody>
           </table>
+          </div>
         ) : (
           <AdminEmptyState
             title="No hay prestadores"

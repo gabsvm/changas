@@ -214,27 +214,39 @@ export default async function PublicServicePage({
               className="border-ink/[0.08] bg-surface consumer-card mt-4 rounded-2xl border px-5 py-4 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.05] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
               aria-label="Desglose del precio"
             >
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-ink/70 text-[13px] font-semibold">
-                  Subtotal del servicio
-                </span>
-                <span className="font-bold">{price}</span>
-              </div>
-              <div className="mt-1.5 flex items-center justify-between gap-3">
-                <span className="text-ink/70 text-[13px] font-semibold">
-                  Comisión de Changas
-                </span>
-                <span className="text-moss text-[13px] font-bold">
-                  Incluida en el total
-                </span>
-              </div>
-              <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
-                <span className="text-[13px] font-extrabold">Total a pagar</span>
-                <span className="text-[15px] font-extrabold">{price}</span>
-              </div>
+              {service.price_model === "FIXED" ? (
+                <>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-ink/70 text-[13px] font-semibold">
+                      Subtotal del servicio
+                    </span>
+                    <span className="font-bold">{price}</span>
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between gap-3">
+                    <span className="text-ink/70 text-[13px] font-semibold">
+                      Comisión de Changas
+                    </span>
+                    <span className="text-moss text-[13px] font-bold">
+                      Incluida en el total
+                    </span>
+                  </div>
+                  <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
+                    <span className="text-[13px] font-extrabold">Total a pagar</span>
+                    <span className="text-[15px] font-extrabold">{price}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[13px] font-extrabold">
+                    Precio de referencia
+                  </span>
+                  <span className="text-[15px] font-extrabold">{price}</span>
+                </div>
+              )}
               <p className="text-ink/70 mt-2 text-xs leading-5">
-                La comisión se descuenta antes de liberarle el pago al
-                proveedor, sin cargos extra sobre el precio publicado.
+                {service.price_model === "FIXED"
+                  ? "Pagás al finalizar desde Changas, sin cargos extra sobre el precio publicado."
+                  : "Precio de referencia — el total se acuerda en la propuesta. Pagás al finalizar desde Changas."}
               </p>
             </section>
           ) : null}
@@ -308,9 +320,7 @@ export default async function PublicServicePage({
           <div className="border-moss/25 bg-moss/[0.07] consumer-card mt-8 flex items-start gap-3.5 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
             <IllustratedBadge tone="green" icon="shield" size="md" label="Garantía de Changas" />
             <div>
-              <p className="text-sm font-extrabold">
-                Pagos retenidos hasta la entrega + soporte
-              </p>
+              <p className="text-sm font-extrabold">Sin pago por adelantado + soporte</p>
               <p className="text-ink/70 mt-1 text-xs leading-6">
                 Sin pago por adelantado: coordinás por chat y se liquida al finalizar. Si algo sale mal, el equipo de Changas te acompaña.
               </p>

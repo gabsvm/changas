@@ -187,7 +187,8 @@ export default async function AdminUsersPage({
         </div>
 
         {users.length ? (
-          <table className="w-full border-separate border-spacing-2">
+          <div className="consumer-scrollbar-none -mx-1 overflow-x-auto px-1">
+          <table className="w-full min-w-[640px] border-separate border-spacing-2">
             <caption className="sr-only">
               Cuentas registradas ({users.length})
             </caption>
@@ -236,6 +237,7 @@ export default async function AdminUsersPage({
               ))}
             </tbody>
           </table>
+          </div>
         ) : (
           <AdminEmptyState
             title="No encontramos usuarios"
