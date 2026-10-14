@@ -17,6 +17,7 @@ import {
   transitionJobAction,
 } from "@/app/(account)/jobs/actions";
 import { ConfirmationCodeForm } from "@/app/(account)/jobs/[jobId]/confirmation-code-form";
+import { ConfirmCompletionReview } from "@/app/(account)/jobs/[jobId]/confirm-completion-review";
 import { PaymentSubmitButton } from "@/components/jobs/payment-submit-button";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
 import { JobTracker } from "@/components/jobs/job-tracker";
@@ -25,7 +26,10 @@ import {
   getJobTracking,
   type NextAction,
 } from "@/components/jobs/job-tracking";
-import type { IllustratedIconName, IllustratedTone } from "@/components/ui/marketplace/illustrated-badge";
+import type {
+  IllustratedIconName,
+  IllustratedTone,
+} from "@/components/ui/marketplace/illustrated-badge";
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { SuccessCheck } from "@/components/ui/marketplace/success-check";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
@@ -178,6 +182,38 @@ export default async function JobPage({
     "COMPLETION_REQUESTED",
     "DISPUTED",
   ].includes(detail.job_status);
+  // P1-04: el panel de ayuda genérico excluye COMPLETED. La apelación del
+  // cierre automático vive en su propia sección (ver #apelar-cierre) y solo
+  // para el cliente elegible: cierre automático reciente (<7d) + cobro
+  // pendiente (DUE) + sin liquidación. NOTA: transition_job_status permite
+  // COMPLETED→DISPUTED a cualquier participante; la UI lo restringe al
+  // cliente a propósito — si el SQL se amplía, mantener la restricción acá.
+  const autoCompletedAt = events.reduce<string | null>(
+    (latest, event) =>
+      event.event_type === "JOB_AUTO_COMPLETED" &&
+      (latest === null || event.created_at > latest)
+        ? event.created_at
+        : latest,
+    null,
+  );
+  const autoCompleteDisputeEligible =
+    isClient &&
+    detail.job_status === "COMPLETED" &&
+    detail.settlement_status === "DUE" &&
+    autoCompletedAt !== null &&
+    // eslint-disable-next-line react-hooks/purity -- server render: wall-clock read is intentional
+    Date.now() - new Date(autoCompletedAt).getTime() <= 7 * 24 * 60 * 60 * 1000;
+  // P1-05: cuando el cobro ya quedó firme (intento SUCCEEDED / SETTLED) el
+  // detalle debe cuadrar con lo efectivamente cobrado. Nombre coordinado con
+  // el slice de lifecycle (`settled_amount_minor` en get_job_detail); si la
+  // columna todavía no existe, cae a settlement_total_minor.
+  const settledAmountMinor = ((): number => {
+    const raw = (detail as unknown as { settled_amount_minor?: unknown })
+      .settled_amount_minor;
+    return typeof raw === "number" && Number.isFinite(raw)
+      ? raw
+      : detail.settlement_total_minor;
+  })();
   const price = formatMinorUnits(
     detail.total_price_amount,
     detail.currency_code as "ARS",
@@ -271,36 +307,36 @@ export default async function JobPage({
             />
           </div>
           <div className="p-4 sm:p-5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <StatusChip tone={status.tone}>{status.label}</StatusChip>
-            <StatusChip tone="neutral">
-              {getServiceModalityLabel(detail.modality)}
-            </StatusChip>
-          </div>
-          <h1 className="font-display mt-3 text-[22px] leading-8 font-extrabold tracking-[-0.025em]">
-            {detail.service_title}
-          </h1>
-          <p className="text-ink/70 mt-1.5 text-sm leading-6">
-            Con {detail.counterparty_name} · {price}
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div className="border-ink/[0.08] bg-canvas rounded-2xl border p-3.5">
-              <p className="text-ink/70 text-xs leading-4 font-semibold">
-                Próxima fecha
-              </p>
-              <p className="mt-0.5 font-bold">
-                {schedulePrimary
-                  ? (dateTime(schedulePrimary) ?? "A coordinar")
-                  : "A coordinar"}
-              </p>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <StatusChip tone={status.tone}>{status.label}</StatusChip>
+              <StatusChip tone="neutral">
+                {getServiceModalityLabel(detail.modality)}
+              </StatusChip>
             </div>
-            <div className="border-ink/[0.08] bg-canvas rounded-2xl border p-3.5">
-              <p className="text-ink/70 text-xs leading-4 font-semibold">
-                Precio acordado
-              </p>
-              <p className="mt-0.5 font-extrabold">{price}</p>
+            <h1 className="font-display mt-3 text-[22px] leading-8 font-extrabold tracking-[-0.025em]">
+              {detail.service_title}
+            </h1>
+            <p className="text-ink/70 mt-1.5 text-sm leading-6">
+              Con {detail.counterparty_name} · {price}
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+              <div className="border-ink/[0.08] bg-canvas rounded-2xl border p-3.5">
+                <p className="text-ink/70 text-xs leading-4 font-semibold">
+                  Próxima fecha
+                </p>
+                <p className="mt-0.5 font-bold">
+                  {schedulePrimary
+                    ? (dateTime(schedulePrimary) ?? "A coordinar")
+                    : "A coordinar"}
+                </p>
+              </div>
+              <div className="border-ink/[0.08] bg-canvas rounded-2xl border p-3.5">
+                <p className="text-ink/70 text-xs leading-4 font-semibold">
+                  Precio acordado
+                </p>
+                <p className="mt-0.5 font-extrabold">{price}</p>
+              </div>
             </div>
-          </div>
           </div>
         </header>
 
@@ -344,7 +380,9 @@ export default async function JobPage({
           ) : null}
           {tracking.exception ? (
             <div className="border-warning/25 bg-warning/[0.06] mt-3 rounded-2xl border p-4">
-              <h3 className="text-sm font-extrabold">{tracking.exception.title}</h3>
+              <h3 className="text-sm font-extrabold">
+                {tracking.exception.title}
+              </h3>
               <p className="text-ink/70 mt-1 text-[13px] leading-6">
                 {tracking.exception.description}
               </p>
@@ -384,7 +422,15 @@ export default async function JobPage({
             {nextAction.sub}
           </p>
           <div className="relative mt-4 grid gap-2 sm:grid-cols-2">
-            <PrimaryAction jobId={jobId} kind={nextAction.kind} />
+            <PrimaryAction
+              jobId={jobId}
+              kind={nextAction.kind}
+              reviewAmounts={{
+                baseMinor: detail.base_price_amount,
+                extrasMinor: detail.settlement_unpaid_extras_minor,
+                totalMinor: detail.settlement_total_minor,
+              }}
+            />
             <Link
               href={`/messages/${detail.conversation_id}`}
               className="consumer-pressable inline-flex min-h-[52px] items-center justify-center rounded-xl border border-white/25 px-4 text-sm font-bold text-white"
@@ -393,6 +439,23 @@ export default async function JobPage({
             </Link>
           </div>
         </section>
+
+        {autoCompleteDisputeEligible ? (
+          <div className="mt-5 scroll-mt-24" id="apelar-cierre">
+            <JobSection
+              title="Disputar cierre automático"
+              badge={{ tone: "rose", icon: "alert" }}
+              description="Este trabajo se cerró automáticamente por falta de respuesta. Si no se hizo o quedó incompleto, podés apelarlo dentro de los 7 días del cierre contándonos el motivo."
+            >
+              <ReasonTransitionForm
+                jobId={jobId}
+                expected="COMPLETED"
+                requested="DISPUTED"
+                label="Disputar cierre automático"
+              />
+            </JobSection>
+          </div>
+        ) : null}
 
         {detail.settlement_status !== "NOT_DUE" ? (
           <div className="mt-5 scroll-mt-24" id="pago">
@@ -405,7 +468,7 @@ export default async function JobPage({
                   <strong>
                     Pagado{" "}
                     {formatMinorUnits(
-                      detail.settlement_total_minor,
+                      settledAmountMinor,
                       detail.currency_code as "ARS",
                     )}
                   </strong>
@@ -464,8 +527,8 @@ export default async function JobPage({
                         />
                       </form>
                       <p className="text-ink/70 mt-2 text-xs leading-5">
-                        Serás redirigido a Mercado Pago para completar el pago de
-                        forma segura.
+                        Serás redirigido a Mercado Pago para completar el pago
+                        de forma segura.
                       </p>
                     </>
                   ) : (
@@ -536,14 +599,24 @@ export default async function JobPage({
                     key={change.scope_change_id}
                     className="border-ink/[0.08] bg-ink/[0.03] rounded-xl border px-3 py-2 text-sm leading-6 whitespace-pre-wrap dark:bg-white/[0.04]"
                   >
-                    <span className="text-moss text-xs font-extrabold tracking-[0.06em] uppercase">Acordado después · </span>
+                    <span className="text-moss text-xs font-extrabold tracking-[0.06em] uppercase">
+                      Acordado después ·{" "}
+                    </span>
                     {change.scope_snapshot}
                   </p>
                 ))}
                 <p className="text-ink/70 text-xs leading-5">
-                  Base {formatMinorUnits(detail.base_price_amount, detail.currency_code as "ARS")} + adicionales pagados{" "}
-                  {formatMinorUnits(detail.paid_additional_amount, detail.currency_code as "ARS")} ={" "}
-                  <strong className="text-ink">total {price}</strong>
+                  Base{" "}
+                  {formatMinorUnits(
+                    detail.base_price_amount,
+                    detail.currency_code as "ARS",
+                  )}{" "}
+                  + adicionales pagados{" "}
+                  {formatMinorUnits(
+                    detail.paid_additional_amount,
+                    detail.currency_code as "ARS",
+                  )}{" "}
+                  = <strong className="text-ink">total {price}</strong>
                 </p>
               </div>
             ) : null}
@@ -569,60 +642,63 @@ export default async function JobPage({
                 description="Si algo sale mal, reportalo: revisamos el caso con ambas partes."
                 collapsible={detail.job_status !== "DISPUTED"}
               >
-              {["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
-                detail.job_status,
-              ) ? (
-                <>
-                  <div className="border-danger/25 bg-danger/[0.04] rounded-2xl border p-4">
-                    <h3 className="text-sm font-extrabold">
-                      ¿Algo salió mal con este trabajo?
-                    </h3>
-                    <ol className="text-ink/70 mt-2 list-decimal space-y-1 pl-5 text-[13px] leading-6">
-                      <li>Contanos qué pasó en el motivo de abajo.</li>
-                      <li>El equipo de Changas revisa el caso con ambas partes.</li>
-                      <li>Te avisamos por acá cuando haya novedades.</li>
-                    </ol>
-                    <div className="mt-3">
-                      <ReasonTransitionForm
-                        jobId={jobId}
-                        expected={detail.job_status}
-                        requested="DISPUTED"
-                        label="Reportar problema"
-                      />
-                    </div>
-                  </div>
-                  <details className="border-ink/10 mt-3 border-t pt-3">
-                    <summary className="consumer-pressable min-h-11 cursor-pointer py-3 text-sm font-semibold">
-                      Cancelar o registrar ausencia
-                    </summary>
-                    <div className="grid gap-3 pb-2 sm:grid-cols-2">
-                      <ReasonTransitionForm
-                        jobId={jobId}
-                        expected={detail.job_status}
-                        requested="CANCELLED"
-                        label="Cancelar trabajo"
-                      />
-                      {detail.job_status === "CONFIRMED" ? (
+                {["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
+                  detail.job_status,
+                ) ? (
+                  <>
+                    <div className="border-danger/25 bg-danger/[0.04] rounded-2xl border p-4">
+                      <h3 className="text-sm font-extrabold">
+                        ¿Algo salió mal con este trabajo?
+                      </h3>
+                      <ol className="text-ink/70 mt-2 list-decimal space-y-1 pl-5 text-[13px] leading-6">
+                        <li>Contanos qué pasó en el motivo de abajo.</li>
+                        <li>
+                          El equipo de Changas revisa el caso con ambas partes.
+                        </li>
+                        <li>Te avisamos por acá cuando haya novedades.</li>
+                      </ol>
+                      <div className="mt-3">
                         <ReasonTransitionForm
                           jobId={jobId}
-                          expected="CONFIRMED"
-                          requested="NO_SHOW"
-                          label="Registrar ausencia"
+                          expected={detail.job_status}
+                          requested="DISPUTED"
+                          label="Reportar problema"
                         />
-                      ) : null}
+                      </div>
                     </div>
-                  </details>
-                </>
-              ) : null}
-              {detail.job_status === "DISPUTED" ? (
-                <div className="border-warning/25 bg-warning/[0.06] rounded-2xl border p-4">
-                  <h3 className="text-sm font-extrabold">Caso en revisión</h3>
-                  <p className="text-ink/70 mt-1 text-[13px] leading-6">
-                    El equipo de Changas está revisando lo reportado con ambas partes. Te avisamos por acá cuando haya novedades.
-                  </p>
-                </div>
-              ) : null}
-            </JobSection>
+                    <details className="border-ink/10 mt-3 border-t pt-3">
+                      <summary className="consumer-pressable min-h-11 cursor-pointer py-3 text-sm font-semibold">
+                        Cancelar o registrar ausencia
+                      </summary>
+                      <div className="grid gap-3 pb-2 sm:grid-cols-2">
+                        <ReasonTransitionForm
+                          jobId={jobId}
+                          expected={detail.job_status}
+                          requested="CANCELLED"
+                          label="Cancelar trabajo"
+                        />
+                        {detail.job_status === "CONFIRMED" ? (
+                          <ReasonTransitionForm
+                            jobId={jobId}
+                            expected="CONFIRMED"
+                            requested="NO_SHOW"
+                            label="Registrar ausencia"
+                          />
+                        ) : null}
+                      </div>
+                    </details>
+                  </>
+                ) : null}
+                {detail.job_status === "DISPUTED" ? (
+                  <div className="border-warning/25 bg-warning/[0.06] rounded-2xl border p-4">
+                    <h3 className="text-sm font-extrabold">Caso en revisión</h3>
+                    <p className="text-ink/70 mt-1 text-[13px] leading-6">
+                      El equipo de Changas está revisando lo reportado con ambas
+                      partes. Te avisamos por acá cuando haya novedades.
+                    </p>
+                  </div>
+                ) : null}
+              </JobSection>
             ) : null}
 
             {detail.job_status === "CONFIRMED" ? (
@@ -833,7 +909,8 @@ export default async function JobPage({
                             )}
                             {isProvider ? (
                               <p className="text-ink/70 mt-1 text-xs">
-                                Podés ajustar el alcance y proponer un nuevo cambio.
+                                Podés ajustar el alcance y proponer un nuevo
+                                cambio.
                               </p>
                             ) : null}
                           </div>
@@ -916,7 +993,11 @@ export default async function JobPage({
                                 action={fakeAdditionalPaymentAction}
                                 className="mt-3 flex flex-wrap gap-2"
                               >
-                                <input type="hidden" name="jobId" value={jobId} />
+                                <input
+                                  type="hidden"
+                                  name="jobId"
+                                  value={jobId}
+                                />
                                 <input
                                   type="hidden"
                                   name="scopeChangeId"
@@ -1035,7 +1116,16 @@ export default async function JobPage({
         <div className="mx-auto grid max-w-4xl grid-cols-[1fr_auto] items-center gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="min-w-0">
             {nextAction.kind ? (
-              <PrimaryAction jobId={jobId} kind={nextAction.kind} compact />
+              <PrimaryAction
+                jobId={jobId}
+                kind={nextAction.kind}
+                compact
+                reviewAmounts={{
+                  baseMinor: detail.base_price_amount,
+                  extrasMinor: detail.settlement_unpaid_extras_minor,
+                  totalMinor: detail.settlement_total_minor,
+                }}
+              />
             ) : (
               <a
                 href="#proxima-accion"
@@ -1047,7 +1137,7 @@ export default async function JobPage({
           </div>
           <Link
             href={`/messages/${detail.conversation_id}`}
-            className="consumer-pressable inline-flex min-h-[52px] items-center justify-center rounded-xl border border-ink/10 px-4 text-sm font-bold"
+            className="consumer-pressable border-ink/10 inline-flex min-h-[52px] items-center justify-center rounded-xl border px-4 text-sm font-bold"
             aria-label="Abrir chat del servicio"
           >
             Chat
@@ -1110,7 +1200,10 @@ function JobSection({
     );
   }
   return (
-    <section id={id} className="border-ink/[0.08] bg-surface consumer-card scroll-mt-24 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/70%)]">
+    <section
+      id={id}
+      className="border-ink/[0.08] bg-surface consumer-card scroll-mt-24 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/70%)]"
+    >
       <SectionHeader
         title={title}
         badge={badge ?? { tone: "neutral", icon: "doc", label: title }}
@@ -1139,7 +1232,9 @@ function StatusButton({
       <input type="hidden" name="jobId" value={jobId} />
       <input type="hidden" name="expectedStatus" value={expected} />
       <input type="hidden" name="requestedStatus" value={requested} />
-      <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">{label}</button>
+      <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
+        {label}
+      </button>
     </form>
   );
 }
@@ -1148,10 +1243,12 @@ function PrimaryAction({
   jobId,
   kind,
   compact = false,
+  reviewAmounts,
 }: {
   jobId: string;
   kind: NextAction["kind"];
   compact?: boolean;
+  reviewAmounts: { baseMinor: number; extrasMinor: number; totalMinor: number };
 }) {
   if (kind === "start") {
     return (
@@ -1179,12 +1276,16 @@ function PrimaryAction({
     return <ConfirmationCodeForm jobId={jobId} />;
   }
   if (kind === "confirm_completion") {
+    // P1-07: interstitial de revisión — ningún commit SQL hasta el botón
+    // final dentro de ConfirmCompletionReview.
     return (
-      <StatusButton
+      <ConfirmCompletionReview
         jobId={jobId}
-        expected="COMPLETION_REQUESTED"
-        requested="COMPLETED"
-        label="Confirmar finalización"
+        baseMinor={reviewAmounts.baseMinor}
+        extrasMinor={reviewAmounts.extrasMinor}
+        totalMinor={reviewAmounts.totalMinor}
+        currencyCode="ARS"
+        compact={compact}
       />
     );
   }
