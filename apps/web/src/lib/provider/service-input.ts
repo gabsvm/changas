@@ -23,6 +23,7 @@ export type ServiceFormRaw = {
   excludes: string;
   materialsNotes: string;
   isPublished: boolean;
+  instantBooking: boolean;
   isPaused: boolean;
   tags: string[];
 };
@@ -77,6 +78,7 @@ export type ServiceParsedData = {
   excludes: string;
   materialsNotes: string;
   isPublished: boolean;
+  instantBooking: boolean;
   isPaused: boolean;
 };
 
@@ -155,6 +157,7 @@ export function parseServiceForm(raw: ServiceFormRaw): ParsedServiceForm {
     materialsNotes: parsed.data.materialsNotes,
     isPublished: parsed.data.isPublished,
     isPaused: parsed.data.isPaused,
+    instantBooking: raw.instantBooking,
   };
   return { ok: true, data, tags: parsedTags.data };
 }

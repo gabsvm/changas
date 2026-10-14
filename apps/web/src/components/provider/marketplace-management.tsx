@@ -654,6 +654,12 @@ function ServiceForm({
           defaultChecked={service?.accepts_offers}
         />
         <Check
+          label="Reserva directa"
+          name="instantBooking"
+          hint="Con precio fijo, los clientes pueden reservar sin esperar tu aceptacion. Sin esto, cada reserva llega como solicitud."
+          defaultChecked={service?.instant_booking_enabled}
+        />
+        <Check
           label="Publicado"
           name="isPublished"
           defaultChecked={service?.is_published}

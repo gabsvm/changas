@@ -4,6 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import {
   canActorTransitionProposal,
   formatMinorUnits,
+  proposalKinds,
+  type ProposalKind,
 } from "@changas/domain";
 
 import { ConversationThread } from "@/components/conversations/conversation-thread";
@@ -67,10 +69,13 @@ async function loadThreadData(conversationId: string) {
 
 export default async function ConversationPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ conversationId: string }>;
+  searchParams: Promise<{ kind?: string }>;
 }) {
   const { conversationId } = await params;
+  const requestedKind = (await searchParams)?.kind;
   const supabase = await createClient();
   const {
     data: { user },
@@ -104,9 +109,9 @@ export default async function ConversationPage({
   const threadVersion = `${messages.at(-1)?.message_id ?? "empty"}:${attachments.length}:${blockedUserId ?? "none"}`;
   const initialTextNonce = crypto.randomUUID();
   const initialAttachmentNonce = crypto.randomUUID();
-
-
-  const proposalStatusLabels: Record<
+  const defaultProposalKind = proposalKinds.includes(requestedKind as ProposalKind)
+    ? (requestedKind as ProposalKind)
+    : undefined;  const proposalStatusLabels: Record<
     ProposalSummary["proposal_status"],
     string
   > = {
@@ -297,6 +302,7 @@ export default async function ConversationPage({
           </section>
         ) : null}
         <ProposalComposer
+          defaultKind={defaultProposalKind}
           conversationId={conversationId}
           currentUserIsClient={currentUserIsClient}
         />

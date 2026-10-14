@@ -1,6 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+
+import { proposalKinds, type ProposalKind } from "@changas/domain";
 
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SuccessCheck } from "@/components/ui/marketplace/success-check";
@@ -11,17 +13,36 @@ import {
 
 const initialState: ProposalActionState = { status: "IDLE", message: "" };
 
+const CLIENT_KINDS: ProposalKind[] = ["DIRECT_BOOKING", "QUOTE_REQUEST", "CLIENT_OFFER"];
+
 export function ProposalComposer({
   conversationId,
   currentUserIsClient,
+  defaultKind,
 }: {
   conversationId: string;
   currentUserIsClient: boolean;
+  defaultKind?: ProposalKind | undefined;
 }) {
   const [state, action, pending] = useActionState(
     createProposalAction,
     initialState,
   );
+  // Clave anti doble-tap: nace en cliente (sin mismatch de hidratacion),
+  // se envia con el formulario y rota en cada submit para que la
+  // siguiente propuesta use una clave nueva. Sin efectos: el boton se
+  // deshabilita en pending y el DOM conserva la clave del submit.
+  const [idempotencyKey, setIdempotencyKey] = useState<string>(() =>
+    typeof window === "undefined" ? "" : crypto.randomUUID(),
+  );
+  const roleDefaultKind: ProposalKind = currentUserIsClient
+    ? "QUOTE_REQUEST"
+    : "PROVIDER_QUOTE";
+  const effectiveDefaultKind =
+    defaultKind && proposalKinds.includes(defaultKind) &&
+    (currentUserIsClient ? CLIENT_KINDS.includes(defaultKind) : defaultKind === "PROVIDER_QUOTE")
+      ? defaultKind
+      : roleDefaultKind;
 
   return (
     <details className="border-ink/[0.08] bg-surface consumer-card relative overflow-hidden rounded-2xl border shadow-[var(--consumer-shadow-card)]">
@@ -53,15 +74,25 @@ export function ProposalComposer({
             {state.message}
           </p>
         ) : null}
-        <form action={action} className="mt-3 grid gap-3 sm:grid-cols-2">
+        <form
+          action={action}
+          onSubmit={() => {
+            setIdempotencyKey(crypto.randomUUID());
+          }}
+          className="mt-3 grid gap-3 sm:grid-cols-2"
+        >
           <input type="hidden" name="conversationId" value={conversationId} />
+          <input
+            type="hidden"
+            name="idempotencyKey"
+            value={idempotencyKey}
+            suppressHydrationWarning
+          />
           <label className="text-ink text-sm font-bold">
             Tipo
             <select
               name="kind"
-              defaultValue={
-                currentUserIsClient ? "QUOTE_REQUEST" : "PROVIDER_QUOTE"
-              }
+              defaultValue={effectiveDefaultKind}
               className="consumer-control text-ink mt-1.5 min-h-[52px] w-full px-3.5 text-base"
             >
               {currentUserIsClient ? (
