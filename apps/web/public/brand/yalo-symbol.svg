@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="64 80 384 400" role="img" aria-labelledby="title desc">
+  <title id="title">YALO — símbolo</title>
+  <desc id="desc">Persona abstracta en forma de Y: brazo izquierdo cian, cuerpo turquesa, brazo derecho menta y cabeza circular separada. Reconstrucción interina fiel a la referencia aprobada; requiere validación del master definitivo.</desc>
+  <defs>
+    <linearGradient id="yaloArmLeft" x1="132" y1="178" x2="252" y2="296" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#08A9F4"/>
+      <stop offset="1" stop-color="#12D9C5"/>
+    </linearGradient>
+    <linearGradient id="yaloArmRight" x1="380" y1="178" x2="260" y2="296" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#65EC91"/>
+      <stop offset="1" stop-color="#12D9C5"/>
+    </linearGradient>
+    <linearGradient id="yaloTrunk" x1="256" y1="290" x2="256" y2="398" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#12D9C5"/>
+      <stop offset="1" stop-color="#0FB5A6"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-width="56">
+    <path d="M132 178 252 296" stroke="url(#yaloArmLeft)"/>
+    <path d="M380 178 260 296" stroke="url(#yaloArmRight)"/>
+    <path d="M256 290 256 398" stroke="url(#yaloTrunk)"/>
+  </g>
+  <circle cx="256" cy="166" r="34" fill="#12D9C5"/>
+</svg>

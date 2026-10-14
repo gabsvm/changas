@@ -29,7 +29,7 @@ export function LegalPage({
             href="/"
             className="consumer-pressable text-terracotta inline-flex min-h-11 items-center text-sm font-bold"
           >
-            ← Volver a Changas
+            ← Volver a YALO
           </Link>
         </header>
         <h1 className="mt-4 text-3xl font-extrabold tracking-[-0.035em]">

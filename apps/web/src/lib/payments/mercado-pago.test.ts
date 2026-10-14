@@ -120,7 +120,7 @@ describe("Phase 11 Mercado Pago provider adapter", () => {
     const result = await provider.createCheckoutSession({
       accessToken: "APP_USR-seller-token",
       title: "Reparación de PC",
-      description: "Trabajo confirmado en Changas",
+      description: "Trabajo confirmado en YALO",
       amountMinor: 100000,
       currencyCode: "ARS",
       marketplaceFeeMinor: 10000,

@@ -22,7 +22,7 @@ const badgeSources = [
   .map((path) => readFileSync(new URL(path, import.meta.url), "utf8"))
   .join("\n");
 
-describe("Changas brand theme", () => {
+describe("YALO brand theme", () => {
   it("uses Space Grotesk + Inter as product typefaces", () => {
     expect(layout).toContain('from "next/font/google"');
     expect(layout).toContain("Space_Grotesk");
@@ -32,43 +32,47 @@ describe("Changas brand theme", () => {
     expect(globals).not.toContain("Bricolage");
   });
 
-  it("uses the approved Changas palette as the global visual foundation", () => {
-    expect(globals).toContain("--color-canvas: #fbf8f3");
-    expect(globals).toContain("--color-ink: #17140f");
-    expect(globals).toContain("--color-brand-orange: #ff6b35");
-    expect(globals).toContain("--color-brand-yellow: #ffc857");
-    expect(globals).toContain("--color-moss: #2563eb");
+  it("uses the approved YALO palette as the global visual foundation", () => {
+    expect(globals).toContain("--color-canvas: #f6f9fc");
+    expect(globals).toContain("--color-ink: #101827");
+    expect(globals).toContain("--color-brand-primary: #161d2a");
+    expect(globals).toContain("--color-brand-primary-strong: #0d121b");
+    expect(globals).toContain("--color-focus: #1576d2");
+    expect(globals).toContain("--yalo-symbol-gradient");
   });
 
-  it("uses ink primary actions and reserves blue for functional contrast", () => {
-    expect(globals).toMatch(/\.button-primary[\s\S]*background:\s*#17140f/i);
+  it("uses navy primary actions and reserves blue for functional contrast", () => {
+    expect(globals).toMatch(/\.button-primary[\s\S]*background:\s*#161d2a/i);
     expect(globals).toMatch(/\.button-primary[\s\S]*color:\s*#ffffff/i);
     expect(globals).toMatch(
-      /:focus-visible[\s\S]*outline:\s*2px solid #2563eb/i,
+      /:focus-visible[\s\S]*outline:\s*2px solid #1576d2/i,
     );
   });
 
-  it("uses accessible semantic derivatives instead of bright brand colors for small status text", () => {
-    expect(globals).toContain("--color-terracotta: #c84010");
+  it("uses accessible semantic derivatives instead of brand colors for small status text", () => {
     expect(globals).toContain("--color-warning: #9a6500");
-    expect(globals).toContain("--color-brand-pink-strong: #d60060");
+    expect(globals).toContain("--color-danger: #c83d46");
   });
 
-  it("uses the accessible pink derivative for unread-count badges", () => {
+  it("uses the danger token for unread-count badges, never brand pink", () => {
     expect(badgeSources).not.toMatch(/bg-brand-pink(?=\s|\")/);
-    expect(badgeSources.match(/bg-brand-pink-strong/g)).toHaveLength(3);
+    expect(badgeSources).toMatch(/bg-danger/);
   });
 
-  it("uses the branded icon artwork for compact wordmarks", () => {
-    expect(globals).toContain('background-image: url("/icon.svg")');
-    expect(icon).toContain("#FFC857");
-    expect(icon).toContain("#FF6B35");
-    expect(icon).toContain("#FF0A78");
+  it("uses the YALO symbol artwork for the app icon", () => {
+    expect(globals).toContain('background-image: url("/brand/yalo-symbol.svg")');
+    expect(icon).toContain("#0D121B");
+    expect(icon).toContain("#08A9F4");
+    expect(icon).toContain("#12D9C5");
+    expect(icon).toContain("#65EC91");
+    expect(icon).not.toContain("#FF6B35");
+    expect(icon).not.toContain("#FF0A78");
   });
 
-  it("retires the previous green and terracotta brand colors", () => {
-    expect(globals).not.toContain("#163832");
-    expect(globals).not.toContain("#285943");
-    expect(globals).not.toContain("#b86145");
+  it("retires the previous warm brand colors", () => {
+    expect(globals).not.toMatch(/#ff6b35/i);
+    expect(globals).not.toMatch(/#ff0a78/i);
+    expect(globals).not.toMatch(/#ffc857/i);
+    expect(globals).not.toMatch(/#163832/i);
   });
 });

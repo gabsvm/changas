@@ -34,13 +34,17 @@ export type IllustratedIconName =
   | "wallet"
   | "calendar";
 
+// YALO D1: los nombres de tono se conservan (los usan decenas de llamadas),
+// pero los valores son navy/semánticos sobrios. Nada de neón identitario.
+// "orange" es el acento de marca (navy); rose/green/gold son semánticos
+// (danger/success/warning), NO azules/verdes de marca.
 const TONES: Record<IllustratedTone, { from: string; to: string }> = {
-  orange: { from: "#FF9A3D", to: "#EE5A24" },
-  blue: { from: "#4F8DFF", to: "#2F4BFE" },
-  green: { from: "#2FBF71", to: "#0E7C46" },
-  rose: { from: "#FB6F92", to: "#E14D7A" },
-  violet: { from: "#8B7CFF", to: "#5B4BD6" },
-  gold: { from: "#F5B942", to: "#DE7E1F" },
+  orange: { from: "#1E293B", to: "#0D121B" },
+  blue: { from: "#1576D2", to: "#0D121B" },
+  green: { from: "#1E7A4C", to: "#0B1F16" },
+  rose: { from: "#A92E37", to: "#5C1620" },
+  violet: { from: "#3B4A6B", to: "#0D121B" },
+  gold: { from: "#8A5F00", to: "#3A2700" },
   neutral: { from: "#A8A29E", to: "#78716C" },
 };
 

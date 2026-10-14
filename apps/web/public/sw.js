@@ -1,8 +1,8 @@
-const STATIC_CACHE = "changas-static-v4";
+const STATIC_CACHE = "yalo-static-v5";
 // P1-08: el worker nunca cachea HTML navegacional. `/` y `/buscar` son
 // force-dynamic personalizadas (saludo/sesión); servirlas desde caché filtra
 // la sesión anterior. Solo assets inmutables + `/offline` precacheado.
-const IMAGE_CACHE = "changas-images-v1";
+const IMAGE_CACHE = "yalo-images-v2";
 const OFFLINE_URL = "/offline";
 const STATIC_URLS = [
   OFFLINE_URL,
@@ -10,6 +10,7 @@ const STATIC_URLS = [
   "/icon-192.png",
   "/icon-512.png",
   "/icon-maskable-512.png",
+  "/brand/yalo-symbol.svg",
   "/screenshots/inicio-390x844.png",
   "/screenshots/buscar-1280x720.png",
 ];
@@ -20,7 +21,7 @@ const PRIVATE_ROOTS = ["/account", "/messages", "/jobs", "/provider", "/api"];
 // las usa para validar el actionUrl del payload; sin esto el click revienta
 // con ReferenceError.
 const SAFE_ACTION_ROOTS = ["/messages", "/jobs", "/account", "/provider"];
-const FALLBACK_PUSH_TITLE = "Changas";
+const FALLBACK_PUSH_TITLE = "YALO";
 const FALLBACK_PUSH_BODY = "Tenés una actualización importante.";
 const FALLBACK_ACTION_URL = "/account/notifications";
 const IMAGE_MAX_ENTRIES = 60;

@@ -28,7 +28,7 @@ export function GuideHeader({
       <div className="flex items-center gap-4">
         <span
           aria-hidden="true"
-          className="font-display grid h-16 w-16 shrink-0 place-items-center rounded-3xl bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_55%,#FF0A78_100%)] text-3xl font-extrabold text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+          className="font-display grid h-16 w-16 shrink-0 place-items-center rounded-3xl bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-3xl font-extrabold text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
         >
           {current}
         </span>
@@ -52,7 +52,7 @@ export function GuideHeader({
             key={item.action}
             className={`h-2 flex-1 rounded-full ${
               index < current
-                ? "bg-[linear-gradient(90deg,#FF9A3D,#FF0A78)]"
+                ? "bg-[var(--yalo-symbol-gradient)]"
                 : "bg-ink/[0.08]"
             }`}
           />
@@ -94,7 +94,7 @@ export function NextStepBanner({
   return (
     <section
       aria-label="Qué sigue"
-      className={`relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_55%,#FF0A78_100%)] p-5 text-white shadow-[0_18px_40px_-14px_rgb(255_107_53/60%)] ${className}`}
+      className={`relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] p-5 text-white shadow-[0_18px_40px_-14px_rgb(13_18_27/60%)] ${className}`}
     >
       <span
         className="pointer-events-none absolute inset-0 opacity-20"

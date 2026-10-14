@@ -77,14 +77,14 @@ describe("notification delivery", () => {
   it("builds a Resend request with an absolute first-party action link", () => {
     const request = buildResendRequest({
       apiKey: "re_test",
-      from: "Changas <notificaciones@changas.test>",
+      from: "YALO <notificaciones@changas.test>",
       origin: "https://changas.test",
       email: {
         deliveryId: "00000000-0000-4000-8000-000000000001",
         to: "persona@example.test",
-        subject: "Trabajo actualizado · Changas",
+        subject: "Trabajo actualizado · YALO",
         text: "Hay una actualización importante.",
-        html: '<p><a href="/jobs/abc">Abrir en Changas</a></p>',
+        html: '<p><a href="/jobs/abc">Abrir en YALO</a></p>',
         actionUrl: "/jobs/abc",
       },
     });

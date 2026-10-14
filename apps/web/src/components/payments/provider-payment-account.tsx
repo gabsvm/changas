@@ -45,7 +45,7 @@ export function ProviderPaymentAccount({
             label="Mercado Pago"
           />
           <div className="min-w-0">
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
+            <p className="text-brand-primary text-[11px] font-extrabold tracking-[0.14em] uppercase dark:text-white">
               Cobros
             </p>
             <h2
@@ -70,7 +70,7 @@ export function ProviderPaymentAccount({
           className="relative h-14 overflow-hidden"
           style={{
             backgroundImage:
-              "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)",
+              "var(--consumer-hero-gradient)",
           }}
           aria-hidden="true"
         >

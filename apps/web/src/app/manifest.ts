@@ -2,16 +2,16 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Changas",
-    short_name: "Changas",
+    name: "YALO",
+    short_name: "YALO",
     description:
       "Una base confiable para conectar habilidades con oportunidades.",
     categories: ["business", "lifestyle"],
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#fbf8f3",
-    theme_color: "#ff6b35",
+    background_color: "#F6F9FC",
+    theme_color: "#0D121B",
     icons: [
       {
         src: "/icon-192.png",
@@ -44,14 +44,14 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: "390x844",
         type: "image/png",
         form_factor: "narrow",
-        label: "Inicio de Changas",
+        label: "Inicio de YALO",
       },
       {
         src: "/screenshots/buscar-1280x720.png",
         sizes: "1280x720",
         type: "image/png",
         form_factor: "wide",
-        label: "Buscador de servicios de Changas",
+        label: "Buscador de servicios de YALO",
       },
     ],
     shortcuts: [

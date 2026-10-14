@@ -56,7 +56,7 @@ export async function sendTextMessage(
       return {
         status: "WARNING",
         message:
-          "Este mensaje parece incluir datos de contacto o pago. Si seguís, la operación puede quedar fuera de la protección de Changas.",
+          "Este mensaje parece incluir datos de contacto o pago. Si seguís, la operación puede quedar fuera de la protección de YALO.",
         signalTypes: assessment.signalTypes,
       };
     }

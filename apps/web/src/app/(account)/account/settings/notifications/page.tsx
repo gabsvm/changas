@@ -37,7 +37,7 @@ export default async function NotificationSettingsPage() {
           </div>
         </div>
         <p className="text-ink/70 mt-1.5 text-sm leading-6">
-          Las alertas críticas dentro de Changas siguen disponibles aunque
+          Las alertas críticas dentro de YALO siguen disponibles aunque
           desactives canales externos.
         </p>
         <div className="consumer-card settings-card bg-surface divide-ink/[0.07] border-ink/[0.08] mt-5 divide-y rounded-2xl border px-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">

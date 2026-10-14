@@ -21,13 +21,13 @@ export default async function ProviderLayout({
           <Link
             className="flex items-center gap-2.5"
             href="/"
-            aria-label="Changas, inicio"
+            aria-label="YALO, inicio"
           >
             <span className="brand-mark" aria-hidden="true">
               C
             </span>
             <span className="text-lg font-bold tracking-[-0.025em]">
-              Changas
+              YALO
             </span>
           </Link>
           <nav

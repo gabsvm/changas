@@ -16,7 +16,7 @@ export function SiteFooter({ className = "" }: { className?: string }) {
         <span className="brand-mark h-6 w-6 !rounded-lg" aria-hidden="true">
           C
         </span>
-        © Changas
+        © YALO
       </span>
       <nav
         aria-label="Información legal"

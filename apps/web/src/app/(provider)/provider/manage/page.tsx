@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { isPaymentsEnabled } from "@changas/config/server";
 import { formatMinorUnits } from "@changas/domain";
 
 import { MarketplaceManagement } from "@/components/provider/marketplace-management";
@@ -10,7 +11,7 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
-import { listMyPastJobs, listMyUpcomingJobs } from "@/lib/jobs/server";
+import { getProviderEarningsSummary } from "@/lib/jobs/earnings-summary";
 import {
   getProviderPaymentAccountState,
   type ProviderPaymentAccountState,
@@ -112,7 +113,7 @@ export default async function ProviderMarketplaceManagePage({
       .order("sort_order"),
     supabase
       .from("skill_requests")
-      .select("id, name, status, created_at")
+      .select("id, name, status, reviewer_note, created_at")
       .eq("requester_user_id", user.id)
       .order("created_at", { ascending: false }),
     supabase.from("service_tags").select("service_id, tag"),
@@ -230,36 +231,15 @@ export default async function ProviderMarketplaceManagePage({
       ? paymentParam
       : null;
 
-  // Resumen de ingresos, solo lectura: reutiliza los listados de trabajos
-  // existentes. Una falla acá no voltea la página.
-  const income = await Promise.all([
-    listMyPastJobs(50).catch(() => []),
-    listMyUpcomingJobs(50).catch(() => []),
-  ]).then(([past, upcoming]) => {
-    const mine = [...past, ...upcoming].filter(
-      (job) => job.is_client === false,
-    );
-    const settled = mine.filter((job) => job.settlement_status === "SETTLED");
-    const due = mine.filter((job) => job.settlement_status === "DUE");
-    const inProgress = mine.filter((job) =>
-      ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
-        job.job_status,
-      ),
-    );
-    return {
-      settledCount: settled.length,
-      settledTotal: settled.reduce(
-        (sum, job) => sum + (job.settlement_total_minor ?? 0),
-        0,
-      ),
-      dueCount: due.length,
-      dueTotal: due.reduce(
-        (sum, job) => sum + (job.settlement_total_minor ?? 0),
-        0,
-      ),
-      inProgressCount: inProgress.length,
-    };
-  });
+  // Resumen de ingresos, solo lectura: agregado server-side sin recorte
+  // arbitrario (YALO C1). Fallback al cálculo anterior si el RPC aún no
+  // existe (deploy ordering). Un error de query no voltea la página pero
+  // se muestra como error visible, nunca como $0.
+  const incomeResult = await getProviderEarningsSummary().then(
+    (summary) => ({ ok: true as const, summary }),
+    () => ({ ok: false as const }),
+  );
+  const paymentsEnabled = isPaymentsEnabled();
 
   const categoryNames = new Map(
     (categories ?? []).map((category) => [category.id, category.name]),
@@ -337,51 +317,94 @@ export default async function ProviderMarketplaceManagePage({
             <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-6" />
           );
         })()}
-        <div
-          className="border-ink/10 bg-surface mt-6 rounded-2xl border p-5"
-          aria-label="Resumen de ingresos"
-        >
-          <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-            Resumen de ingresos
-          </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <div>
-              <p className="text-[22px] leading-7 font-extrabold">
-                {formatMinorUnits(income.settledTotal, "ARS")}
-              </p>
-              <p className="text-ink/70 mt-0.5 text-[13px]">
-                Cobrado · {income.settledCount}{" "}
-                {income.settledCount === 1 ? "trabajo" : "trabajos"}
-              </p>
-            </div>
-            <div>
-              <p className="text-[22px] leading-7 font-extrabold">
-                {formatMinorUnits(income.dueTotal, "ARS")}
-              </p>
-              <p className="text-ink/70 mt-0.5 text-[13px]">
-                Pendiente de cobro · {income.dueCount}{" "}
-                {income.dueCount === 1 ? "trabajo" : "trabajos"}
-              </p>
-            </div>
-            <div>
-              <p className="text-[22px] leading-7 font-extrabold">
-                {income.inProgressCount}
-              </p>
-              <p className="text-ink/70 mt-0.5 text-[13px]">En curso</p>
-            </div>
-          </div>
-          <p className="text-ink/60 mt-3 text-xs leading-5">
-            Se calcula desde tus trabajos como prestador (hasta 50 por listado).
-            El detalle está en{" "}
-            <Link
-              href="/jobs?status=history"
-              className="font-bold underline underline-offset-4"
+        {incomeResult.ok ? (
+          (() => {
+            const income = incomeResult.summary;
+            // Nunca "Cobrado" sin transacción real: con pagos OFF todo es
+            // estimado, y lo simulado (FAKE/sandbox) no es un cobro.
+            const hasRealSettled = income.settledTotal > 0;
+            const settledCaption =
+              paymentsEnabled && hasRealSettled ? "Cobrado" : "Estimado";
+            const dueCaption = paymentsEnabled
+              ? "Pendiente de cobro"
+              : "Estimado a cobrar";
+            return (
+              <div
+                className="border-ink/10 bg-surface mt-6 rounded-2xl border p-5"
+                aria-label="Resumen de ingresos"
+              >
+                <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+                  Resumen de ingresos
+                </p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <p className="text-[22px] leading-7 font-extrabold">
+                      {formatMinorUnits(income.settledTotal, "ARS")}
+                    </p>
+                    <p className="text-ink/70 mt-0.5 text-[13px]">
+                      {settledCaption} · {income.settledCount}{" "}
+                      {income.settledCount === 1 ? "trabajo" : "trabajos"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[22px] leading-7 font-extrabold">
+                      {formatMinorUnits(income.dueTotal, "ARS")}
+                    </p>
+                    <p className="text-ink/70 mt-0.5 text-[13px]">
+                      {dueCaption} · {income.dueCount}{" "}
+                      {income.dueCount === 1 ? "trabajo" : "trabajos"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[22px] leading-7 font-extrabold">
+                      {income.inProgressCount}
+                    </p>
+                    <p className="text-ink/70 mt-0.5 text-[13px]">En curso</p>
+                  </div>
+                </div>
+                <p className="text-ink/60 mt-3 text-xs leading-5">
+                  {!paymentsEnabled
+                    ? "El cobro online aún no está disponible. Los montos son estimados desde tus trabajos y quedan registrados hasta la habilitación."
+                    : income.source === "rpc"
+                      ? "Se calcula desde todos tus trabajos como prestador."
+                      : "Se calcula desde tus trabajos como prestador (hasta 50 por listado)."}
+                  {income.simulatedSettledTotal > 0 ? (
+                    <>
+                      {" "}
+                      Incluye{" "}
+                      {formatMinorUnits(income.simulatedSettledTotal, "ARS")}{" "}
+                      en pagos de prueba (simulados): no son cobros reales.
+                    </>
+                  ) : null}{" "}
+                  El detalle está en{" "}
+                  <Link
+                    href="/jobs?status=history"
+                    className="font-bold underline underline-offset-4"
+                  >
+                    Mis trabajos
+                  </Link>
+                  .
+                </p>
+              </div>
+            );
+          })()
+        ) : (
+          <div
+            className="border-ink/10 bg-surface mt-6 rounded-2xl border p-5"
+            aria-label="Resumen de ingresos"
+          >
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+              Resumen de ingresos
+            </p>
+            <p
+              className="bg-terracotta/10 text-terracotta mt-3 rounded-xl px-4 py-3 text-sm"
+              role="alert"
             >
-              Mis trabajos
-            </Link>
-            .
-          </p>
-        </div>
+              No pudimos cargar el resumen de ingresos. Recargá la página en
+              unos segundos para ver tus saldos.
+            </p>
+          </div>
+        )}
 
         {loadFailed ? (
           <p
@@ -401,7 +424,7 @@ export default async function ProviderMarketplaceManagePage({
         </div>
 
         <div
-          className="mt-6 h-px bg-gradient-to-r from-transparent via-[#EE5A24]/40 to-transparent"
+          className="mt-6 h-px bg-gradient-to-r from-transparent via-[#12D9C5]/40 to-transparent"
           role="separator"
           aria-orientation="horizontal"
         />
@@ -424,6 +447,7 @@ export default async function ProviderMarketplaceManagePage({
               id: request.id,
               name: request.name,
               status: request.status as SkillRequestSummary["status"],
+              reviewer_note: request.reviewer_note ?? null,
               created_at: request.created_at,
             }))}
             serviceTagsByServiceId={serviceTagsByServiceId}

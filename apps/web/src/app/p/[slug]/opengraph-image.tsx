@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 
 import { createClient } from "@/lib/supabase/server";
 
-export const alt = "Perfil de proveedor en Changas";
+export const alt = "Perfil de proveedor en YALO";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -30,6 +30,14 @@ async function loadBrandFonts() {
   ];
 }
 
+async function loadSymbolDataUri(): Promise<string> {
+  const svg = await readFile(
+    join(process.cwd(), "public/brand/yalo-symbol.svg"),
+    "utf8",
+  );
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+}
+
 async function loadProvider(slug: string) {
   try {
     const supabase = await createClient();
@@ -51,15 +59,18 @@ export default async function Image({
 }) {
   const { slug } = await params;
   const provider = await loadProvider(slug);
-  const name = provider?.display_name ?? "Proveedor de Changas";
+  const name = provider?.display_name ?? "Proveedor de YALO";
   const headline = (
     provider?.public_headline ??
     provider?.bio ??
-    "Servicios publicados en Changas."
+    "Servicios publicados en YALO."
   ).slice(0, 140);
-  const initial = name.trim().charAt(0).toUpperCase() || "C";
+  const initial = name.trim().charAt(0).toUpperCase() || "Y";
 
-  const fonts = await loadBrandFonts();
+  const [fonts, symbolSrc] = await Promise.all([
+    loadBrandFonts(),
+    loadSymbolDataUri(),
+  ]);
   return new ImageResponse(
     (
       <div
@@ -68,7 +79,7 @@ export default async function Image({
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#FFF9F3",
+          backgroundColor: "#0D121B",
           fontFamily: '"Space Grotesk", "Inter", sans-serif',
           overflow: "hidden",
         }}
@@ -80,31 +91,17 @@ export default async function Image({
             alignItems: "center",
             padding: "0 80px",
             backgroundImage:
-              "linear-gradient(135deg, #FFC857 0%, #FF6B35 48%, #FF0A78 100%)",
+              "linear-gradient(180deg, #161D2A 0%, #0D121B 100%)",
           }}
         >
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: 9999,
-              backgroundColor: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: 9999,
-                border: "10px solid #FF6B35",
-                borderRightColor: "transparent",
-                transform: "rotate(-32deg)",
-              }}
-            />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={symbolSrc}
+            alt=""
+            width={72}
+            height={72}
+            style={{ width: 72, height: 72 }}
+          />
           <div
             style={{
               color: "#fff",
@@ -114,7 +111,7 @@ export default async function Image({
               letterSpacing: -1,
             }}
           >
-            Changas
+            YALO
           </div>
         </div>
         <div
@@ -130,7 +127,7 @@ export default async function Image({
               height: 150,
               borderRadius: 9999,
               backgroundImage:
-                "linear-gradient(135deg, #FFC857 0%, #FF6B35 48%, #FF0A78 100%)",
+                "linear-gradient(115deg, #08A9F4 0%, #12D9C5 52%, #65EC91 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -157,7 +154,7 @@ export default async function Image({
           >
             <div
               style={{
-                color: "#202124",
+                color: "#fff",
                 fontSize: name.length > 24 ? 60 : 80,
                 fontWeight: 700,
                 lineHeight: 1.05,
@@ -171,7 +168,7 @@ export default async function Image({
             </div>
             <div
               style={{
-                color: "rgba(32,33,36,0.65)",
+                color: "rgba(255,255,255,0.65)",
                 fontSize: 34,
                 fontWeight: 500,
                 lineHeight: 1.3,
@@ -182,6 +179,19 @@ export default async function Image({
               {headline}
             </div>
           </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            padding: "0 80px 48px",
+            color: "#65EC91",
+            fontSize: 22,
+            fontWeight: 500,
+            letterSpacing: 4,
+          }}
+        >
+          TRABAJÁ · CONTRATÁ · CRECÉ
         </div>
       </div>
     ),

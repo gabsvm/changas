@@ -9,7 +9,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Política de privacidad",
-  description: "Cómo Changas trata tus datos personales.",
+  description: "Cómo YALO trata tus datos personales.",
 };
 
 export default function PrivacyPage() {
@@ -122,7 +122,7 @@ export default function PrivacyPage() {
 
       <LegalSection title="8. Menores de edad">
         <p>
-          Changas no está dirigida a menores de 18 años y no recolectamos sus
+          YALO no está dirigida a menores de 18 años y no recolectamos sus
           datos de forma intencional. Si creés que una persona menor creó una
           cuenta, escribinos y la eliminaremos.
         </p>

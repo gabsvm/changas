@@ -46,9 +46,10 @@ function DimensionSelect({ name, label }: { name: string; label: string }) {
       {label}
       <select
         name={name}
-        defaultValue="5"
+        defaultValue=""
         className="border-ink/10 bg-surface mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
       >
+        <option value="">Sin elegir (opcional)</option>
         {[5, 4, 3, 2, 1].map((value) => (
           <option key={value} value={value}>
             {value} / 5
@@ -78,6 +79,8 @@ export async function JobReputationPanel({
 
   // El prestador puede pedir reseña solo si el trabajo ya está cobrado
   // (COMPLETED+SETTLED) y todavía no hay reseña. Solo lectura.
+  // La reseña del cliente, en cambio, no espera al cobro: publicar en
+  // COMPLETED sin SETTLED está permitido (el SQL lo acepta).
   const settlementStatus =
     isProvider && !state.review_id
       ? (await getJobDetail(jobId).catch(() => null))?.settlement_status ?? null
@@ -145,9 +148,13 @@ export async function JobReputationPanel({
             <select
               name="rating"
               required
-              defaultValue="5"
+              defaultValue=""
+              aria-describedby="rating-hint"
               className="border-ink/10 bg-surface mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none sm:max-w-xs dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
             >
+              <option value="" disabled>
+                Elegí una calificación
+              </option>
               {[5, 4, 3, 2, 1].map((value) => (
                 <option key={value} value={value}>
                   {value} / 5
@@ -155,6 +162,10 @@ export async function JobReputationPanel({
               ))}
             </select>
           </label>
+          <p id="rating-hint" className="text-ink/70 -mt-2 text-xs leading-5">
+            Tenés que elegir las estrellas para publicar: sin calificación no
+            se envía la reseña.
+          </p>
           <div className="grid gap-3 sm:grid-cols-3">
             <DimensionSelect name="qualityRating" label="Calidad" />
             <DimensionSelect name="punctualityRating" label="Puntualidad" />

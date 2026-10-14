@@ -16,17 +16,18 @@ describe("marketplace consumer theme", () => {
     expect(css).toContain("--sticky-offset");
   });
 
-  it("uses the approved Changas brand colors", () => {
-    expect(css).toContain("--color-canvas: #fbf8f3");
-    expect(css).toContain("--color-ink: #17140f");
-    expect(css).toContain("--color-brand-orange: #ff6b35");
-    expect(css).toContain("--color-brand-yellow: #ffc857");
-    expect(css).toContain("--color-brand-pink: #ff0a78");
-    expect(css).toContain("--color-brand-pink-strong: #d60060");
-    expect(css).toContain("--color-moss: #2563eb");
+  it("uses the approved YALO brand colors", () => {
+    expect(css).toContain("--color-canvas: #f6f9fc");
+    expect(css).toContain("--color-ink: #101827");
+    expect(css).toContain("--color-brand-primary: #161d2a");
+    expect(css).toContain("--color-brand-primary-strong: #0d121b");
+    expect(css).toContain("--color-focus: #1576d2");
+    expect(css).toContain("--color-danger: #c83d46");
+    expect(css).not.toMatch(/--color-brand-orange:\s*#ff6b35/i);
+    expect(css).not.toMatch(/--color-brand-pink:\s*#ff0a78/i);
   });
 
-  it("defines warm layered marketplace depth tokens", () => {
+  it("defines soft layered marketplace depth tokens", () => {
     expect(css).toContain("--consumer-shadow-card");
     expect(css).toContain("--consumer-shadow-float");
     expect(css).toContain("--consumer-hero-gradient");

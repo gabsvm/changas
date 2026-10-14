@@ -191,7 +191,7 @@ export default async function AccountPage() {
                 ¿Querés ofrecer servicios?
               </h2>
               <p className="text-ink/70 mt-1.5 text-sm leading-6">
-                Creá tu perfil profesional sin cambiar cómo usás Changas para
+                Creá tu perfil profesional sin cambiar cómo usás YALO para
                 contratar.
               </p>
               <StartProviderForm action={startProviderOnboarding} />

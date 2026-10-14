@@ -15,7 +15,7 @@ type AuthMode = "login" | "signup" | "reset" | "update";
 
 const copy = {
   login: {
-    title: "Volvé a Changas",
+    title: "Volvé a YALO",
     description: "Ingresá para continuar con tu cuenta.",
     submit: "Iniciar sesión",
   },
@@ -99,7 +99,7 @@ export function AuthForm({
     <div className="border-ink/[0.08] bg-surface relative w-full max-w-md overflow-hidden rounded-3xl border p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%),0_24px_70px_-20px_rgb(255_107_53/28%)] sm:rounded-[1.75rem] sm:p-8 dark:shadow-[0_24px_70px_-20px_rgb(0_0_0/70%)]">
       <span aria-hidden="true" className="brand-gradient-surface pointer-events-none absolute inset-x-0 top-0 h-1.5" />
       <p className="text-terracotta text-xs font-extrabold tracking-[0.18em] uppercase">
-        Cuenta Changas
+        Cuenta YALO
       </p>
       <h1 className="font-display mt-2 text-3xl leading-tight font-extrabold tracking-[-0.04em] sm:mt-3 sm:text-4xl">
         {modeCopy.title}

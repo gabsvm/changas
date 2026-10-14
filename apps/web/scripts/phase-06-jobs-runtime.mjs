@@ -469,14 +469,21 @@ assert(
   !startedJob.error && startedJob.data === "IN_PROGRESS",
   `Provider start failed: ${startedJob.error?.message ?? "unknown"}`,
 );
-const completionRequest = await provider.rpc("transition_job_status", {
+const clientJobDetail = await clientA.rpc("get_job_detail", {
   target_job_id: jobId,
-  expected_status: "IN_PROGRESS",
-  requested_status: "COMPLETION_REQUESTED",
-  transition_reason: null,
 });
 assert(
-  !completionRequest.error && completionRequest.data === "COMPLETION_REQUESTED",
+  !clientJobDetail.error &&
+    typeof clientJobDetail.data?.[0]?.confirmation_code === "string" &&
+    clientJobDetail.data[0].confirmation_code.length > 0,
+  "Client could not read the confirmation code.",
+);
+const completionRequest = await provider.rpc("request_job_completion", {
+  target_job_id: jobId,
+  confirmation_code: clientJobDetail.data[0].confirmation_code,
+});
+assert(
+  !completionRequest.error && completionRequest.data === "COMPLETED",
   "Provider could not request completion.",
 );
 const illegalProviderCompletion = await provider.rpc("transition_job_status", {

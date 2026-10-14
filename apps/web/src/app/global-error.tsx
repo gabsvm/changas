@@ -86,7 +86,7 @@ export default function GlobalError({
                 color: "#c84010",
               }}
             >
-              Changas
+              YALO
             </p>
             <h1 style={{ marginTop: "1rem", fontSize: "2.25rem" }}>
               La aplicación necesita volver a intentarlo.

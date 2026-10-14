@@ -6,6 +6,7 @@ import {
   useActionState,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -81,6 +82,25 @@ function normalizeRealtimeMessage(
     created_at: row.created_at,
   };
 }
+function formatDayLabel(iso: string): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const sameDay = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
+  if (sameDay(date, now)) return "Hoy";
+  if (sameDay(date, yesterday)) return "Ayer";
+  const label = new Intl.DateTimeFormat("es-AR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(date);
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 
 export function ConversationThread({
   conversationId,
@@ -134,6 +154,56 @@ export function ConversationThread({
   const [readError, setReadError] = useState<string | null>(null);
   const [showAttach, setShowAttach] = useState(false);
   const connectedOnce = useRef(false);
+  const [pendingNew, setPendingNew] = useState(0);
+  const prependAnchorRef = useRef<{ height: number; top: number } | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const firstMessageId = messages[0]?.message_id ?? null;
+
+  const scrollToBottom = useCallback((smooth = false) => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({
+        behavior: smooth ? "smooth" : "auto",
+        block: "end",
+      });
+    } else {
+      window.scrollTo({ top: document.documentElement.scrollHeight });
+    }
+    setPendingNew(0);
+  }, []);
+
+  function isNearBottom(): boolean {
+    if (typeof window === "undefined") return true;
+    const threshold = 160;
+    return (
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - threshold
+    );
+  }
+
+  // Al entrar: anclar abajo sin animación.
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => scrollToBottom(false));
+    return () => window.cancelAnimationFrame(frame);
+  }, [scrollToBottom]);
+
+  // Al anteponer mensajes anteriores: conservar ancla exacta de scroll.
+  useLayoutEffect(() => {
+    const anchor = prependAnchorRef.current;
+    if (!anchor) return;
+    prependAnchorRef.current = null;
+    const delta =
+      document.documentElement.scrollHeight - anchor.height;
+    if (delta > 0) window.scrollBy(0, delta);
+  }, [firstMessageId]);
+
+  // Si el lector baja al fondo, ocultar el pill de nuevos mensajes.
+  useEffect(() => {
+    function onScroll() {
+      if (isNearBottom()) setPendingNew(0);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
@@ -153,12 +223,20 @@ export function ConversationThread({
           );
           if (!incoming) return;
 
+          const stick = isNearBottom();
+
           setMessages((current) =>
             mergeConversationMessages(current, [incoming]),
           );
 
           if (incoming.kind === "IMAGE" || incoming.kind === "FILE") {
             window.setTimeout(refreshThread, 350);
+          }
+
+          if (stick) {
+            window.requestAnimationFrame(() => scrollToBottom(false));
+          } else {
+            setPendingNew((count) => count + 1);
           }
         },
       )
@@ -201,6 +279,10 @@ export function ConversationThread({
     if (!first || loadingOlder) return;
 
     setOlderError(null);
+    prependAnchorRef.current = {
+      height: document.documentElement.scrollHeight,
+      top: window.scrollY,
+    };
     startOlderTransition(async () => {
       try {
         const older = await loadOlderMessages(
@@ -211,6 +293,7 @@ export function ConversationThread({
         setMessages((current) => mergeConversationMessages(older, current));
         setHasOlder(older.length === 50);
       } catch (error) {
+        prependAnchorRef.current = null;
         console.error("[messages] no pudimos cargar mensajes anteriores.", error);
         setOlderError("No pudimos cargar los mensajes anteriores. Probá de nuevo.");
       }
@@ -244,6 +327,10 @@ export function ConversationThread({
   }, [initialAttachments]);
   const waitingForReply =
     messages.length > 0 && messages.at(-1)?.sender_user_id === currentUserId;
+  const handleSent = useCallback(() => {
+    refreshThread();
+    window.requestAnimationFrame(() => scrollToBottom(true));
+  }, [refreshThread, scrollToBottom]);
 
   return (
     <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden sm:min-h-[calc(100dvh-4rem)]">
@@ -251,8 +338,7 @@ export function ConversationThread({
         <div
           className="relative -mx-4 mb-3 h-1.5 overflow-hidden sm:-mx-6"
           style={{
-            backgroundImage:
-              "linear-gradient(135deg, #FF9A3D 0%, #FF6B35 48%, #FF0A78 100%)",
+            backgroundImage: "var(--yalo-symbol-gradient)",
           }}
           aria-hidden="true"
         >
@@ -288,10 +374,7 @@ export function ConversationThread({
           </Link>
           <span
             className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-[15px] font-extrabold text-white shadow-[0_6px_16px_-6px_rgb(23_20_15/40%)]"
-            style={{
-              backgroundImage:
-                "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
-            }}
+            style={{ backgroundColor: "var(--color-brand-primary)" }}
             aria-hidden="true"
           >
             {peerName.trim().charAt(0).toUpperCase() || "C"}
@@ -336,11 +419,11 @@ export function ConversationThread({
           <div
             aria-label={`${spotlight.title}. ${spotlight.sub}`}
             role="group"
-            className="mt-3 flex items-center gap-3 rounded-2xl bg-[#17140f] px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(23_20_15/50%)]"
+            className="mt-3 flex items-center gap-3 rounded-2xl bg-brand-primary-strong px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/50%)]"
           >
             <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2fbf71] opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#2fbf71]" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success" />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-extrabold">
@@ -360,19 +443,19 @@ export function ConversationThread({
             ) : null}
             <Link
               href={spotlight.href}
-              className="consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-3.5 text-[13px] font-extrabold text-[#17140f]"
+              className="consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-3.5 text-[13px] font-extrabold text-ink"
             >
               {spotlight.cta}
             </Link>
           </div>
         ) : null}
         {blockError ? (
-          <p role="alert" className="bg-terracotta/10 text-terracotta mt-3 rounded-xl px-3 py-2 text-xs leading-5">
+          <p role="alert" className="bg-danger/10 text-danger mt-3 rounded-xl px-3 py-2 text-xs leading-5">
             {blockError}
           </p>
         ) : null}
         {blockedByMe ? (
-          <div className="bg-terracotta/10 text-terracotta mt-3 rounded-xl px-3 py-2 text-xs leading-5">
+          <div className="bg-danger/10 text-danger mt-3 rounded-xl px-3 py-2 text-xs leading-5">
             Bloqueaste a esta persona solo en esta conversación. El historial
             se conserva, pero acá no pueden enviarse mensajes ni propuestas
             nuevas hasta desbloquearla.
@@ -388,7 +471,7 @@ export function ConversationThread({
             <span className="truncate text-sm font-extrabold">
               {deal.amountLabel}
             </span>
-            <span className="text-terracotta ml-auto shrink-0 text-[13px] font-bold">
+            <span className="text-brand-primary ml-auto shrink-0 text-[13px] font-bold dark:text-white">
               Ver acuerdo ↓
             </span>
           </a>
@@ -410,14 +493,14 @@ export function ConversationThread({
               {loadingOlder ? "Cargando…" : "Cargar mensajes anteriores"}
             </button>
             {olderError ? (
-              <p role="alert" className="text-terracotta mt-2 text-xs font-semibold">
+              <p role="alert" className="text-danger mt-2 text-xs font-semibold">
                 {olderError}
               </p>
             ) : null}
           </div>
         ) : null}
         {readError ? (
-          <p role="alert" className="text-terracotta mb-3 text-center text-xs font-semibold">
+          <p role="alert" className="text-danger mb-3 text-center text-xs font-semibold">
             {readError}
           </p>
         ) : null}
@@ -435,21 +518,57 @@ export function ConversationThread({
           </div>
         ) : (
           <div className="space-y-2">
-            {messages.map((message) => (
-              <MessageBubble
-                key={message.message_id}
-                message={message}
-                own={message.sender_user_id === currentUserId}
-                attachments={attachmentsByMessage.get(message.message_id) ?? []}
-              />
-            ))}
+            {messages.map((message, index) => {
+              const previous = index > 0 ? messages[index - 1] : null;
+              const current = new Date(message.created_at);
+              const prevDate = previous ? new Date(previous.created_at) : null;
+              const startsNewDay =
+                !prevDate ||
+                current.getFullYear() !== prevDate.getFullYear() ||
+                current.getMonth() !== prevDate.getMonth() ||
+                current.getDate() !== prevDate.getDate();
+              return (
+                <div key={message.message_id}>
+                  {startsNewDay ? (
+                    <div
+                      role="separator"
+                      aria-label={formatDayLabel(message.created_at)}
+                      className="my-4 flex items-center gap-3"
+                    >
+                      <span aria-hidden="true" className="bg-ink/10 h-px flex-1" />
+                      <span className="text-ink/70 rounded-full px-3 py-1 text-xs font-semibold">
+                        {formatDayLabel(message.created_at)}
+                      </span>
+                      <span aria-hidden="true" className="bg-ink/10 h-px flex-1" />
+                    </div>
+                  ) : null}
+                  <MessageBubble
+                    message={message}
+                    own={message.sender_user_id === currentUserId}
+                    attachments={attachmentsByMessage.get(message.message_id) ?? []}
+                  />
+                </div>
+              );
+            })}
+            <div ref={bottomRef} aria-hidden="true" className="h-px" />
           </div>
         )}
+        {pendingNew > 0 ? (
+          <div className="sticky bottom-24 z-10 mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={() => scrollToBottom(true)}
+              className="consumer-pressable bg-ink inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-[13px] font-bold text-white shadow-lg dark:text-brand-primary-strong"
+            >
+              {pendingNew === 1 ? "Nuevo mensaje ↓" : `${pendingNew} nuevos mensajes ↓`}
+            </button>
+          </div>
+        ) : null}
         {waitingForReply ? (
           <div className="mx-auto mt-5 max-w-sm text-center">
             <Link
               href="/account/notifications"
-              className="focus-visible:ring-2 focus-visible:ring-moss/45 bg-brand-yellow/25 text-ink inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[13px] font-bold"
+              className="focus-visible:ring-2 focus-visible:ring-focus/45 bg-brand-primary/[0.07] text-brand-primary inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[13px] font-bold dark:bg-white/10 dark:text-white"
             >
               Avisame cuando responda {peerName}
               <span aria-hidden="true">→</span>
@@ -489,7 +608,7 @@ export function ConversationThread({
                 <TextComposer
                   conversationId={conversationId}
                   initialNonce={initialTextNonce}
-                  onSent={refreshThread}
+                  onSent={handleSent}
                 />
               </div>
             </div>
@@ -497,7 +616,7 @@ export function ConversationThread({
               <AttachmentComposer
                 conversationId={conversationId}
                 initialNonce={initialAttachmentNonce}
-                onSent={refreshThread}
+                onSent={handleSent}
               />
             ) : null}
           </>
@@ -518,8 +637,8 @@ function MessageBubble({
 }) {
   if (message.kind === "SYSTEM") {
     return (
-      <div className="bg-moss/10 text-moss mx-auto my-4 max-w-lg rounded-xl px-4 py-3 text-center text-xs leading-5">
-        {message.body ?? "Actividad de Changas"}
+      <div className="bg-focus/10 text-focus mx-auto my-4 max-w-lg rounded-xl px-4 py-3 text-center text-xs leading-5">
+        {message.body ?? "Actividad de YALO"}
       </div>
     );
   }
@@ -529,14 +648,10 @@ function MessageBubble({
       <article
         className={`max-w-[78%] rounded-[1.125rem] px-3.5 py-2.5 text-[15px] leading-6 sm:max-w-[72%] ${
           own
-            ? "rounded-br-md text-white shadow-[0_8px_20px_-8px_rgb(238_90_36/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
-            : "border-ink/[0.08] text-ink rounded-bl-md border bg-white shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.06] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+            ? "rounded-br-md bg-brand-primary text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/55%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+            : "border-ink/[0.08] text-ink rounded-bl-md border bg-white shadow-[0_1px_2px_rgb(16_24_39/6%),0_8px_20px_-6px_rgb(16_24_39/12%)] dark:bg-white/[0.06] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
         }`}
-        style={
-          own
-            ? { backgroundImage: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)" }
-            : undefined
-        }
+        style={undefined}
       >
         {message.body ? (
           <p className="whitespace-pre-wrap">{message.body}</p>
@@ -547,7 +662,7 @@ function MessageBubble({
               <a
                 key={attachment.id}
                 href={`/messages/attachments/${attachment.id}`}
-                className={`block rounded-xl border px-3 py-2 ${
+                className={`block overflow-hidden rounded-xl border ${
                   own
                     ? "border-white/20 bg-white/10"
                     : "border-ink/10 bg-canvas"
@@ -555,18 +670,28 @@ function MessageBubble({
                 target="_blank"
                 rel="noreferrer"
               >
-                <span className="block truncate font-semibold">
-                  {attachment.mimeType.startsWith("image/")
-                    ? "Imagen"
-                    : "Archivo"}{" "}
-                  · {attachment.originalName}
-                </span>
-                <span
-                  className={`text-[11px] ${
-                    own ? "text-white/65" : "text-ink/70"
-                  }`}
-                >
-                  {formatBytes(attachment.sizeBytes)}
+                {attachment.mimeType.startsWith("image/") ? (
+                  <img
+                    src={`/messages/attachments/${attachment.id}`}
+                    alt={attachment.originalName}
+                    loading="lazy"
+                    className="h-40 w-full object-cover"
+                  />
+                ) : null}
+                <span className="block px-3 py-2">
+                  <span className="block truncate font-semibold">
+                    {attachment.mimeType.startsWith("image/")
+                      ? "Imagen"
+                      : "Archivo"}{" "}
+                    · {attachment.originalName}
+                  </span>
+                  <span
+                    className={`text-[11px] ${
+                      own ? "text-white/65" : "text-ink/70"
+                    }`}
+                  >
+                    {formatBytes(attachment.sizeBytes)}
+                  </span>
                 </span>
               </a>
             ))}
@@ -601,6 +726,7 @@ function TextComposer({
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const nonceRef = useRef<HTMLInputElement>(null);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
   const [state, setState] = useState(textInitialState);
   const [warningDismissed, setWarningDismissed] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -633,6 +759,7 @@ function TextComposer({
         if (nonceRef.current) nonceRef.current.value = crypto.randomUUID();
         setWarningDismissed(false);
         onSent();
+        bodyRef.current?.focus({ preventScroll: true });
       }
     });
   }
@@ -647,17 +774,22 @@ function TextComposer({
         defaultValue={initialNonce}
       />
       <textarea
+        ref={bodyRef}
         name="body"
         onChange={() => setWarningDismissed(true)}
         placeholder="Escribí un mensaje…"
         rows={1}
         maxLength={4000}
-        className="border-ink/[0.1] placeholder:text-ink/40 focus:border-moss/50 min-h-[52px] flex-1 resize-none rounded-2xl border bg-white px-4 py-3.5 text-base outline-none dark:bg-white/[0.06]"
+        inputMode="text"
+        enterKeyHint="send"
+        autoCapitalize="sentences"
+        autoComplete="off"
+        className="border-ink/[0.1] placeholder:text-ink/40 focus:border-focus/50 min-h-[52px] flex-1 resize-none rounded-2xl border bg-white px-4 py-3.5 text-base outline-none dark:bg-white/[0.06]"
       />
       <button
         type="submit"
         disabled={pending}
-        className="consumer-pressable bg-ink grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl text-white disabled:opacity-40"
+        className="consumer-pressable bg-ink grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl text-white disabled:opacity-40 dark:text-brand-primary-strong"
         aria-label="Enviar mensaje"
       >
         {pending ? (
@@ -679,8 +811,8 @@ function TextComposer({
         )}
       </button>
       {state.status === "WARNING" && !warningDismissed ? (
-        <div className="border-terracotta/20 bg-surface relative mt-2 rounded-2xl border p-4 shadow-lg">
-          <p className="text-terracotta text-sm font-semibold">
+        <div className="border-warning/25 bg-surface relative mt-2 rounded-2xl border p-4 shadow-lg">
+          <p className="text-warning text-sm font-semibold">
             Revisá antes de enviar
           </p>
           <p className="text-ink/70 mt-1 text-xs leading-5">{state.message}</p>
@@ -690,7 +822,7 @@ function TextComposer({
               name="confirmLeakage"
               value="true"
               disabled={pending}
-              className="bg-terracotta rounded-full px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+              className="bg-warning rounded-full px-4 py-2 text-xs font-bold text-white disabled:opacity-50 dark:text-brand-primary-strong"
             >
               Enviar de todos modos
             </button>
@@ -706,7 +838,7 @@ function TextComposer({
       ) : null}
       {state.status === "ERROR" ? (
         <p
-          className="text-terracotta absolute right-4 bottom-[4.75rem] left-4 rounded-xl bg-[#fff7f2] px-3 py-2 text-xs"
+          className="text-danger absolute right-4 bottom-[4.75rem] left-4 rounded-xl bg-danger/[0.08] px-3 py-2 text-xs"
           role="alert"
         >
           {state.message}
@@ -841,10 +973,11 @@ function AttachmentComposer({
   }
 
   return (
+    <div className="mt-2">
     <form
       ref={formRef}
       onSubmit={submit}
-      className="mt-2 flex items-center gap-2"
+      className="flex items-center gap-2"
     >
       <input type="hidden" name="conversationId" value={conversationId} />
       <input
@@ -869,7 +1002,7 @@ function AttachmentComposer({
         onChange={handleFilesChange}
         disabled={pending || compressing}
         aria-label="Elegir archivos para adjuntar"
-        className="file:bg-moss/10 file:text-moss min-h-11 min-w-0 flex-1 content-center text-[13px] file:mr-2 file:min-h-11 file:rounded-xl file:border-0 file:px-3 file:font-bold"
+        className="file:bg-focus/10 file:text-focus min-h-11 min-w-0 flex-1 content-center text-[13px] file:mr-2 file:min-h-11 file:rounded-xl file:border-0 file:px-3 file:font-bold"
       />
       <button
         type="submit"
@@ -878,12 +1011,35 @@ function AttachmentComposer({
       >
         {compressing ? "Optimizando…" : pending ? "Subiendo…" : "Adjuntar"}
       </button>
-      {state.status === "error" ? (
-        <p className="sr-only" role="alert">
-          {state.message}
-        </p>
-      ) : null}
     </form>
+      {state.status === "error" ? (
+        <div
+          role="alert"
+          className="bg-danger/10 text-danger mt-2 flex flex-wrap items-center gap-2 rounded-xl px-3 py-2 text-xs leading-5"
+        >
+          <span className="min-w-0 flex-1 font-semibold">{state.message}</span>
+          <button
+            type="button"
+            disabled={pending || compressing}
+            onClick={() => formRef.current?.requestSubmit()}
+            className="consumer-pressable bg-danger inline-flex min-h-11 items-center rounded-full px-4 font-bold text-white disabled:opacity-50 dark:text-brand-primary-strong"
+          >
+            {pending ? "Subiendo…" : "Reintentar"}
+          </button>
+          <button
+            type="button"
+            disabled={pending || compressing}
+            onClick={() => {
+              formRef.current?.reset();
+              setState(attachmentInitialState);
+            }}
+            className="consumer-pressable border-ink/10 inline-flex min-h-11 items-center rounded-full border px-4 font-bold disabled:opacity-50"
+          >
+            Cancelar
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -924,14 +1080,14 @@ function ReportForm({ conversationId }: { conversationId: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="bg-terracotta w-full rounded-full px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+          className="bg-danger w-full rounded-full px-3 py-2 text-xs font-bold text-white disabled:opacity-50 dark:text-brand-primary-strong"
         >
           {pending ? "Enviando…" : "Enviar reporte"}
         </button>
         {state.message ? (
           <p
             className={`text-[11px] leading-4 ${
-              state.status === "SUCCESS" ? "text-moss" : "text-terracotta"
+              state.status === "SUCCESS" ? "text-success" : "text-danger"
             }`}
           >
             {state.message}

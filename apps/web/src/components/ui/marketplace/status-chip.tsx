@@ -4,11 +4,11 @@ type Tone = "neutral" | "info" | "success" | "warning" | "danger" | "brand";
 
 const toneClasses: Record<Tone, string> = {
   neutral: "bg-ink/[0.06] text-ink/70",
-  info: "bg-moss/10 text-moss",
+  info: "bg-focus/10 text-focus",
   success: "bg-success/10 text-success",
-  warning: "bg-brand-yellow/24 text-warning",
+  warning: "bg-warning/12 text-warning",
   danger: "bg-danger/10 text-danger",
-  brand: "bg-brand-orange/12 text-terracotta",
+  brand: "bg-brand-primary/[0.08] text-brand-primary dark:bg-white/10 dark:text-white",
 };
 
 export function StatusChip({

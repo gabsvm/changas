@@ -25,7 +25,7 @@ const message: SafePushMessage = {
   p256dh: "p256dh-key",
   authKey: "auth-key",
   title: "Nuevo mensaje",
-  body: "Tenés un mensaje nuevo en Changas.",
+  body: "Tenés un mensaje nuevo en YALO.",
   actionUrl: "/messages/abc",
 };
 

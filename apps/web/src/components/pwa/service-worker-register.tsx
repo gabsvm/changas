@@ -114,7 +114,7 @@ export function ServiceWorkerRegister() {
       </div>
       <div className="overflow-y-auto p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
         <p className="text-ink/70 mt-1 text-sm leading-6">
-          Recargá Changas para usar la última versión, con las mejoras y
+          Recargá YALO para usar la última versión, con las mejoras y
           arreglos más recientes.
         </p>
         <button

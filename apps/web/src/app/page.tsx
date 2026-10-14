@@ -92,14 +92,12 @@ export default async function HomePage() {
           <Link
             className="flex min-w-0 items-center gap-2.5"
             href="/"
-            aria-label="Changas, inicio"
+            aria-label="YALO, inicio"
           >
-            <span className="brand-mark h-9 w-9" aria-hidden="true">
-              C
-            </span>
+            <span className="brand-mark h-9 w-9" role="img" aria-label="YALO" />
             <span className="min-w-0">
               <span className="block truncate text-[17px] leading-5 font-extrabold tracking-[-0.02em]">
-                {user ? `Hola, ${accountName}` : "Changas"}
+                {user ? `Hola, ${accountName}` : "YALO"}
               </span>
               <span className="text-ink/70 block truncate text-[13px] leading-4 font-medium">
                 {user ? "¿Qué resolvemos hoy?" : "Servicios cerca tuyo"}
@@ -176,16 +174,23 @@ export default async function HomePage() {
             <div className="relative z-10 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-10">
               <div>
                 <div className="relative z-10 max-w-2xl">
-                  <p className="text-ink/80 text-xs font-extrabold tracking-[0.14em] uppercase">
-                    Tu mercado de tareas rápidas
+                  <img
+                    src="/brand/yalo-logo-horizontal-dark.svg"
+                    alt="YALO"
+                    className="h-9 w-auto"
+                    width={120}
+                    height={36}
+                  />
+                  <p className="mt-3 text-xs font-extrabold tracking-[0.14em] text-white/70 uppercase">
+                    Trabajá · Contratá · Crecé
                   </p>
                   <h1
                     id="home-search-title"
-                    className="mt-3 max-w-xl text-[2.5rem] leading-none font-extrabold tracking-[-0.04em] sm:text-6xl"
+                    className="mt-3 max-w-xl text-[2.5rem] leading-none font-extrabold tracking-[-0.04em] text-white sm:text-6xl"
                   >
                     Encontrá a alguien que lo haga.
                   </h1>
-                  <p className="text-ink/80 mt-3 max-w-lg text-[15px] leading-6 sm:text-lg">
+                  <p className="mt-3 max-w-lg text-[15px] leading-6 text-white/80 sm:text-lg">
                     Oficios verificables cerca tuyo o por videollamada. Buscá
                     una vez y elegí con precios claros.
                   </p>
@@ -295,7 +300,7 @@ export default async function HomePage() {
 
           <section className="consumer-card bg-surface relative mt-6 flex flex-col gap-3 overflow-hidden p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <span
-              className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)]"
+              className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--yalo-symbol-gradient)]"
               aria-hidden="true"
             />
             <div className="flex items-start gap-3">

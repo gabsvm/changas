@@ -5,9 +5,13 @@ import { formatMinorUnits } from "@changas/domain";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
+import { parsePageCursor } from "@/lib/cursor-pages";
 import {
-  listMyPastJobs,
-  listMyUpcomingJobs,
+  listMyPastJobsPage,
+  listMyPastJobsThrough,
+  listMyUpcomingJobsPage,
+  listMyUpcomingJobsThrough,
+  type JobStatusFilter,
   type UpcomingJob,
 } from "@/lib/jobs/server";
 import { getJobStatusPresentation } from "@/lib/ui/job-status";
@@ -65,34 +69,26 @@ const statusFilters = [
 
 type StatusFilter = (typeof statusFilters)[number]["key"];
 
-function matchesFilter(job: UpcomingJob, filter: StatusFilter): boolean {
+const JOBS_PAGE_SIZE = 20;
+
+function rpcFilterFor(filter: StatusFilter): {
+  past: boolean;
+  filter: JobStatusFilter | null;
+} {
   switch (filter) {
     case "confirmed":
-      return job.job_status === "CONFIRMED";
+      return { past: false, filter: "CONFIRMED" };
     case "in_progress":
-      return job.job_status === "IN_PROGRESS";
+      return { past: false, filter: "IN_PROGRESS" };
     case "closing":
-      return (
-        job.job_status === "COMPLETION_REQUESTED" ||
-        job.job_status === "DISPUTED"
-      );
+      return { past: false, filter: "CLOSING" };
     case "pending":
-      return job.settlement_status === "DUE";
+      return { past: true, filter: "PENDING_SETTLEMENT" };
     case "history":
-      return true;
+      return { past: true, filter: null };
     default:
-      return true;
+      return { past: false, filter: null };
   }
-}
-
-const DEFAULT_PAGE_SIZE = 20;
-const MAX_PAGE_SIZE = 50;
-
-function parsePageSize(value: string | string[] | undefined): number {
-  const raw = Array.isArray(value) ? value[0] : value;
-  const parsed = Number.parseInt(raw ?? "", 10);
-  if (!Number.isInteger(parsed)) return DEFAULT_PAGE_SIZE;
-  return Math.min(Math.max(parsed, 1), MAX_PAGE_SIZE);
 }
 
 export default async function JobsPage({
@@ -108,17 +104,30 @@ export default async function JobsPage({
   )
     ? ((Array.isArray(rawStatus) ? rawStatus[0] : rawStatus) as StatusFilter)
     : "all";
-  const pageSize = parsePageSize(params.n);
-  const jobs =
-    activeFilter === "history" || activeFilter === "pending"
-      ? await listMyPastJobs(pageSize)
-      : await listMyUpcomingJobs(pageSize);
-  const visible = jobs.filter((job) => matchesFilter(job, activeFilter));
+  const { past, filter: rpcFilter } = rpcFilterFor(activeFilter);
+  const through = parsePageCursor(params);
+  const { items: jobs, next } = past
+    ? await listMyPastJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE)
+    : await listMyUpcomingJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE);
   const statusQuery = activeFilter === "all" ? "" : `status=${activeFilter}&`;
-  const moreHref =
-    jobs.length >= pageSize && pageSize < MAX_PAGE_SIZE
-      ? `/jobs?${statusQuery}n=${MAX_PAGE_SIZE}`
-      : null;
+  const moreHref = next
+    ? `/jobs?${statusQuery}before=${encodeURIComponent(next.at)}&beforeId=${next.id}`
+    : null;
+  // Vacío global vs. sin resultados para el filtro: con filtro server-side,
+  // una página vacía no distingue; una sonda sin filtro (1 fila) decide.
+  let hasAnyJobs = jobs.length > 0;
+  if (!hasAnyJobs && activeFilter !== "all" && activeFilter !== "history") {
+    const probe = past
+      ? await listMyPastJobsPage({}, 1).catch(() => [])
+      : await listMyUpcomingJobsPage({}, 1).catch(() => []);
+    hasAnyJobs = probe.length > 0;
+  }
+  // El banner resume el estado global: con filtro activo usa la primera
+  // página sin filtrar en vez de los ítems ya filtrados.
+  const bannerJobs =
+    activeFilter === "all"
+      ? jobs
+      : await listMyUpcomingJobsPage({}, 50).catch(() => jobs);
 
   return (
     <section className="pb-6 sm:py-14">
@@ -132,10 +141,10 @@ export default async function JobsPage({
         </p>
         {(() => {
           const next = getClientNextAction({
-            activeJobs: jobs.filter((job) =>
+            activeJobs: bannerJobs.filter((job) =>
               ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(job.job_status),
             ).length,
-            pendingPayment: jobs.some((job) => job.settlement_status === "DUE"),
+            pendingPayment: bannerJobs.some((job) => job.settlement_status === "DUE"),
           });
           return (
             <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-4" />
@@ -157,14 +166,14 @@ export default async function JobsPage({
                 aria-current={active ? "page" : undefined}
                 className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-bold ${
                   active
-                    ? "text-white shadow-[0_8px_20px_-8px_rgb(238_90_36/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                    ? "text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                     : "bg-surface border-ink/[0.08] border"
                 }`}
                 style={
                   active
                     ? {
                         backgroundImage:
-                          "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+                          "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
                       }
                     : undefined
                 }
@@ -176,7 +185,16 @@ export default async function JobsPage({
         </nav>
 
         {jobs.length === 0 ? (
-          activeFilter === "history" ? (
+          hasAnyJobs ? (
+            <EmptyState
+              title="Sin trabajos en este estado"
+              description="Probá con otro filtro para ver el resto de tus trabajos."
+              actionHref="/jobs"
+              actionLabel="Limpiar filtro"
+              actionTone="secondary"
+              className="pt-14"
+            />
+          ) : activeFilter === "history" ? (
             <EmptyState
               title="Sin trabajos anteriores"
               description="Cuando completes, canceles o registres ausencias, van a aparecer acá."
@@ -202,18 +220,9 @@ export default async function JobsPage({
               className="pt-14"
             />
           )
-        ) : visible.length === 0 ? (
-          <EmptyState
-            title="Sin trabajos en este estado"
-            description="Probá con otro filtro para ver el resto de tus trabajos."
-            actionHref="/jobs"
-            actionLabel="Ver todos"
-            actionTone="secondary"
-            className="pt-14"
-          />
         ) : (
           <div className="mt-5 grid gap-3">
-            {visible.map((job) => {
+            {jobs.map((job) => {
               const status = getJobStatusPresentation(job.job_status);
               const amount = jobAmount(job);
               const action = nextAction(job);

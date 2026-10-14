@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="64 80 384 400" role="img" aria-labelledby="title">
+  <title id="title">YALO — símbolo monocromo blanco</title>
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-width="56">
+    <path d="M132 178 252 296"/>
+    <path d="M380 178 260 296"/>
+    <path d="M256 290 256 398"/>
+  </g>
+  <circle cx="256" cy="166" r="34" fill="#FFFFFF"/>
+</svg>

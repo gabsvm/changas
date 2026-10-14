@@ -209,14 +209,21 @@ async function completeJob(jobId) {
     !started.error && started.data === "IN_PROGRESS",
     `Could not start job: ${started.error?.message ?? "unknown"}`,
   );
-  const requested = await provider.rpc("transition_job_status", {
+  const clientJobDetail = await client.rpc("get_job_detail", {
     target_job_id: jobId,
-    expected_status: "IN_PROGRESS",
-    requested_status: "COMPLETION_REQUESTED",
-    transition_reason: null,
   });
   assert(
-    !requested.error && requested.data === "COMPLETION_REQUESTED",
+    !clientJobDetail.error &&
+      typeof clientJobDetail.data?.[0]?.confirmation_code === "string" &&
+      clientJobDetail.data[0].confirmation_code.length > 0,
+    "Client could not read the confirmation code.",
+  );
+  const requested = await provider.rpc("request_job_completion", {
+    target_job_id: jobId,
+    confirmation_code: clientJobDetail.data[0].confirmation_code,
+  });
+  assert(
+    !requested.error && requested.data === "COMPLETED",
     `Could not request completion: ${requested.error?.message ?? "unknown"}`,
   );
   const completed = await client.rpc("transition_job_status", {
