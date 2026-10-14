@@ -55,7 +55,7 @@ export function ProviderPaymentAccount({
               Mercado Pago
             </h2>
             <p className="text-ink/70 mt-1.5 max-w-2xl text-sm leading-6">
-              Vinculá tu cuenta para recibir pagos del marketplace. Tus
+              Vinculá tu cuenta para los futuros cobros online. Tus
               credenciales nunca se exponen al navegador.
             </p>
           </div>
@@ -137,9 +137,9 @@ export function ProviderPaymentAccount({
             </a>
           ) : (
             <p className="text-ink/70 mt-3 text-sm leading-6" role="status">
-              Los cobros online se habilitarán próximamente. Para cobrar vas a
-              necesitar una cuenta de Mercado Pago vinculada; tu estado y tus
-              requisitos se muestran arriba.
+              Los cobros online aún no están disponibles. Podés trabajar y
+              cobrar directamente en efectivo o transferencia sin vincular
+              nada; tu estado y tus requisitos se muestran arriba.
             </p>
           )}
         </div>

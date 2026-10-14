@@ -521,7 +521,7 @@ export default async function JobPage({
         {detail.settlement_status !== "NOT_DUE" ? (
           <div className="mt-5 scroll-mt-24" id="pago">
             <JobSection
-              title="Pago del trabajo"
+              title="Pago entre ustedes"
               badge={{ tone: "green", icon: "tag" }}
             >
               {detail.settlement_status === "SETTLED" ? (
@@ -565,7 +565,7 @@ export default async function JobPage({
                       </div>
                     ) : null}
                     <div className="border-ink/10 flex justify-between gap-3 border-t pt-1">
-                      <dt className="font-extrabold">Total a pagar</dt>
+                      <dt className="font-extrabold">Total acordado</dt>
                       <dd className="font-extrabold">
                         {formatMinorUnits(
                           detail.settlement_total_minor,
@@ -594,9 +594,9 @@ export default async function JobPage({
                     </>
                   ) : (
                     <p className="text-ink/70 mt-3 text-xs leading-5">
-                      El pago online todavía no está disponible. El monto queda
-                      pendiente y te vamos a avisar cuando puedas pagarlo por
-                      acá.
+                      El pago se acuerda y se realiza directamente entre las
+                      partes, en efectivo o transferencia. YALO no recibe ni
+                      custodia el dinero.
                     </p>
                   )}
                   {canSimulatePayment ? (
@@ -629,14 +629,14 @@ export default async function JobPage({
                 </>
               ) : (
                 <p className="text-sm leading-7">
-                  Pendiente de cobro:{" "}
+                  Cobro externo sin confirmar:{" "}
                   <strong>
                     {formatMinorUnits(
                       detail.settlement_total_minor,
                       detail.currency_code as "ARS",
                     )}
                   </strong>{" "}
-                  · el cliente lo paga al completar el trabajo.
+                  · el cliente lo paga directamente al completar el trabajo.
                 </p>
               )}
             </JobSection>
@@ -1044,9 +1044,9 @@ export default async function JobPage({
                               </>
                             ) : (
                               <p className="text-ink/70 mt-3 text-xs leading-5">
-                                Este adicional está pendiente de pago. El cobro
-                                online todavía no está disponible y te vamos a
-                                avisar cuando puedas pagarlo por acá.
+                                Este adicional se acuerda y se paga directamente
+                                entre las partes. YALO no recibe ni custodia el
+                                dinero.
                               </p>
                             )}
                             {canSimulatePayment ? (
@@ -1362,7 +1362,7 @@ function PrimaryAction({
           href="#pago"
           className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
         >
-          Ver pendiente de pago
+          Ver pago entre ustedes
         </Link>
       );
     }

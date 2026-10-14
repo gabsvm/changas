@@ -31,7 +31,7 @@ const STEP_DEFS: { key: TrackingStepKey; label: string; hint: string }[] = [
   { key: "confirmed", label: "Confirmado", hint: "Acuerdo cerrado" },
   { key: "in_progress", label: "En curso", hint: "Se está haciendo" },
   { key: "review", label: "Revisión", hint: "Confirmá el resultado" },
-  { key: "payment", label: "Pago", hint: "Pagás al finalizar" },
+  { key: "payment", label: "Pago externo", hint: "Directo entre ustedes" },
   { key: "rating", label: "Reseña", hint: "Contá cómo te fue" },
 ];
 
@@ -176,15 +176,15 @@ export function getJobNextAction(args: {
   if (isClient && status === "COMPLETION_REQUESTED") {
     return {
       heading: "Revisá y confirmá el trabajo",
-      sub: "Si está todo bien, confirmalo para habilitar el pago.",
+      sub: "Si está todo bien, confirmalo para cerrar el trabajo.",
       kind: "confirm_completion",
     };
   }
   if (isClient && status === "COMPLETED" && settlementPending) {
     if (!paymentsEnabled) {
       return {
-        heading: "Trabajo completado · pago pendiente de habilitación",
-        sub: "El cobro online aún no está disponible. Te avisamos cuando se habilite; tu saldo queda registrado.",
+        heading: "Trabajo completado · pago entre ustedes",
+        sub: "Acuerdan efectivo o transferencia directamente. YALO no recibe ni custodia el dinero.",
         kind: null,
       };
     }
@@ -197,8 +197,8 @@ export function getJobNextAction(args: {
   if (isProvider && status === "COMPLETED" && settlementPending) {
     if (!paymentsEnabled) {
       return {
-        heading: "Cierre confirmado · cobro pendiente de habilitación",
-        sub: "El cobro online aún no está disponible. El saldo queda registrado hasta la habilitación.",
+        heading: "Cierre confirmado · cobro entre ustedes",
+        sub: "Acuerdan efectivo o transferencia directamente. YALO no recibe ni custodia el dinero.",
         kind: null,
       };
     }

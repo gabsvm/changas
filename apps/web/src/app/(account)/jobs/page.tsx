@@ -16,6 +16,7 @@ import {
 } from "@/lib/jobs/server";
 import { getJobStatusPresentation } from "@/lib/ui/job-status";
 import { NextStepBanner } from "@/components/ui/guided";
+import { isPaymentsEnabled } from "@changas/config/server";
 import { getClientNextAction } from "@/lib/ui/guided";
 
 function scheduleLabel(job: UpcomingJob) {
@@ -53,17 +54,17 @@ function hasPaidExtras(job: UpcomingJob): boolean {
 
 function settlementLabel(job: UpcomingJob): string | null {
   if (job.settlement_status === "DUE")
-    return job.is_client ? "Pendiente de pago" : "Pendiente de cobro";
+    return job.is_client ? "Pago externo sin confirmar" : "Cobro externo sin confirmar";
   if (job.settlement_status === "SETTLED") return "Pagado";
   return null;
 }
 
 const statusFilters = [
-  { key: "all", label: "Todos" },
+  { key: "all", label: "Activos" },
   { key: "confirmed", label: "Confirmados" },
   { key: "in_progress", label: "En curso" },
   { key: "closing", label: "Por cerrar" },
-  { key: "pending", label: "Pendientes de pago" },
+  { key: "pending", label: "Pago externo sin confirmar" },
   { key: "history", label: "Historial" },
 ] as const;
 
@@ -106,6 +107,7 @@ export default async function JobsPage({
     : "all";
   const { past, filter: rpcFilter } = rpcFilterFor(activeFilter);
   const through = parsePageCursor(params);
+  const paymentsEnabled = isPaymentsEnabled();
   const { items: jobs, next } = past
     ? await listMyPastJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE)
     : await listMyUpcomingJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE);
@@ -145,6 +147,7 @@ export default async function JobsPage({
               ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(job.job_status),
             ).length,
             pendingPayment: bannerJobs.some((job) => job.settlement_status === "DUE"),
+            paymentsEnabled,
           });
           return (
             <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-4" />
@@ -204,10 +207,10 @@ export default async function JobsPage({
             />
           ) : activeFilter === "pending" ? (
             <EmptyState
-              title="Sin pagos pendientes"
-              description="Cuando un trabajo completado quede pendiente de pago o cobro, va a aparecer acá."
+              title="Sin pagos externos por confirmar"
+              description="Cuando un trabajo completado quede con pago externo sin confirmar, va a aparecer acá."
               actionHref="/jobs"
-              actionLabel="Ver todos"
+              actionLabel="Ver activos"
               actionTone="secondary"
               className="pt-14"
             />
