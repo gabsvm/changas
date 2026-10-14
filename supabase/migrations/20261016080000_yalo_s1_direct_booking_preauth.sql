@@ -43,7 +43,6 @@ select
   s.currency_code,
   s.price_unit,
   s.accepts_offers,
-  s.instant_booking_enabled,
   s.expected_duration_minutes,
   s.schedule_type,
   s.includes,
@@ -51,7 +50,8 @@ select
   s.materials_notes,
   sk.slug as skill_slug,
   sk.name as skill_name,
-  s.sort_order
+  s.sort_order,
+  s.instant_booking_enabled
 from public.services s
 join public.provider_profiles pp on pp.user_id = s.provider_user_id
 join public.skills sk on sk.id = s.skill_id and sk.is_active
@@ -61,7 +61,7 @@ where pp.status = 'ACTIVE'
   and s.is_published
   and not s.is_paused;
 
--- 5) save_service_with_tags con flag (nueva firma de 20 args). La firma
+-- 5) save_service_with_tags con flag (nueva firma de 19 args). La firma
 -- historica de 19 args sigue existiendo y delega con el flag en false.
 create or replace function public.save_service_with_tags(
   target_service_id uuid,
@@ -82,7 +82,7 @@ create or replace function public.save_service_with_tags(
   requested_is_published boolean,
   requested_is_paused boolean,
   requested_tags text[],
-  requested_instant_booking_enabled boolean default false
+  requested_instant_booking_enabled boolean
 )
 returns table (id uuid, public_slug text)
 language plpgsql
@@ -202,7 +202,15 @@ language plpgsql
 security definer
 set search_path = pg_catalog, public
 as $$
+declare
+  keep_instant_booking boolean := false;
 begin
+  if target_service_id is not null then
+    select s.instant_booking_enabled into keep_instant_booking
+    from public.services s
+    where s.id = target_service_id;
+    keep_instant_booking := coalesce(keep_instant_booking, false);
+  end if;
   return query select * from public.save_service_with_tags(
     target_service_id,
     requested_skill_id,
@@ -222,7 +230,7 @@ begin
     requested_is_published,
     requested_is_paused,
     requested_tags,
-    false
+    keep_instant_booking
   );
 end;
 $$;
@@ -252,7 +260,7 @@ create or replace function public.create_conversation_proposal(
   proposed_schedule_end_at timestamptz default null,
   proposed_deadline_at timestamptz default null,
   proposal_expires_at timestamptz default null,
-  request_idempotency_key uuid default null
+  request_idempotency_key uuid
 )
 returns uuid
 language plpgsql
@@ -392,7 +400,9 @@ begin
       from public.services s
       join public.provider_profiles pp on pp.user_id = s.provider_user_id
       where s.id = target_service_id;
-      if preauth_ok
+      if (proposed_schedule_start_at is null) <> (proposed_schedule_end_at is null) then
+        preauth_ok := false;
+      elsif preauth_ok
         and proposed_schedule_start_at is not null
         and proposed_schedule_end_at is not null
         and not public.provider_slot_is_available(
@@ -693,3 +703,22 @@ grant execute on function public.create_conversation_proposal(
   timestamptz,
   uuid
 ) to authenticated, service_role;
+
+-- 7) Pre-chequeo de deploy: avisa si hay holds activos solapados legacy
+-- que harian fallar la exclusion anti-overlap (ver nota del PR).
+do $$
+declare
+  legacy_overlaps integer;
+begin
+  select count(*) into legacy_overlaps
+  from public.provider_slot_holds a
+  join public.provider_slot_holds b
+    on a.provider_user_id = b.provider_user_id
+   and a.id < b.id
+   and tstzrange(a.starts_at, a.ends_at, '[)') && tstzrange(b.starts_at, b.ends_at, '[')
+   and a.released_at is null and b.released_at is null;
+  if legacy_overlaps > 0 then
+    raise warning 'yalo-s1: % overlapping active holds predate the exclusion constraint; release them before applying', legacy_overlaps;
+  end if;
+end;
+$$;

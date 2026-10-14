@@ -355,7 +355,11 @@ export async function reviseConversationProposal(
   input: ProposalRevision,
 ): Promise<string> {
   const { rpc } = await getRpcClient();
-  const { target_conversation_id: _conversation, ...draft } = proposalArgs({
+  const {
+    target_conversation_id: _conversation,
+    request_idempotency_key: _key,
+    ...draft
+  } = proposalArgs({
     ...input,
     conversationId: "00000000-0000-4000-8000-000000000000",
   });

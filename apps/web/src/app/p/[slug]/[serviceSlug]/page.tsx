@@ -359,7 +359,7 @@ export default async function PublicServicePage({
                     {price}
                   </p>
                   <p className="text-ink/70 truncate text-xs">
-                    Por chat · coordinás día y precio
+                    {instantEligible ? "Reserva inmediata · pago entre ustedes" : "Por chat · coordinás día y precio"}
                   </p>
                 </div>
                 <ConsultButton label={hireCtaLabel} />

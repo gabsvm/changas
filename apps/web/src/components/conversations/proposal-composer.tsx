@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 import { proposalKinds, type ProposalKind } from "@changas/domain";
 
@@ -28,9 +28,16 @@ export function ProposalComposer({
     createProposalAction,
     initialState,
   );
-  // Clave estable por montaje: el doble-tap reenvia la misma clave y el
-  // RPC devuelve la propuesta existente en vez de duplicar.
-  const [idempotencyKey] = useState(() => crypto.randomUUID());
+  // Clave generada solo en cliente (evita hydration mismatch) y rotada
+  // tras cada exito: el doble-tap comparte clave (el RPC devuelve la
+  // existente) pero la siguiente propuesta usa una clave nueva.
+  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
+  useEffect(() => {
+    setIdempotencyKey(crypto.randomUUID());
+  }, []);
+  useEffect(() => {
+    if (state.status === "SUCCESS") setIdempotencyKey(crypto.randomUUID());
+  }, [state]);
   const roleDefaultKind: ProposalKind = currentUserIsClient
     ? "QUOTE_REQUEST"
     : "PROVIDER_QUOTE";
@@ -72,7 +79,7 @@ export function ProposalComposer({
         ) : null}
         <form action={action} className="mt-3 grid gap-3 sm:grid-cols-2">
           <input type="hidden" name="conversationId" value={conversationId} />
-          <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
+          <input type="hidden" name="idempotencyKey" value={idempotencyKey ?? ""} />
           <label className="text-ink text-sm font-bold">
             Tipo
             <select
