@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 
 import { proposalKinds, type ProposalKind } from "@changas/domain";
 
@@ -28,16 +28,13 @@ export function ProposalComposer({
     createProposalAction,
     initialState,
   );
-  // Clave generada solo en cliente (evita hydration mismatch) y rotada
-  // tras cada exito: el doble-tap comparte clave (el RPC devuelve la
-  // existente) pero la siguiente propuesta usa una clave nueva.
-  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
-  useEffect(() => {
-    setIdempotencyKey(crypto.randomUUID());
-  }, []);
-  useEffect(() => {
-    if (state.status === "SUCCESS") setIdempotencyKey(crypto.randomUUID());
-  }, [state]);
+  // Clave anti doble-tap: nace en cliente (sin mismatch de hidratacion),
+  // se envia con el formulario y rota en cada submit para que la
+  // siguiente propuesta use una clave nueva. Sin efectos: el boton se
+  // deshabilita en pending y el DOM conserva la clave del submit.
+  const [idempotencyKey, setIdempotencyKey] = useState<string>(() =>
+    typeof window === "undefined" ? "" : crypto.randomUUID(),
+  );
   const roleDefaultKind: ProposalKind = currentUserIsClient
     ? "QUOTE_REQUEST"
     : "PROVIDER_QUOTE";
@@ -77,9 +74,20 @@ export function ProposalComposer({
             {state.message}
           </p>
         ) : null}
-        <form action={action} className="mt-3 grid gap-3 sm:grid-cols-2">
+        <form
+          action={action}
+          onSubmit={() => {
+            setIdempotencyKey(crypto.randomUUID());
+          }}
+          className="mt-3 grid gap-3 sm:grid-cols-2"
+        >
           <input type="hidden" name="conversationId" value={conversationId} />
-          <input type="hidden" name="idempotencyKey" value={idempotencyKey ?? ""} />
+          <input
+            type="hidden"
+            name="idempotencyKey"
+            value={idempotencyKey}
+            suppressHydrationWarning
+          />
           <label className="text-ink text-sm font-bold">
             Tipo
             <select
