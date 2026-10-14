@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">YALO — boceto vectorial del isotipo (NO definitivo)</title>
+  <desc id="desc">Aproximación conceptual basada en captura aportada: figura humana en Y, cabeza circular y brazos cian-turquesa-verde sobre fondo navy. No es calco ni archivo maestro oficial.</desc>
+  <defs>
+    <linearGradient id="left" x1="100" y1="155" x2="270" y2="330" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#08A9F4"/><stop offset="1" stop-color="#12D9C5"/>
+    </linearGradient>
+    <linearGradient id="right" x1="260" y1="330" x2="410" y2="145" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#12D9C5"/><stop offset="1" stop-color="#65EC91"/>
+    </linearGradient>
+    <linearGradient id="stem" x1="256" y1="265" x2="256" y2="401" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#12D9C5"/><stop offset="1" stop-color="#12CABB"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#0D121B"/>
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="54">
+    <path d="M128 176 256 300" stroke="url(#left)"/>
+    <path d="M384 176 256 300" stroke="url(#right)"/>
+    <path d="M256 288 256 397" stroke="url(#stem)"/>
+  </g>
+  <circle cx="256" cy="166" r="33" fill="#12D9C5"/>
+</svg>
