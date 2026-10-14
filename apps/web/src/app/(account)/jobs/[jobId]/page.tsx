@@ -124,6 +124,9 @@ const JOB_EVENT_LABELS: Record<string, string> = {
   ADDITIONAL_PAYMENT_PENDING: "El pago del adicional está en curso",
   PROVIDER_REVIEW_REQUEST: "El prestador pidió una reseña",
   COMPLETION_CODE_ISSUED: "Se generó el código de cierre",
+  JOB_DELIVERY_SUBMITTED: "El prestador envió la entrega para revisión",
+  JOB_HANDOVER_VERIFIED: "Se dejó constancia de la entrega",
+  JOB_CORRECTION_REQUESTED: "El cliente pidió una corrección",
 };
 
 function jobStatusChangedLabel(toStatus: string | null): string {
@@ -131,7 +134,7 @@ function jobStatusChangedLabel(toStatus: string | null): string {
     case "IN_PROGRESS":
       return "El trabajo empezó";
     case "COMPLETION_REQUESTED":
-      return "El prestador pidió confirmar el cierre";
+      return "La entrega está en revisión";
     case "COMPLETED":
       return "Trabajo completado";
     case "CANCELLED":

@@ -54,7 +54,7 @@ begin
     raise exception using errcode = '42501', message = 'only the provider submits the delivery';
   end if;
 
-  if clean_summary is null or char_length(clean_summary) > 2000 then
+  if clean_summary is null or char_length(clean_summary) < 3 or char_length(clean_summary) > 2000 then
     raise exception using errcode = '22023', message = 'delivery summary is invalid';
   end if;
 
@@ -262,10 +262,6 @@ begin
   from public.proposal_versions pv
   where pv.id = target_job.accepted_proposal_version_id;
 
-  if job_modality = 'REMOTE' then
-    raise exception using errcode = '22023', message = 'remote delivery needs no code; review the delivery instead';
-  end if;
-
   if target_job.confirmation_code is null then
     -- Sin código no hay secreto que adivinar: transición directa con los
     -- mismos efectos (rol y estado ya validados bajo lock).
@@ -321,10 +317,17 @@ begin
   if normalized_code <> target_job.confirmation_code then
     -- Sin RAISE a propósito: la excepción revertiría este INSERT y el
     -- fallo nunca persistiría (bug P1-01 original). El llamante mapea
-    -- 'MISMATCH' al mensaje de UX.
+    -- 'MISMATCH' al mensaje de UX. El rate-limit queda observable en
+    -- cualquier modalidad; el rechazo remoto vive solo en el camino de
+    -- exito (tras el codigo correcto), asi el conteo de intentos no
+    -- cambia de semantica.
     insert into public.job_confirmation_code_attempts (job_id, attempted_by_user_id)
     values (target_job_id, caller_id);
     return 'MISMATCH';
+  end if;
+
+  if job_modality = 'REMOTE' then
+    raise exception using errcode = '22023', message = 'remote delivery needs no code; review the delivery instead';
   end if;
 
   delete from public.job_confirmation_code_attempts where job_id = target_job_id;

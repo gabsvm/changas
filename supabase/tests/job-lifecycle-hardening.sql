@@ -380,7 +380,7 @@ select is(
   'authority success clears prior attempts'
 );
 select is(
-  (select count(*)::integer from public.job_events where job_id = '14000000-0000-4000-8000-000000000102' and event_type = 'JOB_STATUS_CHANGED' and to_status = 'COMPLETION_REQUESTED'),
+  (select count(*)::integer from public.job_events where job_id = '14000000-0000-4000-8000-000000000102' and event_type = 'JOB_HANDOVER_VERIFIED' and to_status = 'COMPLETION_REQUESTED'),
   1,
   'authority success records exactly one transition event'
 );

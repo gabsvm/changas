@@ -4,7 +4,7 @@
 -- evidencia; correccion con motivo y tope. Todo hace rollback al final.
 begin;
 
-select plan(50);
+select plan(51);
 
 -- Estructura: columnas de entrega.
 select ok(
@@ -273,6 +273,13 @@ select ok(
   ),
   'submission is announced'
 );
+select throws_ok(
+  $$select public.submit_job_delivery(
+    (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '17000000-0000-4000-8000-000000000013')),
+    'ab')$$,
+  '22023', 'delivery summary is invalid',
+  'short delivery summary is rejected with a clear error'
+);
 
 -- Presencial: codigo erroneo tras el envio suma intento, no cierra.
 select is(
@@ -332,9 +339,9 @@ select is(
 select throws_ok(
   $$select public.request_job_completion(
     (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '17000000-0000-4000-8000-000000000011')),
-    '0000')$$,
+    (select confirmation_code from public.jobs where conversation_id = (select id from public.conversations where service_id = '17000000-0000-4000-8000-000000000011')))$$,
   '22023', 'remote delivery needs no code; review the delivery instead',
-  'remote handover check is rejected'
+  'remote handover check is rejected even with the right code'
 );
 select set_config('request.jwt.claim.sub', '17000000-0000-4000-8000-000000000001', true);
 select is(
