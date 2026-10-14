@@ -196,7 +196,7 @@ export default async function ProviderOnboardingPage() {
       ? "/provider/manage"
       : editable && current
         ? current.id === "review" && readyForSubmission && !submitted
-          ? "/provider/onboarding/documents"
+          ? "/provider/onboarding/review"
           : current.href
         : editable
           ? getNextOnboardingHref(provider.onboarding_step)

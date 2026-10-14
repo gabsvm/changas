@@ -17,7 +17,7 @@ export const CLIENT_HIRE_STEPS: readonly GuidedStep[] = [
   { action: "Buscá", hint: "Tocá una categoría o escribí." },
   { action: "Elegí", hint: "Mirá precio y reseñas." },
   { action: "Chateá", hint: "Acordá día y precio." },
-  { action: "Pagá", hint: "Solo cuando termina." },
+  { action: "Acordá pago", hint: "Directo entre ustedes." },
   { action: "Calificá", hint: "Contá cómo te fue." },
 ] as const;
 
@@ -53,8 +53,9 @@ export function getProviderNextAction(args: {
   onboardingStep: number;
   hasServices: boolean;
   paymentConnected: boolean;
+  paymentsEnabled?: boolean;
 }): ProviderNextAction {
-  const { isProvider, providerActive, hasServices, paymentConnected } = args;
+  const { isProvider, providerActive, hasServices, paymentConnected, paymentsEnabled = false } = args;
 
   if (!isProvider) {
     return {
@@ -83,7 +84,7 @@ export function getProviderNextAction(args: {
     };
   }
 
-  if (!paymentConnected) {
+  if (paymentsEnabled && !paymentConnected) {
     return {
       title: "Conectá tu cobro",
       hint: "Sin esto no podés cobrar.",
@@ -104,12 +105,21 @@ export function getProviderNextAction(args: {
 export function getClientNextAction(args: {
   activeJobs: number;
   pendingPayment: boolean;
+  paymentsEnabled?: boolean;
 }): { title: string; hint: string; cta: string; href: string } {
-  if (args.pendingPayment) {
+  if (args.pendingPayment && args.paymentsEnabled) {
     return {
       title: "Tenés un pago pendiente",
       hint: "Tocá y pagá. Es un toque.",
       cta: "Ir a pagar",
+      href: "/jobs",
+    };
+  }
+  if (args.pendingPayment) {
+    return {
+      title: "Pago entre ustedes",
+      hint: "Acuerdan directo entre ustedes.",
+      cta: "Ver mis trabajos",
       href: "/jobs",
     };
   }

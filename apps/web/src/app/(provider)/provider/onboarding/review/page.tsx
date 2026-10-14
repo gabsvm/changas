@@ -13,6 +13,8 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
 import { hasRequiredIdentityDocuments } from "@/lib/ui/provider-submission";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
+import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
+import { submitProviderIdentityReview } from "../documents/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -143,7 +145,7 @@ export default async function ProviderOnboardingReviewPage() {
     canSelfManageProviderStatus(provider.status) && !pendingReview;
 
   let summary =
-    "Este resumen no envía tu identidad. La revisión empieza únicamente cuando confirmás el envío desde Documentos.";
+    "Revisá el resumen y enviá tu identidad a revisión desde esta pantalla.";
   if (pendingReview) {
     summary =
       "Tu identidad ya está en la cola administrativa. La evidencia queda bloqueada mientras se toma una decisión.";
@@ -155,7 +157,7 @@ export default async function ProviderOnboardingReviewPage() {
       "Tu identidad fue rechazada. Revisá el motivo, corregí lo observado y reenviala a revisión.";
   } else if (readyForSubmission) {
     summary =
-      "Los requisitos están completos. Falta enviarlos desde Documentos para entrar en revisión.";
+      "Los requisitos están completos. Enviálos a revisión desde esta pantalla.";
   }
 
   const stateTone = pendingReview
@@ -341,7 +343,7 @@ export default async function ProviderOnboardingReviewPage() {
                 : rejected
                   ? "La documentación se conserva. Corregí lo observado y reenviala desde Documentos para una nueva revisión."
                   : readyForSubmission
-                    ? "Volvé a Documentos y tocá “Enviar a revisión”."
+                    ? "Tocá “Enviar a revisión” acá abajo para entrar en revisión."
                     : "Completá los elementos marcados como Revisar antes de enviar."}
           </p>
           {rejected && rejectionReason ? (
@@ -350,7 +352,20 @@ export default async function ProviderOnboardingReviewPage() {
               <p className="text-ink/70 mt-1 text-sm leading-6">{rejectionReason}</p>
             </div>
           ) : null}
-          {!pendingReview && !approved ? (
+          {editable && readyForSubmission && !pendingReview && !approved ? (
+            <div className="mt-3">
+              <p className="text-ink/70 mb-2 text-xs leading-5">
+                Al enviar, la evidencia entra en la cola administrativa de revisión.
+              </p>
+              <OnboardingAdvanceForm
+                action={submitProviderIdentityReview}
+                nextStep={4}
+                nextHref="/provider/onboarding/review"
+                label={rejected ? "Corregir y reenviar" : "Enviar a revisión"}
+              />
+            </div>
+          ) : null}
+          {!pendingReview && !approved && !(editable && readyForSubmission) ? (
             <Link
               className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
               href="/provider/onboarding/documents"

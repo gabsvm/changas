@@ -312,6 +312,7 @@ export default async function ProviderMarketplaceManagePage({
             onboardingStep: 4,
             hasServices: (services ?? []).length > 0,
             paymentConnected: paymentAccount.status === "CONNECTED",
+            paymentsEnabled,
           });
           return (
             <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-6" />

@@ -13,6 +13,14 @@ const onboardingPage = readFileSync(
   "utf8",
 );
 
+const reviewPage = readFileSync(
+  new URL(
+    "../../app/(provider)/provider/onboarding/review/page.tsx",
+    import.meta.url,
+  ),
+  "utf8",
+);
+
 describe("getOnboardingSteps", () => {
   it("defines the four stable onboarding steps", () => {
     expect(getOnboardingSteps(1).map((step) => step.id)).toEqual([
@@ -39,6 +47,17 @@ describe("getOnboardingSteps", () => {
     expect(onboardingPage).toContain("OnboardingStepCard");
     expect(onboardingPage).toContain("getNextOnboardingHref");
     expect(onboardingPage).toContain("Progreso");
+  });
+
+  it("sends the review from step 4 instead of bouncing to documents", () => {
+    expect(reviewPage).toContain("submitProviderIdentityReview");
+    expect(reviewPage).toContain("OnboardingAdvanceForm");
+    expect(reviewPage).toContain("desde esta pantalla");
+    expect(reviewPage).not.toContain("La revisión empieza");
+    expect(reviewPage).not.toContain("Falta enviarlos desde Documentos");
+    expect(reviewPage).not.toContain("a Documentos y toc");
+    expect(onboardingPage).toContain('? "/provider/onboarding/review"');
+    expect(onboardingPage).not.toContain('? "/provider/onboarding/documents"');
   });
 
   it("clamps an out-of-range current step safely", () => {

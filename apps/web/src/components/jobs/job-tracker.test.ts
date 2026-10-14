@@ -19,6 +19,7 @@ describe("getJobTracking", () => {
       key: "payment",
       state: "current",
     });
+    expect(tracking.steps[3]?.label).toMatch(/externo/i);
     expect(tracking.steps[4]).toMatchObject({ key: "rating", state: "todo" });
   });
 
@@ -79,7 +80,7 @@ describe("getJobNextAction", () => {
     ).toBe("pay");
   });
 
-  it("con cobro apagado no pide pagar ni muestra CTA de pago", () => {
+  it("con cobro apagado dirige al pago externo entre las partes", () => {
     const client = getJobNextAction({
       status: "COMPLETED",
       isClient: true,
@@ -87,8 +88,9 @@ describe("getJobNextAction", () => {
       settlementPending: true,
     });
     expect(client.kind).toBeNull();
-    expect(client.heading).toMatch(/pendiente de habilitación/i);
-    expect(client.sub).toMatch(/aún no está disponible/i);
+    expect(client.heading).toMatch(/entre ustedes|externo/i);
+    expect(client.heading).not.toMatch(/habilitaci/i);
+    expect(client.sub).toMatch(/directamente|declarado/i);
     const provider = getJobNextAction({
       status: "COMPLETED",
       isClient: false,
@@ -96,7 +98,9 @@ describe("getJobNextAction", () => {
       settlementPending: true,
     });
     expect(provider.kind).toBeNull();
-    expect(provider.heading).toMatch(/pendiente de habilitación/i);
+    expect(provider.heading).toMatch(/entre ustedes|externo/i);
+    expect(provider.heading).not.toMatch(/habilitaci/i);
+    expect(provider.sub).toMatch(/directamente|declarado/i);
   });
 
   it("al que espera le explica en vez de mostrarle un botón ajeno", () => {

@@ -227,7 +227,7 @@ export default async function PublicServicePage({
                       Comisión de YALO
                     </span>
                     <span className="text-moss text-[13px] font-bold">
-                      Incluida en el total
+                      Sin cobro online
                     </span>
                   </div>
                   <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
@@ -245,8 +245,8 @@ export default async function PublicServicePage({
               )}
               <p className="text-ink/70 mt-2 text-xs leading-5">
                 {service.price_model === "FIXED"
-                  ? "Pagás al finalizar desde YALO, sin cargos extra sobre el precio publicado."
-                  : "Precio de referencia — el total se acuerda en la propuesta. Pagás al finalizar desde YALO."}
+                  ? "Acordás el precio al contratar. El pago se realiza directamente entre las partes; YALO permite registrar lo declarado."
+                  : "Precio de referencia — el total se acuerda en la propuesta. El pago se realiza directamente entre las partes."}
               </p>
             </section>
           ) : null}
@@ -322,7 +322,7 @@ export default async function PublicServicePage({
             <div>
               <p className="text-sm font-extrabold">Sin pago por adelantado + soporte</p>
               <p className="text-ink/70 mt-1 text-xs leading-6">
-                Sin pago por adelantado: coordinás por chat y se liquida al finalizar. Si algo sale mal, el equipo de YALO te acompaña.
+                Sin pago por adelantado: coordinás por chat y el pago se hace directamente entre las partes. Si algo sale mal, el equipo de YALO te acompaña.
               </p>
             </div>
           </div>
