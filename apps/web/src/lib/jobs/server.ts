@@ -831,10 +831,26 @@ export async function getExternalMoney(jobId: string): Promise<{
       listExternalDeclarations(jobId),
     ]);
     return { ledger, declarations };
-  } catch {
-    // Migración S4 aún no aplicada: la tarjeta cae al resumen de montos.
-    return null;
+  } catch (error) {
+    // Solo la migración pendiente cae al resumen de montos; cualquier otro
+    // error (permiso, transitorio) se propaga a la página.
+    if (isMissingExternalMoneySchema(error)) return null;
+    throw error;
   }
+}
+
+// YALO S4: la tabla y los RPCs llegan con la migración; mismo criterio que
+// isMissingJobListRpc más la tabla ausente en caché de PostgREST.
+function isMissingExternalMoneySchema(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const shape = error as { code?: unknown; message?: unknown };
+  if (shape.code === "42883" || shape.code === "PGRST202" || shape.code === "PGRST205") {
+    return true;
+  }
+  return (
+    typeof shape.message === "string" &&
+    /could not find the (function|table)/i.test(shape.message)
+  );
 }
 
 // YALO S4: historial completo de declaraciones (RLS: solo las partes).
@@ -865,10 +881,28 @@ export async function listExternalDeclarations(
 
 function mapMoneyError(code?: string | null, message?: string | null): JobServerError {
   const detail = `${code ?? ""} ${message ?? ""}`;
-  if (code === "42501" || /job access denied|only the counterpart|only the declarer/i.test(detail)) {
+  if (/authentication required/i.test(detail)) {
+    return new JobServerError(
+      "UNAUTHORIZED",
+      "Necesitás iniciar sesión para administrar trabajos.",
+    );
+  }
+  if (code === "42501" || /job access denied|only the counterpart|only the declarer|only the declarer supersedes/i.test(detail)) {
     return new JobServerError(
       "FORBIDDEN",
       "No tenés permiso para esa acción sobre el dinero externo.",
+    );
+  }
+  if (code === "P0002" || /declaration not found|superseded declaration not found/i.test(detail)) {
+    return new JobServerError(
+      "NOT_FOUND",
+      "No encontramos esa declaración. Actualizá la página.",
+    );
+  }
+  if (/only open declarations can be superseded/i.test(detail)) {
+    return new JobServerError(
+      "CONFLICT",
+      "Solo se puede corregir una declaración abierta.",
     );
   }
   if (/only on completed jobs/i.test(detail)) {

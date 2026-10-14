@@ -79,11 +79,13 @@ begin
     raise exception using errcode = 'P0002', message = 'job not found';
   end if;
 
-  return (
+  -- Sin fila de versión (inasequible con FK NOT NULL, pero barato):
+  -- total 0 para que los topes filtren en vez de dejar pasar NULL.
+  return coalesce((
     select coalesce(pv.price_amount, 0) + public.paid_scope_additional_for_job(target_job.id)
     from public.proposal_versions pv
     where pv.id = target_job.accepted_proposal_version_id
-  );
+  ), 0);
 end;
 $$;
 
@@ -218,6 +220,8 @@ begin
     raise exception using errcode = '22023', message = 'declared amount exceeds the agreed total';
   end if;
 
+  -- El tope cuenta declaraciones accionables (DECLARED_*). CONTESTED es
+  -- desacuerdo registrado, no pendiente de acción: no ocupa lugar.
   select count(*) into pending_count
   from public.external_payment_declarations d
   where d.job_id = target_job_id
@@ -335,6 +339,13 @@ begin
     raise exception using errcode = '42501', message = 'job access denied';
   end if;
 
+  -- El historial bilateral se congela si el trabajo sale de COMPLETED
+  -- (la vía de apelación gobierna el trabajo): fuera de COMPLETED no se
+  -- confirma, contesta ni anula.
+  if target_job.status <> 'COMPLETED' then
+    raise exception using errcode = '22023', message = 'external money is registered only on completed jobs';
+  end if;
+
   if caller_id = declaration.declared_by_user_id then
     raise exception using errcode = '42501', message = 'only the counterpart responds to a declaration';
   end if;
@@ -430,6 +441,11 @@ begin
   select * into target_job from public.jobs where id = declaration.job_id;
   if target_job.id is null or caller_id not in (target_job.client_user_id, target_job.provider_user_id) then
     raise exception using errcode = '42501', message = 'job access denied';
+  end if;
+
+  -- Congelado fuera de COMPLETED, igual que responder (ver arriba).
+  if target_job.status <> 'COMPLETED' then
+    raise exception using errcode = '22023', message = 'external money is registered only on completed jobs';
   end if;
 
   if caller_id <> declaration.declared_by_user_id then

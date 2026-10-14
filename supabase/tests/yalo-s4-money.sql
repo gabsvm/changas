@@ -4,7 +4,7 @@
 -- Todo hace rollback al final del archivo.
 begin;
 
-select plan(28);
+select plan(34);
 
 -- Estructura: tabla, estados, RLS y firmas.
 select ok(
@@ -284,6 +284,23 @@ select throws_ok(
   'over-agreement declaration is rejected'
 );
 
+-- Confirmar por encima del acuerdo con dos parciales también se rechaza.
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
+select public.declare_external_payment(
+  (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000010')),
+  50000, 'TRANSFERENCIA', null, null,
+  '18000000-0000-4000-8000-0000000000b9', null
+);
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
+select throws_ok(
+  $$select public.respond_external_payment(
+    (select id from public.external_payment_declarations
+     where idempotency_key = '18000000-0000-4000-8000-0000000000b9'),
+    true, null)$$,
+  '22023', 'confirmed amount exceeds the agreed total',
+  'second partial confirmation past the agreement is rejected'
+);
+
 -- Contestar con motivo congela sin revertir el trabajo.
 select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
 select public.declare_external_payment(
@@ -322,6 +339,42 @@ select throws_ok(
   'contest without reason is rejected'
 );
 
+-- Reemplazar solo lo propio: la contraparte no puede.
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
+select throws_ok(
+  $$select public.declare_external_payment(
+    (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000011')),
+    10000, 'EFECTIVO', null, null,
+    '18000000-0000-4000-8000-0000000000bA',
+    (select id from public.external_payment_declarations
+     where idempotency_key = '18000000-0000-4000-8000-0000000000b4'))$$,
+  '42501', 'only the declarer supersedes a declaration',
+  'counterpart cannot supersede the declaration'
+);
+
+-- Reemplazar lo propio anula la anterior y enlaza la nueva.
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
+select public.declare_external_payment(
+  (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000011')),
+  30000, 'TRANSFERENCIA', null, 'corrección',
+  '18000000-0000-4000-8000-0000000000bB',
+  (select id from public.external_payment_declarations
+   where idempotency_key = '18000000-0000-4000-8000-0000000000b4')
+);
+select is(
+  (select state::text from public.external_payment_declarations
+   where idempotency_key = '18000000-0000-4000-8000-0000000000b4'),
+  'VOIDED',
+  'superseded declaration is voided'
+);
+select is(
+  (select supersedes_id from public.external_payment_declarations
+   where idempotency_key = '18000000-0000-4000-8000-0000000000bB'),
+  (select id from public.external_payment_declarations
+   where idempotency_key = '18000000-0000-4000-8000-0000000000b4'),
+  'replacement links the voided declaration'
+);
+
 -- Anular: solo quien declaro, solo pendiente.
 select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
 select public.declare_external_payment(
@@ -350,6 +403,39 @@ select throws_ok(
      where idempotency_key = '18000000-0000-4000-8000-0000000000b6'))$$,
   '42501', 'only the declarer voids a declaration',
   'counterpart cannot void the declaration'
+);
+
+-- Fuera de COMPLETED el historial se congela: ni responder ni anular.
+-- (Inserción directa de fixture: el trabajo CONFIRMED no admite declarar.)
+insert into public.external_payment_declarations (
+  job_id, declared_by_user_id, amount_minor, method, state
+)
+select
+  (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000012')),
+  '18000000-0000-4000-8000-000000000001',
+  70000, 'TRANSFERENCIA', 'DECLARED_BY_CLIENT';
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
+select throws_ok(
+  $$select public.respond_external_payment(
+    (select d.id from public.external_payment_declarations d
+     join public.jobs j on j.id = d.job_id
+     join public.conversations c on c.id = j.conversation_id
+     where c.service_id = '18000000-0000-4000-8000-000000000012'
+       and d.amount_minor = 70000),
+    true, null)$$,
+  '22023', 'external money is registered only on completed jobs',
+  'uncompleted job takes no responses'
+);
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
+select throws_ok(
+  $$select public.void_external_payment(
+    (select d.id from public.external_payment_declarations d
+     join public.jobs j on j.id = d.job_id
+     join public.conversations c on c.id = j.conversation_id
+     where c.service_id = '18000000-0000-4000-8000-000000000012'
+       and d.amount_minor = 70000))$$,
+  '22023', 'external money is registered only on completed jobs',
+  'uncompleted job takes no voids'
 );
 
 -- Dinero solo en COMPLETED; ajenos no ven ni tocan.

@@ -215,6 +215,10 @@ export async function declareExternalPaymentAction(
   if (reference.length > 140) {
     throw new Error("La referencia admite hasta 140 caracteres, sin datos bancarios.");
   }
+  // Clave del formulario (estable por render); si falta o es inválida se
+  // genera una fresca para no romper envíos antiguos.
+  const rawKey = stringField(formData, "idempotencyKey");
+  const idempotencyKey = isUuid(rawKey) ? rawKey : randomUUID();
   try {
     await declareExternalPayment({
       jobId,
@@ -222,7 +226,7 @@ export async function declareExternalPaymentAction(
       method: method as (typeof EXTERNAL_MONEY_METHODS)[number],
       paidOn: paidOnRaw === "" ? null : paidOnRaw,
       reference: reference === "" ? null : reference,
-      idempotencyKey: randomUUID(),
+      idempotencyKey,
       supersedesId: stringField(formData, "supersedesId") === "" ? null : uuidField(formData, "supersedesId"),
     });
   } catch (error) {

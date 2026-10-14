@@ -42,6 +42,9 @@ export function ExternalMoneySection({
       declaration.state === "DECLARED_BY_CLIENT" ||
       declaration.state === "DECLARED_BY_PROVIDER",
   );
+  // Clave estable por instancia del formulario: el doble envío del mismo
+  // form llega con la misma clave y la RPC lo vuelve idempotente.
+  const idempotencyKey = crypto.randomUUID();
 
   return (
     <div className="grid gap-4">
@@ -177,6 +180,7 @@ export function ExternalMoneySection({
         </summary>
         <form action={declareExternalPaymentAction} className="grid gap-3 p-4 pt-0">
           <input type="hidden" name="jobId" value={jobId} />
+          <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
           <p className="text-ink/70 text-xs leading-5">
             Esta declaración se envía a la otra parte; todavía no significa
             que esté confirmada.

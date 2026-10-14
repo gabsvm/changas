@@ -51,6 +51,13 @@ describe("job detail marketplace UI", () => {
     expect(source).toContain("ExternalMoneySection");
     expect(source).toContain("getExternalMoney");
     expect(source).not.toMatch(/verificad[oa] por YALO/i);
+    expect(source).toContain("JOB_EXTERNAL_PAYMENT_DECLARED");
+    expect(source).toContain("JOB_EXTERNAL_PAYMENT_CONFIRMED");
+    expect(source).toContain("JOB_EXTERNAL_PAYMENT_CONTESTED");
+    expect(source).toContain("JOB_EXTERNAL_PAYMENT_VOIDED");
+    expect(
+      source.indexOf('settlement_status === "SETTLED" ? ('),
+    ).toBeLessThan(source.indexOf("<ExternalMoneySection"));
   });
 
   it("shows amounts, next actions and status filters in the job list", () => {

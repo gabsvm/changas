@@ -129,6 +129,10 @@ const JOB_EVENT_LABELS: Record<string, string> = {
   JOB_DELIVERY_SUBMITTED: "El prestador envió la entrega para revisión",
   JOB_HANDOVER_VERIFIED: "Se dejó constancia de la entrega",
   JOB_CORRECTION_REQUESTED: "El cliente pidió una corrección",
+  JOB_EXTERNAL_PAYMENT_DECLARED: "Se informó un pago entre las partes",
+  JOB_EXTERNAL_PAYMENT_CONFIRMED: "Ambas partes confirmaron el pago",
+  JOB_EXTERNAL_PAYMENT_CONTESTED: "Se marcó un desacuerdo sobre el pago",
+  JOB_EXTERNAL_PAYMENT_VOIDED: "Se anuló una declaración de pago",
 };
 
 function jobStatusChangedLabel(toStatus: string | null): string {
@@ -582,22 +586,7 @@ export default async function JobPage({
               title="Pago entre ustedes"
               badge={{ tone: "green", icon: "tag" }}
             >
-              {!paymentsEnabled &&
-              detail.job_status === "COMPLETED" &&
-              externalMoney ? (
-                <ExternalMoneySection
-                  jobId={jobId}
-                  isClient={isClient}
-                  clientUserId={detail.client_user_id}
-                  ledger={externalMoney.ledger}
-                  declarations={externalMoney.declarations}
-                  defaultAmountMinor={
-                    externalMoney.ledger.outstandingMinor > 0
-                      ? externalMoney.ledger.outstandingMinor
-                      : detail.settlement_total_minor
-                  }
-                />
-              ) : detail.settlement_status === "SETTLED" ? (
+              {detail.settlement_status === "SETTLED" ? (
                 <p className="text-sm leading-7">
                   <strong>
                     Pagado{" "}
@@ -614,6 +603,21 @@ export default async function JobPage({
                 <p className="text-ink/70 text-sm leading-7">
                   Este trabajo no tiene cargos a cobrar.
                 </p>
+              ) : !paymentsEnabled &&
+                detail.job_status === "COMPLETED" &&
+                externalMoney ? (
+                <ExternalMoneySection
+                  jobId={jobId}
+                  isClient={isClient}
+                  clientUserId={detail.client_user_id}
+                  ledger={externalMoney.ledger}
+                  declarations={externalMoney.declarations}
+                  defaultAmountMinor={
+                    externalMoney.ledger.outstandingMinor > 0
+                      ? externalMoney.ledger.outstandingMinor
+                      : detail.settlement_total_minor
+                  }
+                />
               ) : isClient ? (
                 <>
                   <dl className="space-y-1 text-sm leading-6">
