@@ -71,7 +71,7 @@ export default async function ConversationPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ conversationId: string }>; 
+  params: Promise<{ conversationId: string }>;
   searchParams: Promise<{ kind?: string }>;
 }) {
   const { conversationId } = await params;
