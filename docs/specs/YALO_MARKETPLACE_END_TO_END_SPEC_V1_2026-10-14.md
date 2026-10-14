@@ -198,7 +198,7 @@ Mientras los flags de pagos online estén OFF:
 - Diferenciar actividad externa real y simulación admin en analytics, UI y reportes, con labels explícitos.
 
 ## 7.4 Copy de pagos que corregir YA
-**Evidencia concreta en main:** `apps/web/src/app/p/[slug]/[serviceSlug]/page.tsx` hoy dice «Pagás al finalizar desde YALO» y «Comisión de YALO incluida en el total»; no es correcto con D4 + pagos OFF. Cambiarlo por «Acordás el precio al contratar. El pago se realiza directamente entre las partes; YALO permite registrar lo declarado» y aclaración contractual real de comisión, sin prometer cobro dentro de app.
+**Evidencia concreta en main:** `apps/web/src/app/p/[slug]/[serviceSlug]/page.tsx` hoy dice «Pagás al finalizar desde YALO» y «Comisión de YALO incluida en el total»; no es correcto con D4 + pagos OFF. **Otro bloqueo P0 de copy:** `apps/web/src/lib/ui/guided.ts` mantiene `getProviderNextAction()` → «Conectá tu cobro», «Sin esto no podés cobrar», «Conectar Mercado Pago» cuando `paymentConnected=false`, incluso con `PAYMENTS_ENABLED=false`; `getClientNextAction()` → «Tenés un pago pendiente» y «Ir a pagar» ante `pendingPayment=true`, aunque no hay checkout. Sus callers actuales en `apps/web/src/app/(provider)/provider/manage/page.tsx` y `apps/web/src/app/(account)/jobs/page.tsx` no pasan el flag. También `CLIENT_HIRE_STEPS` termina con «Pagá» sin aclarar que el pago es externo. Corregir utilidades, callers, tests y el panel de Mercado Pago para que la guía principal promueva el cobro externo declarado, nunca la vinculación obligatoria, y para que se pueda trabajar sin cuenta MP. Cambiarlo por «Acordás el precio al contratar. El pago se realiza directamente entre las partes; YALO permite registrar lo declarado» y aclaración contractual real de comisión, sin prometer cobro dentro de app.
 - `apps/web/src/components/jobs/job-tracking.ts` ya comunica «pago online pendiente de habilitación» pero debe ahora dirigir al registro **externo declarado** después de cerrar, en vez de solo una deuda inoperable.
 - Historial `/jobs`: «Pendiente de pago» pasa a «Pago externo sin confirmar» donde corresponda, no reclamar mora; no es válido inferir deuda si ya informaron pagos externos aún sin reconciliar.
 
@@ -405,7 +405,7 @@ Atribuir abandono por pantalla, errores de servidor, tiempo hasta primera respue
 **REGLA:** no ejecutar todos los lotes en una sola pasada. Muse debe informar resultado y **esperar auditoría/permiso** entre lotes; toda rama con base actualizada, PR revisable y tests.
 
 **Fase S0 — corregir contradicciones actuales (sin nuevas tablas):**
-- Ficha de servicio «Pagás desde YALO» y afirmaciones de comisión sin respaldo; copy de seguimiento/pagos externos.
+- Ficha de servicio «Pagás desde YALO» y afirmaciones de comisión sin respaldo; copy de seguimiento/pagos externos, **incluidos `getProviderNextAction`, `getClientNextAction` y `CLIENT_HIRE_STEPS` en `apps/web/src/lib/ui/guided.ts`: hoy exigen MP y dan CTA «Ir a pagar» con pagos OFF**. Debe quedar testado que un prestador ACTIVE con servicio y sin MP puede trabajar y recibir dinero por fuera, y el cliente puede declarar pago externo, no pulsar un checkout imposible.
 - Filtro «Todos», paso 4 onboarding, residuos de color YALO, screenshots PWA y revisión del lettering con master.
 - Asegurar que no aparecen CTAs checkout/MP con flags OFF y ninguna notificación de pago imposible.
 **Gate:** copy 100% coherente D4 y capturas mobile, sin regresiones de contratación actual. No activar B todavía.
