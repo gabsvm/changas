@@ -47,6 +47,12 @@ describe("job detail marketplace UI", () => {
     expect(source).toContain("CorrectionForm");
   });
 
+  it("registers external money bilaterally without bank proof", () => {
+    expect(source).toContain("ExternalMoneySection");
+    expect(source).toContain("getExternalMoney");
+    expect(source).not.toMatch(/verificad[oa] por YALO/i);
+  });
+
   it("shows amounts, next actions and status filters in the job list", () => {
     expect(listSource).toContain("jobAmount");
     expect(listSource).toContain("nextAction");

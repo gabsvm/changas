@@ -290,12 +290,15 @@ select throws_ok(
   'provider cannot govern the post'
 );
 
--- RLS: el prestador ve la necesidad abierta...
+-- RLS: el prestador ve la necesidad abierta (rol real: el superusuario
+-- de CI salta RLS, asi que estas dos lecturas corren como authenticated).
+set role authenticated;
 select is(
   (select count(*)::integer from public.job_posts),
   1,
   'provider sees the open post'
 );
+reset role;
 
 -- ...el dueno la pausa y desaparece del listado...
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
@@ -309,11 +312,13 @@ select is(
   'owner pauses the post'
 );
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000002', true);
+set role authenticated;
 select is(
   (select count(*)::integer from public.job_posts),
   0,
   'paused post hides from providers'
 );
+reset role;
 
 -- ...la reabre, la cierra, y el cierre es terminal.
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);

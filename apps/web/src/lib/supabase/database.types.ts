@@ -251,6 +251,32 @@ type SkillsInsert = Omit<SkillsRow, "id" | "created_at" | "updated_at"> & {
   created_at?: string;
   updated_at?: string;
 };
+export type ExternalPaymentState =
+  | "DECLARED_BY_CLIENT"
+  | "DECLARED_BY_PROVIDER"
+  | "CONFIRMED_BY_BOTH"
+  | "CONTESTED"
+  | "VOIDED";
+
+export type ExternalPaymentMethod = "EFECTIVO" | "TRANSFERENCIA" | "OTRO_ACORDADO";
+
+type ExternalPaymentDeclarationsRow = {
+  id: string;
+  job_id: string;
+  declared_by_user_id: string;
+  amount_minor: number;
+  currency_code: string;
+  method: ExternalPaymentMethod;
+  paid_on: string | null;
+  reference: string | null;
+  state: ExternalPaymentState;
+  counterpart_reason: string | null;
+  idempotency_key: string | null;
+  supersedes_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type JobPostStatus = "OPEN" | "PAUSED" | "CLOSED" | "HIRED";
 
 type JobPostsRow = {
@@ -695,6 +721,11 @@ export type Database = {
         ProviderSkillsUpdate
       >;
       services: TableDefinition<ServicesRow, ServicesInsert, ServicesUpdate>;
+      external_payment_declarations: TableDefinition<
+        ExternalPaymentDeclarationsRow,
+        Omit<ExternalPaymentDeclarationsRow, "id" | "created_at" | "updated_at">,
+        Partial<ExternalPaymentDeclarationsRow>
+      >;
       job_posts: TableDefinition<JobPostsRow, JobPostsInsert, JobPostsUpdate>;
       job_post_events: TableDefinition<
         JobPostEventsRow,
@@ -803,6 +834,39 @@ export type Database = {
           public_zone: string | null;
           public_headline: string | null;
           bio: string | null;
+        }>;
+      };
+      declare_external_payment: {
+        Args: {
+          target_job_id: string;
+          declared_amount_minor: number;
+          declared_method: string;
+          declared_paid_on?: string | null;
+          declared_reference?: string | null;
+          request_idempotency_key?: string | null;
+          supersedes_declaration_id?: string | null;
+        };
+        Returns: string;
+      };
+      respond_external_payment: {
+        Args: {
+          target_declaration_id: string;
+          accepted: boolean;
+          counterpart_reason?: string | null;
+        };
+        Returns: string;
+      };
+      void_external_payment: {
+        Args: { target_declaration_id: string };
+        Returns: string;
+      };
+      external_payment_ledger: {
+        Args: { target_job_id: string };
+        Returns: Array<{
+          agreed_total_minor: number;
+          external_confirmed_minor: number;
+          external_claimed_minor: number;
+          external_outstanding_minor: number;
         }>;
       };
       create_job_post: {

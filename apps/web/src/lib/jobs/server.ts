@@ -679,6 +679,249 @@ export async function requestJobCorrection(
   }
 }
 
+export type ExternalDeclarationState =
+  | "DECLARED_BY_CLIENT"
+  | "DECLARED_BY_PROVIDER"
+  | "CONFIRMED_BY_BOTH"
+  | "CONTESTED"
+  | "VOIDED";
+
+export type ExternalPaymentDeclaration = {
+  id: string;
+  job_id: string;
+  declared_by_user_id: string;
+  amount_minor: number;
+  currency_code: string;
+  method: "EFECTIVO" | "TRANSFERENCIA" | "OTRO_ACORDADO";
+  paid_on: string | null;
+  reference: string | null;
+  state: ExternalDeclarationState;
+  counterpart_reason: string | null;
+  created_at: string;
+};
+
+const EXTERNAL_DECLARATION_STATES: ExternalDeclarationState[] = [
+  "DECLARED_BY_CLIENT",
+  "DECLARED_BY_PROVIDER",
+  "CONFIRMED_BY_BOTH",
+  "CONTESTED",
+  "VOIDED",
+];
+
+function asDeclaration(row: Record<string, unknown>): ExternalPaymentDeclaration {
+  const state = EXTERNAL_DECLARATION_STATES.includes(
+    row.state as ExternalDeclarationState,
+  )
+    ? (row.state as ExternalDeclarationState)
+    : ("DECLARED_BY_CLIENT" as const);
+  return {
+    id: String(row.id ?? ""),
+    job_id: String(row.job_id ?? ""),
+    declared_by_user_id: String(row.declared_by_user_id ?? ""),
+    amount_minor:
+      typeof row.amount_minor === "number" ? row.amount_minor : Number(row.amount_minor ?? 0),
+    currency_code: typeof row.currency_code === "string" ? row.currency_code : "ARS",
+    method:
+      row.method === "EFECTIVO" ||
+      row.method === "TRANSFERENCIA" ||
+      row.method === "OTRO_ACORDADO"
+        ? row.method
+        : "OTRO_ACORDADO",
+    paid_on: typeof row.paid_on === "string" ? row.paid_on : null,
+    reference: typeof row.reference === "string" && row.reference.length > 0 ? row.reference : null,
+    state,
+    counterpart_reason:
+      typeof row.counterpart_reason === "string" && row.counterpart_reason.length > 0
+        ? row.counterpart_reason
+        : null,
+    created_at: typeof row.created_at === "string" ? row.created_at : "",
+  };
+}
+
+// YALO S4: declarar dinero externo (solo en COMPLETED).
+export async function declareExternalPayment(input: {
+  jobId: string;
+  amountMinor: number;
+  method: "EFECTIVO" | "TRANSFERENCIA" | "OTRO_ACORDADO";
+  paidOn?: string | null;
+  reference?: string | null;
+  idempotencyKey: string;
+  supersedesId?: string | null;
+}): Promise<string> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("declare_external_payment", {
+    target_job_id: input.jobId,
+    declared_amount_minor: input.amountMinor,
+    declared_method: input.method,
+    declared_paid_on: input.paidOn ?? null,
+    declared_reference: input.reference ?? null,
+    request_idempotency_key: input.idempotencyKey,
+    supersedes_declaration_id: input.supersedesId ?? null,
+  });
+  if (error) throw mapMoneyError(error.code, error.message);
+  if (typeof data !== "string" || data === "") {
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  }
+  return data;
+}
+
+// YALO S4: la contraparte confirma o contesta.
+export async function respondExternalPayment(input: {
+  declarationId: string;
+  accepted: boolean;
+  reason?: string | null;
+}): Promise<string> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("respond_external_payment", {
+    target_declaration_id: input.declarationId,
+    accepted: input.accepted,
+    counterpart_reason: input.reason ?? null,
+  });
+  if (error) throw mapMoneyError(error.code, error.message);
+  if (typeof data !== "string" || data === "") {
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  }
+  return data;
+}
+
+// YALO S4: quien declaró anula su pendiente (corrección = void + nueva).
+export async function voidExternalPayment(declarationId: string): Promise<void> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("void_external_payment", {
+    target_declaration_id: declarationId,
+  });
+  if (error) throw mapMoneyError(error.code, error.message);
+  if (data !== "VOIDED") {
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  }
+}
+
+// YALO S4: ledger bilateral acordado/confirmado/reclamado/saldo.
+export async function getExternalPaymentLedger(jobId: string): Promise<{
+  agreedTotalMinor: number;
+  confirmedMinor: number;
+  claimedMinor: number;
+  outstandingMinor: number;
+}> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("external_payment_ledger", {
+    target_job_id: jobId,
+  });
+  if (error) throw mapMoneyError(error.code, error.message);
+  const row = (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | null;
+  if (!row) {
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  }
+  return {
+    agreedTotalMinor: Number(row.agreed_total_minor ?? 0),
+    confirmedMinor: Number(row.external_confirmed_minor ?? 0),
+    claimedMinor: Number(row.external_claimed_minor ?? 0),
+    outstandingMinor: Number(row.external_outstanding_minor ?? 0),
+  };
+}
+
+// YALO S4: ledger + historial juntos para la tarjeta de dinero.
+export async function getExternalMoney(jobId: string): Promise<{
+  ledger: { agreedTotalMinor: number; confirmedMinor: number; claimedMinor: number; outstandingMinor: number };
+  declarations: ExternalPaymentDeclaration[];
+} | null> {
+  try {
+    const [ledger, declarations] = await Promise.all([
+      getExternalPaymentLedger(jobId),
+      listExternalDeclarations(jobId),
+    ]);
+    return { ledger, declarations };
+  } catch {
+    // Migración S4 aún no aplicada: la tarjeta cae al resumen de montos.
+    return null;
+  }
+}
+
+// YALO S4: historial completo de declaraciones (RLS: solo las partes).
+export async function listExternalDeclarations(
+  jobId: string,
+): Promise<ExternalPaymentDeclaration[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    throw new JobServerError(
+      "UNAUTHORIZED",
+      "Necesitás iniciar sesión para administrar trabajos.",
+    );
+  }
+  const { data, error } = await supabase
+    .from("external_payment_declarations")
+    .select(
+      "id, job_id, declared_by_user_id, amount_minor, currency_code, method, paid_on, reference, state, counterpart_reason, created_at",
+    )
+    .eq("job_id", jobId)
+    .order("created_at", { ascending: true })
+    .limit(100);
+  if (error) throw mapMoneyError(error.code, error.message);
+  return ((data ?? []) as unknown as Record<string, unknown>[]).map(asDeclaration);
+}
+
+function mapMoneyError(code?: string | null, message?: string | null): JobServerError {
+  const detail = `${code ?? ""} ${message ?? ""}`;
+  if (code === "42501" || /job access denied|only the counterpart|only the declarer/i.test(detail)) {
+    return new JobServerError(
+      "FORBIDDEN",
+      "No tenés permiso para esa acción sobre el dinero externo.",
+    );
+  }
+  if (/only on completed jobs/i.test(detail)) {
+    return new JobServerError(
+      "CONFLICT",
+      "El dinero externo se registra cuando el trabajo está completado.",
+    );
+  }
+  if (/exceeds the agreed total/i.test(detail)) {
+    return new JobServerError(
+      "CONFLICT",
+      "El monto supera el total acordado del trabajo.",
+    );
+  }
+  if (/must be positive|amount/i.test(detail) && /positive/i.test(detail)) {
+    return new JobServerError("CONFLICT", "El monto declarado debe ser positivo.");
+  }
+  if (/payment method is invalid/i.test(detail)) {
+    return new JobServerError("CONFLICT", "El método de pago informado no es válido.");
+  }
+  if (/payment date is invalid/i.test(detail)) {
+    return new JobServerError("CONFLICT", "La fecha aproximada del pago no es válida.");
+  }
+  if (/payment reference is invalid/i.test(detail)) {
+    return new JobServerError(
+      "CONFLICT",
+      "La referencia admite hasta 140 caracteres, sin datos bancarios.",
+    );
+  }
+  if (/reason is required to contest/i.test(detail)) {
+    return new JobServerError(
+      "CONFLICT",
+      "Para marcar desacuerdo contanos el motivo.",
+    );
+  }
+  if (/too many pending declarations/i.test(detail)) {
+    return new JobServerError(
+      "CONFLICT",
+      "Hay demasiadas declaraciones pendientes: resolvé las abiertas antes de informar otra.",
+    );
+  }
+  if (/already resolved/i.test(detail)) {
+    return new JobServerError(
+      "CONFLICT",
+      "Esa declaración ya fue resuelta. Actualizá la página.",
+    );
+  }
+  return new JobServerError(
+    "TRANSIENT",
+    "No pudimos registrar el movimiento. Intentá nuevamente.",
+  );
+}
+
 export async function requestJobReschedule(input: {
   jobId: string;
   scheduleType: ScheduleType;
