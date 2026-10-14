@@ -16,12 +16,14 @@ import {
   applyFakeAdditionalPayment,
   applyFakeSettlementPayment,
   JobServerError,
+  requestJobCorrection,
   requestJobReschedule,
   requestJobScopeChange,
   respondJobReschedule,
   respondJobScopeChange,
   requestJobCompletion,
   setJobExactLocation,
+  submitJobDelivery,
   transitionJob,
 } from "@/lib/jobs/server";
 import {
@@ -110,9 +112,9 @@ export async function transitionJobAction(formData: FormData): Promise<void> {
 
 export type CompletionCodeState = { error: string | null };
 
-// Pedido de finalización con el código del cliente: devuelve el error
-// como estado para mostrarlo junto al input en vez de una excepción
-// genérica. Solo la usa el formulario del código.
+// Constancia de entrega presencial con el código del cliente (YALO S3: ya
+// no es el pedido de revisión, sino la verificación tras el envío).
+// Devuelve el error como estado para mostrarlo junto al input.
 export async function requestCompletionAction(
   _previousState: CompletionCodeState,
   formData: FormData,
@@ -121,7 +123,7 @@ export async function requestCompletionAction(
   const code = stringField(formData, "confirmationCode");
   if (!/^[0-9]{4}$/.test(code)) {
     return {
-      error: "Ingresá los 4 dígitos que el cliente ve en su Seguimiento.",
+      error: "Ingresá los 4 dígitos que el cliente comparte tras revisar.",
     };
   }
   try {
@@ -135,6 +137,51 @@ export async function requestCompletionAction(
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");
   return { error: null };
+}
+
+export type DeliverySubmitState = { error: string | null };
+
+// Envío de la entrega para revisión (sin código). Solo la usa el
+// formulario de entrega del prestador.
+export async function submitDeliveryAction(
+  _previousState: DeliverySubmitState,
+  formData: FormData,
+): Promise<DeliverySubmitState> {
+  const jobId = uuidField(formData, "jobId");
+  const summary = stringField(formData, "deliverySummary");
+  if (summary.length < 3 || summary.length > 2000) {
+    return {
+      error: "El resumen de la entrega necesita entre 3 y 2000 caracteres.",
+    };
+  }
+  try {
+    await submitJobDelivery(jobId, summary);
+  } catch (error) {
+    if (error instanceof JobServerError) return { error: error.message };
+    return { error: "No pudimos completar la acción. Intentá nuevamente." };
+  }
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs");
+  return { error: null };
+}
+
+// Pedido de corrección del cliente con motivo. Vuelve el trabajo a curso.
+export async function requestCorrectionAction(
+  formData: FormData,
+): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const reason = stringField(formData, "correctionReason");
+  if (reason.length < 2 || reason.length > 1000) {
+    throw new Error("El motivo de la corrección necesita entre 2 y 1000 caracteres.");
+  }
+  try {
+    await requestJobCorrection(jobId, reason);
+  } catch (error) {
+    if (error instanceof JobServerError) throw new Error(error.message);
+    throw error;
+  }
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs");
 }
 
 export async function requestRescheduleAction(

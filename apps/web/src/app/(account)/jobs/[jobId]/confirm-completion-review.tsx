@@ -5,6 +5,7 @@ import { useState } from "react";
 import { formatMinorUnits } from "@changas/domain";
 
 import { transitionJobAction } from "@/app/(account)/jobs/actions";
+import { CorrectionForm } from "@/app/(account)/jobs/[jobId]/correction-form";
 
 type ConfirmCompletionReviewProps = {
   jobId: string;
@@ -99,6 +100,7 @@ export function ConfirmCompletionReview({
         </button>
       </form>
       <div className="mt-2 grid gap-2">
+        <CorrectionForm jobId={jobId} />
         <a
           href="#ayuda"
           className="consumer-pressable inline-flex min-h-[52px] w-full items-center justify-center rounded-xl border border-white/25 px-4 text-sm font-bold text-white"

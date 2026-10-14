@@ -65,6 +65,10 @@ export type UpcomingJob = {
 
 export type JobDetail = {
   confirmation_code: string | null;
+  delivery_submitted_at: string | null;
+  delivery_summary: string | null;
+  handover_verified_at: string | null;
+  correction_count: number;
   job_id: string;
   conversation_id: string;
   job_status: JobStatus;
@@ -206,6 +210,48 @@ function mapTransitionError(
     return new JobServerError(
       "CONFLICT",
       "El motivo es demasiado corto: agregá un poco más de detalle.",
+    );
+  }
+  if (detail.includes("submit the delivery before verifying")) {
+    return new JobServerError(
+      "CONFLICT",
+      "Primero enviá la entrega para revisión; recién después se puede dejar constancia con el código.",
+    );
+  }
+  if (detail.includes("remote delivery needs no code")) {
+    return new JobServerError(
+      "CONFLICT",
+      "Esta entrega es remota y no usa código: revisá la entrega enviada.",
+    );
+  }
+  if (detail.includes("delivery evidence is required")) {
+    return new JobServerError(
+      "CONFLICT",
+      "Todavía no hay una entrega registrada para este trabajo.",
+    );
+  }
+  if (detail.includes("handover verification is required")) {
+    return new JobServerError(
+      "CONFLICT",
+      "Falta la constancia presencial del PIN antes de la confirmación final.",
+    );
+  }
+  if (detail.includes("delivery summary is invalid")) {
+    return new JobServerError(
+      "CONFLICT",
+      "El resumen de la entrega necesita entre 3 y 2000 caracteres.",
+    );
+  }
+  if (detail.includes("correction reason is invalid")) {
+    return new JobServerError(
+      "CONFLICT",
+      "El motivo de la corrección necesita entre 2 y 1000 caracteres.",
+    );
+  }
+  if (detail.includes("too many corrections")) {
+    return new JobServerError(
+      "CONFLICT",
+      "Ya se pidieron varias correcciones: reportá el problema para que medie el equipo de YALO.",
     );
   }
   return mapError(code);
@@ -456,6 +502,26 @@ export async function getJobDetail(jobId: string): Promise<JobDetail> {
       row.completion_requested_at.length > 0
         ? row.completion_requested_at
         : null,
+    delivery_submitted_at:
+      typeof row.delivery_submitted_at === "string" &&
+      row.delivery_submitted_at.length > 0
+        ? row.delivery_submitted_at
+        : null,
+    delivery_summary:
+      typeof row.delivery_summary === "string" &&
+      row.delivery_summary.length > 0
+        ? row.delivery_summary
+        : null,
+    handover_verified_at:
+      typeof row.handover_verified_at === "string" &&
+      row.handover_verified_at.length > 0
+        ? row.handover_verified_at
+        : null,
+    correction_count:
+      typeof row.correction_count === "number" &&
+      Number.isFinite(row.correction_count)
+        ? row.correction_count
+        : 0,
     paid_additional_amount: paid,
     total_price_amount: total,
     settlement_status: settlementStatus,
@@ -577,6 +643,40 @@ export async function requestJobCompletion(
     );
   }
   throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+}
+
+// YALO S3: enviar la entrega para revisión (sin código). En remoto mueve
+// directo a COMPLETION_REQUESTED; en presencial queda IN_PROGRESS hasta la
+// constancia por requestJobCompletion.
+export async function submitJobDelivery(
+  jobId: string,
+  summary: string,
+): Promise<void> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("submit_job_delivery", {
+    target_job_id: jobId,
+    delivery_summary: summary,
+  });
+  if (error) throw mapTransitionError(error.code, error.message);
+  if (data !== "SUBMITTED") {
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  }
+}
+
+// YALO S3: el cliente devuelve el trabajo a IN_PROGRESS con motivo.
+export async function requestJobCorrection(
+  jobId: string,
+  reason: string,
+): Promise<void> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("request_job_correction", {
+    target_job_id: jobId,
+    correction_reason: reason,
+  });
+  if (error) throw mapTransitionError(error.code, error.message);
+  if (data !== "CORRECTION_REQUESTED") {
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  }
 }
 
 export async function requestJobReschedule(input: {

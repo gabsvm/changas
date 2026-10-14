@@ -38,10 +38,13 @@ describe("job detail marketplace UI", () => {
     expect(source).toContain("showHelp");
   });
 
-  it("gates completion behind the client confirmation code", () => {
-    expect(source).toContain("Código para el prestador");
+  it("decouples delivery submission from the client handover PIN", () => {
+    expect(source).toContain("PIN para el prestador");
     expect(source).toContain("ConfirmationCodeForm");
-    expect(source).toContain("Ingresar código");
+    expect(source).toContain("Ingresar PIN");
+    expect(source).toContain("DeliverySubmitForm");
+    expect(source).toContain("Enviar entrega");
+    expect(source).toContain("CorrectionForm");
   });
 
   it("shows amounts, next actions and status filters in the job list", () => {

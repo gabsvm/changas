@@ -19,7 +19,7 @@ export function ConfirmationCodeForm({ jobId }: { jobId: string }) {
     <form action={action} className="grid gap-2">
       <input type="hidden" name="jobId" value={jobId} />
       <label className="text-[13px] font-bold text-white/90">
-        Código del cliente
+        PIN que compartió el cliente
         <input
           name="confirmationCode"
           required
@@ -46,7 +46,7 @@ export function ConfirmationCodeForm({ jobId }: { jobId: string }) {
         disabled={pending}
         className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold disabled:opacity-50"
       >
-        {pending ? "Verificando…" : "Solicitar finalización"}
+        {pending ? "Verificando…" : "Dejar constancia de entrega"}
       </button>
     </form>
   );

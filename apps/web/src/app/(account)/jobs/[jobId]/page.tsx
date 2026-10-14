@@ -18,6 +18,8 @@ import {
 } from "@/app/(account)/jobs/actions";
 import { ConfirmationCodeForm } from "@/app/(account)/jobs/[jobId]/confirmation-code-form";
 import { ConfirmCompletionReview } from "@/app/(account)/jobs/[jobId]/confirm-completion-review";
+import { CorrectionForm } from "@/app/(account)/jobs/[jobId]/correction-form";
+import { DeliverySubmitForm } from "@/app/(account)/jobs/[jobId]/delivery-submit-form";
 import { PaymentSubmitButton } from "@/components/jobs/payment-submit-button";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
 import { JobTracker } from "@/components/jobs/job-tracker";
@@ -220,6 +222,9 @@ export default async function JobPage({
     isProvider,
     settlementPending,
     paymentsEnabled,
+    modality: detail.modality,
+    deliverySubmitted: detail.delivery_submitted_at !== null,
+    handoverVerified: detail.handover_verified_at !== null,
   });
   const needsRescheduleAttention = reschedules.some(
     (request) =>
@@ -414,29 +419,43 @@ export default async function JobPage({
           </div>
           {isClient &&
           detail.confirmation_code &&
-          ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
-            detail.job_status,
-          ) ? (
+          detail.modality !== "REMOTE" &&
+          (detail.delivery_submitted_at !== null ||
+            detail.job_status === "COMPLETION_REQUESTED") ? (
             <div className="border-ink/[0.08] bg-canvas mt-3 rounded-2xl border p-4 text-center">
               <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.12em] uppercase">
-                Código para el prestador
+                PIN para el prestador
               </p>
               <p
                 className="font-display mt-1 text-3xl font-extrabold tracking-[0.25em]"
-                aria-label={`Código de confirmación ${detail.confirmation_code}`}
+                aria-label={`PIN de entrega ${detail.confirmation_code}`}
               >
                 {detail.confirmation_code}
               </p>
               <p className="text-ink/70 mt-1 text-xs leading-5">
-                Compartilo cuando el trabajo esté terminado. Sin este código no
-                se puede cerrar.
+                Revisá la entrega y, si está bien, compartilo con el
+                prestador para dejar constancia. No es la confirmación
+                final: después confirmás el trabajo por separado.
               </p>
             </div>
           ) : null}
-          {isProvider && detail.job_status === "IN_PROGRESS" ? (
+          {isProvider &&
+          detail.job_status === "IN_PROGRESS" &&
+          detail.delivery_submitted_at === null ? (
             <p className="text-ink/70 mt-3 text-xs leading-5">
-              Para solicitar la finalización vas a necesitar el código de 4
-              dígitos del cliente.
+              {detail.modality === "REMOTE"
+                ? "Cuando termines, enviá la entrega digital para revisión: no usa ningún código."
+                : "Cuando termines, enviá la entrega para revisión. Recién después vas a necesitar el PIN de 4 dígitos del cliente."}
+            </p>
+          ) : null}
+          {isProvider &&
+          detail.job_status === "IN_PROGRESS" &&
+          detail.delivery_submitted_at !== null &&
+          detail.modality !== "REMOTE" &&
+          detail.handover_verified_at === null ? (
+            <p className="text-ink/70 mt-3 text-xs leading-5">
+              Entrega enviada. Pedile al cliente el PIN de 4 dígitos que ve
+              en su Seguimiento para dejar constancia.
             </p>
           ) : null}
           {tracking.exception ? (
@@ -450,6 +469,33 @@ export default async function JobPage({
             </div>
           ) : null}
         </section>
+
+        {detail.delivery_submitted_at !== null ? (
+          <section
+            className="border-ink/[0.08] bg-surface consumer-card mt-5 rounded-2xl border p-4 sm:p-5"
+            aria-label="Entrega enviada"
+          >
+            <SectionHeader
+              title="Entrega enviada"
+              badge={{ tone: "blue", icon: "doc", label: "Entrega" }}
+            />
+            {detail.delivery_summary ? (
+              <p className="mt-3 text-sm leading-7 whitespace-pre-wrap">
+                {detail.delivery_summary}
+              </p>
+            ) : null}
+            <p className="text-ink/70 mt-2 text-[13px] leading-5">
+              {detail.modality === "REMOTE"
+                ? "Entrega digital en revisión: no usa PIN."
+                : detail.handover_verified_at !== null
+                  ? "Constancia presencial registrada. Falta tu confirmación final."
+                  : "Falta la constancia presencial del PIN."}
+              {detail.correction_count > 0
+                ? ` Correcciones pedidas: ${detail.correction_count}.`
+                : ""}
+            </p>
+          </section>
+        ) : null}
 
         <section
           id="proxima-accion"
@@ -491,6 +537,7 @@ export default async function JobPage({
                 extrasMinor: detail.settlement_unpaid_extras_minor,
                 totalMinor: detail.settlement_total_minor,
               }}
+              remote={detail.modality === "REMOTE"}
             />
             <Link
               href={`/messages/${detail.conversation_id}`}
@@ -1191,6 +1238,7 @@ export default async function JobPage({
                   extrasMinor: detail.settlement_unpaid_extras_minor,
                   totalMinor: detail.settlement_total_minor,
                 }}
+                remote={detail.modality === "REMOTE"}
               />
             ) : (
               <a
@@ -1310,11 +1358,13 @@ function PrimaryAction({
   kind,
   compact = false,
   reviewAmounts,
+  remote,
 }: {
   jobId: string;
   kind: NextAction["kind"];
   compact?: boolean;
   reviewAmounts: { baseMinor: number; extrasMinor: number; totalMinor: number };
+  remote: boolean;
 }) {
   if (kind === "start") {
     return (
@@ -1326,18 +1376,31 @@ function PrimaryAction({
       />
     );
   }
-  if (kind === "request_completion") {
+  if (kind === "submit_delivery") {
     if (compact) {
       return (
         <a
           href="#proxima-accion"
           className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
         >
-          Ingresar código
+          Enviar entrega
         </a>
       );
     }
-    // El error del código se muestra junto al input (sin excepción
+    return <DeliverySubmitForm jobId={jobId} remote={remote} />;
+  }
+  if (kind === "verify_handover") {
+    if (compact) {
+      return (
+        <a
+          href="#proxima-accion"
+          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+        >
+          Ingresar PIN
+        </a>
+      );
+    }
+    // El error del PIN se muestra junto al input (sin excepción
     // genérica) mediante requestCompletionAction + useActionState.
     return <ConfirmationCodeForm jobId={jobId} />;
   }
