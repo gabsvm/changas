@@ -23,12 +23,22 @@ function raw(overrides: Partial<ServiceFormRaw> = {}): ServiceFormRaw {
     materialsNotes: "",
     isPublished: true,
     isPaused: false,
+    instantBooking: false,
     tags: [],
     ...overrides,
   };
 }
 
 describe("parseServiceForm", () => {
+  it("conserva la preautorizacion de reserva directa", () => {
+    const on = parseServiceForm(raw({ instantBooking: true }));
+    expect(on.ok).toBe(true);
+    if (on.ok) expect(on.data.instantBooking).toBe(true);
+    const off = parseServiceForm(raw());
+    expect(off.ok).toBe(true);
+    if (off.ok) expect(off.data.instantBooking).toBe(false);
+  });
+
   it("acepta un servicio válido", () => {
     const result = parseServiceForm(raw());
     expect(result.ok).toBe(true);

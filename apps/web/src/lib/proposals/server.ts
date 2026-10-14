@@ -68,6 +68,7 @@ export type ProposalDraft = {
   scheduleEndAt?: string | null;
   deadlineAt?: string | null;
   expiresAt?: string | null;
+  idempotencyKey?: string | null;
 };
 
 export type ProposalRevision = Omit<ProposalDraft, "conversationId"> & {
@@ -107,6 +108,7 @@ type ProposalRpcClient = {
       proposed_schedule_end_at: string | null;
       proposed_deadline_at: string | null;
       proposal_expires_at: string | null;
+      request_idempotency_key: string | null;
     },
   ): Promise<{ data: string | null; error: RpcError }>;
   rpc(
@@ -319,6 +321,7 @@ function proposalArgs(input: ProposalDraft) {
     proposed_schedule_end_at: input.scheduleEndAt ?? null,
     proposed_deadline_at: input.deadlineAt ?? null,
     proposal_expires_at: input.expiresAt ?? null,
+    request_idempotency_key: input.idempotencyKey ?? null,
   };
 }
 

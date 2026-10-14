@@ -14,6 +14,8 @@ export async function startServiceConversation(
 ): Promise<void> {
   const providerSlug = String(formData.get("providerSlug") ?? "");
   const serviceSlug = String(formData.get("serviceSlug") ?? "");
+  const rawKind = String(formData.get("hireKind") ?? "");
+  const hireKind = rawKind === "DIRECT_BOOKING" || rawKind === "QUOTE_REQUEST" ? rawKind : null;
 
   if (!SLUG_PATTERN.test(providerSlug) || !SLUG_PATTERN.test(serviceSlug)) {
     redirect("/buscar");
@@ -40,5 +42,5 @@ export async function startServiceConversation(
     );
   }
 
-  redirect(`/messages/${conversationId}`);
+  redirect(hireKind ? `/messages/${conversationId}?kind=${hireKind}` : `/messages/${conversationId}`);
 }

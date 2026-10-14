@@ -48,6 +48,7 @@ function serviceRaw(formData: FormData): ServiceFormRaw {
     excludes: getFormString(formData, "excludes"),
     materialsNotes: getFormString(formData, "materialsNotes"),
     isPublished: checkbox(formData, "isPublished"),
+    instantBooking: checkbox(formData, "instantBooking"),
     isPaused: checkbox(formData, "isPaused"),
     tags: getFormString(formData, "tags")
       .split(",")
@@ -76,6 +77,7 @@ type SaveServiceRpcArgs = {
   requested_materials_notes: string | null;
   requested_is_published: boolean;
   requested_is_paused: boolean;
+  requested_instant_booking_enabled: boolean;
   requested_tags: string[];
 };
 
@@ -162,6 +164,7 @@ export async function saveServiceTransactional(
     requested_materials_notes: textOrNull(parsed.materialsNotes),
     requested_is_published: parsed.isPublished,
     requested_is_paused: parsed.isPaused,
+    requested_instant_booking_enabled: parsed.instantBooking,
     requested_tags: parsedTags,
   };
 

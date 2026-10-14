@@ -295,6 +295,7 @@ type ServicesRow = {
   currency_code: string;
   price_unit: string | null;
   accepts_offers: boolean;
+  instant_booking_enabled: boolean;
   expected_duration_minutes: number | null;
   schedule_type: ScheduleTypeValue;
   includes: string | null;

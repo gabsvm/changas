@@ -13,6 +13,10 @@ import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { createClient } from "@/lib/supabase/server";
 import { getServiceModalityLabel } from "@/lib/ui/service-modality";
 import { GuideHeader } from "@/components/ui/guided";
+import {
+  getServiceHireKind,
+  isInstantBookingEligible,
+} from "@/lib/ui/direct-booking";
 import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 
 import { startServiceConversation } from "./actions";
@@ -110,6 +114,14 @@ export default async function PublicServicePage({
     service.price_unit,
   );
 
+  const hireKind = getServiceHireKind(service);
+  const instantEligible = isInstantBookingEligible(service);
+  const hireCtaLabel =
+    hireKind === "DIRECT_BOOKING"
+      ? instantEligible
+        ? `Reservar por ${price}`
+        : "Solicitar contratación"
+      : "Pedir presupuesto";
   return (
     <main
       id="main-content"
@@ -341,6 +353,7 @@ export default async function PublicServicePage({
               >
                 <input type="hidden" name="providerSlug" value={providerSlug} />
                 <input type="hidden" name="serviceSlug" value={serviceSlug} />
+                <input type="hidden" name="hireKind" value={hireKind} />
                 <div className="bg-surface border-ink/[0.08] flex min-w-0 flex-1 flex-col justify-center rounded-2xl border px-4 py-2 sm:hidden">
                   <p className="truncate text-[15px] leading-5 font-extrabold">
                     {price}
@@ -349,7 +362,7 @@ export default async function PublicServicePage({
                     Por chat · coordinás día y precio
                   </p>
                 </div>
-                <ConsultButton />
+                <ConsultButton label={hireCtaLabel} />
               </form>
             </div>
           </div>

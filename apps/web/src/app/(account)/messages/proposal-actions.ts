@@ -77,6 +77,7 @@ export async function createProposalAction(
 ): Promise<ProposalActionState> {
   try {
     const conversationId = requiredUuid(formData, "conversationId");
+    const rawKey = stringField(formData, "idempotencyKey");
     await createConversationProposal({
       conversationId,
       kind: proposalKind(formData),
@@ -86,6 +87,7 @@ export async function createProposalAction(
       scheduleEndAt: optionalIso(formData, "scheduleEndAt"),
       deadlineAt: optionalIso(formData, "deadlineAt"),
       expiresAt: optionalIso(formData, "expiresAt"),
+      idempotencyKey: isUuid(rawKey) ? rawKey : null,
     });
     revalidatePath(`/messages/${conversationId}`);
     return { status: "SUCCESS", message: "Propuesta creada." };
