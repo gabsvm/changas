@@ -60,7 +60,7 @@ describe("getJobNextAction", () => {
         isProvider: true,
         settlementPending: false,
       }).kind,
-    ).toBe("request_completion");
+    ).toBe("submit_delivery");
     expect(
       getJobNextAction({
         status: "COMPLETION_REQUESTED",
@@ -114,14 +114,57 @@ describe("getJobNextAction", () => {
     expect(waiting.heading).toMatch(/confirmado/i);
   });
 
-  it("pide el código del cliente para solicitar la finalización", () => {
+  it("pide enviar la entrega antes que el código (presencial)", () => {
     const action = getJobNextAction({
       status: "IN_PROGRESS",
       isClient: false,
       isProvider: true,
       settlementPending: false,
+      modality: "IN_PERSON",
     });
-    expect(action.kind).toBe("request_completion");
-    expect(action.heading).toMatch(/código/i);
+    expect(action.kind).toBe("submit_delivery");
+    expect(action.heading).toMatch(/revisi/i);
+    expect(action.sub).toMatch(/antes de compartir el PIN/i);
+  });
+
+  it("en remoto no menciona PIN ni código", () => {
+    const action = getJobNextAction({
+      status: "IN_PROGRESS",
+      isClient: false,
+      isProvider: true,
+      settlementPending: false,
+      modality: "REMOTE",
+    });
+    expect(action.kind).toBe("submit_delivery");
+    expect(action.heading).toMatch(/digital/i);
+    expect(action.sub).not.toMatch(/PIN|4 dígitos/i);
+  });
+
+  it("tras el envío presencial pide la constancia PIN", () => {
+    const action = getJobNextAction({
+      status: "IN_PROGRESS",
+      isClient: false,
+      isProvider: true,
+      settlementPending: false,
+      modality: "IN_PERSON",
+      deliverySubmitted: true,
+    });
+    expect(action.kind).toBe("verify_handover");
+    expect(action.heading).toMatch(/PIN/i);
+    expect(action.sub).toMatch(/tras revisar/i);
+  });
+
+  it("tras la constancia queda en espera de revisión", () => {
+    const action = getJobNextAction({
+      status: "IN_PROGRESS",
+      isClient: false,
+      isProvider: true,
+      settlementPending: false,
+      modality: "IN_PERSON",
+      deliverySubmitted: true,
+      handoverVerified: true,
+    });
+    expect(action.kind).toBeNull();
+    expect(action.heading).toMatch(/esperando revisión/i);
   });
 });

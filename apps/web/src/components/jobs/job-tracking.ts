@@ -131,7 +131,8 @@ export function getJobTracking(
 
 export type NextActionKind =
   | "start"
-  | "request_completion"
+  | "submit_delivery"
+  | "verify_handover"
   | "confirm_completion"
   | "pay"
   | "review"
@@ -156,9 +157,18 @@ export function getJobNextAction(args: {
   // YALO A3: con el cobro online apagado no se promete ni se pide pagar.
   // Default false = copia honesta; los callers server pasan el flag real.
   paymentsEnabled?: boolean;
+  // YALO S3: entrega desacoplada por modalidad. Defaults conservadores
+  // (presencial sin constancia) para callers que aún no pasan el estado.
+  modality?: "IN_PERSON" | "REMOTE" | "BOTH";
+  deliverySubmitted?: boolean;
+  handoverVerified?: boolean;
 }): NextAction {
   const { status, isClient, isProvider, settlementPending } = args;
   const paymentsEnabled = args.paymentsEnabled ?? false;
+  const modality = args.modality ?? "IN_PERSON";
+  const deliverySubmitted = args.deliverySubmitted ?? false;
+  const handoverVerified = args.handoverVerified ?? false;
+  const needsHandover = modality !== "REMOTE";
   if (isProvider && status === "CONFIRMED") {
     return {
       heading: "Iniciá el trabajo cuando llegues",
@@ -166,11 +176,37 @@ export function getJobNextAction(args: {
       kind: "start",
     };
   }
+  if (isProvider && status === "IN_PROGRESS" && !deliverySubmitted) {
+    return {
+      heading:
+        modality === "REMOTE"
+          ? "Enviá la entrega digital para revisión"
+          : "Enviá la entrega para revisión",
+      sub:
+        modality === "REMOTE"
+          ? "Resumí lo hecho: el cliente revisa sin ningún código."
+          : "Contá qué hiciste: el cliente revisa antes de compartir el PIN.",
+      kind: "submit_delivery",
+    };
+  }
+  if (
+    isProvider &&
+    status === "IN_PROGRESS" &&
+    deliverySubmitted &&
+    needsHandover &&
+    !handoverVerified
+  ) {
+    return {
+      heading: "Dejá constancia con el PIN del cliente",
+      sub: "El cliente lo comparte tras revisar tu entrega. No es la confirmación final.",
+      kind: "verify_handover",
+    };
+  }
   if (isProvider && status === "IN_PROGRESS") {
     return {
-      heading: "Pedí la revisión con el código del cliente",
-      sub: "Ingresá los 4 dígitos que ve el cliente en su Seguimiento.",
-      kind: "request_completion",
+      heading: "Entrega enviada, esperando revisión",
+      sub: "El cliente está revisando tu entrega. Te avisamos de cada avance.",
+      kind: null,
     };
   }
   if (isClient && status === "COMPLETION_REQUESTED") {
