@@ -154,6 +154,20 @@ export default async function JobsPage({
           );
         })()}
 
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <Link
+            href="/needs/new"
+            className="consumer-pressable bg-surface border-ink/[0.08] inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border px-4 text-sm font-bold"
+          >
+            Publicar una necesidad y comparar ofertas
+          </Link>
+          <Link
+            href="/needs"
+            className="consumer-pressable inline-flex min-h-11 flex-1 items-center justify-center rounded-xl px-4 text-sm font-bold text-ink/70 hover:bg-ink/[0.045]"
+          >
+            Ver mis necesidades
+          </Link>
+        </div>
         <nav
           className="mt-4 flex gap-2 overflow-x-auto"
           aria-label="Filtrar trabajos"
