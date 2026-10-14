@@ -68,9 +68,20 @@ export default async function NeedDetailPage({
 
   const offerCount = isOwner ? await countPostOffers(postId) : 0;
 
-  const { data: myServices } = isOwner
+  const { data: myProfile } = isOwner
     ? { data: null }
     : await supabase
+        .from("provider_profiles")
+        .select("status, marketplace_paused")
+        .eq("user_id", user.id)
+        .maybeSingle();
+  const canOffer =
+    !isOwner &&
+    myProfile?.status === "ACTIVE" &&
+    myProfile?.marketplace_paused === false;
+
+  const { data: myServices } = canOffer
+    ? await supabase
         .from("services")
         .select("id, title")
         .eq("provider_user_id", user.id)
@@ -78,7 +89,8 @@ export default async function NeedDetailPage({
         .eq("is_published", true)
         .eq("is_paused", false)
         .order("sort_order")
-        .limit(10);
+        .limit(10)
+    : { data: null };
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
@@ -157,7 +169,19 @@ export default async function NeedDetailPage({
         </section>
       ) : post.status === "OPEN" ? (
         <section className="mt-6" aria-label="Ofertar en esta necesidad">
-          {(myServices ?? []).length === 0 ? (
+          {!canOffer ? (
+            <p className="text-ink/70 text-sm leading-6">
+              Para ofertar necesitás un perfil de prestador activo y visible
+              en el marketplace.{" "}
+              <ActionLink
+                href="/provider/onboarding"
+                tone="secondary"
+                className="min-h-0 px-3 py-2 text-sm"
+              >
+                Revisar mi perfil
+              </ActionLink>
+            </p>
+          ) : (myServices ?? []).length === 0 ? (
             <p className="text-ink/70 text-sm leading-6">
               Para ofertar necesitás un servicio publicado en este rubro.{" "}
               <ActionLink

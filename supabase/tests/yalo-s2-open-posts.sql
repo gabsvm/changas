@@ -4,7 +4,7 @@
 -- Todo hace rollback al final del archivo.
 begin;
 
-select plan(54);
+select plan(69);
 
 -- Estructura: tablas y columnas.
 select ok(
@@ -408,6 +408,22 @@ from public.provider_skills provider_skill
 where provider_skill.provider_user_id = '16000000-0000-4000-8000-000000000002'
 limit 1;
 
+insert into public.services (
+  id, provider_user_id, skill_id, public_slug, title, description,
+  modality, price_model, price_amount, currency_code, accepts_offers,
+  schedule_type, is_published
+)
+select
+  '16000000-0000-4000-8000-000000000011',
+  '16000000-0000-4000-8000-000000000002',
+  services.skill_id,
+  's2-service-second',
+  'S2 second service',
+  'Synthetic S2 second offer service fixture for the hire path.',
+  'REMOTE', 'FIXED', 120000, 'ARS', false, 'UNSCHEDULED', true
+from public.services
+where id = '16000000-0000-4000-8000-000000000010';
+
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
 select ok(
   public.create_job_post(
@@ -526,6 +542,144 @@ select throws_ok(
     '16000000-0000-4000-8000-000000000010')$$,
   '22023', 'post is not open',
   'closed post takes no offers'
+);
+-- Indices de los listados nuevos.
+select ok(
+  exists (
+    select 1 from pg_indexes
+    where schemaname = 'public' and tablename = 'job_posts'
+      and indexname = 'job_posts_open_skill_created_idx'
+  ),
+  'open post listing has a supporting index'
+);
+select ok(
+  exists (
+    select 1 from pg_indexes
+    where schemaname = 'public' and tablename = 'conversations'
+      and indexname = 'conversations_job_post_idx'
+  ),
+  'post-bound threads have a supporting index'
+);
+
+-- Reuse-and-bind: un hilo de catalogo libre se adopta al post.
+select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
+select ok(
+  public.create_job_post(
+    (select skill_id from public.services where id = '16000000-0000-4000-8000-000000000010'),
+    'Necesito plomero urgente en casa',
+    'Se rompio un cano bajo la bacha y necesito arreglo esta semana.',
+    null, null, null, null, 'ARS',
+    '16000000-0000-4000-8000-0000000000e1'
+  ) is not null,
+  'third open post is created for adoption'
+);
+select ok(
+  public.start_service_conversation('s2-provider', 's2-service') is not null,
+  'catalog thread opens before the offer'
+);
+select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000002', true);
+select is(
+  public.start_post_offer_conversation(
+    (select id from public.job_posts
+     where idempotency_key = '16000000-0000-4000-8000-0000000000e1'),
+    '16000000-0000-4000-8000-000000000010'
+  )::text,
+  (select id::text from public.conversations
+   where service_id = '16000000-0000-4000-8000-000000000010'
+     and client_user_id = '16000000-0000-4000-8000-000000000001'
+     and provider_user_id = '16000000-0000-4000-8000-000000000002'),
+  'offer adopts the free catalog thread'
+);
+select ok(
+  (select job_post_id from public.conversations
+   where service_id = '16000000-0000-4000-8000-000000000010'
+     and client_user_id = '16000000-0000-4000-8000-000000000001'
+     and provider_user_id = '16000000-0000-4000-8000-000000000002')
+  = (select id from public.job_posts
+     where idempotency_key = '16000000-0000-4000-8000-0000000000e1'),
+  'adopted thread points at the post'
+);
+select ok(
+  exists (
+    select 1 from public.job_post_events
+    where job_post_id = (select id from public.job_posts
+      where idempotency_key = '16000000-0000-4000-8000-0000000000e1')
+      and event_type = 'OFFER_RECEIVED'
+  ),
+  'adoption announces the offer on the post'
+);
+
+-- Auto-hire: aceptar la oferta del hilo atado marca HIRED.
+select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
+select ok(
+  public.create_job_post(
+    (select skill_id from public.services where id = '16000000-0000-4000-8000-000000000010'),
+    'Necesito plomero urgente en casa',
+    'Se rompio un cano bajo la bacha y necesito arreglo esta semana.',
+    null, null, null, null, 'ARS',
+    '16000000-0000-4000-8000-0000000000d1'
+  ) is not null,
+  'fourth open post is created for hiring'
+);
+select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000002', true);
+select ok(
+  public.start_post_offer_conversation(
+    (select id from public.job_posts
+     where idempotency_key = '16000000-0000-4000-8000-0000000000d1'),
+    '16000000-0000-4000-8000-000000000011'
+  ) is not null,
+  'offer opens a thread for the hire post'
+);
+select is(
+  (select count(*)::integer from public.conversations
+   where job_post_id = (select id from public.job_posts
+     where idempotency_key = '16000000-0000-4000-8000-0000000000d1')),
+  1,
+  'hire post keeps a single thread'
+);
+select ok(
+  exists (
+    select 1 from public.conversations
+    where job_post_id = (select id from public.job_posts
+      where idempotency_key = '16000000-0000-4000-8000-0000000000d1')
+      and service_id = '16000000-0000-4000-8000-000000000011'
+  ),
+  'hire thread anchors the second service'
+);
+select ok(
+  public.create_conversation_proposal(
+    (select id from public.conversations
+     where job_post_id = (select id from public.job_posts
+       where idempotency_key = '16000000-0000-4000-8000-0000000000d1')),
+    'PROVIDER_QUOTE', null, 100000, null, null, null, null,
+    '16000000-0000-4000-8000-0000000000d2'
+  ) is not null,
+  'provider quotes on the bound thread'
+);
+select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
+select is(
+  public.respond_to_proposal(
+    (select id from public.proposals
+     where idempotency_key = '16000000-0000-4000-8000-0000000000d2'),
+    'ACCEPT'
+  )::text,
+  'ACCEPTED',
+  'client accepts the bound offer'
+);
+select is(
+  (select status::text from public.job_posts
+   where idempotency_key = '16000000-0000-4000-8000-0000000000d1'),
+  'HIRED',
+  'hiring marks the post hired'
+);
+select ok(
+  exists (
+    select 1 from public.job_post_events
+    where job_post_id = (select id from public.job_posts
+      where idempotency_key = '16000000-0000-4000-8000-0000000000d1')
+      and event_type = 'AUTO_HIRED_ON_HIRE'
+  ),
+  'hiring announces itself on the post'
 );
 select * from finish();
 rollback;

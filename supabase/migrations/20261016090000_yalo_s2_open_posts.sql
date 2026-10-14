@@ -33,6 +33,15 @@ create unique index if not exists job_posts_owner_idempotency_uniq
   on public.job_posts (owner_user_id, idempotency_key)
   where idempotency_key is not null;
 
+create index if not exists job_posts_open_skill_created_idx
+  on public.job_posts (status, skill_id, created_at desc);
+
+create index if not exists conversations_job_post_idx
+  on public.conversations (job_post_id);
+
+comment on column public.job_posts.desired_budget_amount
+is 'Orientative budget in minor units (centavos) ARS, null when open.';
+
 create table public.job_post_events (
   id uuid primary key default extensions.gen_random_uuid(),
   job_post_id uuid not null,
@@ -413,9 +422,22 @@ begin
       return existing_conversation_id;
     end if;
     if existing_post_id is null then
-      update public.conversations
-      set job_post_id = target_post_id, updated_at = event_time
-      where id = existing_conversation_id;
+      begin
+        update public.conversations
+        set job_post_id = target_post_id, updated_at = event_time
+        where id = existing_conversation_id;
+      exception when unique_violation then
+        -- Carrera con otro hilo de la dupla: el hilo ya atado gana.
+        select c.id into created_conversation_id
+        from public.conversations c
+        where c.job_post_id = target_post_id
+          and c.client_user_id = post_owner_id
+          and c.provider_user_id = caller_id;
+        if created_conversation_id is null then
+          raise;
+        end if;
+        return created_conversation_id;
+      end;
 
       insert into public.job_post_events (job_post_id, actor_user_id, event_type, metadata)
       values (

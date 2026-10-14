@@ -33,7 +33,6 @@ export type JobPostSummary = {
   desired_budget_amount: number | null;
   currency_code: string;
   status: JobPostStatus;
-  offer_count: number;
   created_at: string;
   updated_at: string;
 };
@@ -113,7 +112,6 @@ async function withSkillNames(rows: PostRow[]): Promise<JobPostSummary[]> {
   return rows.map((row) => ({
     ...row,
     skill_name: names.get(row.skill_id) ?? null,
-    offer_count: 0,
   }));
 }
 
