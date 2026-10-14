@@ -44,20 +44,20 @@ select ok(to_regprocedure('public.respond_job_scope_change(uuid,text)') is not n
 select ok(to_regprocedure('public.apply_fake_additional_payment_result(uuid,uuid,text,uuid)') is not null, 'fake additional payment rpc exists');
 select ok(to_regprocedure('public.set_job_exact_location(uuid,text,double precision,double precision,text)') is not null, 'private exact location rpc exists');
 select ok(to_regprocedure('public.get_job_detail(uuid)') is not null, 'job detail read model exists');
-select ok(to_regprocedure('public.list_my_upcoming_jobs(integer)') is not null, 'upcoming work read model exists');
+select ok(to_regprocedure('public.list_my_upcoming_jobs(integer,text,timestamp with time zone,uuid)') is not null, 'upcoming work read model exists');
 select ok(
-  (select proargnames::text from pg_proc where oid = to_regprocedure('public.list_my_upcoming_jobs(integer)'))
+  (select proargnames::text from pg_proc where oid = to_regprocedure('public.list_my_upcoming_jobs(integer,text,timestamp with time zone,uuid)'))
   like '%base_price_amount%',
   'upcoming work read model exposes agreed pricing'
 );
 select ok(
-  (select proargnames::text from pg_proc where oid = to_regprocedure('public.list_my_upcoming_jobs(integer)'))
+  (select proargnames::text from pg_proc where oid = to_regprocedure('public.list_my_upcoming_jobs(integer,text,timestamp with time zone,uuid)'))
   like '%is_client%',
   'upcoming work read model exposes caller role'
 );
 select ok(
-  not has_function_privilege('anon', 'public.list_my_upcoming_jobs(integer)', 'EXECUTE')
-  and has_function_privilege('authenticated', 'public.list_my_upcoming_jobs(integer)', 'EXECUTE'),
+  not has_function_privilege('anon', 'public.list_my_upcoming_jobs(integer,text,timestamp with time zone,uuid)', 'EXECUTE')
+  and has_function_privilege('authenticated', 'public.list_my_upcoming_jobs(integer,text,timestamp with time zone,uuid)', 'EXECUTE'),
   'upcoming work read model stays authenticated-only'
 );
 
@@ -112,18 +112,18 @@ select ok(
   'job detail exposes the agreed total'
 );
 select ok(
-  (select proargnames::text from pg_proc where oid = to_regprocedure('public.list_my_upcoming_jobs(integer)'))
+  (select proargnames::text from pg_proc where oid = to_regprocedure('public.list_my_upcoming_jobs(integer,text,timestamp with time zone,uuid)'))
   like '%paid_additional_amount%',
   'upcoming work exposes paid additionals'
 );
-select ok(to_regprocedure('public.list_my_past_jobs(integer)') is not null, 'past work read model exists');
+select ok(to_regprocedure('public.list_my_past_jobs(integer,text,timestamp with time zone,uuid)') is not null, 'past work read model exists');
 select ok(
-  not has_function_privilege('anon', 'public.list_my_past_jobs(integer)', 'EXECUTE')
-  and has_function_privilege('authenticated', 'public.list_my_past_jobs(integer)', 'EXECUTE'),
+  not has_function_privilege('anon', 'public.list_my_past_jobs(integer,text,timestamp with time zone,uuid)', 'EXECUTE')
+  and has_function_privilege('authenticated', 'public.list_my_past_jobs(integer,text,timestamp with time zone,uuid)', 'EXECUTE'),
   'past work read model stays authenticated-only'
 );
 select ok(
-  (select pg_get_functiondef(to_regprocedure('public.list_my_past_jobs(integer)')))
+  (select pg_get_functiondef(to_regprocedure('public.list_my_past_jobs(integer,text,timestamp with time zone,uuid)')))
   like '%''COMPLETED'', ''CANCELLED'', ''NO_SHOW''%',
   'past work covers terminal states'
 );

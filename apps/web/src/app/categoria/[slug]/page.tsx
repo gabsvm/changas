@@ -39,19 +39,19 @@ export async function generateMetadata({
     return {
       title: category.name,
       description:
-        category.description ?? "Servicios y habilidades publicados en Changas.",
+        category.description ?? "Servicios y habilidades publicados en YALO.",
       alternates: { canonical: `/categoria/${category.slug}` },
       openGraph: {
-        title: `${category.name} · Changas`,
+        title: `${category.name} · YALO`,
         description:
           category.description ??
-          "Servicios y habilidades publicados en Changas.",
+          "Servicios y habilidades publicados en YALO.",
         type: "website",
         url: `/categoria/${category.slug}`,
       },
     };
   } catch {
-    return { title: "Categoría · Changas" };
+    return { title: "Categoría · YALO" };
   }
 }
 
@@ -208,7 +208,7 @@ export default async function CategoryPage({
                 aria-pressed={filters.modality === "IN_PERSON"}
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.modality === "IN_PERSON"
-                    ? "border-transparent bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                    ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
                     : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
@@ -221,7 +221,7 @@ export default async function CategoryPage({
                 aria-pressed={filters.modality === "REMOTE"}
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.modality === "REMOTE"
-                    ? "border-transparent bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                    ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
                     : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
@@ -234,7 +234,7 @@ export default async function CategoryPage({
                 aria-pressed={filters.acceptsOffers === true}
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.acceptsOffers
-                    ? "border-transparent bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                    ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
                     : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >

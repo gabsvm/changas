@@ -41,7 +41,7 @@ export default function Error({
           <IllustratedBadge tone="rose" icon="alert" size="lg" label="Error" />
         </span>
         <p className="text-terracotta mt-6 text-sm font-semibold tracking-[0.18em] uppercase">
-          Changas
+          YALO
         </p>
         <h1 className="font-display mt-4 text-4xl font-semibold">
           Algo no salió como esperábamos.

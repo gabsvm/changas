@@ -54,7 +54,7 @@ export function SearchFiltersSheet({
         </svg>
         Filtros
         {activeCount > 0 ? (
-          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] px-1.5 text-xs font-extrabold text-white shadow-[0_6px_16px_-6px_rgb(255_107_53/60%)]">
+          <span className="bg-brand-primary grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-xs font-extrabold text-white shadow-[0_6px_16px_-6px_rgb(13_18_27/60%)]">
             {activeCount}
           </span>
         ) : null}
@@ -241,7 +241,7 @@ function FilterGroup({
     <fieldset className="grid gap-4 sm:col-span-2 sm:grid-cols-2">
       <legend className="mb-1 flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] text-ink/70 uppercase">
         <span
-          className="h-4 w-1.5 rounded-full bg-[linear-gradient(180deg,#FF9A3D_0%,#FF0A78_100%)]"
+          className="h-4 w-1.5 rounded-full bg-[var(--yalo-symbol-gradient)]"
           aria-hidden="true"
         />
         {title}

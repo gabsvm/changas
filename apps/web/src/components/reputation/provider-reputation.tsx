@@ -79,7 +79,7 @@ export async function ProviderReputation({
             <p className="text-ink/70 mt-1 text-sm">
               {summary.review_count > 0
                 ? `${summary.review_count} ${summary.review_count === 1 ? "reseña" : "reseñas"} de trabajos completados`
-                : "Todavía no tiene reseñas verificadas en Changas."}
+                : "Todavía no tiene reseñas verificadas en YALO."}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
@@ -255,7 +255,7 @@ function Dimension({ label, value }: { label: string; value: number | null }) {
           style={{
             width: `${pct}%`,
             backgroundImage:
-              "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+              "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
           }}
         />
       </div>

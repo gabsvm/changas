@@ -269,10 +269,10 @@ export default async function ConversationPage({
                 className="min-w-0 flex-1"
               />
               <span
-                className="inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(238_90_36/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                className="inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                 style={{
                   backgroundImage:
-                    "linear-gradient(135deg, #FF9A3D 0%, #FF6B35 48%, #FF0A78 100%)",
+                    "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
                 }}
                 aria-label={`${proposals.length} propuestas`}
               >

@@ -217,7 +217,7 @@ export function LocationPicker({
               onClick={(event) => event.stopPropagation()}
             >
               <span
-                className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)]"
+                className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-[var(--yalo-symbol-gradient)]"
                 aria-hidden="true"
               />
               <div className="flex items-start justify-between gap-4">

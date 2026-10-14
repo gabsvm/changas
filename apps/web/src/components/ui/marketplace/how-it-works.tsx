@@ -2,7 +2,7 @@ const steps = [
   {
     title: "Buscá",
     body: "Tocá una categoría. Mirá precio y reseñas.",
-    gradient: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+    gradient: "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)",
   },
   {
     title: "Chateá",

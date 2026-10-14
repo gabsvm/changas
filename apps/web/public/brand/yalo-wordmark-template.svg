@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 166" role="img" aria-labelledby="title desc">
+  <title id="title">YALO — wordmark</title>
+  <desc id="desc">Letras YALO geométricas construidas como trazos (interino; el master definitivo del lettering requiere aprobación del dueño).</desc>
+  <g fill="none" stroke="COLOR" stroke-width="44" stroke-linejoin="miter" stroke-linecap="square">
+    <path d="M52 16 110 88 168 16M110 88V152"/>
+    <path d="M242 152 300 14 358 152M264 106H336"/>
+    <path d="M432 14V152H542"/>
+    <rect x="592" y="14" width="116" height="138" rx="30"/>
+  </g>
+</svg>

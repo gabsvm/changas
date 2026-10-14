@@ -44,7 +44,7 @@ export function DiscoveryPagination({
             <li key={candidate}>
               <span
                 aria-current="page"
-                className="inline-grid min-h-11 min-w-11 place-items-center rounded-full bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] px-3 text-sm font-extrabold text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                className="inline-grid min-h-11 min-w-11 place-items-center rounded-full bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] px-3 text-sm font-extrabold text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
               >
                 {candidate}
               </span>

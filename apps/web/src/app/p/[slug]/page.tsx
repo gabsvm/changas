@@ -37,20 +37,20 @@ export async function generateMetadata({
     const description =
       provider.bio ??
       provider.public_headline ??
-      "Servicios publicados en Changas.";
+      "Servicios publicados en YALO.";
     return {
       title: provider.display_name,
       description,
       alternates: { canonical: "/p/" + provider.public_slug },
       openGraph: {
-        title: provider.display_name + " · Changas",
+        title: provider.display_name + " · YALO",
         description,
         type: "profile",
         url: "/p/" + provider.public_slug,
       },
     };
   } catch {
-    return { title: "Proveedor · Changas" };
+    return { title: "Proveedor · YALO" };
   }
 }
 
@@ -187,7 +187,7 @@ export default async function PublicProviderPage({
                   tone={coverFor(provider.public_slug).tone}
                   icon="sparkle"
                   size="sm"
-                  label="Proveedor verificado de Changas"
+                  label="Proveedor verificado de YALO"
                 />
               </span>
             </div>
@@ -577,10 +577,10 @@ export default async function PublicProviderPage({
         <footer className="border-ink/10 mt-10 border-t py-6 text-center">
           <p className="text-moss text-xs leading-5 font-extrabold">
             Sin pago por adelantado: coordinás por chat y pagás al finalizar
-            desde acá + soporte de Changas en cada trabajo
+            desde acá + soporte de YALO en cada trabajo
           </p>
           <p className="text-ink/38 mt-1 text-xs leading-5">
-            Changas · información publicada por el proveedor
+            YALO · información publicada por el proveedor
           </p>
         </footer>
       </div>
@@ -626,7 +626,7 @@ function ProfileFact({ label, value }: { label: string; value: number }) {
 }
 
 const PROFILE_COVERS = [
-  { css: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)", tone: "orange" },
+  { css: "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)", tone: "orange" },
   { css: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)", tone: "blue" },
   { css: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)", tone: "green" },
   { css: "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)", tone: "rose" },

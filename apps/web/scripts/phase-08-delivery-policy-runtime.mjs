@@ -292,11 +292,22 @@ await transition(
   "Ausencia para validar recordatorios",
 );
 await transition(provider, completed.jobId, "CONFIRMED", "IN_PROGRESS");
-await transition(
-  provider,
-  completed.jobId,
-  "IN_PROGRESS",
-  "COMPLETION_REQUESTED",
+const completedJobDetail = await client.rpc("get_job_detail", {
+  target_job_id: completed.jobId,
+});
+assert(
+  !completedJobDetail.error &&
+    typeof completedJobDetail.data?.[0]?.confirmation_code === "string" &&
+    completedJobDetail.data[0].confirmation_code.length > 0,
+  "Client could not read the confirmation code.",
+);
+const completionRequest = await provider.rpc("request_job_completion", {
+  target_job_id: completed.jobId,
+  confirmation_code: completedJobDetail.data[0].confirmation_code,
+});
+assert(
+  !completionRequest.error && completionRequest.data === "COMPLETED",
+  `Could not request completion for ${completed.jobId}: ${completionRequest.error?.message ?? "unknown"}`,
 );
 await transition(client, completed.jobId, "COMPLETION_REQUESTED", "COMPLETED");
 

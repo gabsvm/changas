@@ -451,7 +451,7 @@ const WEEKDAY_NAMES = [
   "Sábado",
 ];
 const PORTFOLIO_COVERS = [
-  "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+  "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)",
   "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)",
   "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)",
   "linear-gradient(135deg, #8B7CFF 0%, #5B4BD6 100%)",
@@ -843,14 +843,14 @@ export function MarketplaceManagement({
               aria-current={active ? "true" : undefined}
               className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-all duration-200 ${
                 active
-                  ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                  ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
                   : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
               }`}
               style={
                 active
                   ? {
                       backgroundImage:
-                        "linear-gradient(135deg, #FF9A3D 0%, #FF6B35 48%, #FF0A78 100%)",
+                        "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
                     }
                   : undefined
               }

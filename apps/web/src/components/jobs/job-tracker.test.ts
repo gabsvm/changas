@@ -15,7 +15,10 @@ describe("getJobTracking", () => {
   it("pide el pago antes que la reseña cuando hay settlement pendiente", () => {
     const tracking = getJobTracking("COMPLETED", "DUE");
     expect(tracking.currentIndex).toBe(3);
-    expect(tracking.steps[3]).toMatchObject({ key: "payment", state: "current" });
+    expect(tracking.steps[3]).toMatchObject({
+      key: "payment",
+      state: "current",
+    });
     expect(tracking.steps[4]).toMatchObject({ key: "rating", state: "todo" });
   });
 
@@ -71,8 +74,29 @@ describe("getJobNextAction", () => {
         isClient: true,
         isProvider: false,
         settlementPending: true,
+        paymentsEnabled: true,
       }).kind,
     ).toBe("pay");
+  });
+
+  it("con cobro apagado no pide pagar ni muestra CTA de pago", () => {
+    const client = getJobNextAction({
+      status: "COMPLETED",
+      isClient: true,
+      isProvider: false,
+      settlementPending: true,
+    });
+    expect(client.kind).toBeNull();
+    expect(client.heading).toMatch(/pendiente de habilitación/i);
+    expect(client.sub).toMatch(/aún no está disponible/i);
+    const provider = getJobNextAction({
+      status: "COMPLETED",
+      isClient: false,
+      isProvider: true,
+      settlementPending: true,
+    });
+    expect(provider.kind).toBeNull();
+    expect(provider.heading).toMatch(/pendiente de habilitación/i);
   });
 
   it("al que espera le explica en vez de mostrarle un botón ajeno", () => {

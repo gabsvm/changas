@@ -223,8 +223,8 @@ export function PushOptIn({
       : capability === "denied"
         ? "El permiso está bloqueado en la configuración del navegador."
         : !configured
-          ? "Todavía no está disponible. Mientras tanto verás tus alertas dentro de Changas."
-          : "Enterate al instante cuando te escriban, llegue una propuesta o cambie un trabajo, incluso con Changas cerrado.";
+          ? "Todavía no está disponible. Mientras tanto verás tus alertas dentro de YALO."
+          : "Enterate al instante cuando te escriban, llegue una propuesta o cambie un trabajo, incluso con YALO cerrado.";
 
   return (
     <div>

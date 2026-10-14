@@ -23,13 +23,13 @@ const bodyFont = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(getPublicSiteUrl()),
   title: {
-    default: "Changas",
-    template: "%s · Changas",
+    default: "YALO",
+    template: "%s · YALO",
   },
   description:
     "Una base confiable para conectar habilidades con oportunidades.",
   openGraph: {
-    title: "Changas",
+    title: "YALO",
     description:
       "Una base confiable para conectar habilidades con oportunidades.",
     type: "website",
@@ -38,8 +38,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ff6b35" },
-    { media: "(prefers-color-scheme: dark)", color: "#171310" },
+    { media: "(prefers-color-scheme: light)", color: "#161D2A" },
+    { media: "(prefers-color-scheme: dark)", color: "#0D121B" },
   ],
   colorScheme: "light dark",
 };

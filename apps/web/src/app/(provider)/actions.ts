@@ -69,7 +69,9 @@ export async function startProviderOnboarding(
     return { error: "No pudimos iniciar tu onboarding." };
   }
 
-  redirect("/provider/onboarding");
+  // YALO A2: el row ya existe acá; aterrizar directo en el paso de perfil
+  // (PROFILE_INCOMPLETE es autogestionable) en vez de rebotar en el índice.
+  redirect("/provider/onboarding/profile");
 }
 
 export async function saveProviderOnboarding(

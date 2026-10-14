@@ -5,6 +5,11 @@ import { jobStatuses, scheduleTypes } from "@changas/domain";
 import { isUuid } from "@changas/validation";
 
 import {
+  accumulateThrough,
+  type PagedResult,
+  type PageKey,
+} from "@/lib/cursor-pages";
+import {
   createFakeAdditionalPaymentRecord,
   createFakeSettlementPaymentRecord,
 } from "@/lib/jobs/payment-adapter";
@@ -26,6 +31,18 @@ export class JobServerError extends Error {
 
 export type SettlementStatus = "NOT_DUE" | "DUE" | "SETTLED" | "NOT_REQUIRED";
 
+export type JobStatusFilter =
+  | "CONFIRMED"
+  | "IN_PROGRESS"
+  | "CLOSING"
+  | "PENDING_SETTLEMENT";
+
+export type JobCursor = {
+  beforeSortKey?: string;
+  beforeUpdatedAt?: string;
+  beforeId?: string;
+};
+
 export type UpcomingJob = {
   job_id: string;
   job_status: JobStatus;
@@ -43,6 +60,7 @@ export type UpcomingJob = {
   is_client: boolean | null;
   settlement_status: SettlementStatus | null;
   settlement_total_minor: number | null;
+  sort_key: string | null;
 };
 
 export type JobDetail = {
@@ -152,10 +170,13 @@ function mapError(code?: string | null): JobServerError {
         "TRANSIENT",
         "No pudimos completar la acción. Intentá nuevamente.",
       );
-}
+  }
 }
 
-function mapTransitionError(code?: string | null, message?: string | null): JobServerError {
+function mapTransitionError(
+  code?: string | null,
+  message?: string | null,
+): JobServerError {
   const detail = (message ?? "").toLowerCase();
   if (detail.includes("confirmation code is required")) {
     return new JobServerError(
@@ -241,6 +262,7 @@ function normalizeJobRow(row: UpcomingJob): UpcomingJob {
     is_client: typeof row.is_client === "boolean" ? row.is_client : null,
     settlement_status: normalizeSettlementStatus(row.settlement_status),
     settlement_total_minor: finiteNumberOrNull(row.settlement_total_minor),
+    sort_key: typeof row.sort_key === "string" ? row.sort_key : null,
   };
 }
 
@@ -255,22 +277,131 @@ function filterValidJobRows(rows: UpcomingJob[]): UpcomingJob[] {
     .map(normalizeJobRow);
 }
 
-export async function listMyUpcomingJobs(limit = 20): Promise<UpcomingJob[]> {
-  const { supabase } = await authenticatedClient();
-  const { data, error } = await supabase.rpc("list_my_upcoming_jobs", {
-    limit_count: Math.min(Math.max(limit, 1), 50),
-  });
-  if (error) throw mapError(error.code);
+function isMissingJobListRpc(error: RpcError): boolean {
+  if (error?.code === "42883" || error?.code === "PGRST202") return true;
+  return (
+    typeof error?.message === "string" &&
+    /could not find the function/i.test(error.message)
+  );
+}
+
+type JobListRpcName = "list_my_upcoming_jobs" | "list_my_past_jobs";
+
+async function callJobListRpc(
+  supabase: JobsRpcClient,
+  name: JobListRpcName,
+  cursor: JobCursor,
+  pageSize: number,
+  statusFilter: JobStatusFilter | null,
+  legacy: boolean,
+): Promise<UpcomingJob[]> {
+  const bounded = Math.min(Math.max(pageSize, 1), 50);
+  const args = legacy
+    ? { limit_count: bounded }
+    : name === "list_my_upcoming_jobs"
+      ? {
+          limit_count: bounded,
+          status_filter: statusFilter,
+          before_sort_key: cursor.beforeSortKey ?? null,
+          before_id: cursor.beforeId ?? null,
+        }
+      : {
+          limit_count: bounded,
+          status_filter: statusFilter,
+          before_updated_at: cursor.beforeUpdatedAt ?? null,
+          before_id: cursor.beforeId ?? null,
+        };
+  const { data, error } = await supabase.rpc(name, args);
+  if (error) {
+    if (!legacy && isMissingJobListRpc(error)) {
+      return callJobListRpc(supabase, name, {}, bounded, null, true);
+    }
+    throw mapError(error.code);
+  }
   return filterValidJobRows(requireRows<UpcomingJob>(data));
 }
 
-export async function listMyPastJobs(limit = 20): Promise<UpcomingJob[]> {
+// YALO B3: el filtro vive en SQL (status_filter) y la paginación recorre
+// resultados con cursor keyset. Si el RPC nuevo aún no existe (deploy
+// ordering), fallback a la forma legacy (primera página, límite 50).
+export async function listMyUpcomingJobsPage(
+  cursor: JobCursor = {},
+  pageSize = 20,
+  statusFilter: JobStatusFilter | null = null,
+): Promise<UpcomingJob[]> {
   const { supabase } = await authenticatedClient();
-  const { data, error } = await supabase.rpc("list_my_past_jobs", {
-    limit_count: Math.min(Math.max(limit, 1), 50),
-  });
-  if (error) throw mapError(error.code);
-  return filterValidJobRows(requireRows<UpcomingJob>(data));
+  return callJobListRpc(
+    supabase,
+    "list_my_upcoming_jobs",
+    cursor,
+    pageSize,
+    statusFilter,
+    false,
+  );
+}
+
+export async function listMyPastJobsPage(
+  cursor: JobCursor = {},
+  pageSize = 20,
+  statusFilter: JobStatusFilter | null = null,
+): Promise<UpcomingJob[]> {
+  const { supabase } = await authenticatedClient();
+  return callJobListRpc(
+    supabase,
+    "list_my_past_jobs",
+    cursor,
+    pageSize,
+    statusFilter,
+    false,
+  );
+}
+
+// Acumulación completa (through) sobre el filtro server-side: recorrer
+// páginas con cursor en vez de recortar la primera evita falsos vacíos.
+export async function listMyUpcomingJobsThrough(
+  through: PageKey | null,
+  statusFilter: JobStatusFilter | null = null,
+  pageSize = 20,
+): Promise<PagedResult<UpcomingJob>> {
+  return accumulateThrough(
+    (cursor, limit) =>
+      listMyUpcomingJobsPage(
+        cursor ? { beforeSortKey: cursor.at, beforeId: cursor.id } : {},
+        limit,
+        statusFilter,
+      ),
+    (job) => ({ at: job.sort_key ?? job.updated_at, id: job.job_id }),
+    (job) => job.job_id,
+    through,
+    pageSize,
+  );
+}
+
+export async function listMyPastJobsThrough(
+  through: PageKey | null,
+  statusFilter: JobStatusFilter | null = null,
+  pageSize = 20,
+): Promise<PagedResult<UpcomingJob>> {
+  return accumulateThrough(
+    (cursor, limit) =>
+      listMyPastJobsPage(
+        cursor ? { beforeUpdatedAt: cursor.at, beforeId: cursor.id } : {},
+        limit,
+        statusFilter,
+      ),
+    (job) => ({ at: job.updated_at, id: job.job_id }),
+    (job) => job.job_id,
+    through,
+    pageSize,
+  );
+}
+
+export async function listMyUpcomingJobs(limit = 20): Promise<UpcomingJob[]> {
+  return listMyUpcomingJobsPage({}, limit);
+}
+
+export async function listMyPastJobs(limit = 20): Promise<UpcomingJob[]> {
+  return listMyPastJobsPage({}, limit);
 }
 
 export async function getJobDetail(jobId: string): Promise<JobDetail> {
@@ -417,6 +548,35 @@ export async function transitionJob(
     throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
   }
   return data as JobStatus;
+}
+
+// YALO A1: único camino de cierre con código. El RPC devuelve resultado
+// tipado en vez de excepcionar en MISMATCH/LOCKED para que el INSERT del
+// intento haga commit. transition_job_status rechaza esta ruta (bypass).
+export async function requestJobCompletion(
+  jobId: string,
+  code: string,
+): Promise<void> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("request_job_completion", {
+    target_job_id: jobId,
+    confirmation_code: code,
+  });
+  if (error) throw mapTransitionError(error.code, error.message);
+  if (data === "COMPLETED") return;
+  if (data === "MISMATCH") {
+    throw new JobServerError(
+      "CONFLICT",
+      "Ese código no coincide. Pedile al cliente que lo revise en su Seguimiento e intentá de nuevo.",
+    );
+  }
+  if (data === "LOCKED") {
+    throw new JobServerError(
+      "CONFLICT",
+      "Demasiados intentos con un código incorrecto. Esperá unos minutos antes de probar de nuevo.",
+    );
+  }
+  throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
 }
 
 export async function requestJobReschedule(input: {

@@ -117,7 +117,7 @@ export function buildResendRequest({
         `href="${email.actionUrl}"`,
         `href="${absoluteActionUrl}"`,
       )
-    : `${email.html}<p><a href="${absoluteActionUrl}">Abrir en Changas</a></p>`;
+    : `${email.html}<p><a href="${absoluteActionUrl}">Abrir en YALO</a></p>`;
 
   return {
     url: "https://api.resend.com/emails",

@@ -20,6 +20,7 @@ import {
   requestJobScopeChange,
   respondJobReschedule,
   respondJobScopeChange,
+  requestJobCompletion,
   setJobExactLocation,
   transitionJob,
 } from "@/lib/jobs/server";
@@ -124,13 +125,9 @@ export async function requestCompletionAction(
     };
   }
   try {
-    await transitionJob(
-      jobId,
-      "IN_PROGRESS",
-      "COMPLETION_REQUESTED",
-      null,
-      code,
-    );
+    // YALO A1: autoridad única con rate-limit persistente. transitionJob
+    // rechaza esta ruta para que no exista bypass por RPC directo.
+    await requestJobCompletion(jobId, code);
   } catch (error) {
     if (error instanceof JobServerError) return { error: error.message };
     return { error: "No pudimos completar la acción. Intentá nuevamente." };

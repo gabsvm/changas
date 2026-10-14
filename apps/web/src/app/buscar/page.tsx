@@ -22,7 +22,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Buscar servicios",
-  description: "Explorá servicios y habilidades publicados en Changas.",
+  description: "Explorá servicios y habilidades publicados en YALO.",
   alternates: { canonical: "/buscar" },
   robots: { index: false, follow: true },
 };
@@ -219,7 +219,7 @@ export default async function SearchPage({
                       aria-current={selected ? "true" : undefined}
                       className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-sm font-bold transition-all duration-200 ${
                         selected
-                          ? "border-transparent bg-[linear-gradient(135deg,#FF9A3D_0%,#FF6B35_48%,#FF0A78_100%)] text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
+                          ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
                           : "border-white/60 bg-white/70 text-ink/80 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                       }`}
                     >

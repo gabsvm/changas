@@ -4,7 +4,7 @@ import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge"
 import { SiteFooter } from "@/components/ui/site-footer";
 
 const HERO_POINTS = [
-  { tone: "orange", icon: "briefcase", title: "Pedí changas", text: "Publicá lo que necesitás en minutos." },
+  { tone: "orange", icon: "briefcase", title: "Pedí servicios", text: "Publicá lo que necesitás en minutos." },
   { tone: "blue", icon: "shield", title: "Elegí con confianza", text: "Perfiles verificados y reseñas reales." },
   { tone: "green", icon: "chat", title: "Coordiná directo", text: "Chat y avisos sin intermediarios." },
 ] as const;
@@ -22,14 +22,23 @@ export default function AuthLayout({
           <Link
             className="flex items-center gap-3"
             href="/"
-            aria-label="Changas, inicio"
+            aria-label="YALO, inicio"
           >
-            <span className="brand-mark" aria-hidden="true">
-              C
-            </span>
-            <span className="font-display text-xl font-extrabold tracking-[-0.035em]">
-              Changas
-            </span>
+            <span className="brand-mark" role="img" aria-label="YALO" />
+            <img
+              src="/brand/yalo-logo-horizontal-light.svg"
+              alt="YALO"
+              className="h-6 w-auto dark:hidden"
+              width={72}
+              height={24}
+            />
+            <img
+              src="/brand/yalo-logo-horizontal-dark.svg"
+              alt="YALO"
+              className="hidden h-6 w-auto dark:block"
+              width={72}
+              height={24}
+            />
           </Link>
           <span className="text-terracotta text-xs font-extrabold tracking-[0.16em] uppercase">
             Cuenta
@@ -46,8 +55,7 @@ export default function AuthLayout({
           />
           <div className="relative z-10 grid w-full items-center gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
             <section
-              aria-label="Por qué usar Changas"
-              className="brand-gradient-surface relative hidden overflow-hidden rounded-[1.75rem] p-8 text-white shadow-[0_4px_10px_rgb(255_107_53/14%),0_30px_64px_-18px_rgb(255_87_34/46%)] lg:block dark:shadow-[0_30px_64px_-18px_rgb(0_0_0/70%)]"
+              aria-label="Por qué usar YALO"
             >
               <span
                 className="absolute inset-0 opacity-25"
@@ -67,8 +75,15 @@ export default function AuthLayout({
                 aria-hidden="true"
               />
               <div className="relative">
-                <p className="text-xs font-extrabold tracking-[0.18em] text-white/85 uppercase">
-                  Changas · trabajo de barrio
+                <img
+                  src="/brand/yalo-logo-horizontal-dark.svg"
+                  alt="YALO"
+                  className="h-10 w-auto"
+                  width={133}
+                  height={40}
+                />
+                <p className="mt-4 text-xs font-extrabold tracking-[0.18em] text-white/85 uppercase">
+                  YALO · trabajo de barrio
                 </p>
                 <h2 className="font-display mt-3 text-4xl leading-[1.05] font-extrabold tracking-[-0.035em]">
                   La ayuda que necesitás, a unas cuadras.

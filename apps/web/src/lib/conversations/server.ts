@@ -64,7 +64,7 @@ export type InboxOpenDealRow = {
   currency_code: string;
 };
 
-type RpcError = { code?: string | null } | null;
+type RpcError = { code?: string | null; message?: string | null } | null;
 
 type ConversationRpcClient = {
   rpc(
@@ -115,6 +115,10 @@ type ConversationRpcClient = {
     data: InboxOpenDealRow[] | null;
     error: RpcError;
   }>;
+  rpc(
+    name: "get_my_unread_conversation_count",
+    args?: Record<string, never>,
+  ): Promise<{ data: number | null; error: RpcError }>;
   rpc(
     name: "report_conversation",
     args: {
@@ -227,8 +231,28 @@ export async function listInboxOpenDeals(
   return data ?? [];
 }
 
+function isMissingAggregateRpc(error: RpcError): boolean {
+  if (error?.code === "42883" || error?.code === "PGRST202") return true;
+  return (
+    typeof error?.message === "string" &&
+    /could not find the function/i.test(error.message)
+  );
+}
+
 /** Conversations with unread messages; never throws so layouts keep rendering. */
 export async function getUnreadConversationCount(): Promise<number> {
+  try {
+    const rpc = await getRpcClient();
+    const { data, error } = await rpc.rpc("get_my_unread_conversation_count");
+    if (!error) {
+      const count = Number(data ?? 0);
+      return Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
+    }
+    // Deploy ordering: el agregado aún no existe → conteo anterior.
+    if (!isMissingAggregateRpc(error)) return 0;
+  } catch {
+    return 0;
+  }
   try {
     const conversations = await listMyConversations();
     return conversations.filter((conversation) => conversation.unread_count > 0)

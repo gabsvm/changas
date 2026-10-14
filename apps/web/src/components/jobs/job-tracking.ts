@@ -1,11 +1,7 @@
 import type { JobStatus } from "@changas/domain";
 
 export type TrackingStepKey =
-  | "confirmed"
-  | "in_progress"
-  | "review"
-  | "payment"
-  | "rating";
+  "confirmed" | "in_progress" | "review" | "payment" | "rating";
 
 export type TrackingStepState = "done" | "current" | "todo";
 
@@ -17,11 +13,7 @@ export type TrackingStep = {
 };
 
 export type TrackingExceptionKind =
-  | "disputed"
-  | "cancelled"
-  | "no_show"
-  | "expired"
-  | "refunded";
+  "disputed" | "cancelled" | "no_show" | "expired" | "refunded";
 
 export type TrackingException = {
   kind: TrackingExceptionKind;
@@ -47,11 +39,18 @@ function buildSteps(currentIndex: number): TrackingStep[] {
   return STEP_DEFS.map((def, index) => ({
     ...def,
     state:
-      index < currentIndex ? "done" : index === currentIndex ? "current" : "todo",
+      index < currentIndex
+        ? "done"
+        : index === currentIndex
+          ? "current"
+          : "todo",
   }));
 }
 
-const EXCEPTIONS: Record<TrackingExceptionKind, Omit<TrackingException, "kind">> = {
+const EXCEPTIONS: Record<
+  TrackingExceptionKind,
+  Omit<TrackingException, "kind">
+> = {
   disputed: {
     title: "En revisión por el equipo",
     description:
@@ -73,7 +72,8 @@ const EXCEPTIONS: Record<TrackingExceptionKind, Omit<TrackingException, "kind">>
   },
   refunded: {
     title: "Pago devuelto",
-    description: "El pago de este servicio fue devuelto. No tenés que hacer nada más.",
+    description:
+      "El pago de este servicio fue devuelto. No tenés que hacer nada más.",
   },
 };
 
@@ -153,8 +153,12 @@ export function getJobNextAction(args: {
   isClient: boolean;
   isProvider: boolean;
   settlementPending: boolean;
+  // YALO A3: con el cobro online apagado no se promete ni se pide pagar.
+  // Default false = copia honesta; los callers server pasan el flag real.
+  paymentsEnabled?: boolean;
 }): NextAction {
   const { status, isClient, isProvider, settlementPending } = args;
+  const paymentsEnabled = args.paymentsEnabled ?? false;
   if (isProvider && status === "CONFIRMED") {
     return {
       heading: "Iniciá el trabajo cuando llegues",
@@ -177,11 +181,27 @@ export function getJobNextAction(args: {
     };
   }
   if (isClient && status === "COMPLETED" && settlementPending) {
+    if (!paymentsEnabled) {
+      return {
+        heading: "Trabajo completado · pago pendiente de habilitación",
+        sub: "El cobro online aún no está disponible. Te avisamos cuando se habilite; tu saldo queda registrado.",
+        kind: null,
+      };
+    }
     return {
       heading: "Pagá el trabajo",
       sub: "Un solo pago por todo: base + adicionales aprobados.",
       kind: "pay",
     };
+  }
+  if (isProvider && status === "COMPLETED" && settlementPending) {
+    if (!paymentsEnabled) {
+      return {
+        heading: "Cierre confirmado · cobro pendiente de habilitación",
+        sub: "El cobro online aún no está disponible. El saldo queda registrado hasta la habilitación.",
+        kind: null,
+      };
+    }
   }
   if (status === "COMPLETED" && !settlementPending) {
     return {
@@ -196,7 +216,8 @@ export function getJobNextAction(args: {
   }
   if (isClient && (status === "CONFIRMED" || status === "IN_PROGRESS")) {
     return {
-      heading: status === "CONFIRMED" ? "Trabajo confirmado" : "Trabajo en curso",
+      heading:
+        status === "CONFIRMED" ? "Trabajo confirmado" : "Trabajo en curso",
       sub: "El prestador se encarga del siguiente paso. Te avisamos de cada avance.",
       kind: null,
     };

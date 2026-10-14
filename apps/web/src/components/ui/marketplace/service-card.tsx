@@ -38,16 +38,18 @@ function categoryIconPath(categorySlug: string): string {
   }
 }
 
+// YALO D1: covers sobrios sobre navy (texto blanco encima, AA sobrado).
+// Sin naranjas/rosas legacy; el verde/dorado profundo son semánticos.
 const COVER_VISUALS: ReadonlyArray<{ match: RegExp; from: string; to: string }> = [
-  { match: /hogar/i, from: "#FF9A3D", to: "#EE5A24" },
-  { match: /tecnologia/i, from: "#4F8DFF", to: "#2F4BFE" },
-  { match: /educacion/i, from: "#2FBF71", to: "#0E7C46" },
-  { match: /mascotas/i, from: "#FB6F92", to: "#E14D7A" },
-  { match: /profesional|admin|contab|legal/i, from: "#8B7CFF", to: "#5B4BD6" },
-  { match: /belleza|bienestar|salud|pelu/i, from: "#F5B942", to: "#DE7E1F" },
+  { match: /hogar/i, from: "#243145", to: "#0D121B" },
+  { match: /tecnologia/i, from: "#14568A", to: "#0D121B" },
+  { match: /educacion/i, from: "#166B45", to: "#0B1F16" },
+  { match: /mascotas/i, from: "#8A2B35", to: "#2B0E12" },
+  { match: /profesional|admin|contab|legal/i, from: "#3B4A6B", to: "#0D121B" },
+  { match: /belleza|bienestar|salud|pelu/i, from: "#7A5B16", to: "#241A06" },
 ];
 
-const FALLBACK_COVER_VISUAL = { from: "#FF9A3D", to: "#EE5A24" };
+const FALLBACK_COVER_VISUAL = { from: "#243145", to: "#0D121B" };
 
 function coverVisual(categorySlug: string): { from: string; to: string } {
   return (
@@ -154,7 +156,7 @@ export function ServiceCard({
 
   return (
     <article
-      className={`service-card-shell consumer-card group bg-surface relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:border-brand-orange/30 hover:shadow-[0_4px_8px_rgb(23_20_15/7%),0_26px_52px_-14px_rgb(23_20_15/28%)] dark:hover:border-white/20 ${example ? "border-ink/30! border-dashed!" : "consumer-card-pressed"}`}
+      className={`service-card-shell consumer-card group bg-surface relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:border-brand-primary/25 hover:shadow-[0_4px_8px_rgb(16_24_39/7%),0_26px_52px_-14px_rgb(16_24_39/22%)] dark:hover:border-white/20 ${example ? "border-ink/30! border-dashed!" : "consumer-card-pressed"}`}
     >
       {example ? (
         <div
@@ -191,7 +193,7 @@ export function ServiceCard({
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 24 24"
-                      className="fill-brand-yellow stroke-warning h-3.5 w-3.5"
+                      className="fill-[#F0B429] stroke-warning h-3.5 w-3.5"
                       strokeWidth="1.5"
                     >
                       <path
@@ -213,7 +215,7 @@ export function ServiceCard({
                       Sin reseñas aún
                     </span>
                   )}
-                  <span className="text-terracotta ml-auto shrink-0 text-[15px] font-extrabold">
+                  <span className="text-brand-primary ml-auto shrink-0 text-[15px] font-extrabold dark:text-white">
                     {price}
                   </span>
                 </p>
@@ -262,7 +264,7 @@ export function ServiceCard({
                 <p className="text-ink/70 flex items-center gap-1.5 truncate text-[13px] font-semibold">
                   <Link
                     href={providerHref}
-                    className="focus-visible:ring-2 focus-visible:ring-moss/45 truncate rounded underline-offset-4 hover:underline"
+                    className="focus-visible:ring-2 focus-visible:ring-focus/45 truncate rounded underline-offset-4 hover:underline"
                   >
                     {row.provider_display_name}
                   </Link>
@@ -275,7 +277,7 @@ export function ServiceCard({
                 <h3 className="text-ink mt-0.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
                   <Link
                     href={serviceHref}
-                    className="focus-visible:ring-2 focus-visible:ring-moss/45 rounded"
+                    className="focus-visible:ring-2 focus-visible:ring-focus/45 rounded"
                     aria-label={`${row.service_title}, ${row.provider_display_name}, ${price}`}
                   >
                     {row.service_title}
@@ -286,7 +288,7 @@ export function ServiceCard({
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 24 24"
-                      className="fill-brand-yellow stroke-warning h-3.5 w-3.5"
+                      className="fill-[#F0B429] stroke-warning h-3.5 w-3.5"
                       strokeWidth="1.5"
                     >
                       <path
@@ -305,17 +307,17 @@ export function ServiceCard({
                     </span>
                   ) : (
                     <span className="text-ink/70 font-medium">
-                      Nuevo en Changas · sin reseñas aún
+                      Nuevo en YALO · sin reseñas aún
                     </span>
                   )}
-                  <span className="text-terracotta ml-auto shrink-0 text-[15px] font-extrabold">
+                  <span className="text-brand-primary ml-auto shrink-0 text-[15px] font-extrabold dark:text-white">
                     {price}
                   </span>
                 </p>
                 {hasRating ? null : (
                   <Link
                     href={providerHref}
-                    className="focus-visible:ring-2 focus-visible:ring-moss/45 text-terracotta mt-1.5 inline-flex min-h-11 items-center text-[13px] font-bold"
+                    className="focus-visible:ring-2 focus-visible:ring-focus/45 text-brand-primary mt-1.5 inline-flex min-h-11 items-center text-[13px] font-bold dark:text-white"
                   >
                     Ver perfil del proveedor <span aria-hidden="true">→</span>
                   </Link>

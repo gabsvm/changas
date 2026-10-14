@@ -9,7 +9,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Cookies y almacenamiento",
-  description: "Qué guarda Changas en tu navegador y por qué.",
+  description: "Qué guarda YALO en tu navegador y por qué.",
 };
 
 export default function CookiesPage() {

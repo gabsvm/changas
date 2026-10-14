@@ -147,14 +147,14 @@ export default async function MessagesPage({
             className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
               showUnreadOnly
                 ? "bg-surface border-ink/[0.08] border"
-                : "text-white shadow-[0_8px_20px_-8px_rgb(238_90_36/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                : "text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
             }`}
             style={
               showUnreadOnly
                 ? undefined
                 : {
                     backgroundImage:
-                      "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+                      "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
                   }
             }
           >
@@ -165,14 +165,14 @@ export default async function MessagesPage({
             aria-current={showUnreadOnly ? "page" : undefined}
             className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
               showUnreadOnly
-                ? "text-white shadow-[0_8px_20px_-8px_rgb(238_90_36/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                ? "text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                 : "bg-surface border-ink/[0.08] border"
             }`}
             style={
               showUnreadOnly
                 ? {
                     backgroundImage:
-                      "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)",
+                      "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
                   }
                 : undefined
             }
@@ -308,7 +308,7 @@ function conversationPreview(conversation: ConversationSummary): string {
     case "FILE":
       return "Archivo";
     case "SYSTEM":
-      return "Actualización de Changas";
+      return "Actualización de YALO";
     default:
       return "Conversación iniciada";
   }

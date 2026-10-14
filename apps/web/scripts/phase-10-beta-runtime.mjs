@@ -292,14 +292,21 @@ async function completeJob(provider, client, jobId) {
     `Job start failed: ${result.error?.message ?? "unknown"}`,
   );
 
-  result = await provider.rpc("transition_job_status", {
+  const clientJobDetail = await client.rpc("get_job_detail", {
     target_job_id: jobId,
-    expected_status: "IN_PROGRESS",
-    requested_status: "COMPLETION_REQUESTED",
-    transition_reason: null,
   });
   assert(
-    !result.error && result.data === "COMPLETION_REQUESTED",
+    !clientJobDetail.error &&
+      typeof clientJobDetail.data?.[0]?.confirmation_code === "string" &&
+      clientJobDetail.data[0].confirmation_code.length > 0,
+    "Client could not read the confirmation code.",
+  );
+  result = await provider.rpc("request_job_completion", {
+    target_job_id: jobId,
+    confirmation_code: clientJobDetail.data[0].confirmation_code,
+  });
+  assert(
+    !result.error && result.data === "COMPLETED",
     `Completion request failed: ${result.error?.message ?? "unknown"}`,
   );
 
@@ -682,14 +689,21 @@ assert(
   `Journey B additional fake payment failed: ${additionalPaid.error?.message ?? "unknown"}`,
 );
 
-result = await localProvider.rpc("transition_job_status", {
+const journeyBJobDetail = await client.rpc("get_job_detail", {
   target_job_id: localJobId,
-  expected_status: "IN_PROGRESS",
-  requested_status: "COMPLETION_REQUESTED",
-  transition_reason: null,
 });
 assert(
-  !result.error && result.data === "COMPLETION_REQUESTED",
+  !journeyBJobDetail.error &&
+    typeof journeyBJobDetail.data?.[0]?.confirmation_code === "string" &&
+    journeyBJobDetail.data[0].confirmation_code.length > 0,
+  "Client could not read the Journey B confirmation code.",
+);
+result = await localProvider.rpc("request_job_completion", {
+  target_job_id: localJobId,
+  confirmation_code: journeyBJobDetail.data[0].confirmation_code,
+});
+assert(
+  !result.error && result.data === "COMPLETED",
   `Journey B completion request failed: ${result.error?.message ?? "unknown"}`,
 );
 result = await client.rpc("transition_job_status", {

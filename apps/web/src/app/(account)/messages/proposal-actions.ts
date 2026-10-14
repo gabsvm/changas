@@ -117,19 +117,127 @@ export async function reviseProposalAction(
   }
 }
 
-export async function respondProposalAction(formData: FormData): Promise<void> {
-  const conversationId = requiredUuid(formData, "conversationId");
-  const proposalId = requiredUuid(formData, "proposalId");
-  const action = stringField(formData, "action") as ProposalResponseAction;
-  if (!["ACCEPT", "REJECT", "WITHDRAW"].includes(action)) {
-    throw new Error("Acción de propuesta inválida.");
-  }
-  await respondToProposal(
-    proposalId,
-    action,
-    stringField(formData, "responseReason") || null,
+const respondExpectedStatus: Record<ProposalResponseAction, string> = {
+  ACCEPT: "ACCEPTED",
+  REJECT: "REJECTED",
+  WITHDRAW: "WITHDRAWN",
+};
+
+const respondSuccessMessages: Record<ProposalResponseAction, string> = {
+  ACCEPT: "¡Contratado! El trabajo quedó confirmado sin pago por adelantado.",
+  REJECT: "Propuesta rechazada.",
+  WITHDRAW: "Propuesta retirada.",
+};
+
+function isNetworkLike(error: unknown): boolean {
+  if (error instanceof TypeError) return true;
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  return (
+    message.includes("fetch failed") ||
+    message.includes("network") ||
+    message.includes("red") ||
+    message.includes("timeout") ||
+    message.includes("tempor") ||
+    message.includes("econn") ||
+    message.includes("socket")
   );
-  revalidatePath(`/messages/${conversationId}`);
+}
+
+function respondActionError(
+  error: unknown,
+  action: ProposalResponseAction | null,
+): ProposalActionState {
+  if (isNetworkLike(error)) {
+    return {
+      status: "ERROR",
+      message:
+        "Hubo un problema de red o temporal. Revisá tu conexión e intentá nuevamente.",
+    };
+  }
+  if (error instanceof ProposalServerError) {
+    const raw = error.message.toLowerCase();
+    if (
+      error.code === "FORBIDDEN" &&
+      (raw.includes("block") || raw.includes("bloque"))
+    ) {
+      return {
+        status: "ERROR",
+        message: "No podés responder porque esta conversación está bloqueada.",
+      };
+    }
+    if (raw.includes("venci") || raw.includes("expir")) {
+      return {
+        status: "ERROR",
+        message:
+          "La propuesta venció y ya no se puede responder. Pedí una nueva cotización en esta misma conversación.",
+      };
+    }
+    if (error.code === "CONFLICT") {
+      return {
+        status: "ERROR",
+        message:
+          action === "ACCEPT"
+            ? "El trabajo o la propuesta cambió de estado mientras respondías. Revisá el estado actual antes de reintentar."
+            : "La propuesta ya cambió de estado. Actualizamos la vista: revisá el estado actual antes de reintentar.",
+      };
+    }
+    if (error.code === "TRANSIENT") {
+      return {
+        status: "ERROR",
+        message:
+          "Hubo un problema temporal y no pudimos registrar tu respuesta. Intentá nuevamente.",
+      };
+    }
+    return { status: "ERROR", message: error.message };
+  }
+  if (error instanceof Error) {
+    return { status: "ERROR", message: error.message };
+  }
+  return {
+    status: "ERROR",
+    message: "No pudimos completar la acción. Intentá nuevamente.",
+  };
+}
+
+export async function respondProposalAction(
+  _previousState: ProposalActionState,
+  formData: FormData,
+): Promise<ProposalActionState> {
+  let action: ProposalResponseAction | null = null;
+  try {
+    const conversationId = requiredUuid(formData, "conversationId");
+    const proposalId = requiredUuid(formData, "proposalId");
+    const submitted = stringField(formData, "action") as ProposalResponseAction;
+    if (!["ACCEPT", "REJECT", "WITHDRAW"].includes(submitted)) {
+      return { status: "ERROR", message: "Acción de propuesta inválida." };
+    }
+    action = submitted;
+    const resultingStatus = await respondToProposal(
+      proposalId,
+      action,
+      stringField(formData, "responseReason") || null,
+    );
+    revalidatePath(`/messages/${conversationId}`);
+    if (resultingStatus === "EXPIRED") {
+      return {
+        status: "ERROR",
+        message:
+          "La propuesta venció y ya no se puede responder. Pedí una nueva cotización en esta misma conversación.",
+      };
+    }
+    if (resultingStatus !== respondExpectedStatus[action]) {
+      return {
+        status: "ERROR",
+        message:
+          action === "ACCEPT"
+            ? "El trabajo o la propuesta cambió de estado mientras respondías. Revisá el estado actual antes de reintentar."
+            : "La propuesta ya cambió de estado. Actualizamos la vista: revisá el estado actual antes de reintentar.",
+      };
+    }
+    return { status: "SUCCESS", message: respondSuccessMessages[action] };
+  } catch (error) {
+    return respondActionError(error, action);
+  }
 }
 
 export async function fakePaymentAction(formData: FormData): Promise<void> {

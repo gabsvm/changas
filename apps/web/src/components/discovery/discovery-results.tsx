@@ -67,12 +67,12 @@ function signatureOf(query: string, filters: DiscoveryFilters): string {
 }
 
 const DISCOVERY_COVERS = [
-  { css: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)", tone: "orange" },
-  { css: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)", tone: "blue" },
-  { css: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)", tone: "green" },
-  { css: "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)", tone: "rose" },
-  { css: "linear-gradient(135deg, #8B7CFF 0%, #5B4BD6 100%)", tone: "violet" },
-  { css: "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)", tone: "gold" },
+  { css: "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)", tone: "orange" },
+  { css: "linear-gradient(135deg, #08A9F4 0%, #12D9C5 100%)", tone: "blue" },
+  { css: "linear-gradient(135deg, #12D9C5 0%, #0E7C46 100%)", tone: "green" },
+  { css: "linear-gradient(135deg, #1576D2 0%, #0D121B 100%)", tone: "rose" },
+  { css: "linear-gradient(135deg, #12D9C5 0%, #65EC91 100%)", tone: "violet" },
+  { css: "linear-gradient(135deg, #0D121B 0%, #12D9C5 100%)", tone: "gold" },
 ] as const;
 
 function coverForDiscovery(key: string | null): (typeof DISCOVERY_COVERS)[number] {

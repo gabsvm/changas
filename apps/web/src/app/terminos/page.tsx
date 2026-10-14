@@ -9,18 +9,18 @@ import {
 
 export const metadata: Metadata = {
   title: "Términos y condiciones",
-  description: "Condiciones de uso de la plataforma Changas.",
+  description: "Condiciones de uso de la plataforma YALO.",
 };
 
 export default function TermsPage() {
   return (
     <LegalPage
       title="Términos y condiciones"
-      intro="Reglas para usar Changas, ya sea que busques un servicio o que lo ofrezcas."
+      intro="Reglas para usar YALO, ya sea que busques un servicio o que lo ofrezcas."
     >
       <LegalSection title="1. Quiénes somos">
         <p>
-          Changas es una plataforma digital que acerca a personas que necesitan
+          YALO es una plataforma digital que acerca a personas que necesitan
           un servicio (clientes) con personas que lo ofrecen de forma
           independiente (prestadores). Es operada por [COMPLETAR: razón social],
           CUIT [COMPLETAR], con domicilio en [COMPLETAR: domicilio] y correo de
@@ -35,12 +35,12 @@ export default function TermsPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="2. Rol de Changas">
+      <LegalSection title="2. Rol de YALO">
         <p>
-          Changas facilita el contacto, la comunicación y la organización de los
+          YALO facilita el contacto, la comunicación y la organización de los
           acuerdos. Los servicios los presta cada prestador por su cuenta y
           riesgo, como profesional independiente: no es empleado, socio ni
-          representante de Changas. El contrato de servicio se celebra entre
+          representante de YALO. El contrato de servicio se celebra entre
           cliente y prestador.
         </p>
       </LegalSection>
@@ -60,7 +60,7 @@ export default function TermsPage() {
         <p>
           Para publicar servicios, el prestador completa su perfil, sus datos
           privados de identidad y sube su DNI (frente y dorso) y una selfie. El
-          equipo de Changas revisa ese caso antes de habilitar el perfil.
+          equipo de YALO revisa ese caso antes de habilitar el perfil.
         </p>
         <p>
           La verificación confirma la identidad declarada; no certifica
@@ -100,8 +100,8 @@ export default function TermsPage() {
       <LegalSection title="7. Pagos">
         <p>
           Cuando el pago en línea esté disponible, se procesa a través de
-          Mercado Pago, con la cuenta que el prestador vincula a Changas.
-          Changas no almacena los datos de tu tarjeta. Comisiones, plazos y
+          Mercado Pago, con la cuenta que el prestador vincula a YALO.
+          YALO no almacena los datos de tu tarjeta. Comisiones, plazos y
           condiciones de reintegro: [COMPLETAR].
         </p>
       </LegalSection>
@@ -117,7 +117,7 @@ export default function TermsPage() {
       <LegalSection title="9. Reportes, bloqueos y suspensión">
         <p>
           Podés bloquear a otra persona o reportar conversaciones, reseñas o
-          perfiles. Changas puede restringir o suspender cuentas y contenidos
+          perfiles. YALO puede restringir o suspender cuentas y contenidos
           que incumplan estos términos o la ley, y conservar los registros
           necesarios para atender el caso.
         </p>
@@ -125,7 +125,7 @@ export default function TermsPage() {
 
       <LegalSection title="10. Responsabilidad">
         <p>
-          Changas actúa como intermediaria tecnológica y no garantiza que un
+          YALO actúa como intermediaria tecnológica y no garantiza que un
           prestador esté disponible, ni el resultado, el plazo o la calidad del
           servicio. Hacemos esfuerzos razonables para mantener la plataforma
           operativa, pero puede haber interrupciones.
@@ -139,7 +139,7 @@ export default function TermsPage() {
 
       <LegalSection title="11. Propiedad intelectual">
         <p>
-          La marca, el diseño y el software de Changas pertenecen a su titular.
+          La marca, el diseño y el software de YALO pertenecen a su titular.
           Vos conservás los derechos sobre el contenido que subís y nos das
           permiso para mostrarlo en la plataforma con el fin de prestar el
           servicio.
@@ -150,7 +150,7 @@ export default function TermsPage() {
         <p>
           Podemos actualizar estos términos. Si el cambio es relevante te lo
           vamos a avisar en la plataforma antes de que se aplique. Seguir usando
-          Changas después implica aceptar la versión vigente.
+          YALO después implica aceptar la versión vigente.
         </p>
       </LegalSection>
 

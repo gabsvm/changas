@@ -8,7 +8,7 @@ type CategoryVisual = {
 };
 
 const VISUALS: ReadonlyArray<{ match: RegExp; visual: CategoryVisual }> = [
-  { match: /hogar|limpieza|casa/i, visual: { from: "#FF9A3D", to: "#EE5A24" } },
+  { match: /hogar|limpieza|casa/i, visual: { from: "#243145", to: "#0D121B" } },
   {
     match: /tecno|comput|inform|diseño|program/i,
     visual: { from: "#4F8DFF", to: "#2F4BFE" },

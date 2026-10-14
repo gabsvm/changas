@@ -3,8 +3,7 @@ import { join } from "node:path";
 
 import { ImageResponse } from "next/og";
 
-export const alt =
-  "Changas — Una base confiable para conectar habilidades con oportunidades";
+export const alt = "YALO — Trabajá · Contratá · Crecé";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -29,8 +28,19 @@ async function loadBrandFonts() {
   ];
 }
 
+async function loadSymbolDataUri(): Promise<string> {
+  const svg = await readFile(
+    join(process.cwd(), "public/brand/yalo-symbol.svg"),
+    "utf8",
+  );
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+}
+
 export default async function Image() {
-  const fonts = await loadBrandFonts();
+  const [fonts, symbolSrc] = await Promise.all([
+    loadBrandFonts(),
+    loadSymbolDataUri(),
+  ]);
   return new ImageResponse(
     (
       <div
@@ -39,8 +49,9 @@ export default async function Image() {
           height: "100%",
           display: "flex",
           alignItems: "center",
+          backgroundColor: "#0D121B",
           backgroundImage:
-            "linear-gradient(135deg, #FFC857 0%, #FF6B35 48%, #FF0A78 100%)",
+            "linear-gradient(180deg, #161D2A 0%, #0D121B 100%)",
           padding: "72px 80px",
           position: "relative",
           overflow: "hidden",
@@ -48,78 +59,63 @@ export default async function Image() {
         }}
       >
         <div
-          aria-hidden="true"
           style={{
             position: "absolute",
-            right: -110,
-            top: -110,
-            width: 460,
-            height: 460,
+            right: -120,
+            top: -120,
+            width: 420,
+            height: 420,
             borderRadius: 9999,
-            border: "72px solid rgba(255,255,255,0.28)",
-            borderRightColor: "transparent",
-            transform: "rotate(-32deg)",
+            backgroundImage:
+              "linear-gradient(115deg, #08A9F4 0%, #12D9C5 52%, #65EC91 100%)",
+            opacity: 0.16,
           }}
         />
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            maxWidth: 780,
+            maxWidth: 800,
           }}
         >
           <div style={{ display: "flex", alignItems: "center" }}>
-            <div
-              style={{
-                width: 92,
-                height: 92,
-                borderRadius: 9999,
-                backgroundColor: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 9999,
-                  border: "13px solid #FF6B35",
-                  borderRightColor: "transparent",
-                  transform: "rotate(-32deg)",
-                }}
-              />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={symbolSrc}
+              alt=""
+              width={96}
+              height={96}
+              style={{ width: 96, height: 96 }}
+            />
             <div
               style={{
                 color: "#fff",
-                fontSize: 64,
+                fontSize: 72,
                 fontWeight: 700,
-                marginLeft: 24,
+                marginLeft: 28,
                 letterSpacing: -2,
               }}
             >
-              Changas
+              YALO
             </div>
           </div>
           <div
             style={{
-              color: "rgba(255,255,255,0.85)",
+              color: "#65EC91",
               fontSize: 24,
               fontWeight: 500,
               letterSpacing: 4,
               marginTop: 36,
             }}
           >
-            SERVICIOS Y HABILIDADES
+            TRABAJÁ · CONTRATÁ · CRECÉ
           </div>
           <div
             style={{
-              color: "#fff",
-              fontSize: 52,
-              fontWeight: 700,
-              lineHeight: 1.15,
+              color: "rgba(255,255,255,0.85)",
+              fontSize: 40,
+              fontWeight: 500,
+              lineHeight: 1.25,
               marginTop: 12,
               letterSpacing: -1,
             }}

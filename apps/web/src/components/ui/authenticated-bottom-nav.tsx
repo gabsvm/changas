@@ -169,12 +169,14 @@ export function AuthenticatedBottomNav({
 
   return (
     <nav
-      className="bottom-nav-shell mobile-safe-bottom border-ink/[0.07] fixed inset-x-0 bottom-0 z-50 border-t bg-gradient-to-t from-white via-[#fbf8f3]/95 to-white/85 px-2 pt-1 shadow-[0_-12px_32px_-16px_rgb(23_20_15/25%)] backdrop-blur-xl dark:from-[#1c1917] dark:via-[#1c1917]/95 dark:to-[#1c1917]/85"
+      className="bottom-nav-shell mobile-safe-bottom border-ink/[0.07] fixed inset-x-0 bottom-0 z-50 border-t bg-surface/90 px-2 pt-1 shadow-[0_-12px_32px_-16px_rgb(16_24_39/20%)] backdrop-blur-xl"
       aria-label="Navegación principal"
     >
+      {/* Acento medido: franja de 2px con el gradiente identitario YALO. */}
       <span
         aria-hidden="true"
-        className="brand-gradient-surface pointer-events-none absolute inset-x-0 top-0 h-[2px] opacity-70"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[2px] opacity-70"
+        style={{ backgroundImage: "var(--yalo-symbol-gradient)" }}
       />
       <div className="mx-auto grid h-[var(--consumer-nav-height)] max-w-md grid-cols-5">
         {items.map((item) => {
@@ -190,17 +192,17 @@ export function AuthenticatedBottomNav({
               key={item.key}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`consumer-pressable focus-visible:ring-moss/45 relative flex min-h-12 flex-col items-center justify-end gap-1 rounded-xl px-1 pt-1 pb-2 text-[11px] font-bold outline-none focus-visible:ring-2 ${
+              className={`consumer-pressable focus-visible:ring-focus/45 relative flex min-h-12 flex-col items-center justify-end gap-1 rounded-xl px-1 pt-1 pb-2 text-[11px] font-bold outline-none focus-visible:ring-2 ${
                 active ? "text-ink" : "text-ink/70 hover:text-ink/80"
               }`}
             >
               <span
-                className={`nav-icon relative grid h-8 min-w-11 place-items-center rounded-full px-2.5 ${active ? "brand-gradient-surface text-white shadow-[0_8px_20px_-8px_rgb(255_107_53/70%)]" : ""}`}
+                className={`nav-icon relative grid h-8 min-w-11 place-items-center rounded-full px-2.5 ${active ? "bg-brand-primary text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:bg-white dark:text-ink" : ""}`}
               >
                 <NavIcon name={item.icon} active={active} />
                 {badge > 0 ? (
                   <span
-                    className="bg-brand-pink-strong absolute -top-1 -right-2 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] leading-5 font-bold text-white ring-2 ring-white dark:ring-[#1c1917]"
+                    className="bg-danger absolute -top-1 -right-2 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] leading-5 font-bold text-white ring-2 ring-white dark:text-brand-primary-strong dark:ring-surface"
                     aria-label={`${badge} sin leer en ${item.label}`}
                   >
                     {badge > 99 ? "99+" : badge}

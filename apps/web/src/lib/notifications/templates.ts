@@ -63,7 +63,7 @@ export function buildSafePushMessage(
     endpoint: delivery.endpoint,
     p256dh: delivery.p256dh,
     authKey: delivery.authKey,
-    title: clampPushText(delivery.title, PUSH_TITLE_MAX_LENGTH) || "Changas",
+    title: clampPushText(delivery.title, PUSH_TITLE_MAX_LENGTH) || "YALO",
     body:
       clampPushText(delivery.body, PUSH_BODY_MAX_LENGTH) ||
       "Tenés una actualización importante.",
@@ -79,7 +79,7 @@ export function buildTransactionalEmail(
   }
 
   const actionUrl = sanitizeNotificationActionUrl(delivery.actionUrl);
-  const subject = `${delivery.title} · Changas`;
+  const subject = `${delivery.title} · YALO`;
   const safeTitle = escapeHtml(delivery.title);
   const safeBody = escapeHtml(delivery.body);
   const safeAction = escapeHtml(actionUrl);
@@ -88,8 +88,8 @@ export function buildTransactionalEmail(
     deliveryId: delivery.deliveryId,
     to: delivery.recipientEmail,
     subject,
-    text: `${delivery.title}\n\n${delivery.body}\n\nAbrí Changas para revisar los detalles: ${actionUrl}`,
-    html: `<h1>${safeTitle}</h1><p>${safeBody}</p><p><a href="${safeAction}">Abrir en Changas</a></p>`,
+    text: `${delivery.title}\n\n${delivery.body}\n\nAbrí YALO para revisar los detalles: ${actionUrl}`,
+    html: `<h1>${safeTitle}</h1><p>${safeBody}</p><p><a href="${safeAction}">Abrir en YALO</a></p>`,
     actionUrl,
   };
 }

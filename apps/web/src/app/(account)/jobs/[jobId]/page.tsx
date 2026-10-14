@@ -101,9 +101,69 @@ function scopeStatus(value: string) {
   );
 }
 
-function eventLabel(value: string): string {
-  const normalized = value.toLowerCase().replaceAll("_", " ");
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+// YALO B4: mapa explícito event_type → texto es-AR. Ningún nombre técnico
+// crudo llega a la UI: lo desconocido cae en un texto genérico legible.
+const JOB_EVENT_LABELS: Record<string, string> = {
+  JOB_CONFIRMED: "Trabajo confirmado",
+  JOB_AUTO_COMPLETED: "YALO confirmó el cierre automáticamente",
+  JOB_DISPUTE_RESOLVED: "YALO resolvió el reclamo",
+  JOB_LOCATION_SHARED: "Se compartió la ubicación del trabajo",
+  RESCHEDULE_REQUESTED: "Se pidió cambiar el horario",
+  RESCHEDULE_ACCEPTED: "Se aceptó el nuevo horario",
+  RESCHEDULE_REJECTED: "Se rechazó el cambio de horario",
+  SCOPE_CHANGE_REQUESTED: "Se propuso un cambio de alcance",
+  SCOPE_CHANGE_ACCEPTED: "Se aceptó el cambio de alcance",
+  SCOPE_CHANGE_REJECTED: "Se rechazó el cambio de alcance",
+  JOB_SETTLEMENT_SUCCEEDED: "Se confirmó el cobro del trabajo",
+  JOB_SETTLEMENT_FAILED: "El cobro no se pudo completar",
+  SETTLEMENT_ADDITIONALS_PAID: "Se pagaron los adicionales",
+  ADDITIONAL_PAYMENT_SUCCEEDED: "Se pagó el adicional",
+  ADDITIONAL_PAYMENT_FAILED: "El pago del adicional no se pudo completar",
+  ADDITIONAL_PAYMENT_PENDING: "El pago del adicional está en curso",
+  PROVIDER_REVIEW_REQUEST: "El prestador pidió una reseña",
+  COMPLETION_CODE_ISSUED: "Se generó el código de cierre",
+};
+
+function jobStatusChangedLabel(toStatus: string | null): string {
+  switch (toStatus) {
+    case "IN_PROGRESS":
+      return "El trabajo empezó";
+    case "COMPLETION_REQUESTED":
+      return "El prestador pidió confirmar el cierre";
+    case "COMPLETED":
+      return "Trabajo completado";
+    case "CANCELLED":
+      return "El trabajo se canceló";
+    case "DISPUTED":
+      return "Se informó un problema con el trabajo";
+    case "NO_SHOW":
+      return "Se registró una ausencia";
+    case "CONFIRMED":
+      return "Trabajo confirmado";
+    default:
+      return "El estado del trabajo cambió";
+  }
+}
+
+function eventLabel(event: {
+  event_type: string;
+  to_status: string | null;
+}): string {
+  if (event.event_type === "JOB_STATUS_CHANGED") {
+    return jobStatusChangedLabel(event.to_status);
+  }
+  return JOB_EVENT_LABELS[event.event_type] ?? "Movimiento del trabajo";
+}
+
+function eventActorLabel(
+  actorUserId: string | null,
+  clientUserId: string,
+  providerUserId: string,
+): string {
+  if (!actorUserId) return "YALO";
+  if (actorUserId === clientUserId) return "Cliente";
+  if (actorUserId === providerUserId) return "Prestador";
+  return "Equipo YALO";
 }
 
 export default async function JobPage({
@@ -159,6 +219,7 @@ export default async function JobPage({
     isClient,
     isProvider,
     settlementPending,
+    paymentsEnabled,
   });
   const needsRescheduleAttention = reschedules.some(
     (request) =>
@@ -653,7 +714,7 @@ export default async function JobPage({
                       <ol className="text-ink/70 mt-2 list-decimal space-y-1 pl-5 text-[13px] leading-6">
                         <li>Contanos qué pasó en el motivo de abajo.</li>
                         <li>
-                          El equipo de Changas revisa el caso con ambas partes.
+                          El equipo de YALO revisa el caso con ambas partes.
                         </li>
                         <li>Te avisamos por acá cuando haya novedades.</li>
                       </ol>
@@ -693,7 +754,7 @@ export default async function JobPage({
                   <div className="border-warning/25 bg-warning/[0.06] rounded-2xl border p-4">
                     <h3 className="text-sm font-extrabold">Caso en revisión</h3>
                     <p className="text-ink/70 mt-1 text-[13px] leading-6">
-                      El equipo de Changas está revisando lo reportado con ambas
+                      El equipo de YALO está revisando lo reportado con ambas
                       partes. Te avisamos por acá cuando haya novedades.
                     </p>
                   </div>
@@ -1093,10 +1154,15 @@ export default async function JobPage({
                       <span className="bg-moss ring-canvas absolute top-1 -left-[22px] h-2.5 w-2.5 rounded-full ring-4" />
                       <div className="min-w-0">
                         <strong className="block">
-                          {eventLabel(event.event_type)}
+                          {eventLabel(event)}
                         </strong>
                         <time className="text-ink/42 mt-1 block text-xs leading-4">
-                          {dateTime(event.created_at)}
+                          {eventActorLabel(
+                            event.actor_user_id,
+                            detail.client_user_id,
+                            detail.provider_user_id,
+                          )}{" "}
+                          · {dateTime(event.created_at)}
                         </time>
                         {event.reason ? (
                           <p className="text-ink/70 mt-1.5 leading-6">
@@ -1337,7 +1403,7 @@ function ReasonTransitionForm({
 }) {
   const irreversibleCopy =
     requested === "DISPUTED"
-      ? "No se puede deshacer desde acá: el caso pasa a revisión del equipo de Changas."
+      ? "No se puede deshacer desde acá: el caso pasa a revisión del equipo de YALO."
       : requested === "CANCELLED"
         ? "No se puede deshacer: el trabajo se cierra como cancelado y suma una cancelación a tu reputación."
         : "No se puede deshacer: queda registrada la ausencia en tu reputación.";

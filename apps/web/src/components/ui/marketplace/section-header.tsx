@@ -39,7 +39,7 @@ export function SectionHeader({
       {actionHref ? (
         <Link
           href={actionHref}
-          className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.08] inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full px-3 text-sm font-bold"
+          className="consumer-pressable text-brand-primary hover:bg-brand-primary/[0.06] inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full px-3 text-sm font-bold dark:text-white"
         >
           {actionLabel}
           <svg

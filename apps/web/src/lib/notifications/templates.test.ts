@@ -86,7 +86,7 @@ describe("notification templates", () => {
     const email = buildTransactionalEmail(baseDelivery);
 
     expect(email?.to).toBe("persona@example.test");
-    expect(email?.subject).toBe("Trabajo actualizado · Changas");
+    expect(email?.subject).toBe("Trabajo actualizado · YALO");
     expect(email?.text).toContain(baseDelivery.body);
     expect(email?.actionUrl).toBe(baseDelivery.actionUrl);
   });

@@ -55,7 +55,7 @@ export async function generateMetadata({
       },
     };
   } catch {
-    return { title: "Servicio · Changas" };
+    return { title: "Servicio · YALO" };
   }
 }
 
@@ -224,7 +224,7 @@ export default async function PublicServicePage({
                   </div>
                   <div className="mt-1.5 flex items-center justify-between gap-3">
                     <span className="text-ink/70 text-[13px] font-semibold">
-                      Comisión de Changas
+                      Comisión de YALO
                     </span>
                     <span className="text-moss text-[13px] font-bold">
                       Incluida en el total
@@ -245,8 +245,8 @@ export default async function PublicServicePage({
               )}
               <p className="text-ink/70 mt-2 text-xs leading-5">
                 {service.price_model === "FIXED"
-                  ? "Pagás al finalizar desde Changas, sin cargos extra sobre el precio publicado."
-                  : "Precio de referencia — el total se acuerda en la propuesta. Pagás al finalizar desde Changas."}
+                  ? "Pagás al finalizar desde YALO, sin cargos extra sobre el precio publicado."
+                  : "Precio de referencia — el total se acuerda en la propuesta. Pagás al finalizar desde YALO."}
               </p>
             </section>
           ) : null}
@@ -318,11 +318,11 @@ export default async function PublicServicePage({
           </section>
 
           <div className="border-moss/25 bg-moss/[0.07] consumer-card mt-8 flex items-start gap-3.5 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-            <IllustratedBadge tone="green" icon="shield" size="md" label="Garantía de Changas" />
+            <IllustratedBadge tone="green" icon="shield" size="md" label="Garantía YALO" />
             <div>
               <p className="text-sm font-extrabold">Sin pago por adelantado + soporte</p>
               <p className="text-ink/70 mt-1 text-xs leading-6">
-                Sin pago por adelantado: coordinás por chat y se liquida al finalizar. Si algo sale mal, el equipo de Changas te acompaña.
+                Sin pago por adelantado: coordinás por chat y se liquida al finalizar. Si algo sale mal, el equipo de YALO te acompaña.
               </p>
             </div>
           </div>
@@ -346,7 +346,7 @@ export default async function PublicServicePage({
                     {price}
                   </p>
                   <p className="text-ink/70 truncate text-xs">
-                    Por chat · responde rápido
+                    Por chat · coordinás día y precio
                   </p>
                 </div>
                 <ConsultButton />
@@ -381,7 +381,7 @@ function Info({ title, value }: { title: string; value: string | null }) {
 }
 
 const SERVICE_COVERS = [
-  { css: "linear-gradient(135deg, #FF9A3D 0%, #EE5A24 100%)", tone: "orange" },
+  { css: "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)", tone: "orange" },
   { css: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)", tone: "blue" },
   { css: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)", tone: "green" },
   { css: "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)", tone: "rose" },

@@ -49,13 +49,13 @@ export function AppHeader({
         <Link
           href="/"
           className="flex min-w-0 items-center gap-2.5"
-          aria-label="Changas, inicio"
+          aria-label="YALO, inicio"
         >
           <span className="brand-mark h-9 w-9" aria-hidden="true">
             C
           </span>
           <span className="truncate text-lg font-bold tracking-[-0.025em]">
-            Changas
+            YALO
           </span>
         </Link>
       ) : null}
@@ -64,13 +64,13 @@ export function AppHeader({
         <Link
           href="/"
           className="hidden min-w-0 items-center gap-2.5 sm:flex"
-          aria-label="Changas, inicio"
+          aria-label="YALO, inicio"
         >
           <span className="brand-mark h-9 w-9" aria-hidden="true">
             C
           </span>
           <span className="truncate text-lg font-bold tracking-[-0.025em]">
-            Changas
+            YALO
           </span>
         </Link>
       ) : null}

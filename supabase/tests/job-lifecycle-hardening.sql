@@ -1,6 +1,6 @@
 begin;
 
-select plan(56);
+select plan(70);
 
 select ok(
   exists (
@@ -28,14 +28,14 @@ select ok(
 );
 
 select ok(
-  (select pg_get_functiondef(to_regprocedure('public.transition_job_status(uuid,public.job_status,public.job_status,text,text)')))
-  like '%confirmation code does not match%',
-  'a wrong confirmation code is rejected distinctly'
+  (select pg_get_functiondef(to_regprocedure('public.request_job_completion(uuid,text)')))
+  like '%insert into public.job_confirmation_code_attempts%',
+  'a wrong confirmation code is recorded by the authority'
 );
 
 select ok(
-  (select pg_get_functiondef(to_regprocedure('public.transition_job_status(uuid,public.job_status,public.job_status,text,text)')))
-  like '%confirmation code locked%',
+  (select pg_get_functiondef(to_regprocedure('public.request_job_completion(uuid,text)')))
+  like '%return ''LOCKED''%',
   'repeated code failures lock out temporarily'
 );
 
@@ -309,34 +309,92 @@ select is(
   'LOCKED',
   'the correct code stays locked until the window passes'
 );
+-- YALO A1: la ruta vieja ya no cierra con código (bypass cerrado).
 select throws_ok(
   $$select public.transition_job_status('14000000-0000-4000-8000-000000000101', 'IN_PROGRESS'::public.job_status, 'COMPLETION_REQUESTED'::public.job_status, null, '1234')$$,
-  'P0001', null,
-  'a locked job rejects completion even with the right code'
+  '22023', 'request completion through request_job_completion',
+  'direct completion through the transition is rejected even with the right code'
 );
+-- Fixtures A1: ...107 para fallos/lock vía autoridad, ...108 no se usa
+-- (confirmation_code es NOT NULL desde 20261012000000).
+insert into public.jobs (
+  id, conversation_id, service_id, client_user_id, provider_user_id,
+  accepted_proposal_version_id, status, confirmation_code,
+  completion_requested_at, updated_at
+) values (
+  '14000000-0000-4000-8000-000000000107', '14000000-0000-4000-8000-000000000020', '14000000-0000-4000-8000-000000000010', '14000000-0000-4000-8000-000000000001', '14000000-0000-4000-8000-000000000002', '14000000-0000-4000-8000-000000000040', 'IN_PROGRESS', '4321', null, timezone('utc', now())
+);
+select is(
+  public.request_job_completion('14000000-0000-4000-8000-000000000107', '0000'),
+  'MISMATCH',
+  'authority failure 1 of 5 is recorded'
+);
+select is(
+  public.request_job_completion('14000000-0000-4000-8000-000000000107', '0000'),
+  'MISMATCH',
+  'authority failure 2 of 5 is recorded'
+);
+select is(
+  public.request_job_completion('14000000-0000-4000-8000-000000000107', '0000'),
+  'MISMATCH',
+  'authority failure 3 of 5 is recorded'
+);
+select is(
+  public.request_job_completion('14000000-0000-4000-8000-000000000107', '0000'),
+  'MISMATCH',
+  'authority failure 4 of 5 is recorded'
+);
+select is(
+  public.request_job_completion('14000000-0000-4000-8000-000000000107', '0000'),
+  'MISMATCH',
+  'authority failure 5 of 5 is recorded'
+);
+select is(
+  (select count(*)::integer from public.job_confirmation_code_attempts where job_id = '14000000-0000-4000-8000-000000000107'),
+  5,
+  'five authority failures persist without rollback'
+);
+select is(
+  public.request_job_completion('14000000-0000-4000-8000-000000000107', '0000'),
+  'LOCKED',
+  'the sixth authority attempt is blocked'
+);
+select is(
+  public.request_job_completion('14000000-0000-4000-8000-000000000107', '4321'),
+  'LOCKED',
+  'the correct code stays locked through the authority too'
+);
+select is(
+  public.request_job_completion('14000000-0000-4000-8000-000000000102', '5678'),
+  'COMPLETED',
+  'the correct code completes through the authority'
+);
+select is(
+  (select status::text from public.jobs where id = '14000000-0000-4000-8000-000000000102'),
+  'COMPLETION_REQUESTED',
+  'authority success flips the job status'
+);
+select is(
+  (select count(*)::integer from public.job_confirmation_code_attempts where job_id = '14000000-0000-4000-8000-000000000102'),
+  0,
+  'authority success clears prior attempts'
+);
+select is(
+  (select count(*)::integer from public.job_events where job_id = '14000000-0000-4000-8000-000000000102' and event_type = 'JOB_STATUS_CHANGED' and to_status = 'COMPLETION_REQUESTED'),
+  1,
+  'authority success records exactly one transition event'
+);
+select set_config('request.jwt.claim.sub', '14000000-0000-4000-8000-000000000099', true);
 select throws_ok(
-  $$select public.transition_job_status('14000000-0000-4000-8000-000000000102', 'IN_PROGRESS'::public.job_status, 'COMPLETION_REQUESTED'::public.job_status, null, '0000')$$,
-  '22023', null,
-  'a wrong code without the recorder is still rejected distinctly'
+  $$select public.request_job_completion('14000000-0000-4000-8000-000000000102', '5678')$$,
+  '42501', null,
+  'an outsider cannot request completion'
 );
-select is(
-  (select count(*)::integer from public.job_confirmation_code_attempts where job_id = '14000000-0000-4000-8000-000000000102'),
-  0,
-  'the transition alone records nothing; the recorder owns counting'
-);
-select is(
-  public.record_confirmation_code_attempt('14000000-0000-4000-8000-000000000102', '5678'),
-  'OK',
-  'the correct code is accepted by the recorder'
-);
-select lives_ok(
-  $$select public.transition_job_status('14000000-0000-4000-8000-000000000102', 'IN_PROGRESS'::public.job_status, 'COMPLETION_REQUESTED'::public.job_status, null, '5678')$$,
-  'completion succeeds after the recorder accepts the code'
-);
-select is(
-  (select count(*)::integer from public.job_confirmation_code_attempts where job_id = '14000000-0000-4000-8000-000000000102'),
-  0,
-  'a successful completion clears prior attempts'
+select set_config('request.jwt.claim.sub', '14000000-0000-4000-8000-000000000002', true);
+select throws_ok(
+  $$select public.request_job_completion('14000000-0000-4000-8000-000000000103', '9999')$$,
+  '40001', null,
+  'completion outside IN_PROGRESS is rejected'
 );
 
 -- P1-01 a nivel definición: sin INSERT+RAISE autodestructivo, con lock.
@@ -372,8 +430,38 @@ select ok(
 );
 select ok(
   (select pg_get_functiondef(to_regprocedure('public.transition_job_status(uuid,public.job_status,public.job_status,text,text)')))
+  like '%request completion through request_job_completion%',
+  'the old completion route rejects instead of guessing codes'
+);
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.request_job_completion(uuid,text)')))
   like '%pg_advisory_xact_lock%',
-  'the transition serializes code guesses per job'
+  'the authority serializes code guesses per job'
+);
+select has_function(
+  'public',
+  'request_job_completion',
+  array['uuid', 'text'],
+  'the completion authority RPC exists'
+);
+select ok(
+  coalesce(
+    has_function_privilege(
+      'authenticated',
+      to_regprocedure('public.request_job_completion(uuid,text)'),
+      'EXECUTE'
+    ),
+    false
+  )
+  and not coalesce(
+    has_function_privilege(
+      'anon',
+      to_regprocedure('public.request_job_completion(uuid,text)'),
+      'EXECUTE'
+    ),
+    false
+  ),
+  'the authority is callable by participants, not anonymously'
 );
 select ok(
   (select pg_get_functiondef(to_regprocedure('public.record_confirmation_code_attempt(uuid,text)')))
@@ -493,6 +581,18 @@ select ok(
   not like '%settled_amount_for_job%',
   'settlement snapshot logic is untouched'
 );
+-- YALO A3: sin cobro online no se materializan recordatorios de deuda.
+select is(
+  (select enabled from public.app_feature_flags where name = 'payments_online'),
+  false,
+  'online payments ship disabled by default'
+);
+select is(
+  (select public.materialize_due_settlement_reminders()),
+  0,
+  'no debt reminders materialize while payments are off'
+);
+
 
 select * from finish();
 rollback;
