@@ -61,6 +61,62 @@ describe("private avatar delivery", () => {
     expect(download).toHaveBeenCalledWith("owner/avatar.jpg");
   });
 
+  it("serves the current avatar to public requests without a session", async () => {
+    maybeSingle.mockResolvedValue({
+      data: { avatar_url: "/api/avatar/owner/avatar.jpg" },
+      error: null,
+    });
+    download.mockResolvedValue({
+      data: new Blob(["avatar"], { type: "image/jpeg" }),
+      error: null,
+    });
+    // No cookies, Authorization header, or session: access control rests
+    // on the profile association, not on who is asking.
+    const response = await GET(new Request("http://localhost"), {
+      params: Promise.resolve({ path: ["owner", "avatar.jpg"] }),
+    });
+    expect(response.status).toBe(200);
+    expect(download).toHaveBeenCalledWith("owner/avatar.jpg");
+  });
+
+  it("returns 404 when the visitor requests a stale (no longer associated) object", async () => {
+    // The route queries profiles by exact avatar_url match, so a rotated-out
+    // path matches no row and never reaches storage.
+    maybeSingle.mockResolvedValue({ data: null, error: null });
+    const response = await GET(new Request("http://localhost"), {
+      params: Promise.resolve({ path: ["owner", "old-avatar.jpg"] }),
+    });
+    expect(response.status).toBe(404);
+    expect(download).not.toHaveBeenCalled();
+  });
+
+  it("returns 404 for profiles without an avatar", async () => {
+    maybeSingle.mockResolvedValue({
+      data: { avatar_url: null },
+      error: null,
+    });
+    const response = await GET(new Request("http://localhost"), {
+      params: Promise.resolve({ path: ["owner", "avatar.jpg"] }),
+    });
+    expect(response.status).toBe(404);
+    expect(download).not.toHaveBeenCalled();
+  });
+
+  it("hides profile lookup failures behind a generic 404", async () => {
+    maybeSingle.mockResolvedValue({
+      data: null,
+      error: { message: "secret" },
+    });
+    const response = await GET(new Request("http://localhost"), {
+      params: Promise.resolve({ path: ["owner", "avatar.jpg"] }),
+    });
+    expect(response.status).toBe(404);
+    expect(await response.json()).toEqual({
+      error: "No encontramos esa imagen.",
+    });
+    expect(download).not.toHaveBeenCalled();
+  });
+
   it("hides storage failures", async () => {
     maybeSingle.mockResolvedValue({
       data: { avatar_url: "/api/avatar/owner/avatar.jpg" },
@@ -71,6 +127,8 @@ describe("private avatar delivery", () => {
       params: Promise.resolve({ path: ["owner", "avatar.jpg"] }),
     });
     expect(response.status).toBe(404);
-    expect(await response.json()).toEqual({ error: "No encontramos esa imagen." });
+    expect(await response.json()).toEqual({
+      error: "No encontramos esa imagen.",
+    });
   });
 });

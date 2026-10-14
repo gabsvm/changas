@@ -6,7 +6,13 @@ vi.mock("server-only", () => ({}));
 
 import { decryptPaymentToken, encryptPaymentToken } from "./crypto";
 import { createOAuthState, verifyOAuthState } from "./oauth-state";
-import { createPaymentServer, PaymentServerError } from "./server";
+import {
+  buildSettlementEconomicVersion,
+  buildSettlementIdempotencyKey,
+  buildSettlementRequestNonce,
+  createPaymentServer,
+  PaymentServerError,
+} from "./server";
 
 const PROVIDER_USER_ID = "71100000-0000-4000-8000-000000000001";
 const OTHER_PROVIDER_USER_ID = "71100000-0000-4000-8000-000000000002";
@@ -19,7 +25,19 @@ const PAYMENT_ACCOUNT_ID = "71160000-0000-4000-8000-000000000001";
 const CHECKOUT_ID = "71170000-0000-4000-8000-000000000001";
 const PROPOSAL_NONCE = "71180000-0000-4000-8000-000000000001";
 const SCOPE_NONCE = "71180000-0000-4000-8000-000000000002";
-const SETTLEMENT_NONCE = "71180000-0000-4000-8000-000000000003";
+const SETTLEMENT_VERSION = buildSettlementEconomicVersion({
+  amountMinor: 140000,
+  currencyCode: "ARS",
+  includedScopeChangeIds: [SCOPE_CHANGE_ID],
+});
+const SETTLEMENT_DERIVED_NONCE = buildSettlementRequestNonce(
+  JOB_ID,
+  SETTLEMENT_VERSION,
+);
+const SETTLEMENT_IDEMPOTENCY_KEY = buildSettlementIdempotencyKey(
+  JOB_ID,
+  SETTLEMENT_VERSION,
+);
 const OTHER_JOB_ID = "71150000-0000-4000-8000-000000000009";
 const NOW = Date.UTC(2026, 8, 5, 21, 45, 0);
 const TOKEN_KEY = Buffer.alloc(32, 7).toString("base64");
@@ -328,7 +346,7 @@ type CheckoutRow = {
   marketplaceFeeMinor: number;
   providerNetExpectedMinor: number;
   currencyCode: string;
-  status: "CREATED" | "REDIRECT_READY";
+  status: "CREATED" | "REDIRECT_READY" | "FAILED" | "EXPIRED";
   providerCheckoutReference: string | null;
   checkoutUrl: string | null;
   jobId?: string | null;
@@ -343,6 +361,7 @@ function makeCheckoutServer(
     settlementSnapshot?: Record<string, unknown> | null;
     providerAccount?: Record<string, unknown> | null;
     existingCheckout?: CheckoutRow | null;
+    activeCheckout?: CheckoutRow | null;
   } = {},
 ) {
   const createdRows: CheckoutRow[] = [];
@@ -351,6 +370,8 @@ function makeCheckoutServer(
     providerCheckoutReference: string;
     checkoutUrl: string;
   }> = [];
+  const expireCheckoutSession = vi.fn(async (_checkoutId: string) => undefined);
+  const resetCheckoutSession = vi.fn(async (_checkoutId: string) => undefined);
   const createCheckoutSession = vi.fn(async () => ({
     providerCheckoutReference: "pref-phase11-001",
     checkoutUrl:
@@ -437,6 +458,9 @@ function makeCheckoutServer(
     loadSettlementCheckoutSnapshot: async () => settlementSnapshot,
     loadConnectedProviderAccount: async () => providerAccount,
     findCheckoutByNonce: async () => overrides.existingCheckout ?? null,
+    findActiveSettlementCheckout: async () => overrides.activeCheckout ?? null,
+    expireCheckoutSession,
+    resetCheckoutSession,
     createCheckoutRecord: async (input: CheckoutRow) => {
       const row = { ...input, id: CHECKOUT_ID };
       createdRows.push(row);
@@ -457,7 +481,14 @@ function makeCheckoutServer(
     },
   });
 
-  return { server, createdRows, finalizedRows, createCheckoutSession };
+  return {
+    server,
+    createdRows,
+    finalizedRows,
+    createCheckoutSession,
+    expireCheckoutSession,
+    resetCheckoutSession,
+  };
 }
 
 describe("Phase 11 durable real checkout creation", () => {
@@ -626,20 +657,62 @@ describe("Phase 11 durable real checkout creation", () => {
 });
 
 describe("Job settlement checkout at close", () => {
+  function settlementRow(overrides: Partial<CheckoutRow> = {}): CheckoutRow {
+    return {
+      id: CHECKOUT_ID,
+      requestNonce: SETTLEMENT_DERIVED_NONCE,
+      purpose: "PROPOSAL",
+      targetId: PROPOSAL_ID,
+      clientUserId: CLIENT_USER_ID,
+      providerUserId: PROVIDER_USER_ID,
+      paymentProviderAccountId: PAYMENT_ACCOUNT_ID,
+      providerName: "MERCADO_PAGO",
+      externalReference: `changas:checkout:${SETTLEMENT_DERIVED_NONCE}`,
+      amountMinor: 140000,
+      marketplaceFeeMinor: 14000,
+      providerNetExpectedMinor: 126000,
+      currencyCode: "ARS",
+      status: "REDIRECT_READY",
+      providerCheckoutReference: "pref-settlement",
+      checkoutUrl:
+        "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pref-settlement",
+      jobId: JOB_ID,
+      includedScopeChangeIds: [SCOPE_CHANGE_ID],
+      ...overrides,
+    };
+  }
+
+  it("derives a stable nonce and provider key per job and economic version", () => {
+    expect(buildSettlementRequestNonce(JOB_ID, SETTLEMENT_VERSION)).toBe(
+      SETTLEMENT_DERIVED_NONCE,
+    );
+    expect(buildSettlementIdempotencyKey(JOB_ID, SETTLEMENT_VERSION)).toBe(
+      SETTLEMENT_IDEMPOTENCY_KEY,
+    );
+    const changedVersion = buildSettlementEconomicVersion({
+      amountMinor: 150000,
+      currencyCode: "ARS",
+      includedScopeChangeIds: [SCOPE_CHANGE_ID],
+    });
+    expect(buildSettlementRequestNonce(JOB_ID, changedVersion)).not.toBe(
+      SETTLEMENT_DERIVED_NONCE,
+    );
+    expect(buildSettlementIdempotencyKey(JOB_ID, changedVersion)).not.toBe(
+      SETTLEMENT_IDEMPOTENCY_KEY,
+    );
+  });
+
   it("creates a settlement checkout for the consolidated close total", async () => {
     const { server, createdRows, createCheckoutSession } = makeCheckoutServer();
 
-    const result = await server.createJobSettlementCheckout(
-      JOB_ID,
-      SETTLEMENT_NONCE,
-    );
+    const result = await server.createJobSettlementCheckout(JOB_ID);
 
     expect(createCheckoutSession).toHaveBeenCalledWith(
       expect.objectContaining({
         amountMinor: 140000,
         currencyCode: "ARS",
         marketplaceFeeMinor: 14000,
-        idempotencyKey: SETTLEMENT_NONCE,
+        idempotencyKey: SETTLEMENT_IDEMPOTENCY_KEY,
         backUrls: {
           success: `https://changas.test/payments/return/success?job=${JOB_ID}`,
           pending: `https://changas.test/payments/return/pending?job=${JOB_ID}`,
@@ -650,6 +723,8 @@ describe("Job settlement checkout at close", () => {
     expect(createdRows[0]).toMatchObject({
       purpose: "PROPOSAL",
       targetId: PROPOSAL_ID,
+      requestNonce: SETTLEMENT_DERIVED_NONCE,
+      externalReference: `changas:checkout:${SETTLEMENT_DERIVED_NONCE}`,
       jobId: JOB_ID,
       includedScopeChangeIds: [SCOPE_CHANGE_ID],
       amountMinor: 140000,
@@ -677,7 +752,7 @@ describe("Job settlement checkout at close", () => {
     });
 
     await expectPaymentError(
-      () => server.createJobSettlementCheckout(JOB_ID, SETTLEMENT_NONCE),
+      () => server.createJobSettlementCheckout(JOB_ID),
       "INVALID_PROVIDER_STATE",
     );
   });
@@ -688,51 +763,91 @@ describe("Job settlement checkout at close", () => {
     });
 
     await expectPaymentError(
-      () => server.createJobSettlementCheckout(JOB_ID, SETTLEMENT_NONCE),
+      () => server.createJobSettlementCheckout(JOB_ID),
       "FORBIDDEN",
     );
   });
 
   it("reuses a redirect-ready settlement session and rejects a nonce bound to another settlement", async () => {
-    const existingCheckout: CheckoutRow = {
-      id: CHECKOUT_ID,
-      requestNonce: SETTLEMENT_NONCE,
-      purpose: "PROPOSAL",
-      targetId: PROPOSAL_ID,
-      clientUserId: CLIENT_USER_ID,
-      providerUserId: PROVIDER_USER_ID,
-      paymentProviderAccountId: PAYMENT_ACCOUNT_ID,
-      providerName: "MERCADO_PAGO",
-      externalReference: `changas:checkout:${SETTLEMENT_NONCE}`,
-      amountMinor: 140000,
-      marketplaceFeeMinor: 14000,
-      providerNetExpectedMinor: 126000,
-      currencyCode: "ARS",
-      status: "REDIRECT_READY",
-      providerCheckoutReference: "pref-settlement",
-      checkoutUrl:
-        "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pref-settlement",
-      jobId: JOB_ID,
-      includedScopeChangeIds: [SCOPE_CHANGE_ID],
-    };
+    const existingCheckout = settlementRow();
     const reused = makeCheckoutServer({ existingCheckout });
-    const result = await reused.server.createJobSettlementCheckout(
-      JOB_ID,
-      SETTLEMENT_NONCE,
-    );
+    const result = await reused.server.createJobSettlementCheckout(JOB_ID);
     expect(result).toEqual({
       checkoutSessionId: CHECKOUT_ID,
       checkoutUrl: existingCheckout.checkoutUrl,
     });
     expect(reused.createdRows).toHaveLength(0);
+    expect(reused.createCheckoutSession).not.toHaveBeenCalled();
 
     const conflicted = makeCheckoutServer({
       existingCheckout: { ...existingCheckout, jobId: OTHER_JOB_ID },
     });
     await expectPaymentError(
-      () =>
-        conflicted.server.createJobSettlementCheckout(JOB_ID, SETTLEMENT_NONCE),
+      () => conflicted.server.createJobSettlementCheckout(JOB_ID),
       "CONFLICT",
     );
+  });
+
+  it("reuses a vigente active session with another nonce instead of calling the provider", async () => {
+    const legacyActive = settlementRow({
+      id: "71170000-0000-4000-8000-000000000099",
+      requestNonce: "71180000-0000-4000-8000-000000000099",
+    });
+    const { server, createdRows, createCheckoutSession } = makeCheckoutServer({
+      activeCheckout: legacyActive,
+    });
+
+    const result = await server.createJobSettlementCheckout(JOB_ID);
+
+    expect(result).toEqual({
+      checkoutSessionId: legacyActive.id,
+      checkoutUrl: legacyActive.checkoutUrl,
+    });
+    expect(createdRows).toHaveLength(0);
+    expect(createCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it("expires a stale active session when the economic version changed", async () => {
+    const staleActive = settlementRow({
+      id: "71170000-0000-4000-8000-000000000098",
+      requestNonce: "71180000-0000-4000-8000-000000000098",
+      amountMinor: 130000,
+      marketplaceFeeMinor: 13000,
+      providerNetExpectedMinor: 117000,
+    });
+    const {
+      server,
+      createdRows,
+      expireCheckoutSession,
+      createCheckoutSession,
+    } = makeCheckoutServer({ activeCheckout: staleActive });
+
+    const result = await server.createJobSettlementCheckout(JOB_ID);
+
+    expect(expireCheckoutSession).toHaveBeenCalledWith(staleActive.id);
+    expect(createdRows).toHaveLength(1);
+    expect(createCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({ idempotencyKey: SETTLEMENT_IDEMPOTENCY_KEY }),
+    );
+    expect(result.checkoutSessionId).toBe(CHECKOUT_ID);
+  });
+
+  it("reopens a terminal failed session on retry under the same stable key", async () => {
+    const failed = settlementRow({ status: "FAILED" });
+    const factory = makeCheckoutServer({ existingCheckout: failed });
+    factory.resetCheckoutSession.mockImplementation(async () => {
+      failed.status = "CREATED";
+      failed.providerCheckoutReference = null;
+      failed.checkoutUrl = null;
+    });
+
+    const result = await factory.server.createJobSettlementCheckout(JOB_ID);
+
+    expect(factory.resetCheckoutSession).toHaveBeenCalledWith(CHECKOUT_ID);
+    expect(factory.createdRows).toHaveLength(0);
+    expect(factory.createCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({ idempotencyKey: SETTLEMENT_IDEMPOTENCY_KEY }),
+    );
+    expect(result.checkoutSessionId).toBe(CHECKOUT_ID);
   });
 });

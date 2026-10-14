@@ -14,17 +14,17 @@ export default async function PaymentReturnFailurePage({
         Pago no completado
       </p>
       <h1 className="font-display mt-3 text-4xl font-semibold tracking-[-0.03em]">
-        No se cobró nada
+        No pudimos confirmar el pago
       </h1>
       <p className="text-ink/70 mt-5 text-sm leading-6">
-        El pago no se completó y no se hizo ningún cargo. Podés reintentarlo
-        desde tu trabajo cuando quieras.
+        Revisá el estado actualizado en el trabajo antes de intentar de nuevo:
+        ahí vas a ver si el pago quedó pendiente o tenés que generarlo otra vez.
       </p>
       <Link
         className="button-primary mt-7 inline-flex"
         href={resolveJobReturnHref(params.job)}
       >
-        Reintentar desde el trabajo
+        Volver al trabajo
       </Link>
     </section>
   );

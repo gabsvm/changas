@@ -1,5 +1,7 @@
-const STATIC_CACHE = "changas-static-v3";
-const RUNTIME_CACHE = "changas-pages-v1";
+const STATIC_CACHE = "changas-static-v4";
+// P1-08: el worker nunca cachea HTML navegacional. `/` y `/buscar` son
+// force-dynamic personalizadas (saludo/sesión); servirlas desde caché filtra
+// la sesión anterior. Solo assets inmutables + `/offline` precacheado.
 const IMAGE_CACHE = "changas-images-v1";
 const OFFLINE_URL = "/offline";
 const STATIC_URLS = [
@@ -21,9 +23,6 @@ const SAFE_ACTION_ROOTS = ["/messages", "/jobs", "/account", "/provider"];
 const FALLBACK_PUSH_TITLE = "Changas";
 const FALLBACK_PUSH_BODY = "Tenés una actualización importante.";
 const FALLBACK_ACTION_URL = "/account/notifications";
-// Únicas navegaciones públicas con revalidación en segundo plano.
-const SWR_PATHS = new Set(["/", "/buscar", "/offline"]);
-const RUNTIME_MAX_ENTRIES = 20;
 const IMAGE_MAX_ENTRIES = 60;
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -38,12 +37,7 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter(
-              (key) =>
-                key !== STATIC_CACHE &&
-                key !== RUNTIME_CACHE &&
-                key !== IMAGE_CACHE,
-            )
+            .filter((key) => key !== STATIC_CACHE && key !== IMAGE_CACHE)
             .map((key) => caches.delete(key)),
         ),
       )
@@ -69,27 +63,6 @@ function trimCache(cache, maxEntries) {
     return Promise.all(
       keys.slice(0, keys.length - maxEntries).map((key) => cache.delete(key)),
     );
-  });
-}
-
-// Stale-while-revalidate para las páginas públicas listadas: responde al
-// instante si hay copia y actualiza en segundo plano. Las navegaciones caen
-// a /offline si no hay copia ni red.
-function staleWhileRevalidate(request, { offlineFallback = false } = {}) {
-  return caches.open(RUNTIME_CACHE).then(async (cache) => {
-    const cached = await cache.match(request);
-    const network = fetch(request)
-      .then(async (response) => {
-        if (response.ok) {
-          await cache.put(request, response.clone());
-          await trimCache(cache, RUNTIME_MAX_ENTRIES);
-        }
-        return response;
-      })
-      .catch(() =>
-        offlineFallback ? cached || caches.match(OFFLINE_URL) : cached,
-      );
-    return cached || network;
   });
 }
 
@@ -121,13 +94,10 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (request.mode === "navigate") {
+    // P1-08: HTML navegacional siempre de red — `/` y `/buscar` son
+    // force-dynamic por sesión y un `cache.put` filtraría al usuario
+    // anterior tras logout. Sin red cae al shell `/offline` precacheado.
     if (isPrivatePath(url.pathname)) {
-      return;
-    }
-    if (SWR_PATHS.has(url.pathname)) {
-      event.respondWith(
-        staleWhileRevalidate(request, { offlineFallback: true }),
-      );
       return;
     }
     event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL)));
@@ -135,11 +105,6 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (isPrivatePath(url.pathname)) {
-    return;
-  }
-
-  if (SWR_PATHS.has(url.pathname)) {
-    event.respondWith(staleWhileRevalidate(request));
     return;
   }
 

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 import {
   calculateMarketplaceFeeMinor,
@@ -92,6 +92,7 @@ type HostedCheckoutPreset = {
   snapshot: CheckoutAuthoritySnapshot;
   settlementJobId: string;
   includedScopeChangeIds: string[];
+  providerIdempotencyKey: string;
 };
 
 type ConnectedProviderAccount = {
@@ -175,6 +176,9 @@ type PaymentServerDependencies = {
   loadSettlementCheckoutSnapshot?: (jobId: string) => Promise<unknown>;
   loadConnectedProviderAccount?: (providerUserId: string) => Promise<unknown>;
   findCheckoutByNonce?: (requestNonce: string) => Promise<unknown>;
+  findActiveSettlementCheckout?: (jobId: string) => Promise<unknown | null>;
+  expireCheckoutSession?: (checkoutId: string) => Promise<void>;
+  resetCheckoutSession?: (checkoutId: string) => Promise<void>;
   createCheckoutRecord?: (input: CheckoutRecordInput) => Promise<unknown>;
   markCheckoutRedirectReady?: (input: {
     checkoutId: string;
@@ -203,12 +207,16 @@ type RpcClient = {
 
 type SelectQuery = {
   eq: (column: string, value: unknown) => SelectQuery;
+  in: (column: string, values: unknown[]) => SelectQuery;
+  order: (column: string, options?: { ascending?: boolean }) => SelectQuery;
+  limit: (count: number) => SelectQuery;
   maybeSingle: () => PromiseLike<RpcResult>;
   single: () => PromiseLike<RpcResult>;
 };
 
 type MutationQuery = {
   eq: (column: string, value: unknown) => MutationQuery;
+  in: (column: string, values: unknown[]) => MutationQuery;
   select: (columns: string) => SelectQuery;
 };
 
@@ -624,6 +632,67 @@ function buildExternalReference(requestNonce: string): string {
   return `changas:checkout:${requestNonce}`;
 }
 
+function uuidFromHashSeed(seed: string): string {
+  const chars = createHash("sha256")
+    .update(seed, "utf8")
+    .digest("hex")
+    .slice(0, 32)
+    .split("");
+  chars[12] = "5";
+  chars[16] = ((parseInt(chars[16] ?? "0", 16) & 0x3) | 0x8).toString(16);
+  const hex = chars.join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+/**
+ * Versión económica del cobro al cierre: monto + moneda + adicionales
+ * incluidos. Junto al job define la clave idempotente del checkout.
+ */
+export function buildSettlementEconomicVersion(input: {
+  amountMinor: number;
+  currencyCode: string;
+  includedScopeChangeIds: string[];
+}): string {
+  const ids = [...input.includedScopeChangeIds].sort();
+  return `${input.amountMinor}:${input.currencyCode}:${ids.join(",")}`;
+}
+
+/**
+ * Nonce estable por trabajo + versión económica. Reemplaza el randomUUID
+ * por click: el doble click concurrente colisiona en el mismo registro
+ * (unique de request_nonce) y el reuso por nonce existente lo absorbe.
+ */
+export function buildSettlementRequestNonce(
+  jobId: string,
+  economicVersion: string,
+): string {
+  requireNonEmptyString(jobId, "jobId");
+  requireNonEmptyString(economicVersion, "economicVersion");
+  return uuidFromHashSeed(
+    `changas:job-settlement:nonce:v1:${jobId}:${economicVersion}`,
+  );
+}
+
+/**
+ * Idempotency key estable para el proveedor (header X-Idempotency-Key):
+ * mismo trabajo + misma versión económica ⇒ misma preferencia.
+ */
+export function buildSettlementIdempotencyKey(
+  jobId: string,
+  economicVersion: string,
+): string {
+  requireNonEmptyString(jobId, "jobId");
+  requireNonEmptyString(economicVersion, "economicVersion");
+  const digest = createHash("sha256")
+    .update(
+      `changas:job-settlement:idempotency:v1:${jobId}:${economicVersion}`,
+      "utf8",
+    )
+    .digest("hex")
+    .slice(0, 32);
+  return digest;
+}
+
 function getCheckoutDependencies(dependencies: PaymentServerDependencies) {
   if (
     !dependencies.loadProposalCheckoutSnapshot ||
@@ -1026,7 +1095,7 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
         pending: returnUrl(RETURN_PENDING_PATH),
         failure: returnUrl(RETURN_FAILURE_PATH),
       },
-      idempotencyKey: requestNonce,
+      idempotencyKey: preset?.providerIdempotencyKey ?? requestNonce,
     });
 
     await checkoutDependencies.markCheckoutRedirectReady({
@@ -1055,10 +1124,7 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
     return createHostedCheckout("SCOPE_CHANGE", scopeChangeId, requestNonce);
   }
 
-  async function createJobSettlementCheckout(
-    jobId: string,
-    requestNonce: string,
-  ) {
+  async function createJobSettlementCheckout(jobId: string) {
     const loader = dependencies.loadSettlementCheckoutSnapshot;
     if (!loader) {
       throw new PaymentServerError(
@@ -1067,10 +1133,80 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
       );
     }
     const settlement = normalizeSettlementSnapshot(await loader(jobId), jobId);
+    // Clave idempotente por trabajo + versión económica: el nonce y la
+    // idempotency key del proveedor derivan del snapshot, no del click.
+    const economicVersion = buildSettlementEconomicVersion(settlement);
+    const effectiveNonce = buildSettlementRequestNonce(
+      settlement.jobId,
+      economicVersion,
+    );
+    const providerIdempotencyKey = buildSettlementIdempotencyKey(
+      settlement.jobId,
+      economicVersion,
+    );
+    const matchesSettlement = (checkout: CheckoutRecord): boolean =>
+      checkout.clientUserId === settlement.clientUserId &&
+      checkout.jobId === settlement.jobId &&
+      checkout.amountMinor === settlement.amountMinor &&
+      checkout.currencyCode === settlement.currencyCode &&
+      sameIdSet(
+        checkout.includedScopeChangeIds,
+        settlement.includedScopeChangeIds,
+      );
+
+    // Guard de sesión activa: una sola sesión vigente por trabajo. Si hay
+    // otra sesión activa con la misma economía se reusa; si cambió la
+    // economía (o es un resto legacy con otro nonce) se anula antes de
+    // llamar al proveedor.
+    if (
+      dependencies.findActiveSettlementCheckout &&
+      dependencies.expireCheckoutSession
+    ) {
+      const activeRaw = await dependencies.findActiveSettlementCheckout(
+        settlement.jobId,
+      );
+      if (activeRaw !== null && activeRaw !== undefined) {
+        const active = normalizeCheckoutRecord(activeRaw);
+        if (
+          matchesSettlement(active) &&
+          active.status === "REDIRECT_READY" &&
+          active.checkoutUrl &&
+          active.requestNonce !== effectiveNonce
+        ) {
+          return {
+            checkoutSessionId: active.id,
+            checkoutUrl: active.checkoutUrl,
+          };
+        }
+        if (
+          active.requestNonce !== effectiveNonce &&
+          (active.status === "CREATED" || active.status === "REDIRECT_READY")
+        ) {
+          await dependencies.expireCheckoutSession(active.id);
+        }
+      }
+    }
+
+    // Reintento tras fallo/expiración: la misma clave estable vuelve a
+    // ocupar la fila terminal en vez de chocar con CONFLICT.
+    if (dependencies.findCheckoutByNonce && dependencies.resetCheckoutSession) {
+      const existingRaw =
+        await dependencies.findCheckoutByNonce(effectiveNonce);
+      if (existingRaw !== null && existingRaw !== undefined) {
+        const existing = normalizeCheckoutRecord(existingRaw);
+        if (
+          matchesSettlement(existing) &&
+          (existing.status === "FAILED" || existing.status === "EXPIRED")
+        ) {
+          await dependencies.resetCheckoutSession(existing.id);
+        }
+      }
+    }
+
     return createHostedCheckout(
       "PROPOSAL",
       settlement.proposalId,
-      requestNonce,
+      effectiveNonce,
       {
         snapshot: {
           targetId: settlement.proposalId,
@@ -1084,6 +1220,7 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
         },
         settlementJobId: settlement.jobId,
         includedScopeChangeIds: settlement.includedScopeChangeIds,
+        providerIdempotencyKey,
       },
     );
   }
@@ -1501,6 +1638,62 @@ async function findCheckoutByNonce(
   return result.data === null ? null : mapCheckoutDatabaseRow(result.data);
 }
 
+async function findActiveSettlementCheckout(
+  jobId: string,
+): Promise<CheckoutRecord | null> {
+  const admin = getAdminTableClient();
+  const result = await admin
+    .from("payment_checkout_sessions")
+    .select("*")
+    .eq("job_id", jobId)
+    .in("status", ["CREATED", "REDIRECT_READY"])
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (result.error) {
+    throwDatabaseError(
+      "Unable to read active settlement session",
+      result.error,
+    );
+  }
+  return result.data === null ? null : mapCheckoutDatabaseRow(result.data);
+}
+
+async function expireCheckoutSession(checkoutId: string): Promise<void> {
+  const admin = getAdminTableClient();
+  const result = await admin
+    .from("payment_checkout_sessions")
+    .update({ status: "EXPIRED" })
+    .eq("id", checkoutId)
+    .in("status", ["CREATED", "REDIRECT_READY"])
+    .select("id")
+    .single();
+  // Si ya llegó a estado terminal por otra vía (webhook concurrente),
+  // no hay nada que anular: se sigue con la sesión vigente real.
+  if (result.error || !isRecord(result.data)) return;
+}
+
+async function resetCheckoutSession(checkoutId: string): Promise<void> {
+  const admin = getAdminTableClient();
+  const result = await admin
+    .from("payment_checkout_sessions")
+    .update({
+      status: "CREATED",
+      provider_checkout_reference: null,
+      checkout_url: null,
+    })
+    .eq("id", checkoutId)
+    .in("status", ["FAILED", "EXPIRED"])
+    .select("id")
+    .single();
+  if (result.error || !isRecord(result.data)) {
+    throwDatabaseError(
+      "Unable to reopen terminal settlement session",
+      result.error,
+    );
+  }
+}
+
 async function createCheckoutRecord(
   input: CheckoutRecordInput,
 ): Promise<CheckoutRecord> {
@@ -1584,6 +1777,9 @@ function getDefaultPaymentServer() {
     loadSettlementCheckoutSnapshot,
     loadConnectedProviderAccount,
     findCheckoutByNonce,
+    findActiveSettlementCheckout,
+    expireCheckoutSession,
+    resetCheckoutSession,
     createCheckoutRecord,
     markCheckoutRedirectReady,
     paymentProvider: {
@@ -1645,12 +1841,6 @@ export async function createScopeChangeCheckout(
   );
 }
 
-export async function createJobSettlementCheckout(
-  jobId: string,
-  requestNonce: string,
-) {
-  return getDefaultPaymentServer().createJobSettlementCheckout(
-    jobId,
-    requestNonce,
-  );
+export async function createJobSettlementCheckout(jobId: string) {
+  return getDefaultPaymentServer().createJobSettlementCheckout(jobId);
 }

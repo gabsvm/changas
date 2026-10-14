@@ -246,10 +246,9 @@ export async function startJobSettlementCheckoutAction(
     throw new Error("El pago online todavía no está habilitado.");
   }
   const jobId = uuidField(formData, "jobId");
-  const checkout = await createJobSettlementCheckout(
-    jobId,
-    crypto.randomUUID(),
-  );
+  // La clave idempotente deriva del trabajo + versión económica en el
+  // servidor: reintentar el formulario reusa la sesión vigente.
+  const checkout = await createJobSettlementCheckout(jobId);
   redirect(checkout.checkoutUrl);
 }
 

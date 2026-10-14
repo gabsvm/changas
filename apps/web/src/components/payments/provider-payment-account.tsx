@@ -1,3 +1,5 @@
+import { isPaymentsEnabled } from "@changas/config/server";
+
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SettingsRow } from "@/components/ui/marketplace/settings-row";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
@@ -25,6 +27,7 @@ export function ProviderPaymentAccount({
   account,
   feedback = null,
 }: ProviderPaymentAccountProps) {
+  const paymentsEnabled = isPaymentsEnabled();
   const connected = account.status === "CONNECTED";
   const actionLabel = connected
     ? "Reconectar Mercado Pago"
@@ -35,7 +38,12 @@ export function ProviderPaymentAccount({
     <section aria-labelledby="provider-payment-account-title">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-3">
-          <IllustratedBadge tone="blue" icon="wallet" size="md" label="Mercado Pago" />
+          <IllustratedBadge
+            tone="blue"
+            icon="wallet"
+            size="md"
+            label="Mercado Pago"
+          />
           <div className="min-w-0">
             <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
               Cobros
@@ -77,53 +85,63 @@ export function ProviderPaymentAccount({
           <span className="absolute -right-4 -bottom-6 h-16 w-16 rounded-full bg-white/20" />
         </div>
         <div className="px-4 pb-4">
-        {feedback === "connected" ? (
-          <p
-            className="bg-success/[0.07] text-success -mx-4 px-4 py-2.5 text-sm font-semibold"
-            role="status"
-          >
-            Cuenta de Mercado Pago vinculada correctamente.
-          </p>
-        ) : null}
-        {feedback === "oauth_error" ? (
-          <p
-            className="bg-danger/[0.07] text-danger -mx-4 px-4 py-2.5 text-sm font-semibold"
-            role="alert"
-          >
-            No pudimos completar la vinculación. Podés volver a intentarlo sin
-            afectar trabajos ni pagos existentes.
-          </p>
-        ) : null}
+          {feedback === "connected" ? (
+            <p
+              className="bg-success/[0.07] text-success -mx-4 px-4 py-2.5 text-sm font-semibold"
+              role="status"
+            >
+              Cuenta de Mercado Pago vinculada correctamente.
+            </p>
+          ) : null}
+          {feedback === "oauth_error" ? (
+            <p
+              className="bg-danger/[0.07] text-danger -mx-4 px-4 py-2.5 text-sm font-semibold"
+              role="alert"
+            >
+              No pudimos completar la vinculación. Podés volver a intentarlo sin
+              afectar trabajos ni pagos existentes.
+            </p>
+          ) : null}
 
-        <div className="mt-3 space-y-2">
-          <div className="border-ink/[0.08] bg-canvas rounded-xl border px-3">
-            <SettingsRow
-              title="Cuenta"
-              description={account.providerAccountReference ?? "Todavía no vinculada"}
-            />
+          <div className="mt-3 space-y-2">
+            <div className="border-ink/[0.08] bg-canvas rounded-xl border px-3">
+              <SettingsRow
+                title="Cuenta"
+                description={
+                  account.providerAccountReference ?? "Todavía no vinculada"
+                }
+              />
+            </div>
+            <div className="border-ink/[0.08] bg-canvas rounded-xl border px-3">
+              <SettingsRow
+                title="Autorización"
+                description={
+                  account.tokenExpiresAt
+                    ? new Intl.DateTimeFormat("es-AR", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                        timeZone: "America/Argentina/Buenos_Aires",
+                      }).format(new Date(account.tokenExpiresAt))
+                    : "Sin autorización activa"
+                }
+              />
+            </div>
           </div>
-          <div className="border-ink/[0.08] bg-canvas rounded-xl border px-3">
-            <SettingsRow
-              title="Autorización"
-              description={
-                account.tokenExpiresAt
-                  ? new Intl.DateTimeFormat("es-AR", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                      timeZone: "America/Argentina/Buenos_Aires",
-                    }).format(new Date(account.tokenExpiresAt))
-                  : "Sin autorización activa"
-              }
-            />
-          </div>
-        </div>
 
-        <a
-          className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
-          href="/api/payments/mercado-pago/oauth/start"
-        >
-          {actionLabel}
-        </a>
+          {paymentsEnabled ? (
+            <a
+              className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
+              href="/api/payments/mercado-pago/oauth/start"
+            >
+              {actionLabel}
+            </a>
+          ) : (
+            <p className="text-ink/70 mt-3 text-sm leading-6" role="status">
+              Los cobros online se habilitarán próximamente. Para cobrar vas a
+              necesitar una cuenta de Mercado Pago vinculada; tu estado y tus
+              requisitos se muestran arriba.
+            </p>
+          )}
         </div>
       </div>
     </section>
