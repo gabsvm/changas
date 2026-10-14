@@ -318,6 +318,14 @@ export default async function ProviderMarketplaceManagePage({
             <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-6" />
           );
         })()}
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+          <Link
+            href="/oportunidades"
+            className="consumer-pressable bg-surface border-ink/[0.08] inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border px-4 text-sm font-bold"
+          >
+            Ver oportunidades para ofertar
+          </Link>
+        </div>
         {incomeResult.ok ? (
           (() => {
             const income = incomeResult.summary;

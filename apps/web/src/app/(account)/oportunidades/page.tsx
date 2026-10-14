@@ -1,0 +1,88 @@
+import { redirect } from "next/navigation";
+
+import { formatMinorUnits } from "@changas/domain";
+
+import { MobileAppBar } from "@/components/ui/mobile-app-bar";
+import { ActionLink } from "@/components/ui/marketplace/action-button";
+import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { createClient } from "@/lib/supabase/server";
+import { listOpenJobPosts } from "@/lib/jobs/job-posts-server";
+
+export const metadata = {
+  title: "Oportunidades | YALO",
+  description:
+    "Necesidades abiertas de clientes en tus rubros para ofertar tu trabajo.",
+};
+
+export default async function OpportunitiesPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login?next=/oportunidades");
+
+  const { data: mySkills } = await supabase
+    .from("provider_skills")
+    .select("skill_id")
+    .eq("provider_user_id", user.id);
+  const skillIds = (mySkills ?? []).map((row) => row.skill_id);
+
+  const posts = skillIds.length
+    ? (await listOpenJobPosts({ skillIds, limit: 30 })).filter(
+        (post) => post.owner_user_id !== user.id,
+      )
+    : [];
+
+  return (
+    <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
+      <MobileAppBar title="Oportunidades" backHref="/provider/manage" />
+      <p className="text-ink/70 mt-2 text-[15px] leading-6">
+        Necesidades abiertas en tus rubros. Ofertá con uno de tus servicios y
+        negociá por chat; el pago se acuerda por fuera de YALO.
+      </p>
+      {posts.length === 0 ? (
+        <div className="mt-6">
+          <EmptyState
+            title="No hay oportunidades en tus rubros"
+            description="Agregá más rubros a tu perfil o volvé más tarde: las necesidades nuevas aparecen acá."
+            actionHref="/provider/manage"
+            actionLabel="Gestionar mis rubros"
+          />
+        </div>
+      ) : (
+        <ul className="mt-6 flex flex-col gap-4">
+          {posts.map((post) => (
+            <li
+              key={post.id}
+              className="border-ink/10 bg-surface rounded-2xl border p-4"
+            >
+              <p className="text-ink/70 text-[13px] font-bold">
+                {post.skill_name ?? "Rubro"}
+                {post.location_text ? ` · ${post.location_text}` : ""}
+              </p>
+              <p className="mt-1 text-sm font-bold">{post.title}</p>
+              <p className="text-ink/70 mt-1 line-clamp-2 text-[13px] leading-5">
+                {post.description}
+              </p>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <span className="text-sm font-bold">
+                  {post.desired_budget_amount
+                    ? `Ref: ${formatMinorUnits(post.desired_budget_amount, post.currency_code)}`
+                    : "Presupuesto a convenir"}
+                </span>
+                <ActionLink
+                  href={`/needs/${post.id}`}
+                  tone="secondary"
+                  className="min-h-0 px-3 py-2 text-sm"
+                >
+                  Ver y ofertar
+                </ActionLink>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </main>
+  );
+}

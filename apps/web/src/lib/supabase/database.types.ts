@@ -251,6 +251,50 @@ type SkillsInsert = Omit<SkillsRow, "id" | "created_at" | "updated_at"> & {
   created_at?: string;
   updated_at?: string;
 };
+export type JobPostStatus = "OPEN" | "PAUSED" | "CLOSED" | "HIRED";
+
+type JobPostsRow = {
+  id: string;
+  owner_user_id: string;
+  skill_id: string;
+  title: string;
+  description: string;
+  location_text: string | null;
+  schedule_start_at: string | null;
+  schedule_end_at: string | null;
+  desired_budget_amount: number | null;
+  currency_code: string;
+  status: JobPostStatus;
+  idempotency_key: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type JobPostsInsert = {
+  owner_user_id: string;
+  skill_id: string;
+  title: string;
+  description: string;
+  location_text?: string | null;
+  schedule_start_at?: string | null;
+  schedule_end_at?: string | null;
+  desired_budget_amount?: number | null;
+  currency_code?: string;
+  idempotency_key?: string | null;
+};
+
+type JobPostsUpdate = Partial<
+  Omit<JobPostsInsert, "owner_user_id" | "skill_id">
+>;
+
+type JobPostEventsRow = {
+  id: string;
+  job_post_id: string;
+  actor_user_id: string | null;
+  event_type: string;
+  metadata: Json;
+  created_at: string;
+};
 type SkillsUpdate = Partial<SkillsInsert>;
 
 type SkillSynonymsRow = {
@@ -651,6 +695,12 @@ export type Database = {
         ProviderSkillsUpdate
       >;
       services: TableDefinition<ServicesRow, ServicesInsert, ServicesUpdate>;
+      job_posts: TableDefinition<JobPostsRow, JobPostsInsert, JobPostsUpdate>;
+      job_post_events: TableDefinition<
+        JobPostEventsRow,
+        Omit<JobPostEventsRow, "id" | "created_at">,
+        Partial<Pick<JobPostEventsRow, "metadata">>
+      >;
       service_tags: TableDefinition<
         ServiceTagsRow,
         ServiceTagsInsert,
@@ -754,6 +804,28 @@ export type Database = {
           public_headline: string | null;
           bio: string | null;
         }>;
+      };
+      create_job_post: {
+        Args: {
+          requested_skill_id: string;
+          requested_title: string;
+          requested_description: string;
+          requested_location_text?: string | null;
+          proposed_schedule_start_at?: string | null;
+          proposed_schedule_end_at?: string | null;
+          desired_budget_amount?: number | null;
+          requested_currency_code?: string;
+          request_idempotency_key?: string | null;
+        };
+        Returns: string;
+      };
+      update_job_post_status: {
+        Args: { target_post_id: string; requested_status: JobPostStatus };
+        Returns: JobPostStatus;
+      };
+      start_post_offer_conversation: {
+        Args: { target_post_id: string; target_service_id: string };
+        Returns: string;
       };
       submit_skill_request: {
         Args: {
