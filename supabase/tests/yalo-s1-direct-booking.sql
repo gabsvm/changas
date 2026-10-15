@@ -4,7 +4,7 @@
 -- rollback al final del archivo.
 begin;
 
-select plan(35);
+select plan(37);
 
 -- Estructura: flag de preautorizacion.
 select ok(
@@ -222,7 +222,7 @@ select is(
   (select status::text from public.proposals
    where id = public.create_conversation_proposal(
      '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
-     null, null, null, null, '15000000-0000-4000-8000-0000000000a2')),
+     '2030-01-10T10:00:00Z', '2030-01-10T11:00:00Z', null, null, '15000000-0000-4000-8000-0000000000a2')),
   'ACCEPTED',
   'direct booking with preauthorization is accepted'
 );
@@ -233,6 +233,16 @@ select is(
      where idempotency_key = '15000000-0000-4000-8000-0000000000a2')),
   'CONFIRMED',
   'preauthorized direct booking creates a confirmed job'
+);
+
+-- Flag sin un horario reservable NO es una reserva instantanea.
+select is(
+  (select status::text from public.proposals
+   where id = public.create_conversation_proposal(
+     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
+     null, null, null, null, '15000000-0000-4000-8000-0000000000a4')),
+  'OPEN',
+  'preauthorization without a concrete slot remains a bilateral request'
 );
 
 -- Prestador no ACTIVE: vuelve a solicitud aunque el flag siga ON.
@@ -320,7 +330,22 @@ select is(
   'historic save preserves an enabled flag'
 );
 
--- Ventana sin disponibilidad (sin reglas) no auto-confirma.
+-- Bloqueo real de disponibilidad: la fecha no puede auto-contratarse.
+insert into public.provider_slot_holds (
+  proposal_id, accepted_proposal_version_id, provider_user_id, client_user_id,
+  request_nonce, starts_at, ends_at, expires_at
+) values (
+  (select id from public.proposals
+   where idempotency_key = '15000000-0000-4000-8000-0000000000a2'),
+  (select current_version_id from public.proposals
+   where idempotency_key = '15000000-0000-4000-8000-0000000000a2'),
+  '15000000-0000-4000-8000-000000000002',
+  '15000000-0000-4000-8000-000000000001',
+  '15000000-0000-4000-8000-0000000000c0',
+  '2030-02-10T09:00:00Z', '2030-02-10T13:00:00Z',
+  timezone('utc', now()) + interval '14 days'
+);
+
 select set_config('request.jwt.claim.sub', '15000000-0000-4000-8000-000000000001', true);
 update public.provider_profiles set status = 'ACTIVE'
 where user_id = '15000000-0000-4000-8000-000000000002';
@@ -329,7 +354,7 @@ select is(
    where id = public.create_conversation_proposal(
      '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
      '2030-02-10T10:00:00Z', '2030-02-10T12:00:00Z', null, null,
-     '15000000-0000-4000-8000-0000000000b1',
+     '15000000-0000-4000-8000-0000000000b1'
    )),
   'OPEN',
   'unavailable window stays a bilateral request'
