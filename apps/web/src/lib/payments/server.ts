@@ -174,6 +174,7 @@ type PaymentServerDependencies = {
   loadProposalCheckoutSnapshot?: (proposalId: string) => Promise<unknown>;
   loadScopeChangeCheckoutSnapshot?: (scopeChangeId: string) => Promise<unknown>;
   loadSettlementCheckoutSnapshot?: (jobId: string) => Promise<unknown>;
+  loadExternalConfirmedMinor?: (jobId: string) => Promise<number>;
   loadConnectedProviderAccount?: (providerUserId: string) => Promise<unknown>;
   findCheckoutByNonce?: (requestNonce: string) => Promise<unknown>;
   findActiveSettlementCheckout?: (jobId: string) => Promise<unknown | null>;
@@ -1132,7 +1133,28 @@ export function createPaymentServer(dependencies: PaymentServerDependencies) {
         "Settlement checkout is not configured",
       );
     }
-    const settlement = normalizeSettlementSnapshot(await loader(jobId), jobId);
+    const snapshot = normalizeSettlementSnapshot(await loader(jobId), jobId);
+    // YALO S5/E21 (SPEC 7.3): el checkout online excluye lo ya confirmado
+    // entre las partes. Si lo bilateral cubre el total, no hay checkout.
+    const externalConfirmedRaw =
+      (await dependencies.loadExternalConfirmedMinor?.(snapshot.jobId)) ?? 0;
+    const externalConfirmedMinor =
+      Number.isSafeInteger(externalConfirmedRaw) && externalConfirmedRaw > 0
+        ? externalConfirmedRaw
+        : 0;
+    if (snapshot.amountMinor - externalConfirmedMinor <= 0) {
+      throw new PaymentServerError(
+        "CONFLICT",
+        "Job amount already covered by confirmed external payments",
+      );
+    }
+    const settlement =
+      externalConfirmedMinor === 0
+        ? snapshot
+        : {
+            ...snapshot,
+            amountMinor: snapshot.amountMinor - externalConfirmedMinor,
+          };
     // Clave idempotente por trabajo + versión económica: el nonce y la
     // idempotency key del proveedor derivan del snapshot, no del click.
     const economicVersion = buildSettlementEconomicVersion(settlement);
@@ -1529,6 +1551,37 @@ async function loadSettlementCheckoutSnapshot(jobId: string): Promise<unknown> {
   };
 }
 
+// YALO S5/E21: confirmado bilateral para excluir del checkout online.
+// Tolerante al orden de deploy (ledger aun sin migrar -> 0).
+async function loadExternalConfirmedMinor(jobId: string): Promise<number> {
+  const admin = createAdminClient() as unknown as RpcClient;
+  const { data, error } = await admin.rpc("external_payment_ledger", {
+    target_job_id: jobId,
+  });
+  if (error) {
+    if (
+      error.code === "42883" ||
+      error.code === "PGRST202" ||
+      (typeof error.message === "string" &&
+        /could not find the function/i.test(error.message))
+    ) {
+      return 0;
+    }
+    throwDatabaseError("Unable to load bilateral payment ledger", error);
+  }
+  const row = (Array.isArray(data) ? data[0] : data) as Record<
+    string,
+    unknown
+  > | null;
+  const raw = row?.external_confirmed_minor;
+  const confirmed = typeof raw === "bigint" ? Number(raw) : raw;
+  return typeof confirmed === "number" &&
+    Number.isSafeInteger(confirmed) &&
+    confirmed > 0
+    ? confirmed
+    : 0;
+}
+
 async function loadConnectedProviderAccount(
   providerUserId: string,
 ): Promise<ConnectedProviderAccount | null> {
@@ -1775,6 +1828,7 @@ function getDefaultPaymentServer() {
     loadProposalCheckoutSnapshot,
     loadScopeChangeCheckoutSnapshot,
     loadSettlementCheckoutSnapshot,
+    loadExternalConfirmedMinor,
     loadConnectedProviderAccount,
     findCheckoutByNonce,
     findActiveSettlementCheckout,

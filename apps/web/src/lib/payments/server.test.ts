@@ -362,6 +362,7 @@ function makeCheckoutServer(
     providerAccount?: Record<string, unknown> | null;
     existingCheckout?: CheckoutRow | null;
     activeCheckout?: CheckoutRow | null;
+    externalConfirmedMinor?: number;
   } = {},
 ) {
   const createdRows: CheckoutRow[] = [];
@@ -456,6 +457,8 @@ function makeCheckoutServer(
     loadProposalCheckoutSnapshot: async () => proposalSnapshot,
     loadScopeChangeCheckoutSnapshot: async () => scopeSnapshot,
     loadSettlementCheckoutSnapshot: async () => settlementSnapshot,
+    loadExternalConfirmedMinor: async () =>
+      overrides.externalConfirmedMinor ?? 0,
     loadConnectedProviderAccount: async () => providerAccount,
     findCheckoutByNonce: async () => overrides.existingCheckout ?? null,
     findActiveSettlementCheckout: async () => overrides.activeCheckout ?? null,
@@ -734,6 +737,34 @@ describe("Job settlement checkout at close", () => {
       status: "CREATED",
     });
     expect(result.checkoutSessionId).toBe(CHECKOUT_ID);
+  });
+
+  it("deducts bilaterally confirmed money from checkout", async () => {
+    const { server, createdRows, createCheckoutSession } = makeCheckoutServer({
+      externalConfirmedMinor: 40000,
+    });
+
+    await server.createJobSettlementCheckout(JOB_ID);
+
+    expect(createCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amountMinor: 100000,
+        marketplaceFeeMinor: 10000,
+      }),
+    );
+    expect(createdRows[0]).toMatchObject({ amountMinor: 100000 });
+  });
+
+  it("rejects checkout covered by bilateral payments", async () => {
+    const { server, createCheckoutSession } = makeCheckoutServer({
+      externalConfirmedMinor: 140000,
+    });
+
+    await expectPaymentError(
+      () => server.createJobSettlementCheckout(JOB_ID),
+      "CONFLICT",
+    );
+    expect(createCheckoutSession).not.toHaveBeenCalled();
   });
 
   it("rejects a settlement snapshot bound to another job", async () => {
