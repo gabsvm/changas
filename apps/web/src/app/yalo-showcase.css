@@ -9,8 +9,16 @@
   --color-terracotta: #9beef0;
   --color-surface-muted: #1a2a38;
   background:
-    radial-gradient(ellipse 50% 38% at 50% 21%, rgb(8 169 244 / 7%), transparent 82%),
-    radial-gradient(ellipse 49% 27% at 96% 64%, rgb(18 217 197 / 5%), transparent 88%),
+    radial-gradient(
+      ellipse 50% 38% at 50% 21%,
+      rgb(8 169 244 / 7%),
+      transparent 82%
+    ),
+    radial-gradient(
+      ellipse 49% 27% at 96% 64%,
+      rgb(18 217 197 / 5%),
+      transparent 88%
+    ),
     #0d121b;
   color: #f5f8fc;
   isolation: isolate;
@@ -55,7 +63,9 @@
   border: 1px solid rgb(255 255 255 / 13%);
   border-radius: 999px;
   background: rgb(21 32 46 / 76%);
-  box-shadow: inset 0 1px rgb(255 255 255 / 9%), 0 14px 42px rgb(0 0 0 / 22%);
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 9%),
+    0 14px 42px rgb(0 0 0 / 22%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   backdrop-filter: blur(20px) saturate(160%);
 }
@@ -74,16 +84,20 @@
   place-items: center;
   border-radius: 14px;
   background: rgb(5 14 26 / 85%);
-  box-shadow: inset 0 1px rgb(255 255 255 / 8%), 0 5px 18px rgb(0 0 0 / 21%);
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 8%),
+    0 5px 18px rgb(0 0 0 / 21%);
 }
-.yalo-header-symbol img { display: block; }
+.yalo-header-symbol img {
+  display: block;
+}
 .yalo-header-wordmark {
   color: white;
   font-family: var(--font-display);
   font-size: 1.43rem;
   font-weight: 800;
-  letter-spacing: -.085em;
-  padding-right: .06em;
+  letter-spacing: -0.085em;
+  padding-right: 0.06em;
 }
 .yalo-desktop-navigation {
   flex: 1;
@@ -112,8 +126,18 @@
 .yalo-desktop-navigation nav > a:last-child:not([aria-current="page"]) {
   display: none;
 }
-.yalo-nav-actions { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
-.yalo-nav-login { color: #d6e1ea; font-size: 13px; font-weight: 650; white-space: nowrap; }
+.yalo-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-shrink: 0;
+}
+.yalo-nav-login {
+  color: #d6e1ea;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
 .yalo-nav-primary,
 .yalo-nav-mobile {
   display: inline-flex;
@@ -128,12 +152,21 @@
   font-size: 13px;
   font-weight: 800;
   box-shadow: 0 7px 25px rgb(18 217 197 / 18%);
-  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease;
   white-space: nowrap;
 }
 .yalo-nav-primary:hover,
-.yalo-nav-mobile:hover { transform: translateY(-2px); filter: brightness(1.07); box-shadow: 0 10px 28px rgb(18 217 197 / 25%); }
-.yalo-nav-mobile { display: none; }
+.yalo-nav-mobile:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.07);
+  box-shadow: 0 10px 28px rgb(18 217 197 / 25%);
+}
+.yalo-nav-mobile {
+  display: none;
+}
 
 .yalo-live-job {
   display: flex;
@@ -146,11 +179,33 @@
   background: rgb(18 217 197 / 7%);
 }
 .yalo-live-job strong,
-.yalo-live-job small { display: block; }
-.yalo-live-job strong { font-size: 13px; }
-.yalo-live-job small { font-size: 12px; color: #9fb4c6; margin-top: 3px; }
-.yalo-live-pulse { width: 10px; height: 10px; flex-shrink: 0; border-radius: 50%; background: #65ec91; box-shadow: 0 0 0 5px rgb(101 236 145 / 12%), 0 0 15px #65ec91; }
-.yalo-live-link { font-size: 12px; font-weight: 700; color: #84e8dd; white-space: nowrap; }
+.yalo-live-job small {
+  display: block;
+}
+.yalo-live-job strong {
+  font-size: 13px;
+}
+.yalo-live-job small {
+  font-size: 12px;
+  color: #9fb4c6;
+  margin-top: 3px;
+}
+.yalo-live-pulse {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #65ec91;
+  box-shadow:
+    0 0 0 5px rgb(101 236 145 / 12%),
+    0 0 15px #65ec91;
+}
+.yalo-live-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: #84e8dd;
+  white-space: nowrap;
+}
 
 .yalo-stage {
   position: relative;
@@ -163,8 +218,15 @@
   overflow: hidden;
   border-radius: 36px;
   border: 1px solid rgb(255 255 255 / 9%);
-  background: radial-gradient(ellipse at 48% 62%, #162a3a 0%, #0c1624 42%, #070d17 85%);
-  box-shadow: inset 0 1px rgb(255 255 255 / 7%), 0 30px 90px rgb(0 0 0 / 20%);
+  background: radial-gradient(
+    ellipse at 48% 62%,
+    #162a3a 0%,
+    #0c1624 42%,
+    #070d17 85%
+  );
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 7%),
+    0 30px 90px rgb(0 0 0 / 20%);
 }
 .yalo-stage::before {
   content: "";
@@ -172,7 +234,14 @@
   z-index: 1;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(90deg, rgb(7 13 23 / 40%), rgb(7 13 23 / 12%) 45%, rgb(7 13 23 / 42%)), linear-gradient(0deg, #080f19 0%, transparent 35%, rgb(8 14 24 / 15%));
+  background:
+    linear-gradient(
+      90deg,
+      rgb(7 13 23 / 40%),
+      rgb(7 13 23 / 12%) 45%,
+      rgb(7 13 23 / 42%)
+    ),
+    linear-gradient(0deg, #080f19 0%, transparent 35%, rgb(8 14 24 / 15%));
 }
 .yalo-stage::after {
   content: "";
@@ -180,17 +249,40 @@
   z-index: 1;
   inset: 0;
   pointer-events: none;
-  opacity: .23;
-  background-image: radial-gradient(rgb(255 255 255 / 30%) .8px, transparent 1.2px);
+  opacity: 0.23;
+  background-image: radial-gradient(
+    rgb(255 255 255 / 30%) 0.8px,
+    transparent 1.2px
+  );
   background-size: 26px 26px;
   mask-image: linear-gradient(90deg, #000, transparent 70%);
 }
-.yalo-stage-backdrop { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.yalo-stage-orb {
-  position: absolute; display: block; border-radius: 50%; filter: blur(54px);
+.yalo-stage-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
-.yalo-stage-orb-one { width: 370px; height: 370px; top: -170px; right: -80px; background: rgb(8 169 244 / 18%); }
-.yalo-stage-orb-two { width: 300px; height: 300px; bottom: -220px; left: 4%; background: rgb(18 217 197 / 15%); }
+.yalo-stage-orb {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  filter: blur(54px);
+}
+.yalo-stage-orb-one {
+  width: 370px;
+  height: 370px;
+  top: -170px;
+  right: -80px;
+  background: rgb(8 169 244 / 18%);
+}
+.yalo-stage-orb-two {
+  width: 300px;
+  height: 300px;
+  bottom: -220px;
+  left: 4%;
+  background: rgb(18 217 197 / 15%);
+}
 .yalo-magnetic-canvas {
   position: absolute;
   z-index: 0;
@@ -198,7 +290,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  opacity: .84;
+  opacity: 0.84;
   pointer-events: none;
   mask-image: radial-gradient(ellipse at 57% 44%, #000 19%, transparent 76%);
 }
@@ -221,12 +313,22 @@
   color: #d8f6f2;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: .155em;
+  letter-spacing: 0.155em;
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
-.yalo-eyebrow-spark { width: 7px; height: 7px; border-radius: 50%; background: #65ec91; box-shadow: 0 0 16px rgb(101 236 145 / 70%); }
-.yalo-eyebrow-arrow { color: #65ec91; font-size: 15px; letter-spacing: 0; }
+.yalo-eyebrow-spark {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #65ec91;
+  box-shadow: 0 0 16px rgb(101 236 145 / 70%);
+}
+.yalo-eyebrow-arrow {
+  color: #65ec91;
+  font-size: 15px;
+  letter-spacing: 0;
+}
 .yalo-stage-title {
   max-width: 900px;
   margin: 25px auto 0;
@@ -235,7 +337,7 @@
   font-size: clamp(2.75rem, 6.3vw, 5.5rem);
   line-height: 1.055;
   font-weight: 780;
-  letter-spacing: -.065em;
+  letter-spacing: -0.065em;
   text-wrap: balance;
 }
 .yalo-stage-title span {
@@ -277,42 +379,100 @@
   box-shadow: none;
   border-radius: 14px;
 }
-.yalo-hero-search .consumer-control svg { color: #526174; }
-.yalo-hero-search .consumer-control input { color: #101827; min-width: 0; }
-.yalo-hero-search .consumer-control input::placeholder { color: #68788a; opacity: 1; }
-.yalo-search-submit {
-  display: inline-flex; align-items: center; justify-content: center; gap: 16px;
-  min-height: 55px; flex-shrink: 0; padding: 0 25px; border: 0; border-radius: 14px;
-  background: linear-gradient(110deg, #08a9f4, #12d9c5 65%, #65ec91);
-  color: #072333; font-size: 14px; font-weight: 800;
-  cursor: pointer;
-  transition: transform 180ms ease, filter 180ms ease;
+.yalo-hero-search .consumer-control svg {
+  color: #526174;
 }
-.yalo-search-submit:hover { transform: translateY(-1px); filter: brightness(1.09); }
+.yalo-hero-search .consumer-control input {
+  color: #101827;
+  min-width: 0;
+}
+.yalo-hero-search .consumer-control input::placeholder {
+  color: #68788a;
+  opacity: 1;
+}
+.yalo-search-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 55px;
+  flex-shrink: 0;
+  padding: 0 25px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #08a9f4, #12d9c5 65%, #65ec91);
+  color: #072333;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
+}
+.yalo-search-submit:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.09);
+}
 .yalo-hero-shortcuts {
-  display: flex; justify-content: center; align-items: center; flex-wrap: wrap;
-  gap: 8px; margin: 19px auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 19px auto 0;
 }
 .yalo-hero-shortcuts > span {
-  color: #8fa6b9; font-size: 11px; font-weight: 600; margin-right: 3px;
+  color: #8fa6b9;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 3px;
 }
 .yalo-hero-shortcuts a {
-  display: inline-flex; align-items: center; gap: 8px;
-  min-height: 38px; padding: 0 14px; border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
   border: 1px solid rgb(255 255 255 / 14%);
   background: rgb(255 255 255 / 5%);
-  color: #ddebf2; font-size: 11px; font-weight: 750;
-  transition: background 180ms ease, border-color 180ms ease;
+  color: #ddebf2;
+  font-size: 11px;
+  font-weight: 750;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease;
 }
-.yalo-hero-shortcuts a:hover { background: rgb(18 217 197 / 13%); border-color: rgb(18 217 197 / 38%); }
-.yalo-hero-shortcuts a span { color: #65ec91; }
+.yalo-hero-shortcuts a:hover {
+  background: rgb(18 217 197 / 13%);
+  border-color: rgb(18 217 197 / 38%);
+}
+.yalo-hero-shortcuts a span {
+  color: #65ec91;
+}
 .yalo-stage-footnote {
-  position: absolute; z-index: 3; left: 36px; right: 36px; bottom: 23px;
-  display: flex; justify-content: space-between; gap: 20px;
-  color: #7d96a9; font-size: 9px; letter-spacing: .18em; font-weight: 750;
+  position: absolute;
+  z-index: 3;
+  left: 36px;
+  right: 36px;
+  bottom: 23px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #7d96a9;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  font-weight: 750;
 }
-.yalo-stage-scroll { display: flex; gap: 15px; align-items: center; }
-.yalo-stage-scroll span { color: #12d9c5; font-size: 19px; }
+.yalo-stage-scroll {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+.yalo-stage-scroll span {
+  color: #12d9c5;
+  font-size: 19px;
+}
 
 .yalo-confidence-bar {
   display: grid;
@@ -323,70 +483,149 @@
   border-block: 1px solid rgb(255 255 255 / 9%);
 }
 .yalo-confidence-bar > span {
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  color: #aebfce; font-size: 12px; line-height: 1.5; font-weight: 650; text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #aebfce;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 650;
+  text-align: center;
 }
 .yalo-confidence-icon {
-  display: inline-grid; place-items: center; width: 25px; height: 25px;
-  flex-shrink: 0; border-radius: 50%;
-  color: #65ec91; background: rgb(18 217 197 / 9%); font-size: 14px;
+  display: inline-grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: #65ec91;
+  background: rgb(18 217 197 / 9%);
+  font-size: 14px;
 }
 
-.yalo-home-section { margin-top: clamp(68px, 9vw, 110px); }
-.yalo-section-heading {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  gap: 24px; margin-bottom: 28px;
+.yalo-home-section {
+  margin-top: clamp(68px, 9vw, 110px);
 }
-.yalo-section-heading > div { min-width: 0; }
+.yalo-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.yalo-section-heading > div {
+  min-width: 0;
+}
 .yalo-section-kicker {
   margin: 0 0 14px;
   color: #74deda;
-  font-size: 10px; line-height: 1.4; font-weight: 800; letter-spacing: .19em;
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 800;
+  letter-spacing: 0.19em;
 }
 .yalo-section-heading h2 {
-  margin: 0; color: #f7f9fc;
+  margin: 0;
+  color: #f7f9fc;
   font-family: var(--font-display);
   font-size: clamp(1.85rem, 3.8vw, 3.4rem);
-  line-height: 1.12; letter-spacing: -.055em; font-weight: 760;
+  line-height: 1.12;
+  letter-spacing: -0.055em;
+  font-weight: 760;
   text-wrap: balance;
 }
-.yalo-period { color: #12d9c5; }
-.yalo-section-description { color: #93a8b9; max-width: 620px; margin: 12px 0 0; font-size: 14px; line-height: 1.65; }
-.yalo-section-link {
-  display: inline-flex; align-items: center; gap: 20px;
-  flex-shrink: 0; min-height: 45px; padding: 0 17px; border-radius: 999px;
-  border: 1px solid rgb(255 255 255 / 16%); background: rgb(255 255 255 / 4%);
-  color: #e2f5f2; font-size: 12px; font-weight: 750; white-space: nowrap;
-  transition: transform 180ms ease, border-color 180ms ease;
+.yalo-period {
+  color: #12d9c5;
 }
-.yalo-section-link:hover { transform: translateY(-2px); border-color: #12d9c5; }
-.yalo-section-link span { color: #65ec91; }
+.yalo-section-description {
+  color: #93a8b9;
+  max-width: 620px;
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.yalo-section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+  min-height: 45px;
+  padding: 0 17px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 16%);
+  background: rgb(255 255 255 / 4%);
+  color: #e2f5f2;
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+.yalo-section-link:hover {
+  transform: translateY(-2px);
+  border-color: #12d9c5;
+}
+.yalo-section-link span {
+  color: #65ec91;
+}
 
 .yalo-category-grid {
-  display: grid; grid-template-columns: repeat(8, minmax(0, 1fr));
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 14px;
 }
-.yalo-category-grid > a { min-width: 0; gap: 13px; }
+.yalo-category-grid > a {
+  min-width: 0;
+  gap: 13px;
+}
 .yalo-category-grid > a > span:first-child {
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 22px;
   background: linear-gradient(150deg, #20334a 0%, #131e2d 95%) !important;
-  box-shadow: inset 0 1px rgb(255 255 255 / 7%), 0 12px 30px rgb(0 0 0 / 15%);
-  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 7%),
+    0 12px 30px rgb(0 0 0 / 15%);
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
 }
-.yalo-category-grid > a:nth-child(3n+2) > span:first-child { background: linear-gradient(150deg, #173e46, #13222c) !important; }
-.yalo-category-grid > a:nth-child(4n+3) > span:first-child { background: linear-gradient(150deg, #234035, #142329) !important; }
+.yalo-category-grid > a:nth-child(3n + 2) > span:first-child {
+  background: linear-gradient(150deg, #173e46, #13222c) !important;
+}
+.yalo-category-grid > a:nth-child(4n + 3) > span:first-child {
+  background: linear-gradient(150deg, #234035, #142329) !important;
+}
 .yalo-category-grid > a:hover > span:first-child {
-  transform: translateY(-5px); border-color: rgb(18 217 197 / 38%);
+  transform: translateY(-5px);
+  border-color: rgb(18 217 197 / 38%);
   box-shadow: 0 18px 38px rgb(0 0 0 / 27%);
 }
-.yalo-category-grid > a > span:last-child { color: #c5d4df; font-size: 12px; line-height: 1.4; }
-.yalo-category-grid svg { color: #baf9e1 !important; }
+.yalo-category-grid > a > span:last-child {
+  color: #c5d4df;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.yalo-category-grid svg {
+  color: #baf9e1 !important;
+}
 
-.yalo-featured-results { min-width: 0; }
-.yalo-featured-results > section > div:first-child { display: none; }
-.yalo-featured-results > section > p { color: #90a6b9; }
-.yalo-featured-results ul { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; }
+.yalo-featured-results {
+  min-width: 0;
+}
+.yalo-featured-results > section > div:first-child {
+  display: none;
+}
+.yalo-featured-results > section > p {
+  color: #90a6b9;
+}
+.yalo-featured-results ul {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 17px;
+}
 .yalo-featured-results .service-card-shell {
   background: #162232 !important;
   border: 1px solid rgb(255 255 255 / 10%);
@@ -397,156 +636,503 @@
   border-color: rgb(18 217 197 / 35%) !important;
   box-shadow: 0 20px 45px rgb(0 0 0 / 28%) !important;
 }
-.yalo-featured-results .service-card-shell .text-ink { color: #f4f8fc; }
-.yalo-featured-results .service-card-shell .text-ink\/70 { color: #a6b8c7; }
-.yalo-featured-results .service-card-shell .text-brand-primary { color: #a1f1dd; }
-.yalo-featured-results .service-card-shell > a { overflow: hidden; }
-.yalo-featured-results .service-card-shell img { transition: transform 450ms ease; }
-.yalo-featured-results .service-card-shell:hover img { transform: scale(1.035); }
-.yalo-empty-copy { color: #99b0c0; font-size: 14px; }
+.yalo-featured-results .service-card-shell .text-ink {
+  color: #f4f8fc;
+}
+.yalo-featured-results .service-card-shell .text-ink\/70 {
+  color: #a6b8c7;
+}
+.yalo-featured-results .service-card-shell .text-brand-primary {
+  color: #a1f1dd;
+}
+.yalo-featured-results .service-card-shell > a {
+  overflow: hidden;
+}
+.yalo-featured-results .service-card-shell img {
+  transition: transform 450ms ease;
+}
+.yalo-featured-results .service-card-shell:hover img {
+  transform: scale(1.035);
+}
+.yalo-empty-copy {
+  color: #99b0c0;
+  font-size: 14px;
+}
 
-.yalo-values-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.yalo-values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
 .yalo-value-card {
-  position: relative; min-width: 0; padding: 27px;
-  border: 1px solid rgb(255 255 255 / 10%); border-radius: 25px;
+  position: relative;
+  min-width: 0;
+  padding: 27px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 25px;
   background: linear-gradient(150deg, rgb(28 44 61 / 80%), rgb(15 27 41 / 95%));
   box-shadow: inset 0 1px rgb(255 255 255 / 5%);
-  transition: border-color 180ms ease, transform 180ms ease;
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
 }
-.yalo-value-card:hover { border-color: rgb(18 217 197 / 30%); transform: translateY(-3px); }
-.yalo-value-top { display: flex; align-items: flex-start; justify-content: space-between; }
-.yalo-value-number { color: #6d889d; font-size: 12px; font-weight: 650; letter-spacing: .13em; }
-.yalo-value-glyph { display: grid; place-items: center; width: 35px; height: 35px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 12px; color: #8ceadb; font-size: 16px; }
-.yalo-value-label { display: inline-block; margin-top: 30px; color: #85e5d9; font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
-.yalo-value-card h3 { margin: 8px 0 0; color: #f5f9fc; font-family: var(--font-display); font-size: clamp(19px, 2vw, 24px); letter-spacing: -.04em; }
-.yalo-value-card p { margin: 10px 0 0; color: #9fb4c6; font-size: 13px; line-height: 1.7; }
-.yalo-how-it-works { margin-top: 28px; }
-.yalo-how-it-works > section { margin-top: 0; }
-.yalo-how-it-works h2 { display: none; }
-.yalo-how-it-works ol { gap: 16px; }
+.yalo-value-card:hover {
+  border-color: rgb(18 217 197 / 30%);
+  transform: translateY(-3px);
+}
+.yalo-value-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.yalo-value-number {
+  color: #6d889d;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+}
+.yalo-value-glyph {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 12px;
+  color: #8ceadb;
+  font-size: 16px;
+}
+.yalo-value-label {
+  display: inline-block;
+  margin-top: 30px;
+  color: #85e5d9;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.yalo-value-card h3 {
+  margin: 8px 0 0;
+  color: #f5f9fc;
+  font-family: var(--font-display);
+  font-size: clamp(19px, 2vw, 24px);
+  letter-spacing: -0.04em;
+}
+.yalo-value-card p {
+  margin: 10px 0 0;
+  color: #9fb4c6;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.yalo-how-it-works {
+  margin-top: 28px;
+}
+.yalo-how-it-works > section {
+  margin-top: 0;
+}
+.yalo-how-it-works h2 {
+  display: none;
+}
+.yalo-how-it-works ol {
+  gap: 16px;
+}
 .yalo-how-it-works li {
   border: 1px solid rgb(255 255 255 / 9%);
   border-radius: 23px;
   background: #172332 !important;
   box-shadow: none;
 }
-.yalo-how-it-works li > span:first-child { display: none; }
-.yalo-how-it-works li h3 { font-family: var(--font-display); font-size: 17px; color: #f8fbff; }
-.yalo-how-it-works li p { color: #98adbf; }
-.yalo-how-it-works li > span:nth-child(2) { background: #123a3c !important; box-shadow: none !important; }
-.yalo-how-it-works li > span:nth-child(2) > span:first-child { display: none; }
+.yalo-how-it-works li > span:first-child {
+  display: none;
+}
+.yalo-how-it-works li h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: #f8fbff;
+}
+.yalo-how-it-works li p {
+  color: #98adbf;
+}
+.yalo-how-it-works li > span:nth-child(2) {
+  background: #123a3c !important;
+  box-shadow: none !important;
+}
+.yalo-how-it-works li > span:nth-child(2) > span:first-child {
+  display: none;
+}
 
 .yalo-final-cta {
-  position: relative; isolation: isolate;
+  position: relative;
+  isolation: isolate;
   margin-top: clamp(74px, 10vw, 120px);
   padding: 75px 20px;
-  border: 1px solid rgb(255 255 255 / 11%); border-radius: 34px; overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 11%);
+  border-radius: 34px;
+  overflow: hidden;
   text-align: center;
-  background: radial-gradient(ellipse 80% 130% at 50% 120%, rgb(12 131 139 / 24%), transparent 75%), #142235;
+  background:
+    radial-gradient(
+      ellipse 80% 130% at 50% 120%,
+      rgb(12 131 139 / 24%),
+      transparent 75%
+    ),
+    #142235;
 }
-.yalo-final-cta-glow { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 130%, rgb(101 236 145 / 12%), transparent 57%); }
-.yalo-final-cta h2 { max-width: 830px; margin: 0 auto; font-family: var(--font-display); font-size: clamp(2rem, 4.8vw, 4.1rem); line-height: 1.12; font-weight: 780; letter-spacing: -.055em; text-wrap: balance; }
-.yalo-final-cta h2 span { display: block; background: linear-gradient(100deg, #80cbfb, #65ec91); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.yalo-final-cta > p:not(.yalo-section-kicker) { margin: 18px 0 0; color: #a7c2ce; font-size: 15px; }
-.yalo-final-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 13px; margin-top: 30px; }
+.yalo-final-cta-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    circle at 50% 130%,
+    rgb(101 236 145 / 12%),
+    transparent 57%
+  );
+}
+.yalo-final-cta h2 {
+  max-width: 830px;
+  margin: 0 auto;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.8vw, 4.1rem);
+  line-height: 1.12;
+  font-weight: 780;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+.yalo-final-cta h2 span {
+  display: block;
+  background: linear-gradient(100deg, #80cbfb, #65ec91);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.yalo-final-cta > p:not(.yalo-section-kicker) {
+  margin: 18px 0 0;
+  color: #a7c2ce;
+  font-size: 15px;
+}
+.yalo-final-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 13px;
+  margin-top: 30px;
+}
 .yalo-button-light,
 .yalo-button-outline {
-  display: inline-flex; justify-content: center; align-items: center; gap: 35px;
-  min-height: 54px; padding: 0 25px; border-radius: 999px; font-size: 13px; font-weight: 800;
-  transition: transform 180ms ease, filter 180ms ease;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 35px;
+  min-height: 54px;
+  padding: 0 25px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
 }
-.yalo-button-light { background: linear-gradient(105deg, #08a9f4, #12d9c5, #65ec91); color: #072333; }
-.yalo-button-outline { border: 1px solid rgb(255 255 255 / 25%); color: #f5faff; background: rgb(255 255 255 / 5%); }
+.yalo-button-light {
+  background: linear-gradient(105deg, #08a9f4, #12d9c5, #65ec91);
+  color: #072333;
+}
+.yalo-button-outline {
+  border: 1px solid rgb(255 255 255 / 25%);
+  color: #f5faff;
+  background: rgb(255 255 255 / 5%);
+}
 .yalo-button-light:hover,
-.yalo-button-outline:hover { transform: translateY(-2px); filter: brightness(1.08); }
-.yalo-showcase-footer { border-color: rgb(255 255 255 / 11%) !important; color: #91aabd !important; margin-top: 32px !important; padding: 30px 0 15px !important; }
+.yalo-button-outline:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+.yalo-showcase-footer {
+  border-color: rgb(255 255 255 / 11%) !important;
+  color: #91aabd !important;
+  margin-top: 32px !important;
+  padding: 30px 0 15px !important;
+}
 .yalo-showcase-footer span,
-.yalo-showcase-footer a { color: #b2c5d2 !important; }
-.yalo-showcase-footer a:hover { color: #fff !important; }
-.yalo-showcase-footer .brand-mark { background-color: #0d121b; }
+.yalo-showcase-footer a {
+  color: #b2c5d2 !important;
+}
+.yalo-showcase-footer a:hover {
+  color: #fff !important;
+}
+.yalo-showcase-footer .brand-mark {
+  background-color: #0d121b;
+}
 
 @media (max-width: 1100px) {
-  .yalo-desktop-navigation nav > a { padding-inline: 8px; font-size: 12px; }
-  .yalo-category-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .yalo-featured-results ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .yalo-desktop-navigation nav > a {
+    padding-inline: 8px;
+    font-size: 12px;
+  }
+  .yalo-category-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .yalo-featured-results ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 950px) {
-  .yalo-desktop-navigation { display: none; }
-  .yalo-nav-actions { margin-left: auto; }
-  .yalo-stage { min-height: 600px; }
-  .yalo-stage-title { font-size: clamp(2.65rem, 7.7vw, 4.3rem); }
+  .yalo-desktop-navigation {
+    display: none;
+  }
+  .yalo-nav-actions {
+    margin-left: auto;
+  }
+  .yalo-stage {
+    min-height: 600px;
+  }
+  .yalo-stage-title {
+    font-size: clamp(2.65rem, 7.7vw, 4.3rem);
+  }
 }
 
 @media (max-width: 640px) {
-  .yalo-showcase { padding-bottom: 0; }
-  .yalo-showcase .yalo-shell { width: calc(100% - 24px); }
+  .yalo-showcase {
+    padding-bottom: 0;
+  }
+  .yalo-showcase .yalo-shell {
+    width: calc(100% - 24px);
+  }
   .yalo-glass-nav {
-    min-height: 62px; padding: 7px 9px 7px 11px;
-    margin-top: 8px; gap: 8px; border-radius: 22px;
+    min-height: 62px;
+    padding: 7px 9px 7px 11px;
+    margin-top: 8px;
+    gap: 8px;
+    border-radius: 22px;
     top: max(8px, env(safe-area-inset-top));
   }
-  .yalo-header-symbol { width: 37px; height: 37px; border-radius: 11px; }
-  .yalo-header-symbol img { width: 29px; height: 29px; }
-  .yalo-header-wordmark { font-size: 1.24rem; }
-  .yalo-nav-actions { display: none; }
-  .yalo-nav-mobile { display: inline-flex; margin-left: auto; min-height: 41px; padding: 0 13px; font-size: 12px; gap: 9px; }
-  .yalo-live-job { gap: 10px; padding: 11px; }
-  .yalo-live-link { font-size: 11px; }
+  .yalo-header-symbol {
+    width: 37px;
+    height: 37px;
+    border-radius: 11px;
+  }
+  .yalo-header-symbol img {
+    width: 29px;
+    height: 29px;
+  }
+  .yalo-header-wordmark {
+    font-size: 1.24rem;
+  }
+  .yalo-nav-actions {
+    display: none;
+  }
+  .yalo-nav-mobile {
+    display: inline-flex;
+    margin-left: auto;
+    min-height: 41px;
+    padding: 0 13px;
+    font-size: 12px;
+    gap: 9px;
+  }
+  .yalo-live-job {
+    gap: 10px;
+    padding: 11px;
+  }
+  .yalo-live-link {
+    font-size: 11px;
+  }
   .yalo-stage {
-    min-height: 610px; margin-top: 12px; border-radius: 25px;
+    min-height: 610px;
+    margin-top: 12px;
+    border-radius: 25px;
     padding: 22px 8px 37px;
   }
-  .yalo-stage-copy { width: 100%; margin: 10px auto 40px; padding-inline: 10px; }
-  .yalo-hero-eyebrow { padding: 10px 12px; font-size: 9px; gap: 7px; letter-spacing: .10em; }
-  .yalo-stage-title { margin-top: 22px; font-size: clamp(2.15rem, 9.5vw, 3.25rem); line-height: 1.085; letter-spacing: -.06em; }
-  .yalo-stage-description { margin-top: 17px; font-size: 14px; line-height: 1.6; max-width: 330px; }
-  .yalo-magnetic-canvas { display: none; }
-  .yalo-stage-orb-one { right: -180px; top: -40px; filter: blur(45px); }
-  .yalo-stage-orb-two { bottom: -150px; left: -100px; }
-  .yalo-hero-search { flex-direction: column; margin-top: 27px; padding: 7px; gap: 7px; border-radius: 19px; }
-  .yalo-hero-search .consumer-control { width: 100%; min-height: 53px; border-radius: 13px; }
-  .yalo-search-submit { width: 100%; min-height: 51px; }
-  .yalo-hero-shortcuts { gap: 7px; margin-top: 17px; }
-  .yalo-hero-shortcuts > span { width: 100%; }
-  .yalo-hero-shortcuts a { min-height: 35px; padding-inline: 11px; font-size: 10px; }
-  .yalo-stage-footnote { left: 20px; right: 20px; bottom: 16px; justify-content: center; text-align: center; font-size: 8px; }
-  .yalo-stage-footnote > span:first-child { display: none; }
-  .yalo-confidence-bar { grid-template-columns: 1fr; gap: 14px; padding: 19px 8px; }
-  .yalo-confidence-bar > span { justify-content: flex-start; font-size: 12px; text-align: left; }
-  .yalo-home-section { margin-top: 65px; }
-  .yalo-section-heading { align-items: flex-start; flex-direction: column; gap: 16px; margin-bottom: 22px; }
-  .yalo-section-heading h2 { font-size: 2rem; }
-  .yalo-section-link { min-height: 40px; font-size: 11px; padding-inline: 15px; }
-  .yalo-category-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-  .yalo-category-grid > a > span:first-child { border-radius: 16px; }
-  .yalo-category-grid > a > span:last-child { font-size: 10px; line-height: 1.35; min-height: 2.3em; }
-  .yalo-category-grid svg { width: 28px; height: 28px; }
-  .yalo-featured-results ul { grid-template-columns: minmax(0, 1fr); gap: 14px; }
-  .yalo-values-grid { grid-template-columns: 1fr; gap: 12px; }
-  .yalo-value-card { padding: 22px; border-radius: 20px; }
-  .yalo-value-label { margin-top: 15px; }
-  .yalo-how-it-works ol { grid-template-columns: 1fr; }
-  .yalo-final-cta { margin-top: 70px; padding: 52px 18px; border-radius: 25px; }
-  .yalo-final-cta h2 { font-size: 2.15rem; }
-  .yalo-final-actions { flex-direction: column; }
-  .yalo-button-light, .yalo-button-outline { width: 100%; gap: 15px; }
-  .yalo-showcase-footer { justify-content: center; text-align: center; }
+  .yalo-stage-copy {
+    width: 100%;
+    margin: 10px auto 40px;
+    padding-inline: 10px;
+  }
+  .yalo-hero-eyebrow {
+    padding: 10px 12px;
+    font-size: 9px;
+    gap: 7px;
+    letter-spacing: 0.1em;
+  }
+  .yalo-stage-title {
+    margin-top: 22px;
+    font-size: clamp(2.15rem, 9.5vw, 3.25rem);
+    line-height: 1.085;
+    letter-spacing: -0.06em;
+  }
+  .yalo-stage-description {
+    margin-top: 17px;
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 330px;
+  }
+  .yalo-magnetic-canvas {
+    display: none;
+  }
+  .yalo-stage-orb-one {
+    right: -180px;
+    top: -40px;
+    filter: blur(45px);
+  }
+  .yalo-stage-orb-two {
+    bottom: -150px;
+    left: -100px;
+  }
+  .yalo-hero-search {
+    flex-direction: column;
+    margin-top: 27px;
+    padding: 7px;
+    gap: 7px;
+    border-radius: 19px;
+  }
+  .yalo-hero-search .consumer-control {
+    width: 100%;
+    min-height: 53px;
+    border-radius: 13px;
+  }
+  .yalo-search-submit {
+    width: 100%;
+    min-height: 51px;
+  }
+  .yalo-hero-shortcuts {
+    gap: 7px;
+    margin-top: 17px;
+  }
+  .yalo-hero-shortcuts > span {
+    width: 100%;
+  }
+  .yalo-hero-shortcuts a {
+    min-height: 35px;
+    padding-inline: 11px;
+    font-size: 10px;
+  }
+  .yalo-stage-footnote {
+    left: 20px;
+    right: 20px;
+    bottom: 16px;
+    justify-content: center;
+    text-align: center;
+    font-size: 8px;
+  }
+  .yalo-stage-footnote > span:first-child {
+    display: none;
+  }
+  .yalo-confidence-bar {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 19px 8px;
+  }
+  .yalo-confidence-bar > span {
+    justify-content: flex-start;
+    font-size: 12px;
+    text-align: left;
+  }
+  .yalo-home-section {
+    margin-top: 65px;
+  }
+  .yalo-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .yalo-section-heading h2 {
+    font-size: 2rem;
+  }
+  .yalo-section-link {
+    min-height: 40px;
+    font-size: 11px;
+    padding-inline: 15px;
+  }
+  .yalo-category-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .yalo-category-grid > a > span:first-child {
+    border-radius: 16px;
+  }
+  .yalo-category-grid > a > span:last-child {
+    font-size: 10px;
+    line-height: 1.35;
+    min-height: 2.3em;
+  }
+  .yalo-category-grid svg {
+    width: 28px;
+    height: 28px;
+  }
+  .yalo-featured-results ul {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .yalo-values-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .yalo-value-card {
+    padding: 22px;
+    border-radius: 20px;
+  }
+  .yalo-value-label {
+    margin-top: 15px;
+  }
+  .yalo-how-it-works ol {
+    grid-template-columns: 1fr;
+  }
+  .yalo-final-cta {
+    margin-top: 70px;
+    padding: 52px 18px;
+    border-radius: 25px;
+  }
+  .yalo-final-cta h2 {
+    font-size: 2.15rem;
+  }
+  .yalo-final-actions {
+    flex-direction: column;
+  }
+  .yalo-button-light,
+  .yalo-button-outline {
+    width: 100%;
+    gap: 15px;
+  }
+  .yalo-showcase-footer {
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 @media (max-width: 360px) {
-  .yalo-stage { min-height: 635px; }
-  .yalo-stage-title { font-size: 2.1rem; }
-  .yalo-stage-copy { padding-inline: 4px; }
-  .yalo-hero-shortcuts a { font-size: 10px; padding: 0 9px; }
-  .yalo-nav-mobile { padding: 0 10px; }
+  .yalo-stage {
+    min-height: 635px;
+  }
+  .yalo-stage-title {
+    font-size: 2.1rem;
+  }
+  .yalo-stage-copy {
+    padding-inline: 4px;
+  }
+  .yalo-hero-shortcuts a {
+    font-size: 10px;
+    padding: 0 9px;
+  }
+  .yalo-nav-mobile {
+    padding: 0 10px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .yalo-showcase *, .yalo-showcase *::before, .yalo-showcase *::after {
+  .yalo-showcase *,
+  .yalo-showcase *::before,
+  .yalo-showcase *::after {
     animation: none !important;
     transition-duration: 0ms !important;
     scroll-behavior: auto !important;
   }
-  .yalo-magnetic-canvas { display: none !important; }
+  .yalo-magnetic-canvas {
+    display: none !important;
+  }
+}
+
+/* Public home keeps the app bottom navigation on phones only. */
+@media (min-width: 641px) {
+  .yalo-mobile-bottom-nav {
+    display: none;
+  }
 }

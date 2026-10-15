@@ -144,5 +144,11 @@ export function MagneticRibbons() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} aria-hidden="true" className="yalo-magnetic-canvas" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="yalo-magnetic-canvas"
+    />
+  );
 }

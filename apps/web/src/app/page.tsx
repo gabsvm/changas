@@ -15,7 +15,10 @@ import { SearchField } from "@/components/ui/marketplace/search-field";
 import { SiteFooter } from "@/components/ui/site-footer";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { listMyUpcomingJobs, type UpcomingJob } from "@/lib/jobs/server";
-import { JOB_TERMINAL_STATUSES, getJobStatusPresentation } from "@/lib/ui/job-status";
+import {
+  JOB_TERMINAL_STATUSES,
+  getJobStatusPresentation,
+} from "@/lib/ui/job-status";
 import { getJobTracking } from "@/components/jobs/job-tracking";
 import { createClient } from "@/lib/supabase/server";
 
@@ -52,7 +55,9 @@ export default async function HomePage() {
   const filters = parseDiscoveryFilters({ pageSize: "6" });
   const supabase = await createClient();
   const [
-    { data: { user } },
+    {
+      data: { user },
+    },
     { data: categories },
     discovery,
   ] = await Promise.all([
@@ -91,16 +96,30 @@ export default async function HomePage() {
   }
 
   const heroJob = activeJobs[0] ?? null;
-  const heroTracking = heroJob ? getJobTracking(heroJob.job_status, null) : null;
-  const heroStatus = heroJob ? getJobStatusPresentation(heroJob.job_status) : null;
+  const heroTracking = heroJob
+    ? getJobTracking(heroJob.job_status, null)
+    : null;
+  const heroStatus = heroJob
+    ? getJobStatusPresentation(heroJob.job_status)
+    : null;
 
   return (
     <main id="main-content" className="yalo-showcase mobile-content-with-nav">
       <div className="yalo-shell">
         <header className="yalo-glass-nav">
-          <Link href="/" className="yalo-header-brand" aria-label="YALO, inicio">
+          <Link
+            href="/"
+            className="yalo-header-brand"
+            aria-label="YALO, inicio"
+          >
             <span className="yalo-header-symbol">
-              <Image src="/brand/yalo-symbol.svg" width={35} height={35} alt="" priority />
+              <Image
+                src="/brand/yalo-symbol.svg"
+                width={35}
+                height={35}
+                alt=""
+                priority
+              />
             </span>
             <span className="yalo-header-wordmark">YALO</span>
           </Link>
@@ -133,7 +152,11 @@ export default async function HomePage() {
           <Link
             href={"/jobs/" + heroJob.job_id}
             className="yalo-live-job"
-            aria-label={"Servicio en marcha: " + heroJob.service_title + ". Ver seguimiento."}
+            aria-label={
+              "Servicio en marcha: " +
+              heroJob.service_title +
+              ". Ver seguimiento."
+            }
           >
             <span className="yalo-live-pulse" aria-hidden="true" />
             <span className="min-w-0 flex-1">
@@ -142,7 +165,9 @@ export default async function HomePage() {
                   ? "Tenés " + activeJobs.length + " servicios en marcha"
                   : "Tenés un servicio en marcha"}
               </strong>
-              <small>{heroJob.service_title} · {heroStatus.label}</small>
+              <small>
+                {heroJob.service_title} · {heroStatus.label}
+              </small>
             </span>
             <span className="yalo-live-link">Ver seguimiento ↗</span>
           </Link>
@@ -158,15 +183,17 @@ export default async function HomePage() {
             <div className="yalo-hero-eyebrow">
               <span className="yalo-eyebrow-spark" aria-hidden="true" />
               TRABAJÁ · CONTRATÁ · CRECÉ
-              <span className="yalo-eyebrow-arrow" aria-hidden="true">↗</span>
+              <span className="yalo-eyebrow-arrow" aria-hidden="true">
+                ↗
+              </span>
             </div>
             <h1 id="home-search-title" className="yalo-stage-title">
               Lo que necesitás.
               <span>Alguien que sabe hacerlo.</span>
             </h1>
             <p className="yalo-stage-description">
-              De arreglar una canilla a lanzar tu próximo proyecto.
-              Encontrá personas que saben, hablá directo y resolvé a tu manera.
+              De arreglar una canilla a lanzar tu próximo proyecto. Encontrá
+              personas que saben, hablá directo y resolvé a tu manera.
             </p>
 
             <form action="/buscar" role="search" className="yalo-hero-search">
@@ -181,31 +208,60 @@ export default async function HomePage() {
               </button>
             </form>
 
-            <div className="yalo-hero-shortcuts" role="group" aria-label="Explorar servicios">
+            <div
+              className="yalo-hero-shortcuts"
+              role="group"
+              aria-label="Explorar servicios"
+            >
               <span>Explorá por</span>
-              <Link href="/buscar?mode=presencial">Presencial <span aria-hidden="true">↗</span></Link>
-              <Link href="/buscar?mode=remoto">Remoto <span aria-hidden="true">↗</span></Link>
-              <Link href="/buscar?offers=true">Con ofertas <span aria-hidden="true">↗</span></Link>
+              <Link href="/buscar?mode=presencial">
+                Presencial <span aria-hidden="true">↗</span>
+              </Link>
+              <Link href="/buscar?mode=remoto">
+                Remoto <span aria-hidden="true">↗</span>
+              </Link>
+              <Link href="/buscar?offers=true">
+                Con ofertas <span aria-hidden="true">↗</span>
+              </Link>
             </div>
           </div>
 
           <div className="yalo-stage-footnote" aria-hidden="true">
             <span>PERSONAS + HABILIDADES + OPORTUNIDADES</span>
-            <span className="yalo-stage-scroll">DESCUBRÍ YALO <span>↓</span></span>
+            <span className="yalo-stage-scroll">
+              DESCUBRÍ YALO <span>↓</span>
+            </span>
           </div>
         </section>
 
-        <section className="yalo-confidence-bar" aria-label="Por qué elegir YALO">
-          <span><span className="yalo-confidence-icon">✓</span> Perfiles con identidad verificada</span>
-          <span><span className="yalo-confidence-icon">↗</span> Conversá sin intermediarios</span>
-          <span><span className="yalo-confidence-icon">✦</span> Reseñas de trabajos reales</span>
+        <section
+          className="yalo-confidence-bar"
+          aria-label="Por qué elegir YALO"
+        >
+          <span>
+            <span className="yalo-confidence-icon">✓</span> Perfiles con
+            identidad verificada
+          </span>
+          <span>
+            <span className="yalo-confidence-icon">↗</span> Conversá sin
+            intermediarios
+          </span>
+          <span>
+            <span className="yalo-confidence-icon">✦</span> Reseñas de trabajos
+            reales
+          </span>
         </section>
 
-        <section className="yalo-home-section yalo-category-section" aria-labelledby="categories-title">
+        <section
+          className="yalo-home-section yalo-category-section"
+          aria-labelledby="categories-title"
+        >
           <div className="yalo-section-heading">
             <div>
               <p className="yalo-section-kicker">ENCONTRÁ TU SOLUCIÓN</p>
-              <h2 id="categories-title">¿Qué hacemos hoy<span className="yalo-period">?</span></h2>
+              <h2 id="categories-title">
+                ¿Qué hacemos hoy<span className="yalo-period">?</span>
+              </h2>
               <p className="yalo-section-description">
                 Desde algo puntual hasta ese proyecto que venís postergando.
               </p>
@@ -224,17 +280,24 @@ export default async function HomePage() {
                 icon={category.slug}
               />
             ))}
-            {(!categories || categories.length === 0) ? (
-              <p className="yalo-empty-copy">Explorá los servicios disponibles en YALO.</p>
+            {!categories || categories.length === 0 ? (
+              <p className="yalo-empty-copy">
+                Explorá los servicios disponibles en YALO.
+              </p>
             ) : null}
           </div>
         </section>
 
-        <section className="yalo-home-section yalo-featured-section" aria-labelledby="featured-title">
+        <section
+          className="yalo-home-section yalo-featured-section"
+          aria-labelledby="featured-title"
+        >
           <div className="yalo-section-heading">
             <div>
               <p className="yalo-section-kicker">PERSONAS QUE HACEN</p>
-              <h2 id="featured-title">Talento para lo que venga<span className="yalo-period">.</span></h2>
+              <h2 id="featured-title">
+                Talento para lo que venga<span className="yalo-period">.</span>
+              </h2>
               <p className="yalo-section-description">
                 Mirá perfiles, compará propuestas y elegí con información.
               </p>
@@ -246,7 +309,8 @@ export default async function HomePage() {
           <div className="yalo-featured-results">
             {discovery.error ? (
               <p role="status" className="yalo-empty-copy">
-                La búsqueda está momentáneamente en mantenimiento. Probá de nuevo más tarde.
+                La búsqueda está momentáneamente en mantenimiento. Probá de
+                nuevo más tarde.
               </p>
             ) : discovery.rows.length > 0 ? (
               <NearbyServiceRail
@@ -256,17 +320,27 @@ export default async function HomePage() {
               />
             ) : (
               <ExampleServices
-                publishHref={user ? "/provider/onboarding" : "/login?next=/provider/onboarding"}
+                publishHref={
+                  user
+                    ? "/provider/onboarding"
+                    : "/login?next=/provider/onboarding"
+                }
               />
             )}
           </div>
         </section>
 
-        <section className="yalo-home-section yalo-values" aria-labelledby="values-title">
+        <section
+          className="yalo-home-section yalo-values"
+          aria-labelledby="values-title"
+        >
           <div className="yalo-section-heading">
             <div>
               <p className="yalo-section-kicker">ASÍ DE SIMPLE</p>
-              <h2 id="values-title">Un buen contacto cambia todo<span className="yalo-period">.</span></h2>
+              <h2 id="values-title">
+                Un buen contacto cambia todo
+                <span className="yalo-period">.</span>
+              </h2>
             </div>
           </div>
           <div className="yalo-values-grid">
@@ -274,7 +348,9 @@ export default async function HomePage() {
               <article key={benefit.number} className="yalo-value-card">
                 <div className="yalo-value-top">
                   <span className="yalo-value-number">{benefit.number} /</span>
-                  <span className="yalo-value-glyph" aria-hidden="true">↗</span>
+                  <span className="yalo-value-glyph" aria-hidden="true">
+                    ↗
+                  </span>
                 </div>
                 <span className="yalo-value-label">{benefit.detail}</span>
                 <h3>{benefit.title}</h3>
@@ -282,7 +358,9 @@ export default async function HomePage() {
               </article>
             ))}
           </div>
-          <div className="yalo-how-it-works"><HowItWorks /></div>
+          <div className="yalo-how-it-works">
+            <HowItWorks />
+          </div>
         </section>
 
         <section className="yalo-final-cta" aria-labelledby="final-cta-title">
@@ -304,7 +382,9 @@ export default async function HomePage() {
         </section>
         <SiteFooter className="yalo-showcase-footer" />
       </div>
-      <BottomNav authenticated={Boolean(user)} />
+      <div className="yalo-mobile-bottom-nav">
+        <BottomNav authenticated={Boolean(user)} />
+      </div>
     </main>
   );
 }
