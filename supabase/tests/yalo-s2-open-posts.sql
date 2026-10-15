@@ -4,7 +4,7 @@
 -- Todo hace rollback al final del archivo.
 begin;
 
-select plan(69);
+select plan(74);
 
 -- Estructura: tablas y columnas.
 select ok(
@@ -661,6 +661,58 @@ select ok(
   ) is not null,
   'provider quotes on the bound thread'
 );
+-- Segundo candidato real. Preparar DOS ofertas antes de adjudicar la
+-- primera; la segunda no podra contratar cuando el post quede HIRED.
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data
+) values (
+  '00000000-0000-0000-0000-000000000000',
+  '16000000-0000-4000-8000-000000000003',
+  'authenticated', 'authenticated', 's2-second-provider@example.test',
+  'not-a-real-password', now(), now(), now(), '{}', '{"display_name":"Second Provider"}'
+);
+insert into public.provider_profiles (
+  user_id, status, onboarding_step, public_slug, public_headline
+) values (
+  '16000000-0000-4000-8000-000000000003',
+  'ACTIVE', 4, 's2-provider-second', 'Second candidate'
+);
+insert into public.services (
+  id, provider_user_id, skill_id, public_slug, title, description,
+  modality, price_model, price_amount, currency_code, accepts_offers,
+  schedule_type, is_published
+)
+select
+  '16000000-0000-4000-8000-000000000013',
+  '16000000-0000-4000-8000-000000000003',
+  s.skill_id, 's2-service-third', 'S2 third service',
+  'Second candidate for a race on one open need.',
+  'REMOTE', 'FIXED', 120000, 'ARS', false, 'UNSCHEDULED', true
+from public.services s
+where s.id = '16000000-0000-4000-8000-000000000010';
+
+select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000003', true);
+select ok(
+  public.start_post_offer_conversation(
+    (select id from public.job_posts
+     where idempotency_key = '16000000-0000-4000-8000-0000000000d1'),
+    '16000000-0000-4000-8000-000000000013'
+  ) is not null,
+  'second candidate can enter while post is still OPEN'
+);
+select ok(
+  public.create_conversation_proposal(
+    (select id from public.conversations
+     where job_post_id = (select id from public.job_posts
+       where idempotency_key = '16000000-0000-4000-8000-0000000000d1')
+       and provider_user_id = '16000000-0000-4000-8000-000000000003'),
+    'PROVIDER_QUOTE', null, 120000, null, null, null, null,
+    '16000000-0000-4000-8000-0000000000d3'
+  ) is not null,
+  'second candidate submits independent priced offer'
+);
+
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
 select is(
   public.respond_to_proposal(
@@ -685,6 +737,30 @@ select ok(
       and event_type = 'AUTO_HIRED_ON_HIRE'
   ),
   'hiring announces itself on the post'
+);
+-- La segunda aceptacion, incluso tras refrescar, NO crea un segundo job.
+select throws_ok(
+  $$select public.respond_to_proposal(
+    (select id from public.proposals
+     where idempotency_key = '16000000-0000-4000-8000-0000000000d3'),
+    'ACCEPT')$$,
+  '40001', 'post already awarded or no longer open',
+  'second candidate cannot be awarded the same one-slot need'
+);
+select is(
+  (select count(*)::integer from public.jobs j
+   join public.conversations c on c.id = j.conversation_id
+   join public.job_posts jp on jp.id = c.job_post_id
+   where jp.idempotency_key = '16000000-0000-4000-8000-0000000000d1'),
+  1,
+  'one-slot need has exactly one real job'
+);
+select is(
+  (select count(*)::integer from public.job_post_awards a
+   join public.job_posts jp on jp.id = a.job_post_id
+   where jp.idempotency_key = '16000000-0000-4000-8000-0000000000d1'),
+  1,
+  'unique award ledger contains one winner'
 );
 select * from finish();
 rollback;
