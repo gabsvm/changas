@@ -13,13 +13,9 @@ export type ExternalPaymentState =
   | "VOIDED";
 
 export type ExternalPaymentMethod =
-  | "EFECTIVO"
-  | "TRANSFERENCIA"
-  | "OTRO_ACORDADO";
+  "EFECTIVO" | "TRANSFERENCIA" | "OTRO_ACORDADO";
 
-export function externalPaymentStateLabel(
-  state: ExternalPaymentState,
-): string {
+export function externalPaymentStateLabel(state: ExternalPaymentState): string {
   switch (state) {
     case "DECLARED_BY_CLIENT":
       return "Declarado por cliente";

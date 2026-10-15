@@ -19,7 +19,9 @@ function formatPaidOn(paidOn: string | null): string {
   if (!paidOn) return "sin fecha informada";
   const parsed = new Date(`${paidOn}T12:00:00`);
   if (Number.isNaN(parsed.getTime())) return paidOn;
-  return new Intl.DateTimeFormat("es-AR", { dateStyle: "medium" }).format(parsed);
+  return new Intl.DateTimeFormat("es-AR", { dateStyle: "medium" }).format(
+    parsed,
+  );
 }
 
 export function ExternalMoneySection({
@@ -80,8 +82,8 @@ export function ExternalMoneySection({
         Estado: {externalMoneyStatusLabel(ledger)}
       </p>
       <p className="text-ink/70 text-xs leading-5">
-        Pueden acordar efectivo o transferencia directamente. YALO no recibe
-        ni custodia el dinero; lo declarado acá no está verificado por YALO.
+        Pueden acordar efectivo o transferencia directamente. YALO no recibe ni
+        custodia el dinero; lo declarado acá no está verificado por YALO.
       </p>
 
       {pending.map((declaration) => {
@@ -148,10 +150,10 @@ export function ExternalMoneySection({
                         maxLength={1000}
                         rows={2}
                         placeholder="Contá qué pasó"
-                        className="mt-1 w-full rounded-xl border border-ink/15 px-3 py-2 text-sm font-normal"
+                        className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2 text-sm font-normal"
                       />
                     </label>
-                    <button className="consumer-pressable inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-ink/15 px-4 text-sm font-bold">
+                    <button className="consumer-pressable border-ink/15 inline-flex min-h-11 w-full items-center justify-center rounded-xl border px-4 text-sm font-bold">
                       Marcar desacuerdo
                     </button>
                   </form>
@@ -165,7 +167,7 @@ export function ExternalMoneySection({
                   name="declarationId"
                   value={declaration.id}
                 />
-                <button className="consumer-pressable text-ink/70 inline-flex min-h-10 items-center rounded-xl px-3 text-[13px] font-bold hover:bg-ink/[0.045]">
+                <button className="consumer-pressable text-ink/70 hover:bg-ink/[0.045] inline-flex min-h-10 items-center rounded-xl px-3 text-[13px] font-bold">
                   Anular esta declaración
                 </button>
               </form>
@@ -178,12 +180,15 @@ export function ExternalMoneySection({
         <summary className="consumer-pressable min-h-[52px] cursor-pointer px-4 py-3 text-sm font-bold">
           {isClient ? "Informar que pagué" : "Registrar dinero recibido"}
         </summary>
-        <form action={declareExternalPaymentAction} className="grid gap-3 p-4 pt-0">
+        <form
+          action={declareExternalPaymentAction}
+          className="grid gap-3 p-4 pt-0"
+        >
           <input type="hidden" name="jobId" value={jobId} />
           <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
           <p className="text-ink/70 text-xs leading-5">
-            Esta declaración se envía a la otra parte; todavía no significa
-            que esté confirmada.
+            Esta declaración se envía a la otra parte; todavía no significa que
+            esté confirmada.
           </p>
           <label className="text-[13px] font-bold">
             Monto en ARS
@@ -192,7 +197,7 @@ export function ExternalMoneySection({
               required
               inputMode="decimal"
               defaultValue={(defaultAmountMinor / 100).toLocaleString("es-AR")}
-              className="mt-1 w-full rounded-xl border border-ink/15 px-3 py-2.5 text-sm font-normal"
+              className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal"
             />
           </label>
           <label className="text-[13px] font-bold">
@@ -201,7 +206,7 @@ export function ExternalMoneySection({
               name="method"
               required
               defaultValue="TRANSFERENCIA"
-              className="mt-1 w-full rounded-xl border border-ink/15 px-3 py-2.5 text-sm font-normal"
+              className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal"
             >
               {METHOD_OPTIONS.map((method) => (
                 <option key={method} value={method}>
@@ -215,7 +220,7 @@ export function ExternalMoneySection({
             <input
               name="paidOn"
               type="date"
-              className="mt-1 w-full rounded-xl border border-ink/15 px-3 py-2.5 text-sm font-normal"
+              className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal"
             />
           </label>
           <label className="text-[13px] font-bold">
@@ -224,7 +229,7 @@ export function ExternalMoneySection({
               name="reference"
               maxLength={140}
               placeholder="Ej: comprobante 1234"
-              className="mt-1 w-full rounded-xl border border-ink/15 px-3 py-2.5 text-sm font-normal"
+              className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal"
             />
           </label>
           <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
@@ -238,11 +243,15 @@ export function ExternalMoneySection({
           <p className="text-[13px] font-extrabold">Historial</p>
           <ul className="mt-1 flex flex-col gap-1.5">
             {declarations.map((declaration) => (
-              <li key={declaration.id} className="text-ink/70 text-[13px] leading-5">
+              <li
+                key={declaration.id}
+                className="text-ink/70 text-[13px] leading-5"
+              >
                 {formatMinorUnits(declaration.amount_minor, "ARS")} ·{" "}
                 {externalPaymentMethodLabel(declaration.method)} ·{" "}
                 {externalPaymentStateLabel(declaration.state)}
-                {declaration.state === "CONTESTED" && declaration.counterpart_reason
+                {declaration.state === "CONTESTED" &&
+                declaration.counterpart_reason
                   ? ` · Motivo: ${declaration.counterpart_reason}`
                   : ""}
               </li>
