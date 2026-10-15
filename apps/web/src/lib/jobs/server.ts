@@ -64,6 +64,8 @@ export type UpcomingJob = {
 };
 
 export type JobDetail = {
+  /** Schema capability: false on the legacy production DB before S3. */
+  delivery_flow_available: boolean;
   confirmation_code: string | null;
   delivery_submitted_at: string | null;
   delivery_summary: string | null;
@@ -490,6 +492,7 @@ export async function getJobDetail(jobId: string): Promise<JobDetail> {
       : 0;
   return {
     ...row,
+    delivery_flow_available: Object.prototype.hasOwnProperty.call(row, "delivery_submitted_at"),
     confirmation_code:
       typeof row.confirmation_code === "string" &&
       row.confirmation_code.length > 0
