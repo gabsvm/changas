@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import "./yalo-showcase.css";
 import type { Metadata } from "next";
@@ -99,7 +100,7 @@ export default async function HomePage() {
         <header className="yalo-glass-nav">
           <Link href="/" className="yalo-header-brand" aria-label="YALO, inicio">
             <span className="yalo-header-symbol">
-              <img src="/brand/yalo-symbol.svg" width={35} height={35} alt="" />
+              <Image src="/brand/yalo-symbol.svg" width={35} height={35} alt="" priority />
             </span>
             <span className="yalo-header-wordmark">YALO</span>
           </Link>
