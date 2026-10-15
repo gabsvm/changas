@@ -69,6 +69,7 @@ export type JobDetail = {
   confirmation_code: string | null;
   delivery_submitted_at: string | null;
   delivery_summary: string | null;
+  delivery_evidence_url: string | null;
   handover_verified_at: string | null;
   correction_count: number;
   job_id: string;
@@ -515,6 +516,11 @@ export async function getJobDetail(jobId: string): Promise<JobDetail> {
       row.delivery_summary.length > 0
         ? row.delivery_summary
         : null,
+    delivery_evidence_url:
+      typeof row.delivery_evidence_url === "string" &&
+      row.delivery_evidence_url.startsWith("https://")
+        ? row.delivery_evidence_url
+        : null,
     handover_verified_at:
       typeof row.handover_verified_at === "string" &&
       row.handover_verified_at.length > 0
@@ -654,11 +660,13 @@ export async function requestJobCompletion(
 export async function submitJobDelivery(
   jobId: string,
   summary: string,
+  evidenceUrl?: string | null,
 ): Promise<void> {
   const { supabase } = await authenticatedClient();
   const { data, error } = await supabase.rpc("submit_job_delivery", {
     target_job_id: jobId,
     delivery_summary: summary,
+    delivery_evidence_url: evidenceUrl ?? null,
   });
   if (error) throw mapTransitionError(error.code, error.message);
   if (data !== "SUBMITTED") {
