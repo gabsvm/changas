@@ -15,7 +15,7 @@ import { createClient } from "@/lib/supabase/server";
 import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 import {
-  countPostOffers,
+  listJobPostOfferCards,
   getJobPost,
   JobPostServerError,
 } from "@/lib/jobs/job-posts-server";
@@ -69,7 +69,8 @@ export default async function NeedDetailPage({
 
   const isOwner = post.owner_user_id === user.id;
 
-  const offerCount = isOwner ? await countPostOffers(postId) : 0;
+  const offers = isOwner ? await listJobPostOfferCards(postId) : [];
+  const offerCount = offers.length;
 
   const { data: myProfile } = isOwner
     ? { data: null }
@@ -139,6 +140,37 @@ export default async function NeedDetailPage({
             Las ofertas llegan como mensajes: negociás la última versión y al
             aceptar se crea el trabajo. El pago se acuerda por fuera de YALO.
           </p>
+          {offers.length > 0 ? (
+            <div className="mt-4 grid gap-3" aria-label="Comparar ofertas de prestadores">
+              {offers.map((offer) => (
+                <article key={offer.proposal_id} className="border-ink/10 bg-surface rounded-2xl border p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-extrabold">{offer.provider_name}</p>
+                      <p className="text-ink/65 mt-1 text-xs">
+                        {offer.proposal_status === "ACCEPTED" ? "Contratada" : "Cotización disponible"}
+                      </p>
+                    </div>
+                    <strong className="text-sm">
+                      {formatMinorUnits(offer.price_amount, offer.currency_code)}
+                    </strong>
+                  </div>
+                  <p className="text-ink/75 mt-3 text-sm leading-6 whitespace-pre-wrap">
+                    {offer.scope_snapshot}
+                  </p>
+                  <p className="text-ink/60 mt-2 text-xs">
+                    {scheduleLabel(offer.schedule_start_at, offer.schedule_end_at)}
+                  </p>
+                  <ActionLink
+                    href={`/messages/${offer.conversation_id}`}
+                    className="mt-3 w-full"
+                  >
+                    {offer.proposal_status === "ACCEPTED" ? "Ver acuerdo" : "Ver oferta y contratar"}
+                  </ActionLink>
+                </article>
+              ))}
+            </div>
+          ) : null}
           {(post.status === "OPEN" || post.status === "PAUSED") && (
             <div className="mt-3 flex gap-2">
               <form action={governNeedAction}>
