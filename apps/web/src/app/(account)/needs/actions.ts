@@ -1,6 +1,5 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 
 import { revalidatePath } from "next/cache";
@@ -42,7 +41,9 @@ export async function createNeedAction(formData: FormData): Promise<void> {
   if (!parsed.ok) throw new Error(parsed.message);
 
   try {
-    const postId = await createJobPost(parsed.data, randomUUID());
+    const nonce = stringField(formData, "idempotencyKey");
+    if (!isUuid(nonce)) throw new Error("No pudimos validar el formulario. Recargá y probá de nuevo.");
+    const postId = await createJobPost(parsed.data, nonce);
     revalidatePath("/needs");
     redirect(`/needs/${postId}`);
   } catch (error) {
