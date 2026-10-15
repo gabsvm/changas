@@ -113,7 +113,7 @@ export function NeedWizard({
         ))}
       </nav>
 
-      <div data-step="0" hidden={step !== 0} className="grid gap-5">
+      <div data-step="0" hidden={step !== 0} className={step === 0 ? "grid gap-5" : "hidden"}>
         <FormField label="¿Qué rubro necesitás?">
           <select
             name="skillId"
@@ -153,7 +153,7 @@ export function NeedWizard({
         </FormField>
       </div>
 
-      <div data-step="1" hidden={step !== 1} className="grid gap-5">
+      <div data-step="1" hidden={step !== 1} className={step === 1 ? "grid gap-5" : "hidden"}>
         <FormField label="Barrio o zona (opcional)">
           <input
             name="locationText"
