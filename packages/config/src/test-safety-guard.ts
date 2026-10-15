@@ -30,8 +30,11 @@ export function isPrivateIp(ip: string): boolean {
   // RFC 1918 Class B: 172.16.0.0 - 172.31.255.255 (WSL2 / Docker network)
   const bMatch = ip.match(/^172\.(\d+)\./);
   if (bMatch) {
-    const octet = parseInt(bMatch[1], 10);
-    if (octet >= 16 && octet <= 31) return true;
+    const octetText = bMatch[1];
+    if (octetText !== undefined) {
+      const octet = parseInt(octetText, 10);
+      if (octet >= 16 && octet <= 31) return true;
+    }
   }
   // RFC 1918 Class C: 192.168.0.0 - 192.168.255.255
   if (ip.startsWith("192.168.")) return true;
