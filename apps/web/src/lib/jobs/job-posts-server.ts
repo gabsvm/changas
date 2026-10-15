@@ -177,6 +177,7 @@ export async function listOpenJobPosts(options?: {
   skillId?: string;
   skillIds?: string[];
   limit?: number;
+  page?: number;
 }): Promise<JobPostSummary[]> {
   await requireUserId();
   const supabase = await createClient();
@@ -185,7 +186,11 @@ export async function listOpenJobPosts(options?: {
     .select(POST_COLUMNS)
     .eq("status", "OPEN")
     .order("created_at", { ascending: false })
-    .limit(options?.limit ?? 30);
+    .order("id", { ascending: false })
+    .range(
+      Math.max(0, Math.trunc(options?.page ?? 0)) * Math.min(50, Math.max(1, options?.limit ?? 30)),
+      (Math.max(0, Math.trunc(options?.page ?? 0)) + 1) * Math.min(50, Math.max(1, options?.limit ?? 30)) - 1,
+    );
   if (options?.skillId) query = query.eq("skill_id", options.skillId);
   if (options?.skillIds && options.skillIds.length > 0)
     query = query.in("skill_id", options.skillIds);
@@ -194,7 +199,7 @@ export async function listOpenJobPosts(options?: {
   return withSkillNames((data ?? []) as PostRow[]);
 }
 
-export async function listMyJobPosts(): Promise<JobPostSummary[]> {
+export async function listMyJobPosts(page = 0, pageSize = 20): Promise<JobPostSummary[]> {
   const userId = await requireUserId();
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -202,7 +207,11 @@ export async function listMyJobPosts(): Promise<JobPostSummary[]> {
     .select(POST_COLUMNS)
     .eq("owner_user_id", userId)
     .order("created_at", { ascending: false })
-    .limit(50);
+    .order("id", { ascending: false })
+    .range(
+      Math.max(0, Math.trunc(page)) * Math.min(50, Math.max(1, pageSize)),
+      (Math.max(0, Math.trunc(page)) + 1) * Math.min(50, Math.max(1, pageSize)) - 1,
+    );
   if (error) throw mapError(error);
   return withSkillNames((data ?? []) as PostRow[]);
 }
