@@ -20,6 +20,7 @@ import { ConfirmationCodeForm } from "@/app/(account)/jobs/[jobId]/confirmation-
 import { ConfirmCompletionReview } from "@/app/(account)/jobs/[jobId]/confirm-completion-review";
 import { CorrectionForm } from "@/app/(account)/jobs/[jobId]/correction-form";
 import { DeliverySubmitForm } from "@/app/(account)/jobs/[jobId]/delivery-submit-form";
+import { ExternalMoneySection } from "@/app/(account)/jobs/[jobId]/external-money-section";
 import { PaymentSubmitButton } from "@/components/jobs/payment-submit-button";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
 import { JobTracker } from "@/components/jobs/job-tracker";
@@ -37,6 +38,7 @@ import { SuccessCheck } from "@/components/ui/marketplace/success-check";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import {
+  getExternalMoney,
   getJobDetail,
   JobServerError,
   listJobEvents,
@@ -127,6 +129,10 @@ const JOB_EVENT_LABELS: Record<string, string> = {
   JOB_DELIVERY_SUBMITTED: "El prestador envió la entrega para revisión",
   JOB_HANDOVER_VERIFIED: "Se dejó constancia de la entrega",
   JOB_CORRECTION_REQUESTED: "El cliente pidió una corrección",
+  JOB_EXTERNAL_PAYMENT_DECLARED: "Se informó un pago entre las partes",
+  JOB_EXTERNAL_PAYMENT_CONFIRMED: "Ambas partes confirmaron el pago",
+  JOB_EXTERNAL_PAYMENT_CONTESTED: "Se marcó un desacuerdo sobre el pago",
+  JOB_EXTERNAL_PAYMENT_VOIDED: "Se anuló una declaración de pago",
 };
 
 function jobStatusChangedLabel(toStatus: string | null): string {
@@ -214,6 +220,12 @@ export default async function JobPage({
   const canSimulatePayment =
     process.env.NODE_ENV !== "production" || adminFlag === true;
   const paymentsEnabled = isPaymentsEnabled();
+  // YALO S4: tarjeta bilateral en COMPLETED con pagos OFF (tolerante a la
+  // migración pendiente).
+  const externalMoney =
+    !paymentsEnabled && detail.job_status === "COMPLETED"
+      ? await getExternalMoney(jobId)
+      : null;
   const schedulePrimary =
     detail.schedule_starts_at ?? detail.schedule_deadline_at ?? null;
   const status = getJobStatusPresentation(detail.job_status);
@@ -591,6 +603,21 @@ export default async function JobPage({
                 <p className="text-ink/70 text-sm leading-7">
                   Este trabajo no tiene cargos a cobrar.
                 </p>
+              ) : !paymentsEnabled &&
+                detail.job_status === "COMPLETED" &&
+                externalMoney ? (
+                <ExternalMoneySection
+                  jobId={jobId}
+                  isClient={isClient}
+                  clientUserId={detail.client_user_id}
+                  ledger={externalMoney.ledger}
+                  declarations={externalMoney.declarations}
+                  defaultAmountMinor={
+                    externalMoney.ledger.outstandingMinor > 0
+                      ? externalMoney.ledger.outstandingMinor
+                      : detail.settlement_total_minor
+                  }
+                />
               ) : isClient ? (
                 <>
                   <dl className="space-y-1 text-sm leading-6">

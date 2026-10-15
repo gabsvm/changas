@@ -1,5 +1,7 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -15,6 +17,7 @@ import { isUuid } from "@changas/validation";
 import {
   applyFakeAdditionalPayment,
   applyFakeSettlementPayment,
+  declareExternalPayment,
   JobServerError,
   requestJobCorrection,
   requestJobReschedule,
@@ -22,9 +25,11 @@ import {
   respondJobReschedule,
   respondJobScopeChange,
   requestJobCompletion,
+  respondExternalPayment,
   setJobExactLocation,
   submitJobDelivery,
   transitionJob,
+  voidExternalPayment,
 } from "@/lib/jobs/server";
 import {
   createJobReview,
@@ -176,6 +181,95 @@ export async function requestCorrectionAction(
   }
   try {
     await requestJobCorrection(jobId, reason);
+  } catch (error) {
+    if (error instanceof JobServerError) throw new Error(error.message);
+    throw error;
+  }
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs");
+}
+
+const EXTERNAL_MONEY_METHODS = ["EFECTIVO", "TRANSFERENCIA", "OTRO_ACORDADO"] as const;
+
+function moneyMinorField(formData: FormData): number {
+  const raw = stringField(formData, "amount").replace(/\./g, "").replace(",", ".");
+  if (!/^\d+(\.\d{1,2})?$/.test(raw)) throw new Error("El monto declarado debe ser positivo.");
+  const minor = Math.round(Number(raw) * 100);
+  if (!Number.isSafeInteger(minor) || minor <= 0) {
+    throw new Error("El monto declarado debe ser positivo.");
+  }
+  return minor;
+}
+
+// Declarar dinero externo (quien paga o quien recibe). Solo COMPLETED.
+export async function declareExternalPaymentAction(
+  formData: FormData,
+): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const method = stringField(formData, "method");
+  if (!EXTERNAL_MONEY_METHODS.includes(method as (typeof EXTERNAL_MONEY_METHODS)[number])) {
+    throw new Error("El método de pago informado no es válido.");
+  }
+  const paidOnRaw = stringField(formData, "paidOn");
+  const reference = stringField(formData, "reference");
+  if (reference.length > 140) {
+    throw new Error("La referencia admite hasta 140 caracteres, sin datos bancarios.");
+  }
+  // Clave del formulario (estable por render); si falta o es inválida se
+  // genera una fresca para no romper envíos antiguos.
+  const rawKey = stringField(formData, "idempotencyKey");
+  const idempotencyKey = isUuid(rawKey) ? rawKey : randomUUID();
+  try {
+    await declareExternalPayment({
+      jobId,
+      amountMinor: moneyMinorField(formData),
+      method: method as (typeof EXTERNAL_MONEY_METHODS)[number],
+      paidOn: paidOnRaw === "" ? null : paidOnRaw,
+      reference: reference === "" ? null : reference,
+      idempotencyKey,
+      supersedesId: stringField(formData, "supersedesId") === "" ? null : uuidField(formData, "supersedesId"),
+    });
+  } catch (error) {
+    if (error instanceof JobServerError) throw new Error(error.message);
+    throw error;
+  }
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs");
+}
+
+// La contraparte confirma o contesta con motivo.
+export async function respondExternalPaymentAction(
+  formData: FormData,
+): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const declarationId = uuidField(formData, "declarationId");
+  const accepted = stringField(formData, "decision") === "accept";
+  const reason = stringField(formData, "reason");
+  if (!accepted && (reason.length < 1 || reason.length > 1000)) {
+    throw new Error("Para marcar desacuerdo contanos el motivo.");
+  }
+  try {
+    await respondExternalPayment({
+      declarationId,
+      accepted,
+      reason: accepted ? null : reason,
+    });
+  } catch (error) {
+    if (error instanceof JobServerError) throw new Error(error.message);
+    throw error;
+  }
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs");
+}
+
+// Quien declaró anula su pendiente (corrección = void + nueva).
+export async function voidExternalPaymentAction(
+  formData: FormData,
+): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const declarationId = uuidField(formData, "declarationId");
+  try {
+    await voidExternalPayment(declarationId);
   } catch (error) {
     if (error instanceof JobServerError) throw new Error(error.message);
     throw error;

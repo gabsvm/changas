@@ -220,7 +220,7 @@ export function getJobNextAction(args: {
     if (!paymentsEnabled) {
       return {
         heading: "Trabajo completado · pago entre ustedes",
-        sub: "Acuerdan efectivo o transferencia directamente. YALO no recibe ni custodia el dinero.",
+        sub: "Acuerdan efectivo o transferencia directamente. Registrá lo pagado en «Pago entre ustedes».",
         kind: null,
       };
     }
@@ -234,7 +234,7 @@ export function getJobNextAction(args: {
     if (!paymentsEnabled) {
       return {
         heading: "Cierre confirmado · cobro entre ustedes",
-        sub: "Acuerdan efectivo o transferencia directamente. YALO no recibe ni custodia el dinero.",
+        sub: "Acuerdan efectivo o transferencia directamente. Registrá lo recibido en «Pago entre ustedes».",
         kind: null,
       };
     }
