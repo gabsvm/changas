@@ -117,11 +117,11 @@ export default async function PublicServicePage({
   const hireKind = getServiceHireKind(service);
   const instantEligible = isInstantBookingEligible(service);
   const hireCtaLabel =
-    hireKind === "DIRECT_BOOKING"
-      ? instantEligible
-        ? `Reservar por ${price}`
-        : "Solicitar contratación"
-      : "Pedir presupuesto";
+    instantEligible
+      ? `Reservar por ${price}`
+      : service.price_model === "FIXED" && service.price_amount !== null
+        ? "Solicitar contratación"
+        : "Pedir presupuesto";
   return (
     <main
       id="main-content"
