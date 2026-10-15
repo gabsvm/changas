@@ -240,6 +240,7 @@ export default async function JobPage({
     modality: detail.modality,
     deliverySubmitted: detail.delivery_submitted_at !== null,
     handoverVerified: detail.handover_verified_at !== null,
+    deliveryFlowAvailable: detail.delivery_flow_available,
   });
   const needsRescheduleAttention = reschedules.some(
     (request) =>
@@ -435,7 +436,8 @@ export default async function JobPage({
           {isClient &&
           detail.confirmation_code &&
           detail.modality !== "REMOTE" &&
-          (detail.delivery_submitted_at !== null ||
+          (!detail.delivery_flow_available && detail.job_status === "IN_PROGRESS" ||
+            detail.delivery_submitted_at !== null ||
             detail.job_status === "COMPLETION_REQUESTED") ? (
             <div className="border-ink/[0.08] bg-canvas mt-3 rounded-2xl border p-4 text-center">
               <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.12em] uppercase">
@@ -448,9 +450,9 @@ export default async function JobPage({
                 {detail.confirmation_code}
               </p>
               <p className="text-ink/70 mt-1 text-xs leading-5">
-                Revisá la entrega y, si está bien, compartilo con el
-                prestador para dejar constancia. No es la confirmación
-                final: después confirmás el trabajo por separado.
+                {detail.delivery_flow_available
+                  ? "Revisá la entrega y, si está bien, compartilo con el prestador para dejar constancia. No es la confirmación final."
+                  : "Compartí este código solamente cuando el prestador haya terminado el trabajo. Después podrás confirmar el cierre."}
               </p>
             </div>
           ) : null}
