@@ -284,12 +284,12 @@ grant execute on function public.save_service_with_tags(
 create or replace function public.create_conversation_proposal(
   target_conversation_id uuid,
   requested_kind public.proposal_kind,
-  scope_text text default null,
-  proposed_price_amount bigint default null,
-  proposed_schedule_start_at timestamptz default null,
-  proposed_schedule_end_at timestamptz default null,
-  proposed_deadline_at timestamptz default null,
-  proposal_expires_at timestamptz default null,
+  scope_text text,
+  proposed_price_amount bigint,
+  proposed_schedule_start_at timestamptz,
+  proposed_schedule_end_at timestamptz,
+  proposed_deadline_at timestamptz,
+  proposal_expires_at timestamptz,
   request_idempotency_key uuid
 )
 returns uuid
@@ -670,8 +670,8 @@ begin
 end;
 $$;
 
--- La firma historica delega sin clave: misma conducta que antes salvo el
--- endurecimiento de preautorizacion, que aplica a ambas firmas.
+-- La firma historica delega sin clave: preserva control de user_blocks y
+-- endurecimiento de preautorizacion a traves de la implementacion canonica.
 create or replace function public.create_conversation_proposal(
   target_conversation_id uuid,
   requested_kind public.proposal_kind,

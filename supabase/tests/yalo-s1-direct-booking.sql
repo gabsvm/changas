@@ -181,21 +181,26 @@ select set_config('request.jwt.claim.sub', '15000000-0000-4000-8000-000000000001
 select set_config('request.jwt.claim.role', 'authenticated', true);
 
 -- La aridad historica de 8 args sigue creando solicitudes OPEN sin flag.
+select public.create_conversation_proposal(
+  '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
+  null, null, null, null);
+
 select is(
   (select status::text from public.proposals
-   where id = public.create_conversation_proposal(
-     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
-     null, null, null, null)),
+   where conversation_id = '15000000-0000-4000-8000-000000000020'
+   order by created_at desc limit 1),
   'OPEN',
   'historic eight-arg call stays a bilateral request'
 );
 
 -- Sin flag: nace solicitud OPEN, sin trabajo, con evento bilateral.
+select public.create_conversation_proposal(
+  '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
+  null, null, null, null, '15000000-0000-4000-8000-0000000000a1');
+
 select is(
   (select status::text from public.proposals
-   where id = public.create_conversation_proposal(
-     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
-     null, null, null, null, '15000000-0000-4000-8000-0000000000a1')),
+   where idempotency_key = '15000000-0000-4000-8000-0000000000a1'),
   'OPEN',
   'direct booking without preauthorization stays open'
 );
@@ -218,11 +223,13 @@ select ok(
 update public.services set instant_booking_enabled = true
 where id = '15000000-0000-4000-8000-000000000010';
 
+select public.create_conversation_proposal(
+  '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
+  '2030-01-10T10:00:00Z', '2030-01-10T11:00:00Z', null, null, '15000000-0000-4000-8000-0000000000a2');
+
 select is(
   (select status::text from public.proposals
-   where id = public.create_conversation_proposal(
-     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
-     '2030-01-10T10:00:00Z', '2030-01-10T11:00:00Z', null, null, '15000000-0000-4000-8000-0000000000a2')),
+   where idempotency_key = '15000000-0000-4000-8000-0000000000a2'),
   'ACCEPTED',
   'direct booking with preauthorization is accepted'
 );
@@ -236,11 +243,13 @@ select is(
 );
 
 -- Flag sin un horario reservable NO es una reserva instantanea.
+select public.create_conversation_proposal(
+  '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
+  null, null, null, null, '15000000-0000-4000-8000-0000000000a4');
+
 select is(
   (select status::text from public.proposals
-   where id = public.create_conversation_proposal(
-     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
-     null, null, null, null, '15000000-0000-4000-8000-0000000000a4')),
+   where idempotency_key = '15000000-0000-4000-8000-0000000000a4'),
   'OPEN',
   'preauthorization without a concrete slot remains a bilateral request'
 );
@@ -249,11 +258,13 @@ select is(
 update public.provider_profiles set status = 'SUSPENDED'
 where user_id = '15000000-0000-4000-8000-000000000002';
 
+select public.create_conversation_proposal(
+  '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
+  null, null, null, null, '15000000-0000-4000-8000-0000000000a3');
+
 select is(
   (select status::text from public.proposals
-   where id = public.create_conversation_proposal(
-     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
-     null, null, null, null, '15000000-0000-4000-8000-0000000000a3')),
+   where idempotency_key = '15000000-0000-4000-8000-0000000000a3'),
   'OPEN',
   'suspended provider cannot self-confirm a booking'
 );
@@ -286,11 +297,15 @@ select set_config('request.jwt.claim.sub', '15000000-0000-4000-8000-000000000002
 select throws_ok(
   $$select public.create_conversation_proposal(
     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
-    null, null, null, null, '15000000-0000-4000-8000-0000000000a4')$$,
+    null, null, null, null, '15000000-0000-4000-8000-0000000000a5')$$,
   '42501', 'only the client can create a direct booking',
   'provider cannot direct-book its own service'
 );
 
+
+-- Restaura estado ACTIVE para las pruebas de save_service_with_tags.
+update public.provider_profiles set status = 'ACTIVE'
+where user_id = '15000000-0000-4000-8000-000000000002';
 
 -- La aridad historica de save (19 args) inserta con flag en false.
 select set_config('request.jwt.claim.sub', '15000000-0000-4000-8000-000000000002', true);
@@ -304,7 +319,7 @@ select is(
       'REMOTE', 'FIXED', 50000, 'ARS', null, false, null, 'UNSCHEDULED',
       null, null, null, true, false, '{}'
     ) as saved(id, public_slug)
-  ), 1,
+  )), 1,
   'historic save signature inserts a service'
 );
 select is(
@@ -349,13 +364,15 @@ insert into public.provider_slot_holds (
 select set_config('request.jwt.claim.sub', '15000000-0000-4000-8000-000000000001', true);
 update public.provider_profiles set status = 'ACTIVE'
 where user_id = '15000000-0000-4000-8000-000000000002';
+select public.create_conversation_proposal(
+  '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
+  '2030-02-10T10:00:00Z', '2030-02-10T12:00:00Z', null, null,
+  '15000000-0000-4000-8000-0000000000b1'
+);
+
 select is(
   (select status::text from public.proposals
-   where id = public.create_conversation_proposal(
-     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
-     '2030-02-10T10:00:00Z', '2030-02-10T12:00:00Z', null, null,
-     '15000000-0000-4000-8000-0000000000b1'
-   )),
+   where idempotency_key = '15000000-0000-4000-8000-0000000000b1'),
   'OPEN',
   'unavailable window stays a bilateral request'
 );
@@ -366,12 +383,14 @@ select is(
   'no job is created for an unavailable window'
 );
 -- Agenda unilateral (solo inicio) tampoco auto-confirma.
+select public.create_conversation_proposal(
+  '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
+  '2030-03-10T10:00:00Z', null, null, null,
+  '15000000-0000-4000-8000-0000000000b2');
+
 select is(
   (select status::text from public.proposals
-   where id = public.create_conversation_proposal(
-     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
-     '2030-03-10T10:00:00Z', null, null, null,
-     '15000000-0000-4000-8000-0000000000b2')),
+   where idempotency_key = '15000000-0000-4000-8000-0000000000b2'),
   'OPEN',
   'partial window stays a bilateral request'
 );
@@ -400,6 +419,7 @@ select throws_ok(
     '2030-04-10T11:00:00Z', '2030-04-10T13:00:00Z', '2030-05-10T10:00:00Z'
   )$q$,
   '23P01',
+  null,
   'overlapping holds are rejected'
 );
 -- El block guard tambien frena la firma nueva.
@@ -412,7 +432,7 @@ select throws_ok(
   $$select public.create_conversation_proposal(
     '15000000-0000-4000-8000-000000000020', 'DIRECT_BOOKING', null, null,
     null, null, null, null,
-    '15000000-0000-4000-8000-0000000000d1'),
+    '15000000-0000-4000-8000-0000000000d1')$$,
   '42501', 'conversation proposals are blocked',
   'blocked conversation freezes the hardened path'
 );

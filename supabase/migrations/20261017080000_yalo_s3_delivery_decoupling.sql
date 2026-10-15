@@ -320,7 +320,11 @@ begin
     raise exception using errcode = '42501', message = 'job access denied';
   end if;
 
-  if target_job.status <> 'IN_PROGRESS' then
+  select coalesce(target_job.effective_modality, pv.modality) into job_modality
+  from public.proposal_versions pv
+  where pv.id = target_job.accepted_proposal_version_id;
+
+  if target_job.status <> 'IN_PROGRESS' and (target_job.status <> 'COMPLETION_REQUESTED' or job_modality <> 'REMOTE') then
     raise exception using errcode = '40001', message = 'job state changed; refresh and retry';
   end if;
 
@@ -333,10 +337,6 @@ begin
   if target_job.delivery_submitted_at is null then
     raise exception using errcode = '22023', message = 'submit the delivery before verifying the handover code';
   end if;
-
-  select coalesce(target_job.effective_modality, pv.modality) into job_modality
-  from public.proposal_versions pv
-  where pv.id = target_job.accepted_proposal_version_id;
 
   if target_job.confirmation_code is null then
     -- Sin código no hay secreto que adivinar: transición directa con los

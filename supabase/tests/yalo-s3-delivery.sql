@@ -130,7 +130,7 @@ insert into public.services (
   schedule_type, is_published
 )
 select
-  '17000000-0000-4000-8000-0000000000' || suffix,
+  ('17000000-0000-4000-8000-0000000000' || suffix)::uuid,
   '17000000-0000-4000-8000-000000000002',
   provider_skill.skill_id,
   's3-service-' || suffix,
@@ -205,7 +205,8 @@ select set_config('request.jwt.claim.sub', '17000000-0000-4000-8000-000000000001
 select is(
   public.respond_to_proposal(
     (select id from public.proposals where idempotency_key = '17000000-0000-4000-8000-0000000000a1'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'first quote is accepted'
@@ -213,7 +214,8 @@ select is(
 select is(
   public.respond_to_proposal(
     (select id from public.proposals where idempotency_key = '17000000-0000-4000-8000-0000000000a2'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'second quote is accepted'
@@ -221,7 +223,8 @@ select is(
 select is(
   public.respond_to_proposal(
     (select id from public.proposals where idempotency_key = '17000000-0000-4000-8000-0000000000a3'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'third quote is accepted'
@@ -229,7 +232,8 @@ select is(
 select is(
   public.respond_to_proposal(
     (select id from public.proposals where idempotency_key = '17000000-0000-4000-8000-0000000000a4'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'fourth quote is accepted'

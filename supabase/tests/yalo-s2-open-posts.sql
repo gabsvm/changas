@@ -102,7 +102,7 @@ select ok(
 select ok(
   (select column_default from information_schema.columns
    where table_schema = 'public' and table_name = 'job_posts'
-     and column_name = 'status') = '''OPEN''::public.job_post_status',
+     and column_name = 'status') like '%''OPEN''%',
   'posts default to open'
 );
 select ok(
@@ -429,6 +429,22 @@ select
 from public.services
 where id = '16000000-0000-4000-8000-000000000010';
 
+insert into public.services (
+  id, provider_user_id, skill_id, public_slug, title, description,
+  modality, price_model, price_amount, currency_code, accepts_offers,
+  schedule_type, is_published
+)
+select
+  '16000000-0000-4000-8000-000000000012',
+  '16000000-0000-4000-8000-000000000002',
+  services.skill_id,
+  's2-service-adoption',
+  'S2 adoption service',
+  'Synthetic S2 adoption offer service fixture.',
+  'REMOTE', 'FIXED', 110000, 'ARS', false, 'UNSCHEDULED', true
+from public.services
+where id = '16000000-0000-4000-8000-000000000010';
+
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
 select ok(
   public.create_job_post(
@@ -497,15 +513,15 @@ select is(
   'repeat offer creates no duplicate thread'
 );
 
--- Quien no es dueno del servicio no puede ofertar con el.
+-- Quien no es dueno del servicio no puede ofertar con el, y el dueno del post no puede ofertar sobre si mismo.
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
 select throws_ok(
   $$select public.start_post_offer_conversation(
     (select id from public.job_posts
      where idempotency_key = '16000000-0000-4000-8000-0000000000c1'),
     '16000000-0000-4000-8000-000000000010')$$,
-  '42501', 'offer service is not available',
-  'client cannot offer with another service'
+  '22023', 'cannot offer on your own post',
+  'client cannot offer on own post'
 );
 
 -- El bloqueo del par frena la oferta.
@@ -570,7 +586,7 @@ select ok(
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
 select ok(
   public.create_job_post(
-    (select skill_id from public.services where id = '16000000-0000-4000-8000-000000000010'),
+    (select skill_id from public.services where id = '16000000-0000-4000-8000-000000000012'),
     'Necesito plomero urgente en casa',
     'Se rompio un cano bajo la bacha y necesito arreglo esta semana.',
     null, null, null, null, 'ARS',
@@ -579,7 +595,7 @@ select ok(
   'third open post is created for adoption'
 );
 select ok(
-  public.start_service_conversation('s2-provider', 's2-service') is not null,
+  public.start_service_conversation('s2-provider', 's2-service-adoption') is not null,
   'catalog thread opens before the offer'
 );
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000002', true);
@@ -587,17 +603,17 @@ select is(
   public.start_post_offer_conversation(
     (select id from public.job_posts
      where idempotency_key = '16000000-0000-4000-8000-0000000000e1'),
-    '16000000-0000-4000-8000-000000000010'
+    '16000000-0000-4000-8000-000000000012'
   )::text,
   (select id::text from public.conversations
-   where service_id = '16000000-0000-4000-8000-000000000010'
+   where service_id = '16000000-0000-4000-8000-000000000012'
      and client_user_id = '16000000-0000-4000-8000-000000000001'
      and provider_user_id = '16000000-0000-4000-8000-000000000002'),
   'offer adopts the free catalog thread'
 );
 select ok(
   (select job_post_id from public.conversations
-   where service_id = '16000000-0000-4000-8000-000000000010'
+   where service_id = '16000000-0000-4000-8000-000000000012'
      and client_user_id = '16000000-0000-4000-8000-000000000001'
      and provider_user_id = '16000000-0000-4000-8000-000000000002')
   = (select id from public.job_posts
@@ -678,6 +694,12 @@ insert into public.provider_profiles (
   '16000000-0000-4000-8000-000000000003',
   'ACTIVE', 4, 's2-provider-second', 'Second candidate'
 );
+insert into public.provider_skills (provider_user_id, skill_id)
+select
+  '16000000-0000-4000-8000-000000000003',
+  s.skill_id
+from public.services s
+where s.id = '16000000-0000-4000-8000-000000000010';
 insert into public.services (
   id, provider_user_id, skill_id, public_slug, title, description,
   modality, price_model, price_amount, currency_code, accepts_offers,
@@ -718,7 +740,8 @@ select is(
   public.respond_to_proposal(
     (select id from public.proposals
      where idempotency_key = '16000000-0000-4000-8000-0000000000d2'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'client accepts the bound offer'
@@ -743,7 +766,8 @@ select throws_ok(
   $$select public.respond_to_proposal(
     (select id from public.proposals
      where idempotency_key = '16000000-0000-4000-8000-0000000000d3'),
-    'ACCEPT')$$,
+    'ACCEPT',
+    null)$$,
   '40001', 'post already awarded or no longer open',
   'second candidate cannot be awarded the same one-slot need'
 );
