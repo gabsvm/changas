@@ -12,6 +12,8 @@ import {
   marketplaceInputClass,
 } from "@/components/ui/marketplace/form-field";
 import { createClient } from "@/lib/supabase/server";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
+import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 import {
   countPostOffers,
   getJobPost,
@@ -46,6 +48,7 @@ export default async function NeedDetailPage({
 }: {
   params: Promise<{ postId: string }>;
 }) {
+  if (!arePublicNeedsEnabled()) return <NeedsComingSoon />;
   const { postId } = await params;
   const supabase = await createClient();
   const {
