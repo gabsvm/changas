@@ -4,7 +4,7 @@
 -- evidencia; correccion con motivo y tope. Todo hace rollback al final.
 begin;
 
-select plan(51);
+select plan(52);
 
 -- Estructura: columnas de entrega.
 select ok(
@@ -32,7 +32,7 @@ select ok(
 
 -- Firmas nuevas + compuertas en definiciones vigentes.
 select ok(
-  to_regprocedure('public.submit_job_delivery(uuid,text)') is not null,
+  to_regprocedure('public.submit_job_delivery(uuid,text,text)') is not null,
   'delivery submission RPC exists'
 );
 select ok(
@@ -321,12 +321,23 @@ select is(
   'client confirms the verified job'
 );
 
--- Remoto: el envio mueve directo a revision, sin PIN.
+-- Remoto: la simple descripcion NO constituye entrega verificable.
 select set_config('request.jwt.claim.sub', '17000000-0000-4000-8000-000000000002', true);
+select throws_ok(
+  $$select public.submit_job_delivery(
+    (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '17000000-0000-4000-8000-000000000011')),
+    'Texto sin enlace de evidencia.'
+  )$$,
+  '22023', 'remote delivery requires a valid HTTPS evidence link',
+  'remote submission needs HTTPS evidence'
+);
+
+-- Remoto: la entrega con enlace mueve a revision, sin PIN.
 select is(
   public.submit_job_delivery(
     (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '17000000-0000-4000-8000-000000000011')),
-    'Entrega digital lista para revision.'
+    'Entrega digital lista para revision.',
+    'https://example.com/yalo/test-delivery'
   ),
   'SUBMITTED',
   'remote submission needs no code'
