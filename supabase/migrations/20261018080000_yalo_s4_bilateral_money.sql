@@ -351,7 +351,7 @@ begin
     raise exception using errcode = 'P0002', message = 'declaration not found';
   end if;
 
-  select * into target_job from public.jobs where id = declaration.job_id;
+  select * into target_job from public.jobs where id = declaration.job_id for update;
   if target_job.id is null or caller_id not in (target_job.client_user_id, target_job.provider_user_id) then
     raise exception using errcode = '42501', message = 'job access denied';
   end if;
@@ -465,7 +465,7 @@ begin
     raise exception using errcode = 'P0002', message = 'declaration not found';
   end if;
 
-  select * into target_job from public.jobs where id = declaration.job_id;
+  select * into target_job from public.jobs where id = declaration.job_id for update;
   if target_job.id is null or caller_id not in (target_job.client_user_id, target_job.provider_user_id) then
     raise exception using errcode = '42501', message = 'job access denied';
   end if;
