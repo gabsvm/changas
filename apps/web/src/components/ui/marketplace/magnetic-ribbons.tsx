@@ -100,7 +100,7 @@ export function MagneticRibbons() {
           points.push({ x, y });
         }
 
-        const color = palette[strand % palette.length];
+        const color = palette[strand % palette.length] ?? "#12D9C5";
         ctx.beginPath();
         points.forEach((p, i) => {
           if (i === 0) ctx.moveTo(p.x, p.y);
