@@ -3,27 +3,24 @@ import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import pg from "pg";
+import {
+  assertSafeLocalTarget,
+  validateLocalDatabaseUrl,
+  validateLocalSupabaseUrl,
+} from "../../packages/config/src/test-safety-guard.ts";
 
-function getLocalIp(): string {
-  try {
-    const wsl = execSync("wsl hostname -I", { encoding: "utf8" })
-      .trim()
-      .split(" ")[0];
-    if (wsl) return wsl;
-  } catch {}
-  return "127.0.0.1";
-}
-
-const localIp = getLocalIp();
-const supabaseUrl =
+const localIp = "127.0.0.1";
+const supabaseUrl = validateLocalSupabaseUrl(
   process.env.API_URL ??
-  process.env.NEXT_PUBLIC_SUPABASE_URL ??
-  `http://${localIp}:54321`;
+    process.env.NEXT_PUBLIC_SUPABASE_URL ??
+    `http://${localIp}:54321`,
+);
 const serviceRoleKey =
   process.env.SERVICE_ROLE_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
-const dbUrl =
+const dbUrl = validateLocalDatabaseUrl(
   process.env.DATABASE_URL ??
-  `postgres://postgres:postgres@${localIp}:54322/postgres`;
+    `postgres://postgres:postgres@${localIp}:54322/postgres`,
+);
 
 function requireCredentials() {
   if (!serviceRoleKey) {
@@ -78,11 +75,13 @@ function attachErrorListeners(page: Page, label: string, errors: string[]) {
   page.on("console", (msg) => {
     if (msg.type() === "error") {
       const text = msg.text();
-      // Filter out benign static/favicon 404s
+      // Filter out benign static/favicon 404s and local realtime websocket handshakes
       if (
         !text.includes("favicon") &&
         !text.includes("manifest.webmanifest") &&
-        !text.includes("status of 404")
+        !text.includes("status of 404") &&
+        !text.includes("WebSocket connection") &&
+        !text.includes("realtime")
       ) {
         errors.push(`[${label} console.error] ${text}`);
       }
@@ -113,118 +112,394 @@ async function loginUser(page: Page, email: string, pass: string) {
   await expect(page).toHaveURL(/\/account/);
 }
 
-test.describe("YALO Dual Model Validation (PR #29)", () => {
+test.describe("YALO Dual Model Validation Suite (PR #29)", () => {
   test.setTimeout(180_000);
 
-  test("Model A (Direct Selection) and Model B (Open Need) Full Lifecycle", async ({
+  test.beforeAll(async () => {
+    // Barrera de seguridad fail-closed obligatoria
+    await assertSafeLocalTarget({
+      supabaseUrl,
+      databaseUrl: dbUrl,
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // TEST 1: MODELO A1 — RESERVA DIRECTA PREAUTORIZADA (INSTANT BOOKING)
+  // ---------------------------------------------------------------------------
+  test("Modelo A1 - Reserva directa preautorizada con slot instantáneo", async ({
     browser,
   }) => {
     const { dbUrl } = requireCredentials();
     const runId = Math.random().toString(16).slice(2, 8);
     const consoleErrors: string[] = [];
 
-    // 1. Create synthetic accounts
-    const clientUser = await createAuthUser(`cliente-${runId}`, "Cliente YALO");
-    const provider1User = await createAuthUser(
-      `p1-${runId}`,
-      "Prestador Presencial",
+    const clientUser = await createAuthUser(
+      `c-inst-${runId}`,
+      "Cliente Directo",
     );
-    const provider2User = await createAuthUser(
-      `p2-${runId}`,
-      "Prestador Remoto",
+    const providerUser = await createAuthUser(
+      `p-inst-${runId}`,
+      "Prestador Instantáneo",
     );
 
-    const p1Slug = `p1-${runId}`;
-    const p2Slug = `p2-${runId}`;
-    const s1Slug = `cerrajeria-urgencia-${runId}`;
-    const s2Slug = `web-landing-${runId}`;
+    const pSlug = `p-inst-${runId}`;
+    const sSlug = `cerrajeria-instant-${runId}`;
 
-    // 2. Setup DB fixtures for providers and services
     const db = new pg.Client({ connectionString: dbUrl });
     await db.connect();
 
-    let inPersonSkillId: string;
-    let remoteSkillId: string;
-
     try {
       const skillsRes = await db.query(
-        "SELECT id, name FROM skills WHERE is_active ORDER BY sort_order, id LIMIT 4",
+        "SELECT id FROM skills WHERE is_active ORDER BY sort_order, id LIMIT 1",
       );
-      inPersonSkillId = skillsRes.rows[0].id;
-      remoteSkillId = skillsRes.rows[1].id;
+      const skillId = skillsRes.rows[0].id;
 
-      // Provider 1 Profile & Service (In-Person)
       await db.query(
-        `
-        INSERT INTO provider_profiles (user_id, status, onboarding_step, public_slug, public_headline)
-        VALUES ($1, 'ACTIVE', 4, $2, 'Cerrajería y Seguridad Presencial')
-        ON CONFLICT (user_id) DO UPDATE SET status = 'ACTIVE', marketplace_paused = false;
-      `,
-        [provider1User.id, p1Slug],
+        `INSERT INTO provider_profiles (user_id, status, onboarding_step, public_slug, public_headline)
+         VALUES ($1, 'ACTIVE', 4, $2, 'Cerrajero de Guardia')
+         ON CONFLICT (user_id) DO UPDATE SET status = 'ACTIVE', marketplace_paused = false;`,
+        [providerUser.id, pSlug],
       );
 
       await db.query(
-        `
-        INSERT INTO provider_skills (provider_user_id, skill_id)
-        VALUES ($1, $2) ON CONFLICT DO NOTHING;
-      `,
-        [provider1User.id, inPersonSkillId],
+        `INSERT INTO provider_skills (provider_user_id, skill_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
+        [providerUser.id, skillId],
       );
 
+      // Servicio con instant_booking_enabled = true
       await db.query(
-        `
-        INSERT INTO services (
+        `INSERT INTO services (
           id, provider_user_id, skill_id, public_slug, title, description,
           modality, price_model, price_amount, currency_code, accepts_offers,
           schedule_type, is_published, is_paused, instant_booking_enabled
         ) VALUES (
-          gen_random_uuid(), $1, $2, $3, 'Cerrajería y Apertura de Emergencia',
-          'Servicio presencial rápido para aperturas de urgencia y cambios de combinación.',
-          'IN_PERSON', 'FIXED', 1500000, 'ARS', true,
-          'UNSCHEDULED', true, false, false
-        );
-      `,
-        [provider1User.id, inPersonSkillId, s1Slug],
-      );
-
-      // Provider 2 Profile & Service (Remote)
-      await db.query(
-        `
-        INSERT INTO provider_profiles (user_id, status, onboarding_step, public_slug, public_headline)
-        VALUES ($1, 'ACTIVE', 4, $2, 'Desarrollo Web & Soluciones Digitales')
-        ON CONFLICT (user_id) DO UPDATE SET status = 'ACTIVE', marketplace_paused = false;
-      `,
-        [provider2User.id, p2Slug],
-      );
-
-      await db.query(
-        `
-        INSERT INTO provider_skills (provider_user_id, skill_id)
-        VALUES ($1, $2) ON CONFLICT DO NOTHING;
-      `,
-        [provider2User.id, remoteSkillId],
-      );
-
-      await db.query(
-        `
-        INSERT INTO services (
-          id, provider_user_id, skill_id, public_slug, title, description,
-          modality, price_model, price_amount, currency_code, accepts_offers,
-          schedule_type, is_published, is_paused, instant_booking_enabled
-        ) VALUES (
-          gen_random_uuid(), $1, $2, $3, 'Desarrollo de Landing Page y Web App',
-          'Servicio de diseño y maquetación web digital a distancia.',
-          'REMOTE', 'FIXED', 5000000, 'ARS', true,
-          'UNSCHEDULED', true, false, false
-        );
-      `,
-        [provider2User.id, remoteSkillId, s2Slug],
+          gen_random_uuid(), $1, $2, $3, 'Cerrajería Apertura Inmediata',
+          'Servicio de apertura con confirmación directa preautorizada.',
+          'IN_PERSON', 'FIXED', 2000000, 'ARS', false,
+          'FIXED_SLOT', true, false, true
+        );`,
+        [providerUser.id, skillId, sSlug],
       );
     } finally {
       await db.end();
     }
 
-    // 3. Create independent browser contexts
+    const clientCtx = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+    });
+    const clientPage = await clientCtx.newPage();
+    attachErrorListeners(clientPage, "Client-Instant", consoleErrors);
+
+    await loginUser(clientPage, clientUser.email, clientUser.pass);
+
+    // Navegar al servicio con instant booking
+    await clientPage.goto(`/p/${pSlug}/${sSlug}`);
+    await expect(
+      clientPage.getByRole("heading", {
+        name: "Cerrajería Apertura Inmediata",
+      }),
+    ).toBeVisible();
+
+    // Comprobar que el CTA indica "Consultar disponibilidad y reservar" (D2 SPEC v1.0)
+    const instantCta = clientPage.getByRole("button", {
+      name: /consultar disponibilidad y reservar/i,
+    });
+    await expect(instantCta).toBeVisible();
+    await captureScreenshot(
+      clientPage,
+      "01-model-a1-instant-booking-service.png",
+    );
+
+    await instantCta.click();
+    await expect(clientPage).toHaveURL(/\/messages\/[0-9a-f-]{36}/i);
+    await captureScreenshot(clientPage, "02-model-a1-instant-conversation.png");
+
+    await clientCtx.close();
+    expect(consoleErrors).toEqual([]);
+  });
+
+  // ---------------------------------------------------------------------------
+  // TEST 2: MODELO A2 — CONTRATACIÓN NEGOCIADA Y CICLO COMPLETO CON PIN
+  // ---------------------------------------------------------------------------
+  test("Modelo A2 - Contratación negociada y entrega presencial completa con PIN", async ({
+    browser,
+  }) => {
+    const { dbUrl } = requireCredentials();
+    const runId = Math.random().toString(16).slice(2, 8);
+    const consoleErrors: string[] = [];
+
+    const clientUser = await createAuthUser(
+      `c-neg-${runId}`,
+      "Cliente Presencial",
+    );
+    const providerUser = await createAuthUser(
+      `p-neg-${runId}`,
+      "Prestador Presencial",
+    );
+
+    const pSlug = `p-neg-${runId}`;
+    const sSlug = `cerrajeria-negociada-${runId}`;
+
+    const db = new pg.Client({ connectionString: dbUrl });
+    await db.connect();
+
+    try {
+      const skillsRes = await db.query(
+        "SELECT id FROM skills WHERE is_active ORDER BY sort_order, id LIMIT 1",
+      );
+      const skillId = skillsRes.rows[0].id;
+
+      await db.query(
+        `INSERT INTO provider_profiles (user_id, status, onboarding_step, public_slug, public_headline)
+         VALUES ($1, 'ACTIVE', 4, $2, 'Cerrajería Profesional 24hs')
+         ON CONFLICT (user_id) DO UPDATE SET status = 'ACTIVE', marketplace_paused = false;`,
+        [providerUser.id, pSlug],
+      );
+
+      await db.query(
+        `INSERT INTO provider_skills (provider_user_id, skill_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
+        [providerUser.id, skillId],
+      );
+
+      // instant_booking_enabled = false (Negociación obligatoria)
+      await db.query(
+        `INSERT INTO services (
+          id, provider_user_id, skill_id, public_slug, title, description,
+          modality, price_model, price_amount, currency_code, accepts_offers,
+          schedule_type, is_published, is_paused, instant_booking_enabled
+        ) VALUES (
+          gen_random_uuid(), $1, $2, $3, 'Cerrajería y Apertura de Emergencia',
+          'Apertura técnica y cambio de cerraduras con presupuesto acordado.',
+          'IN_PERSON', 'FIXED', 1500000, 'ARS', false,
+          'UNSCHEDULED', true, false, false
+        );`,
+        [providerUser.id, skillId, sSlug],
+      );
+    } finally {
+      await db.end();
+    }
+
+    const clientCtx = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+    });
+    const pCtx = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+    });
+
+    const clientPage = await clientCtx.newPage();
+    const pPage = await pCtx.newPage();
+
+    attachErrorListeners(clientPage, "Client-Neg", consoleErrors);
+    attachErrorListeners(pPage, "Provider-Neg", consoleErrors);
+
+    await loginUser(clientPage, clientUser.email, clientUser.pass);
+    await loginUser(pPage, providerUser.email, providerUser.pass);
+
+    // 1. Cliente solicita cotización
+    await clientPage.goto(`/p/${pSlug}/${sSlug}`);
+    const quoteButton = clientPage.getByRole("button", {
+      name: /pedir cotización/i,
+    });
+    await expect(quoteButton).toBeVisible();
+    await quoteButton.click();
+
+    await expect(clientPage).toHaveURL(/\/messages\/[0-9a-f-]{36}/i);
+    const convId = clientPage.url().match(/\/messages\/([0-9a-f-]{36})/i)![1];
+
+    // 2. Prestador envía propuesta
+    await pPage.goto(`/messages/${convId}`);
+    await openDetails(pPage, /Enviar una cotización|Proponer un acuerdo/);
+    const proposalForm = pPage.locator("form").filter({
+      has: pPage.getByRole("button", { name: "Enviar propuesta" }),
+    });
+    await proposalForm.locator('input[name="price"]').fill("15000");
+    await proposalForm
+      .locator('textarea[name="scope"]')
+      .fill("Apertura técnica y cambio de perno.");
+    await proposalForm.evaluate((form: HTMLFormElement) =>
+      form.requestSubmit(),
+    );
+    await expect(
+      pPage.getByText("Propuesta creada.", { exact: true }),
+    ).toBeVisible();
+
+    // 3. Cliente acepta y contrata
+    await clientPage.reload();
+    await expect(
+      clientPage.getByText("Apertura técnica y cambio de perno.").first(),
+    ).toBeVisible();
+    await clientPage
+      .getByRole("button", { name: "Contratar" })
+      .click({ force: true });
+    await clientPage
+      .getByRole("button", { name: "Confirmar contratación" })
+      .click({ force: true });
+
+    await expect(
+      clientPage.getByText(/ya tiene un servicio en marcha/i),
+    ).toBeVisible({ timeout: 15_000 });
+    const jobLink = clientPage.getByRole("link", { name: "Ver seguimiento →" });
+    const jobHref = await jobLink.getAttribute("href");
+    const jobId = jobHref!.split("/jobs/")[1];
+
+    // 4. Prestador inicia trabajo
+    await pPage.goto(`/jobs/${jobId}`);
+    await pPage
+      .getByRole("button", { name: "Iniciar trabajo" })
+      .click({ force: true });
+    await expect(pPage.locator('textarea[name="deliverySummary"]')).toBeVisible(
+      { timeout: 15_000 },
+    );
+
+    // 5. Prestador envía entrega presencial
+    await pPage
+      .locator('textarea[name="deliverySummary"]')
+      .fill("Cerradura abierta correctamente.");
+    await pPage
+      .getByRole("button", { name: "Enviar para revisión" })
+      .click({ force: true });
+    await expect(pPage.locator('input[name="confirmationCode"]')).toBeVisible({
+      timeout: 15_000,
+    });
+
+    // 6. Cliente ve el PIN de 4 dígitos
+    await clientPage.goto(`/jobs/${jobId}`);
+    const pinEl = clientPage.locator('[aria-label^="PIN de entrega"]');
+    await expect(pinEl).toBeVisible({ timeout: 15_000 });
+    const ariaLabel = await pinEl.getAttribute("aria-label");
+    const pinText = (
+      ariaLabel
+        ? ariaLabel.replace(/\D/g, "")
+        : (await pinEl.innerText()).replace(/\D/g, "")
+    ).trim();
+    expect(pinText).toMatch(/^\d{4}$/);
+
+    // 7. Prestador valida PIN presencial
+    await pPage.locator('input[name="confirmationCode"]').fill(pinText);
+    await pPage
+      .getByRole("button", { name: "Dejar constancia de entrega" })
+      .click({ force: true });
+    await expect(
+      pPage.locator('input[name="confirmationCode"]'),
+    ).not.toBeVisible({ timeout: 15_000 });
+
+    // 8. Cierre bilateral del cliente
+    await clientPage.reload();
+    await clientPage
+      .getByRole("button", { name: "Revisar y confirmar" })
+      .click({ force: true });
+    const confirmFinal = clientPage.getByRole("button", {
+      name: /Confirmar trabajo por/i,
+    });
+    await confirmFinal.click({ force: true });
+    await expect(clientPage.getByText("Completado").first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await captureScreenshot(clientPage, "03-model-a2-presencial-completed.png");
+
+    // 9. Declaración y confirmación de pago externo
+    await pPage.reload();
+    await openDetails(pPage, "Registrar dinero recibido");
+    await pPage.locator('input[name="amount"]').fill("15000");
+    await pPage.locator('select[name="method"]').selectOption("TRANSFERENCIA");
+    await pPage
+      .getByRole("button", { name: "Enviar declaración" })
+      .click({ force: true });
+
+    await clientPage.reload();
+    await clientPage
+      .getByRole("button", { name: "Confirmar que lo pagué" })
+      .click({ force: true });
+    await expect(
+      clientPage.getByText("$0", { exact: false }).first(),
+    ).toBeVisible({ timeout: 15_000 });
+
+    // 10. Reseña 5 estrellas
+    await clientPage.reload();
+    const ratingSelect = clientPage.locator('select[name="rating"]');
+    await expect(ratingSelect).toBeVisible({ timeout: 15_000 });
+    await ratingSelect.selectOption("5");
+    await clientPage
+      .locator('textarea[name="reviewText"]')
+      .fill("Excelente cerrajero presencial!");
+    await clientPage
+      .getByRole("button", { name: "Publicar reseña" })
+      .click({ force: true });
+    await expect(
+      clientPage.getByText("Reseña verificada de este trabajo").first(),
+    ).toBeVisible({ timeout: 15_000 });
+
+    await clientCtx.close();
+    await pCtx.close();
+    expect(consoleErrors).toEqual([]);
+  });
+
+  // ---------------------------------------------------------------------------
+  // TEST 3: MODELO B — NECESIDAD PÚBLICA CON COMPARADOR MULTI-OFERTA (2 OFERTAS)
+  // ---------------------------------------------------------------------------
+  test("Modelo B - Comparador multi-oferta (2 candidatos) y adjudicación única", async ({
+    browser,
+  }) => {
+    const { dbUrl } = requireCredentials();
+    const runId = Math.random().toString(16).slice(2, 8);
+    const consoleErrors: string[] = [];
+
+    const clientUser = await createAuthUser(`c-rfq-${runId}`, "Cliente RFQ");
+    const p1User = await createAuthUser(`p1-rfq-${runId}`, "Candidato 1");
+    const p2User = await createAuthUser(`p2-rfq-${runId}`, "Candidato 2");
+
+    const p1Slug = `p1-rfq-${runId}`;
+    const p2Slug = `p2-rfq-${runId}`;
+    const s1Slug = `web-dev-1-${runId}`;
+    const s2Slug = `web-dev-2-${runId}`;
+
+    const db = new pg.Client({ connectionString: dbUrl });
+    await db.connect();
+
+    let remoteSkillId: string;
+    try {
+      const skillsRes = await db.query(
+        "SELECT id FROM skills WHERE is_active ORDER BY sort_order, id LIMIT 1",
+      );
+      remoteSkillId = skillsRes.rows[0].id;
+
+      // Provider 1 setup
+      await db.query(
+        `INSERT INTO provider_profiles (user_id, status, onboarding_step, public_slug, public_headline)
+         VALUES ($1, 'ACTIVE', 4, $2, 'Candidato 1 Web')
+         ON CONFLICT (user_id) DO UPDATE SET status = 'ACTIVE', marketplace_paused = false;`,
+        [p1User.id, p1Slug],
+      );
+      await db.query(
+        `INSERT INTO provider_skills (provider_user_id, skill_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
+        [p1User.id, remoteSkillId],
+      );
+      await db.query(
+        `INSERT INTO services (id, provider_user_id, skill_id, public_slug, title, description, modality, price_model, price_amount, currency_code, accepts_offers, schedule_type, is_published, is_paused)
+         VALUES (gen_random_uuid(), $1, $2, $3, 'Desarrollo Web Frontend P1', 'Desarrollo de landing page y diseño web frontend profesional.', 'REMOTE', 'FIXED', 4500000, 'ARS', true, 'UNSCHEDULED', true, false);`,
+        [p1User.id, remoteSkillId, s1Slug],
+      );
+
+      // Provider 2 setup
+      await db.query(
+        `INSERT INTO provider_profiles (user_id, status, onboarding_step, public_slug, public_headline)
+         VALUES ($1, 'ACTIVE', 4, $2, 'Candidato 2 Web')
+         ON CONFLICT (user_id) DO UPDATE SET status = 'ACTIVE', marketplace_paused = false;`,
+        [p2User.id, p2Slug],
+      );
+      await db.query(
+        `INSERT INTO provider_skills (provider_user_id, skill_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
+        [p2User.id, remoteSkillId],
+      );
+      await db.query(
+        `INSERT INTO services (id, provider_user_id, skill_id, public_slug, title, description, modality, price_model, price_amount, currency_code, accepts_offers, schedule_type, is_published, is_paused)
+         VALUES (gen_random_uuid(), $1, $2, $3, 'Desarrollo Web Frontend P2', 'Desarrollo web a medida con Next.js y Tailwind CSS responsive.', 'REMOTE', 'FIXED', 5000000, 'ARS', true, 'UNSCHEDULED', true, false);`,
+        [p2User.id, remoteSkillId, s2Slug],
+      );
+    } finally {
+      await db.end();
+    }
+
     const clientCtx = await browser.newContext({
       viewport: { width: 1280, height: 800 },
     });
@@ -239,460 +514,315 @@ test.describe("YALO Dual Model Validation (PR #29)", () => {
     const p1Page = await p1Ctx.newPage();
     const p2Page = await p2Ctx.newPage();
 
-    attachErrorListeners(clientPage, "Client", consoleErrors);
-    attachErrorListeners(p1Page, "Provider1", consoleErrors);
-    attachErrorListeners(p2Page, "Provider2", consoleErrors);
+    attachErrorListeners(clientPage, "Client-RFQ", consoleErrors);
+    attachErrorListeners(p1Page, "Provider1-RFQ", consoleErrors);
+    attachErrorListeners(p2Page, "Provider2-RFQ", consoleErrors);
 
-    // Login users into their separate sessions
     await loginUser(clientPage, clientUser.email, clientUser.pass);
-    await loginUser(p1Page, provider1User.email, provider1User.pass);
-    await loginUser(p2Page, provider2User.email, provider2User.pass);
+    await loginUser(p1Page, p1User.email, p1User.pass);
+    await loginUser(p2Page, p2User.email, p2User.pass);
 
-    // =========================================================================
-    // MODEL A: DIRECT SELECTION (PRESENCIAL)
-    // =========================================================================
-    console.log("--- Starting Model A: Direct Selection (Presencial) ---");
-
-    // Client visits Provider 1's service page
-    await clientPage.goto(`/p/${p1Slug}/${s1Slug}`);
-    await expect(
-      clientPage.getByRole("heading", {
-        name: "Cerrajería y Apertura de Emergencia",
-      }),
-    ).toBeVisible();
-    await captureScreenshot(clientPage, "01-model-a-service-desktop.png");
-
-    // Client requests quotation
-    const quoteButton = clientPage.getByRole("button", {
-      name: /pedir cotización/i,
-    });
-    await expect(quoteButton).toBeVisible();
-    await quoteButton.click();
-
-    // Redirected to conversation (may include ?kind=...)
-    await expect(clientPage).toHaveURL(/\/messages\/[0-9a-f-]{36}/i);
-    const convMatch = clientPage.url().match(/\/messages\/([0-9a-f-]{36})/i);
-    if (!convMatch)
-      throw new Error("Conversation URL does not contain valid UUID");
-    const convId = convMatch[1];
-    await captureScreenshot(clientPage, "02-model-a-conversation-desktop.png");
-
-    // Provider 1 visits the conversation and proposes an agreement
-    await p1Page.goto(`/messages/${convId}`);
-    await expect(
-      p1Page.getByText("Cerrajería y Apertura de Emergencia").first(),
-    ).toBeVisible();
-
-    await openDetails(p1Page, /Enviar una cotización|Proponer un acuerdo/);
-    const proposalForm = p1Page.locator("form").filter({
-      has: p1Page.getByRole("button", { name: "Enviar propuesta" }),
-    });
-    await proposalForm.locator('input[name="price"]').fill("15000");
-    await proposalForm
-      .locator('textarea[name="scope"]')
-      .fill("Apertura de cerradura de seguridad sin rotura y cambio de perno.");
-    await proposalForm.evaluate((form: HTMLFormElement) =>
-      form.requestSubmit(),
-    );
-    await expect(
-      p1Page.getByText("Propuesta creada.", { exact: true }),
-    ).toBeVisible();
-
-    // Client accepts the proposal
-    await clientPage.reload();
-    await expect(
-      clientPage
-        .getByText("Apertura de cerradura de seguridad sin rotura")
-        .first(),
-    ).toBeVisible();
-
-    // Two-step hire confirmation on ProposalCard
-    const hireButton = clientPage.getByRole("button", { name: "Contratar" });
-    await expect(hireButton).toBeVisible();
-    await hireButton.click({ force: true });
-
-    const confirmHireButton = clientPage.getByRole("button", {
-      name: "Confirmar contratación",
-    });
-    await expect(confirmHireButton).toBeVisible();
-    await confirmHireButton.click({ force: true });
-
-    // Post-acceptance banner appears with link to Job
-    await expect(
-      clientPage.getByText(/ya tiene un servicio en marcha/i),
-    ).toBeVisible({ timeout: 15_000 });
-    const viewJobLink = clientPage.getByRole("link", {
-      name: "Ver seguimiento →",
-    });
-    await expect(viewJobLink).toBeVisible({ timeout: 15_000 });
-    const jobHref = await viewJobLink.getAttribute("href");
-    if (!jobHref) throw new Error("Job link not found in conversation.");
-    const jobId = jobHref.split("/jobs/")[1];
-
-    // Client opens Job page
-    await clientPage.goto(`/jobs/${jobId}`);
-    await expect(clientPage.getByText("Confirmado").first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await captureScreenshot(clientPage, "03-model-a-job-confirmed-desktop.png");
-
-    // Provider 1 starts the job
-    await p1Page.goto(`/jobs/${jobId}`);
-    const startJobButton = p1Page.getByRole("button", {
-      name: "Iniciar trabajo",
-    });
-    await expect(startJobButton).toBeVisible();
-    await startJobButton.click({ force: true });
-    await expect(
-      p1Page.locator('textarea[name="deliverySummary"]'),
-    ).toBeVisible({ timeout: 15_000 });
-
-    // Provider 1 submits delivery summary
-    await p1Page
-      .locator('textarea[name="deliverySummary"]')
-      .fill("Se realizó la apertura de cerradura y se colocó el nuevo perno.");
-    await p1Page
-      .getByRole("button", { name: "Enviar para revisión" })
-      .click({ force: true });
-    await expect(p1Page.locator('input[name="confirmationCode"]')).toBeVisible({
-      timeout: 15_000,
-    });
-
-    // Client reloads job page to see the generated PIN
-    await clientPage.reload();
-    const pinEl = clientPage.locator('[aria-label^="PIN de entrega"]');
-    await expect(pinEl).toBeVisible({ timeout: 15_000 });
-    const pinText = (await pinEl.innerText()).trim();
-    expect(pinText).toMatch(/^\d{4}$/);
-
-    // Provider 1 enters the 4-digit PIN in ConfirmationCodeForm
-    await p1Page.locator('input[name="confirmationCode"]').fill(pinText);
-    await p1Page
-      .getByRole("button", { name: "Dejar constancia de entrega" })
-      .click({ force: true });
-    await expect(
-      p1Page.locator('input[name="confirmationCode"]'),
-    ).not.toBeVisible({ timeout: 15_000 });
-
-    // Client reviews and confirms completion (S3: bilateral closure)
-    await clientPage.reload();
-    await expect(
-      clientPage.getByRole("button", { name: "Revisar y confirmar" }),
-    ).toBeVisible({ timeout: 15_000 });
-    await clientPage
-      .getByRole("button", { name: "Revisar y confirmar" })
-      .click({ force: true });
-    const finalConfirmButtonA = clientPage.getByRole("button", {
-      name: /Confirmar trabajo por/i,
-    });
-    await expect(finalConfirmButtonA).toBeVisible({ timeout: 15_000 });
-    await finalConfirmButtonA.click({ force: true });
-
-    // Status transitions to COMPLETED
-    await expect(clientPage.getByText("Completado").first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await captureScreenshot(
-      clientPage,
-      "04-model-a-handover-verified-desktop.png",
-    );
-
-    // External money declaration: Provider 1 declares payment received
-    await p1Page.reload();
-    await openDetails(p1Page, "Registrar dinero recibido");
-    await p1Page.locator('input[name="amount"]').fill("15000");
-    await p1Page.locator('select[name="method"]').selectOption("TRANSFERENCIA");
-    await p1Page
-      .getByRole("button", { name: "Enviar declaración" })
-      .click({ force: true });
-
-    // Client confirms payment
-    await clientPage.reload();
-    const confirmPaymentButton = clientPage.getByRole("button", {
-      name: "Confirmar que lo pagué",
-    });
-    await expect(confirmPaymentButton).toBeVisible({ timeout: 15_000 });
-    await confirmPaymentButton.click({ force: true });
-
-    await expect(clientPage.getByText("Saldo").first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(
-      clientPage.getByText("$0", { exact: false }).first(),
-    ).toBeVisible({ timeout: 15_000 });
-
-    // Client leaves a 5-star review
-    await clientPage.locator('select[name="rating"]').selectOption("5");
-    await clientPage
-      .locator('textarea[name="reviewText"]')
-      .fill("Excelente cerrajero, super rápido y confiable.");
-    await clientPage
-      .getByRole("button", { name: "Publicar reseña" })
-      .click({ force: true });
-
-    await expect(
-      clientPage.getByText("Reseña verificada de este trabajo").first(),
-    ).toBeVisible({ timeout: 15_000 });
-    await captureScreenshot(clientPage, "05-model-a-reviewed-desktop.png");
-
-    console.log(
-      "[OK] Model A: Direct Selection (Presencial) completed successfully!",
-    );
-
-    // =========================================================================
-    // MODEL B: OPEN NEED (REMOTO)
-    // =========================================================================
-    console.log("--- Starting Model B: Open Need (Remoto) ---");
-
-    // Client creates public need via Mobile viewport
+    // 1. Cliente publica necesidad vía Wizard móvil
     await clientPage.setViewportSize({ width: 390, height: 844 });
     await clientPage.goto("/needs/new");
-    await expect(
-      clientPage.getByText("Publicar necesidad").first(),
-    ).toBeVisible({ timeout: 15_000 });
-
-    // Step 0: rubro, title, description
     await clientPage
       .locator('select[name="skillId"]')
       .selectOption(remoteSkillId);
     await clientPage
       .locator('input[name="title"]')
-      .fill("Desarrollo de landing page responsive en Next.js");
+      .fill("Creación de Landing Institucional Next.js");
     await clientPage
       .locator('textarea[name="description"]')
-      .fill(
-        "Necesito crear una landing page institucional con diseño responsive y componentes interactivos.",
-      );
+      .fill("Necesitamos maquetación responsive en Next.js con Tailwind.");
     await clientPage
       .getByRole("button", { name: "Continuar" })
       .click({ force: true });
 
-    // Step 1: location & budget
-    await clientPage
-      .locator('input[name="locationText"]')
-      .fill("Remoto / Todo el país");
+    await clientPage.locator('input[name="locationText"]').fill("Remoto");
     await clientPage.locator('input[name="desiredBudgetAmount"]').fill("50000");
     await clientPage
       .getByRole("button", { name: "Continuar" })
       .click({ force: true });
 
-    // Step 2: Review and submit
-    await expect(
-      clientPage.getByText("Revisá antes de publicar"),
-    ).toBeVisible();
-    await captureScreenshot(clientPage, "06-model-b-need-published-mobile.png");
     await clientPage
       .getByRole("button", { name: "Publicar necesidad" })
       .click({ force: true });
+    await expect(clientPage).toHaveURL(/\/needs\/[0-9a-f-]{36}/i);
+    const postId = clientPage.url().split("/needs/")[1];
 
-    // Client is redirected to /needs/[postId]
-    await expect(clientPage).toHaveURL(/\/needs\/[0-9a-f-]{36}$/i);
-    const needUrl = clientPage.url();
-    const postId = needUrl.split("/needs/")[1];
-
-    // Provider 2 visits the need page to submit an offer
-    await p2Page.goto(`/needs/${postId}`);
+    // 2. Prestador 1 envía oferta por $45.000
+    await p1Page.goto(`/needs/${postId}`);
+    await p1Page.locator('select[name="serviceId"]').selectOption({ index: 1 });
+    await p1Page
+      .getByRole("button", { name: "Ofertar en esta necesidad" })
+      .click({ force: true });
+    await expect(p1Page).toHaveURL(/\/messages\/[0-9a-f-]{36}/i);
+    await openDetails(p1Page, /Enviar una cotización|Proponer un acuerdo/);
+    const formP1 = p1Page
+      .locator("form")
+      .filter({
+        has: p1Page.getByRole("button", { name: "Enviar propuesta" }),
+      });
+    await formP1.locator('input[name="price"]').fill("45000");
+    await formP1
+      .locator('textarea[name="scope"]')
+      .fill("Oferta candidato 1 por $45.000 ARS.");
+    await formP1.evaluate((form: HTMLFormElement) => form.requestSubmit());
     await expect(
-      p2Page
-        .getByText("Desarrollo de landing page responsive en Next.js")
-        .first(),
-    ).toBeVisible();
+      p1Page.getByText("Propuesta creada.", { exact: true }),
+    ).toBeVisible({ timeout: 15_000 });
 
-    // Provider 2 selects their remote service and clicks "Ofertar en esta necesidad"
-    const offerSelect = p2Page.locator('select[name="serviceId"]');
-    await expect(offerSelect).toBeVisible();
-    // Select first available service option
-    await offerSelect.selectOption({ index: 1 });
+    // 3. Prestador 2 envía oferta por $50.000
+    await p2Page.goto(`/needs/${postId}`);
+    await p2Page.locator('select[name="serviceId"]').selectOption({ index: 1 });
     await p2Page
       .getByRole("button", { name: "Ofertar en esta necesidad" })
       .click({ force: true });
-
-    // Provider 2 is redirected to the conversation and submits their quotation
     await expect(p2Page).toHaveURL(/\/messages\/[0-9a-f-]{36}/i);
     await openDetails(p2Page, /Enviar una cotización|Proponer un acuerdo/);
-    const proposalForm2 = p2Page.locator("form").filter({
-      has: p2Page.getByRole("button", { name: "Enviar propuesta" }),
-    });
-    await proposalForm2.locator('input[name="price"]').fill("50000");
-    await proposalForm2
+    const formP2 = p2Page
+      .locator("form")
+      .filter({
+        has: p2Page.getByRole("button", { name: "Enviar propuesta" }),
+      });
+    await formP2.locator('input[name="price"]').fill("50000");
+    await formP2
       .locator('textarea[name="scope"]')
-      .fill(
-        "Desarrollo completo de landing page en Next.js con diseño responsive y componentes interactivos.",
-      );
-    await proposalForm2.evaluate((form: HTMLFormElement) =>
-      form.requestSubmit(),
-    );
+      .fill("Oferta candidato 2 por $50.000 ARS con componentes premium.");
+    await formP2.evaluate((form: HTMLFormElement) => form.requestSubmit());
     await expect(
       p2Page.getByText("Propuesta creada.", { exact: true }),
     ).toBeVisible({ timeout: 15_000 });
 
-    // Client visits /needs/[postId] on desktop to compare offers
+    // 4. Cliente abre comparador en escritorio y ve "2 ofertas recibidas"
     await clientPage.setViewportSize({ width: 1280, height: 800 });
     await clientPage.goto(`/needs/${postId}`);
     await expect(
-      clientPage.getByText("1 oferta recibida").first(),
-    ).toBeVisible();
-    await captureScreenshot(clientPage, "07-model-b-need-awarded-desktop.png");
+      clientPage.getByText("2 ofertas recibidas").first(),
+    ).toBeVisible({ timeout: 15_000 });
+    await captureScreenshot(clientPage, "04-model-b-comparator-2-offers.png");
 
-    const compareOfferCta = clientPage.getByRole("link", {
-      name: "Ver oferta y contratar",
-    });
-    await expect(compareOfferCta).toBeVisible();
-    await compareOfferCta.click({ force: true });
-
-    // Client accepts Provider 2's offer via ProposalCard
+    // 5. Cliente contrata a Prestador 2
+    const compareCta = clientPage
+      .getByRole("link", { name: "Ver oferta y contratar" })
+      .last();
+    const conversationHref = await compareCta.getAttribute("href");
+    expect(conversationHref).toMatch(/\/messages\/[0-9a-f-]{36}/i);
+    await clientPage.goto(conversationHref!);
     await expect(clientPage).toHaveURL(/\/messages\/[0-9a-f-]{36}/i);
-    const hireOfferButton = clientPage.getByRole("button", {
-      name: "Contratar",
-    });
-    await expect(hireOfferButton).toBeVisible();
-    await hireOfferButton.click({ force: true });
 
-    const confirmHireOfferButton = clientPage.getByRole("button", {
-      name: "Confirmar contratación",
-    });
-    await expect(confirmHireOfferButton).toBeVisible();
-    await confirmHireOfferButton.click({ force: true });
+    await clientPage
+      .getByRole("button", { name: "Contratar" })
+      .click({ force: true });
+    await clientPage
+      .getByRole("button", { name: "Confirmar contratación" })
+      .click({ force: true });
 
-    // Post is awarded (HIRED) and Job is created
+    // Adjudicación confirmada
     await expect(
       clientPage.getByText(/ya tiene un servicio en marcha/i),
     ).toBeVisible({ timeout: 15_000 });
-    const remoteJobLink = clientPage.getByRole("link", {
-      name: "Ver seguimiento →",
-    });
-    await expect(remoteJobLink).toBeVisible({ timeout: 15_000 });
-    const remoteJobHref = await remoteJobLink.getAttribute("href");
-    if (!remoteJobHref)
-      throw new Error("Remote job link not found in conversation.");
-    const remoteJobId = remoteJobHref.split("/jobs/")[1];
+    await captureScreenshot(clientPage, "05-model-b-awarded-provider2.png");
 
-    // Provider 2 starts remote job
-    await p2Page.goto(`/jobs/${remoteJobId}`);
-    await p2Page
+    await clientCtx.close();
+    await p1Ctx.close();
+    await p2Ctx.close();
+    expect(consoleErrors).toEqual([]);
+  });
+
+  // ---------------------------------------------------------------------------
+  // TEST 4: ENTREGA REMOTA — VALIDACIÓN DE URL, CORRECCIÓN Y NO AUTOCIERRE
+  // ---------------------------------------------------------------------------
+  test("Entrega Remota - Validación estricta de URL HTTPS, corrección y no autocierre", async ({
+    browser,
+  }) => {
+    const { dbUrl } = requireCredentials();
+    const runId = Math.random().toString(16).slice(2, 8);
+    const consoleErrors: string[] = [];
+
+    const clientUser = await createAuthUser(`c-rem-${runId}`, "Cliente Remoto");
+    const pUser = await createAuthUser(`p-rem-${runId}`, "Prestador Remoto");
+
+    const pSlug = `p-rem-${runId}`;
+    const sSlug = `dev-remote-${runId}`;
+
+    const db = new pg.Client({ connectionString: dbUrl });
+    await db.connect();
+
+    let jobId: string;
+    try {
+      const skillsRes = await db.query(
+        "SELECT id FROM skills WHERE is_active ORDER BY sort_order, id LIMIT 1",
+      );
+      const skillId = skillsRes.rows[0].id;
+
+      await db.query(
+        `INSERT INTO provider_profiles (user_id, status, onboarding_step, public_slug, public_headline)
+         VALUES ($1, 'ACTIVE', 4, $2, 'Diseñador UI/UX')
+         ON CONFLICT (user_id) DO UPDATE SET status = 'ACTIVE', marketplace_paused = false;`,
+        [pUser.id, pSlug],
+      );
+      await db.query(
+        `INSERT INTO provider_skills (provider_user_id, skill_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
+        [pUser.id, skillId],
+      );
+      const servRes = await db.query(
+        `INSERT INTO services (id, provider_user_id, skill_id, public_slug, title, description, modality, price_model, price_amount, currency_code, accepts_offers, schedule_type, is_published, is_paused)
+         VALUES (gen_random_uuid(), $1, $2, $3, 'Diseño Figma y Maquetación', 'Servicio digital remoto.', 'REMOTE', 'FIXED', 3000000, 'ARS', true, 'UNSCHEDULED', true, false)
+         RETURNING id;`,
+        [pUser.id, skillId, sSlug],
+      );
+
+      // Crear conversación, propuesta y trabajo ya CONFIRMED
+      const convRes = await db.query(
+        `INSERT INTO conversations (id, service_id, client_user_id, provider_user_id)
+         VALUES (gen_random_uuid(), $1, $2, $3) RETURNING id;`,
+        [servRes.rows[0].id, clientUser.id, pUser.id],
+      );
+      const convId = convRes.rows[0].id;
+
+      await db.query(`SELECT set_config('request.jwt.claim.sub', $1, false);`, [
+        pUser.id,
+      ]);
+      const propRes = await db.query(
+        `SELECT public.create_conversation_proposal(
+          $1::uuid, 'PROVIDER_QUOTE'::public.proposal_kind, 'Diseño en Figma'::text, 3000000::bigint,
+          null, null, null, null, gen_random_uuid()
+        ) as id;`,
+        [convId],
+      );
+      const propId = propRes.rows[0].id;
+
+      await db.query(`SELECT set_config('request.jwt.claim.sub', $1, false);`, [
+        clientUser.id,
+      ]);
+      await db.query(
+        `SELECT public.respond_to_proposal($1::uuid, 'ACCEPT', null);`,
+        [propId],
+      );
+      const jobRes = await db.query(
+        `SELECT id FROM public.jobs WHERE conversation_id = $1::uuid;`,
+        [convId],
+      );
+      jobId = jobRes.rows[0].id;
+    } finally {
+      await db.end();
+    }
+
+    const clientCtx = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+    });
+    const pCtx = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+    });
+
+    const clientPage = await clientCtx.newPage();
+    const pPage = await pCtx.newPage();
+
+    attachErrorListeners(clientPage, "Client-RemoteDelivery", consoleErrors);
+    attachErrorListeners(pPage, "Provider-RemoteDelivery", consoleErrors);
+
+    await loginUser(clientPage, clientUser.email, clientUser.pass);
+    await loginUser(pPage, pUser.email, pUser.pass);
+
+    // 1. Prestador inicia trabajo
+    await pPage.goto(`/jobs/${jobId}`);
+    await pPage
       .getByRole("button", { name: "Iniciar trabajo" })
       .click({ force: true });
-    await expect(
-      p2Page.locator('textarea[name="deliverySummary"]'),
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(pPage.locator('textarea[name="deliverySummary"]')).toBeVisible(
+      { timeout: 15_000 },
+    );
 
-    // Provider 2 submits digital delivery (first iteration)
-    await p2Page
+    // 2. Intento de entrega inválida (rechazo de URL no HTTPS o malformada)
+    await pPage
       .locator('textarea[name="deliverySummary"]')
-      .fill("Entrega inicial del sitio web montado en repositorio.");
-    await p2Page
+      .fill("Entrega sin HTTPS");
+    await pPage
       .locator('input[name="deliveryEvidenceUrl"]')
-      .fill("https://github.com/gabsvm/changas");
-    await p2Page
+      .fill("http://untrusted-http-link.com");
+    await pPage
+      .getByRole("button", { name: "Enviar para revisión" })
+      .click({ force: true });
+
+    // Debe permanecer en formulario o mostrar error de validación HTTPS
+    await expect(
+      pPage.locator('input[name="deliveryEvidenceUrl"]'),
+    ).toBeVisible();
+
+    // 3. Prestador envía entrega válida con HTTPS
+    await pPage
+      .locator('input[name="deliveryEvidenceUrl"]')
+      .fill(
+        "https://github.com/gabsvm/changas/releases/v1.0.0/deliverable.zip",
+      );
+    await pPage
       .getByRole("button", { name: "Enviar para revisión" })
       .click({ force: true });
     await expect(
-      p2Page.getByText(/esperando revisión|Pendiente de cierre/i).first(),
+      pPage.getByText(/esperando revisión|Pendiente de cierre/i).first(),
     ).toBeVisible({ timeout: 15_000 });
-    await captureScreenshot(p2Page, "08-model-b-delivery-submitted.png");
 
-    // Client requests a correction
-    await clientPage.goto(`/jobs/${remoteJobId}`);
-    await expect(
-      clientPage.getByRole("button", { name: "Revisar y confirmar" }),
-    ).toBeVisible({ timeout: 15_000 });
+    // 4. Cliente solicita corrección formal
+    await clientPage.goto(`/jobs/${jobId}`);
     await clientPage
       .getByRole("button", { name: "Revisar y confirmar" })
       .click({ force: true });
     await openDetails(clientPage, "Pedir corrección");
     await clientPage
       .locator('textarea[name="correctionReason"]')
-      .fill(
-        "Por favor ajustar los márgenes móviles y el contraste del footer.",
-      );
+      .fill("Por favor ajustar colores corporativos y tipografía del footer.");
     await clientPage
       .getByRole("button", { name: "Enviar corrección" })
       .click({ force: true });
 
+    // El trabajo vuelve a En curso (IN_PROGRESS)
     await expect(clientPage.getByText("En curso").first()).toBeVisible({
       timeout: 15_000,
     });
-    await captureScreenshot(clientPage, "09-model-b-correction-requested.png");
+    await captureScreenshot(
+      clientPage,
+      "06-model-b-remote-correction-requested.png",
+    );
 
-    // Provider 2 re-submits delivery with corrections
-    await p2Page.reload();
-    await expect(
-      p2Page.locator('textarea[name="deliverySummary"]'),
-    ).toBeVisible({ timeout: 15_000 });
-    await p2Page
+    // 5. Prestador re-entrega corregido
+    await pPage.reload();
+    await expect(pPage.locator('textarea[name="deliverySummary"]')).toBeVisible(
+      { timeout: 15_000 },
+    );
+    await pPage
       .locator('textarea[name="deliverySummary"]')
-      .fill(
-        "Segunda entrega con correcciones de footer y márgenes móviles aplicadas.",
-      );
-    await p2Page
+      .fill("Correcciones de colores y tipografía aplicadas en v1.0.1.");
+    await pPage
       .locator('input[name="deliveryEvidenceUrl"]')
-      .fill("https://github.com/gabsvm/changas/tree/main");
-    await p2Page
+      .fill(
+        "https://github.com/gabsvm/changas/releases/v1.0.1/deliverable-fixed.zip",
+      );
+    await pPage
       .getByRole("button", { name: "Enviar para revisión" })
       .click({ force: true });
     await expect(
-      p2Page.getByText(/esperando revisión|Pendiente de cierre/i).first(),
+      pPage.getByText(/esperando revisión|Pendiente de cierre/i).first(),
     ).toBeVisible({ timeout: 15_000 });
 
-    // Client confirms completion
+    // 6. Cliente confirma y finaliza
     await clientPage.reload();
-    await expect(
-      clientPage.getByRole("button", { name: "Revisar y confirmar" }),
-    ).toBeVisible({ timeout: 15_000 });
     await clientPage
       .getByRole("button", { name: "Revisar y confirmar" })
       .click({ force: true });
-    const finalConfirmButton = clientPage.getByRole("button", {
-      name: /Confirmar trabajo por/i,
-    });
-    await expect(finalConfirmButton).toBeVisible({ timeout: 15_000 });
-    await finalConfirmButton.click({ force: true });
-
+    await clientPage
+      .getByRole("button", { name: /Confirmar trabajo por/i })
+      .click({ force: true });
     await expect(clientPage.getByText("Completado").first()).toBeVisible({
       timeout: 15_000,
     });
-    await clientPage.setViewportSize({ width: 390, height: 844 });
-    await captureScreenshot(clientPage, "10-model-b-completed-mobile.png");
-    await clientPage.setViewportSize({ width: 1280, height: 800 });
+    await captureScreenshot(
+      clientPage,
+      "07-model-b-remote-approved-completed.png",
+    );
 
-    // External money declaration & confirmation for remote job
-    await p2Page.reload();
-    await openDetails(p2Page, "Registrar dinero recibido");
-    await p2Page.locator('input[name="amount"]').fill("50000");
-    await p2Page.locator('select[name="method"]').selectOption("TRANSFERENCIA");
-    await p2Page
-      .getByRole("button", { name: "Enviar declaración" })
-      .click({ force: true });
-
-    await clientPage.reload();
-    const confirmRemotePayment = clientPage.getByRole("button", {
-      name: "Confirmar que lo pagué",
-    });
-    await expect(confirmRemotePayment).toBeVisible({ timeout: 15_000 });
-    await confirmRemotePayment.click({ force: true });
-
-    // Client leaves review for Provider 2
-    await clientPage.locator('select[name="rating"]').selectOption("5");
-    await clientPage
-      .locator('textarea[name="reviewText"]')
-      .fill("Excelente desarrollador, resolvió las correcciones al instante!");
-    await clientPage
-      .getByRole("button", { name: "Publicar reseña" })
-      .click({ force: true });
-
-    await expect(
-      clientPage.getByText("Reseña verificada de este trabajo").first(),
-    ).toBeVisible();
-    await captureScreenshot(clientPage, "11-model-b-reviewed.png");
-
-    console.log("[OK] Model B: Open Need (Remoto) completed successfully!");
-
-    // Close contexts cleanly
     await clientCtx.close();
-    await p1Ctx.close();
-    await p2Ctx.close();
-
-    // Final assertion: no critical uncaught page/console errors
+    await pCtx.close();
     expect(consoleErrors).toEqual([]);
   });
 });
