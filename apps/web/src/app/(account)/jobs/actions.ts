@@ -28,6 +28,7 @@ import {
   respondExternalPayment,
   setJobExactLocation,
   submitJobDelivery,
+  chooseJobEffectiveModality,
   transitionJob,
   voidExternalPayment,
 } from "@/lib/jobs/server";
@@ -142,6 +143,17 @@ export async function requestCompletionAction(
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");
   return { error: null };
+}
+
+export async function chooseJobModalityAction(formData: FormData): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const modality = stringField(formData, "modality");
+  if (modality !== "IN_PERSON" && modality !== "REMOTE") {
+    throw new Error("Elegí trabajo presencial o remoto.");
+  }
+  await chooseJobEffectiveModality(jobId, modality);
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs");
 }
 
 export type DeliverySubmitState = { error: string | null };
