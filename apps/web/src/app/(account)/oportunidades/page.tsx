@@ -6,6 +6,8 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { ActionLink } from "@/components/ui/marketplace/action-button";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { createClient } from "@/lib/supabase/server";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
+import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 import { listOpenJobPosts } from "@/lib/jobs/job-posts-server";
 
 export const metadata = {
@@ -15,6 +17,7 @@ export const metadata = {
 };
 
 export default async function OpportunitiesPage() {
+  if (!arePublicNeedsEnabled()) return <NeedsComingSoon />;
   const supabase = await createClient();
   const {
     data: { user },
