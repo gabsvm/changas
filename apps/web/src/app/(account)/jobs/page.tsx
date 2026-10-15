@@ -18,6 +18,7 @@ import { getJobStatusPresentation } from "@/lib/ui/job-status";
 import { NextStepBanner } from "@/components/ui/guided";
 import { isPaymentsEnabled } from "@changas/config/server";
 import { getClientNextAction } from "@/lib/ui/guided";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 
 function scheduleLabel(job: UpcomingJob) {
   if (job.starts_at) {
@@ -154,6 +155,7 @@ export default async function JobsPage({
           );
         })()}
 
+        {arePublicNeedsEnabled() ? (
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <Link
             href="/needs/new"
@@ -168,6 +170,7 @@ export default async function JobsPage({
             Ver mis necesidades
           </Link>
         </div>
+        ) : null}
         <nav
           className="mt-4 flex gap-2 overflow-x-auto"
           aria-label="Filtrar trabajos"
