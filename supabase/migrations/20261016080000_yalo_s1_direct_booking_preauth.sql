@@ -687,6 +687,8 @@ language plpgsql
 security definer
 set search_path = pg_catalog, public
 as $$
+-- user_blocks: el control de bloqueos lo aplica la implementacion
+-- canonica de 9 args; esta firma historica delega sin duplicarlo.
 begin
   return public.create_conversation_proposal(
     target_conversation_id,

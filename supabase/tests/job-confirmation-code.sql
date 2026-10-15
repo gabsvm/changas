@@ -33,8 +33,10 @@ select ok(
 );
 
 select ok(
-  (select pg_get_functiondef(to_regprocedure('public.transition_job_status(uuid,public.job_status,public.job_status,text,text)')))
-  like '%confirmation code is required to request completion%',
+  (select pg_get_functiondef(to_regprocedure('public.request_job_completion(uuid,text)')))
+  like '%confirmation code is required to request completion%'
+  and (select pg_get_functiondef(to_regprocedure('public.transition_job_status(uuid,public.job_status,public.job_status,text,text)')))
+  like '%request completion through request_job_completion%',
   'requesting completion without the code is rejected'
 );
 
