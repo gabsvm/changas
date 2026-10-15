@@ -62,8 +62,9 @@ revoke all privileges on table public.external_payment_declarations from public,
 grant select on table public.external_payment_declarations to authenticated;
 grant select, insert, update on table public.external_payment_declarations to service_role;
 
--- Monto total acordado: base + adicionales pagados (misma cuenta que
--- get_job_detail expone como total).
+-- Monto contractual: base + adicionales aceptados, ya sean PAID
+-- o pendientes de liquidacion (AWAITING_PAYMENT/PAYMENT_FAILED).
+-- El pago externo no debe depender de Mercado Pago ni excluir extras acordados.
 create or replace function public.external_agreed_total_for_job(target_job_id uuid)
 returns bigint
 language plpgsql
@@ -82,7 +83,9 @@ begin
   -- Sin fila de versión (inasequible con FK NOT NULL, pero barato):
   -- total 0 para que los topes filtren en vez de dejar pasar NULL.
   return coalesce((
-    select coalesce(pv.price_amount, 0) + public.paid_scope_additional_for_job(target_job.id)
+    select coalesce(pv.price_amount, 0)
+      + public.paid_scope_additional_for_job(target_job.id)
+      + public.unpaid_scope_additional_for_job(target_job.id)
     from public.proposal_versions pv
     where pv.id = target_job.accepted_proposal_version_id
   ), 0);
@@ -92,8 +95,10 @@ $$;
 revoke all on function public.external_agreed_total_for_job(uuid)
 from public, anon, authenticated, service_role;
 
+-- Helper SECURITY DEFINER no valida pertenencia: jamas exponerlo por RPC
+-- autenticado. Se invoca exclusivamente dentro de RPCs con ownership check.
 grant execute on function public.external_agreed_total_for_job(uuid)
-to authenticated, service_role;
+to service_role;
 
 -- Ledger bilateral: agreed / confirmed / claimed / outstanding.
 create or replace function public.external_payment_ledger(target_job_id uuid)
@@ -315,6 +320,7 @@ as $$
 declare
   caller_id uuid := auth.uid();
   declaration public.external_payment_declarations%rowtype;
+  declaration_job_id uuid;
   target_job public.jobs%rowtype;
   agreed bigint;
   confirmed bigint;
@@ -324,6 +330,17 @@ begin
   if caller_id is null then
     raise exception using errcode = '42501', message = 'authentication required';
   end if;
+
+  -- Orden global de locks: advisory(job) -> declaration -> job.
+  -- Nunca tomar primero el row lock de declaration y luego advisory:
+  -- declaration/supersede adquiere advisory antes que cualquier otra fila.
+  select d.job_id into declaration_job_id
+  from public.external_payment_declarations d
+  where d.id = target_declaration_id;
+  if declaration_job_id is null then
+    raise exception using errcode = 'P0002', message = 'declaration not found';
+  end if;
+  perform pg_advisory_xact_lock(hashtextextended(declaration_job_id::text, 0));
 
   select * into declaration
   from public.external_payment_declarations
@@ -353,8 +370,6 @@ begin
   if declaration.state not in ('DECLARED_BY_CLIENT', 'DECLARED_BY_PROVIDER') then
     raise exception using errcode = '40001', message = 'declaration already resolved; refresh and retry';
   end if;
-
-  perform pg_advisory_xact_lock(hashtextextended(declaration.job_id::text, 0));
 
   if accepted then
     if clean_reason is not null and char_length(clean_reason) > 1000 then
@@ -422,12 +437,24 @@ as $$
 declare
   caller_id uuid := auth.uid();
   declaration public.external_payment_declarations%rowtype;
+  declaration_job_id uuid;
   target_job public.jobs%rowtype;
   event_time timestamptz := timezone('utc', now());
 begin
   if caller_id is null then
     raise exception using errcode = '42501', message = 'authentication required';
   end if;
+
+  -- Orden global de locks: advisory(job) -> declaration -> job.
+  -- Nunca tomar primero el row lock de declaration y luego advisory:
+  -- declaration/supersede adquiere advisory antes que cualquier otra fila.
+  select d.job_id into declaration_job_id
+  from public.external_payment_declarations d
+  where d.id = target_declaration_id;
+  if declaration_job_id is null then
+    raise exception using errcode = 'P0002', message = 'declaration not found';
+  end if;
+  perform pg_advisory_xact_lock(hashtextextended(declaration_job_id::text, 0));
 
   select * into declaration
   from public.external_payment_declarations
