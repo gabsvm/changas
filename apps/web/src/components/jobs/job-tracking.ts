@@ -178,6 +178,15 @@ export function getJobNextAction(args: {
       kind: "verify_handover",
     };
   }
+  if (args.deliveryFlowAvailable === true && modality === "BOTH" && status === "CONFIRMED") {
+    return {
+      heading: isClient ? "Elegí si el trabajo es presencial o remoto" : "Esperando elección de modalidad",
+      sub: isClient
+        ? "El prestador ofrece ambas. Elegí cómo se hará el trabajo antes de comenzar."
+        : "El cliente debe elegir presencial o remoto para evitar un PIN incorrecto.",
+      kind: null,
+    };
+  }
   if (isProvider && status === "CONFIRMED") {
     return {
       heading: "Iniciá el trabajo cuando llegues",
