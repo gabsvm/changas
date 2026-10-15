@@ -1,18 +1,18 @@
 const steps = [
   {
-    title: "Buscá",
-    body: "Tocá una categoría. Mirá precio y reseñas.",
+    title: "Descubrí",
+    body: "Explorá servicios y elegí a la persona indicada.",
     gradient: "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)",
   },
   {
-    title: "Chateá",
-    body: "Acordá día y precio por chat.",
-    gradient: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)",
+    title: "Acordá",
+    body: "Conversá y definí el alcance, el precio y el momento.",
+    gradient: "linear-gradient(135deg, #08A9F4 0%, #12518A 100%)",
   },
   {
-    title: "Pagá y calificá",
-    body: "Pagás al terminar. Después calificás.",
-    gradient: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)",
+    title: "Resolvé y calificá",
+    body: "Seguí el trabajo, acordá el pago por fuera de YALO y compartí tu experiencia.",
+    gradient: "linear-gradient(135deg, #12D9C5 0%, #14785E 100%)",
   },
 ] as const;
 
