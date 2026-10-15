@@ -501,6 +501,16 @@ export default async function JobPage({
                 {detail.delivery_summary}
               </p>
             ) : null}
+            {detail.delivery_evidence_url ? (
+              <a
+                href={detail.delivery_evidence_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-primary mt-3 block break-all text-sm font-bold underline underline-offset-2"
+              >
+                Ver enlace de entrega digital
+              </a>
+            ) : null}
             <p className="text-ink/70 mt-2 text-[13px] leading-5">
               {detail.modality === "REMOTE"
                 ? "Entrega digital en revisión: no usa PIN."
