@@ -654,6 +654,20 @@ export async function requestJobCompletion(
   throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
 }
 
+/** Select the effective modality for an agreed BOTH job. Only client, before delivery. */
+export async function chooseJobEffectiveModality(
+  jobId: string,
+  modality: "IN_PERSON" | "REMOTE",
+): Promise<void> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("choose_job_effective_modality", {
+    target_job_id: jobId,
+    requested_modality: modality,
+  });
+  if (error) throw mapTransitionError(error.code, error.message);
+  if (data !== modality) throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+}
+
 // YALO S3: enviar la entrega para revisión (sin código). En remoto mueve
 // directo a COMPLETION_REQUESTED; en presencial queda IN_PROGRESS hasta la
 // constancia por requestJobCompletion.
