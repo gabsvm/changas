@@ -4,7 +4,7 @@
 -- Todo hace rollback al final del archivo.
 begin;
 
-select plan(34);
+select plan(38);
 
 -- Estructura: tabla, estados, RLS y firmas.
 select ok(
@@ -464,5 +464,43 @@ select is(
   'outsider reads no declarations'
 );
 reset role;
+-- Precio privado: helper interno no es RPC ejecutable por cualquier usuario.
+select ok(
+  not has_function_privilege('authenticated', 'public.external_agreed_total_for_job(uuid)', 'EXECUTE'),
+  'outsider authenticated role cannot execute private price helper'
+);
+select ok(
+  has_function_privilege('service_role', 'public.external_agreed_total_for_job(uuid)', 'EXECUTE'),
+  'service role can invoke the internal price helper'
+);
+
+-- Precio acordado externo incluye adicional aceptado aunque MP este OFF.
+-- Status AWAITING_PAYMENT significa consentimiento contractual sin checkout.
+insert into public.job_scope_changes (
+  job_id, requested_by_user_id, status, scope_snapshot,
+  additional_amount_minor, currency_code
+) values (
+  (select j.id from public.jobs j
+   where j.service_id = '18000000-0000-4000-8000-000000000010'),
+  '18000000-0000-4000-8000-000000000002',
+  'AWAITING_PAYMENT', 'Adicional de materiales aprobado sin checkout.',
+  30000, 'ARS'
+);
+select is(
+  (select agreed_total_minor from public.external_payment_ledger(
+    (select j.id from public.jobs j
+     where j.service_id = '18000000-0000-4000-8000-000000000010')
+  )),
+  130000,
+  'agreed total includes 100000 base plus 30000 accepted additional'
+);
+select is(
+  (select external_outstanding_minor from public.external_payment_ledger(
+    (select j.id from public.jobs j
+     where j.service_id = '18000000-0000-4000-8000-000000000010')
+  )),
+  70000,
+  'confirmed 60000 leaves 70000 including accepted additional'
+);
 select * from finish();
 rollback;
