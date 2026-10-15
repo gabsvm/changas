@@ -25,7 +25,7 @@ create unique index if not exists proposals_conversation_idempotency_key_uniq
 -- 3) Preflight ANTES de crear la constraint. Nunca permitir que un
 -- listado de reservas legacy con solapes cause una migracion a medias.
 -- Se informa el numero de solapes sin revelar detalles de usuarios.
-do $
+do $$
 declare
   legacy_overlaps integer;
 begin
@@ -42,7 +42,7 @@ begin
       message = format('Cannot add slot exclusion: %s legacy overlapping active holds', legacy_overlaps);
   end if;
 end;
-$;
+$$;
 
 -- Exclusion anti-doble-booking en holds activos del mismo prestador.
 alter table public.provider_slot_holds
