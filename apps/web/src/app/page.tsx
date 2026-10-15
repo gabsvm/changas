@@ -1,45 +1,56 @@
-import { HeroVisual } from "@/components/ui/marketplace/hero-visual";
-import { HowItWorks } from "@/components/ui/marketplace/how-it-works";
-import { SiteFooter } from "@/components/ui/site-footer";
 import Link from "next/link";
-import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import type { Metadata } from "next";
 
 import { parseDiscoveryFilters } from "@changas/domain";
-
 import { ExampleServices } from "@/components/discovery/example-services";
 import { BottomNav } from "@/components/ui/nav-with-counts";
-import { Avatar } from "@/components/ui/marketplace/avatar";
+import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import { CategoryTile } from "@/components/ui/marketplace/category-tile";
-import { EmptyState } from "@/components/ui/marketplace/empty-state";
+import { HowItWorks } from "@/components/ui/marketplace/how-it-works";
+import { MagneticRibbons } from "@/components/ui/marketplace/magnetic-ribbons";
 import { NearbyServiceRail } from "@/components/ui/marketplace/nearby-service-rail";
 import { SearchField } from "@/components/ui/marketplace/search-field";
-import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
-import { SectionHeader } from "@/components/ui/marketplace/section-header";
+import { SiteFooter } from "@/components/ui/site-footer";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { listMyUpcomingJobs, type UpcomingJob } from "@/lib/jobs/server";
+import { JOB_TERMINAL_STATUSES, getJobStatusPresentation } from "@/lib/ui/job-status";
 import { getJobTracking } from "@/components/jobs/job-tracking";
-import {
-  JOB_TERMINAL_STATUSES,
-  getJobStatusPresentation,
-} from "@/lib/ui/job-status";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Encontrá a alguien que lo haga",
   description:
-    "Buscá servicios y personas con habilidades cerca tuyo o trabajá de forma remota.",
+    "YALO conecta a quienes necesitan resolver algo con personas que saben hacerlo. Explorá servicios, compará propuestas y contratá con confianza.",
 };
 
 export const dynamic = "force-dynamic";
+
+const benefits = [
+  {
+    number: "01",
+    title: "Personas reales",
+    body: "Perfiles con identidad verificada antes de ofrecer servicios.",
+    detail: "Identidad",
+  },
+  {
+    number: "02",
+    title: "Todo más claro",
+    body: "Consultá, conversá y acordá el alcance y el precio.",
+    detail: "Acuerdos",
+  },
+  {
+    number: "03",
+    title: "De principio a fin",
+    body: "Seguimiento del trabajo y reseñas de experiencias reales.",
+    detail: "Confianza",
+  },
+] as const;
 
 export default async function HomePage() {
   const filters = parseDiscoveryFilters({ pageSize: "6" });
   const supabase = await createClient();
   const [
-    {
-      data: { user },
-    },
+    { data: { user } },
     { data: categories },
     discovery,
   ] = await Promise.all([
@@ -52,6 +63,7 @@ export default async function HomePage() {
       .limit(8),
     searchDiscovery({ query: "", filters }),
   ]);
+
   const { data: greetingProfile } = user
     ? await supabase
         .from("profiles")
@@ -59,299 +71,236 @@ export default async function HomePage() {
         .eq("id", user.id)
         .maybeSingle()
     : { data: null };
+
   const accountName =
     greetingProfile?.display_name?.trim().split(/\s+/)[0] ||
     user?.email?.split("@")[0] ||
     "Tu cuenta";
+
   let activeJobs: UpcomingJob[] = [];
   if (user) {
     try {
-      const upcoming = await listMyUpcomingJobs(5);
-      activeJobs = upcoming.filter(
+      activeJobs = (await listMyUpcomingJobs(5)).filter(
         (job) => !JOB_TERMINAL_STATUSES.includes(job.job_status),
       );
     } catch {
       activeJobs = [];
     }
   }
+
   const heroJob = activeJobs[0] ?? null;
-  const heroTracking = heroJob
-    ? getJobTracking(heroJob.job_status, null)
-    : null;
-  const heroStatus = heroJob
-    ? getJobStatusPresentation(heroJob.job_status)
-    : null;
+  const heroTracking = heroJob ? getJobTracking(heroJob.job_status, null) : null;
+  const heroStatus = heroJob ? getJobStatusPresentation(heroJob.job_status) : null;
 
   return (
-    <main
-      id="main-content"
-      className="feed-home bg-canvas text-ink mobile-content-with-nav min-h-screen"
-    >
-      <div className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-8 sm:pt-5">
-        <header className="consumer-app-header bg-canvas/90 border-ink/[0.06] sticky top-0 z-30 -mx-4 flex min-h-14 items-center justify-between border-b px-4 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
-          <Link
-            className="flex min-w-0 items-center gap-2.5"
-            href="/"
-            aria-label="YALO, inicio"
-          >
-            <span className="brand-mark h-9 w-9" role="img" aria-label="YALO" />
-            <span className="min-w-0">
-              <span className="block truncate text-[17px] leading-5 font-extrabold tracking-[-0.02em]">
-                {user ? `Hola, ${accountName}` : "YALO"}
-              </span>
-              <span className="text-ink/70 block truncate text-[13px] leading-4 font-medium">
-                {user ? "¿Qué resolvemos hoy?" : "Servicios cerca tuyo"}
-              </span>
+    <main id="main-content" className="yalo-showcase mobile-content-with-nav">
+      <div className="yalo-shell">
+        <header className="yalo-glass-nav">
+          <Link href="/" className="yalo-header-brand" aria-label="YALO, inicio">
+            <span className="yalo-header-symbol">
+              <img src="/brand/yalo-symbol.svg" width={35} height={35} alt="" />
             </span>
+            <span className="yalo-header-wordmark">YALO</span>
           </Link>
-          <div className="mr-2 ml-auto hidden sm:block">
+          <div className="yalo-desktop-navigation">
             <DesktopNav authenticated={Boolean(user)} />
           </div>
-          {user ? (
+          <div className="yalo-nav-actions">
+            {user ? (
+              <Link className="yalo-nav-login" href="/account">
+                Hola, {accountName}
+              </Link>
+            ) : (
+              <Link className="yalo-nav-login" href="/login">
+                Ingresar
+              </Link>
+            )}
             <Link
-              href="/account"
-              className="consumer-pressable hover:bg-ink/[0.04] flex h-12 w-12 items-center justify-center rounded-full sm:hidden"
-              aria-label="Abrir mi cuenta"
+              className="yalo-nav-primary"
+              href={user ? "/provider/manage" : "/provider/onboarding"}
             >
-              <Avatar name={accountName} size="sm" />
+              Ofrecer mis servicios <span aria-hidden="true">↗</span>
             </Link>
-          ) : (
-            <Link
-              className="consumer-pressable hover:bg-ink/[0.04] text-ink border-ink/[0.1] bg-surface inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-bold shadow-sm"
-              href="/login"
-            >
-              Ingresar
-            </Link>
-          )}
+          </div>
+          <Link className="yalo-nav-mobile" href={user ? "/account" : "/login"}>
+            {user ? "Mi cuenta" : "Ingresar"} <span aria-hidden="true">↗</span>
+          </Link>
         </header>
+
         {heroJob && heroTracking && heroStatus ? (
           <Link
-            href={`/jobs/${heroJob.job_id}`}
-            aria-label={`Tenés un servicio en marcha: ${heroJob.service_title}. Ver seguimiento.`}
-            className="consumer-pressable mt-4 flex items-center gap-3 rounded-2xl bg-[#17140f] px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(23_20_15/50%)]"
+            href={"/jobs/" + heroJob.job_id}
+            className="yalo-live-job"
+            aria-label={"Servicio en marcha: " + heroJob.service_title + ". Ver seguimiento."}
           >
-            <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2fbf71] opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#2fbf71]" />
-            </span>
+            <span className="yalo-live-pulse" aria-hidden="true" />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-extrabold">
+              <strong>
                 {activeJobs.length > 1
-                  ? `Tenés ${activeJobs.length} servicios en marcha`
+                  ? "Tenés " + activeJobs.length + " servicios en marcha"
                   : "Tenés un servicio en marcha"}
-              </span>
-              <span className="block truncate text-xs text-white/70">
-                {heroJob.service_title} · {heroTracking.exception ? heroStatus.label : `Paso ${heroTracking.currentIndex + 1} de ${heroTracking.steps.length} · ${heroStatus.label}`}
-              </span>
+              </strong>
+              <small>{heroJob.service_title} · {heroStatus.label}</small>
             </span>
-            <span className="shrink-0 rounded-full bg-white px-3.5 py-2 text-[13px] font-extrabold text-[#17140f]">
-              Ver seguimiento
-            </span>
+            <span className="yalo-live-link">Ver seguimiento ↗</span>
           </Link>
         ) : null}
-        <div className="pt-4 sm:pt-9">
-          <section
-            aria-labelledby="home-search-title"
-            className="brand-gradient-surface text-ink relative overflow-hidden rounded-[1.75rem] p-5 shadow-[var(--consumer-shadow-hero)] sm:p-9"
-          >
-            <span
-              className="pointer-events-none absolute inset-0 opacity-25"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                backgroundSize: "12px 12px",
-              }}
-              aria-hidden="true"
-            />
-            <span
-              className="pointer-events-none absolute -right-10 -bottom-16 h-48 w-48 rounded-full bg-white/20"
-              aria-hidden="true"
-            />
-            <span
-              className="pointer-events-none absolute -top-10 -left-10 h-32 w-32 rounded-full bg-white/15"
-              aria-hidden="true"
-            />
-            <div className="relative z-10 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-10">
-              <div>
-                <div className="relative z-10 max-w-2xl">
-                  <img
-                    src="/brand/yalo-logo-horizontal-dark.svg"
-                    alt="YALO"
-                    className="h-9 w-auto"
-                    width={120}
-                    height={36}
-                  />
-                  <p className="mt-3 text-xs font-extrabold tracking-[0.14em] text-white/70 uppercase">
-                    Trabajá · Contratá · Crecé
-                  </p>
-                  <h1
-                    id="home-search-title"
-                    className="mt-3 max-w-xl text-[2.5rem] leading-none font-extrabold tracking-[-0.04em] text-white sm:text-6xl"
-                  >
-                    Encontrá a alguien que lo haga.
-                  </h1>
-                  <p className="mt-3 max-w-lg text-[15px] leading-6 text-white/80 sm:text-lg">
-                    Oficios verificables cerca tuyo o por videollamada. Buscá
-                    una vez y elegí con precios claros.
-                  </p>
-                </div>
-                <form
-                  action="/buscar"
-                  className="relative z-10 mt-6 flex flex-col gap-2.5 sm:max-w-2xl sm:flex-row sm:items-center"
-                >
-                  <div className="min-w-0 flex-1">
-                    <SearchField
-                      className="min-h-14 shadow-[var(--shadow-lg)]"
-                      id="home-query"
-                      name="q"
-                      placeholder="Plomero, clases, paseo…"
-                      aria-label="Buscar un servicio o habilidad"
-                    />
-                  </div>
-                  <button
-                    className="consumer-pressable cta-ink inline-flex min-h-14 w-full items-center justify-center rounded-2xl px-8 text-[15px] font-extrabold whitespace-nowrap sm:w-auto"
-                    type="submit"
-                  >
-                    Buscar
-                  </button>
-                </form>
-                <div
-                  className="relative z-10 mt-4 flex flex-wrap gap-2"
-                  role="group"
-                  aria-label="Atajos de búsqueda"
-                >
-                  <Link
-                    href="/buscar?mode=presencial"
-                    className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
-                  >
-                    Presencial
-                  </Link>
-                  <Link
-                    href="/buscar?mode=remoto"
-                    className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
-                  >
-                    Remoto
-                  </Link>
-                  <Link
-                    href="/buscar?offers=true"
-                    className="chip-glass consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold"
-                  >
-                    Acepta ofertas
-                  </Link>
-                </div>
-              </div>
-              <HeroVisual />
-            </div>
-          </section>
 
-          <section className="mt-6" aria-labelledby="categories-title">
-            <div id="categories-title">
-              <SectionHeader
-                title="Oficios populares"
-                actionHref="/buscar"
-                actionLabel="Ver todos"
-                badge={{ tone: "gold", icon: "compass" }}
+        <section className="yalo-stage" aria-labelledby="home-search-title">
+          <div className="yalo-stage-backdrop" aria-hidden="true">
+            <span className="yalo-stage-orb yalo-stage-orb-one" />
+            <span className="yalo-stage-orb yalo-stage-orb-two" />
+          </div>
+          <MagneticRibbons />
+          <div className="yalo-stage-copy">
+            <div className="yalo-hero-eyebrow">
+              <span className="yalo-eyebrow-spark" aria-hidden="true" />
+              TRABAJÁ · CONTRATÁ · CRECÉ
+              <span className="yalo-eyebrow-arrow" aria-hidden="true">↗</span>
+            </div>
+            <h1 id="home-search-title" className="yalo-stage-title">
+              Lo que necesitás.
+              <span>Alguien que sabe hacerlo.</span>
+            </h1>
+            <p className="yalo-stage-description">
+              De arreglar una canilla a lanzar tu próximo proyecto.
+              Encontrá personas que saben, hablá directo y resolvé a tu manera.
+            </p>
+
+            <form action="/buscar" role="search" className="yalo-hero-search">
+              <SearchField
+                id="home-query"
+                name="q"
+                placeholder="¿Qué necesitás resolver hoy?"
+                aria-label="Buscar un servicio o habilidad"
               />
-            </div>
-            <div className="mt-2 grid grid-cols-4 gap-2.5 sm:grid-cols-7">
-              {(categories ?? []).map((category) => (
-                <CategoryTile
-                  key={category.slug}
-                  href={`/categoria/${category.slug}`}
-                  label={category.name}
-                  description={category.description}
-                  icon={category.slug}
-                />
-              ))}
-            </div>
-          </section>
+              <button className="yalo-search-submit" type="submit">
+                Buscar <span aria-hidden="true">↗</span>
+              </button>
+            </form>
 
-          <section className="mt-7">
+            <div className="yalo-hero-shortcuts" role="group" aria-label="Explorar servicios">
+              <span>Explorá por</span>
+              <Link href="/buscar?mode=presencial">Presencial <span aria-hidden="true">↗</span></Link>
+              <Link href="/buscar?mode=remoto">Remoto <span aria-hidden="true">↗</span></Link>
+              <Link href="/buscar?offers=true">Con ofertas <span aria-hidden="true">↗</span></Link>
+            </div>
+          </div>
+
+          <div className="yalo-stage-footnote" aria-hidden="true">
+            <span>PERSONAS + HABILIDADES + OPORTUNIDADES</span>
+            <span className="yalo-stage-scroll">DESCUBRÍ YALO <span>↓</span></span>
+          </div>
+        </section>
+
+        <section className="yalo-confidence-bar" aria-label="Por qué elegir YALO">
+          <span><span className="yalo-confidence-icon">✓</span> Perfiles con identidad verificada</span>
+          <span><span className="yalo-confidence-icon">↗</span> Conversá sin intermediarios</span>
+          <span><span className="yalo-confidence-icon">✦</span> Reseñas de trabajos reales</span>
+        </section>
+
+        <section className="yalo-home-section yalo-category-section" aria-labelledby="categories-title">
+          <div className="yalo-section-heading">
+            <div>
+              <p className="yalo-section-kicker">ENCONTRÁ TU SOLUCIÓN</p>
+              <h2 id="categories-title">¿Qué hacemos hoy<span className="yalo-period">?</span></h2>
+              <p className="yalo-section-description">
+                Desde algo puntual hasta ese proyecto que venís postergando.
+              </p>
+            </div>
+            <Link href="/buscar" className="yalo-section-link">
+              Ver todos los servicios <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+          <div className="yalo-category-grid">
+            {(categories ?? []).map((category) => (
+              <CategoryTile
+                key={category.slug}
+                href={"/categoria/" + category.slug}
+                label={category.name}
+                description={category.description}
+                icon={category.slug}
+              />
+            ))}
+            {(!categories || categories.length === 0) ? (
+              <p className="yalo-empty-copy">Explorá los servicios disponibles en YALO.</p>
+            ) : null}
+          </div>
+        </section>
+
+        <section className="yalo-home-section yalo-featured-section" aria-labelledby="featured-title">
+          <div className="yalo-section-heading">
+            <div>
+              <p className="yalo-section-kicker">PERSONAS QUE HACEN</p>
+              <h2 id="featured-title">Talento para lo que venga<span className="yalo-period">.</span></h2>
+              <p className="yalo-section-description">
+                Mirá perfiles, compará propuestas y elegí con información.
+              </p>
+            </div>
+            <Link href="/buscar" className="yalo-section-link">
+              Explorar YALO <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+          <div className="yalo-featured-results">
             {discovery.error ? (
-              <div>
-                <SectionHeader
-                  title="Profesionales destacados"
-                  actionHref="/buscar"
-                  actionLabel="Explorar más"
-                  badge={{ tone: "orange", icon: "star" }}
-                />
-                <p className="text-ink/70 mt-3 text-sm" role="status">
-                  La búsqueda está momentáneamente en mantenimiento.
-                </p>
-              </div>
+              <p role="status" className="yalo-empty-copy">
+                La búsqueda está momentáneamente en mantenimiento. Probá de nuevo más tarde.
+              </p>
             ) : discovery.rows.length > 0 ? (
               <NearbyServiceRail
                 rows={discovery.rows.slice(0, 6)}
-                title="Profesionales destacados"
+                title="Servicios disponibles"
                 actionHref="/buscar"
               />
             ) : (
               <ExampleServices
-                publishHref={
-                  user
-                    ? "/provider/onboarding"
-                    : "/login?next=/provider/onboarding"
-                }
+                publishHref={user ? "/provider/onboarding" : "/login?next=/provider/onboarding"}
               />
             )}
-          </section>
+          </div>
+        </section>
 
-          <HowItWorks />
-
-          <section className="consumer-card bg-surface relative mt-6 flex flex-col gap-3 overflow-hidden p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-            <span
-              className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--yalo-symbol-gradient)]"
-              aria-hidden="true"
-            />
-            <div className="flex items-start gap-3">
-              <IllustratedBadge tone="green" icon="shield" size="md" label="Identidad verificada" />
-              <div>
-                <h2 className="text-[15px] font-extrabold">
-                  Elegí con confianza
-                </h2>
-                <p className="text-ink/70 mt-1 text-[13px] leading-5">
-                  Cada proveedor verifica su identidad (DNI y selfie) antes de
-                  publicar. Perfiles públicos, precios claros y reseñas de
-                  trabajos reales. La verificación confirma quién es la persona;
-                  no certifica matrículas ni la calidad del trabajo.
-                </p>
-              </div>
+        <section className="yalo-home-section yalo-values" aria-labelledby="values-title">
+          <div className="yalo-section-heading">
+            <div>
+              <p className="yalo-section-kicker">ASÍ DE SIMPLE</p>
+              <h2 id="values-title">Un buen contacto cambia todo<span className="yalo-period">.</span></h2>
             </div>
-          </section>
+          </div>
+          <div className="yalo-values-grid">
+            {benefits.map((benefit) => (
+              <article key={benefit.number} className="yalo-value-card">
+                <div className="yalo-value-top">
+                  <span className="yalo-value-number">{benefit.number} /</span>
+                  <span className="yalo-value-glyph" aria-hidden="true">↗</span>
+                </div>
+                <span className="yalo-value-label">{benefit.detail}</span>
+                <h3>{benefit.title}</h3>
+                <p>{benefit.body}</p>
+              </article>
+            ))}
+          </div>
+          <div className="yalo-how-it-works"><HowItWorks /></div>
+        </section>
 
-          {!user ? (
-            <section className="consumer-card bg-ink! relative mt-4 flex flex-col gap-3 overflow-hidden p-5 text-white dark:border-white/10 dark:bg-[#2a231c]! dark:text-[#f5efe8]">
-              <span
-                className="pointer-events-none absolute inset-0 opacity-20"
-                style={{
-                  backgroundImage:
-                    "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                  backgroundSize: "12px 12px",
-                }}
-                aria-hidden="true"
-              />
-              <span
-                className="pointer-events-none absolute -right-8 -bottom-12 h-36 w-36 rounded-full bg-white/10"
-                aria-hidden="true"
-              />
-              <div>
-                <h2 className="text-base font-extrabold tracking-[-0.02em]">
-                  Tu oficio merece un buen escaparate.
-                </h2>
-                <p className="mt-1 text-[13px] text-white/70">
-                  Publicá lo que hacés y empezá a recibir consultas.
-                </p>
-              </div>
-              <Link
-                className="consumer-pressable text-ink inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-4 text-sm font-extrabold dark:border dark:border-white/15 dark:bg-white/10 dark:text-white"
-                href="/provider/onboarding"
-              >
-                Ofrecer mis servicios
-              </Link>
-            </section>
-          ) : null}
-          <SiteFooter />
-        </div>
+        <section className="yalo-final-cta" aria-labelledby="final-cta-title">
+          <div className="yalo-final-cta-glow" aria-hidden="true" />
+          <p className="yalo-section-kicker">TU PRÓXIMO PASO EMPIEZA ACÁ</p>
+          <h2 id="final-cta-title">
+            ¿Tenés algo para resolver
+            <span> o algo para ofrecer?</span>
+          </h2>
+          <p>Dos maneras de crecer. Un mismo lugar para encontrarse.</p>
+          <div className="yalo-final-actions">
+            <Link href="/buscar" className="yalo-button-light">
+              Quiero contratar <span aria-hidden="true">↗</span>
+            </Link>
+            <Link href="/provider/onboarding" className="yalo-button-outline">
+              Quiero trabajar <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </section>
+        <SiteFooter className="yalo-showcase-footer" />
       </div>
       <BottomNav authenticated={Boolean(user)} />
     </main>
