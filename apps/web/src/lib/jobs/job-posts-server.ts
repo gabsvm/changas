@@ -129,11 +129,18 @@ export type JobPostOfferCard = {
   offer_updated_at: string;
 };
 
+type JobPostOffersRpc = {
+  rpc(
+    name: "list_job_post_offer_cards",
+    args: { target_post_id: string },
+  ): Promise<{ data: JobPostOfferCard[] | null; error: SupabaseError }>;
+};
+
 /** Solo el dueno: el RPC comprueba ownership. No cuenta chats vacios. */
 export async function listJobPostOfferCards(postId: string): Promise<JobPostOfferCard[]> {
   await requireUserId();
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("list_job_post_offer_cards", {
+  const { data, error } = await (supabase as unknown as JobPostOffersRpc).rpc("list_job_post_offer_cards", {
     target_post_id: postId,
   });
   if (error) throw mapError(error);
@@ -144,7 +151,7 @@ export async function countPostOffers(postId: string): Promise<number> {
   await requireUserId();
   const supabase = await createClient();
   // Oferta ≠ chat abierto. Contar cotizaciones reales, no eventos OFFER_RECEIVED.
-  const { data, error } = await supabase.rpc("list_job_post_offer_cards", {
+  const { data, error } = await (supabase as unknown as JobPostOffersRpc).rpc("list_job_post_offer_cards", {
     target_post_id: postId,
   });
   if (error) throw mapError(error);
