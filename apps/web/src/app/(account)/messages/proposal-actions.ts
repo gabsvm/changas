@@ -21,6 +21,7 @@ import {
 } from "@/lib/proposals/server";
 import { createProposalCheckout } from "@/lib/payments/server";
 import { createClient } from "@/lib/supabase/server";
+import { getConversationContext } from "@/lib/conversations/server";
 
 export type ProposalActionState = {
   status: "IDLE" | "SUCCESS" | "ERROR";
@@ -77,12 +78,8 @@ function actionError(error: unknown): ProposalActionState {
  */
 async function requireInstantPreauthorization(conversationId: string): Promise<void> {
   const supabase = await createClient();
-  const { data: thread, error: threadError } = await supabase
-    .from("conversations")
-    .select("service_id")
-    .eq("id", conversationId)
-    .maybeSingle();
-  if (threadError || !thread) throw new Error("No podemos consultar este servicio.");
+  const thread = await getConversationContext(conversationId);
+  if (!thread) throw new Error("No podemos consultar este servicio.");
   const { data: service, error: serviceError } = await supabase
     .from("services")
     .select("instant_booking_enabled")
