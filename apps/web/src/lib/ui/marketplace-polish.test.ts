@@ -5,6 +5,14 @@ const rootSource = readFileSync(
   new URL("../../app/page.tsx", import.meta.url),
   "utf8",
 );
+const homeThemeSource = readFileSync(
+  new URL("../../app/yalo-showcase.css", import.meta.url),
+  "utf8",
+);
+const magneticSource = readFileSync(
+  new URL("../../components/ui/marketplace/magnetic-ribbons.tsx", import.meta.url),
+  "utf8",
+);
 const heroSource = readFileSync(
   new URL("../../components/ui/marketplace/brand-hero.tsx", import.meta.url),
   "utf8",
@@ -77,12 +85,12 @@ const serviceCardSource = readFileSync(
 
 describe("marketplace polish contracts", () => {
   it("gives the home feed a unified hero search with depth", () => {
-    expect(rootSource).toContain("brand-gradient-surface");
+    expect(rootSource).toContain("yalo-stage");
     expect(rootSource).toContain("home-query");
     expect(rootSource).toContain("mode=presencial");
     expect(rootSource).toContain("mode=remoto");
     expect(rootSource).toContain("offers=true");
-    expect(rootSource).toContain("shadow");
+    expect(homeThemeSource).toContain("box-shadow");
     expect(rootSource).not.toContain("<BrandHero");
     expect(rootSource).not.toContain("home-search-panel");
     expect(rootSource).not.toContain("quick-action-card");
@@ -93,7 +101,7 @@ describe("marketplace polish contracts", () => {
     expect(rootSource).toContain('id="home-query"');
     expect(rootSource).not.toContain("home-query-mobile");
     expect(rootSource).not.toContain("home-search-title-desktop");
-    expect(rootSource).toContain("flex-col");
+    expect(homeThemeSource).toContain("flex-direction: column");
   });
 
   it("lets utility colors win over the global anchor reset", () => {
@@ -129,20 +137,32 @@ describe("marketplace polish contracts", () => {
   });
 
   it("keeps the primary hero action readable on narrow screens", () => {
-    expect(rootSource).toContain("whitespace-nowrap");
-    expect(rootSource).toContain("w-full");
+    expect(rootSource).toContain("yalo-search-submit");
+    expect(homeThemeSource).toContain(".yalo-search-submit { width: 100%");
   });
 
   it("organizes the home as a polished marketplace feed", () => {
-    expect(rootSource).toContain("feed-home");
-    expect(rootSource).toContain("Oficios populares");
-    expect(rootSource).toContain("Profesionales destacados");
+    expect(rootSource).toContain("yalo-showcase");
+    expect(rootSource).toContain("¿Qué hacemos hoy");
+    expect(rootSource).toContain("Talento para lo que venga");
     expect(rootSource).toContain("Ofrecer mis servicios");
     expect(rootSource).toContain("NearbyServiceRail");
-    expect(rootSource).toContain("Elegí con confianza");
+    expect(rootSource).toContain("Personas reales");
     expect(rootSource).toContain('id="home-query"');
     expect(nearbySource).toContain("ServiceCard");
     expect(nearbySource).not.toContain('from "./service-row"');
+  });
+
+  it("keeps magnetic motion optional, brand-consistent and accessible", () => {
+    expect(rootSource).toContain("<MagneticRibbons");
+    expect(magneticSource).toContain("prefers-reduced-motion: reduce");
+    expect(magneticSource).toContain("pointer: fine");
+    expect(magneticSource).toContain("33");
+    expect(magneticSource).toContain("#08A9F4");
+    expect(magneticSource).toContain("#12D9C5");
+    expect(homeThemeSource).toContain("@media (max-width: 360px)");
+    expect(homeThemeSource).toContain("overflow-x: clip");
+    expect(homeThemeSource).toContain("yalo-glass-nav");
   });
 
   it("uses premium action surfaces in authenticated empty states", () => {
@@ -185,7 +205,7 @@ describe("marketplace polish contracts", () => {
   });
 
   it("gives public discovery surfaces a shared tactile composition", () => {
-    expect(rootSource).toContain("IllustratedBadge");
+    expect(rootSource).toContain("CategoryTile");
     expect(categorySource).toContain("brand-gradient-surface");
     expect(categorySource).toContain("discovery-results-shell");
     expect(providerSource).toContain("coverFor");
