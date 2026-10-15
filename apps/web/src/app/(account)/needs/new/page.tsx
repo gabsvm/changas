@@ -8,6 +8,8 @@ import {
   marketplaceTextareaClass,
 } from "@/components/ui/marketplace/form-field";
 import { createClient } from "@/lib/supabase/server";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
+import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 import { createNeedAction } from "../actions";
 
 export const metadata = {
@@ -17,6 +19,7 @@ export const metadata = {
 };
 
 export default async function NewNeedPage() {
+  if (!arePublicNeedsEnabled()) return <NeedsComingSoon />;
   const supabase = await createClient();
   const {
     data: { user },
