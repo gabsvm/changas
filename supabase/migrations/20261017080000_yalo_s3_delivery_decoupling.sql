@@ -5,6 +5,8 @@
 -- cliente. Remoto nunca pide PIN. Append-only; no toca datos existentes.
 
 alter table public.jobs
+  add column if not exists effective_modality public.service_modality null
+    check (effective_modality in ('IN_PERSON', 'REMOTE')),
   add column if not exists delivery_submitted_at timestamptz null,
   add column if not exists delivery_evidence_url text null
     check (delivery_evidence_url is null or char_length(delivery_evidence_url) <= 2048),
@@ -62,12 +64,15 @@ begin
     raise exception using errcode = '22023', message = 'delivery summary is invalid';
   end if;
 
-  select pv.modality into job_modality
+  select coalesce(target_job.effective_modality, pv.modality) into job_modality
   from public.proposal_versions pv
   where pv.id = target_job.accepted_proposal_version_id;
 
   if job_modality is null then
     raise exception using errcode = 'P0002', message = 'agreed terms not found';
+  end if;
+  if job_modality = 'BOTH' then
+    raise exception using errcode = '22023', message = 'choose effective work modality before delivery';
   end if;
 
   if job_modality = 'REMOTE' and (
@@ -129,6 +134,62 @@ revoke all on function public.submit_job_delivery(uuid, text, text)
 from public, anon, authenticated, service_role;
 
 grant execute on function public.submit_job_delivery(uuid, text, text)
+to authenticated, service_role;
+
+-- Para servicios ofertados como BOTH, el cliente fija la modalidad
+-- operativa efectiva antes de entregar. El prestador ya autorizo ambas.
+-- La decision queda en el trabajo y no altera el servicio original.
+create or replace function public.choose_job_effective_modality(
+  target_job_id uuid,
+  requested_modality public.service_modality
+)
+returns public.service_modality
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $$
+declare
+  caller_id uuid := auth.uid();
+  target_job public.jobs%rowtype;
+  published_modality public.service_modality;
+begin
+  if caller_id is null then
+    raise exception using errcode = '42501', message = 'authentication required';
+  end if;
+  if requested_modality not in ('IN_PERSON', 'REMOTE') then
+    raise exception using errcode = '22023', message = 'choose in-person or remote modality';
+  end if;
+  perform pg_advisory_xact_lock(hashtextextended(target_job_id::text, 0));
+  select * into target_job from public.jobs where id = target_job_id for update;
+  if target_job.id is null or target_job.client_user_id <> caller_id then
+    raise exception using errcode = '42501', message = 'only the client chooses work modality';
+  end if;
+  if target_job.status not in ('CONFIRMED', 'IN_PROGRESS')
+    or target_job.delivery_submitted_at is not null then
+    raise exception using errcode = '40001', message = 'work modality can no longer change';
+  end if;
+  select pv.modality into published_modality
+  from public.proposal_versions pv
+  where pv.id = target_job.accepted_proposal_version_id;
+  if published_modality <> 'BOTH' then
+    raise exception using errcode = '22023', message = 'work modality is already fixed by the agreement';
+  end if;
+  if target_job.effective_modality is not null
+    and target_job.effective_modality <> requested_modality then
+    raise exception using errcode = '40001', message = 'work modality is already selected';
+  end if;
+  update public.jobs set effective_modality = requested_modality,
+    updated_at = timezone('utc', now()) where id = target_job_id;
+  insert into public.job_events(job_id, actor_user_id, event_type, reason, created_at)
+  values (target_job_id, caller_id, 'JOB_MODALITY_CHOSEN',
+    requested_modality::text, timezone('utc', now()));
+  return requested_modality;
+end;
+$$;
+
+revoke all on function public.choose_job_effective_modality(uuid, public.service_modality)
+from public, anon, authenticated, service_role;
+grant execute on function public.choose_job_effective_modality(uuid, public.service_modality)
 to authenticated, service_role;
 
 -- Pedir correccion: el cliente devuelve el trabajo a IN_PROGRESS con
@@ -273,7 +334,7 @@ begin
     raise exception using errcode = '22023', message = 'submit the delivery before verifying the handover code';
   end if;
 
-  select pv.modality into job_modality
+  select coalesce(target_job.effective_modality, pv.modality) into job_modality
   from public.proposal_versions pv
   where pv.id = target_job.accepted_proposal_version_id;
 
@@ -407,7 +468,7 @@ begin
       raise exception using errcode = '22023', message = 'delivery evidence is required before completion';
     end if;
 
-    select pv.modality into job_modality
+    select coalesce(NEW.effective_modality, pv.modality) into job_modality
     from public.proposal_versions pv
     where pv.id = NEW.accepted_proposal_version_id;
 
@@ -457,7 +518,7 @@ begin
       and coalesce(j.completion_requested_at, j.updated_at) < cutoff - interval '7 days'
       and j.delivery_submitted_at is not null
       -- No autocerrar remotos sin revision humana: URL no prueba entrega real.
-      and pv.modality <> 'REMOTE'
+      and coalesce(j.effective_modality, pv.modality) = 'IN_PERSON'
       and j.handover_verified_at is not null
     order by coalesce(j.completion_requested_at, j.updated_at)
     limit 500
@@ -573,7 +634,7 @@ begin
     pv.scope_snapshot,
     pv.price_amount,
     pv.currency_code,
-    pv.modality,
+    coalesce(j.effective_modality, pv.modality),
     sv.schedule_type,
     sv.starts_at,
     sv.ends_at,
