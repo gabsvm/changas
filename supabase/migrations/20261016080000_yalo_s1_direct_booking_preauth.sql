@@ -22,7 +22,15 @@ create unique index if not exists proposals_conversation_idempotency_key_uniq
   on public.proposals (conversation_id, idempotency_key)
   where idempotency_key is not null;
 
--- 3) Preflight ANTES de crear la constraint. Nunca permitir que un
+-- 3) Limpieza preventiva de holds expirados antes del preflight para evitar
+-- bloqueos residuales por sesiones de pago inactivas o abandonadas.
+update public.provider_slot_holds
+set released_at = expires_at,
+    updated_at = timezone('utc', now())
+where released_at is null
+  and expires_at <= timezone('utc', now());
+
+-- Preflight ANTES de crear la constraint. Nunca permitir que un
 -- listado de reservas legacy con solapes cause una migracion a medias.
 -- Se informa el numero de solapes sin revelar detalles de usuarios.
 do $$
@@ -389,6 +397,15 @@ begin
   perform 1 from public.services s where s.id = target_service_id for update;
   perform 1 from public.provider_profiles pp where pp.user_id = target_provider_id for update;
 
+  -- Libera holds expirados del prestador para alinear el estado real con
+  -- la constraint GiST anti-solape.
+  update public.provider_slot_holds
+  set released_at = event_time,
+      updated_at = event_time
+  where provider_user_id = target_provider_id
+    and released_at is null
+    and expires_at <= event_time;
+
   if proposal_expires_at is not null and proposal_expires_at <= event_time then
     raise exception using errcode = '22023', message = 'proposal expiry must be in the future';
   end if;
@@ -544,7 +561,11 @@ begin
     service_price_model,
     effective_price,
     service_currency,
-    service_schedule_type,
+    case
+      when proposed_schedule_start_at is not null and proposed_schedule_end_at is not null
+        then 'FIXED_SLOT'::public.schedule_type
+      else coalesce(service_schedule_type, 'UNSCHEDULED'::public.schedule_type)
+    end,
     proposed_schedule_start_at,
     proposed_schedule_end_at,
     proposed_deadline_at,
@@ -593,31 +614,10 @@ begin
     on conflict (accepted_proposal_version_id)
     do update set accepted_proposal_version_id = excluded.accepted_proposal_version_id;
 
-    -- Reserva de capacidad: la ventana acordada queda bloqueada mientras
-    -- la exclusion anti-overlap impide doble booking concurrente.
-    if proposed_schedule_start_at is not null
-      and proposed_schedule_end_at is not null then
-      insert into public.provider_slot_holds (
-        proposal_id,
-        accepted_proposal_version_id,
-        provider_user_id,
-        client_user_id,
-        request_nonce,
-        starts_at,
-        ends_at,
-        expires_at
-      ) values (
-        created_proposal_id,
-        created_version_id,
-        target_provider_id,
-        target_client_id,
-        coalesce(request_idempotency_key, extensions.gen_random_uuid()),
-        proposed_schedule_start_at,
-        proposed_schedule_end_at,
-        coalesce(proposal_expires_at, event_time + interval '7 days')
-      )
-      on conflict (proposal_id, request_nonce) do nothing;
-    end if;
+    -- Capacidad permanente asegurada: initialize_job_schedule() ya inserto
+    -- la reserva activa en public.provider_booking_slots bajo lock advisory y
+    -- exclusion GiST anti-solape. No se inserta un hold transitorio de 7 dias;
+    -- la reserva del trabajo confirmado persiste hasta cancelacion o reprogramacion auditada.
   end if;
 
   insert into public.proposal_events (

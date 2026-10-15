@@ -120,7 +120,7 @@ export default async function PublicServicePage({
     instantEligible
       ? "Consultar disponibilidad y reservar"
       : service.price_model === "FIXED" && service.price_amount !== null
-        ? "Solicitar contratación"
+        ? "Pedir cotización"
         : "Pedir presupuesto";
   return (
     <main
@@ -359,7 +359,7 @@ export default async function PublicServicePage({
                     {price}
                   </p>
                   <p className="text-ink/70 truncate text-xs">
-                    {instantEligible ? "Reserva inmediata · pago entre ustedes" : "Por chat · coordinás día y precio"}
+                    {instantEligible ? "Reserva directa · coordinás día y hora" : "Por chat · coordinás día y precio"}
                   </p>
                 </div>
                 <ConsultButton label={hireCtaLabel} />

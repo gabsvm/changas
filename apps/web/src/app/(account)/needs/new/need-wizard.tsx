@@ -46,7 +46,11 @@ export function NeedWizard({
       const saved = window.sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved) as { data?: Draft; savedAt?: number };
-        if (parsed.data && parsed.savedAt && Date.now() - parsed.savedAt < MAX_AGE_MS) {
+        if (
+          parsed.data &&
+          parsed.savedAt &&
+          Date.now() - parsed.savedAt < MAX_AGE_MS
+        ) {
           return { ...EMPTY, ...parsed.data };
         }
         window.sessionStorage.removeItem(STORAGE_KEY);
@@ -84,7 +88,9 @@ export function NeedWizard({
   function next() {
     const form = formRef.current;
     if (!form) return;
-    const fields = form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+    const fields = form.querySelectorAll<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >(
       `[data-step="${step}"] input:not([type=hidden]), [data-step="${step}"] textarea, [data-step="${step}"] select`,
     );
     for (const input of Array.from(fields)) {
@@ -93,8 +99,12 @@ export function NeedWizard({
         return;
       }
     }
-    if (step === 1 && draft.scheduleStartAt && draft.scheduleEndAt &&
-      new Date(draft.scheduleEndAt) <= new Date(draft.scheduleStartAt)) {
+    if (
+      step === 1 &&
+      draft.scheduleStartAt &&
+      draft.scheduleEndAt &&
+      new Date(draft.scheduleEndAt) <= new Date(draft.scheduleStartAt)
+    ) {
       setError("La fecha de fin debe ser posterior al inicio.");
       return;
     }
@@ -102,9 +112,16 @@ export function NeedWizard({
   }
 
   return (
-    <form action={createNeedAction} ref={formRef} className="mt-6 flex flex-col gap-5">
+    <form
+      action={createNeedAction}
+      ref={formRef}
+      className="mt-6 flex flex-col gap-5"
+    >
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
-      <nav aria-label="Progreso de la publicación" className="grid grid-cols-3 gap-2">
+      <nav
+        aria-label="Progreso de la publicación"
+        className="grid grid-cols-3 gap-2"
+      >
         {["Qué necesitás", "Cuándo y dónde", "Revisar"].map((label, index) => (
           <div
             key={label}
@@ -116,7 +133,11 @@ export function NeedWizard({
         ))}
       </nav>
 
-      <div data-step="0" hidden={step !== 0} className={step === 0 ? "grid gap-5" : "hidden"}>
+      <div
+        data-step="0"
+        hidden={step !== 0}
+        className={step === 0 ? "grid gap-5" : "hidden"}
+      >
         <FormField label="¿Qué rubro necesitás?">
           <select
             name="skillId"
@@ -125,11 +146,20 @@ export function NeedWizard({
             className={marketplaceInputClass}
             onChange={(event) => change("skillId", event.target.value)}
           >
-            <option value="" disabled>Elegí un rubro</option>
-            {skills.map((skill) => <option key={skill.id} value={skill.id}>{skill.name}</option>)}
+            <option value="" disabled>
+              Elegí un rubro
+            </option>
+            {skills.map((skill) => (
+              <option key={skill.id} value={skill.id}>
+                {skill.name}
+              </option>
+            ))}
           </select>
         </FormField>
-        <FormField label="Título" helper="Describí la tarea en una frase (10 a 120 caracteres).">
+        <FormField
+          label="Título"
+          helper="Describí la tarea en una frase (10 a 120 caracteres)."
+        >
           <input
             name="title"
             value={draft.title}
@@ -141,7 +171,10 @@ export function NeedWizard({
             className={marketplaceInputClass}
           />
         </FormField>
-        <FormField label="Descripción" helper="Contá el alcance del trabajo. No incluyas DNI, teléfonos ni dirección exacta.">
+        <FormField
+          label="Descripción"
+          helper="Contá el alcance del trabajo. No incluyas DNI, teléfonos ni dirección exacta."
+        >
           <textarea
             name="description"
             value={draft.description}
@@ -156,7 +189,11 @@ export function NeedWizard({
         </FormField>
       </div>
 
-      <div data-step="1" hidden={step !== 1} className={step === 1 ? "grid gap-5" : "hidden"}>
+      <div
+        data-step="1"
+        hidden={step !== 1}
+        className={step === 1 ? "grid gap-5" : "hidden"}
+      >
         <FormField label="Barrio o zona (opcional)">
           <input
             name="locationText"
@@ -168,14 +205,18 @@ export function NeedWizard({
           />
         </FormField>
         <FormField label="Inicio deseado (opcional)">
-          <input name="scheduleStartAt" type="datetime-local"
+          <input
+            name="scheduleStartAt"
+            type="datetime-local"
             value={draft.scheduleStartAt}
             onChange={(event) => change("scheduleStartAt", event.target.value)}
             className={marketplaceInputClass}
           />
         </FormField>
         <FormField label="Fin deseado (opcional)">
-          <input name="scheduleEndAt" type="datetime-local"
+          <input
+            name="scheduleEndAt"
+            type="datetime-local"
             value={draft.scheduleEndAt}
             onChange={(event) => change("scheduleEndAt", event.target.value)}
             className={marketplaceInputClass}
@@ -183,9 +224,12 @@ export function NeedWizard({
         </FormField>
         <FormField label="Presupuesto orientativo ARS (opcional)">
           <input
-            name="desiredBudgetAmount" inputMode="decimal"
+            name="desiredBudgetAmount"
+            inputMode="decimal"
             value={draft.desiredBudgetAmount}
-            onChange={(event) => change("desiredBudgetAmount", event.target.value)}
+            onChange={(event) =>
+              change("desiredBudgetAmount", event.target.value)
+            }
             placeholder="Ej: 80.000"
             className={marketplaceInputClass}
           />
@@ -196,40 +240,74 @@ export function NeedWizard({
       </div>
 
       {step === 2 ? (
-        <section data-step="2" className="bg-surface border-ink/10 rounded-2xl border p-4">
-          <h2 className="font-display text-lg font-bold">Revisá antes de publicar</h2>
+        <section
+          data-step="2"
+          className="bg-surface border-ink/10 rounded-2xl border p-4"
+        >
+          <h2 className="font-display text-lg font-bold">
+            Revisá antes de publicar
+          </h2>
           <dl className="mt-3 grid gap-3 text-sm">
-            <div><dt className="text-ink/60">Trabajo</dt><dd className="font-bold">{draft.title}</dd></div>
-            <div><dt className="text-ink/60">Descripción</dt><dd className="whitespace-pre-wrap">{draft.description}</dd></div>
-            <div><dt className="text-ink/60">Zona</dt><dd>{draft.locationText || "A coordinar"}</dd></div>
-            <div><dt className="text-ink/60">Presupuesto</dt><dd>{draft.desiredBudgetAmount || "A convenir"}</dd></div>
+            <div>
+              <dt className="text-ink/60">Trabajo</dt>
+              <dd className="font-bold">{draft.title}</dd>
+            </div>
+            <div>
+              <dt className="text-ink/60">Descripción</dt>
+              <dd className="whitespace-pre-wrap">{draft.description}</dd>
+            </div>
+            <div>
+              <dt className="text-ink/60">Zona</dt>
+              <dd>{draft.locationText || "A coordinar"}</dd>
+            </div>
+            <div>
+              <dt className="text-ink/60">Presupuesto</dt>
+              <dd>{draft.desiredBudgetAmount || "A convenir"}</dd>
+            </div>
           </dl>
           <p className="text-ink/70 mt-4 text-xs leading-5">
-            Tu publicación será visible para prestadores del rubro. La contratación
-            y el precio final solo quedan confirmados cuando elegís una propuesta.
+            Tu publicación será visible para prestadores del rubro. La
+            contratación y el precio final solo quedan confirmados cuando elegís
+            una propuesta.
           </p>
           <p className="text-ink/60 mt-2 text-xs">
-            Borrador temporal en esta pestaña. Evitá datos privados en la descripción.
+            Borrador temporal en esta pestaña. Evitá datos privados en la
+            descripción.
           </p>
         </section>
       ) : null}
 
-      {error ? <p role="alert" className="text-danger text-sm font-semibold">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="text-danger text-sm font-semibold">
+          {error}
+        </p>
+      ) : null}
 
       <div className="flex items-center gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => { setStep((prev) => prev - 1); setError(""); }}
-            className="border-ink/15 min-h-12 rounded-xl border px-5 text-sm font-bold">
+          <button
+            type="button"
+            onClick={() => {
+              setStep((prev) => prev - 1);
+              setError("");
+            }}
+            className="border-ink/15 min-h-12 rounded-xl border px-5 text-sm font-bold"
+          >
             Volver
           </button>
         ) : null}
         {step < 2 ? (
-          <button type="button" onClick={next}
-            className="consumer-pressable cta-ink min-h-12 flex-1 rounded-xl px-5 text-sm font-bold">
+          <button
+            type="button"
+            onClick={next}
+            className="consumer-pressable cta-ink min-h-12 flex-1 rounded-xl px-5 text-sm font-bold"
+          >
             Continuar
           </button>
         ) : (
-          <ActionButton type="submit" className="flex-1">Publicar necesidad</ActionButton>
+          <ActionButton type="submit" className="flex-1">
+            Publicar necesidad
+          </ActionButton>
         )}
       </div>
     </form>
