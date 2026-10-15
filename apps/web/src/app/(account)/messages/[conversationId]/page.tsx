@@ -109,6 +109,12 @@ export default async function ConversationPage({
   const threadVersion = `${messages.at(-1)?.message_id ?? "empty"}:${attachments.length}:${blockedUserId ?? "none"}`;
   const initialTextNonce = crypto.randomUUID();
   const initialAttachmentNonce = crypto.randomUUID();
+  const { data: preauthService, error: preauthError } = await supabase
+    .from("services")
+    .select("instant_booking_enabled")
+    .eq("id", context.service_id)
+    .maybeSingle();
+  const canOfferInstant = !preauthError && preauthService?.instant_booking_enabled === true;
   const defaultProposalKind = proposalKinds.includes(requestedKind as ProposalKind)
     ? (requestedKind as ProposalKind)
     : undefined;  const proposalStatusLabels: Record<
@@ -302,6 +308,7 @@ export default async function ConversationPage({
           </section>
         ) : null}
         <ProposalComposer
+          allowDirectBooking={canOfferInstant}
           defaultKind={defaultProposalKind}
           conversationId={conversationId}
           currentUserIsClient={currentUserIsClient}
