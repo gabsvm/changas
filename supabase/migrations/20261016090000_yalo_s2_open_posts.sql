@@ -78,7 +78,7 @@ returns trigger
 language plpgsql
 security definer
 set search_path = pg_catalog, public
-as $
+as $$
 declare
   bound_post_id uuid;
   post_owner_id uuid;
@@ -104,7 +104,7 @@ begin
   end if;
   return NEW;
 end;
-$;
+$$;
 
 drop trigger if exists guard_job_post_single_award_trigger on public.jobs;
 create trigger guard_job_post_single_award_trigger
