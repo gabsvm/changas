@@ -1,3 +1,7 @@
+try {
+  process.loadEnvFile(".env.local");
+} catch {}
+
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
