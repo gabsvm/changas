@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/marketplace/action-button";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { createClient } from "@/lib/supabase/server";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
+import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 import { listMyJobPosts } from "@/lib/jobs/job-posts-server";
 import { governNeedAction } from "./actions";
 
@@ -23,6 +25,7 @@ const STATUS_LABELS = {
 } as const;
 
 export default async function NeedsPage() {
+  if (!arePublicNeedsEnabled()) return <NeedsComingSoon />;
   const supabase = await createClient();
   const {
     data: { user },
