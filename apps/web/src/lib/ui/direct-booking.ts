@@ -14,9 +14,13 @@ type HirableService = {
 
 /** Reserva directa solo con precio fijo y monto; el resto pide presupuesto. */
 export function getServiceHireKind(service: HirableService): ServiceHireKind {
+  // IMPORTANT: the legacy production RPC auto-accepts DIRECT_BOOKING.
+  // Never emit that kind unless the provider has explicitly opted in.
+  // This also fails closed while the S1 migration is not deployed.
   if (
     service.price_model === "FIXED" &&
-    service.price_amount !== null
+    service.price_amount !== null &&
+    service.instant_booking_enabled === true
   ) {
     return "DIRECT_BOOKING";
   }
