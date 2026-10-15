@@ -489,6 +489,7 @@ export default async function JobPage({
         </section>
 
         {isClient &&
+        detail.delivery_flow_available &&
         detail.modality === "BOTH" &&
         ["CONFIRMED", "IN_PROGRESS"].includes(detail.job_status) ? (
           <section className="border-ink/10 bg-surface mt-4 rounded-2xl border p-4" aria-label="Elegir modalidad efectiva">
