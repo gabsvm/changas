@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
@@ -45,6 +46,7 @@ export default async function NewNeedPage() {
         action={createNeedAction}
         className="mt-6 flex flex-col gap-5"
       >
+        <input type="hidden" name="idempotencyKey" value={randomUUID()} />
         <FormField
           label="¿Qué rubro necesitás?"
           helper="Elegí el rubro que mejor describa el trabajo."
