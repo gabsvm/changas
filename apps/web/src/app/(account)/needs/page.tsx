@@ -24,7 +24,9 @@ const STATUS_LABELS = {
   HIRED: "Contratada",
 } as const;
 
-export default async function NeedsPage() {
+export default async function NeedsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const params = await searchParams;
+  const page = Math.min(10000, Math.max(0, Number.parseInt(params.page ?? "0", 10) || 0));
   if (!arePublicNeedsEnabled()) return <NeedsComingSoon />;
   const supabase = await createClient();
   const {
@@ -33,11 +35,15 @@ export default async function NeedsPage() {
 
   if (!user) redirect("/login?next=/needs");
 
-  const posts = await listMyJobPosts();
+  const posts = await listMyJobPosts(page, 20);
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
       <MobileAppBar title="Mis necesidades" backHref="/jobs" />
+      <nav className="mt-5 flex gap-3" aria-label="Páginas de mis necesidades">
+        {page > 0 ? <ActionLink href={`/needs?page=${page - 1}`} tone="secondary">Anterior</ActionLink> : null}
+        {posts.length === 20 ? <ActionLink href={`/needs?page=${page + 1}`} tone="secondary">Siguiente</ActionLink> : null}
+      </nav>
       <div className="mt-4">
         <ActionLink href="/needs/new" className="w-full">
           Publicar necesidad
