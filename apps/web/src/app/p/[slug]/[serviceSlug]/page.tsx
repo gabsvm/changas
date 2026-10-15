@@ -118,7 +118,7 @@ export default async function PublicServicePage({
   const instantEligible = isInstantBookingEligible(service);
   const hireCtaLabel =
     instantEligible
-      ? `Reservar por ${price}`
+      ? "Consultar disponibilidad y reservar"
       : service.price_model === "FIXED" && service.price_amount !== null
         ? "Solicitar contratación"
         : "Pedir presupuesto";
