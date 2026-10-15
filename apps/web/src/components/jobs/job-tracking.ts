@@ -162,6 +162,8 @@ export function getJobNextAction(args: {
   modality?: "IN_PERSON" | "REMOTE" | "BOTH";
   deliverySubmitted?: boolean;
   handoverVerified?: boolean;
+  /** While S3 DB is not installed, preserve the legacy PIN-based flow. */
+  deliveryFlowAvailable?: boolean;
 }): NextAction {
   const { status, isClient, isProvider, settlementPending } = args;
   const paymentsEnabled = args.paymentsEnabled ?? false;
@@ -169,6 +171,13 @@ export function getJobNextAction(args: {
   const deliverySubmitted = args.deliverySubmitted ?? false;
   const handoverVerified = args.handoverVerified ?? false;
   const needsHandover = modality !== "REMOTE";
+  if (isProvider && status === "IN_PROGRESS" && args.deliveryFlowAvailable === false) {
+    return {
+      heading: "Solicitá el código de cierre al cliente",
+      sub: "Por ahora la entrega se confirma con el código del cliente. El nuevo flujo de entregas aún no está habilitado.",
+      kind: "verify_handover",
+    };
+  }
   if (isProvider && status === "CONFIRMED") {
     return {
       heading: "Iniciá el trabajo cuando llegues",
