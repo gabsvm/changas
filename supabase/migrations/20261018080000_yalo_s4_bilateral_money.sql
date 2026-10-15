@@ -62,8 +62,9 @@ revoke all privileges on table public.external_payment_declarations from public,
 grant select on table public.external_payment_declarations to authenticated;
 grant select, insert, update on table public.external_payment_declarations to service_role;
 
--- Monto total acordado: base + adicionales pagados (misma cuenta que
--- get_job_detail expone como total).
+-- Monto contractual: base + adicionales aceptados, ya sean PAID
+-- o pendientes de liquidacion (AWAITING_PAYMENT/PAYMENT_FAILED).
+-- El pago externo no debe depender de Mercado Pago ni excluir extras acordados.
 create or replace function public.external_agreed_total_for_job(target_job_id uuid)
 returns bigint
 language plpgsql
@@ -82,7 +83,9 @@ begin
   -- Sin fila de versión (inasequible con FK NOT NULL, pero barato):
   -- total 0 para que los topes filtren en vez de dejar pasar NULL.
   return coalesce((
-    select coalesce(pv.price_amount, 0) + public.paid_scope_additional_for_job(target_job.id)
+    select coalesce(pv.price_amount, 0)
+      + public.paid_scope_additional_for_job(target_job.id)
+      + public.unpaid_scope_additional_for_job(target_job.id)
     from public.proposal_versions pv
     where pv.id = target_job.accepted_proposal_version_id
   ), 0);
@@ -92,8 +95,10 @@ $$;
 revoke all on function public.external_agreed_total_for_job(uuid)
 from public, anon, authenticated, service_role;
 
+-- Helper SECURITY DEFINER no valida pertenencia: jamas exponerlo por RPC
+-- autenticado. Se invoca exclusivamente dentro de RPCs con ownership check.
 grant execute on function public.external_agreed_total_for_job(uuid)
-to authenticated, service_role;
+to service_role;
 
 -- Ledger bilateral: agreed / confirmed / claimed / outstanding.
 create or replace function public.external_payment_ledger(target_job_id uuid)
@@ -315,6 +320,7 @@ as $$
 declare
   caller_id uuid := auth.uid();
   declaration public.external_payment_declarations%rowtype;
+  declaration_job_id uuid;
   target_job public.jobs%rowtype;
   agreed bigint;
   confirmed bigint;
@@ -325,6 +331,17 @@ begin
     raise exception using errcode = '42501', message = 'authentication required';
   end if;
 
+  -- Orden global de locks: advisory(job) -> declaration -> job.
+  -- Nunca tomar primero el row lock de declaration y luego advisory:
+  -- declaration/supersede adquiere advisory antes que cualquier otra fila.
+  select d.job_id into declaration_job_id
+  from public.external_payment_declarations d
+  where d.id = target_declaration_id;
+  if declaration_job_id is null then
+    raise exception using errcode = 'P0002', message = 'declaration not found';
+  end if;
+  perform pg_advisory_xact_lock(hashtextextended(declaration_job_id::text, 0));
+
   select * into declaration
   from public.external_payment_declarations
   where id = target_declaration_id
@@ -334,7 +351,7 @@ begin
     raise exception using errcode = 'P0002', message = 'declaration not found';
   end if;
 
-  select * into target_job from public.jobs where id = declaration.job_id;
+  select * into target_job from public.jobs where id = declaration.job_id for update;
   if target_job.id is null or caller_id not in (target_job.client_user_id, target_job.provider_user_id) then
     raise exception using errcode = '42501', message = 'job access denied';
   end if;
@@ -353,8 +370,6 @@ begin
   if declaration.state not in ('DECLARED_BY_CLIENT', 'DECLARED_BY_PROVIDER') then
     raise exception using errcode = '40001', message = 'declaration already resolved; refresh and retry';
   end if;
-
-  perform pg_advisory_xact_lock(hashtextextended(declaration.job_id::text, 0));
 
   if accepted then
     if clean_reason is not null and char_length(clean_reason) > 1000 then
@@ -422,12 +437,24 @@ as $$
 declare
   caller_id uuid := auth.uid();
   declaration public.external_payment_declarations%rowtype;
+  declaration_job_id uuid;
   target_job public.jobs%rowtype;
   event_time timestamptz := timezone('utc', now());
 begin
   if caller_id is null then
     raise exception using errcode = '42501', message = 'authentication required';
   end if;
+
+  -- Orden global de locks: advisory(job) -> declaration -> job.
+  -- Nunca tomar primero el row lock de declaration y luego advisory:
+  -- declaration/supersede adquiere advisory antes que cualquier otra fila.
+  select d.job_id into declaration_job_id
+  from public.external_payment_declarations d
+  where d.id = target_declaration_id;
+  if declaration_job_id is null then
+    raise exception using errcode = 'P0002', message = 'declaration not found';
+  end if;
+  perform pg_advisory_xact_lock(hashtextextended(declaration_job_id::text, 0));
 
   select * into declaration
   from public.external_payment_declarations
@@ -438,7 +465,7 @@ begin
     raise exception using errcode = 'P0002', message = 'declaration not found';
   end if;
 
-  select * into target_job from public.jobs where id = declaration.job_id;
+  select * into target_job from public.jobs where id = declaration.job_id for update;
   if target_job.id is null or caller_id not in (target_job.client_user_id, target_job.provider_user_id) then
     raise exception using errcode = '42501', message = 'job access denied';
   end if;
@@ -475,3 +502,77 @@ from public, anon, authenticated, service_role;
 
 grant execute on function public.void_external_payment(uuid)
 to authenticated, service_role;
+
+-- Correccion lint 0A000: UNION ALL ORDER BY exige alias identico en el primer SELECT
+create or replace function public.list_payment_reconciliation_candidates(
+  reconciliation_provider_name text default 'MERCADO_PAGO',
+  reconciliation_range_start timestamptz default null,
+  reconciliation_range_end timestamptz default null
+)
+returns table (
+  checkout_session_id uuid,
+  payment_attempt_id uuid,
+  additional_payment_attempt_id uuid,
+  provider_name text,
+  provider_payment_reference text,
+  local_status text,
+  amount_minor bigint,
+  currency_code text,
+  external_reference text,
+  provider_account_reference text,
+  access_token_ciphertext text,
+  access_token_iv text,
+  access_token_auth_tag text,
+  encryption_key_version integer
+)
+language plpgsql
+stable
+security definer
+set search_path = pg_catalog, public
+as $$
+begin
+  if auth.role() <> 'service_role' then
+    raise exception using errcode = '42501', message = 'payment reconciliation candidates are server-only';
+  end if;
+
+  return query
+  select checkout.id as checkout_session_id, payment.id as payment_attempt_id, null::uuid as additional_payment_attempt_id, checkout.provider_name,
+    payment.provider_reference, payment.status::text, payment.amount_minor,
+    payment.currency_code, checkout.external_reference,
+    account.provider_account_reference, account.access_token_ciphertext,
+    account.access_token_iv, account.access_token_auth_tag, account.encryption_key_version
+  from public.payment_checkout_sessions checkout
+  join public.payment_attempts payment
+    on checkout.purpose = 'PROPOSAL'
+   and payment.proposal_id = checkout.proposal_id
+   and payment.request_nonce = checkout.request_nonce
+   and payment.provider_name = checkout.provider_name
+  join public.payment_provider_accounts account on account.id = checkout.payment_provider_account_id
+  where checkout.provider_name = upper(btrim(reconciliation_provider_name))
+    and (reconciliation_range_start is null or payment.created_at >= reconciliation_range_start)
+    and (reconciliation_range_end is null or payment.created_at <= reconciliation_range_end)
+
+  union all
+
+  select checkout.id as checkout_session_id, null::uuid as payment_attempt_id, additional.id as additional_payment_attempt_id, checkout.provider_name,
+    additional.provider_reference, additional.status::text, additional.amount_minor,
+    additional.currency_code, checkout.external_reference,
+    account.provider_account_reference, account.access_token_ciphertext,
+    account.access_token_iv, account.access_token_auth_tag, account.encryption_key_version
+  from public.payment_checkout_sessions checkout
+  join public.job_additional_payment_attempts additional
+    on checkout.purpose = 'SCOPE_CHANGE'
+   and additional.scope_change_id = checkout.scope_change_id
+   and additional.request_nonce = checkout.request_nonce
+   and additional.provider_name = checkout.provider_name
+  join public.payment_provider_accounts account on account.id = checkout.payment_provider_account_id
+  where checkout.provider_name = upper(btrim(reconciliation_provider_name))
+    and (reconciliation_range_start is null or additional.created_at >= reconciliation_range_start)
+    and (reconciliation_range_end is null or additional.created_at <= reconciliation_range_end)
+  order by checkout_session_id;
+end;
+$$;
+
+revoke all on function public.list_payment_reconciliation_candidates(text, timestamptz, timestamptz) from public, anon, authenticated, service_role;
+grant execute on function public.list_payment_reconciliation_candidates(text, timestamptz, timestamptz) to service_role;
+

@@ -4,7 +4,7 @@
 -- Todo hace rollback al final del archivo.
 begin;
 
-select plan(69);
+select plan(74);
 
 -- Estructura: tablas y columnas.
 select ok(
@@ -102,7 +102,7 @@ select ok(
 select ok(
   (select column_default from information_schema.columns
    where table_schema = 'public' and table_name = 'job_posts'
-     and column_name = 'status') = '''OPEN''::public.job_post_status',
+     and column_name = 'status') like '%''OPEN''%',
   'posts default to open'
 );
 select ok(
@@ -429,6 +429,22 @@ select
 from public.services
 where id = '16000000-0000-4000-8000-000000000010';
 
+insert into public.services (
+  id, provider_user_id, skill_id, public_slug, title, description,
+  modality, price_model, price_amount, currency_code, accepts_offers,
+  schedule_type, is_published
+)
+select
+  '16000000-0000-4000-8000-000000000012',
+  '16000000-0000-4000-8000-000000000002',
+  services.skill_id,
+  's2-service-adoption',
+  'S2 adoption service',
+  'Synthetic S2 adoption offer service fixture.',
+  'REMOTE', 'FIXED', 110000, 'ARS', false, 'UNSCHEDULED', true
+from public.services
+where id = '16000000-0000-4000-8000-000000000010';
+
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
 select ok(
   public.create_job_post(
@@ -497,15 +513,15 @@ select is(
   'repeat offer creates no duplicate thread'
 );
 
--- Quien no es dueno del servicio no puede ofertar con el.
+-- Quien no es dueno del servicio no puede ofertar con el, y el dueno del post no puede ofertar sobre si mismo.
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
 select throws_ok(
   $$select public.start_post_offer_conversation(
     (select id from public.job_posts
      where idempotency_key = '16000000-0000-4000-8000-0000000000c1'),
     '16000000-0000-4000-8000-000000000010')$$,
-  '42501', 'offer service is not available',
-  'client cannot offer with another service'
+  '22023', 'cannot offer on your own post',
+  'client cannot offer on own post'
 );
 
 -- El bloqueo del par frena la oferta.
@@ -570,7 +586,7 @@ select ok(
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
 select ok(
   public.create_job_post(
-    (select skill_id from public.services where id = '16000000-0000-4000-8000-000000000010'),
+    (select skill_id from public.services where id = '16000000-0000-4000-8000-000000000012'),
     'Necesito plomero urgente en casa',
     'Se rompio un cano bajo la bacha y necesito arreglo esta semana.',
     null, null, null, null, 'ARS',
@@ -579,7 +595,7 @@ select ok(
   'third open post is created for adoption'
 );
 select ok(
-  public.start_service_conversation('s2-provider', 's2-service') is not null,
+  public.start_service_conversation('s2-provider', 's2-service-adoption') is not null,
   'catalog thread opens before the offer'
 );
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000002', true);
@@ -587,17 +603,17 @@ select is(
   public.start_post_offer_conversation(
     (select id from public.job_posts
      where idempotency_key = '16000000-0000-4000-8000-0000000000e1'),
-    '16000000-0000-4000-8000-000000000010'
+    '16000000-0000-4000-8000-000000000012'
   )::text,
   (select id::text from public.conversations
-   where service_id = '16000000-0000-4000-8000-000000000010'
+   where service_id = '16000000-0000-4000-8000-000000000012'
      and client_user_id = '16000000-0000-4000-8000-000000000001'
      and provider_user_id = '16000000-0000-4000-8000-000000000002'),
   'offer adopts the free catalog thread'
 );
 select ok(
   (select job_post_id from public.conversations
-   where service_id = '16000000-0000-4000-8000-000000000010'
+   where service_id = '16000000-0000-4000-8000-000000000012'
      and client_user_id = '16000000-0000-4000-8000-000000000001'
      and provider_user_id = '16000000-0000-4000-8000-000000000002')
   = (select id from public.job_posts
@@ -661,12 +677,71 @@ select ok(
   ) is not null,
   'provider quotes on the bound thread'
 );
+-- Segundo candidato real. Preparar DOS ofertas antes de adjudicar la
+-- primera; la segunda no podra contratar cuando el post quede HIRED.
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data
+) values (
+  '00000000-0000-0000-0000-000000000000',
+  '16000000-0000-4000-8000-000000000003',
+  'authenticated', 'authenticated', 's2-second-provider@example.test',
+  'not-a-real-password', now(), now(), now(), '{}', '{"display_name":"Second Provider"}'
+);
+insert into public.provider_profiles (
+  user_id, status, onboarding_step, public_slug, public_headline
+) values (
+  '16000000-0000-4000-8000-000000000003',
+  'ACTIVE', 4, 's2-provider-second', 'Second candidate'
+);
+insert into public.provider_skills (provider_user_id, skill_id)
+select
+  '16000000-0000-4000-8000-000000000003',
+  s.skill_id
+from public.services s
+where s.id = '16000000-0000-4000-8000-000000000010';
+insert into public.services (
+  id, provider_user_id, skill_id, public_slug, title, description,
+  modality, price_model, price_amount, currency_code, accepts_offers,
+  schedule_type, is_published
+)
+select
+  '16000000-0000-4000-8000-000000000013',
+  '16000000-0000-4000-8000-000000000003',
+  s.skill_id, 's2-service-third', 'S2 third service',
+  'Second candidate for a race on one open need.',
+  'REMOTE', 'FIXED', 120000, 'ARS', false, 'UNSCHEDULED', true
+from public.services s
+where s.id = '16000000-0000-4000-8000-000000000010';
+
+select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000003', true);
+select ok(
+  public.start_post_offer_conversation(
+    (select id from public.job_posts
+     where idempotency_key = '16000000-0000-4000-8000-0000000000d1'),
+    '16000000-0000-4000-8000-000000000013'
+  ) is not null,
+  'second candidate can enter while post is still OPEN'
+);
+select ok(
+  public.create_conversation_proposal(
+    (select id from public.conversations
+     where job_post_id = (select id from public.job_posts
+       where idempotency_key = '16000000-0000-4000-8000-0000000000d1')
+       and provider_user_id = '16000000-0000-4000-8000-000000000003'),
+    'PROVIDER_QUOTE', null, 120000, null, null, null, null,
+    '16000000-0000-4000-8000-0000000000d3'
+  ) is not null,
+  'second candidate submits independent priced offer'
+);
+
 select set_config('request.jwt.claim.sub', '16000000-0000-4000-8000-000000000001', true);
 select is(
   public.respond_to_proposal(
     (select id from public.proposals
      where idempotency_key = '16000000-0000-4000-8000-0000000000d2'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'client accepts the bound offer'
@@ -685,6 +760,31 @@ select ok(
       and event_type = 'AUTO_HIRED_ON_HIRE'
   ),
   'hiring announces itself on the post'
+);
+-- La segunda aceptacion, incluso tras refrescar, NO crea un segundo job.
+select throws_ok(
+  $$select public.respond_to_proposal(
+    (select id from public.proposals
+     where idempotency_key = '16000000-0000-4000-8000-0000000000d3'),
+    'ACCEPT',
+    null)$$,
+  '40001', 'post already awarded or no longer open',
+  'second candidate cannot be awarded the same one-slot need'
+);
+select is(
+  (select count(*)::integer from public.jobs j
+   join public.conversations c on c.id = j.conversation_id
+   join public.job_posts jp on jp.id = c.job_post_id
+   where jp.idempotency_key = '16000000-0000-4000-8000-0000000000d1'),
+  1,
+  'one-slot need has exactly one real job'
+);
+select is(
+  (select count(*)::integer from public.job_post_awards a
+   join public.job_posts jp on jp.id = a.job_post_id
+   where jp.idempotency_key = '16000000-0000-4000-8000-0000000000d1'),
+  1,
+  'unique award ledger contains one winner'
 );
 select * from finish();
 rollback;

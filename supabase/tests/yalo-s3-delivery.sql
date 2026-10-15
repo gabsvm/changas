@@ -4,7 +4,7 @@
 -- evidencia; correccion con motivo y tope. Todo hace rollback al final.
 begin;
 
-select plan(51);
+select plan(56);
 
 -- Estructura: columnas de entrega.
 select ok(
@@ -32,7 +32,7 @@ select ok(
 
 -- Firmas nuevas + compuertas en definiciones vigentes.
 select ok(
-  to_regprocedure('public.submit_job_delivery(uuid,text)') is not null,
+  to_regprocedure('public.submit_job_delivery(uuid,text,text)') is not null,
   'delivery submission RPC exists'
 );
 select ok(
@@ -55,6 +55,33 @@ select ok(
   (select pg_get_functiondef(to_regprocedure('public.request_job_completion(uuid,text)')))
   like '%submit the delivery before verifying%',
   'handover check requires a prior submission'
+);
+
+-- Modality BOTH must be resolved on the job before digital delivery.
+select ok(
+  exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'jobs'
+      and column_name = 'effective_modality'
+  ),
+  'jobs persist effective in-person or remote modality'
+);
+select ok(
+  to_regprocedure('public.choose_job_effective_modality(uuid,public.service_modality)') is not null,
+  'client can choose an effective modality for a BOTH service'
+);
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.choose_job_effective_modality(uuid,public.service_modality)',
+    'EXECUTE'
+  ),
+  'authenticated can call role-authorized modality selector'
+);
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.auto_complete_stale_jobs()')))
+  like '%effective_modality%',
+  'stale job auto-close respects the effective delivery modality'
 );
 
 -- Fixtures S3 prefijo 1700; todo hace rollback al final del archivo.
@@ -103,7 +130,7 @@ insert into public.services (
   schedule_type, is_published
 )
 select
-  '17000000-0000-4000-8000-0000000000' || suffix,
+  ('17000000-0000-4000-8000-0000000000' || suffix)::uuid,
   '17000000-0000-4000-8000-000000000002',
   provider_skill.skill_id,
   's3-service-' || suffix,
@@ -178,7 +205,8 @@ select set_config('request.jwt.claim.sub', '17000000-0000-4000-8000-000000000001
 select is(
   public.respond_to_proposal(
     (select id from public.proposals where idempotency_key = '17000000-0000-4000-8000-0000000000a1'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'first quote is accepted'
@@ -186,7 +214,8 @@ select is(
 select is(
   public.respond_to_proposal(
     (select id from public.proposals where idempotency_key = '17000000-0000-4000-8000-0000000000a2'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'second quote is accepted'
@@ -194,7 +223,8 @@ select is(
 select is(
   public.respond_to_proposal(
     (select id from public.proposals where idempotency_key = '17000000-0000-4000-8000-0000000000a3'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'third quote is accepted'
@@ -202,7 +232,8 @@ select is(
 select is(
   public.respond_to_proposal(
     (select id from public.proposals where idempotency_key = '17000000-0000-4000-8000-0000000000a4'),
-    'ACCEPT'
+    'ACCEPT',
+    null
   )::text,
   'ACCEPTED',
   'fourth quote is accepted'
@@ -321,12 +352,23 @@ select is(
   'client confirms the verified job'
 );
 
--- Remoto: el envio mueve directo a revision, sin PIN.
+-- Remoto: la simple descripcion NO constituye entrega verificable.
 select set_config('request.jwt.claim.sub', '17000000-0000-4000-8000-000000000002', true);
+select throws_ok(
+  $$select public.submit_job_delivery(
+    (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '17000000-0000-4000-8000-000000000011')),
+    'Texto sin enlace de evidencia.'
+  )$$,
+  '22023', 'remote delivery requires a valid HTTPS evidence link',
+  'remote submission needs HTTPS evidence'
+);
+
+-- Remoto: la entrega con enlace mueve a revision, sin PIN.
 select is(
   public.submit_job_delivery(
     (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '17000000-0000-4000-8000-000000000011')),
-    'Entrega digital lista para revision.'
+    'Entrega digital lista para revision.',
+    'https://example.com/yalo/test-delivery'
   ),
   'SUBMITTED',
   'remote submission needs no code'

@@ -42,6 +42,23 @@ export function DeliverySubmitForm({
           className="mt-1.5 w-full rounded-xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-medium text-white outline-none placeholder:font-normal placeholder:text-white/50"
         />
       </label>
+      {remote ? (
+        <label className="text-[13px] font-bold text-white/90">
+          Enlace HTTPS de la entrega
+          <input
+            type="url"
+            name="deliveryEvidenceUrl"
+            required
+            maxLength={2048}
+            pattern="https://.*"
+            placeholder="https://drive.google.com/..."
+            className="mt-1.5 w-full rounded-xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-medium text-white outline-none placeholder:text-white/50"
+          />
+          <span className="mt-1 block text-xs font-normal text-white/70">
+            El cliente debe poder acceder al entregable. YALO no verifica automáticamente el contenido.
+          </span>
+        </label>
+      ) : null}
       {state.error ? (
         <p
           id="entrega-error"

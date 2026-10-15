@@ -4,7 +4,7 @@
 -- Todo hace rollback al final del archivo.
 begin;
 
-select plan(34);
+select plan(38);
 
 -- Estructura: tabla, estados, RLS y firmas.
 select ok(
@@ -131,7 +131,7 @@ insert into public.services (
   schedule_type, is_published
 )
 select
-  '18000000-0000-4000-8000-0000000000' || suffix,
+  ('18000000-0000-4000-8000-0000000000' || suffix)::uuid,
   '18000000-0000-4000-8000-000000000002',
   provider_skill.skill_id,
   's4-service-' || suffix,
@@ -174,15 +174,18 @@ select public.create_conversation_proposal(
 select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
 select public.respond_to_proposal(
   (select id from public.proposals where idempotency_key = '18000000-0000-4000-8000-0000000000a1'),
-  'ACCEPT'
+  'ACCEPT',
+  null
 );
 select public.respond_to_proposal(
   (select id from public.proposals where idempotency_key = '18000000-0000-4000-8000-0000000000a2'),
-  'ACCEPT'
+  'ACCEPT',
+  null
 );
 select public.respond_to_proposal(
   (select id from public.proposals where idempotency_key = '18000000-0000-4000-8000-0000000000a3'),
-  'ACCEPT'
+  'ACCEPT',
+  null
 );
 
 select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
@@ -196,11 +199,13 @@ select public.transition_job_status(
 );
 select public.submit_job_delivery(
   (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000010')),
-  'Entrega digital para Conciliacion.'
+  'Entrega digital para Conciliacion.',
+  'https://example.com/yalo/s4-delivery-1'
 );
 select public.submit_job_delivery(
   (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000011')),
-  'Segunda entrega digital para Conciliacion.'
+  'Segunda entrega digital para Conciliacion.',
+  'https://example.com/yalo/s4-delivery-2'
 );
 select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
 select public.transition_job_status(
@@ -254,14 +259,14 @@ select is(
   (select external_confirmed_minor from public.external_payment_ledger(
     (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000010'))
   )),
-  60000,
+  60000::bigint,
   'ledger counts the confirmed payment'
 );
 select is(
   (select external_outstanding_minor from public.external_payment_ledger(
     (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000010'))
   )),
-  40000,
+  40000::bigint,
   'ledger keeps the outstanding balance'
 );
 select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
@@ -340,7 +345,7 @@ select throws_ok(
 );
 
 -- Reemplazar solo lo propio: la contraparte no puede.
-select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
 select throws_ok(
   $$select public.declare_external_payment(
     (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000011')),
@@ -353,7 +358,7 @@ select throws_ok(
 );
 
 -- Reemplazar lo propio anula la anterior y enlaza la nueva.
-select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
 select public.declare_external_payment(
   (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000011')),
   30000, 'TRANSFERENCIA', null, 'corrección',
@@ -464,5 +469,44 @@ select is(
   'outsider reads no declarations'
 );
 reset role;
+-- Precio privado: helper interno no es RPC ejecutable por cualquier usuario.
+select ok(
+  not has_function_privilege('authenticated', 'public.external_agreed_total_for_job(uuid)', 'EXECUTE'),
+  'outsider authenticated role cannot execute private price helper'
+);
+select ok(
+  has_function_privilege('service_role', 'public.external_agreed_total_for_job(uuid)', 'EXECUTE'),
+  'service role can invoke the internal price helper'
+);
+
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
+-- Precio acordado externo incluye adicional aceptado aunque MP este OFF.
+-- Status AWAITING_PAYMENT significa consentimiento contractual sin checkout.
+insert into public.job_scope_changes (
+  job_id, requested_by_user_id, status, scope_snapshot,
+  additional_amount_minor, currency_code
+) values (
+  (select j.id from public.jobs j
+   where j.service_id = '18000000-0000-4000-8000-000000000010'),
+  '18000000-0000-4000-8000-000000000002',
+  'AWAITING_PAYMENT', 'Adicional de materiales aprobado sin checkout.',
+  30000, 'ARS'
+);
+select is(
+  (select agreed_total_minor from public.external_payment_ledger(
+    (select j.id from public.jobs j
+     where j.service_id = '18000000-0000-4000-8000-000000000010')
+  )),
+  130000::bigint,
+  'agreed total includes 100000 base plus 30000 accepted additional'
+);
+select is(
+  (select external_outstanding_minor from public.external_payment_ledger(
+    (select j.id from public.jobs j
+     where j.service_id = '18000000-0000-4000-8000-000000000010')
+  )),
+  70000::bigint,
+  'confirmed 60000 leaves 70000 including accepted additional'
+);
 select * from finish();
 rollback;

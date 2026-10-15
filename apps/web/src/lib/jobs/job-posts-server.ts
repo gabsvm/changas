@@ -115,16 +115,47 @@ async function withSkillNames(rows: PostRow[]): Promise<JobPostSummary[]> {
   }));
 }
 
+export type JobPostOfferCard = {
+  conversation_id: string;
+  provider_user_id: string;
+  provider_name: string;
+  proposal_id: string;
+  proposal_status: "OPEN" | "ACCEPTED";
+  price_amount: number;
+  currency_code: string;
+  scope_snapshot: string;
+  schedule_start_at: string | null;
+  schedule_end_at: string | null;
+  offer_updated_at: string;
+};
+
+type JobPostOffersRpc = {
+  rpc(
+    name: "list_job_post_offer_cards",
+    args: { target_post_id: string },
+  ): Promise<{ data: JobPostOfferCard[] | null; error: SupabaseError }>;
+};
+
+/** Solo el dueno: el RPC comprueba ownership. No cuenta chats vacios. */
+export async function listJobPostOfferCards(postId: string): Promise<JobPostOfferCard[]> {
+  await requireUserId();
+  const supabase = await createClient();
+  const { data, error } = await (supabase as unknown as JobPostOffersRpc).rpc("list_job_post_offer_cards", {
+    target_post_id: postId,
+  });
+  if (error) throw mapError(error);
+  return (data ?? []) as JobPostOfferCard[];
+}
+
 export async function countPostOffers(postId: string): Promise<number> {
   await requireUserId();
   const supabase = await createClient();
-  const { count, error } = await supabase
-    .from("job_post_events")
-    .select("id", { count: "exact", head: true })
-    .eq("job_post_id", postId)
-    .eq("event_type", "OFFER_RECEIVED");
+  // Oferta ≠ chat abierto. Contar cotizaciones reales, no eventos OFFER_RECEIVED.
+  const { data, error } = await (supabase as unknown as JobPostOffersRpc).rpc("list_job_post_offer_cards", {
+    target_post_id: postId,
+  });
   if (error) throw mapError(error);
-  return count ?? 0;
+  return data?.length ?? 0;
 }
 
 export async function createJobPost(
@@ -153,6 +184,7 @@ export async function listOpenJobPosts(options?: {
   skillId?: string;
   skillIds?: string[];
   limit?: number;
+  page?: number;
 }): Promise<JobPostSummary[]> {
   await requireUserId();
   const supabase = await createClient();
@@ -161,7 +193,11 @@ export async function listOpenJobPosts(options?: {
     .select(POST_COLUMNS)
     .eq("status", "OPEN")
     .order("created_at", { ascending: false })
-    .limit(options?.limit ?? 30);
+    .order("id", { ascending: false })
+    .range(
+      Math.max(0, Math.trunc(options?.page ?? 0)) * Math.min(50, Math.max(1, options?.limit ?? 30)),
+      (Math.max(0, Math.trunc(options?.page ?? 0)) + 1) * Math.min(50, Math.max(1, options?.limit ?? 30)) - 1,
+    );
   if (options?.skillId) query = query.eq("skill_id", options.skillId);
   if (options?.skillIds && options.skillIds.length > 0)
     query = query.in("skill_id", options.skillIds);
@@ -170,7 +206,7 @@ export async function listOpenJobPosts(options?: {
   return withSkillNames((data ?? []) as PostRow[]);
 }
 
-export async function listMyJobPosts(): Promise<JobPostSummary[]> {
+export async function listMyJobPosts(page = 0, pageSize = 20): Promise<JobPostSummary[]> {
   const userId = await requireUserId();
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -178,7 +214,11 @@ export async function listMyJobPosts(): Promise<JobPostSummary[]> {
     .select(POST_COLUMNS)
     .eq("owner_user_id", userId)
     .order("created_at", { ascending: false })
-    .limit(50);
+    .order("id", { ascending: false })
+    .range(
+      Math.max(0, Math.trunc(page)) * Math.min(50, Math.max(1, pageSize)),
+      (Math.max(0, Math.trunc(page)) + 1) * Math.min(50, Math.max(1, pageSize)) - 1,
+    );
   if (error) throw mapError(error);
   return withSkillNames((data ?? []) as PostRow[]);
 }

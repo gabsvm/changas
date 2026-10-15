@@ -20,6 +20,8 @@ import {
   type ProposalResponseAction,
 } from "@/lib/proposals/server";
 import { createProposalCheckout } from "@/lib/payments/server";
+import { createClient } from "@/lib/supabase/server";
+import { getConversationContext } from "@/lib/conversations/server";
 
 export type ProposalActionState = {
   status: "IDLE" | "SUCCESS" | "ERROR";
@@ -71,6 +73,23 @@ function actionError(error: unknown): ProposalActionState {
   };
 }
 
+/** Defense in depth while the legacy S1 RPC is still installed in prod.
+ * The S1 migration additionally enforces this under a DB lock.
+ */
+async function requireInstantPreauthorization(conversationId: string): Promise<void> {
+  const supabase = await createClient();
+  const thread = await getConversationContext(conversationId);
+  if (!thread) throw new Error("No podemos consultar este servicio.");
+  const { data: service, error: serviceError } = await supabase
+    .from("services")
+    .select("instant_booking_enabled")
+    .eq("id", thread.service_id)
+    .maybeSingle();
+  if (serviceError || service?.instant_booking_enabled !== true) {
+    throw new Error("Este servicio requiere aceptación del prestador. Usá «Solicitar cotización».");
+  }
+}
+
 export async function createProposalAction(
   _previousState: ProposalActionState,
   formData: FormData,
@@ -78,9 +97,11 @@ export async function createProposalAction(
   try {
     const conversationId = requiredUuid(formData, "conversationId");
     const rawKey = stringField(formData, "idempotencyKey");
+    const kind = proposalKind(formData);
+    if (kind === "DIRECT_BOOKING") await requireInstantPreauthorization(conversationId);
     await createConversationProposal({
       conversationId,
-      kind: proposalKind(formData),
+      kind,
       scopeText: stringField(formData, "scope") || null,
       priceAmount: optionalPrice(formData),
       scheduleStartAt: optionalIso(formData, "scheduleStartAt"),

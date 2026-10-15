@@ -6,6 +6,8 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { ActionLink } from "@/components/ui/marketplace/action-button";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { createClient } from "@/lib/supabase/server";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
+import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 import { listOpenJobPosts } from "@/lib/jobs/job-posts-server";
 
 export const metadata = {
@@ -14,7 +16,10 @@ export const metadata = {
     "Necesidades abiertas de clientes en tus rubros para ofertar tu trabajo.",
 };
 
-export default async function OpportunitiesPage() {
+export default async function OpportunitiesPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const params = await searchParams;
+  const page = Math.min(10000, Math.max(0, Number.parseInt(params.page ?? "0", 10) || 0));
+  if (!arePublicNeedsEnabled()) return <NeedsComingSoon />;
   const supabase = await createClient();
   const {
     data: { user },
@@ -29,7 +34,7 @@ export default async function OpportunitiesPage() {
   const skillIds = (mySkills ?? []).map((row) => row.skill_id);
 
   const posts = skillIds.length
-    ? (await listOpenJobPosts({ skillIds, limit: 30 })).filter(
+    ? (await listOpenJobPosts({ skillIds, limit: 30, page })).filter(
         (post) => post.owner_user_id !== user.id,
       )
     : [];
@@ -37,6 +42,10 @@ export default async function OpportunitiesPage() {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
       <MobileAppBar title="Oportunidades" backHref="/provider/manage" />
+      <nav className="mt-5 flex gap-3" aria-label="Páginas de oportunidades">
+        {page > 0 ? <ActionLink href={`/oportunidades?page=${page - 1}`} tone="secondary">Anterior</ActionLink> : null}
+        {posts.length === 30 ? <ActionLink href={`/oportunidades?page=${page + 1}`} tone="secondary">Siguiente</ActionLink> : null}
+      </nav>
       <p className="text-ink/70 mt-2 text-[15px] leading-6">
         Necesidades abiertas en tus rubros. Ofertá con uno de tus servicios y
         negociá por chat; el pago se acuerda por fuera de YALO.

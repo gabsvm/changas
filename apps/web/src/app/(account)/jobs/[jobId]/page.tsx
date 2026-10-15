@@ -5,6 +5,7 @@ import { formatMinorUnits, type JobStatus } from "@changas/domain";
 import { isPaymentsEnabled } from "@changas/config/server";
 
 import {
+  chooseJobModalityAction,
   fakeAdditionalPaymentAction,
   fakeSettlementPaymentAction,
   requestRescheduleAction,
@@ -240,6 +241,7 @@ export default async function JobPage({
     modality: detail.modality,
     deliverySubmitted: detail.delivery_submitted_at !== null,
     handoverVerified: detail.handover_verified_at !== null,
+    deliveryFlowAvailable: detail.delivery_flow_available,
   });
   const needsRescheduleAttention = reschedules.some(
     (request) =>
@@ -435,7 +437,8 @@ export default async function JobPage({
           {isClient &&
           detail.confirmation_code &&
           detail.modality !== "REMOTE" &&
-          (detail.delivery_submitted_at !== null ||
+          (!detail.delivery_flow_available && detail.job_status === "IN_PROGRESS" ||
+            detail.delivery_submitted_at !== null ||
             detail.job_status === "COMPLETION_REQUESTED") ? (
             <div className="border-ink/[0.08] bg-canvas mt-3 rounded-2xl border p-4 text-center">
               <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.12em] uppercase">
@@ -448,9 +451,9 @@ export default async function JobPage({
                 {detail.confirmation_code}
               </p>
               <p className="text-ink/70 mt-1 text-xs leading-5">
-                Revisá la entrega y, si está bien, compartilo con el
-                prestador para dejar constancia. No es la confirmación
-                final: después confirmás el trabajo por separado.
+                {detail.delivery_flow_available
+                  ? "Revisá la entrega y, si está bien, compartilo con el prestador para dejar constancia. No es la confirmación final."
+                  : "Compartí este código solamente cuando el prestador haya terminado el trabajo. Después podrás confirmar el cierre."}
               </p>
             </div>
           ) : null}
@@ -485,6 +488,30 @@ export default async function JobPage({
           ) : null}
         </section>
 
+        {isClient &&
+        detail.delivery_flow_available &&
+        detail.modality === "BOTH" &&
+        ["CONFIRMED", "IN_PROGRESS"].includes(detail.job_status) ? (
+          <section className="border-ink/10 bg-surface mt-4 rounded-2xl border p-4" aria-label="Elegir modalidad efectiva">
+            <h2 className="font-display text-lg font-bold">¿Cómo se hará este trabajo?</h2>
+            <p className="text-ink/70 mt-1 text-sm">
+              El servicio admite ambas modalidades. Elegí la que acordaste con el prestador
+              antes de que envíe la entrega.
+            </p>
+            <form action={chooseJobModalityAction} className="mt-3 flex flex-wrap gap-3">
+              <input type="hidden" name="jobId" value={jobId} />
+              <button type="submit" name="modality" value="IN_PERSON"
+                className="consumer-pressable cta-ink min-h-11 rounded-xl px-4 text-sm font-bold">
+                Presencial, con PIN
+              </button>
+              <button type="submit" name="modality" value="REMOTE"
+                className="consumer-pressable border-ink/20 min-h-11 rounded-xl border px-4 text-sm font-bold">
+                Remoto, con entrega digital
+              </button>
+            </form>
+          </section>
+        ) : null}
+
         {detail.delivery_submitted_at !== null ? (
           <section
             className="border-ink/[0.08] bg-surface consumer-card mt-5 rounded-2xl border p-4 sm:p-5"
@@ -498,6 +525,16 @@ export default async function JobPage({
               <p className="mt-3 text-sm leading-7 whitespace-pre-wrap">
                 {detail.delivery_summary}
               </p>
+            ) : null}
+            {detail.delivery_evidence_url ? (
+              <a
+                href={detail.delivery_evidence_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-primary mt-3 block break-all text-sm font-bold underline underline-offset-2"
+              >
+                Ver enlace de entrega digital
+              </a>
             ) : null}
             <p className="text-ink/70 mt-2 text-[13px] leading-5">
               {detail.modality === "REMOTE"

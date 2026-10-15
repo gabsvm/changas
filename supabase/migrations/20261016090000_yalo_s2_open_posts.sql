@@ -36,9 +36,6 @@ create unique index if not exists job_posts_owner_idempotency_uniq
 create index if not exists job_posts_open_skill_created_idx
   on public.job_posts (status, skill_id, created_at desc);
 
-create index if not exists conversations_job_post_idx
-  on public.conversations (job_post_id);
-
 comment on column public.job_posts.desired_budget_amount
 is 'Orientative budget in minor units (centavos) ARS, null when open.';
 
@@ -56,7 +53,63 @@ comment on table public.job_post_events is 'Audit trail of open needs (created, 
 alter table public.conversations
   add column if not exists job_post_id uuid null;
 
+create index if not exists conversations_job_post_idx
+  on public.conversations (job_post_id);
+
 comment on column public.conversations.job_post_id is 'Bound open need, if this thread answers one. Offers stay 1:1.';
+
+-- Una necesidad equivale a una sola contratacion. Este PK asegura
+-- materialmente un unico ganador, incluso si otro proceso intenta escribir
+-- un segundo trabajo por otro hilo del mismo anuncio.
+create table public.job_post_awards (
+  job_post_id uuid primary key references public.job_posts(id) on delete restrict,
+  job_id uuid not null unique references public.jobs(id) on delete restrict,
+  created_at timestamptz not null default timezone('utc', now())
+);
+alter table public.job_post_awards enable row level security;
+revoke all privileges on table public.job_post_awards from public, anon, authenticated;
+grant select, insert on public.job_post_awards to service_role;
+
+-- BEFORE INSERT bloquea la fila del post: dos aceptaciones desde distintas
+-- conversaciones se serializan. La segunda ve HIRED tras el commit de la
+-- primera y NO puede crear otro trabajo, incluso por invocacion directa RPC.
+create or replace function public.guard_job_post_single_award()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $$
+declare
+  bound_post_id uuid;
+  post_owner_id uuid;
+  post_status public.job_post_status;
+begin
+  select c.job_post_id into bound_post_id
+  from public.conversations c
+  where c.id = NEW.conversation_id;
+  if bound_post_id is null then
+    return NEW;
+  end if;
+
+  select p.owner_user_id, p.status into post_owner_id, post_status
+  from public.job_posts p
+  where p.id = bound_post_id
+  for update;
+
+  if post_owner_id is null or post_owner_id <> NEW.client_user_id then
+    raise exception using errcode = '42501', message = 'post/client contract mismatch';
+  end if;
+  if post_status <> 'OPEN' then
+    raise exception using errcode = '40001', message = 'post already awarded or no longer open';
+  end if;
+  return NEW;
+end;
+$$;
+
+drop trigger if exists guard_job_post_single_award_trigger on public.jobs;
+create trigger guard_job_post_single_award_trigger
+before insert on public.jobs
+for each row execute function public.guard_job_post_single_award();
 
 -- Cierre automatico: cualquier trabajo nacido de un hilo atado cierra el
 -- post (manual o previo estado PAUSED incluido).
@@ -83,6 +136,9 @@ begin
     and status in ('OPEN', 'PAUSED');
 
   if found then
+    insert into public.job_post_awards (job_post_id, job_id)
+    values (bound_post_id, NEW.id);
+
     insert into public.job_post_events (job_post_id, actor_user_id, event_type, metadata)
     values (bound_post_id, NEW.client_user_id, 'AUTO_HIRED_ON_HIRE', jsonb_build_object('job_id', NEW.id));
   end if;
@@ -493,4 +549,67 @@ revoke all on function public.start_post_offer_conversation(uuid, uuid)
 from public, anon, authenticated, service_role;
 
 grant execute on function public.start_post_offer_conversation(uuid, uuid)
+to authenticated, service_role;
+
+-- Read model de ofertas economicas (no 'interesados'): expone una sola
+-- propuesta vigente de cada prestador SOLO al dueno de la necesidad.
+-- No entrega ofertas privadas a otros prestadores, ni datos de contacto.
+create or replace function public.list_job_post_offer_cards(target_post_id uuid)
+returns table (
+  conversation_id uuid,
+  provider_user_id uuid,
+  provider_name text,
+  proposal_id uuid,
+  proposal_status public.proposal_status,
+  price_amount bigint,
+  currency_code text,
+  scope_snapshot text,
+  schedule_start_at timestamptz,
+  schedule_end_at timestamptz,
+  offer_updated_at timestamptz
+)
+language plpgsql
+stable
+security definer
+set search_path = pg_catalog, public
+as $$
+declare
+  caller_id uuid := auth.uid();
+begin
+  if caller_id is null or not exists (
+    select 1 from public.job_posts jp
+    where jp.id = target_post_id and jp.owner_user_id = caller_id
+  ) then
+    raise exception using errcode = '42501', message = 'post offers access denied';
+  end if;
+
+  return query
+  select distinct on (c.provider_user_id)
+    c.id,
+    c.provider_user_id,
+    coalesce(pr.display_name, 'Prestador')::text,
+    p.id,
+    p.status,
+    pv.price_amount,
+    pv.currency_code,
+    pv.scope_snapshot,
+    pv.schedule_start_at,
+    pv.schedule_end_at,
+    p.updated_at
+  from public.conversations c
+  join public.proposals p on p.conversation_id = c.id
+  join public.proposal_versions pv on pv.id = p.current_version_id
+  left join public.profiles pr on pr.id = c.provider_user_id
+  where c.job_post_id = target_post_id
+    and p.status in ('OPEN', 'ACCEPTED')
+    and pv.authored_by_user_id = c.provider_user_id
+    and pv.price_amount is not null
+    and pv.price_amount > 0
+  order by c.provider_user_id, p.updated_at desc, p.id desc;
+end;
+$$;
+
+revoke all on function public.list_job_post_offer_cards(uuid)
+from public, anon, authenticated, service_role;
+grant execute on function public.list_job_post_offer_cards(uuid)
 to authenticated, service_role;

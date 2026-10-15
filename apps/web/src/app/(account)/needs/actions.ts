@@ -1,6 +1,6 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -28,6 +28,7 @@ function uuidField(formData: FormData, name: string): string {
 }
 
 export async function createNeedAction(formData: FormData): Promise<void> {
+  if (!arePublicNeedsEnabled()) throw new Error("Las solicitudes abiertas todavía no están habilitadas.");
   const parsed = parseJobPostForm({
     skillId: stringField(formData, "skillId"),
     title: stringField(formData, "title"),
@@ -40,7 +41,9 @@ export async function createNeedAction(formData: FormData): Promise<void> {
   if (!parsed.ok) throw new Error(parsed.message);
 
   try {
-    const postId = await createJobPost(parsed.data, randomUUID());
+    const nonce = stringField(formData, "idempotencyKey");
+    if (!isUuid(nonce)) throw new Error("No pudimos validar el formulario. Recargá y probá de nuevo.");
+    const postId = await createJobPost(parsed.data, nonce);
     revalidatePath("/needs");
     redirect(`/needs/${postId}`);
   } catch (error) {
@@ -52,6 +55,7 @@ export async function createNeedAction(formData: FormData): Promise<void> {
 const governableStatuses: JobPostStatus[] = ["OPEN", "PAUSED", "CLOSED"];
 
 export async function governNeedAction(formData: FormData): Promise<void> {
+  if (!arePublicNeedsEnabled()) throw new Error("Las solicitudes abiertas todavía no están habilitadas.");
   const postId = uuidField(formData, "postId");
   const rawStatus = stringField(formData, "status");
   const status = governableStatuses.find((candidate) => candidate === rawStatus);
@@ -68,6 +72,7 @@ export async function governNeedAction(formData: FormData): Promise<void> {
 }
 
 export async function offerOnNeedAction(formData: FormData): Promise<void> {
+  if (!arePublicNeedsEnabled()) throw new Error("Las solicitudes abiertas todavía no están habilitadas.");
   const postId = uuidField(formData, "postId");
   const serviceId = uuidField(formData, "serviceId");
 

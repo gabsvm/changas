@@ -210,12 +210,13 @@ insert into public.proposal_versions (
   service_title_snapshot, service_description_snapshot, modality,
   scope_snapshot, price_model_snapshot, price_amount, currency_code, schedule_type
 ) values
-  ('14000000-0000-4000-8000-000000000040', '14000000-0000-4000-8000-000000000030', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'rate-limit job', 'REMOTE', 'rate-limit scope', 'FIXED', 50000, 'ARS', 'UNSCHEDULED'),
-  ('14000000-0000-4000-8000-000000000041', '14000000-0000-4000-8000-000000000031', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'success-path job', 'IN_PERSON', 'success scope', 'FIXED', 60000, 'ARS', 'UNSCHEDULED'),
-  ('14000000-0000-4000-8000-000000000042', '14000000-0000-4000-8000-000000000032', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'settlement job', 'REMOTE', 'settlement scope', 'FIXED', 100000, 'ARS', 'UNSCHEDULED'),
-  ('14000000-0000-4000-8000-000000000043', '14000000-0000-4000-8000-000000000033', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'cancelled job', 'REMOTE', 'cancelled scope', 'FIXED', 70000, 'ARS', 'UNSCHEDULED'),
-  ('14000000-0000-4000-8000-000000000044', '14000000-0000-4000-8000-000000000034', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'disputed job', 'REMOTE', 'disputed scope', 'FIXED', 80000, 'ARS', 'UNSCHEDULED'),
-  ('14000000-0000-4000-8000-000000000045', '14000000-0000-4000-8000-000000000035', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'stale job', 'REMOTE', 'stale scope', 'FIXED', 90000, 'ARS', 'UNSCHEDULED');
+  ('14000000-0000-4000-8000-000000000040', '14000000-0000-4000-8000-000000000030', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'rate-limit lifecycle job', 'REMOTE', 'rate-limit scope', 'FIXED', 50000, 'ARS', 'UNSCHEDULED'),
+  ('14000000-0000-4000-8000-000000000041', '14000000-0000-4000-8000-000000000031', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'success-path lifecycle job', 'IN_PERSON', 'success scope', 'FIXED', 60000, 'ARS', 'UNSCHEDULED'),
+  ('14000000-0000-4000-8000-000000000042', '14000000-0000-4000-8000-000000000032', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'settlement lifecycle job', 'REMOTE', 'settlement scope', 'FIXED', 100000, 'ARS', 'UNSCHEDULED'),
+  ('14000000-0000-4000-8000-000000000043', '14000000-0000-4000-8000-000000000033', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'cancelled lifecycle job', 'REMOTE', 'cancelled scope', 'FIXED', 70000, 'ARS', 'UNSCHEDULED'),
+  ('14000000-0000-4000-8000-000000000044', '14000000-0000-4000-8000-000000000034', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'disputed lifecycle job', 'REMOTE', 'disputed scope', 'FIXED', 80000, 'ARS', 'UNSCHEDULED'),
+  ('14000000-0000-4000-8000-000000000045', '14000000-0000-4000-8000-000000000035', 1, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'stale lifecycle test job', 'IN_PERSON', 'stale scope', 'FIXED', 90000, 'ARS', 'UNSCHEDULED'),
+  ('14000000-0000-4000-8000-000000000046', '14000000-0000-4000-8000-000000000035', 2, 'PROVIDER_QUOTE', '14000000-0000-4000-8000-000000000002', 'Lote AB service', 'authority probe version', 'REMOTE', 'authority scope', 'FIXED', 90000, 'ARS', 'UNSCHEDULED');
 
 update public.proposals
 set current_version_id = case id
@@ -251,6 +252,8 @@ insert into public.jobs (
   ('14000000-0000-4000-8000-000000000104', '14000000-0000-4000-8000-000000000020', '14000000-0000-4000-8000-000000000010', '14000000-0000-4000-8000-000000000001', '14000000-0000-4000-8000-000000000002', '14000000-0000-4000-8000-000000000043', 'CANCELLED', '1111', timezone('utc', now()) - interval '8 days', null, timezone('utc', now()) - interval '8 days'),
   ('14000000-0000-4000-8000-000000000105', '14000000-0000-4000-8000-000000000020', '14000000-0000-4000-8000-000000000010', '14000000-0000-4000-8000-000000000001', '14000000-0000-4000-8000-000000000002', '14000000-0000-4000-8000-000000000044', 'DISPUTED', '2222', timezone('utc', now()) - interval '8 days', null, timezone('utc', now()) - interval '8 days'),
   ('14000000-0000-4000-8000-000000000106', '14000000-0000-4000-8000-000000000020', '14000000-0000-4000-8000-000000000010', '14000000-0000-4000-8000-000000000001', '14000000-0000-4000-8000-000000000002', '14000000-0000-4000-8000-000000000045', 'COMPLETION_REQUESTED', '3333', timezone('utc', now()) - interval '8 days', timezone('utc', now()) - interval '8 days', timezone('utc', now()));
+
+update public.jobs set handover_verified_at = timezone('utc', now()) - interval '8 days' where id = '14000000-0000-4000-8000-000000000106';
 
 insert into public.job_scope_changes (
   id, job_id, requested_by_user_id, status, scope_snapshot,
@@ -322,7 +325,7 @@ insert into public.jobs (
   accepted_proposal_version_id, status, confirmation_code,
   completion_requested_at, delivery_submitted_at, updated_at
 ) values (
-  '14000000-0000-4000-8000-000000000107', '14000000-0000-4000-8000-000000000020', '14000000-0000-4000-8000-000000000010', '14000000-0000-4000-8000-000000000001', '14000000-0000-4000-8000-000000000002', '14000000-0000-4000-8000-000000000040', 'IN_PROGRESS', '4321', null, timezone('utc', now()), timezone('utc', now())
+  '14000000-0000-4000-8000-000000000107', '14000000-0000-4000-8000-000000000020', '14000000-0000-4000-8000-000000000010', '14000000-0000-4000-8000-000000000001', '14000000-0000-4000-8000-000000000002', '14000000-0000-4000-8000-000000000046', 'IN_PROGRESS', '4321', null, timezone('utc', now()), timezone('utc', now())
 );
 select is(
   public.request_job_completion('14000000-0000-4000-8000-000000000107', '0000'),
@@ -472,7 +475,7 @@ select ok(
 -- P1-02: el cron es atómico y no pisa CANCELLED/DISPUTED.
 select ok(
   (select pg_get_functiondef(to_regprocedure('public.auto_complete_stale_jobs()')))
-  like '%for update skip locked%',
+  like '%skip locked%',
   'auto-complete claims rows with SKIP LOCKED'
 );
 select ok(

@@ -28,6 +28,7 @@ import {
   respondExternalPayment,
   setJobExactLocation,
   submitJobDelivery,
+  chooseJobEffectiveModality,
   transitionJob,
   voidExternalPayment,
 } from "@/lib/jobs/server";
@@ -144,6 +145,17 @@ export async function requestCompletionAction(
   return { error: null };
 }
 
+export async function chooseJobModalityAction(formData: FormData): Promise<void> {
+  const jobId = uuidField(formData, "jobId");
+  const modality = stringField(formData, "modality");
+  if (modality !== "IN_PERSON" && modality !== "REMOTE") {
+    throw new Error("Elegí trabajo presencial o remoto.");
+  }
+  await chooseJobEffectiveModality(jobId, modality);
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs");
+}
+
 export type DeliverySubmitState = { error: string | null };
 
 // Envío de la entrega para revisión (sin código). Solo la usa el
@@ -154,13 +166,17 @@ export async function submitDeliveryAction(
 ): Promise<DeliverySubmitState> {
   const jobId = uuidField(formData, "jobId");
   const summary = stringField(formData, "deliverySummary");
+  const evidenceUrl = stringField(formData, "deliveryEvidenceUrl");
+  if (evidenceUrl && (!evidenceUrl.startsWith("https://") || evidenceUrl.length > 2048)) {
+    return { error: "El enlace de entrega debe comenzar con https:// y tener hasta 2048 caracteres." };
+  }
   if (summary.length < 3 || summary.length > 2000) {
     return {
       error: "El resumen de la entrega necesita entre 3 y 2000 caracteres.",
     };
   }
   try {
-    await submitJobDelivery(jobId, summary);
+    await submitJobDelivery(jobId, summary, evidenceUrl || null);
   } catch (error) {
     if (error instanceof JobServerError) return { error: error.message };
     return { error: "No pudimos completar la acción. Intentá nuevamente." };

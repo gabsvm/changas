@@ -16,14 +16,14 @@ describe("getServiceHireKind", () => {
     ).toBe("DIRECT_BOOKING");
   });
 
-  it("requests hiring when fixed but not preauthorized", () => {
+  it("never issues DIRECT_BOOKING when fixed but not preauthorized", () => {
     expect(
       getServiceHireKind({
         price_model: "FIXED",
         price_amount: 100000,
         instant_booking_enabled: false,
       }),
-    ).toBe("DIRECT_BOOKING");
+    ).toBe("QUOTE_REQUEST");
   });
 
   it("asks for a quote when the price is not fixed", () => {

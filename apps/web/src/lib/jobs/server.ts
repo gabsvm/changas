@@ -64,9 +64,12 @@ export type UpcomingJob = {
 };
 
 export type JobDetail = {
+  /** Schema capability: false on the legacy production DB before S3. */
+  delivery_flow_available: boolean;
   confirmation_code: string | null;
   delivery_submitted_at: string | null;
   delivery_summary: string | null;
+  delivery_evidence_url: string | null;
   handover_verified_at: string | null;
   correction_count: number;
   job_id: string;
@@ -490,6 +493,7 @@ export async function getJobDetail(jobId: string): Promise<JobDetail> {
       : 0;
   return {
     ...row,
+    delivery_flow_available: Object.prototype.hasOwnProperty.call(row, "delivery_submitted_at"),
     confirmation_code:
       typeof row.confirmation_code === "string" &&
       row.confirmation_code.length > 0
@@ -511,6 +515,11 @@ export async function getJobDetail(jobId: string): Promise<JobDetail> {
       typeof row.delivery_summary === "string" &&
       row.delivery_summary.length > 0
         ? row.delivery_summary
+        : null,
+    delivery_evidence_url:
+      typeof row.delivery_evidence_url === "string" &&
+      row.delivery_evidence_url.startsWith("https://")
+        ? row.delivery_evidence_url
         : null,
     handover_verified_at:
       typeof row.handover_verified_at === "string" &&
@@ -645,17 +654,33 @@ export async function requestJobCompletion(
   throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
 }
 
+/** Select the effective modality for an agreed BOTH job. Only client, before delivery. */
+export async function chooseJobEffectiveModality(
+  jobId: string,
+  modality: "IN_PERSON" | "REMOTE",
+): Promise<void> {
+  const { supabase } = await authenticatedClient();
+  const { data, error } = await supabase.rpc("choose_job_effective_modality", {
+    target_job_id: jobId,
+    requested_modality: modality,
+  });
+  if (error) throw mapTransitionError(error.code, error.message);
+  if (data !== modality) throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+}
+
 // YALO S3: enviar la entrega para revisión (sin código). En remoto mueve
 // directo a COMPLETION_REQUESTED; en presencial queda IN_PROGRESS hasta la
 // constancia por requestJobCompletion.
 export async function submitJobDelivery(
   jobId: string,
   summary: string,
+  evidenceUrl?: string | null,
 ): Promise<void> {
   const { supabase } = await authenticatedClient();
   const { data, error } = await supabase.rpc("submit_job_delivery", {
     target_job_id: jobId,
     delivery_summary: summary,
+    delivery_evidence_url: evidenceUrl ?? null,
   });
   if (error) throw mapTransitionError(error.code, error.message);
   if (data !== "SUBMITTED") {
@@ -807,7 +832,13 @@ export async function getExternalPaymentLedger(jobId: string): Promise<{
   const { data, error } = await supabase.rpc("external_payment_ledger", {
     target_job_id: jobId,
   });
-  if (error) throw mapMoneyError(error.code, error.message);
+  if (error) {
+    // Preserve PostgREST's schema-missing code so getExternalMoney can
+    // degrade safely until the S4 migration is deployed. Never swallow
+    // ordinary authorization/transient errors.
+    if (isMissingExternalMoneySchema(error)) throw error;
+    throw mapMoneyError(error.code, error.message);
+  }
   const row = (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | null;
   if (!row) {
     throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
@@ -875,7 +906,13 @@ export async function listExternalDeclarations(
     .eq("job_id", jobId)
     .order("created_at", { ascending: true })
     .limit(100);
-  if (error) throw mapMoneyError(error.code, error.message);
+  if (error) {
+    // Preserve PostgREST's schema-missing code so getExternalMoney can
+    // degrade safely until the S4 migration is deployed. Never swallow
+    // ordinary authorization/transient errors.
+    if (isMissingExternalMoneySchema(error)) throw error;
+    throw mapMoneyError(error.code, error.message);
+  }
   return ((data ?? []) as unknown as Record<string, unknown>[]).map(asDeclaration);
 }
 
