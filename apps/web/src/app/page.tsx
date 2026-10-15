@@ -1,4 +1,5 @@
 import Link from "next/link";
+import "./yalo-showcase.css";
 import type { Metadata } from "next";
 
 import { parseDiscoveryFilters } from "@changas/domain";
