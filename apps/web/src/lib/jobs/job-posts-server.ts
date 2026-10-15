@@ -115,16 +115,40 @@ async function withSkillNames(rows: PostRow[]): Promise<JobPostSummary[]> {
   }));
 }
 
+export type JobPostOfferCard = {
+  conversation_id: string;
+  provider_user_id: string;
+  provider_name: string;
+  proposal_id: string;
+  proposal_status: "OPEN" | "ACCEPTED";
+  price_amount: number;
+  currency_code: string;
+  scope_snapshot: string;
+  schedule_start_at: string | null;
+  schedule_end_at: string | null;
+  offer_updated_at: string;
+};
+
+/** Solo el dueno: el RPC comprueba ownership. No cuenta chats vacios. */
+export async function listJobPostOfferCards(postId: string): Promise<JobPostOfferCard[]> {
+  await requireUserId();
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("list_job_post_offer_cards", {
+    target_post_id: postId,
+  });
+  if (error) throw mapError(error);
+  return (data ?? []) as JobPostOfferCard[];
+}
+
 export async function countPostOffers(postId: string): Promise<number> {
   await requireUserId();
   const supabase = await createClient();
-  const { count, error } = await supabase
-    .from("job_post_events")
-    .select("id", { count: "exact", head: true })
-    .eq("job_post_id", postId)
-    .eq("event_type", "OFFER_RECEIVED");
+  // Oferta ≠ chat abierto. Contar cotizaciones reales, no eventos OFFER_RECEIVED.
+  const { data, error } = await supabase.rpc("list_job_post_offer_cards", {
+    target_post_id: postId,
+  });
   if (error) throw mapError(error);
-  return count ?? 0;
+  return data?.length ?? 0;
 }
 
 export async function createJobPost(
