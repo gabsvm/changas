@@ -22,7 +22,29 @@ create unique index if not exists proposals_conversation_idempotency_key_uniq
   on public.proposals (conversation_id, idempotency_key)
   where idempotency_key is not null;
 
--- 3) Exclusion anti-doble-booking en holds activos del mismo prestador.
+-- 3) Preflight ANTES de crear la constraint. Nunca permitir que un
+-- listado de reservas legacy con solapes cause una migracion a medias.
+-- Se informa el numero de solapes sin revelar detalles de usuarios.
+do $
+declare
+  legacy_overlaps integer;
+begin
+  select count(*) into legacy_overlaps
+  from public.provider_slot_holds a
+  join public.provider_slot_holds b
+    on a.provider_user_id = b.provider_user_id
+   and a.id < b.id
+   and a.released_at is null and b.released_at is null
+   and tstzrange(a.starts_at, a.ends_at, '[)')
+     && tstzrange(b.starts_at, b.ends_at, '[)');
+  if legacy_overlaps > 0 then
+    raise exception using errcode = '23514',
+      message = format('Cannot add slot exclusion: %s legacy overlapping active holds', legacy_overlaps);
+  end if;
+end;
+$;
+
+-- Exclusion anti-doble-booking en holds activos del mismo prestador.
 alter table public.provider_slot_holds
   add constraint provider_slot_holds_no_overlap_excl
   exclude using gist (
@@ -400,11 +422,11 @@ begin
       from public.services s
       join public.provider_profiles pp on pp.user_id = s.provider_user_id
       where s.id = target_service_id;
-      if (proposed_schedule_start_at is null) <> (proposed_schedule_end_at is null) then
+      -- Sin una ventana de agenda no hay capacidad reservada: queda
+      -- propuesta OPEN, no reserva instantanea ni doble booking invisible.
+      if proposed_schedule_start_at is null or proposed_schedule_end_at is null then
         preauth_ok := false;
       elsif preauth_ok
-        and proposed_schedule_start_at is not null
-        and proposed_schedule_end_at is not null
         and not public.provider_slot_is_available(
           target_provider_id,
           proposed_schedule_start_at,
@@ -704,21 +726,5 @@ grant execute on function public.create_conversation_proposal(
   uuid
 ) to authenticated, service_role;
 
--- 7) Pre-chequeo de deploy: avisa si hay holds activos solapados legacy
--- que harian fallar la exclusion anti-overlap (ver nota del PR).
-do $$
-declare
-  legacy_overlaps integer;
-begin
-  select count(*) into legacy_overlaps
-  from public.provider_slot_holds a
-  join public.provider_slot_holds b
-    on a.provider_user_id = b.provider_user_id
-   and a.id < b.id
-   and tstzrange(a.starts_at, a.ends_at, '[)') && tstzrange(b.starts_at, b.ends_at, '[')
-   and a.released_at is null and b.released_at is null;
-  if legacy_overlaps > 0 then
-    raise warning 'yalo-s1: % overlapping active holds predate the exclusion constraint; release them before applying', legacy_overlaps;
-  end if;
-end;
-$$;
+-- El preflight de holds se ejecuta arriba, antes del ALTER TABLE.
+-- Aplicar solo tras ensayar en staging y revisar compatibilidad de firmas.
