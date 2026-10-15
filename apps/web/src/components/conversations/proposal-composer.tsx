@@ -19,8 +19,10 @@ export function ProposalComposer({
   conversationId,
   currentUserIsClient,
   defaultKind,
+  allowDirectBooking = false,
 }: {
   conversationId: string;
+  allowDirectBooking?: boolean;
   currentUserIsClient: boolean;
   defaultKind?: ProposalKind | undefined;
 }) {
@@ -40,7 +42,7 @@ export function ProposalComposer({
     : "PROVIDER_QUOTE";
   const effectiveDefaultKind =
     defaultKind && proposalKinds.includes(defaultKind) &&
-    (currentUserIsClient ? CLIENT_KINDS.includes(defaultKind) : defaultKind === "PROVIDER_QUOTE")
+    (currentUserIsClient ? CLIENT_KINDS.includes(defaultKind) && (defaultKind !== "DIRECT_BOOKING" || allowDirectBooking) : defaultKind === "PROVIDER_QUOTE")
       ? defaultKind
       : roleDefaultKind;
 
@@ -97,9 +99,9 @@ export function ProposalComposer({
             >
               {currentUserIsClient ? (
                 <>
-                  <option value="DIRECT_BOOKING">
-                    Reserva al precio publicado
-                  </option>
+                  {allowDirectBooking ? (
+                    <option value="DIRECT_BOOKING">Reservar al precio publicado</option>
+                  ) : null}
                   <option value="QUOTE_REQUEST">Solicitar cotización</option>
                   <option value="CLIENT_OFFER">Hacer una oferta</option>
                 </>
