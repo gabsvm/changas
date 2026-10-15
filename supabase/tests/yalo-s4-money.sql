@@ -474,6 +474,7 @@ select ok(
   'service role can invoke the internal price helper'
 );
 
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
 -- Precio acordado externo incluye adicional aceptado aunque MP este OFF.
 -- Status AWAITING_PAYMENT significa consentimiento contractual sin checkout.
 insert into public.job_scope_changes (
