@@ -40,29 +40,32 @@ export function NeedWizard({
   idempotencyKey: string;
 }) {
   const [step, setStep] = useState(0);
-  const [draft, setDraft] = useState<Draft>(EMPTY);
-  const [hydrated, setHydrated] = useState(false);
-  const [error, setError] = useState("");
-  const formRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
+  const [draft, setDraft] = useState<Draft>(() => {
+    if (typeof window === "undefined") return EMPTY;
     try {
       const saved = window.sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved) as { data?: Draft; savedAt?: number };
         if (parsed.data && parsed.savedAt && Date.now() - parsed.savedAt < MAX_AGE_MS) {
-          setDraft({ ...EMPTY, ...parsed.data });
-        } else {
-          window.sessionStorage.removeItem(STORAGE_KEY);
+          return { ...EMPTY, ...parsed.data };
         }
+        window.sessionStorage.removeItem(STORAGE_KEY);
       }
     } catch {
       // Storage can be unavailable in private browsing.
     }
-    setHydrated(true);
-  }, []);
+    return EMPTY;
+  });
+  const isMountedRef = useRef(false);
+  const [error, setError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+
   useEffect(() => {
-    if (!hydrated) return;
+    isMountedRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!isMountedRef.current) return;
     try {
       window.sessionStorage.setItem(
         STORAGE_KEY,
@@ -71,7 +74,7 @@ export function NeedWizard({
     } catch {
       // Form still works without browser storage.
     }
-  }, [draft, hydrated]);
+  }, [draft]);
 
   function change(key: keyof Draft, value: string) {
     setDraft((current) => ({ ...current, [key]: value }));
