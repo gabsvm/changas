@@ -4,7 +4,7 @@
 -- evidencia; correccion con motivo y tope. Todo hace rollback al final.
 begin;
 
-select plan(52);
+select plan(56);
 
 -- Estructura: columnas de entrega.
 select ok(
@@ -55,6 +55,33 @@ select ok(
   (select pg_get_functiondef(to_regprocedure('public.request_job_completion(uuid,text)')))
   like '%submit the delivery before verifying%',
   'handover check requires a prior submission'
+);
+
+-- Modality BOTH must be resolved on the job before digital delivery.
+select ok(
+  exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'jobs'
+      and column_name = 'effective_modality'
+  ),
+  'jobs persist effective in-person or remote modality'
+);
+select ok(
+  to_regprocedure('public.choose_job_effective_modality(uuid,public.service_modality)') is not null,
+  'client can choose an effective modality for a BOTH service'
+);
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.choose_job_effective_modality(uuid,public.service_modality)',
+    'EXECUTE'
+  ),
+  'authenticated can call role-authorized modality selector'
+);
+select ok(
+  (select pg_get_functiondef(to_regprocedure('public.auto_complete_stale_jobs()')))
+  like '%effective_modality%',
+  'stale job auto-close respects the effective delivery modality'
 );
 
 -- Fixtures S3 prefijo 1700; todo hace rollback al final del archivo.
