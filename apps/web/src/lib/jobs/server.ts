@@ -810,7 +810,13 @@ export async function getExternalPaymentLedger(jobId: string): Promise<{
   const { data, error } = await supabase.rpc("external_payment_ledger", {
     target_job_id: jobId,
   });
-  if (error) throw mapMoneyError(error.code, error.message);
+  if (error) {
+    // Preserve PostgREST's schema-missing code so getExternalMoney can
+    // degrade safely until the S4 migration is deployed. Never swallow
+    // ordinary authorization/transient errors.
+    if (isMissingExternalMoneySchema(error)) throw error;
+    throw mapMoneyError(error.code, error.message);
+  }
   const row = (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | null;
   if (!row) {
     throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
@@ -878,7 +884,13 @@ export async function listExternalDeclarations(
     .eq("job_id", jobId)
     .order("created_at", { ascending: true })
     .limit(100);
-  if (error) throw mapMoneyError(error.code, error.message);
+  if (error) {
+    // Preserve PostgREST's schema-missing code so getExternalMoney can
+    // degrade safely until the S4 migration is deployed. Never swallow
+    // ordinary authorization/transient errors.
+    if (isMissingExternalMoneySchema(error)) throw error;
+    throw mapMoneyError(error.code, error.message);
+  }
   return ((data ?? []) as unknown as Record<string, unknown>[]).map(asDeclaration);
 }
 
