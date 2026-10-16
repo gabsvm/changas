@@ -253,29 +253,56 @@ export async function declareExternalPaymentAction(
   revalidatePath("/jobs");
 }
 
-// La contraparte confirma o contesta con motivo.
+// La contraparte confirma o contesta con motivo. Los conflictos financieros son
+// errores recuperables del formulario, no errores fatales de la ruta.
+export type ExternalPaymentResponseState = { error: string | null };
+
 export async function respondExternalPaymentAction(
+  _previousState: ExternalPaymentResponseState,
   formData: FormData,
-): Promise<void> {
-  const jobId = uuidField(formData, "jobId");
-  const declarationId = uuidField(formData, "declarationId");
-  const accepted = stringField(formData, "decision") === "accept";
-  const reason = stringField(formData, "reason");
-  if (!accepted && (reason.length < 1 || reason.length > 1000)) {
-    throw new Error("Para marcar desacuerdo contanos el motivo.");
-  }
+): Promise<ExternalPaymentResponseState> {
+  let jobId: string;
   try {
+    jobId = uuidField(formData, "jobId");
+    const declarationId = uuidField(formData, "declarationId");
+    const decision = stringField(formData, "decision");
+    if (decision !== "accept" && decision !== "contest") {
+      return { error: "Elegí una respuesta válida al pago informado." };
+    }
+    const accepted = decision === "accept";
+    const reason = stringField(formData, "reason");
+    if (!accepted && (reason.length < 1 || reason.length > 1000)) {
+      return { error: "Para marcar desacuerdo contanos el motivo (hasta 1000 caracteres)." };
+    }
+
     await respondExternalPayment({
       declarationId,
       accepted,
       reason: accepted ? null : reason,
     });
   } catch (error) {
-    if (error instanceof JobServerError) throw new Error(error.message);
-    throw error;
+    if (error instanceof JobServerError) {
+      if (error.code === "CONFLICT") {
+        return {
+          error: error.message === "El monto supera el total acordado del trabajo."
+            ? "No pudimos confirmar: este importe, sumado a pagos ya confirmados, supera el total acordado. Revisá el historial; quien informó el pago puede anular la declaración y registrar el importe correcto."
+            : error.message,
+        };
+      }
+      if (error.code === "UNAUTHORIZED" || error.code === "FORBIDDEN") {
+        return { error: error.message };
+      }
+    }
+    if (error instanceof Error && error.message === "Identificador inválido.") {
+      return { error: "El pago informado no es válido. Actualizá la página y probá otra vez." };
+    }
+    console.error("[jobs] Error al responder a una declaración de pago", error);
+    return { error: "No pudimos registrar la respuesta. Tus pagos no cambiaron; actualizá la página y probá otra vez." };
   }
+
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");
+  return { error: null };
 }
 
 // Quien declaró anula su pendiente (corrección = void + nueva).
