@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { useRef, useState } from "react";
 
 import { manualLocations } from "@changas/domain";
@@ -138,7 +139,7 @@ export function LocationPicker({
 
   if (compact) {
     return (
-      <div className="location-picker-compact border-ink/[0.08] rounded-2xl border bg-white/75 p-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] backdrop-blur-sm dark:border-white/10 dark:bg-[#2a231c]/85">
+      <div className="yalo-location-compact location-picker-compact border-ink/[0.08] rounded-2xl border bg-white/75 p-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] backdrop-blur-sm dark:border-white/10 dark:bg-[#2a231c]/85">
         <div className="flex w-full items-center justify-between gap-2">
           <label className="text-ink/75 flex min-h-11 min-w-0 items-center gap-2 text-sm font-semibold">
             <svg
@@ -202,103 +203,110 @@ export function LocationPicker({
             {locationMessage}
           </span>
         ) : null}
-        {locationSheetOpen ? (
-          <div
-            className="bg-ink/35 fixed inset-0 z-50 flex items-end p-3 sm:items-center sm:justify-center"
-            role="presentation"
-            onClick={() => setLocationSheetOpen(false)}
-          >
-            <div
-              ref={locationDialogRef}
-              className="location-picker-sheet bg-surface relative w-full max-w-lg overflow-hidden overflow-y-auto rounded-3xl border border-white/80 p-5 shadow-[0_24px_70px_rgba(32,33,36,0.2)] sm:p-6 dark:border-white/10"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="location-picker-title"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <span
-                className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-[var(--yalo-symbol-gradient)]"
-                aria-hidden="true"
-              />
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-                    Tu zona
-                  </p>
-                  <h2
-                    className="font-display mt-1 text-2xl font-extrabold tracking-[-0.035em]"
-                    id="location-picker-title"
-                  >
-                    ¿Dónde estás buscando?
-                  </h2>
-                </div>
-                <button
-                  ref={locationCloseRef}
-                  className="consumer-pressable text-ink/75 hover:bg-ink/[0.05] grid h-11 w-11 shrink-0 place-items-center rounded-full text-2xl leading-none"
-                  type="button"
-                  onClick={() => setLocationSheetOpen(false)}
-                  aria-label="Cerrar selector de ubicación"
-                >
-                  ×
-                </button>
-              </div>
-              <p className="text-ink/75 mt-2 max-w-[28rem] text-sm leading-5">
-                Usamos una zona aproximada para mostrarte opciones relevantes.
-                Tu ubicación exacta nunca se publica.
-              </p>
-              <button
-                className="consumer-pressable border-moss/20 bg-moss/[0.07] text-ink hover:bg-moss/[0.11] mt-5 flex min-h-16 w-full items-center gap-3 rounded-2xl border px-4 text-left shadow-[0_6px_18px_rgba(37,99,235,0.08)]"
-                type="button"
-                onClick={() => {
-                  setLocationSheetOpen(false);
-                  requestDeviceLocation();
-                }}
+        {locationSheetOpen
+          ? createPortal(
+              <div
+                className="bg-ink/35 fixed inset-0 z-50 flex items-end p-3 sm:items-center sm:justify-center"
+                role="presentation"
+                onClick={() => setLocationSheetOpen(false)}
               >
-                <span
-                  className="bg-moss/12 text-moss grid h-10 w-10 shrink-0 place-items-center rounded-full text-lg"
-                  aria-hidden="true"
+                <div
+                  ref={locationDialogRef}
+                  className="location-picker-sheet bg-surface relative w-full max-w-lg overflow-hidden overflow-y-auto rounded-3xl border border-white/80 p-5 shadow-[0_24px_70px_rgba(32,33,36,0.2)] sm:p-6 dark:border-white/10"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="location-picker-title"
+                  onClick={(event) => event.stopPropagation()}
                 >
-                  ⌖
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-bold">
-                    Usar mi ubicación actual
-                  </span>
-                  <span className="text-ink/75 mt-0.5 block text-xs">
-                    Te pediremos permiso al dispositivo
-                  </span>
-                </span>
-                <span className="text-moss text-lg" aria-hidden="true">
-                  →
-                </span>
-              </button>
-              <div className="border-ink/10 mt-5 border-t pt-5">
-                <label className="text-sm font-bold" htmlFor="location-sheet">
-                  O elegí una zona manualmente
-                  <select
-                    className="consumer-control focus:border-moss/45 focus:ring-moss/10 mt-2 w-full px-3 text-sm outline-none focus:ring-2"
-                    value={manualLocation}
-                    id="location-sheet"
-                    onChange={(event) => {
-                      selectManualLocation(event.currentTarget.value);
+                  <span
+                    className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-[var(--yalo-symbol-gradient)]"
+                    aria-hidden="true"
+                  />
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+                        Tu zona
+                      </p>
+                      <h2
+                        className="font-display mt-1 text-2xl font-extrabold tracking-[-0.035em]"
+                        id="location-picker-title"
+                      >
+                        ¿Dónde estás buscando?
+                      </h2>
+                    </div>
+                    <button
+                      ref={locationCloseRef}
+                      className="consumer-pressable text-ink/75 hover:bg-ink/[0.05] grid h-11 w-11 shrink-0 place-items-center rounded-full text-2xl leading-none"
+                      type="button"
+                      onClick={() => setLocationSheetOpen(false)}
+                      aria-label="Cerrar selector de ubicación"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <p className="text-ink/75 mt-2 max-w-[28rem] text-sm leading-5">
+                    Usamos una zona aproximada para mostrarte opciones
+                    relevantes. Tu ubicación exacta nunca se publica.
+                  </p>
+                  <button
+                    className="consumer-pressable border-moss/20 bg-moss/[0.07] text-ink hover:bg-moss/[0.11] mt-5 flex min-h-16 w-full items-center gap-3 rounded-2xl border px-4 text-left shadow-[0_6px_18px_rgba(37,99,235,0.08)]"
+                    type="button"
+                    onClick={() => {
                       setLocationSheetOpen(false);
+                      requestDeviceLocation();
                     }}
                   >
-                    <option value="">Sin ubicación</option>
-                    {manualLocations.map((location) => (
-                      <option key={location.slug} value={location.slug}>
-                        {location.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <p className="text-ink/75 mt-4 text-xs leading-5">
-                Podés cambiar esta elección cuando quieras desde la búsqueda.
-              </p>
-            </div>
-          </div>
-        ) : null}
+                    <span
+                      className="bg-moss/12 text-moss grid h-10 w-10 shrink-0 place-items-center rounded-full text-lg"
+                      aria-hidden="true"
+                    >
+                      ⌖
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold">
+                        Usar mi ubicación actual
+                      </span>
+                      <span className="text-ink/75 mt-0.5 block text-xs">
+                        Te pediremos permiso al dispositivo
+                      </span>
+                    </span>
+                    <span className="text-moss text-lg" aria-hidden="true">
+                      →
+                    </span>
+                  </button>
+                  <div className="border-ink/10 mt-5 border-t pt-5">
+                    <label
+                      className="text-sm font-bold"
+                      htmlFor="location-sheet"
+                    >
+                      O elegí una zona manualmente
+                      <select
+                        className="consumer-control focus:border-moss/45 focus:ring-moss/10 mt-2 w-full px-3 text-sm outline-none focus:ring-2"
+                        value={manualLocation}
+                        id="location-sheet"
+                        onChange={(event) => {
+                          selectManualLocation(event.currentTarget.value);
+                          setLocationSheetOpen(false);
+                        }}
+                      >
+                        <option value="">Sin ubicación</option>
+                        {manualLocations.map((location) => (
+                          <option key={location.slug} value={location.slug}>
+                            {location.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <p className="text-ink/75 mt-4 text-xs leading-5">
+                    Podés cambiar esta elección cuando quieras desde la
+                    búsqueda.
+                  </p>
+                </div>
+              </div>,
+              document.body,
+            )
+          : null}
       </div>
     );
   }

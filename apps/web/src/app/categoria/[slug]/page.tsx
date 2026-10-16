@@ -44,8 +44,7 @@ export async function generateMetadata({
       openGraph: {
         title: `${category.name} · YALO`,
         description:
-          category.description ??
-          "Servicios y habilidades publicados en YALO.",
+          category.description ?? "Servicios y habilidades publicados en YALO.",
         type: "website",
         url: `/categoria/${category.slug}`,
       },
@@ -110,7 +109,7 @@ export default async function CategoryPage({
   return (
     <main
       id="main-content"
-      className="bg-canvas text-ink mobile-content-with-nav min-h-screen"
+      className="yalo-ui bg-canvas text-ink mobile-content-with-nav min-h-screen"
     >
       <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-8 sm:pt-5">
         <AppHeader
@@ -127,7 +126,7 @@ export default async function CategoryPage({
           className="sm:flex"
         />
         <section className="pt-5 sm:pt-9">
-          <div className="brand-gradient-surface text-ink relative overflow-hidden rounded-3xl p-5 shadow-[var(--consumer-shadow-hero)] sm:p-6">
+          <div className="yalo-category-hero brand-gradient-surface relative overflow-hidden rounded-3xl p-5 text-white shadow-[var(--consumer-shadow-hero)] sm:p-6">
             <span
               className="pointer-events-none absolute inset-0 opacity-25"
               style={{
@@ -161,7 +160,7 @@ export default async function CategoryPage({
                 query ? `/buscar?q=${encodeURIComponent(query)}` : "/buscar"
               }
               aria-label={`Quitar filtro de categoría ${category.name}`}
-              className="consumer-pressable relative z-10 mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-white/60 bg-white/70 px-3.5 text-[13px] font-bold text-ink backdrop-blur-sm hover:bg-white"
+              className="consumer-pressable text-ink relative z-10 mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-white/60 bg-white/70 px-3.5 text-[13px] font-bold backdrop-blur-sm hover:bg-white"
             >
               {category.name}
               <span aria-hidden="true" className="text-sm leading-none">
@@ -209,7 +208,7 @@ export default async function CategoryPage({
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.modality === "IN_PERSON"
                     ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                    : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
                 Presencial
@@ -222,7 +221,7 @@ export default async function CategoryPage({
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.modality === "REMOTE"
                     ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                    : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
                 Remoto
@@ -235,7 +234,7 @@ export default async function CategoryPage({
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.acceptsOffers
                     ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                    : "border-white/60 bg-white/70 text-ink backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
                 }`}
               >
                 Acepta ofertas

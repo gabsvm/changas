@@ -7,6 +7,7 @@ import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 
 import "./globals.css";
+import "./yalo-interior.css";
 
 const displayFont = Space_Grotesk({
   subsets: ["latin"],
@@ -45,7 +46,7 @@ export const viewport: Viewport = {
 };
 
 const themeInitScript =
-  '(function(){try{var t=localStorage.getItem("changas-theme");if(t!=="light"&&t!=="dark"&&t!=="system")t="light";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var h=document.documentElement;h.classList.toggle("dark",d);h.style.colorScheme=t==="system"?"light dark":t;}catch(e){}})();';
+  '(function(){try{var t=localStorage.getItem("changas-theme");if(t!=="light"&&t!=="dark"&&t!=="system")t="dark";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var h=document.documentElement;h.classList.toggle("dark",d);h.style.colorScheme=t==="system"?"light dark":t;}catch(e){}})();';
 
 export default function RootLayout({
   children,

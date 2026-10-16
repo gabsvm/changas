@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useId, useRef } from "react";
+import { createPortal } from "react-dom";
 
 import { animatePanelEntrance } from "@/lib/ui/panel-motion";
 import { useDialogFocus } from "@/lib/ui/use-dialog-focus";
@@ -50,7 +51,7 @@ export function BottomSheet({
         aria-modal="true"
         aria-labelledby={titleId}
         data-motion-panel
-        className="mobile-safe-bottom bg-surface border-ink/[0.08] relative z-10 max-h-[88dvh] w-full overflow-hidden overflow-y-auto rounded-t-[1.25rem] border px-4 pt-3 pb-4 shadow-[0_1px_2px_rgb(23_20_15/8%),0_-18px_50px_rgba(0,0,0,0.18),0_24px_64px_-20px_rgb(255_107_53/25%)] sm:max-w-xl sm:rounded-2xl sm:p-5 dark:shadow-[0_-18px_50px_rgba(0,0,0,0.5)]"
+        className="yalo-bottom-sheet mobile-safe-bottom bg-surface border-ink/[0.08] relative z-10 max-h-[88dvh] w-full overflow-hidden overflow-y-auto rounded-t-[1.25rem] border px-4 pt-3 pb-4 shadow-[0_1px_2px_rgb(23_20_15/8%),0_-18px_50px_rgba(0,0,0,0.18),0_24px_64px_-20px_rgb(255_107_53/25%)] sm:max-w-xl sm:rounded-2xl sm:p-5 dark:shadow-[0_-18px_50px_rgba(0,0,0,0.5)]"
       >
         <span
           aria-hidden="true"

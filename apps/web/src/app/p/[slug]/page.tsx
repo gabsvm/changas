@@ -130,7 +130,7 @@ export default async function PublicProviderPage({
   return (
     <main
       id="main-content"
-      className="bg-canvas text-ink min-h-screen px-4 pt-4 pb-28 sm:px-8 sm:pb-10"
+      className="yalo-ui bg-canvas text-ink min-h-screen px-4 pt-4 pb-28 sm:px-8 sm:pb-10"
     >
       <div className="mx-auto max-w-4xl">
         <AppHeader
@@ -287,7 +287,12 @@ export default async function PublicProviderPage({
           ) : null}
 
           <div className="profile-trust-strip border-brand-yellow/35 bg-surface-muted consumer-card mt-5 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
-            <IllustratedBadge tone="gold" icon="sparkle" size="md" label="Información pública clara" />
+            <IllustratedBadge
+              tone="gold"
+              icon="sparkle"
+              size="md"
+              label="Información pública clara"
+            />
             <div>
               <p className="text-sm font-extrabold">
                 Información pública clara
@@ -300,13 +305,20 @@ export default async function PublicProviderPage({
           </div>
 
           <div className="profile-verification border-moss/25 bg-surface-muted consumer-card mt-3 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
-            <IllustratedBadge tone="green" icon="check" size="md" label="Verificación de identidad" />
+            <IllustratedBadge
+              tone="green"
+              icon="check"
+              size="md"
+              label="Verificación de identidad"
+            />
             <div>
-              <p className="text-sm font-extrabold">Verificación de identidad</p>
+              <p className="text-sm font-extrabold">
+                Verificación de identidad
+              </p>
               <p className="text-ink/70 mt-1 text-xs leading-6">
-                Este perfil completó el alta de proveedor y está habilitado
-                para publicar. Por privacidad no mostramos documentos ni fechas
-                de revisión.
+                Este perfil completó el alta de proveedor y está habilitado para
+                publicar. Por privacidad no mostramos documentos ni fechas de
+                revisión.
               </p>
             </div>
           </div>
@@ -363,7 +375,11 @@ export default async function PublicProviderPage({
           <ProviderReputation providerSlug={provider.public_slug} />
         </div>
 
-        <PublicSection title="Servicios" badge={{ tone: "orange", icon: "tag" }} id="servicios">
+        <PublicSection
+          title="Servicios"
+          badge={{ tone: "orange", icon: "tag" }}
+          id="servicios"
+        >
           {(services ?? []).length ? (
             <div className="grid gap-3">
               {(services ?? []).map((service) => (
@@ -374,7 +390,9 @@ export default async function PublicProviderPage({
                 >
                   <span
                     className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl text-lg font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
-                    style={{ backgroundImage: coverFor(service.public_slug).css }}
+                    style={{
+                      backgroundImage: coverFor(service.public_slug).css,
+                    }}
                     aria-hidden="true"
                   >
                     <span
@@ -440,7 +458,10 @@ export default async function PublicProviderPage({
         </PublicSection>
 
         {(skills ?? []).length ? (
-          <PublicSection title="Habilidades" badge={{ tone: "blue", icon: "sparkle" }}>
+          <PublicSection
+            title="Habilidades"
+            badge={{ tone: "blue", icon: "sparkle" }}
+          >
             <div className="flex flex-wrap gap-2">
               {(skills ?? []).map((skill) => (
                 <StatusChip tone="neutral" key={skill.skill_slug}>
@@ -452,7 +473,10 @@ export default async function PublicProviderPage({
         ) : null}
 
         {(areas ?? []).length ? (
-          <PublicSection title="Zona de servicio" badge={{ tone: "blue", icon: "pin" }}>
+          <PublicSection
+            title="Zona de servicio"
+            badge={{ tone: "blue", icon: "pin" }}
+          >
             <div className="grid gap-2">
               {(areas ?? []).map((area) => (
                 <div
@@ -460,8 +484,15 @@ export default async function PublicProviderPage({
                   key={`${area.label}-${area.radius_meters}`}
                 >
                   <span className="flex min-w-0 items-center gap-2.5">
-                    <IllustratedBadge tone="blue" icon="pin" size="sm" label="Zona de servicio" />
-                    <span className="truncate text-sm font-semibold">{area.label}</span>
+                    <IllustratedBadge
+                      tone="blue"
+                      icon="pin"
+                      size="sm"
+                      label="Zona de servicio"
+                    />
+                    <span className="truncate text-sm font-semibold">
+                      {area.label}
+                    </span>
                   </span>
                   <span className="text-ink/70 shrink-0 text-xs">
                     Radio aprox. {area.radius_meters} m
@@ -476,7 +507,10 @@ export default async function PublicProviderPage({
         ) : null}
 
         {(portfolio ?? []).length ? (
-          <PublicSection title="Portfolio" badge={{ tone: "violet", icon: "sparkle" }}>
+          <PublicSection
+            title="Portfolio"
+            badge={{ tone: "violet", icon: "sparkle" }}
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               {(portfolio ?? []).map((item) => (
                 <article
@@ -514,11 +548,22 @@ export default async function PublicProviderPage({
         ) : null}
 
         {(experiences ?? []).length ? (
-          <PublicSection title="Experiencia" badge={{ tone: "violet", icon: "briefcase" }}>
+          <PublicSection
+            title="Experiencia"
+            badge={{ tone: "violet", icon: "briefcase" }}
+          >
             <div className="grid gap-2">
               {(experiences ?? []).map((item) => (
-                <div className="border-ink/[0.08] bg-surface consumer-card flex items-start gap-3 rounded-2xl border px-4 py-3.5" key={`${item.title}-${item.started_on}`}>
-                  <IllustratedBadge tone="violet" icon="briefcase" size="sm" label="Experiencia laboral" />
+                <div
+                  className="border-ink/[0.08] bg-surface consumer-card flex items-start gap-3 rounded-2xl border px-4 py-3.5"
+                  key={`${item.title}-${item.started_on}`}
+                >
+                  <IllustratedBadge
+                    tone="violet"
+                    icon="briefcase"
+                    size="sm"
+                    label="Experiencia laboral"
+                  />
                   <div className="min-w-0">
                     <p className="text-sm leading-5 font-semibold">
                       {item.title}
@@ -539,14 +584,22 @@ export default async function PublicProviderPage({
         ) : null}
 
         {(education ?? []).length || (certifications ?? []).length ? (
-          <PublicSection title="Formación y credenciales" badge={{ tone: "gold", icon: "star" }}>
+          <PublicSection
+            title="Formación y credenciales"
+            badge={{ tone: "gold", icon: "star" }}
+          >
             <div className="grid gap-2">
               {(education ?? []).map((item) => (
                 <div
                   className="border-ink/[0.08] bg-surface consumer-card flex items-start gap-3 rounded-2xl border px-4 py-3.5"
                   key={`${item.institution}-${item.started_on}`}
                 >
-                  <IllustratedBadge tone="gold" icon="star" size="sm" label="Formación" />
+                  <IllustratedBadge
+                    tone="gold"
+                    icon="star"
+                    size="sm"
+                    label="Formación"
+                  />
                   <div className="min-w-0">
                     <p className="text-sm leading-5 font-semibold">
                       {item.institution}
@@ -558,8 +611,16 @@ export default async function PublicProviderPage({
                 </div>
               ))}
               {(certifications ?? []).map((item) => (
-                <div className="border-ink/[0.08] bg-surface consumer-card flex items-start gap-3 rounded-2xl border px-4 py-3.5" key={`${item.title}-${item.issued_on}`}>
-                  <IllustratedBadge tone="green" icon="shield" size="sm" label="Certificación" />
+                <div
+                  className="border-ink/[0.08] bg-surface consumer-card flex items-start gap-3 rounded-2xl border px-4 py-3.5"
+                  key={`${item.title}-${item.issued_on}`}
+                >
+                  <IllustratedBadge
+                    tone="green"
+                    icon="shield"
+                    size="sm"
+                    label="Certificación"
+                  />
                   <div className="min-w-0">
                     <p className="text-sm leading-5 font-semibold">
                       {item.title}
@@ -595,14 +656,26 @@ function PublicSection({
   id,
 }: {
   title: string;
-  badge: { tone: "orange" | "blue" | "green" | "rose" | "violet" | "gold" | "neutral"; icon: "tag" | "sparkle" | "pin" | "briefcase" | "star" | "shield" | "check"; label?: string };
+  badge: {
+    tone: "orange" | "blue" | "green" | "rose" | "violet" | "gold" | "neutral";
+    icon: "tag" | "sparkle" | "pin" | "briefcase" | "star" | "shield" | "check";
+    label?: string;
+  };
   children: ReactNode;
   id?: string;
 }) {
   return (
-    <section id={id} className="profile-section-card consumer-card bg-surface mt-6 scroll-mt-24 p-5 sm:p-6">
+    <section
+      id={id}
+      className="profile-section-card consumer-card bg-surface mt-6 scroll-mt-24 p-5 sm:p-6"
+    >
       <span className="flex min-w-0 items-center gap-2.5">
-        <IllustratedBadge tone={badge.tone} icon={badge.icon} size="sm" label={badge.label ?? title} />
+        <IllustratedBadge
+          tone={badge.tone}
+          icon={badge.icon}
+          size="sm"
+          label={badge.label ?? title}
+        />
         <h2 className="font-display truncate text-lg leading-7 font-bold tracking-[-0.015em]">
           {title}
         </h2>
@@ -626,16 +699,17 @@ function ProfileFact({ label, value }: { label: string; value: number }) {
 }
 
 const PROFILE_COVERS = [
-  { css: "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)", tone: "orange" },
-  { css: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)", tone: "blue" },
-  { css: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)", tone: "green" },
-  { css: "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)", tone: "rose" },
-  { css: "linear-gradient(135deg, #8B7CFF 0%, #5B4BD6 100%)", tone: "violet" },
-  { css: "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)", tone: "gold" },
+  { css: "linear-gradient(135deg, #22354A 0%, #0D121B 100%)", tone: "orange" },
+  { css: "linear-gradient(135deg, #164F6B 0%, #112033 100%)", tone: "blue" },
+  { css: "linear-gradient(135deg, #185253 0%, #10282F 100%)", tone: "green" },
+  { css: "linear-gradient(135deg, #235346 0%, #12282E 100%)", tone: "rose" },
+  { css: "linear-gradient(135deg, #28455C 0%, #121E2C 100%)", tone: "violet" },
+  { css: "linear-gradient(135deg, #1B4D57 0%, #10222D 100%)", tone: "gold" },
 ] as const;
 
 function coverFor(slug: string) {
   let hash = 0;
-  for (let i = 0; i < slug.length; i += 1) hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < slug.length; i += 1)
+    hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
   return PROFILE_COVERS[hash % PROFILE_COVERS.length] ?? PROFILE_COVERS[0];
 }

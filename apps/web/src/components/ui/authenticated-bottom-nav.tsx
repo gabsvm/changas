@@ -169,7 +169,7 @@ export function AuthenticatedBottomNav({
 
   return (
     <nav
-      className="bottom-nav-shell mobile-safe-bottom border-ink/[0.07] fixed inset-x-0 bottom-0 z-50 border-t bg-surface/90 px-2 pt-1 shadow-[0_-12px_32px_-16px_rgb(16_24_39/20%)] backdrop-blur-xl"
+      className="bottom-nav-shell mobile-safe-bottom border-ink/[0.07] bg-surface/90 fixed inset-x-0 bottom-0 z-50 border-t px-2 pt-1 shadow-[0_-12px_32px_-16px_rgb(16_24_39/20%)] backdrop-blur-xl sm:hidden"
       aria-label="Navegación principal"
     >
       {/* Acento medido: franja de 2px con el gradiente identitario YALO. */}
@@ -197,12 +197,12 @@ export function AuthenticatedBottomNav({
               }`}
             >
               <span
-                className={`nav-icon relative grid h-8 min-w-11 place-items-center rounded-full px-2.5 ${active ? "bg-brand-primary text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:bg-white dark:text-ink" : ""}`}
+                className={`nav-icon relative grid h-8 min-w-11 place-items-center rounded-full px-2.5 ${active ? "bg-brand-primary dark:text-ink text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:bg-white" : ""}`}
               >
                 <NavIcon name={item.icon} active={active} />
                 {badge > 0 ? (
                   <span
-                    className="bg-danger absolute -top-1 -right-2 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] leading-5 font-bold text-white ring-2 ring-white dark:text-brand-primary-strong dark:ring-surface"
+                    className="bg-danger dark:text-brand-primary-strong dark:ring-surface absolute -top-1 -right-2 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] leading-5 font-bold text-white ring-2 ring-white"
                     aria-label={`${badge} sin leer en ${item.label}`}
                   >
                     {badge > 99 ? "99+" : badge}

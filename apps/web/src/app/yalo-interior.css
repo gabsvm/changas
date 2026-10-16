@@ -1,0 +1,510 @@
+﻿/* YALO — unified marketplace surfaces, authored for both explicit themes.
+   Decorative only: transactional state, RLS, routing and forms are untouched. */
+.yalo-ui {
+  --yalo-ui-glass: rgb(19 31 46 / 88%);
+  --yalo-ui-border: rgb(255 255 255 / 13%);
+  --yalo-ui-accent: #12d9c5;
+  --yalo-ui-glow: rgb(18 217 197 / 17%);
+  background-image:
+    radial-gradient(
+      60rem 29rem at 100% -16rem,
+      rgb(8 169 244 / 10%),
+      transparent 75%
+    ),
+    radial-gradient(
+      62rem 31rem at -20% 80%,
+      rgb(18 217 197 / 6%),
+      transparent 75%
+    );
+  background-repeat: no-repeat;
+  min-width: 0;
+}
+.yalo-ui,
+.yalo-ui > div,
+.yalo-ui section,
+.yalo-ui article {
+  max-width: 100%;
+}
+.yalo-ui :focus-visible {
+  outline: 2px solid #12d9c5;
+  outline-offset: 3px;
+}
+.yalo-ui .consumer-card {
+  border-radius: 23px;
+  border-color: rgb(45 68 84 / 13%);
+  box-shadow:
+    0 2px 7px rgb(13 18 27 / 4%),
+    0 17px 43px -20px rgb(13 18 27 / 17%);
+}
+.dark .yalo-ui .consumer-card {
+  border-color: rgb(210 239 247 / 10%);
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 3%),
+    0 19px 43px -20px rgb(0 0 0 / 60%);
+}
+
+/* The same floating liquid-glass identity as the landing, shared by
+   search, categories, public profiles and public service details. */
+.yalo-ui .yalo-interior-header,
+.yalo-ui .yalo-account-header,
+.yalo-ui .yalo-auth-header {
+  position: sticky;
+  top: max(10px, env(safe-area-inset-top));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  min-height: 66px;
+  margin: 12px 0 15px;
+  padding: 9px 16px;
+  border: 1px solid var(--yalo-ui-border);
+  border-radius: 25px;
+  background: var(--yalo-ui-glass);
+  color: #f5f8fc;
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 8%),
+    0 12px 34px rgb(13 18 27 / 20%);
+  -webkit-backdrop-filter: blur(18px) saturate(165%);
+  backdrop-filter: blur(18px) saturate(165%);
+}
+.yalo-ui .yalo-interior-header {
+  margin-inline: 0 !important;
+  overflow: visible;
+}
+.yalo-ui .yalo-interior-header::before,
+.yalo-ui .yalo-interior-header > span[aria-hidden="true"]:first-child {
+  pointer-events: none;
+}
+.yalo-ui .yalo-interior-header a,
+.yalo-ui .yalo-interior-header .text-ink,
+.yalo-ui .yalo-account-header a,
+.yalo-ui .yalo-auth-header a {
+  color: #e4edf6;
+}
+.yalo-ui .yalo-interior-header a:hover,
+.yalo-ui .yalo-account-header a:hover {
+  color: white;
+  background-color: rgb(255 255 255 / 8%);
+}
+.yalo-ui .yalo-interior-header nav a {
+  color: #c4d4e2 !important;
+}
+.yalo-ui .yalo-interior-header nav a[aria-current="page"] {
+  background: rgb(18 217 197 / 14%) !important;
+  color: #aaf8e8 !important;
+}
+.yalo-ui .yalo-interior-header .brand-mark,
+.yalo-ui .yalo-account-header .brand-mark {
+  width: 37px;
+  height: 37px;
+  background-color: #091722;
+  border-radius: 12px;
+  box-shadow: none;
+}
+.yalo-ui .yalo-account-header {
+  border-radius: 999px;
+  padding-inline: 24px;
+  gap: 12px;
+}
+.yalo-ui .yalo-account-header nav a {
+  border-radius: 999px;
+}
+.yalo-ui .yalo-auth-header {
+  position: relative;
+  top: auto;
+  border-radius: 999px;
+  padding-inline: 20px;
+  flex-shrink: 0;
+}
+.yalo-ui .yalo-auth-header > span {
+  color: #83e8df !important;
+}
+
+/* Brand panels always have WHITE text — never token ink on navy.
+   A soft cyan depth replaces the old unrelated color blobs. */
+.yalo-ui .brand-gradient-surface,
+.yalo-ui .yalo-auth-hero {
+  background:
+    radial-gradient(
+      ellipse 60% 100% at 97% 4%,
+      rgb(8 169 244 / 18%),
+      transparent 78%
+    ),
+    radial-gradient(
+      ellipse 65% 75% at 0% 100%,
+      rgb(18 217 197 / 10%),
+      transparent 75%
+    ),
+    linear-gradient(140deg, #1c2b3d 0%, #101c2b 52%, #0b121d 100%);
+  color: #f8fbff;
+  border: 1px solid rgb(255 255 255 / 9%);
+  border-radius: 27px;
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 8%),
+    0 18px 50px rgb(0 0 0 / 16%);
+}
+.yalo-ui .yalo-auth-hero {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  padding: clamp(24px, 4vw, 45px);
+}
+.yalo-ui .yalo-auth-hero::before {
+  content: "";
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 310px;
+  height: 310px;
+  border: 1px solid rgb(18 217 197 / 19%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 35px rgb(18 217 197 / 4%),
+    0 0 0 85px rgb(8 169 244 / 3%);
+  pointer-events: none;
+}
+.yalo-ui .yalo-auth-hero h2,
+.yalo-ui .yalo-auth-hero strong,
+.yalo-ui .yalo-auth-hero li,
+.yalo-ui .yalo-auth-hero li span,
+.yalo-ui .yalo-search-hero h1,
+.yalo-ui .yalo-category-hero h1,
+.yalo-ui .yalo-category-hero p {
+  color: #f8fbff !important;
+}
+.yalo-ui .yalo-auth-hero li {
+  position: relative;
+  border-color: rgb(255 255 255 / 11%);
+  background: rgb(255 255 255 / 6%);
+}
+.yalo-ui .yalo-auth-hero li span span:last-child {
+  color: #b6cadb !important;
+}
+.yalo-ui .yalo-auth-hero p {
+  color: #b7e8e6;
+}
+.yalo-ui .yalo-auth-hero > span[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+/* Guided flow: large but proportionate, with one unmistakable active stage. */
+.yalo-ui .yalo-guide {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  border-color: rgb(8 169 244 / 11%);
+}
+.yalo-ui .yalo-guide::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--yalo-symbol-gradient);
+}
+.yalo-ui .yalo-guide > div > span:first-child {
+  width: 59px;
+  height: 59px;
+  border-radius: 17px;
+  background: #0d121b;
+  color: #65ec91;
+  font-size: 28px;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 15%);
+}
+.yalo-ui .yalo-guide p:first-child {
+  color: #168b96;
+  letter-spacing: 0.12em;
+}
+.dark .yalo-ui .yalo-guide p:first-child {
+  color: #7fede0;
+}
+.yalo-ui .yalo-guide ol:last-child li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Discovery & category heroes: accessible controls and no cut-off chips. */
+.yalo-ui .yalo-search-hero,
+.yalo-ui .yalo-category-hero {
+  isolation: isolate;
+}
+.yalo-ui .yalo-search-hero h1,
+.yalo-ui .yalo-category-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3.5vw, 35px);
+  letter-spacing: -0.045em;
+}
+.yalo-ui .yalo-search-hero .consumer-control,
+.yalo-ui .yalo-category-hero .consumer-control {
+  background: #f8fbff !important;
+  border-color: rgb(255 255 255 / 30%) !important;
+  color: #101827 !important;
+  box-shadow: 0 10px 27px rgb(0 0 0 / 12%);
+}
+.yalo-ui .yalo-search-hero input,
+.yalo-ui .yalo-category-hero input,
+.yalo-ui .yalo-search-hero .consumer-control svg,
+.yalo-ui .yalo-category-hero .consumer-control svg {
+  color: #101827 !important;
+}
+.yalo-ui .yalo-search-hero input::placeholder,
+.yalo-ui .yalo-category-hero input::placeholder {
+  color: #526174 !important;
+  opacity: 1;
+}
+.yalo-ui .yalo-search-hero .cta-ink,
+.yalo-ui .yalo-category-hero .cta-ink {
+  border: 0;
+  background: linear-gradient(110deg, #08a9f4, #12d9c5 63%, #65ec91);
+  color: #062233;
+  box-shadow: 0 7px 27px rgb(18 217 197 / 15%);
+}
+.yalo-ui .yalo-search-hero .cta-ink:hover,
+.yalo-ui .yalo-category-hero .cta-ink:hover {
+  filter: brightness(1.08);
+}
+.yalo-ui .yalo-search-hero .yalo-location-compact {
+  border-color: rgb(255 255 255 / 17%) !important;
+  background: rgb(255 255 255 / 9%) !important;
+  color: #f5faff;
+  box-shadow: none;
+}
+.yalo-ui .yalo-search-hero .yalo-location-compact label,
+.yalo-ui .yalo-search-hero .yalo-location-compact select {
+  color: #f5faff !important;
+}
+.yalo-ui .yalo-search-hero .yalo-location-compact select {
+  max-width: min(44vw, 190px);
+}
+.yalo-ui .yalo-search-hero .yalo-location-compact option {
+  color: #101827;
+  background: #f8fbff;
+}
+.yalo-ui .yalo-search-hero .yalo-location-compact button {
+  background: rgb(255 255 255 / 92%);
+  color: #112132;
+  border-color: rgb(255 255 255 / 8%);
+  border-radius: 999px;
+}
+.yalo-ui .yalo-search-hero .yalo-filter-trigger {
+  border: 1px solid rgb(255 255 255 / 19%) !important;
+  border-radius: 15px;
+  background: rgb(255 255 255 / 9%) !important;
+  color: #eaf9fa !important;
+  box-shadow: none;
+}
+.yalo-ui .yalo-search-hero .yalo-filter-trigger:hover {
+  background: rgb(255 255 255 / 15%) !important;
+  border-color: rgb(18 217 197 / 40%) !important;
+}
+.yalo-ui .yalo-search-hero .yalo-category-filters {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  gap: 8px;
+}
+.yalo-ui .yalo-search-hero .yalo-category-filters a,
+.yalo-ui .yalo-category-hero a[aria-pressed] {
+  white-space: nowrap;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 16%);
+  color: #f0f7fb;
+  box-shadow: none;
+}
+.yalo-ui .yalo-search-hero .yalo-category-filters a[aria-current="true"],
+.yalo-ui .yalo-category-hero a[aria-pressed="true"] {
+  border-color: rgb(18 217 197 / 65%);
+  background: rgb(18 217 197 / 19%);
+  color: #bffbed;
+}
+.yalo-ui .yalo-search-hero .text-ink\/75,
+.yalo-ui .yalo-category-hero .text-ink\/75,
+.yalo-ui .yalo-category-hero .text-ink\/80,
+.yalo-ui .yalo-category-hero .brand-kicker {
+  color: #c8dbe6 !important;
+}
+.yalo-ui .yalo-category-hero > a {
+  border-color: rgb(255 255 255 / 15%);
+  background: rgb(255 255 255 / 11%);
+  color: #f0f8fd;
+}
+.yalo-ui .discovery-results-shell {
+  min-width: 0;
+}
+.yalo-ui .discovery-results-shell ul {
+  min-width: 0;
+}
+.yalo-ui .service-card-shell,
+.yalo-ui .discovery-results-shell article {
+  border-radius: 23px;
+  overflow: hidden;
+}
+
+/* Forms: avoid inherited brown slabs and unreadable white-on-white text. */
+.yalo-ui .consumer-control {
+  border-radius: 15px;
+}
+.yalo-ui input,
+.yalo-ui select,
+.yalo-ui textarea {
+  min-width: 0;
+}
+.yalo-ui .brand-hero-panel {
+  border-radius: 20px;
+}
+.yalo-ui .yalo-bottom-sheet {
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -22px 60px rgb(0 0 0 / 31%);
+}
+.yalo-ui .yalo-bottom-sheet::before {
+  content: "";
+  position: absolute;
+  height: 3px;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--yalo-symbol-gradient);
+}
+.yalo-ui .yalo-account-header nav a {
+  color: #c8d8e6;
+  padding-inline: 13px;
+}
+.yalo-ui .yalo-account-header nav a:focus-visible {
+  outline-color: #65ec91;
+}
+.yalo-ui .cta-ink:not(.yalo-search-hero .cta-ink) {
+  border-radius: 15px;
+}
+
+/* Mobile bottom nav uses the same brand bar independently of a user's
+   light/dark preference — navigation keeps a consistent visual anchor. */
+.yalo-ui .bottom-nav-shell {
+  border-color: rgb(255 255 255 / 10%) !important;
+  background: rgb(17 27 40 / 96%) !important;
+  box-shadow: 0 -12px 35px rgb(0 0 0 / 22%);
+  color: #eef8fa;
+}
+.yalo-ui .bottom-nav-shell > div a {
+  color: #a6bacb !important;
+}
+.yalo-ui .bottom-nav-shell > div a[aria-current="page"] {
+  color: #f8fcff !important;
+}
+.yalo-ui .bottom-nav-shell > div a[aria-current="page"] .nav-icon {
+  color: #062233 !important;
+  background: var(--yalo-symbol-gradient) !important;
+  box-shadow: 0 5px 19px rgb(18 217 197 / 17%);
+}
+
+/* Dark theme uses navy, never the old brown palette. */
+.dark .yalo-ui .yalo-location-compact,
+.dark .yalo-ui .yalo-filter-trigger {
+  background: #1c2b3a;
+  border-color: rgb(255 255 255 / 14%);
+}
+.dark .yalo-ui .consumer-control {
+  background: #192637;
+}
+.dark .yalo-ui .bg-white,
+.dark .yalo-ui .bg-white\/75,
+.dark .yalo-ui .bg-white\/70 {
+  background-color: #1e2b3d;
+}
+.dark .yalo-ui .yalo-search-hero .consumer-control,
+.dark .yalo-ui .yalo-category-hero .consumer-control {
+  background: #f8fbff !important;
+}
+.dark .yalo-ui .yalo-search-hero .yalo-location-compact {
+  background: rgb(255 255 255 / 9%) !important;
+}
+.dark .yalo-ui .yalo-search-hero .yalo-filter-trigger {
+  background: rgb(255 255 255 / 9%) !important;
+}
+@media (max-width: 640px) {
+  .yalo-ui .yalo-interior-header {
+    min-height: 58px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border-radius: 19px;
+  }
+  .yalo-ui .yalo-auth-header {
+    margin: 0 0 12px;
+  }
+  .yalo-ui .yalo-guide {
+    padding: 15px;
+  }
+  .yalo-ui .yalo-guide > div {
+    gap: 12px;
+  }
+  .yalo-ui .yalo-guide > div > span:first-child {
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .yalo-ui .yalo-guide h2 {
+    font-size: 20px;
+    line-height: 1.2;
+  }
+  .yalo-ui .yalo-guide ol:last-child li {
+    font-size: 10px;
+  }
+  .yalo-ui .yalo-search-hero,
+  .yalo-ui .yalo-category-hero {
+    padding: 19px;
+    border-radius: 24px;
+  }
+  .yalo-ui .yalo-search-hero .yalo-category-filters a {
+    min-height: 37px;
+    padding-inline: 13px;
+    font-size: 12px;
+  }
+  .yalo-ui .yalo-search-hero .yalo-location-compact select {
+    max-width: min(40vw, 160px);
+    text-overflow: ellipsis;
+  }
+  .yalo-ui .yalo-search-hero .yalo-location-compact button {
+    padding-inline: 11px;
+  }
+  .yalo-ui .yalo-auth-hero {
+    padding: 25px;
+  }
+  .yalo-ui .yalo-auth-hero h2 {
+    font-size: clamp(26px, 8vw, 38px);
+  }
+}
+@media (max-width: 360px) {
+  .yalo-ui .yalo-guide {
+    padding: 12px;
+  }
+  .yalo-ui .yalo-search-hero {
+    padding: 15px;
+  }
+  .yalo-ui .yalo-category-filters a {
+    font-size: 11px;
+  }
+  .yalo-ui .yalo-interior-header {
+    padding-inline: 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yalo-ui *,
+  .yalo-ui *::before,
+  .yalo-ui *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Job actions must never sit behind the 5-tab mobile nav. */
+.yalo-ui .yalo-job-mobile-cta {
+  bottom: var(--mobile-bottom-nav-height);
+  border-top: 1px solid rgb(18 217 197 / 13%);
+  box-shadow: 0 -10px 30px rgb(0 0 0 / 14%);
+}
+@media (min-width: 640px) {
+  .yalo-ui .yalo-job-mobile-cta {
+    bottom: 0;
+  }
+}

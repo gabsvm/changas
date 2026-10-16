@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import { guideProgress, type GuidedStep } from "@/lib/ui/guided";
 
@@ -23,7 +23,7 @@ export function GuideHeader({
   return (
     <section
       aria-label={`Paso ${current} de ${total}: ${active?.action ?? ""}`}
-      className={`border-ink/[0.08] bg-surface consumer-card rounded-3xl border p-5 ${className}`}
+      className={`yalo-guide border-ink/[0.08] bg-surface consumer-card rounded-3xl border p-5 ${className}`}
     >
       <div className="flex items-center gap-4">
         <span
@@ -41,8 +41,13 @@ export function GuideHeader({
           </h2>
           <p className="text-ink/70 mt-0.5 text-sm leading-5">{active?.hint}</p>
         </div>
-        <span className="ml-auto hidden shrink-0 text-right sm:block" aria-hidden="true">
-          <span className="font-display block text-3xl font-extrabold">{percent}%</span>
+        <span
+          className="ml-auto hidden shrink-0 text-right sm:block"
+          aria-hidden="true"
+        >
+          <span className="font-display block text-3xl font-extrabold">
+            {percent}%
+          </span>
           <span className="text-ink/60 block text-xs font-bold">listo</span>
         </span>
       </div>

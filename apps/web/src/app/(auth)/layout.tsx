@@ -1,12 +1,27 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SiteFooter } from "@/components/ui/site-footer";
 
 const HERO_POINTS = [
-  { tone: "orange", icon: "briefcase", title: "Pedí servicios", text: "Publicá lo que necesitás en minutos." },
-  { tone: "blue", icon: "shield", title: "Elegí con confianza", text: "Perfiles verificados y reseñas reales." },
-  { tone: "green", icon: "chat", title: "Coordiná directo", text: "Chat y avisos sin intermediarios." },
+  {
+    tone: "orange",
+    icon: "briefcase",
+    title: "Pedí servicios",
+    text: "Publicá lo que necesitás en minutos.",
+  },
+  {
+    tone: "blue",
+    icon: "shield",
+    title: "Elegí con confianza",
+    text: "Perfiles verificados y reseñas reales.",
+  },
+  {
+    tone: "green",
+    icon: "chat",
+    title: "Coordiná directo",
+    text: "Chat y avisos sin intermediarios.",
+  },
 ] as const;
 
 export default function AuthLayout({
@@ -15,10 +30,10 @@ export default function AuthLayout({
   return (
     <main
       id="main-content"
-      className="bg-canvas text-ink min-h-screen overflow-x-clip px-5 py-5 sm:px-8"
+      className="yalo-ui bg-canvas text-ink min-h-screen overflow-x-clip px-5 py-5 sm:px-8"
     >
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-6xl flex-col">
-        <header className="border-ink/10 flex items-center justify-between border-b pb-5">
+        <header className="yalo-auth-header border-ink/10 flex items-center justify-between border-b pb-5">
           <Link
             className="flex items-center gap-3"
             href="/"
@@ -54,9 +69,7 @@ export default function AuthLayout({
             aria-hidden="true"
           />
           <div className="relative z-10 grid w-full items-center gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
-            <section
-              aria-label="Por qué usar YALO"
-            >
+            <section aria-label="Por qué usar YALO" className="yalo-auth-hero">
               <span
                 className="absolute inset-0 opacity-25"
                 style={{
@@ -75,13 +88,10 @@ export default function AuthLayout({
                 aria-hidden="true"
               />
               <div className="relative">
-                <img
-                  src="/brand/yalo-logo-horizontal-dark.svg"
-                  alt="YALO"
-                  className="h-10 w-auto"
-                  width={133}
-                  height={40}
-                />
+                <span className="font-display inline-flex items-center gap-2.5 text-3xl font-extrabold tracking-[-0.06em] text-white">
+                  <span className="brand-mark h-11 w-11" aria-hidden="true" />
+                  YALO
+                </span>
                 <p className="mt-4 text-xs font-extrabold tracking-[0.18em] text-white/85 uppercase">
                   YALO · trabajo de barrio
                 </p>
