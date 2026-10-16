@@ -4,7 +4,7 @@
 -- Todo hace rollback al final del archivo.
 begin;
 
-select plan(48);
+select plan(49);
 
 -- Estructura: tabla, estados, RLS y firmas.
 select ok(
@@ -244,7 +244,7 @@ select is(
   'repeat key returns the same declaration'
 );
 
--- Confirmar: solo la contraparte, con tope acordado.
+-- Confirmar: solo la contraparte; el excedente se asigna como propina.
 select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
 select is(
   public.respond_external_payment(
@@ -279,7 +279,7 @@ select throws_ok(
   'declarer cannot confirm its own payment'
 );
 
--- Topes: ni declarar ni confirmar por encima del acuerdo.
+-- Declaraciones por encima del acuerdo: permitidas, pendientes de ambas partes.
 select ok(
   public.declare_external_payment(
     (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000010')),
@@ -297,7 +297,7 @@ select is(
   'declared but unconfirmed overpayment can still be voided'
 );
 
--- Confirmar por encima del acuerdo con dos parciales también se rechaza.
+-- Confirmar por encima del acuerdo con dos parciales divide contrato y propina.
 select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
 select public.declare_external_payment(
   (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000010')),
