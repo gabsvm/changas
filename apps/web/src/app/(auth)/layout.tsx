@@ -40,20 +40,9 @@ export default function AuthLayout({
             aria-label="YALO, inicio"
           >
             <span className="brand-mark" role="img" aria-label="YALO" />
-            <img
-              src="/brand/yalo-logo-horizontal-light.svg"
-              alt="YALO"
-              className="h-6 w-auto dark:hidden"
-              width={72}
-              height={24}
-            />
-            <img
-              src="/brand/yalo-logo-horizontal-dark.svg"
-              alt="YALO"
-              className="hidden h-6 w-auto dark:block"
-              width={72}
-              height={24}
-            />
+            <span className="font-display text-xl font-extrabold tracking-[-0.06em] text-white">
+              YALO
+            </span>
           </Link>
           <span className="text-terracotta text-xs font-extrabold tracking-[0.16em] uppercase">
             Cuenta

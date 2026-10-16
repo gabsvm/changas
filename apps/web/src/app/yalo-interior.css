@@ -371,7 +371,7 @@
 .yalo-ui .yalo-account-header nav a:focus-visible {
   outline-color: #65ec91;
 }
-.yalo-ui .cta-ink:not(.yalo-search-hero .cta-ink) {
+.yalo-ui .cta-ink {
   border-radius: 15px;
 }
 
@@ -403,11 +403,6 @@
 }
 .dark .yalo-ui .consumer-control {
   background: #192637;
-}
-.dark .yalo-ui .bg-white,
-.dark .yalo-ui .bg-white\/75,
-.dark .yalo-ui .bg-white\/70 {
-  background-color: #1e2b3d;
 }
 .dark .yalo-ui .yalo-search-hero .consumer-control,
 .dark .yalo-ui .yalo-category-hero .consumer-control {
@@ -506,5 +501,15 @@
 @media (min-width: 640px) {
   .yalo-ui .yalo-job-mobile-cta {
     bottom: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .yalo-ui .yalo-category-hero form {
+    flex-direction: column;
+  }
+  .yalo-ui .yalo-category-hero form > div,
+  .yalo-ui .yalo-category-hero form > button {
+    width: 100%;
   }
 }

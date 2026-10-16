@@ -206,7 +206,7 @@ export function LocationPicker({
         {locationSheetOpen
           ? createPortal(
               <div
-                className="bg-ink/35 fixed inset-0 z-50 flex items-end p-3 sm:items-center sm:justify-center"
+                className="bg-ink/35 fixed inset-0 z-[10000] flex items-end p-3 sm:items-center sm:justify-center"
                 role="presentation"
                 onClick={() => setLocationSheetOpen(false)}
               >

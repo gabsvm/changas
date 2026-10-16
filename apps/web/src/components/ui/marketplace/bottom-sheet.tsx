@@ -36,7 +36,7 @@ export function BottomSheet({
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
+      className="fixed inset-0 z-[10000] flex items-end justify-center sm:items-center"
     >
       <button
         type="button"
