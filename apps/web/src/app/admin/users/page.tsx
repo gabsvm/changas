@@ -51,23 +51,23 @@ export default async function AdminUsersPage({
 
       <form className="flex gap-2" method="get">
         <input
-          className="min-w-0 flex-1 border border-ink/10 bg-white px-4 py-3 text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
+          className="border-ink/10 text-ink min-w-0 flex-1 border bg-white px-4 py-3 dark:border-white/10 dark:bg-white/10 dark:text-white"
           name="q"
           defaultValue={query}
           placeholder="Email o nombre"
           aria-label="Buscar usuario"
         />
-        <button className="min-h-12 rounded-2xl bg-[#ff6b35] px-4 py-3 text-sm font-extrabold text-[#10131a]">
+        <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
           Buscar
         </button>
       </form>
 
       {invalidSelection ? (
         <AdminPanel>
-          <p className="text-sm font-bold text-ink">
+          <p className="text-ink text-sm font-bold">
             No pudimos cargar esa cuenta.
           </p>
-          <p className="mt-1 text-sm text-ink/70">
+          <p className="text-ink/70 mt-1 text-sm">
             Verificá el identificador o elegí una cuenta desde la lista.
           </p>
         </AdminPanel>
@@ -77,13 +77,13 @@ export default async function AdminUsersPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-[11px] font-extrabold tracking-[0.14em] text-ink/60 uppercase">
+              <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.14em] uppercase">
                 Cuenta seleccionada
               </p>
-              <h2 className="mt-1 truncate font-display text-xl font-extrabold text-ink">
+              <h2 className="font-display text-ink mt-1 truncate text-xl font-extrabold">
                 {detail.display_name ?? detail.email ?? detail.user_id}
               </h2>
-              <p className="mt-1 truncate text-sm text-ink/70">
+              <p className="text-ink/70 mt-1 truncate text-sm">
                 {detail.email ?? "Sin email"}
               </p>
             </div>
@@ -99,18 +99,18 @@ export default async function AdminUsersPage({
             </div>
           </div>
 
-          <dl className="grid gap-3 rounded-2xl border border-ink/[0.08] bg-surface p-4 text-sm sm:grid-cols-2">
+          <dl className="border-ink/[0.08] bg-surface grid gap-3 rounded-2xl border p-4 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-xs font-bold text-ink/60">Nombre legal</dt>
-              <dd className="mt-1 font-semibold text-ink">
+              <dt className="text-ink/60 text-xs font-bold">Nombre legal</dt>
+              <dd className="text-ink mt-1 font-semibold">
                 {detail.legal_name ?? "No cargado"}
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-bold text-ink/60">
+              <dt className="text-ink/60 text-xs font-bold">
                 Estado de prestador
               </dt>
-              <dd className="mt-1 font-semibold text-ink">
+              <dd className="text-ink mt-1 font-semibold">
                 {providerLabel(detail.provider_status)}
               </dd>
             </div>
@@ -118,10 +118,10 @@ export default async function AdminUsersPage({
 
           <div>
             <div className="mb-3">
-              <p className="text-sm font-extrabold text-ink">
+              <p className="text-ink text-sm font-extrabold">
                 Habilitación como prestador
               </p>
-              <p className="mt-1 text-xs leading-5 text-ink/70">
+              <p className="text-ink/70 mt-1 text-xs leading-5">
                 El camino normal conserva onboarding y revisión. La activación
                 manual es un bypass auditado.
               </p>
@@ -132,21 +132,21 @@ export default async function AdminUsersPage({
             />
           </div>
 
-          <details className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
-            <summary className="cursor-pointer text-sm font-extrabold text-ink">
+          <details className="border-ink/[0.08] bg-surface rounded-2xl border p-3">
+            <summary className="text-ink cursor-pointer text-sm font-extrabold">
               Restricciones de cuenta
             </summary>
             <div className="mt-3 grid gap-3 lg:grid-cols-3">
               {(["RESTRICTED", "SUSPENDED"] as const).map((kind) => (
                 <form
                   action={setAccountRestrictionAction}
-                  className="rounded-2xl border border-ink/[0.08] bg-surface p-3"
+                  className="border-ink/[0.08] bg-surface rounded-2xl border p-3"
                   key={kind}
                 >
                   <input type="hidden" name="userId" value={detail.user_id} />
                   <input type="hidden" name="kind" value={kind} />
                   <input
-                    className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
+                    className="border-ink/10 text-ink w-full border bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                     name="reason"
                     required
                     minLength={3}
@@ -161,15 +161,15 @@ export default async function AdminUsersPage({
               ))}
               <form
                 action={restoreAccountAction}
-                className="rounded-2xl border border-ink/[0.08] bg-surface p-3"
+                className="border-ink/[0.08] bg-surface rounded-2xl border p-3"
               >
                 <input type="hidden" name="userId" value={detail.user_id} />
                 <input
-                  className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
+                  className="border-ink/10 text-ink w-full border bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="reason"
                   placeholder="Motivo de restauración"
                 />
-                <button className="mt-2 min-h-11 w-full rounded-xl border border-ink/[0.08] px-3 py-2 text-sm font-extrabold text-ink">
+                <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-extrabold">
                   Restaurar cuenta
                 </button>
               </form>
@@ -180,64 +180,120 @@ export default async function AdminUsersPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-base font-extrabold text-ink">Cuentas</h2>
-          <span className="rounded-full border border-ink/[0.08] bg-surface px-2.5 py-1 text-xs font-bold text-ink/70">
+          <h2 className="font-display text-ink text-base font-extrabold">
+            Cuentas
+          </h2>
+          <span className="border-ink/[0.08] bg-surface text-ink/70 rounded-full border px-2.5 py-1 text-xs font-bold">
             {users.length}
           </span>
         </div>
 
         {users.length ? (
-          <div className="consumer-scrollbar-none -mx-1 overflow-x-auto px-1">
-          <table className="w-full min-w-[640px] border-separate border-spacing-2">
-            <caption className="sr-only">
-              Cuentas registradas ({users.length})
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
-                  Cuenta
-                </th>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
-                  Contacto
-                </th>
-                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
-                  Estado
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            <div
+              className="grid gap-3 md:hidden"
+              aria-label="Cuentas registradas"
+            >
               {users.map((user) => (
-                <tr
+                <Link
                   key={user.user_id}
-                  className="rounded-3xl border border-ink/[0.08] bg-surface transition-colors hover:border-brand-orange/30 hover:bg-ink/[0.04]"
+                  href={
+                    "/admin/users?q=" +
+                    encodeURIComponent(query) +
+                    "&user=" +
+                    user.user_id
+                  }
+                  className="admin-mobile-record consumer-pressable consumer-card bg-surface flex flex-col gap-2 rounded-2xl p-4"
                 >
-                  <th scope="row" className="min-w-0 rounded-l-3xl p-4 text-left">
-                    <Link
-                      className="block truncate text-sm font-extrabold text-ink hover:underline"
-                      href={`/admin/users?q=${encodeURIComponent(query)}&user=${user.user_id}`}
-                    >
+                  <span className="flex items-start justify-between gap-3">
+                    <span className="text-ink min-w-0 font-extrabold">
                       {user.display_name ?? user.email ?? user.user_id}
-                    </Link>
-                    {user.role === "admin" ? (
-                      <span className="text-[11px] font-extrabold text-terracotta">
-                        ADMIN
-                      </span>
-                    ) : null}
-                  </th>
-                  <td className="max-w-45 truncate p-4 text-xs text-ink/70">
+                    </span>
+                    <span className="shrink-0">
+                      <AdminStatusBadge
+                        label={providerLabel(user.provider_status)}
+                        tone={providerTone(user.provider_status)}
+                      />
+                    </span>
+                  </span>
+                  <span className="text-ink/70 text-xs leading-5 break-all">
                     {user.email ?? user.user_id}
-                  </td>
-                  <td className="rounded-r-3xl p-4 text-right">
-                    <AdminStatusBadge
-                      label={providerLabel(user.provider_status)}
-                      tone={providerTone(user.provider_status)}
-                    />
-                  </td>
-                </tr>
+                  </span>
+                  {user.role === "admin" ? (
+                    <span className="text-xs font-extrabold text-[#12D9C5]">
+                      ADMIN
+                    </span>
+                  ) : null}
+                  <span className="text-xs font-semibold text-[#12D9C5]">
+                    Ver cuenta y permisos →
+                  </span>
+                </Link>
               ))}
-            </tbody>
-          </table>
-          </div>
+            </div>
+            <div className="-mx-1 hidden overflow-x-auto px-1 md:block">
+              <table className="w-full min-w-[640px] border-separate border-spacing-2">
+                <caption className="sr-only">
+                  Cuentas registradas ({users.length})
+                </caption>
+                <thead>
+                  <tr>
+                    <th
+                      scope="col"
+                      className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                    >
+                      Cuenta
+                    </th>
+                    <th
+                      scope="col"
+                      className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                    >
+                      Contacto
+                    </th>
+                    <th
+                      scope="col"
+                      className="text-ink/70 px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] uppercase"
+                    >
+                      Estado
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr
+                      key={user.user_id}
+                      className="border-ink/[0.08] bg-surface hover:bg-ink/[0.04] rounded-3xl border transition-colors hover:border-[#12D9C5]/30"
+                    >
+                      <th
+                        scope="row"
+                        className="min-w-0 rounded-l-3xl p-4 text-left"
+                      >
+                        <Link
+                          className="text-ink block truncate text-sm font-extrabold hover:underline"
+                          href={`/admin/users?q=${encodeURIComponent(query)}&user=${user.user_id}`}
+                        >
+                          {user.display_name ?? user.email ?? user.user_id}
+                        </Link>
+                        {user.role === "admin" ? (
+                          <span className="text-terracotta text-[11px] font-extrabold">
+                            ADMIN
+                          </span>
+                        ) : null}
+                      </th>
+                      <td className="text-ink/70 max-w-45 truncate p-4 text-xs">
+                        {user.email ?? user.user_id}
+                      </td>
+                      <td className="rounded-r-3xl p-4 text-right">
+                        <AdminStatusBadge
+                          label={providerLabel(user.provider_status)}
+                          tone={providerTone(user.provider_status)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         ) : (
           <AdminEmptyState
             title="No encontramos usuarios"

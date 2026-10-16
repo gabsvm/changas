@@ -23,18 +23,26 @@ export default async function AccountPage() {
 
   if (!user) redirect("/login?next=/account");
 
-  const [{ data: profile }, { data: provider }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("display_name, public_zone, bio, avatar_url")
-      .eq("id", user.id)
-      .maybeSingle(),
-    supabase
-      .from("provider_profiles")
-      .select("status, onboarding_step")
-      .eq("user_id", user.id)
-      .maybeSingle(),
-  ]);
+  const [{ data: profile }, { data: provider }, { data: isAdmin }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("display_name, public_zone, bio, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("provider_profiles")
+        .select("status, onboarding_step")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      (
+        supabase as unknown as {
+          rpc(
+            name: "is_current_user_admin",
+          ): Promise<{ data: boolean | null; error: unknown }>;
+        }
+      ).rpc("is_current_user_admin"),
+    ]);
 
   const displayName =
     profile?.display_name || user.email?.split("@")[0] || "Tu cuenta";
@@ -96,7 +104,10 @@ export default async function AccountPage() {
                 {user.email}
               </span>
             </span>
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/20 text-xl text-white" aria-hidden="true">
+            <span
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/20 text-xl text-white"
+              aria-hidden="true"
+            >
               ›
             </span>
           </Link>
@@ -112,7 +123,13 @@ export default async function AccountPage() {
           });
           if (provider?.status === "ACTIVE") return null;
           return (
-            <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-5" />
+            <NextStepBanner
+              title={next.title}
+              hint={next.hint}
+              cta={next.cta}
+              href={next.href}
+              className="mt-5"
+            />
           );
         })()}
 
@@ -258,6 +275,17 @@ export default async function AccountPage() {
                 }
               />
             ) : null}
+          </AccountGroup>
+        ) : null}
+
+        {isAdmin === true ? (
+          <AccountGroup title="Administración">
+            <SettingsRow
+              href="/admin"
+              title="Panel administrativo"
+              description="Usuarios, prestadores y operaciones"
+              leading={<IllustratedBadge tone="blue" icon="shield" size="sm" />}
+            />
           </AccountGroup>
         ) : null}
 

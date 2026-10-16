@@ -24,7 +24,7 @@ export default async function AdminLayout({
           <Link
             className="flex min-h-12 min-w-0 items-center gap-3 rounded-2xl"
             href="/admin"
-            aria-label="Changas Administración"
+            aria-label="YALO Administración"
           >
             <span
               className="brand-mark h-10 w-10 shrink-0"
@@ -32,7 +32,7 @@ export default async function AdminLayout({
             />
             <div className="min-w-0">
               <p className="text-terracotta truncate text-[11px] font-extrabold tracking-[0.19em] uppercase">
-                Changas
+                YALO
               </p>
               <p className="text-ink truncate text-sm font-extrabold tracking-[-0.01em]">
                 Administración

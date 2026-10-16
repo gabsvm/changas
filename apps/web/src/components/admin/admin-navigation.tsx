@@ -133,52 +133,55 @@ export function AdminNavigation() {
   return (
     <>
       <aside className="admin-sidebar bg-canvas/95 border-ink/[0.06] fixed top-[4.5rem] bottom-0 left-0 z-30 hidden w-64 space-y-4 overflow-y-auto border-r p-4 backdrop-blur-xl lg:block">
-        {(["Principal", "Operación", "Personas", "Catálogo", "Sistema"] as const).map(
-          (group) => {
-            const items = adminNavigationItems.filter(
-              (item) => item.navGroup === group,
-            );
-            if (items.length === 0) return null;
-            return (
-              <div key={group}>
-                <p className="text-ink/60 px-3 pb-2 text-[11px] font-extrabold tracking-[0.18em] uppercase">
-                  {group}
-                </p>
-                <nav className="space-y-1" aria-label={`Administración: ${group}`}>
-                  {items.map((item) => {
-                    const active = isAdminNavigationItemActive(
-                      pathname,
-                      item.href,
-                    );
-                    return (
-                      <Link
-                        aria-current={active ? "page" : undefined}
-                        className={`consumer-pressable flex min-h-12 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition-colors ${
-                          active
-                            ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(255_107_53/55%)]"
-                            : "text-ink/70 hover:bg-ink/[0.04] hover:text-ink"
-                        }`}
-                        style={
-                          active
-                            ? {
-                                backgroundImage:
-                                  "linear-gradient(135deg, #FF9A3D 0%, #FF6B35 48%, #FF0A78 100%)",
-                              }
-                            : undefined
-                        }
-                        href={item.href}
-                        key={item.id}
-                      >
-                        <NavIcon id={item.id} />
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </nav>
-              </div>
-            );
-          },
-        )}
+        {(
+          ["Principal", "Operación", "Personas", "Catálogo", "Sistema"] as const
+        ).map((group) => {
+          const items = adminNavigationItems.filter(
+            (item) => item.navGroup === group,
+          );
+          if (items.length === 0) return null;
+          return (
+            <div key={group}>
+              <p className="text-ink/60 px-3 pb-2 text-[11px] font-extrabold tracking-[0.18em] uppercase">
+                {group}
+              </p>
+              <nav
+                className="space-y-1"
+                aria-label={`Administración: ${group}`}
+              >
+                {items.map((item) => {
+                  const active = isAdminNavigationItemActive(
+                    pathname,
+                    item.href,
+                  );
+                  return (
+                    <Link
+                      aria-current={active ? "page" : undefined}
+                      className={`consumer-pressable flex min-h-12 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition-colors ${
+                        active
+                          ? "border-transparent text-[#062433] shadow-[0_10px_24px_-8px_rgb(18_217_197/30%)]"
+                          : "text-ink/70 hover:bg-ink/[0.04] hover:text-ink"
+                      }`}
+                      style={
+                        active
+                          ? {
+                              backgroundImage:
+                                "linear-gradient(135deg, #08A9F4 0%, #12D9C5 65%, #65EC91 100%)",
+                            }
+                          : undefined
+                      }
+                      href={item.href}
+                      key={item.id}
+                    >
+                      <NavIcon id={item.id} />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+          );
+        })}
       </aside>
 
       {moreOpen ? (
@@ -227,45 +230,48 @@ export function AdminNavigation() {
               </button>
             </div>
             <div className="space-y-4">
-              {(
-                ["Operación", "Personas", "Catálogo", "Sistema"] as const
-              ).map((group) => {
-                const items = adminMoreItems.filter(
-                  (item) => item.navGroup === group,
-                );
-                if (items.length === 0) return null;
-                return (
-                  <div key={group}>
-                    <p className="text-ink/60 px-1 pb-1.5 text-[11px] font-extrabold tracking-[0.16em] uppercase">
-                      {group}
-                    </p>
-                    <nav className="grid grid-cols-2 gap-2" aria-label={group}>
-                      {items.map((item) => {
-                        const active = isAdminNavigationItemActive(
-                          pathname,
-                          item.href,
-                        );
-                        return (
-                          <Link
-                            aria-current={active ? "page" : undefined}
-                            className={`flex min-h-16 items-center gap-3 rounded-2xl border px-3 py-3 text-sm font-bold ${
-                              active
-                                ? "border-brand-orange/30 bg-brand-orange/10 text-terracotta"
-                                : "border-ink/[0.08] bg-surface text-ink"
-                            }`}
-                            href={item.href}
-                            key={item.id}
-                            onClick={() => setMoreOpen(false)}
-                          >
-                            <NavIcon id={item.id} />
-                            {item.label}
-                          </Link>
-                        );
-                      })}
-                    </nav>
-                  </div>
-                );
-              })}
+              {(["Operación", "Personas", "Catálogo", "Sistema"] as const).map(
+                (group) => {
+                  const items = adminMoreItems.filter(
+                    (item) => item.navGroup === group,
+                  );
+                  if (items.length === 0) return null;
+                  return (
+                    <div key={group}>
+                      <p className="text-ink/60 px-1 pb-1.5 text-[11px] font-extrabold tracking-[0.16em] uppercase">
+                        {group}
+                      </p>
+                      <nav
+                        className="grid grid-cols-2 gap-2"
+                        aria-label={group}
+                      >
+                        {items.map((item) => {
+                          const active = isAdminNavigationItemActive(
+                            pathname,
+                            item.href,
+                          );
+                          return (
+                            <Link
+                              aria-current={active ? "page" : undefined}
+                              className={`flex min-h-16 items-center gap-3 rounded-2xl border px-3 py-3 text-sm font-bold ${
+                                active
+                                  ? "border-[#12D9C5]/30 bg-[#12D9C5]/10 text-[#12D9C5]"
+                                  : "border-ink/[0.08] bg-surface text-ink"
+                              }`}
+                              href={item.href}
+                              key={item.id}
+                              onClick={() => setMoreOpen(false)}
+                            >
+                              <NavIcon id={item.id} />
+                              {item.label}
+                            </Link>
+                          );
+                        })}
+                      </nav>
+                    </div>
+                  );
+                },
+              )}
             </div>
           </section>
         </div>
@@ -281,7 +287,7 @@ export function AdminNavigation() {
             <Link
               aria-current={active ? "page" : undefined}
               className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
-                active ? "text-terracotta" : "text-ink/60"
+                active ? "text-[#12D9C5]" : "text-ink/60"
               }`}
               href={item.href}
               key={item.id}
@@ -296,7 +302,7 @@ export function AdminNavigation() {
           aria-controls="admin-more-menu"
           aria-haspopup="dialog"
           className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
-            moreActive || moreOpen ? "text-terracotta" : "text-ink/60"
+            moreActive || moreOpen ? "text-[#12D9C5]" : "text-ink/60"
           }`}
           onClick={() => setMoreOpen(true)}
           type="button"

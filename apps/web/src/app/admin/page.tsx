@@ -80,7 +80,7 @@ export default async function AdminPage() {
         <AdminMetricCard
           label="Usuarios"
           value={users.length}
-          hint={`${jobs.length} ${jobs.length === 1 ? "trabajo visible" : "trabajos visibles"}`}
+          hint="Cuentas registradas"
           tone="info"
         />
       </div>
@@ -88,15 +88,15 @@ export default async function AdminPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-              <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
-                Prioridad
-              </p>
-              <h2 className="font-display mt-1 text-lg font-extrabold text-ink">
-                Necesita atención
-              </h2>
+            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
+              Prioridad
+            </p>
+            <h2 className="font-display text-ink mt-1 text-lg font-extrabold">
+              Necesita atención
+            </h2>
           </div>
           {hasAttention ? (
-            <span className="border-brand-orange/25 bg-brand-orange/10 text-terracotta rounded-full border px-2.5 py-1 text-xs font-extrabold">
+            <span className="text-terracotta rounded-full border border-[#12D9C5]/25 bg-[#12D9C5]/10 px-2.5 py-1 text-xs font-extrabold">
               Acción requerida
             </span>
           ) : null}
@@ -220,14 +220,12 @@ export default async function AdminPage() {
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {tools.map(([href, title, description]) => (
             <Link
-              className="border-ink/[0.08] hover:border-brand-orange/30 min-h-24 rounded-2xl border bg-white p-4 transition-colors dark:border-white/10 dark:bg-[#2a231c]"
+              className="border-ink/[0.08] min-h-24 rounded-2xl border bg-white p-4 transition-colors hover:border-[#12D9C5]/30 dark:border-white/10 dark:bg-[#1b2b3d]"
               href={href}
               key={href}
             >
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-ink text-sm font-extrabold">
-                  {title}
-                </h3>
+                <h3 className="text-ink text-sm font-extrabold">{title}</h3>
                 <span className="text-ink/40" aria-hidden="true">
                   ↗
                 </span>
