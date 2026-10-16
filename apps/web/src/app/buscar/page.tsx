@@ -133,7 +133,7 @@ export default async function SearchPage({
   return (
     <main
       id="main-content"
-      className="bg-canvas text-ink mobile-content-with-nav min-h-screen"
+      className="yalo-ui bg-canvas text-ink mobile-content-with-nav min-h-screen"
     >
       <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-8 sm:pt-5">
         <AppHeader
@@ -150,10 +150,14 @@ export default async function SearchPage({
           }
         />
 
-        <GuideHeader step={1} steps={CLIENT_HIRE_STEPS} className="mt-4 sm:mt-6" />
+        <GuideHeader
+          step={1}
+          steps={CLIENT_HIRE_STEPS}
+          className="mt-4 sm:mt-6"
+        />
 
         <section className="pt-3 sm:pt-8">
-          <div className="brand-gradient-surface text-ink relative overflow-hidden rounded-3xl p-5 shadow-[var(--consumer-shadow-hero)] sm:p-6">
+          <div className="yalo-search-hero brand-gradient-surface relative overflow-hidden rounded-3xl p-5 text-white shadow-[var(--consumer-shadow-hero)] sm:p-6">
             <span
               className="pointer-events-none absolute inset-0 opacity-25"
               style={{
@@ -207,7 +211,7 @@ export default async function SearchPage({
             {categories.length ? (
               <nav
                 aria-label="Categorías"
-                className="consumer-scrollbar-none relative z-10 -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
+                className="yalo-category-filters consumer-scrollbar-none relative z-10 mt-4 flex flex-wrap gap-2 pb-1"
               >
                 {[{ slug: null, name: "Todas" }, ...categories].map((item) => {
                   const selected =
@@ -220,7 +224,7 @@ export default async function SearchPage({
                       className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-sm font-bold transition-all duration-200 ${
                         selected
                           ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                          : "border-white/60 bg-white/70 text-ink/80 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                          : "yalo-filter-pill border-white/20 bg-white/10 text-white backdrop-blur-sm hover:bg-white/15"
                       }`}
                     >
                       {item.name}

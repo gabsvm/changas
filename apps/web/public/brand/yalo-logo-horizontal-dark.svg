@@ -17,9 +17,9 @@
   </defs>
   <g transform="translate(24,38) scale(0.7)">
     <g fill="none" stroke-linecap="round" stroke-width="56">
-      <path d="M132 178 252 296" stroke="url(#yhArmLeft)"/>
-      <path d="M380 178 260 296" stroke="url(#yhArmRight)"/>
-      <path d="M256 290 256 398" stroke="url(#yhTrunk)"/>
+      <path d="M132 178 252 296" stroke="url(#ydArmLeft)"/>
+      <path d="M380 178 260 296" stroke="url(#ydArmRight)"/>
+      <path d="M256 290 256 398" stroke="url(#ydTrunk)"/>
     </g>
     <circle cx="256" cy="166" r="34" fill="#12D9C5"/>
   </g>

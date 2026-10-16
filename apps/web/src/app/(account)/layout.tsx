@@ -14,10 +14,10 @@ export default async function AccountLayout({
   return (
     <main
       id="main-content"
-      className="bg-canvas text-ink mobile-content-with-nav min-h-screen overflow-x-clip px-4 sm:px-8 sm:py-5"
+      className="yalo-ui bg-canvas text-ink mobile-content-with-nav min-h-screen overflow-x-clip px-4 sm:px-8 sm:py-5"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <header className="border-ink/[0.07] hidden min-h-14 items-center justify-between gap-5 border-b pb-4 sm:flex">
+        <header className="yalo-account-header border-ink/[0.07] hidden min-h-14 items-center justify-between gap-5 border-b pb-4 sm:flex">
           <Link
             className="flex items-center gap-2.5"
             href="/"
@@ -26,9 +26,7 @@ export default async function AccountLayout({
             <span className="brand-mark" aria-hidden="true">
               C
             </span>
-            <span className="text-lg font-bold tracking-[-0.025em]">
-              YALO
-            </span>
+            <span className="text-lg font-bold tracking-[-0.025em]">YALO</span>
           </Link>
           <nav
             className="flex items-center justify-end gap-1 text-sm font-semibold"

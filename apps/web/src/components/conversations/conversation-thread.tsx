@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -101,7 +101,6 @@ function formatDayLabel(iso: string): string {
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
-
 export function ConversationThread({
   conversationId,
   currentUserId,
@@ -191,8 +190,7 @@ export function ConversationThread({
     const anchor = prependAnchorRef.current;
     if (!anchor) return;
     prependAnchorRef.current = null;
-    const delta =
-      document.documentElement.scrollHeight - anchor.height;
+    const delta = document.documentElement.scrollHeight - anchor.height;
     if (delta > 0) window.scrollBy(0, delta);
   }, [firstMessageId]);
 
@@ -268,7 +266,10 @@ export function ConversationThread({
     void markConversationReadAction(conversationId, latestMessageId).then(
       () => setReadError(null),
       (error) => {
-        console.error("[messages] no pudimos marcar la conversación como leída.", error);
+        console.error(
+          "[messages] no pudimos marcar la conversación como leída.",
+          error,
+        );
         setReadError("No pudimos marcar los mensajes como leídos.");
       },
     );
@@ -294,8 +295,13 @@ export function ConversationThread({
         setHasOlder(older.length === 50);
       } catch (error) {
         prependAnchorRef.current = null;
-        console.error("[messages] no pudimos cargar mensajes anteriores.", error);
-        setOlderError("No pudimos cargar los mensajes anteriores. Probá de nuevo.");
+        console.error(
+          "[messages] no pudimos cargar mensajes anteriores.",
+          error,
+        );
+        setOlderError(
+          "No pudimos cargar los mensajes anteriores. Probá de nuevo.",
+        );
       }
     });
   }
@@ -419,11 +425,14 @@ export function ConversationThread({
           <div
             aria-label={`${spotlight.title}. ${spotlight.sub}`}
             role="group"
-            className="mt-3 flex items-center gap-3 rounded-2xl bg-brand-primary-strong px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/50%)]"
+            className="bg-brand-primary-strong mt-3 flex items-center gap-3 rounded-2xl px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/50%)]"
           >
-            <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success" />
+            <span
+              className="relative flex h-2.5 w-2.5 shrink-0"
+              aria-hidden="true"
+            >
+              <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+              <span className="bg-success relative inline-flex h-2.5 w-2.5 rounded-full" />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-extrabold">
@@ -443,22 +452,25 @@ export function ConversationThread({
             ) : null}
             <Link
               href={spotlight.href}
-              className="consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-3.5 text-[13px] font-extrabold text-ink"
+              className="consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-3.5 text-[13px] font-extrabold text-[#0D121B]"
             >
               {spotlight.cta}
             </Link>
           </div>
         ) : null}
         {blockError ? (
-          <p role="alert" className="bg-danger/10 text-danger mt-3 rounded-xl px-3 py-2 text-xs leading-5">
+          <p
+            role="alert"
+            className="bg-danger/10 text-danger mt-3 rounded-xl px-3 py-2 text-xs leading-5"
+          >
             {blockError}
           </p>
         ) : null}
         {blockedByMe ? (
           <div className="bg-danger/10 text-danger mt-3 rounded-xl px-3 py-2 text-xs leading-5">
-            Bloqueaste a esta persona solo en esta conversación. El historial
-            se conserva, pero acá no pueden enviarse mensajes ni propuestas
-            nuevas hasta desbloquearla.
+            Bloqueaste a esta persona solo en esta conversación. El historial se
+            conserva, pero acá no pueden enviarse mensajes ni propuestas nuevas
+            hasta desbloquearla.
           </div>
         ) : null}
         {deal ? (
@@ -493,14 +505,20 @@ export function ConversationThread({
               {loadingOlder ? "Cargando…" : "Cargar mensajes anteriores"}
             </button>
             {olderError ? (
-              <p role="alert" className="text-danger mt-2 text-xs font-semibold">
+              <p
+                role="alert"
+                className="text-danger mt-2 text-xs font-semibold"
+              >
                 {olderError}
               </p>
             ) : null}
           </div>
         ) : null}
         {readError ? (
-          <p role="alert" className="text-danger mb-3 text-center text-xs font-semibold">
+          <p
+            role="alert"
+            className="text-danger mb-3 text-center text-xs font-semibold"
+          >
             {readError}
           </p>
         ) : null}
@@ -508,7 +526,12 @@ export function ConversationThread({
         {messages.length === 0 ? (
           <div className="mx-auto mt-12 max-w-sm text-center">
             <span className="mx-auto block w-fit">
-              <IllustratedBadge tone="orange" icon="chat" size="lg" label="Sin mensajes todavía" />
+              <IllustratedBadge
+                tone="orange"
+                icon="chat"
+                size="lg"
+                label="Sin mensajes todavía"
+              />
             </span>
             <p className="mt-4 text-xl font-semibold">Empezá la conversación</p>
             <p className="text-ink/70 mt-2 text-sm leading-6">
@@ -535,17 +558,25 @@ export function ConversationThread({
                       aria-label={formatDayLabel(message.created_at)}
                       className="my-4 flex items-center gap-3"
                     >
-                      <span aria-hidden="true" className="bg-ink/10 h-px flex-1" />
+                      <span
+                        aria-hidden="true"
+                        className="bg-ink/10 h-px flex-1"
+                      />
                       <span className="text-ink/70 rounded-full px-3 py-1 text-xs font-semibold">
                         {formatDayLabel(message.created_at)}
                       </span>
-                      <span aria-hidden="true" className="bg-ink/10 h-px flex-1" />
+                      <span
+                        aria-hidden="true"
+                        className="bg-ink/10 h-px flex-1"
+                      />
                     </div>
                   ) : null}
                   <MessageBubble
                     message={message}
                     own={message.sender_user_id === currentUserId}
-                    attachments={attachmentsByMessage.get(message.message_id) ?? []}
+                    attachments={
+                      attachmentsByMessage.get(message.message_id) ?? []
+                    }
                   />
                 </div>
               );
@@ -558,9 +589,11 @@ export function ConversationThread({
             <button
               type="button"
               onClick={() => scrollToBottom(true)}
-              className="consumer-pressable bg-ink inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-[13px] font-bold text-white shadow-lg dark:text-brand-primary-strong"
+              className="consumer-pressable bg-ink dark:text-brand-primary-strong inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-[13px] font-bold text-white shadow-lg"
             >
-              {pendingNew === 1 ? "Nuevo mensaje ↓" : `${pendingNew} nuevos mensajes ↓`}
+              {pendingNew === 1
+                ? "Nuevo mensaje ↓"
+                : `${pendingNew} nuevos mensajes ↓`}
             </button>
           </div>
         ) : null}
@@ -568,7 +601,7 @@ export function ConversationThread({
           <div className="mx-auto mt-5 max-w-sm text-center">
             <Link
               href="/account/notifications"
-              className="focus-visible:ring-2 focus-visible:ring-focus/45 bg-brand-primary/[0.07] text-brand-primary inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[13px] font-bold dark:bg-white/10 dark:text-white"
+              className="focus-visible:ring-focus/45 bg-brand-primary/[0.07] text-brand-primary inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[13px] font-bold focus-visible:ring-2 dark:bg-white/10 dark:text-white"
             >
               Avisame cuando responda {peerName}
               <span aria-hidden="true">→</span>
@@ -648,7 +681,7 @@ function MessageBubble({
       <article
         className={`max-w-[78%] rounded-[1.125rem] px-3.5 py-2.5 text-[15px] leading-6 sm:max-w-[72%] ${
           own
-            ? "rounded-br-md bg-brand-primary text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/55%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+            ? "bg-brand-primary rounded-br-md text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/55%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
             : "border-ink/[0.08] text-ink rounded-bl-md border bg-white shadow-[0_1px_2px_rgb(16_24_39/6%),0_8px_20px_-6px_rgb(16_24_39/12%)] dark:bg-white/[0.06] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
         }`}
         style={undefined}
@@ -789,7 +822,7 @@ function TextComposer({
       <button
         type="submit"
         disabled={pending}
-        className="consumer-pressable bg-ink grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl text-white disabled:opacity-40 dark:text-brand-primary-strong"
+        className="consumer-pressable bg-ink dark:text-brand-primary-strong grid h-[52px] w-[52px] shrink-0 place-items-center rounded-2xl text-white disabled:opacity-40"
         aria-label="Enviar mensaje"
       >
         {pending ? (
@@ -822,7 +855,7 @@ function TextComposer({
               name="confirmLeakage"
               value="true"
               disabled={pending}
-              className="bg-warning rounded-full px-4 py-2 text-xs font-bold text-white disabled:opacity-50 dark:text-brand-primary-strong"
+              className="bg-warning dark:text-brand-primary-strong rounded-full px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
             >
               Enviar de todos modos
             </button>
@@ -838,7 +871,7 @@ function TextComposer({
       ) : null}
       {state.status === "ERROR" ? (
         <p
-          className="text-danger absolute right-4 bottom-[4.75rem] left-4 rounded-xl bg-danger/[0.08] px-3 py-2 text-xs"
+          className="text-danger bg-danger/[0.08] absolute right-4 bottom-[4.75rem] left-4 rounded-xl px-3 py-2 text-xs"
           role="alert"
         >
           {state.message}
@@ -953,7 +986,9 @@ function AttachmentComposer({
             // `messages` se accede por RPC y no está en los tipos generados.
             const untyped = supabase as unknown as {
               from(table: string): {
-                delete(): { eq(column: string, value: string): Promise<unknown> };
+                delete(): {
+                  eq(column: string, value: string): Promise<unknown>;
+                };
               };
             };
             await untyped.from("messages").delete().eq("id", messageId);
@@ -974,44 +1009,40 @@ function AttachmentComposer({
 
   return (
     <div className="mt-2">
-    <form
-      ref={formRef}
-      onSubmit={submit}
-      className="flex items-center gap-2"
-    >
-      <input type="hidden" name="conversationId" value={conversationId} />
-      <input
-        ref={nonceRef}
-        type="hidden"
-        name="nonce"
-        defaultValue={initialNonce}
-      />
-      <select
-        name="kind"
-        defaultValue="IMAGE"
-        aria-label="Tipo de adjunto"
-        className="border-ink/[0.1] min-h-11 rounded-xl border bg-white px-3 text-sm font-semibold dark:bg-white/[0.06]"
-      >
-        <option value="IMAGE">Imagen</option>
-        <option value="FILE">Archivo</option>
-      </select>
-      <input
-        type="file"
-        name="attachments"
-        multiple
-        onChange={handleFilesChange}
-        disabled={pending || compressing}
-        aria-label="Elegir archivos para adjuntar"
-        className="file:bg-focus/10 file:text-focus min-h-11 min-w-0 flex-1 content-center text-[13px] file:mr-2 file:min-h-11 file:rounded-xl file:border-0 file:px-3 file:font-bold"
-      />
-      <button
-        type="submit"
-        disabled={pending || compressing}
-        className="consumer-pressable border-ink/[0.1] inline-flex min-h-11 items-center rounded-xl border bg-white px-4 text-sm font-bold disabled:opacity-40 dark:bg-white/[0.06]"
-      >
-        {compressing ? "Optimizando…" : pending ? "Subiendo…" : "Adjuntar"}
-      </button>
-    </form>
+      <form ref={formRef} onSubmit={submit} className="flex items-center gap-2">
+        <input type="hidden" name="conversationId" value={conversationId} />
+        <input
+          ref={nonceRef}
+          type="hidden"
+          name="nonce"
+          defaultValue={initialNonce}
+        />
+        <select
+          name="kind"
+          defaultValue="IMAGE"
+          aria-label="Tipo de adjunto"
+          className="border-ink/[0.1] min-h-11 rounded-xl border bg-white px-3 text-sm font-semibold dark:bg-white/[0.06]"
+        >
+          <option value="IMAGE">Imagen</option>
+          <option value="FILE">Archivo</option>
+        </select>
+        <input
+          type="file"
+          name="attachments"
+          multiple
+          onChange={handleFilesChange}
+          disabled={pending || compressing}
+          aria-label="Elegir archivos para adjuntar"
+          className="file:bg-focus/10 file:text-focus min-h-11 min-w-0 flex-1 content-center text-[13px] file:mr-2 file:min-h-11 file:rounded-xl file:border-0 file:px-3 file:font-bold"
+        />
+        <button
+          type="submit"
+          disabled={pending || compressing}
+          className="consumer-pressable border-ink/[0.1] inline-flex min-h-11 items-center rounded-xl border bg-white px-4 text-sm font-bold disabled:opacity-40 dark:bg-white/[0.06]"
+        >
+          {compressing ? "Optimizando…" : pending ? "Subiendo…" : "Adjuntar"}
+        </button>
+      </form>
       {state.status === "error" ? (
         <div
           role="alert"
@@ -1022,7 +1053,7 @@ function AttachmentComposer({
             type="button"
             disabled={pending || compressing}
             onClick={() => formRef.current?.requestSubmit()}
-            className="consumer-pressable bg-danger inline-flex min-h-11 items-center rounded-full px-4 font-bold text-white disabled:opacity-50 dark:text-brand-primary-strong"
+            className="consumer-pressable bg-danger dark:text-brand-primary-strong inline-flex min-h-11 items-center rounded-full px-4 font-bold text-white disabled:opacity-50"
           >
             {pending ? "Subiendo…" : "Reintentar"}
           </button>
@@ -1080,7 +1111,7 @@ function ReportForm({ conversationId }: { conversationId: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="bg-danger w-full rounded-full px-3 py-2 text-xs font-bold text-white disabled:opacity-50 dark:text-brand-primary-strong"
+          className="bg-danger dark:text-brand-primary-strong w-full rounded-full px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
         >
           {pending ? "Enviando…" : "Enviar reporte"}
         </button>

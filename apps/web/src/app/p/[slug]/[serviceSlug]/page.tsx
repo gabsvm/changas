@@ -116,16 +116,15 @@ export default async function PublicServicePage({
 
   const hireKind = getServiceHireKind(service);
   const instantEligible = isInstantBookingEligible(service);
-  const hireCtaLabel =
-    instantEligible
-      ? "Consultar disponibilidad y reservar"
-      : service.price_model === "FIXED" && service.price_amount !== null
-        ? "Pedir cotización"
-        : "Pedir presupuesto";
+  const hireCtaLabel = instantEligible
+    ? "Consultar disponibilidad y reservar"
+    : service.price_model === "FIXED" && service.price_amount !== null
+      ? "Pedir cotización"
+      : "Pedir presupuesto";
   return (
     <main
       id="main-content"
-      className="bg-canvas text-ink min-h-screen px-4 pt-4 pb-28 sm:px-8 sm:pb-10"
+      className="yalo-ui bg-canvas text-ink min-h-screen px-4 pt-4 pb-28 sm:px-8 sm:pb-10"
     >
       <div className="mx-auto max-w-3xl">
         {consultErrorMessage ? (
@@ -186,158 +185,182 @@ export default async function PublicServicePage({
             </span>
           </div>
           <div className="p-5 sm:p-8 sm:pt-6">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <StatusChip tone="info">
-              {getServiceModalityLabel(service.modality)}
-            </StatusChip>
-            {service.accepts_offers ? (
-              <StatusChip tone="brand">Acepta ofertas</StatusChip>
-            ) : null}
-          </div>
-
-          <h1 className="font-display mt-4 text-[24px] leading-8 font-extrabold tracking-[-0.03em] sm:text-4xl sm:leading-10">
-            {service.title}
-          </h1>
-          <p className="text-ink/70 mt-3 max-w-2xl text-[15px] leading-7 sm:text-base">
-            {service.description}
-          </p>
-
-          <section
-            className="service-price-panel border-ink/[0.08] bg-surface consumer-card mt-6 grid grid-cols-2 gap-x-4 gap-y-4 rounded-2xl border px-5 py-5 shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] sm:grid-cols-3 dark:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
-            aria-label="Precio y condiciones"
-          >
-            <Metric label="Precio" value={price} />
-            <Metric
-              label="Duración"
-              value={
-                service.expected_duration_minutes
-                  ? `${service.expected_duration_minutes} min`
-                  : "A coordinar"
-              }
-            />
-            <Metric
-              label="Propuestas"
-              value={service.accepts_offers ? "Acepta" : "Precio fijo"}
-            />
-          </section>
-
-          {service.price_amount !== null ? (
-            <section
-              className="border-ink/[0.08] bg-surface consumer-card mt-4 rounded-2xl border px-5 py-4 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.05] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
-              aria-label="Desglose del precio"
-            >
-              {service.price_model === "FIXED" ? (
-                <>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-ink/70 text-[13px] font-semibold">
-                      Subtotal del servicio
-                    </span>
-                    <span className="font-bold">{price}</span>
-                  </div>
-                  <div className="mt-1.5 flex items-center justify-between gap-3">
-                    <span className="text-ink/70 text-[13px] font-semibold">
-                      Comisión de YALO
-                    </span>
-                    <span className="text-moss text-[13px] font-bold">
-                      Sin cobro online
-                    </span>
-                  </div>
-                  <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
-                    <span className="text-[13px] font-extrabold">Total a pagar</span>
-                    <span className="text-[15px] font-extrabold">{price}</span>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[13px] font-extrabold">
-                    Precio de referencia
-                  </span>
-                  <span className="text-[15px] font-extrabold">{price}</span>
-                </div>
-              )}
-              <p className="text-ink/70 mt-2 text-xs leading-5">
-                {service.price_model === "FIXED"
-                  ? "Acordás el precio al contratar. El pago se realiza directamente entre las partes; YALO permite registrar lo declarado."
-                  : "Precio de referencia — el total se acuerda en la propuesta. El pago se realiza directamente entre las partes."}
-              </p>
-            </section>
-          ) : null}
-
-
-          <section className="border-ink/[0.08] bg-surface consumer-card mt-8 rounded-2xl border p-5 sm:p-6">
-            <span className="flex min-w-0 items-center gap-2.5">
-              <IllustratedBadge tone="blue" icon="doc" size="sm" label="Detalles del servicio" />
-              <h2 className="font-display text-lg leading-7 font-bold">
-                Detalles del servicio
-              </h2>
-            </span>
-            <div className="mt-4 grid gap-2">
-              <Info title="Incluye" value={service.includes} />
-              <Info title="No incluye" value={service.excludes} />
-              <Info
-                title="Materiales y notas"
-                value={service.materials_notes}
-              />
+            <div className="flex flex-wrap items-center gap-1.5">
+              <StatusChip tone="info">
+                {getServiceModalityLabel(service.modality)}
+              </StatusChip>
+              {service.accepts_offers ? (
+                <StatusChip tone="brand">Acepta ofertas</StatusChip>
+              ) : null}
             </div>
-          </section>
 
-          {(tags ?? []).length ? (
-            <section className="border-ink/[0.08] bg-surface consumer-card mt-4 rounded-2xl border p-5 sm:p-6">
-              <span className="flex min-w-0 items-center gap-2.5">
-                <IllustratedBadge tone="violet" icon="tag" size="sm" label="Relacionado" />
-                <h2 className="font-display text-lg leading-7 font-bold">Relacionado</h2>
-              </span>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {(tags ?? []).map((tag) => (
-                  <StatusChip tone="neutral" key={tag.tag}>
-                    {tag.tag}
-                  </StatusChip>
-                ))}
-              </div>
-            </section>
-          ) : null}
+            <h1 className="font-display mt-4 text-[24px] leading-8 font-extrabold tracking-[-0.03em] sm:text-4xl sm:leading-10">
+              {service.title}
+            </h1>
+            <p className="text-ink/70 mt-3 max-w-2xl text-[15px] leading-7 sm:text-base">
+              {service.description}
+            </p>
 
-          <section className="border-ink/10 mt-8 border-t pt-6">
-            <Link
-              href={`/p/${providerSlug}`}
-              className="consumer-card consumer-pressable bg-surface border-ink/[0.08] flex min-h-14 items-center gap-4 rounded-2xl border p-3 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)]"
+            <section
+              className="service-price-panel border-ink/[0.08] bg-surface consumer-card mt-6 grid grid-cols-2 gap-x-4 gap-y-4 rounded-2xl border px-5 py-5 shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] sm:grid-cols-3 dark:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
+              aria-label="Precio y condiciones"
             >
-              <Avatar
-                name={provider.display_name}
-                src={
-                  isTrustedPublicAvatarUrl(provider.avatar_url)
-                    ? provider.avatar_url
-                    : null
+              <Metric label="Precio" value={price} />
+              <Metric
+                label="Duración"
+                value={
+                  service.expected_duration_minutes
+                    ? `${service.expected_duration_minutes} min`
+                    : "A coordinar"
                 }
               />
-              <span className="min-w-0 flex-1">
-                <span className="text-ink/70 block text-xs font-semibold">
-                  Ofrece
-                </span>
-                <span className="block truncate text-sm font-bold">
-                  {provider.display_name}
-                </span>
-                {provider.public_headline ? (
-                  <span className="text-ink/70 mt-0.5 block truncate text-sm">
-                    {provider.public_headline}
-                  </span>
-                ) : null}
-              </span>
-              <span className="text-ink/25 text-xl" aria-hidden="true">
-                ›
-              </span>
-            </Link>
-          </section>
+              <Metric
+                label="Propuestas"
+                value={service.accepts_offers ? "Acepta" : "Precio fijo"}
+              />
+            </section>
 
-          <div className="border-moss/25 bg-moss/[0.07] consumer-card mt-8 flex items-start gap-3.5 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-            <IllustratedBadge tone="green" icon="shield" size="md" label="Garantía YALO" />
-            <div>
-              <p className="text-sm font-extrabold">Sin pago por adelantado + soporte</p>
-              <p className="text-ink/70 mt-1 text-xs leading-6">
-                Sin pago por adelantado: coordinás por chat y el pago se hace directamente entre las partes. Si algo sale mal, el equipo de YALO te acompaña.
-              </p>
+            {service.price_amount !== null ? (
+              <section
+                className="border-ink/[0.08] bg-surface consumer-card mt-4 rounded-2xl border px-5 py-4 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.05] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+                aria-label="Desglose del precio"
+              >
+                {service.price_model === "FIXED" ? (
+                  <>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-ink/70 text-[13px] font-semibold">
+                        Subtotal del servicio
+                      </span>
+                      <span className="font-bold">{price}</span>
+                    </div>
+                    <div className="mt-1.5 flex items-center justify-between gap-3">
+                      <span className="text-ink/70 text-[13px] font-semibold">
+                        Comisión de YALO
+                      </span>
+                      <span className="text-moss text-[13px] font-bold">
+                        Sin cobro online
+                      </span>
+                    </div>
+                    <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
+                      <span className="text-[13px] font-extrabold">
+                        Total a pagar
+                      </span>
+                      <span className="text-[15px] font-extrabold">
+                        {price}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[13px] font-extrabold">
+                      Precio de referencia
+                    </span>
+                    <span className="text-[15px] font-extrabold">{price}</span>
+                  </div>
+                )}
+                <p className="text-ink/70 mt-2 text-xs leading-5">
+                  {service.price_model === "FIXED"
+                    ? "Acordás el precio al contratar. El pago se realiza directamente entre las partes; YALO permite registrar lo declarado."
+                    : "Precio de referencia — el total se acuerda en la propuesta. El pago se realiza directamente entre las partes."}
+                </p>
+              </section>
+            ) : null}
+
+            <section className="border-ink/[0.08] bg-surface consumer-card mt-8 rounded-2xl border p-5 sm:p-6">
+              <span className="flex min-w-0 items-center gap-2.5">
+                <IllustratedBadge
+                  tone="blue"
+                  icon="doc"
+                  size="sm"
+                  label="Detalles del servicio"
+                />
+                <h2 className="font-display text-lg leading-7 font-bold">
+                  Detalles del servicio
+                </h2>
+              </span>
+              <div className="mt-4 grid gap-2">
+                <Info title="Incluye" value={service.includes} />
+                <Info title="No incluye" value={service.excludes} />
+                <Info
+                  title="Materiales y notas"
+                  value={service.materials_notes}
+                />
+              </div>
+            </section>
+
+            {(tags ?? []).length ? (
+              <section className="border-ink/[0.08] bg-surface consumer-card mt-4 rounded-2xl border p-5 sm:p-6">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <IllustratedBadge
+                    tone="violet"
+                    icon="tag"
+                    size="sm"
+                    label="Relacionado"
+                  />
+                  <h2 className="font-display text-lg leading-7 font-bold">
+                    Relacionado
+                  </h2>
+                </span>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(tags ?? []).map((tag) => (
+                    <StatusChip tone="neutral" key={tag.tag}>
+                      {tag.tag}
+                    </StatusChip>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            <section className="border-ink/10 mt-8 border-t pt-6">
+              <Link
+                href={`/p/${providerSlug}`}
+                className="consumer-card consumer-pressable bg-surface border-ink/[0.08] flex min-h-14 items-center gap-4 rounded-2xl border p-3 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)]"
+              >
+                <Avatar
+                  name={provider.display_name}
+                  src={
+                    isTrustedPublicAvatarUrl(provider.avatar_url)
+                      ? provider.avatar_url
+                      : null
+                  }
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="text-ink/70 block text-xs font-semibold">
+                    Ofrece
+                  </span>
+                  <span className="block truncate text-sm font-bold">
+                    {provider.display_name}
+                  </span>
+                  {provider.public_headline ? (
+                    <span className="text-ink/70 mt-0.5 block truncate text-sm">
+                      {provider.public_headline}
+                    </span>
+                  ) : null}
+                </span>
+                <span className="text-ink/25 text-xl" aria-hidden="true">
+                  ›
+                </span>
+              </Link>
+            </section>
+
+            <div className="border-moss/25 bg-moss/[0.07] consumer-card mt-8 flex items-start gap-3.5 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+              <IllustratedBadge
+                tone="green"
+                icon="shield"
+                size="md"
+                label="Garantía YALO"
+              />
+              <div>
+                <p className="text-sm font-extrabold">
+                  Sin pago por adelantado + soporte
+                </p>
+                <p className="text-ink/70 mt-1 text-xs leading-6">
+                  Sin pago por adelantado: coordinás por chat y el pago se hace
+                  directamente entre las partes. Si algo sale mal, el equipo de
+                  YALO te acompaña.
+                </p>
+              </div>
             </div>
-          </div>
           </div>
           <div className="service-cta-bar service-cta-bar-no-nav bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:static sm:mx-0 sm:mt-8 sm:border-0 sm:bg-transparent sm:p-0">
             <div className="mx-auto flex max-w-3xl items-stretch gap-3 sm:items-center sm:justify-between">
@@ -359,7 +382,9 @@ export default async function PublicServicePage({
                     {price}
                   </p>
                   <p className="text-ink/70 truncate text-xs">
-                    {instantEligible ? "Reserva directa · coordinás día y hora" : "Por chat · coordinás día y precio"}
+                    {instantEligible
+                      ? "Reserva directa · coordinás día y hora"
+                      : "Por chat · coordinás día y precio"}
                   </p>
                 </div>
                 <ConsultButton label={hireCtaLabel} />
@@ -394,16 +419,17 @@ function Info({ title, value }: { title: string; value: string | null }) {
 }
 
 const SERVICE_COVERS = [
-  { css: "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)", tone: "orange" },
-  { css: "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)", tone: "blue" },
-  { css: "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)", tone: "green" },
-  { css: "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)", tone: "rose" },
-  { css: "linear-gradient(135deg, #8B7CFF 0%, #5B4BD6 100%)", tone: "violet" },
-  { css: "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)", tone: "gold" },
+  { css: "linear-gradient(135deg, #22354A 0%, #0D121B 100%)", tone: "orange" },
+  { css: "linear-gradient(135deg, #164F6B 0%, #112033 100%)", tone: "blue" },
+  { css: "linear-gradient(135deg, #185253 0%, #10282F 100%)", tone: "green" },
+  { css: "linear-gradient(135deg, #235346 0%, #12282E 100%)", tone: "rose" },
+  { css: "linear-gradient(135deg, #28455C 0%, #121E2C 100%)", tone: "violet" },
+  { css: "linear-gradient(135deg, #1B4D57 0%, #10222D 100%)", tone: "gold" },
 ] as const;
 
 function coverFor(slug: string) {
   let hash = 0;
-  for (let i = 0; i < slug.length; i += 1) hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < slug.length; i += 1)
+    hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
   return SERVICE_COVERS[hash % SERVICE_COVERS.length] ?? SERVICE_COVERS[0];
 }

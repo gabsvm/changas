@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 
@@ -34,7 +34,7 @@ export function SearchFiltersSheet({
     <>
       <button
         type="button"
-        className="consumer-pressable border-ink/[0.1] text-ink inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border bg-white px-4 text-[15px] font-bold shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] transition-all duration-200 hover:-translate-y-px hover:border-brand-orange/30 hover:shadow-[0_2px_4px_rgb(23_20_15/6%),0_14px_30px_-8px_rgb(23_20_15/18%)] sm:w-auto dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+        className="yalo-filter-trigger consumer-pressable border-ink/[0.1] text-ink hover:border-brand-orange/30 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border bg-white px-4 text-[15px] font-bold shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] transition-all duration-200 hover:-translate-y-px hover:shadow-[0_2px_4px_rgb(23_20_15/6%),0_14px_30px_-8px_rgb(23_20_15/18%)] sm:w-auto dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -239,7 +239,7 @@ function FilterGroup({
 }) {
   return (
     <fieldset className="grid gap-4 sm:col-span-2 sm:grid-cols-2">
-      <legend className="mb-1 flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] text-ink/70 uppercase">
+      <legend className="text-ink/70 mb-1 flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] uppercase">
         <span
           className="h-4 w-1.5 rounded-full bg-[var(--yalo-symbol-gradient)]"
           aria-hidden="true"

@@ -67,19 +67,24 @@ function signatureOf(query: string, filters: DiscoveryFilters): string {
 }
 
 const DISCOVERY_COVERS = [
-  { css: "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)", tone: "orange" },
-  { css: "linear-gradient(135deg, #08A9F4 0%, #12D9C5 100%)", tone: "blue" },
-  { css: "linear-gradient(135deg, #12D9C5 0%, #0E7C46 100%)", tone: "green" },
-  { css: "linear-gradient(135deg, #1576D2 0%, #0D121B 100%)", tone: "rose" },
-  { css: "linear-gradient(135deg, #12D9C5 0%, #65EC91 100%)", tone: "violet" },
-  { css: "linear-gradient(135deg, #0D121B 0%, #12D9C5 100%)", tone: "gold" },
+  { css: "linear-gradient(135deg, #22354A 0%, #0D121B 100%)", tone: "orange" },
+  { css: "linear-gradient(135deg, #164F6B 0%, #112033 100%)", tone: "blue" },
+  { css: "linear-gradient(135deg, #185253 0%, #10282F 100%)", tone: "green" },
+  { css: "linear-gradient(135deg, #235346 0%, #12282E 100%)", tone: "rose" },
+  { css: "linear-gradient(135deg, #28455C 0%, #121E2C 100%)", tone: "violet" },
+  { css: "linear-gradient(135deg, #1B4D57 0%, #10222D 100%)", tone: "gold" },
 ] as const;
 
-function coverForDiscovery(key: string | null): (typeof DISCOVERY_COVERS)[number] {
+function coverForDiscovery(
+  key: string | null,
+): (typeof DISCOVERY_COVERS)[number] {
   if (!key) return DISCOVERY_COVERS[0];
   let hash = 0;
-  for (let i = 0; i < key.length; i += 1) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-  return DISCOVERY_COVERS[hash % DISCOVERY_COVERS.length] ?? DISCOVERY_COVERS[0];
+  for (let i = 0; i < key.length; i += 1)
+    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  return (
+    DISCOVERY_COVERS[hash % DISCOVERY_COVERS.length] ?? DISCOVERY_COVERS[0]
+  );
 }
 
 function LoadingSkeletons() {
@@ -345,13 +350,22 @@ export function DiscoveryResults({
     );
   }
 
-  const activeCover = coverForDiscovery(filters.categorySlug ?? filters.skillSlug ?? query ?? null);
+  const activeCover = coverForDiscovery(
+    filters.categorySlug ?? filters.skillSlug ?? query ?? null,
+  );
   return (
     <section
       aria-label="Resultados de búsqueda"
       aria-busy={loadingMore || nearbyLoading}
     >
-      <SectionHeader title="Resultados" badge={{ tone: "orange", icon: "star", label: "Resultados de búsqueda" }} />
+      <SectionHeader
+        title="Resultados"
+        badge={{
+          tone: "orange",
+          icon: "star",
+          label: "Resultados de búsqueda",
+        }}
+      />
       <div className="mt-1 flex min-h-12 flex-wrap items-center justify-between gap-2">
         <p
           aria-live="polite"
@@ -433,7 +447,12 @@ export function DiscoveryResults({
               aria-hidden="true"
             />
             <span className="relative">
-              <IllustratedBadge tone={activeCover.tone} icon="search" size="md" label="Sin resultados" />
+              <IllustratedBadge
+                tone={activeCover.tone}
+                icon="search"
+                size="md"
+                label="Sin resultados"
+              />
             </span>
           </div>
           <EmptyState

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { formatMinorUnits, type JobStatus } from "@changas/domain";
@@ -437,7 +437,8 @@ export default async function JobPage({
           {isClient &&
           detail.confirmation_code &&
           detail.modality !== "REMOTE" &&
-          (!detail.delivery_flow_available && detail.job_status === "IN_PROGRESS" ||
+          ((!detail.delivery_flow_available &&
+            detail.job_status === "IN_PROGRESS") ||
             detail.delivery_submitted_at !== null ||
             detail.job_status === "COMPLETION_REQUESTED") ? (
             <div className="border-ink/[0.08] bg-canvas mt-3 rounded-2xl border p-4 text-center">
@@ -472,8 +473,8 @@ export default async function JobPage({
           detail.modality !== "REMOTE" &&
           detail.handover_verified_at === null ? (
             <p className="text-ink/70 mt-3 text-xs leading-5">
-              Entrega enviada. Pedile al cliente el PIN de 4 dígitos que ve
-              en su Seguimiento para dejar constancia.
+              Entrega enviada. Pedile al cliente el PIN de 4 dígitos que ve en
+              su Seguimiento para dejar constancia.
             </p>
           ) : null}
           {tracking.exception ? (
@@ -492,20 +493,36 @@ export default async function JobPage({
         detail.delivery_flow_available &&
         detail.modality === "BOTH" &&
         ["CONFIRMED", "IN_PROGRESS"].includes(detail.job_status) ? (
-          <section className="border-ink/10 bg-surface mt-4 rounded-2xl border p-4" aria-label="Elegir modalidad efectiva">
-            <h2 className="font-display text-lg font-bold">¿Cómo se hará este trabajo?</h2>
+          <section
+            className="border-ink/10 bg-surface mt-4 rounded-2xl border p-4"
+            aria-label="Elegir modalidad efectiva"
+          >
+            <h2 className="font-display text-lg font-bold">
+              ¿Cómo se hará este trabajo?
+            </h2>
             <p className="text-ink/70 mt-1 text-sm">
-              El servicio admite ambas modalidades. Elegí la que acordaste con el prestador
-              antes de que envíe la entrega.
+              El servicio admite ambas modalidades. Elegí la que acordaste con
+              el prestador antes de que envíe la entrega.
             </p>
-            <form action={chooseJobModalityAction} className="mt-3 flex flex-wrap gap-3">
+            <form
+              action={chooseJobModalityAction}
+              className="mt-3 flex flex-wrap gap-3"
+            >
               <input type="hidden" name="jobId" value={jobId} />
-              <button type="submit" name="modality" value="IN_PERSON"
-                className="consumer-pressable cta-ink min-h-11 rounded-xl px-4 text-sm font-bold">
+              <button
+                type="submit"
+                name="modality"
+                value="IN_PERSON"
+                className="consumer-pressable cta-ink min-h-11 rounded-xl px-4 text-sm font-bold"
+              >
                 Presencial, con PIN
               </button>
-              <button type="submit" name="modality" value="REMOTE"
-                className="consumer-pressable border-ink/20 min-h-11 rounded-xl border px-4 text-sm font-bold">
+              <button
+                type="submit"
+                name="modality"
+                value="REMOTE"
+                className="consumer-pressable border-ink/20 min-h-11 rounded-xl border px-4 text-sm font-bold"
+              >
                 Remoto, con entrega digital
               </button>
             </form>
@@ -531,7 +548,7 @@ export default async function JobPage({
                 href={detail.delivery_evidence_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-brand-primary mt-3 block break-all text-sm font-bold underline underline-offset-2"
+                className="text-brand-primary mt-3 block text-sm font-bold break-all underline underline-offset-2"
               >
                 Ver enlace de entrega digital
               </a>
@@ -1267,9 +1284,7 @@ export default async function JobPage({
                     <div className="flex items-start gap-2.5">
                       <span className="bg-moss ring-canvas absolute top-1 -left-[22px] h-2.5 w-2.5 rounded-full ring-4" />
                       <div className="min-w-0">
-                        <strong className="block">
-                          {eventLabel(event)}
-                        </strong>
+                        <strong className="block">{eventLabel(event)}</strong>
                         <time className="text-ink/42 mt-1 block text-xs leading-4">
                           {eventActorLabel(
                             event.actor_user_id,
@@ -1292,7 +1307,7 @@ export default async function JobPage({
           </aside>
         </div>
       </div>
-      <div className="bg-surface/95 border-ink/10 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur md:hidden">
+      <div className="yalo-job-mobile-cta bg-surface/95 border-ink/10 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur md:hidden">
         <div className="mx-auto grid max-w-4xl grid-cols-[1fr_auto] items-center gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="min-w-0">
             {nextAction.kind ? (
