@@ -2,7 +2,6 @@ import { formatMinorUnits } from "@changas/domain";
 
 import {
   declareExternalPaymentAction,
-  respondExternalPaymentAction,
   voidExternalPaymentAction,
 } from "@/app/(account)/jobs/actions";
 import {
@@ -12,6 +11,7 @@ import {
   type ExternalMoneyLedger,
 } from "@/lib/jobs/external-money";
 import type { ExternalPaymentDeclaration } from "@/lib/jobs/server";
+import { ExternalPaymentResponseForm } from "@/app/(account)/jobs/[jobId]/external-payment-response-form";
 
 const METHOD_OPTIONS = ["EFECTIVO", "TRANSFERENCIA", "OTRO_ACORDADO"] as const;
 
@@ -39,6 +39,14 @@ export function ExternalMoneySection({
   declarations: ExternalPaymentDeclaration[];
   defaultAmountMinor: number;
 }) {
+  const availableToConfirmMinor = Math.max(
+    0,
+    ledger.agreedTotalMinor - ledger.confirmedMinor,
+  );
+  const unallocatedMinor = Math.max(
+    0,
+    availableToConfirmMinor - ledger.claimedMinor,
+  );
   const pending = declarations.filter(
     (declaration) =>
       declaration.state === "DECLARED_BY_CLIENT" ||
@@ -112,51 +120,37 @@ export function ExternalMoneySection({
             </p>
             {counterpart ? (
               <div className="mt-2 grid gap-2">
-                <form action={respondExternalPaymentAction}>
-                  <input type="hidden" name="jobId" value={jobId} />
-                  <input
-                    type="hidden"
-                    name="declarationId"
-                    value={declaration.id}
+                {declaration.amount_minor > availableToConfirmMinor ? (
+                  <p
+                    role="alert"
+                    className="border-warning/30 bg-warning/[0.08] text-ink rounded-xl border px-3 py-2.5 text-[13px] leading-5"
+                  >
+                    <strong>Este importe no se puede confirmar.</strong>{" "}
+                    La declaración es de{" "}
+                    {formatMinorUnits(declaration.amount_minor, "ARS")}, pero
+                    quedan {formatMinorUnits(availableToConfirmMinor, "ARS")} del
+                    total acordado sin confirmar. Pedile a quien la registró que
+                    la anule y vuelva a informar el importe correcto.
+                    No confirmamos un pago que supere lo acordado.
+                  </p>
+                ) : (
+                  <ExternalPaymentResponseForm
+                    jobId={jobId}
+                    declarationId={declaration.id}
+                    decision="accept"
+                    isClient={isClient}
                   />
-                  <input type="hidden" name="decision" value="accept" />
-                  <button className="consumer-pressable cta-ink inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-extrabold">
-                    {isClient
-                      ? "Confirmar que lo pagué"
-                      : "Confirmar que lo recibí"}
-                  </button>
-                </form>
+                )}
                 <details className="border-ink/10 rounded-xl border">
                   <summary className="consumer-pressable min-h-11 cursor-pointer px-4 py-2.5 text-sm font-bold">
                     {isClient ? "No lo pagué" : "No lo recibí"}
                   </summary>
-                  <form
-                    action={respondExternalPaymentAction}
-                    className="grid gap-2 p-3 pt-0"
-                  >
-                    <input type="hidden" name="jobId" value={jobId} />
-                    <input
-                      type="hidden"
-                      name="declarationId"
-                      value={declaration.id}
-                    />
-                    <input type="hidden" name="decision" value="contest" />
-                    <label className="text-xs font-bold">
-                      Motivo del desacuerdo
-                      <textarea
-                        name="reason"
-                        required
-                        minLength={1}
-                        maxLength={1000}
-                        rows={2}
-                        placeholder="Contá qué pasó"
-                        className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2 text-sm font-normal"
-                      />
-                    </label>
-                    <button className="consumer-pressable border-ink/15 inline-flex min-h-11 w-full items-center justify-center rounded-xl border px-4 text-sm font-bold">
-                      Marcar desacuerdo
-                    </button>
-                  </form>
+                  <ExternalPaymentResponseForm
+                    jobId={jobId}
+                    declarationId={declaration.id}
+                    decision="contest"
+                    isClient={isClient}
+                  />
                 </details>
               </div>
             ) : (
@@ -176,6 +170,7 @@ export function ExternalMoneySection({
         );
       })}
 
+      {unallocatedMinor > 0 ? (
       <details className="border-ink/10 rounded-xl border">
         <summary className="consumer-pressable min-h-[52px] cursor-pointer px-4 py-3 text-sm font-bold">
           {isClient ? "Informar que pagué" : "Registrar dinero recibido"}
@@ -196,7 +191,7 @@ export function ExternalMoneySection({
               name="amount"
               required
               inputMode="decimal"
-              defaultValue={(defaultAmountMinor / 100).toLocaleString("es-AR")}
+              defaultValue={(Math.min(defaultAmountMinor, unallocatedMinor) / 100).toLocaleString("es-AR")}
               className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal"
             />
           </label>
@@ -237,6 +232,16 @@ export function ExternalMoneySection({
           </button>
         </form>
       </details>
+      ) : (
+        <p
+          role="status"
+          className="border-ink/10 bg-ink/[0.04] text-ink/80 rounded-xl border px-3 py-3 text-[13px] leading-5"
+        >
+          {ledger.claimedMinor > 0
+            ? "Ya está declarado el importe pendiente. Esperá la respuesta de la otra parte antes de informar otro pago."
+            : "El importe acordado ya está confirmado por ambas partes."}
+        </p>
+      )}
 
       {declarations.length > 0 ? (
         <div>
