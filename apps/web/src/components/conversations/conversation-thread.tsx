@@ -107,6 +107,9 @@ export function ConversationThread({
   currentUserId,
   peerUserId,
   peerName,
+  currentUserIsClient,
+  allowDirectBooking,
+  actionableProposalId,
   serviceTitle,
   providerHref,
   deal,
@@ -121,6 +124,9 @@ export function ConversationThread({
   currentUserId: string;
   peerUserId: string;
   peerName: string;
+  currentUserIsClient: boolean;
+  allowDirectBooking: boolean;
+  actionableProposalId: string | null;
   serviceTitle: string;
   providerHref: string;
   deal: {
@@ -345,8 +351,40 @@ export function ConversationThread({
     window.requestAnimationFrame(() => scrollToBottom(true));
   }, [refreshThread, scrollToBottom]);
 
+  function openProposalComposer(
+    kind: "DIRECT_BOOKING" | "QUOTE_REQUEST" | "CLIENT_OFFER" | "PROVIDER_QUOTE",
+  ) {
+    const details = document.getElementById("nueva-propuesta");
+    if (!(details instanceof HTMLDetailsElement)) return;
+    details.open = true;
+    const kindSelect = details.querySelector<HTMLSelectElement>('select[name="kind"]');
+    if (kindSelect) kindSelect.value = kind;
+    details.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.requestAnimationFrame(() => {
+      details
+        .querySelector<HTMLInputElement | HTMLTextAreaElement>(
+          kind === "QUOTE_REQUEST" ? 'textarea[name="scope"]' : 'input[name="price"]',
+        )
+        ?.focus({ preventScroll: true });
+    });
+  }
+
+  function startHire() {
+    if (actionableProposalId) {
+      document
+        .getElementById(`propuesta-${actionableProposalId}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (currentUserIsClient) {
+      openProposalComposer(allowDirectBooking ? "DIRECT_BOOKING" : "CLIENT_OFFER");
+    }
+  }
+
+  const showHireAction = currentUserIsClient || actionableProposalId !== null;
+
   return (
-    <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden sm:min-h-[calc(100dvh-4rem)]">
+    <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-clip sm:min-h-[calc(100dvh-4rem)]">
       <header className="border-ink/[0.08] bg-canvas/95 sticky top-0 z-10 overflow-hidden border-b px-4 pt-0 pb-3 backdrop-blur sm:px-6">
         <div
           className="relative -mx-4 mb-3 h-1.5 overflow-hidden sm:-mx-6"
@@ -428,6 +466,49 @@ export function ConversationThread({
             </div>
           </details>
         </div>
+        <div
+          className={`mt-3 grid gap-2 ${showHireAction ? "grid-cols-2" : "grid-cols-1"}`}
+          role="group"
+          aria-label={showHireAction ? "Cotizar y contratar" : "Cotizaciones"}
+        >
+          {showHireAction ? (
+            <button
+              type="button"
+              onClick={startHire}
+              disabled={blockedByMe}
+              aria-controls={
+                actionableProposalId
+                  ? `propuesta-${actionableProposalId}`
+                  : "nueva-propuesta"
+              }
+              className="consumer-pressable inline-flex min-h-12 items-center justify-center rounded-xl border border-[#65EC91]/40 px-3 text-sm font-extrabold text-[#062333] shadow-[0_8px_24px_rgb(18_217_197/20%)] disabled:cursor-not-allowed disabled:opacity-50"
+              style={{
+                backgroundImage:
+                  "linear-gradient(112deg, #08A9F4, #12D9C5 62%, #65EC91)",
+              }}
+            >
+              {currentUserIsClient ? "Contratar" : "Aceptar oferta"}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={() =>
+              openProposalComposer(
+                currentUserIsClient ? "QUOTE_REQUEST" : "PROVIDER_QUOTE",
+              )
+            }
+            disabled={blockedByMe}
+            aria-controls="nueva-propuesta"
+            className="consumer-pressable border-ink/15 bg-surface text-ink inline-flex min-h-12 items-center justify-center rounded-xl border px-3 text-sm font-extrabold shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {currentUserIsClient ? "Cotizar" : "Enviar cotización"}
+          </button>
+        </div>
+        {currentUserIsClient && !actionableProposalId && !allowDirectBooking ? (
+          <p className="text-ink/70 mt-1.5 text-[11px] leading-4">
+            Para contratar, proponé precio y alcance; se confirma cuando la otra parte acepta.
+          </p>
+        ) : null}
         {spotlight ? (
           <div
             aria-label={`${spotlight.title}. ${spotlight.sub}`}

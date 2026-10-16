@@ -167,25 +167,18 @@ export default async function ConversationPage({
               ),
       }
     : null;
-  const openProposal =
-    proposals.find((proposal) => proposal.proposal_status === "OPEN") ?? null;
-  const hireSpotlight =
-    openProposal !== null &&
-    openProposal.price_amount !== null &&
-    canActorTransitionProposal({
-      actorRole: currentUserIsClient ? "CLIENT" : "PROVIDER",
-      actorIsAuthor: openProposal.authored_by_user_id === user.id,
-      from: openProposal.proposal_status,
-      to: "ACCEPTED",
-    })
-      ? {
-          kind: "hire" as const,
-          title: `Contratar · ${formatMinorUnits(openProposal.price_amount, openProposal.currency_code)}`,
-          sub: "Sin pago por adelantado. Tocá para revisar y confirmar.",
-          cta: "Contratar",
-          href: "#propuestas",
-        }
-      : null;
+  const actionableProposalId =
+    proposals.find(
+      (proposal) =>
+        proposal.proposal_status === "OPEN" &&
+        proposal.price_amount !== null &&
+        canActorTransitionProposal({
+          actorRole: currentUserIsClient ? "CLIENT" : "PROVIDER",
+          actorIsAuthor: proposal.authored_by_user_id === user.id,
+          from: proposal.proposal_status,
+          to: "ACCEPTED",
+        }),
+    )?.proposal_id ?? null;
   const spotlightJob =
     conversationJobs.find(
       (job) => !JOB_TERMINAL_STATUSES.includes(job.job_status),
@@ -217,7 +210,7 @@ export default async function ConversationPage({
           helpHref: `/jobs/${spotlightJob.job_id}#ayuda`,
         }
       : null;
-  const spotlight = hireSpotlight ?? jobSpotlight;
+  const spotlight = jobSpotlight;
 
   return (
     <section className="space-y-4 py-4 sm:py-6">
@@ -230,6 +223,9 @@ export default async function ConversationPage({
         currentUserId={user.id}
         peerUserId={peerUserId}
         peerName={peerName}
+        currentUserIsClient={currentUserIsClient}
+        allowDirectBooking={canOfferInstant}
+        actionableProposalId={actionableProposalId}
         serviceTitle={context.service_title}
         providerHref={`/p/${context.provider_slug}/${context.service_slug}`}
         initialMessages={messages}
