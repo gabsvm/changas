@@ -10,13 +10,14 @@ const card = load("../../components/conversations/proposal-card.tsx");
 
 describe("chat hiring and quoting actions", () => {
   it("shows prominent contracting and quoting choices at the top of the chat", () => {
-    expect(thread).toContain('aria-label="Cotizar y contratar"');
-    expect(thread.indexOf('aria-label="Cotizar y contratar"')).toBeLessThan(
+    expect(thread).toContain('aria-label={showHireAction ? "Cotizar y contratar" : "Cotizaciones"}');
+    expect(thread.indexOf('aria-label={showHireAction ? "Cotizar y contratar" : "Cotizaciones"}')).toBeLessThan(
       thread.indexOf("{spotlight ? ("),
     );
     expect(thread).toContain('currentUserIsClient ? "Contratar" : "Aceptar oferta"');
     expect(thread).toContain('currentUserIsClient ? "Cotizar" : "Enviar cotización"');
     expect(thread).toContain("disabled={blockedByMe}");
+    expect(thread).toContain("overflow-clip");
   });
 
   it("routes contracting to the accept flow or an appropriately typed proposal", () => {
