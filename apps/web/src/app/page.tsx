@@ -203,7 +203,12 @@ export default async function HomePage() {
             >
               <div className="yalo-intent-actions">
                 <Link href="/buscar" className="yalo-intent-link yalo-intent-hire">
-                  <span className="yalo-intent-icon" aria-hidden="true">⌕</span>
+                  <span className="yalo-intent-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="23" height="23" fill="none">
+                      <circle cx="10.7" cy="10.7" r="6.3" stroke="currentColor" strokeWidth="2" />
+                      <path d="m15.5 15.5 4.6 4.6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </span>
                   <span className="yalo-intent-text">
                     <strong>Quiero contratar</strong>
                     <span>Encontrar alguien que me ayude</span>
@@ -214,7 +219,12 @@ export default async function HomePage() {
                   href="/provider/onboarding"
                   className="yalo-intent-link yalo-intent-work"
                 >
-                  <span className="yalo-intent-icon" aria-hidden="true">✳</span>
+                  <span className="yalo-intent-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="23" height="23" fill="none">
+                      <rect x="3" y="7" width="18" height="13" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M9 7V5.5C9 4.7 9.7 4 10.5 4h3c.8 0 1.5.7 1.5 1.5V7M3 12.5c5.4 3.6 12.6 3.6 18 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  </span>
                   <span className="yalo-intent-text">
                     <strong>Quiero trabajar</strong>
                     <span>Ofrecer mis servicios</span>
