@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { formatMinorUnits } from "@changas/domain";
 
 import {
+  getUnreadConversationCount,
   listConversationsThrough,
   listInboxOpenDeals,
 } from "@/lib/conversations/server";
@@ -112,9 +113,7 @@ export default async function MessagesPage({
   const deals = await loadOpenDeals(
     conversations.map((conversation) => conversation.conversation_id),
   );
-  const unreadTotal = conversations.filter(
-    (conversation) => conversation.unread_count > 0,
-  ).length;
+  const unreadTotal = await getUnreadConversationCount();
   const visible = showUnreadOnly
     ? conversations.filter((conversation) => conversation.unread_count > 0)
     : conversations;
@@ -185,10 +184,22 @@ export default async function MessagesPage({
           showUnreadOnly ? (
             <EmptyState
               className="empty-state-card py-16 sm:py-20"
-              title="No tenés mensajes sin leer"
-              description="Cuando haya novedades en tus chats, van a aparecer acá."
-              actionHref="/messages"
-              actionLabel="Ver todas"
+              title={
+                unreadTotal > 0 && moreHref
+                  ? "Tenés mensajes sin leer más atrás"
+                  : "No tenés mensajes sin leer"
+              }
+              description={
+                unreadTotal > 0 && moreHref
+                  ? "Seguimos buscando en tus conversaciones anteriores."
+                  : "Cuando haya novedades en tus chats, van a aparecer acá."
+              }
+              actionHref={unreadTotal > 0 && moreHref ? moreHref : "/messages"}
+              actionLabel={
+                unreadTotal > 0 && moreHref
+                  ? "Mostrar más conversaciones"
+                  : "Ver todas"
+              }
               actionTone="secondary"
             />
           ) : (
@@ -248,7 +259,7 @@ function ConversationRow({
   return (
     <Link
       href={`/messages/${conversation.conversation_id}`}
-      className="consumer-card consumer-pressable bg-surface group flex min-h-[76px] items-center gap-3 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:hover:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)] sm:px-4"
+      className="consumer-card consumer-pressable bg-surface group flex min-h-[76px] items-center gap-3 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] sm:px-4 dark:hover:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
     >
       <Avatar
         name={conversation.peer_display_name}

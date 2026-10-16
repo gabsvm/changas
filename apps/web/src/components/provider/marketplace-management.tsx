@@ -255,7 +255,15 @@ function Field({
   required?: boolean;
   helper?: string | undefined;
   placeholder?: string | undefined;
-  inputMode?: "decimal" | "none" | "numeric" | "search" | "tel" | "text" | "url" | undefined;
+  inputMode?:
+    | "decimal"
+    | "none"
+    | "numeric"
+    | "search"
+    | "tel"
+    | "text"
+    | "url"
+    | undefined;
   min?: string | number;
   max?: string | number;
   step?: string | number;
@@ -400,7 +408,7 @@ function UseLocationButton() {
             { timeout: 10000 },
           );
         }}
-        className="consumer-pressable border-ink/[0.08] inline-flex min-h-11 items-center gap-2 rounded-full border bg-white px-4 text-[13px] font-bold dark:border-white/10 dark:bg-[#2a231c]"
+        className="consumer-pressable border-ink/[0.08] inline-flex min-h-11 items-center gap-2 rounded-full border bg-white px-4 text-[13px] font-bold dark:border-white/10 dark:bg-[#1b2b3d]"
       >
         {status === "loading" ? "Buscando tu ubicación…" : "Usar mi ubicación"}
       </button>
@@ -413,7 +421,6 @@ function UseLocationButton() {
     </span>
   );
 }
-
 
 const SECTION_BADGES: Record<
   string,
@@ -481,7 +488,7 @@ function Section({
   return (
     <section
       id={anchor}
-      className="border-ink/10 consumer-card scroll-mt-32 overflow-hidden rounded-2xl border bg-white/65 dark:border-white/10 dark:bg-[#2a231c]"
+      className="border-ink/10 consumer-card scroll-mt-32 overflow-hidden rounded-2xl border bg-white/65 dark:border-white/10 dark:bg-[#1b2b3d]"
     >
       <span
         className="brand-gradient-surface pointer-events-none block h-1.5"
@@ -676,7 +683,7 @@ function ServiceForm({
           defaultChecked={service?.is_paused}
         />
       </div>
-      <details className="border-ink/10 rounded-xl border bg-white/60 px-3 py-1 dark:border-white/10 dark:bg-[#2a231c]">
+      <details className="border-ink/10 rounded-xl border bg-white/60 px-3 py-1 dark:border-white/10 dark:bg-[#1b2b3d]">
         <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center text-sm font-bold">
           Más detalles (opcional)
         </summary>
@@ -744,7 +751,7 @@ function ProfessionalRecordList({
     <div className="grid gap-3 md:grid-cols-2">
       {records.map((record) => (
         <article
-          className="border-ink/10 rounded-xl border bg-white/60 p-4 dark:border-white/10 dark:bg-[#2a231c]"
+          className="border-ink/10 rounded-xl border bg-white/60 p-4 dark:border-white/10 dark:bg-[#1b2b3d]"
           key={record.id}
         >
           {render(record)}
@@ -850,7 +857,7 @@ export function MarketplaceManagement({
               className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-all duration-200 ${
                 active
                   ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                  : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                  : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#1b2b3d] dark:text-[#f5efe8]"
               }`}
               style={
                 active
@@ -947,7 +954,7 @@ export function MarketplaceManagement({
             {providerSkills.length ? (
               providerSkills.map((item) => (
                 <div
-                  className="border-ink/10 flex items-center justify-between gap-3 rounded-xl border bg-white/60 px-4 py-3 dark:border-white/10 dark:bg-[#2a231c]"
+                  className="border-ink/10 flex items-center justify-between gap-3 rounded-xl border bg-white/60 px-4 py-3 dark:border-white/10 dark:bg-[#1b2b3d]"
                   key={item.skill_id}
                 >
                   <div>
@@ -987,7 +994,7 @@ export function MarketplaceManagement({
         <div className="space-y-5">
           <details
             open={services.length === 0}
-            className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3 dark:border-white/10 dark:bg-[#2a231c]"
+            className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3 dark:border-white/10 dark:bg-[#1b2b3d]"
           >
             <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
               + Nuevo servicio
@@ -1006,7 +1013,7 @@ export function MarketplaceManagement({
           </details>
           {services.map((service) => (
             <div
-              className="border-ink/10 rounded-xl border bg-white/45 p-4 dark:border-white/10 dark:bg-[#2a231c]"
+              className="border-ink/10 rounded-xl border bg-white/45 p-4 dark:border-white/10 dark:bg-[#1b2b3d]"
               key={service.id}
             >
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -1422,12 +1429,12 @@ export function MarketplaceManagement({
           <div className="space-y-3">
             {availabilityRules.map((item) => (
               <article
-                className="border-ink/10 rounded-xl border bg-white/60 p-4 dark:border-white/10 dark:bg-[#2a231c]"
+                className="border-ink/10 rounded-xl border bg-white/60 p-4 dark:border-white/10 dark:bg-[#1b2b3d]"
                 key={item.id}
               >
                 <p className="font-semibold">
-                  Día {WEEKDAY_NAMES[item.weekday] ?? `día ${item.weekday}`} · {item.start_time.slice(0, 5)}–
-                  {item.end_time.slice(0, 5)}
+                  Día {WEEKDAY_NAMES[item.weekday] ?? `día ${item.weekday}`} ·{" "}
+                  {item.start_time.slice(0, 5)}–{item.end_time.slice(0, 5)}
                 </p>
                 <p className="text-ink/70 mt-1 text-xs">
                   {item.timezone} · {item.is_active ? "activo" : "inactivo"}
@@ -1481,7 +1488,7 @@ export function MarketplaceManagement({
             <p className="font-semibold">Bloqueos</p>
             {availabilityBlocks.map((item) => (
               <article
-                className="border-ink/10 mt-3 rounded-xl border bg-white/60 p-4 dark:border-white/10 dark:bg-[#2a231c]"
+                className="border-ink/10 mt-3 rounded-xl border bg-white/60 p-4 dark:border-white/10 dark:bg-[#1b2b3d]"
                 key={item.id}
               >
                 <p className="text-sm">

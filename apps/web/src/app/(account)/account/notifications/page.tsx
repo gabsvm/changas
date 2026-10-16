@@ -5,7 +5,10 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
-import { listNotificationsThrough } from "@/lib/notifications/server";
+import {
+  getUnreadNotificationCount,
+  listNotificationsThrough,
+} from "@/lib/notifications/server";
 import { parsePageCursor } from "@/lib/cursor-pages";
 import { createClient } from "@/lib/supabase/server";
 import { getNotificationKindLabel } from "@/lib/ui/notifications";
@@ -67,7 +70,7 @@ export default async function NotificationCenterPage({
   const moreHref = next
     ? `/account/notifications?before=${encodeURIComponent(next.at)}&beforeId=${next.id}`
     : null;
-  const unreadCount = notifications.filter((item) => item.unread).length;
+  const unreadCount = await getUnreadNotificationCount(supabase);
   const groups = new Map<string, typeof notifications>();
 
   for (const notification of notifications) {
@@ -81,7 +84,12 @@ export default async function NotificationCenterPage({
       <div className="pt-4 sm:pt-0">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
-            <IllustratedBadge tone="gold" icon="bell" size="md" label="Actividad" />
+            <IllustratedBadge
+              tone="gold"
+              icon="bell"
+              size="md"
+              label="Actividad"
+            />
             <div className="min-w-0">
               <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
                 Actividad

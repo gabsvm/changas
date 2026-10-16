@@ -637,8 +637,8 @@ export default async function PublicProviderPage({
 
         <footer className="border-ink/10 mt-10 border-t py-6 text-center">
           <p className="text-moss text-xs leading-5 font-extrabold">
-            Sin pago por adelantado: coordinás por chat y pagás al finalizar
-            desde acá + soporte de YALO en cada trabajo
+            Sin pago por adelantado: acordás y realizás el pago directamente con
+            el prestador. YALO te acompaña durante el trabajo.
           </p>
           <p className="text-ink/38 mt-1 text-xs leading-5">
             YALO · información publicada por el proveedor

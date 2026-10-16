@@ -11,23 +11,23 @@ const VISUALS: ReadonlyArray<{ match: RegExp; visual: CategoryVisual }> = [
   { match: /hogar|limpieza|casa/i, visual: { from: "#243145", to: "#0D121B" } },
   {
     match: /tecno|comput|inform|diseño|program/i,
-    visual: { from: "#4F8DFF", to: "#2F4BFE" },
+    visual: { from: "#08A9F4", to: "#166491" },
   },
   {
     match: /educa|clase|curso|idioma/i,
-    visual: { from: "#2FBF71", to: "#0E7C46" },
+    visual: { from: "#12D9C5", to: "#146962" },
   },
   {
     match: /mascota|perro|gato|paseo/i,
-    visual: { from: "#FB6F92", to: "#E14D7A" },
+    visual: { from: "#1D778E", to: "#11445D" },
   },
   {
     match: /profesional|admin|contab|legal/i,
-    visual: { from: "#8B7CFF", to: "#5B4BD6" },
+    visual: { from: "#245C80", to: "#132D4A" },
   },
   {
     match: /belleza|bienestar|salud|pelu/i,
-    visual: { from: "#F5B942", to: "#DE7E1F" },
+    visual: { from: "#3C806B", to: "#144D44" },
   },
 ];
 
@@ -45,8 +45,7 @@ export function CategoryTile({
   icon: string;
 }) {
   const visual =
-    VISUALS.find((entry) => entry.match.test(icon))?.visual ??
-    FALLBACK_VISUAL;
+    VISUALS.find((entry) => entry.match.test(icon))?.visual ?? FALLBACK_VISUAL;
   return (
     <Link
       href={href}

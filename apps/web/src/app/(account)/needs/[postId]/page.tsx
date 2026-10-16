@@ -98,7 +98,10 @@ export default async function NeedDetailPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
-      <MobileAppBar title="Necesidad" backHref={isOwner ? "/needs" : "/oportunidades"} />
+      <MobileAppBar
+        title="Necesidad"
+        backHref={isOwner ? "/needs" : "/oportunidades"}
+      />
       <p className="text-ink/70 mt-2 text-[13px] font-bold">
         {post.skill_name ?? "Rubro"} · {STATUS_LABELS[post.status]}
       </p>
@@ -141,31 +144,49 @@ export default async function NeedDetailPage({
             aceptar se crea el trabajo. El pago se acuerda por fuera de YALO.
           </p>
           {offers.length > 0 ? (
-            <div className="mt-4 grid gap-3" aria-label="Comparar ofertas de prestadores">
+            <div
+              className="mt-4 grid gap-3"
+              aria-label="Comparar ofertas de prestadores"
+            >
               {offers.map((offer) => (
-                <article key={offer.proposal_id} className="border-ink/10 bg-surface rounded-2xl border p-4">
+                <article
+                  key={offer.proposal_id}
+                  className="consumer-card bg-surface rounded-2xl border p-4"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-extrabold">{offer.provider_name}</p>
+                      <p className="text-sm font-extrabold">
+                        {offer.provider_name}
+                      </p>
                       <p className="text-ink/65 mt-1 text-xs">
-                        {offer.proposal_status === "ACCEPTED" ? "Contratada" : "Cotización disponible"}
+                        {offer.proposal_status === "ACCEPTED"
+                          ? "Contratada"
+                          : "Cotización disponible"}
                       </p>
                     </div>
                     <strong className="text-sm">
-                      {formatMinorUnits(offer.price_amount, offer.currency_code)}
+                      {formatMinorUnits(
+                        offer.price_amount,
+                        offer.currency_code,
+                      )}
                     </strong>
                   </div>
                   <p className="text-ink/75 mt-3 text-sm leading-6 whitespace-pre-wrap">
                     {offer.scope_snapshot}
                   </p>
                   <p className="text-ink/60 mt-2 text-xs">
-                    {scheduleLabel(offer.schedule_start_at, offer.schedule_end_at)}
+                    {scheduleLabel(
+                      offer.schedule_start_at,
+                      offer.schedule_end_at,
+                    )}
                   </p>
                   <ActionLink
                     href={`/messages/${offer.conversation_id}`}
                     className="mt-3 w-full"
                   >
-                    {offer.proposal_status === "ACCEPTED" ? "Ver acuerdo" : "Ver oferta y contratar"}
+                    {offer.proposal_status === "ACCEPTED"
+                      ? "Ver acuerdo"
+                      : "Ver oferta y contratar"}
                   </ActionLink>
                 </article>
               ))}
@@ -206,8 +227,8 @@ export default async function NeedDetailPage({
         <section className="mt-6" aria-label="Ofertar en esta necesidad">
           {!canOffer ? (
             <p className="text-ink/70 text-sm leading-6">
-              Para ofertar necesitás un perfil de prestador activo y visible
-              en el marketplace.{" "}
+              Para ofertar necesitás un perfil de prestador activo y visible en
+              el marketplace.{" "}
               <ActionLink
                 href="/provider/onboarding"
                 tone="secondary"
@@ -250,7 +271,9 @@ export default async function NeedDetailPage({
                   ))}
                 </select>
               </FormField>
-              <ActionButton type="submit">Ofertar en esta necesidad</ActionButton>
+              <ActionButton type="submit">
+                Ofertar en esta necesidad
+              </ActionButton>
             </form>
           )}
         </section>

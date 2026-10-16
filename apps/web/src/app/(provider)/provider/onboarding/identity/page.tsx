@@ -46,7 +46,12 @@ export default async function ProviderOnboardingIdentityPage() {
       <MobileAppBar title="Tu identidad" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-center gap-3">
-          <IllustratedBadge tone="green" icon="shield" size="md" label="Paso 2 de 4" />
+          <IllustratedBadge
+            tone="green"
+            icon="shield"
+            size="md"
+            label="Paso 2 de 4"
+          />
           <div>
             <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Paso 2 de 4
@@ -57,7 +62,8 @@ export default async function ProviderOnboardingIdentityPage() {
           </div>
         </div>
         <p className="text-ink/70 mt-2 text-sm leading-6">
-          Solo vos ves esto. Nadie más.
+          Estos datos no son públicos. Solo el equipo autorizado de YALO puede
+          revisarlos para verificar tu identidad.
         </p>
 
         <div className="mt-4">

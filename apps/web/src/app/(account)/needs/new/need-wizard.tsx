@@ -125,7 +125,7 @@ export function NeedWizard({
         {["Qué necesitás", "Cuándo y dónde", "Revisar"].map((label, index) => (
           <div
             key={label}
-            className={`rounded-xl px-2 py-3 text-center text-xs font-bold ${index === step ? "bg-ink text-white" : "bg-surface text-ink/60"}`}
+            className={`rounded-xl px-2 py-3 text-center text-xs font-bold ${index === step ? "bg-[#132538] text-[#65EC91]" : "bg-surface text-ink/60"}`}
             aria-current={index === step ? "step" : undefined}
           >
             {index + 1}. {label}
@@ -249,6 +249,13 @@ export function NeedWizard({
           </h2>
           <dl className="mt-3 grid gap-3 text-sm">
             <div>
+              <dt className="text-ink/60">Rubro</dt>
+              <dd className="font-bold">
+                {skills.find((skill) => skill.id === draft.skillId)?.name ??
+                  "Sin seleccionar"}
+              </dd>
+            </div>
+            <div>
               <dt className="text-ink/60">Trabajo</dt>
               <dd className="font-bold">{draft.title}</dd>
             </div>
@@ -259,6 +266,18 @@ export function NeedWizard({
             <div>
               <dt className="text-ink/60">Zona</dt>
               <dd>{draft.locationText || "A coordinar"}</dd>
+            </div>
+            <div>
+              <dt className="text-ink/60">Horario</dt>
+              <dd>
+                {draft.scheduleStartAt
+                  ? new Date(draft.scheduleStartAt).toLocaleString("es-AR")
+                  : "A coordinar"}
+                {draft.scheduleEndAt
+                  ? " — " +
+                    new Date(draft.scheduleEndAt).toLocaleString("es-AR")
+                  : ""}
+              </dd>
             </div>
             <div>
               <dt className="text-ink/60">Presupuesto</dt>

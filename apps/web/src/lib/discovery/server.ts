@@ -83,11 +83,21 @@ export async function searchDiscovery(
     "search_discovery_services_v4",
     args,
   );
-  const rows = safeDiscoveryRows(data);
+  const allRows = safeDiscoveryRows(data);
+  // Do not promote explicitly labeled test listings in the public catalog.
+  // The underlying records stay untouched for development and administration.
+  const rows =
+    process.env.NODE_ENV === "production"
+      ? allRows.filter(
+          (row) =>
+            !/\(\s*prueba\s*\)\s*$/i.test(row.service_title) &&
+            row.category_slug !== "prueba-emulador",
+        )
+      : allRows;
 
   return {
     rows,
-    hasMore: rows[0]?.has_more ?? false,
+    hasMore: allRows[0]?.has_more ?? false,
     error: error?.message ?? null,
   };
 }

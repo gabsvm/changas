@@ -25,15 +25,15 @@ import {
   type ProposalSummary,
 } from "@/lib/proposals/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  listConversationJobs,
-  type ConversationJob,
-} from "@/lib/jobs/server";
+import { listConversationJobs, type ConversationJob } from "@/lib/jobs/server";
 import {
   getJobNextAction,
   getJobTracking,
 } from "@/components/jobs/job-tracking";
-import { JOB_TERMINAL_STATUSES, getJobStatusPresentation } from "@/lib/ui/job-status";
+import {
+  JOB_TERMINAL_STATUSES,
+  getJobStatusPresentation,
+} from "@/lib/ui/job-status";
 import { GuideHeader } from "@/components/ui/guided";
 import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 
@@ -97,7 +97,10 @@ export default async function ConversationPage({
     conversationJobs = [];
   }
   const jobByVersion = new Map(
-    conversationJobs.map((job) => [job.accepted_proposal_version_id, job.job_id]),
+    conversationJobs.map((job) => [
+      job.accepted_proposal_version_id,
+      job.job_id,
+    ]),
   );
   const currentUserIsClient = user.id === context.client_user_id;
   const peerUserId = currentUserIsClient
@@ -114,10 +117,14 @@ export default async function ConversationPage({
     .select("instant_booking_enabled")
     .eq("id", context.service_id)
     .maybeSingle();
-  const canOfferInstant = !preauthError && preauthService?.instant_booking_enabled === true;
-  const defaultProposalKind = proposalKinds.includes(requestedKind as ProposalKind)
+  const canOfferInstant =
+    !preauthError && preauthService?.instant_booking_enabled === true;
+  const defaultProposalKind = proposalKinds.includes(
+    requestedKind as ProposalKind,
+  )
     ? (requestedKind as ProposalKind)
-    : undefined;  const proposalStatusLabels: Record<
+    : undefined;
+  const proposalStatusLabels: Record<
     ProposalSummary["proposal_status"],
     string
   > = {
@@ -214,7 +221,9 @@ export default async function ConversationPage({
 
   return (
     <section className="space-y-4 py-4 sm:py-6">
-      <GuideHeader step={3} steps={CLIENT_HIRE_STEPS} />
+      {currentUserIsClient && conversationJobs.length === 0 ? (
+        <GuideHeader step={3} steps={CLIENT_HIRE_STEPS} />
+      ) : null}
       <ConversationThread
         key={threadVersion}
         conversationId={conversationId}

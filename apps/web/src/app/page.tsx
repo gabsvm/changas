@@ -271,15 +271,22 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="yalo-category-grid">
-            {(categories ?? []).map((category) => (
-              <CategoryTile
-                key={category.slug}
-                href={"/categoria/" + category.slug}
-                label={category.name}
-                description={category.description}
-                icon={category.slug}
-              />
-            ))}
+            {(categories ?? [])
+              .filter(
+                (category) =>
+                  process.env.NODE_ENV !== "production" ||
+                  (category.slug !== "prueba-emulador" &&
+                    !/prueba emulador/i.test(category.name)),
+              )
+              .map((category) => (
+                <CategoryTile
+                  key={category.slug}
+                  href={"/categoria/" + category.slug}
+                  label={category.name}
+                  description={category.description}
+                  icon={category.slug}
+                />
+              ))}
             {!categories || categories.length === 0 ? (
               <p className="yalo-empty-copy">
                 Explorá los servicios disponibles en YALO.

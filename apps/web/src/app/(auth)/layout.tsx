@@ -44,21 +44,24 @@ export default function AuthLayout({
               YALO
             </span>
           </Link>
-          <span className="text-terracotta text-xs font-extrabold tracking-[0.16em] uppercase">
+          <span className="text-xs font-extrabold tracking-[0.16em] text-[#12D9C5] uppercase">
             Cuenta
           </span>
         </header>
-        <div className="relative flex flex-1 items-center justify-center py-12">
+        <div className="relative flex flex-1 items-center justify-center py-5 sm:py-12">
           <div
-            className="bg-brand-yellow/20 pointer-events-none absolute -top-20 -right-24 h-56 w-56 rounded-full blur-3xl"
+            className="pointer-events-none absolute -top-20 -right-24 h-56 w-56 rounded-full bg-[#08A9F4]/15 blur-3xl"
             aria-hidden="true"
           />
           <div
-            className="bg-brand-orange/10 pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full blur-3xl"
+            className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[#12D9C5]/10 blur-3xl"
             aria-hidden="true"
           />
-          <div className="relative z-10 grid w-full items-center gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
-            <section aria-label="Por qué usar YALO" className="yalo-auth-hero">
+          <div className="relative z-10 grid w-full items-center gap-5 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
+            <section
+              aria-label="Por qué usar YALO"
+              className="yalo-auth-hero order-last lg:order-first"
+            >
               <span
                 className="absolute inset-0 opacity-25"
                 style={{
@@ -111,7 +114,7 @@ export default function AuthLayout({
                 </ul>
               </div>
             </section>
-            <div className="w-full">{children}</div>
+            <div className="order-first w-full lg:order-last">{children}</div>
           </div>
         </div>
         <SiteFooter className="mt-0" />

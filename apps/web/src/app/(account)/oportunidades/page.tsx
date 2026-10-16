@@ -16,9 +16,16 @@ export const metadata = {
     "Necesidades abiertas de clientes en tus rubros para ofertar tu trabajo.",
 };
 
-export default async function OpportunitiesPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+export default async function OpportunitiesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const params = await searchParams;
-  const page = Math.min(10000, Math.max(0, Number.parseInt(params.page ?? "0", 10) || 0));
+  const page = Math.min(
+    10000,
+    Math.max(0, Number.parseInt(params.page ?? "0", 10) || 0),
+  );
   if (!arePublicNeedsEnabled()) return <NeedsComingSoon />;
   const supabase = await createClient();
   const {
@@ -43,8 +50,16 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
       <MobileAppBar title="Oportunidades" backHref="/provider/manage" />
       <nav className="mt-5 flex gap-3" aria-label="Páginas de oportunidades">
-        {page > 0 ? <ActionLink href={`/oportunidades?page=${page - 1}`} tone="secondary">Anterior</ActionLink> : null}
-        {posts.length === 30 ? <ActionLink href={`/oportunidades?page=${page + 1}`} tone="secondary">Siguiente</ActionLink> : null}
+        {page > 0 ? (
+          <ActionLink href={`/oportunidades?page=${page - 1}`} tone="secondary">
+            Anterior
+          </ActionLink>
+        ) : null}
+        {posts.length === 30 ? (
+          <ActionLink href={`/oportunidades?page=${page + 1}`} tone="secondary">
+            Siguiente
+          </ActionLink>
+        ) : null}
       </nav>
       <p className="text-ink/70 mt-2 text-[15px] leading-6">
         Necesidades abiertas en tus rubros. Ofertá con uno de tus servicios y
@@ -64,7 +79,7 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
           {posts.map((post) => (
             <li
               key={post.id}
-              className="border-ink/10 bg-surface rounded-2xl border p-4"
+              className="consumer-card bg-surface rounded-2xl border p-4"
             >
               <p className="text-ink/70 text-[13px] font-bold">
                 {post.skill_name ?? "Rubro"}
