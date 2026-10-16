@@ -6,7 +6,7 @@ const moneyUI = load("../../app/(account)/jobs/[jobId]/external-money-section.ts
 const declareUI = load("../../app/(account)/jobs/[jobId]/external-payment-declaration-form.tsx");
 const actions = load("../../app/(account)/jobs/actions.ts");
 const server = load("./server.ts");
-const migration = load("../../../../supabase/migrations/20261019000000_external_payment_tips.sql");
+const migration = load("../../../../../supabase/migrations/20261019000000_external_payment_tips.sql");
 
 describe("external tip integration regressions", () => {
   it("shows contract versus tips, allowing tip-only declarations", () => {
@@ -17,7 +17,7 @@ describe("external tip integration regressions", () => {
     expect(declareUI).toContain("splitExternalMoneyPayment");
     expect(declareUI).toContain("Dejar una propina");
     expect(declareUI).toContain("Desglose estimado");
-    expect(declareUI).toContain("la otra parte confirma");
+    expect(declareUI).toContain("La otra persona debe confirmar");
   });
 
   it("reports declared money errors inline without route crashes", () => {
