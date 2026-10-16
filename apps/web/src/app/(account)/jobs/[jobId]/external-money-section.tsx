@@ -6,6 +6,9 @@ import {
 } from "@/app/(account)/jobs/actions";
 import {
   externalMoneyStatusLabel,
+  externalMoneyAvailableToConfirm,
+  externalMoneyAvailableToDeclare,
+  canConfirmExternalPayment,
   externalPaymentMethodLabel,
   externalPaymentStateLabel,
   type ExternalMoneyLedger,
@@ -39,14 +42,8 @@ export function ExternalMoneySection({
   declarations: ExternalPaymentDeclaration[];
   defaultAmountMinor: number;
 }) {
-  const availableToConfirmMinor = Math.max(
-    0,
-    ledger.agreedTotalMinor - ledger.confirmedMinor,
-  );
-  const unallocatedMinor = Math.max(
-    0,
-    availableToConfirmMinor - ledger.claimedMinor,
-  );
+  const availableToConfirmMinor = externalMoneyAvailableToConfirm(ledger);
+  const unallocatedMinor = externalMoneyAvailableToDeclare(ledger);
   const pending = declarations.filter(
     (declaration) =>
       declaration.state === "DECLARED_BY_CLIENT" ||
@@ -120,7 +117,7 @@ export function ExternalMoneySection({
             </p>
             {counterpart ? (
               <div className="mt-2 grid gap-2">
-                {declaration.amount_minor > availableToConfirmMinor ? (
+                {!canConfirmExternalPayment(ledger, declaration.amount_minor) ? (
                   <p
                     role="alert"
                     className="border-warning/30 bg-warning/[0.08] text-ink rounded-xl border px-3 py-2.5 text-[13px] leading-5"
@@ -171,7 +168,7 @@ export function ExternalMoneySection({
       })}
 
       {unallocatedMinor > 0 ? (
-      <details className="border-ink/10 rounded-xl border">
+        <details className="border-ink/10 rounded-xl border">
         <summary className="consumer-pressable min-h-[52px] cursor-pointer px-4 py-3 text-sm font-bold">
           {isClient ? "Informar que pagué" : "Registrar dinero recibido"}
         </summary>
@@ -231,7 +228,7 @@ export function ExternalMoneySection({
             Enviar declaración
           </button>
         </form>
-      </details>
+        </details>
       ) : (
         <p
           role="status"
