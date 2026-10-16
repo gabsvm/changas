@@ -77,7 +77,12 @@ export default async function SearchPage({
     supabase.auth.getUser(),
   ]);
   const { rows, hasMore } = searchResult;
-  const categories = categoriesResult.data ?? [];
+  const categories = (categoriesResult.data ?? []).filter(
+    (category) =>
+      process.env.NODE_ENV !== "production" ||
+      (category.slug !== "prueba-emulador" &&
+        !/prueba emulador/i.test(category.name)),
+  );
   const skills = skillsResult.data ?? [];
   const activeCategory = categories.find(
     (item) => item.slug === filters.categorySlug,
@@ -153,7 +158,7 @@ export default async function SearchPage({
         <GuideHeader
           step={1}
           steps={CLIENT_HIRE_STEPS}
-          className="mt-4 sm:mt-6"
+          className="mt-4 hidden sm:mt-6 sm:block"
         />
 
         <section className="pt-3 sm:pt-8">

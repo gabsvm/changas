@@ -55,7 +55,9 @@ function hasPaidExtras(job: UpcomingJob): boolean {
 
 function settlementLabel(job: UpcomingJob): string | null {
   if (job.settlement_status === "DUE")
-    return job.is_client ? "Pago externo sin confirmar" : "Cobro externo sin confirmar";
+    return job.is_client
+      ? "Pago externo sin confirmar"
+      : "Cobro externo sin confirmar";
   if (job.settlement_status === "SETTLED") return "Pagado";
   return null;
 }
@@ -145,31 +147,41 @@ export default async function JobsPage({
         {(() => {
           const next = getClientNextAction({
             activeJobs: bannerJobs.filter((job) =>
-              ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(job.job_status),
+              ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
+                job.job_status,
+              ),
             ).length,
-            pendingPayment: bannerJobs.some((job) => job.settlement_status === "DUE"),
+            pendingPayment: bannerJobs.some(
+              (job) => job.settlement_status === "DUE",
+            ),
             paymentsEnabled,
           });
           return (
-            <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-4" />
+            <NextStepBanner
+              title={next.title}
+              hint={next.hint}
+              cta={next.cta}
+              href={next.href}
+              className="mt-4"
+            />
           );
         })()}
 
         {arePublicNeedsEnabled() ? (
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-          <Link
-            href="/needs/new"
-            className="consumer-pressable bg-surface border-ink/[0.08] inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border px-4 text-sm font-bold"
-          >
-            Publicar una necesidad y comparar ofertas
-          </Link>
-          <Link
-            href="/needs"
-            className="consumer-pressable inline-flex min-h-11 flex-1 items-center justify-center rounded-xl px-4 text-sm font-bold text-ink/70 hover:bg-ink/[0.045]"
-          >
-            Ver mis necesidades
-          </Link>
-        </div>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <Link
+              href="/needs/new"
+              className="consumer-pressable bg-surface border-ink/[0.08] inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border px-4 text-sm font-bold"
+            >
+              Publicar una necesidad y comparar ofertas
+            </Link>
+            <Link
+              href="/needs"
+              className="consumer-pressable text-ink/70 hover:bg-ink/[0.045] inline-flex min-h-11 flex-1 items-center justify-center rounded-xl px-4 text-sm font-bold"
+            >
+              Ver mis necesidades
+            </Link>
+          </div>
         ) : null}
         <nav
           className="mt-4 flex gap-2 overflow-x-auto"
@@ -256,7 +268,7 @@ export default async function JobsPage({
                     className="relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl text-base font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                     style={{
                       backgroundImage:
-                        "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)",
+                        "linear-gradient(135deg, #08A9F4 0%, #125C75 100%)",
                     }}
                     aria-hidden="true"
                   >
@@ -284,7 +296,7 @@ export default async function JobsPage({
                     </span>
                   </span>
                   {amount || action ? (
-                    <span className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="flex max-w-[42%] shrink-0 flex-col items-end gap-1 text-right sm:max-w-none">
                       {amount ? (
                         <span className="text-[15px] font-extrabold">
                           {amount}

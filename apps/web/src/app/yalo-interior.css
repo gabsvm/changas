@@ -51,7 +51,6 @@
   position: sticky;
   top: max(10px, env(safe-area-inset-top));
   z-index: 40;
-  display: flex;
   align-items: center;
   min-height: 66px;
   margin: 12px 0 15px;
@@ -512,4 +511,31 @@
   .yalo-ui .yalo-category-hero form > button {
     width: 100%;
   }
+}
+
+/* Keep responsive visibility intact despite the shared glass header. */
+.yalo-ui .yalo-auth-header {
+  display: flex;
+}
+.yalo-ui .yalo-account-header {
+  display: none;
+}
+@media (min-width: 640px) {
+  .yalo-ui .yalo-account-header {
+    display: flex;
+  }
+  .yalo-ui .yalo-interior-header.sm\:hidden {
+    display: none;
+  }
+}
+@media (max-width: 639px) {
+  .yalo-ui .yalo-interior-header {
+    display: flex;
+  }
+  .yalo-ui .service-card-shell .aspect-video {
+    aspect-ratio: 1.95;
+  }
+}
+.yalo-ui .service-card-shell .aspect-video {
+  max-height: 245px;
 }

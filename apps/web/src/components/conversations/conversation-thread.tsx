@@ -291,8 +291,11 @@ export function ConversationThread({
           first.created_at,
           first.message_id,
         );
-        setMessages((current) => mergeConversationMessages(older, current));
-        setHasOlder(older.length === 50);
+        setMessages((current) =>
+          mergeConversationMessages(older.messages, current),
+        );
+        setOlderAttachments((current) => [...current, ...older.attachments]);
+        setHasOlder(older.messages.length === 50);
       } catch (error) {
         prependAnchorRef.current = null;
         console.error(
@@ -322,15 +325,18 @@ export function ConversationThread({
     });
   }
 
+  const [olderAttachments, setOlderAttachments] = useState<
+    ConversationAttachmentSummary[]
+  >([]);
   const attachmentsByMessage = useMemo(() => {
     const map = new Map<string, ConversationAttachmentSummary[]>();
-    for (const attachment of initialAttachments) {
+    for (const attachment of [...initialAttachments, ...olderAttachments]) {
       const items = map.get(attachment.messageId) ?? [];
       items.push(attachment);
       map.set(attachment.messageId, items);
     }
     return map;
-  }, [initialAttachments]);
+  }, [initialAttachments, olderAttachments]);
   const waitingForReply =
     messages.length > 0 && messages.at(-1)?.sender_user_id === currentUserId;
   const handleSent = useCallback(() => {
@@ -798,7 +804,11 @@ function TextComposer({
   }
 
   return (
-    <form ref={formRef} onSubmit={submit} className="flex items-end gap-2">
+    <form
+      ref={formRef}
+      onSubmit={submit}
+      className="flex flex-wrap items-end gap-2"
+    >
       <input type="hidden" name="conversationId" value={conversationId} />
       <input
         ref={nonceRef}
@@ -817,7 +827,7 @@ function TextComposer({
         enterKeyHint="send"
         autoCapitalize="sentences"
         autoComplete="off"
-        className="border-ink/[0.1] placeholder:text-ink/40 focus:border-focus/50 min-h-[52px] flex-1 resize-none rounded-2xl border bg-white px-4 py-3.5 text-base outline-none dark:bg-white/[0.06]"
+        className="border-ink/[0.1] placeholder:text-ink/40 focus:border-focus/50 min-h-[52px] min-w-0 flex-1 resize-none rounded-2xl border bg-white px-4 py-3.5 text-base outline-none dark:bg-white/[0.06]"
       />
       <button
         type="submit"
@@ -844,7 +854,7 @@ function TextComposer({
         )}
       </button>
       {state.status === "WARNING" && !warningDismissed ? (
-        <div className="border-warning/25 bg-surface relative mt-2 rounded-2xl border p-4 shadow-lg">
+        <div className="border-warning/25 bg-surface relative order-last w-full basis-full rounded-2xl border p-4 shadow-lg">
           <p className="text-warning text-sm font-semibold">
             Revisá antes de enviar
           </p>

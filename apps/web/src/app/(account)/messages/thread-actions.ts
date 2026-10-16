@@ -3,6 +3,10 @@
 import { revalidatePath } from "next/cache";
 
 import { isUuid } from "@changas/validation";
+import {
+  listConversationAttachments,
+  type ConversationAttachmentSummary,
+} from "@/lib/conversations/attachments";
 
 import {
   listConversationMessages,
@@ -23,17 +27,24 @@ export async function loadOlderMessages(
   conversationId: string,
   beforeCreatedAt: string,
   beforeId: string,
-): Promise<ConversationMessage[]> {
+): Promise<{
+  messages: ConversationMessage[];
+  attachments: ConversationAttachmentSummary[];
+}> {
   assertUuid(conversationId);
   assertUuid(beforeId);
   if (!Number.isFinite(Date.parse(beforeCreatedAt))) {
     throw new Error("Cursor inválido.");
   }
 
-  return listConversationMessages(conversationId, {
+  const messages = await listConversationMessages(conversationId, {
     beforeCreatedAt,
     beforeId,
   });
+  const attachments = await listConversationAttachments(
+    messages.map((message) => message.message_id),
+  );
+  return { messages, attachments };
 }
 
 export async function markConversationReadAction(

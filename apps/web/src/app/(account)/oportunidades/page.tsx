@@ -16,9 +16,16 @@ export const metadata = {
     "Necesidades abiertas de clientes en tus rubros para ofertar tu trabajo.",
 };
 
-export default async function OpportunitiesPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+export default async function OpportunitiesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const params = await searchParams;
-  const page = Math.min(10000, Math.max(0, Number.parseInt(params.page ?? "0", 10) || 0));
+  const page = Math.min(
+    10000,
+    Math.max(0, Number.parseInt(params.page ?? "0", 10) || 0),
+  );
   if (!arePublicNeedsEnabled()) return <NeedsComingSoon />;
   const supabase = await createClient();
   const {
@@ -33,18 +40,25 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
     .eq("provider_user_id", user.id);
   const skillIds = (mySkills ?? []).map((row) => row.skill_id);
 
-  const posts = skillIds.length
-    ? (await listOpenJobPosts({ skillIds, limit: 30, page })).filter(
-        (post) => post.owner_user_id !== user.id,
-      )
+  const allPosts = skillIds.length
+    ? await listOpenJobPosts({ skillIds, limit: 30, page })
     : [];
+  const posts = allPosts.filter((post) => post.owner_user_id !== user.id);
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
       <MobileAppBar title="Oportunidades" backHref="/provider/manage" />
       <nav className="mt-5 flex gap-3" aria-label="Páginas de oportunidades">
-        {page > 0 ? <ActionLink href={`/oportunidades?page=${page - 1}`} tone="secondary">Anterior</ActionLink> : null}
-        {posts.length === 30 ? <ActionLink href={`/oportunidades?page=${page + 1}`} tone="secondary">Siguiente</ActionLink> : null}
+        {page > 0 ? (
+          <ActionLink href={`/oportunidades?page=${page - 1}`} tone="secondary">
+            Anterior
+          </ActionLink>
+        ) : null}
+        {allPosts.length === 30 ? (
+          <ActionLink href={`/oportunidades?page=${page + 1}`} tone="secondary">
+            Siguiente
+          </ActionLink>
+        ) : null}
       </nav>
       <p className="text-ink/70 mt-2 text-[15px] leading-6">
         Necesidades abiertas en tus rubros. Ofertá con uno de tus servicios y
@@ -53,10 +67,24 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
       {posts.length === 0 ? (
         <div className="mt-6">
           <EmptyState
-            title="No hay oportunidades en tus rubros"
-            description="Agregá más rubros a tu perfil o volvé más tarde: las necesidades nuevas aparecen acá."
-            actionHref="/provider/manage"
-            actionLabel="Gestionar mis rubros"
+            title={
+              allPosts.length === 30
+                ? "Todavía hay más oportunidades por revisar"
+                : "No hay oportunidades en tus rubros"
+            }
+            description={
+              allPosts.length === 30
+                ? "En este grupo no encontramos propuestas ajenas. Podés seguir revisando las siguientes."
+                : "Agregá más rubros a tu perfil o volvé más tarde: las necesidades nuevas aparecen acá."
+            }
+            actionHref={
+              allPosts.length === 30
+                ? "/oportunidades?page=" + (page + 1)
+                : "/provider/manage"
+            }
+            actionLabel={
+              allPosts.length === 30 ? "Ver siguientes" : "Gestionar mis rubros"
+            }
           />
         </div>
       ) : (
@@ -64,7 +92,7 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
           {posts.map((post) => (
             <li
               key={post.id}
-              className="border-ink/10 bg-surface rounded-2xl border p-4"
+              className="consumer-card bg-surface rounded-2xl border p-4"
             >
               <p className="text-ink/70 text-[13px] font-bold">
                 {post.skill_name ?? "Rubro"}

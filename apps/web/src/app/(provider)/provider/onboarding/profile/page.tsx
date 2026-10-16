@@ -48,7 +48,12 @@ export default async function ProviderOnboardingProfilePage() {
       <MobileAppBar title="Tus datos" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-center gap-3">
-          <IllustratedBadge tone="violet" icon="user" size="md" label="Paso 1 de 4" />
+          <IllustratedBadge
+            tone="violet"
+            icon="user"
+            size="md"
+            label="Paso 1 de 4"
+          />
           <div>
             <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Paso 1 de 4
@@ -59,7 +64,7 @@ export default async function ProviderOnboardingProfilePage() {
           </div>
         </div>
         <p className="text-ink/70 mt-2 text-sm leading-6">
-          Nombre y zona. Nada más.
+          Contanos quién sos, en qué zona trabajás y qué servicios ofrecés.
         </p>
 
         <div

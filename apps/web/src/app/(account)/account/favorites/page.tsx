@@ -19,7 +19,7 @@ export default async function FavoritesPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/account/favorites");
 
-  const { data: favorites } = await (
+  const { data: favorites, error: favoritesError } = await (
     supabase as unknown as {
       rpc(name: "list_my_favorite_providers_v2"): Promise<{
         data: Array<{
@@ -45,7 +45,12 @@ export default async function FavoritesPage() {
       <MobileAppBar title="Guardados" backHref="/account" />
       <div className="mx-auto max-w-3xl pt-5 sm:pt-0">
         <div className="flex items-center gap-3">
-          <IllustratedBadge tone="rose" icon="heart" size="md" label="Guardados" />
+          <IllustratedBadge
+            tone="rose"
+            icon="heart"
+            size="md"
+            label="Guardados"
+          />
           <div>
             <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Mi cuenta
@@ -59,7 +64,16 @@ export default async function FavoritesPage() {
           Volvé rápido a los profesionales que querés comparar o contratar.
         </p>
 
-        {favorites?.length ? (
+        {favoritesError ? (
+          <EmptyState
+            title="No pudimos cargar tus guardados"
+            description="Tus profesionales guardados siguen en tu cuenta. Probá de nuevo en unos momentos."
+            actionHref="/account/favorites"
+            actionLabel="Reintentar"
+            actionTone="secondary"
+            className="pt-14"
+          />
+        ) : favorites?.length ? (
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {favorites.map((provider) => {
               const rating =
