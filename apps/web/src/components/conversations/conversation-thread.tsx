@@ -464,7 +464,7 @@ export function ConversationThread({
               </svg>
               <span className="sr-only">Opciones de conversación</span>
             </summary>
-            <div className="border-ink/[0.08] bg-surface absolute right-0 z-40 mt-2 w-60 max-w-[70vw] rounded-2xl border p-2 shadow-lg>
+            <div className="border-ink/[0.08] bg-surface absolute right-0 z-40 mt-2 w-60 max-w-[70vw] rounded-2xl border p-2 shadow-lg">
               <button
                 type="button"
                 onClick={toggleBlock}
