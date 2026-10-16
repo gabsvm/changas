@@ -46,13 +46,13 @@ export default async function AdminProvidersPage({
 
       <form className="flex gap-2" method="get">
         <input
-          className="min-w-0 flex-1 border border-ink/10 bg-white px-4 py-3 text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
+          className="border-ink/10 text-ink min-w-0 flex-1 border bg-white px-4 py-3 dark:border-white/10 dark:bg-white/10 dark:text-white"
           name="q"
           defaultValue={query}
           placeholder="Nombre, email o slug"
           aria-label="Buscar prestador"
         />
-        <button className="min-h-12 rounded-2xl bg-[#ff6b35] px-4 py-3 text-sm font-extrabold text-[#10131a]">
+        <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
           Buscar
         </button>
       </form>
@@ -61,13 +61,13 @@ export default async function AdminProvidersPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-[11px] font-extrabold tracking-[0.14em] text-ink/60 uppercase">
+              <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.14em] uppercase">
                 Prestador seleccionado
               </p>
-              <h2 className="mt-1 truncate font-display text-xl font-extrabold text-ink">
+              <h2 className="font-display text-ink mt-1 truncate text-xl font-extrabold">
                 {detail.display_name ?? detail.public_slug}
               </h2>
-              <p className="mt-1 truncate text-sm text-ink/70">
+              <p className="text-ink/70 mt-1 truncate text-sm">
                 {detail.email ?? "Sin email"}
               </p>
             </div>
@@ -88,13 +88,11 @@ export default async function AdminProvidersPage({
               ],
             ].map(([label, value]) => (
               <div
-                className="rounded-2xl border border-ink/[0.08] bg-surface p-3"
+                className="border-ink/[0.08] bg-surface rounded-2xl border p-3"
                 key={label}
               >
-                <p className="text-[11px] font-bold text-ink/60">{label}</p>
-                <p className="mt-1 text-sm font-extrabold text-ink">
-                  {value}
-                </p>
+                <p className="text-ink/60 text-[11px] font-bold">{label}</p>
+                <p className="text-ink mt-1 text-sm font-extrabold">{value}</p>
               </div>
             ))}
           </div>
@@ -104,8 +102,8 @@ export default async function AdminProvidersPage({
             providerStatus={detail.status}
           />
 
-          <details className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
-            <summary className="cursor-pointer text-sm font-extrabold text-ink">
+          <details className="border-ink/[0.08] bg-surface rounded-2xl border p-3">
+            <summary className="text-ink cursor-pointer text-sm font-extrabold">
               Restricciones operativas
             </summary>
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -117,7 +115,7 @@ export default async function AdminProvidersPage({
                 />
                 <input type="hidden" name="kind" value="RESTRICTED" />
                 <input
-                  className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
+                  className="border-ink/10 text-ink w-full border bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="reason"
                   required
                   minLength={3}
@@ -135,7 +133,7 @@ export default async function AdminProvidersPage({
                 />
                 <input type="hidden" name="kind" value="SUSPENDED" />
                 <input
-                  className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
+                  className="border-ink/10 text-ink w-full border bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="reason"
                   required
                   minLength={3}
@@ -152,11 +150,11 @@ export default async function AdminProvidersPage({
                   value={detail.provider_user_id}
                 />
                 <input
-                  className="w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
+                  className="border-ink/10 text-ink w-full border bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="reason"
                   placeholder="Motivo"
                 />
-                <button className="mt-2 min-h-11 w-full rounded-xl border border-ink/[0.08] px-3 py-2 text-sm font-extrabold text-ink">
+                <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-extrabold">
                   Restaurar
                 </button>
               </form>
@@ -167,65 +165,118 @@ export default async function AdminProvidersPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-base font-extrabold text-ink">
+          <h2 className="font-display text-ink text-base font-extrabold">
             Prestadores registrados
           </h2>
-          <span className="rounded-full border border-ink/[0.08] bg-surface px-2.5 py-1 text-xs font-bold text-ink/70">
+          <span className="border-ink/[0.08] bg-surface text-ink/70 rounded-full border px-2.5 py-1 text-xs font-bold">
             {providers.length}
           </span>
         </div>
 
         {providers.length ? (
-          <div className="consumer-scrollbar-none -mx-1 overflow-x-auto px-1">
-          <table className="w-full min-w-[640px] border-separate border-spacing-2">
-            <caption className="sr-only">
-              Prestadores registrados ({providers.length})
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
-                  Prestador
-                </th>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
-                  Contacto
-                </th>
-                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
-                  Estado
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            <div
+              className="grid gap-3 md:hidden"
+              aria-label="Prestadores registrados"
+            >
               {providers.map((provider) => (
-                <tr
+                <Link
                   key={provider.provider_user_id}
-                  className="rounded-3xl border border-ink/[0.08] bg-surface transition-colors hover:border-brand-orange/30 hover:bg-ink/[0.04]"
+                  href={
+                    "/admin/providers?q=" +
+                    encodeURIComponent(query) +
+                    "&provider=" +
+                    provider.provider_user_id
+                  }
+                  className="admin-mobile-record consumer-pressable consumer-card bg-surface flex flex-col gap-2 rounded-2xl p-4"
                 >
-                  <th scope="row" className="min-w-0 rounded-l-3xl p-4 text-left">
-                    <Link
-                      className="block truncate text-sm font-extrabold text-ink hover:underline"
-                      href={`/admin/providers?q=${encodeURIComponent(query)}&provider=${provider.provider_user_id}`}
-                    >
+                  <span className="flex items-start justify-between gap-3">
+                    <span className="text-ink min-w-0 font-extrabold">
                       {provider.display_name ?? provider.public_slug}
-                    </Link>
-                    <span className="mt-2 block text-[11px] font-bold text-ink/60">
-                      Paso {provider.onboarding_step}/4 ·{" "}
-                      {provider.document_count} docs
                     </span>
-                  </th>
-                  <td className="max-w-45 truncate p-4 text-xs text-ink/70">
+                    <span className="shrink-0">
+                      <AdminStatusBadge
+                        label={statusLabel(provider.status)}
+                        tone={providerTone(provider.status)}
+                      />
+                    </span>
+                  </span>
+                  <span className="text-ink/70 text-xs leading-5 break-all">
                     {provider.email ?? provider.public_slug}
-                  </td>
-                  <td className="rounded-r-3xl p-4 text-right">
-                    <AdminStatusBadge
-                      label={statusLabel(provider.status)}
-                      tone={providerTone(provider.status)}
-                    />
-                  </td>
-                </tr>
+                  </span>
+                  <span className="text-ink/70 text-xs">
+                    Paso {provider.onboarding_step}/4 ·{" "}
+                    {provider.document_count} documentos
+                  </span>
+                  <span className="text-xs font-semibold text-[#12D9C5]">
+                    Ver prestador y controles →
+                  </span>
+                </Link>
               ))}
-            </tbody>
-          </table>
-          </div>
+            </div>
+            <div className="-mx-1 hidden overflow-x-auto px-1 md:block">
+              <table className="w-full min-w-[640px] border-separate border-spacing-2">
+                <caption className="sr-only">
+                  Prestadores registrados ({providers.length})
+                </caption>
+                <thead>
+                  <tr>
+                    <th
+                      scope="col"
+                      className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                    >
+                      Prestador
+                    </th>
+                    <th
+                      scope="col"
+                      className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                    >
+                      Contacto
+                    </th>
+                    <th
+                      scope="col"
+                      className="text-ink/70 px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] uppercase"
+                    >
+                      Estado
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {providers.map((provider) => (
+                    <tr
+                      key={provider.provider_user_id}
+                      className="border-ink/[0.08] bg-surface hover:bg-ink/[0.04] rounded-3xl border transition-colors hover:border-[#12D9C5]/30"
+                    >
+                      <th
+                        scope="row"
+                        className="min-w-0 rounded-l-3xl p-4 text-left"
+                      >
+                        <Link
+                          className="text-ink block truncate text-sm font-extrabold hover:underline"
+                          href={`/admin/providers?q=${encodeURIComponent(query)}&provider=${provider.provider_user_id}`}
+                        >
+                          {provider.display_name ?? provider.public_slug}
+                        </Link>
+                        <span className="text-ink/60 mt-2 block text-[11px] font-bold">
+                          Paso {provider.onboarding_step}/4 ·{" "}
+                          {provider.document_count} docs
+                        </span>
+                      </th>
+                      <td className="text-ink/70 max-w-45 truncate p-4 text-xs">
+                        {provider.email ?? provider.public_slug}
+                      </td>
+                      <td className="rounded-r-3xl p-4 text-right">
+                        <AdminStatusBadge
+                          label={statusLabel(provider.status)}
+                          tone={providerTone(provider.status)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         ) : (
           <AdminEmptyState
             title="No hay prestadores"

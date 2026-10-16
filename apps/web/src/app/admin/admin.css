@@ -4,10 +4,10 @@
   --admin-surface-2: #f3efe9;
   --admin-border: rgb(23 20 15 / 8%);
   --admin-muted: rgb(23 20 15 / 65%);
-  --admin-orange: #ff6b35;
-  --admin-yellow: #ffc857;
+  --admin-orange: #08a9f4;
+  --admin-yellow: #65ec91;
   --admin-blue: #2563eb;
-  --admin-pink: #d60060;
+  --admin-pink: #12d9c5;
   color-scheme: light;
   background: var(--admin-bg);
 }
@@ -20,8 +20,8 @@
   --admin-muted: #98a2b3;
   color-scheme: dark;
   background:
-    radial-gradient(circle at 92% 4%, rgb(255 107 53 / 8%), transparent 28rem),
-    radial-gradient(circle at 10% 80%, rgb(37 99 235 / 5%), transparent 24rem),
+    radial-gradient(circle at 92% 4%, rgb(8 169 244 / 10%), transparent 28rem),
+    radial-gradient(circle at 10% 80%, rgb(18 217 197 / 7%), transparent 24rem),
     var(--admin-bg);
 }
 
@@ -74,7 +74,7 @@
 .admin-shell .bg-slate-950,
 .admin-shell .bg-slate-900 {
   background-color: var(--admin-orange);
-  color: #10131a;
+  color: #051d29;
 }
 
 .admin-shell .hover\:bg-slate-100:hover,
@@ -125,8 +125,8 @@
 .admin-shell input:focus,
 .admin-shell select:focus,
 .admin-shell textarea:focus {
-  border-color: rgb(255 107 53 / 70%);
-  outline: 2px solid rgb(255 107 53 / 18%);
+  border-color: rgb(18 217 197 / 70%);
+  outline: 2px solid rgb(18 217 197 / 18%);
   outline-offset: 1px;
 }
 
@@ -229,4 +229,26 @@
 }
 .dark .admin-shell td {
   border-color: rgb(39 49 66 / 75%);
+}
+
+/* YALO brand accents; warnings and destructive actions keep their own colors. */
+.admin-shell .text-terracotta {
+  color: #086e78;
+}
+.dark .admin-shell .text-terracotta {
+  color: #72ebe0;
+}
+.admin-shell :focus-visible {
+  outline: 2px solid #12d9c5;
+  outline-offset: 3px;
+}
+.admin-shell .admin-main {
+  background-image: radial-gradient(
+    50rem 25rem at 90% -9rem,
+    rgb(8 169 244 / 5%),
+    transparent 85%
+  );
+}
+.admin-shell .admin-mobile-record {
+  overflow-wrap: anywhere;
 }

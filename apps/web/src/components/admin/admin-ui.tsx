@@ -8,7 +8,7 @@ const toneClasses: Record<Tone, string> = {
   success: "border-success/25 bg-success/10 text-success",
   info: "border-moss/25 bg-moss/10 text-moss",
   danger: "border-danger/25 bg-danger/10 text-danger",
-  pink: "border-brand-orange/25 bg-brand-orange/10 text-terracotta",
+  pink: "border-[#12D9C5]/30 bg-[#12D9C5]/10 text-[#087681] dark:text-[#7BF2E7]",
 };
 
 export function AdminPageHeader({
@@ -28,7 +28,7 @@ export function AdminPageHeader({
         <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
           {eyebrow}
         </p>
-        <h1 className="font-display mt-1 text-2xl font-extrabold tracking-[-0.03em] text-ink sm:text-3xl">
+        <h1 className="font-display text-ink mt-1 text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl">
           {title}
         </h1>
         {description ? (
@@ -115,7 +115,7 @@ export function AdminMetricCard({
           className={`mt-1 h-2.5 w-2.5 rounded-full border ${toneClasses[tone]}`}
         />
       </div>
-      <p className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] text-ink">
+      <p className="font-display text-ink mt-2 text-3xl font-extrabold tracking-[-0.04em]">
         {value}
       </p>
       {hint ? <p className="text-ink/60 mt-1 text-xs">{hint}</p> : null}
