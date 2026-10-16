@@ -40,11 +40,10 @@ export default async function OpportunitiesPage({
     .eq("provider_user_id", user.id);
   const skillIds = (mySkills ?? []).map((row) => row.skill_id);
 
-  const posts = skillIds.length
-    ? (await listOpenJobPosts({ skillIds, limit: 30, page })).filter(
-        (post) => post.owner_user_id !== user.id,
-      )
+  const allPosts = skillIds.length
+    ? await listOpenJobPosts({ skillIds, limit: 30, page })
     : [];
+  const posts = allPosts.filter((post) => post.owner_user_id !== user.id);
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
@@ -55,7 +54,7 @@ export default async function OpportunitiesPage({
             Anterior
           </ActionLink>
         ) : null}
-        {posts.length === 30 ? (
+        {allPosts.length === 30 ? (
           <ActionLink href={`/oportunidades?page=${page + 1}`} tone="secondary">
             Siguiente
           </ActionLink>
@@ -68,10 +67,24 @@ export default async function OpportunitiesPage({
       {posts.length === 0 ? (
         <div className="mt-6">
           <EmptyState
-            title="No hay oportunidades en tus rubros"
-            description="Agregá más rubros a tu perfil o volvé más tarde: las necesidades nuevas aparecen acá."
-            actionHref="/provider/manage"
-            actionLabel="Gestionar mis rubros"
+            title={
+              allPosts.length === 30
+                ? "Todavía hay más oportunidades por revisar"
+                : "No hay oportunidades en tus rubros"
+            }
+            description={
+              allPosts.length === 30
+                ? "En este grupo no encontramos propuestas ajenas. Podés seguir revisando las siguientes."
+                : "Agregá más rubros a tu perfil o volvé más tarde: las necesidades nuevas aparecen acá."
+            }
+            actionHref={
+              allPosts.length === 30
+                ? "/oportunidades?page=" + (page + 1)
+                : "/provider/manage"
+            }
+            actionLabel={
+              allPosts.length === 30 ? "Ver siguientes" : "Gestionar mis rubros"
+            }
           />
         </div>
       ) : (
