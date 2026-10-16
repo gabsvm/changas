@@ -193,11 +193,56 @@ export default async function HomePage() {
               <span>Alguien que sabe hacerlo.</span>
             </h1>
             <p className="yalo-stage-description">
-              De arreglar una canilla a lanzar tu próximo proyecto. Encontrá
-              personas que saben, hablá directo y resolvé a tu manera.
+              ¿Necesitás resolver algo o querés ofrecer lo que sabés hacer?
+              Elegí cómo empezar.
             </p>
 
-            <form action="/buscar" role="search" className="yalo-hero-search">
+            <nav
+              className="yalo-intent"
+              aria-label="Elegí qué querés hacer en YALO"
+            >
+              <div className="yalo-intent-actions">
+                <Link href="/buscar" className="yalo-intent-link yalo-intent-hire">
+                  <span className="yalo-intent-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="23" height="23" fill="none">
+                      <circle cx="10.7" cy="10.7" r="6.3" stroke="currentColor" strokeWidth="2" />
+                      <path d="m15.5 15.5 4.6 4.6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  <span className="yalo-intent-text">
+                    <strong>Quiero contratar</strong>
+                    <span>Encontrar alguien que me ayude</span>
+                  </span>
+                  <span className="yalo-intent-arrow" aria-hidden="true">↗</span>
+                </Link>
+                <Link
+                  href="/provider/onboarding"
+                  className="yalo-intent-link yalo-intent-work"
+                >
+                  <span className="yalo-intent-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="23" height="23" fill="none">
+                      <rect x="3" y="7" width="18" height="13" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M9 7V5.5C9 4.7 9.7 4 10.5 4h3c.8 0 1.5.7 1.5 1.5V7M3 12.5c5.4 3.6 12.6 3.6 18 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  <span className="yalo-intent-text">
+                    <strong>Quiero trabajar</strong>
+                    <span>Ofrecer mis servicios</span>
+                  </span>
+                  <span className="yalo-intent-arrow" aria-hidden="true">↗</span>
+                </Link>
+              </div>
+            </nav>
+
+            <p className="yalo-hero-search-caption">
+              ¿Ya sabés qué necesitás? Buscá directamente
+            </p>
+            <form
+              action="/buscar"
+              role="search"
+              className="yalo-hero-search"
+              aria-label="Buscar servicios"
+            >
               <SearchField
                 id="home-query"
                 name="q"
@@ -371,23 +416,6 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="yalo-final-cta" aria-labelledby="final-cta-title">
-          <div className="yalo-final-cta-glow" aria-hidden="true" />
-          <p className="yalo-section-kicker">TU PRÓXIMO PASO EMPIEZA ACÁ</p>
-          <h2 id="final-cta-title">
-            ¿Tenés algo para resolver
-            <span> o algo para ofrecer?</span>
-          </h2>
-          <p>Dos maneras de crecer. Un mismo lugar para encontrarse.</p>
-          <div className="yalo-final-actions">
-            <Link href="/buscar" className="yalo-button-light">
-              Quiero contratar <span aria-hidden="true">↗</span>
-            </Link>
-            <Link href="/provider/onboarding" className="yalo-button-outline">
-              Quiero trabajar <span aria-hidden="true">↗</span>
-            </Link>
-          </div>
-        </section>
         <SiteFooter className="yalo-showcase-footer" />
       </div>
       <div className="yalo-mobile-bottom-nav">
