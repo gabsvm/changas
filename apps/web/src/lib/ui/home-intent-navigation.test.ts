@@ -11,7 +11,7 @@ describe("home: obvious hire or work entrypoints", () => {
     const stage = home.indexOf('className="yalo-stage"');
     const choices = home.indexOf('className="yalo-intent"');
     const search = home.indexOf('className="yalo-hero-search"');
-    const categories = home.indexOf('className="yalo-category-section"');
+    const categories = home.indexOf('className="yalo-home-section yalo-category-section"');
     // Classes can share a longer className expression; compare section markers instead.
     expect(stage).toBeGreaterThan(-1);
     expect(choices).toBeGreaterThan(stage);
