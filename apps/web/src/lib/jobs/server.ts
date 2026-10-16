@@ -716,6 +716,7 @@ export type ExternalPaymentDeclaration = {
   job_id: string;
   declared_by_user_id: string;
   amount_minor: number;
+  tip_amount_minor: number;
   currency_code: string;
   method: "EFECTIVO" | "TRANSFERENCIA" | "OTRO_ACORDADO";
   paid_on: string | null;
@@ -745,6 +746,7 @@ function asDeclaration(row: Record<string, unknown>): ExternalPaymentDeclaration
     declared_by_user_id: String(row.declared_by_user_id ?? ""),
     amount_minor:
       typeof row.amount_minor === "number" ? row.amount_minor : Number(row.amount_minor ?? 0),
+    tip_amount_minor: Number(row.tip_amount_minor ?? 0),
     currency_code: typeof row.currency_code === "string" ? row.currency_code : "ARS",
     method:
       row.method === "EFECTIVO" ||
@@ -853,7 +855,7 @@ export async function getExternalPaymentLedger(jobId: string): Promise<{
 
 // YALO S4: ledger + historial juntos para la tarjeta de dinero.
 export async function getExternalMoney(jobId: string): Promise<{
-  ledger: { agreedTotalMinor: number; confirmedMinor: number; claimedMinor: number; outstandingMinor: number };
+  ledger: { agreedTotalMinor: number; confirmedMinor: number; claimedMinor: number; outstandingMinor: number; confirmedTipMinor: number };
   declarations: ExternalPaymentDeclaration[];
 } | null> {
   try {
@@ -861,7 +863,10 @@ export async function getExternalMoney(jobId: string): Promise<{
       getExternalPaymentLedger(jobId),
       listExternalDeclarations(jobId),
     ]);
-    return { ledger, declarations };
+    const confirmedTipMinor = declarations
+      .filter((d) => d.state === "CONFIRMED_BY_BOTH")
+      .reduce((sum, d) => sum + d.tip_amount_minor, 0);
+    return { ledger: { ...ledger, confirmedTipMinor }, declarations };
   } catch (error) {
     // Solo la migración pendiente cae al resumen de montos; cualquier otro
     // error (permiso, transitorio) se propaga a la página.
@@ -901,7 +906,7 @@ export async function listExternalDeclarations(
   const { data, error } = await supabase
     .from("external_payment_declarations")
     .select(
-      "id, job_id, declared_by_user_id, amount_minor, currency_code, method, paid_on, reference, state, counterpart_reason, created_at",
+      "id, job_id, declared_by_user_id, amount_minor, tip_amount_minor, currency_code, method, paid_on, reference, state, counterpart_reason, created_at",
     )
     .eq("job_id", jobId)
     .order("created_at", { ascending: true })

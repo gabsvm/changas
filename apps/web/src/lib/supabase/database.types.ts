@@ -265,6 +265,7 @@ type ExternalPaymentDeclarationsRow = {
   job_id: string;
   declared_by_user_id: string;
   amount_minor: number;
+  tip_amount_minor: number;
   currency_code: string;
   method: ExternalPaymentMethod;
   paid_on: string | null;

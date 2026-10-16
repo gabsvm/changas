@@ -48,6 +48,7 @@ export type ExternalMoneyLedger = {
   confirmedMinor: number;
   claimedMinor: number;
   outstandingMinor: number;
+  confirmedTipMinor: number;
 };
 
 /** A pending declaration is not a confirmed payment; never count it twice. */
@@ -64,23 +65,31 @@ export function externalMoneyAvailableToDeclare(
   return Math.max(0, externalMoneyAvailableToConfirm(ledger) - ledger.claimedMinor);
 }
 
-export function canConfirmExternalPayment(
-  ledger: ExternalMoneyLedger,
+/** Allocation preview: first cover the outstanding contract, remainder is a tip.
+ * The authoritative allocation is saved by the database when both parties
+ * confirm the declaration. Pending declarations are estimates only.
+ */
+export function splitExternalMoneyPayment(
+  remainingContractMinor: number,
   amountMinor: number,
-): boolean {
-  return (
-    Number.isSafeInteger(amountMinor) &&
-    amountMinor > 0 &&
-    amountMinor <= externalMoneyAvailableToConfirm(ledger)
-  );
+): { contractMinor: number; tipMinor: number } {
+  if (
+    !Number.isSafeInteger(remainingContractMinor) ||
+    !Number.isSafeInteger(amountMinor) ||
+    amountMinor <= 0
+  ) {
+    return { contractMinor: 0, tipMinor: 0 };
+  }
+  const contractMinor = Math.min(Math.max(0, remainingContractMinor), amountMinor);
+  return { contractMinor, tipMinor: amountMinor - contractMinor };
 }
 
 export function externalMoneyStatusLabel(ledger: ExternalMoneyLedger): string {
-  if (ledger.outstandingMinor <= 0 && ledger.confirmedMinor > 0) {
-    return "Confirmado por ambas partes";
-  }
   if (ledger.claimedMinor > 0) {
     return "Pendiente de confirmación";
+  }
+  if (ledger.outstandingMinor <= 0 && ledger.confirmedMinor > 0) {
+    return "Confirmado por ambas partes";
   }
   if (ledger.confirmedMinor > 0) {
     return "Pago parcial confirmado";
