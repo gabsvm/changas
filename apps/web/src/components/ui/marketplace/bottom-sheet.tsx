@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -33,7 +33,7 @@ export function BottomSheet({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       ref={rootRef}
       className="fixed inset-0 z-[10000] flex items-end justify-center sm:items-center"
@@ -80,6 +80,7 @@ export function BottomSheet({
         </div>
         {children}
       </section>
-    </div>
+    </div>,
+    document.body,
   );
 }
