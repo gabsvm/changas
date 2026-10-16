@@ -384,7 +384,7 @@ export function ConversationThread({
   const showHireAction = currentUserIsClient || actionableProposalId !== null;
 
   return (
-    <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden sm:min-h-[calc(100dvh-4rem)]">
+    <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-clip sm:min-h-[calc(100dvh-4rem)]">
       <header className="border-ink/[0.08] bg-canvas/95 sticky top-0 z-10 overflow-hidden border-b px-4 pt-0 pb-3 backdrop-blur sm:px-6">
         <div
           className="relative -mx-4 mb-3 h-1.5 overflow-hidden sm:-mx-6"
@@ -469,7 +469,7 @@ export function ConversationThread({
         <div
           className={`mt-3 grid gap-2 ${showHireAction ? "grid-cols-2" : "grid-cols-1"}`}
           role="group"
-          aria-label="Cotizar y contratar"
+          aria-label={showHireAction ? "Cotizar y contratar" : "Cotizaciones"}
         >
           {showHireAction ? (
             <button
