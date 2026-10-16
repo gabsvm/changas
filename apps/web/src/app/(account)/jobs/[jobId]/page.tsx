@@ -230,8 +230,23 @@ export default async function JobPage({
   const schedulePrimary =
     detail.schedule_starts_at ?? detail.schedule_deadline_at ?? null;
   const status = getJobStatusPresentation(detail.job_status);
-  const settlementPending = detail.settlement_status === "DUE";
-  const tracking = getJobTracking(detail.job_status, detail.settlement_status);
+  // Offline payment reconciliation is authoritative for this page while
+  // online payments are disabled. A completed, mutually confirmed contract
+  // advances to reviews even when the unrelated checkout status remains DUE.
+  // A pending tip still needs the counterpart's response.
+  const externalMoneyPending =
+    externalMoney !== null &&
+    (externalMoney.ledger.outstandingMinor > 0 ||
+      externalMoney.ledger.claimedMinor > 0);
+  const settlementPending =
+    detail.settlement_status === "DUE" &&
+    (externalMoney === null || externalMoneyPending);
+  const tracking = getJobTracking(
+    detail.job_status,
+    externalMoney !== null && !settlementPending
+      ? "SETTLED"
+      : detail.settlement_status,
+  );
   const nextAction = getJobNextAction({
     status: detail.job_status,
     isClient,
