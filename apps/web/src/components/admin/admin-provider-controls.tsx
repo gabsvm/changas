@@ -28,7 +28,7 @@ export function AdminProviderControls({
       {providerStatus === null ? (
         <form action={prepareProviderAction}>
           <input type="hidden" name="userId" value={userId} />
-          <button className="min-h-12 w-full rounded-2xl bg-[#ff6b35] px-4 py-3 text-sm font-extrabold text-[#10131a] shadow-[0_8px_22px_rgba(255,107,53,0.18)]">
+          <button className="min-h-12 w-full rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a] shadow-[0_8px_22px_rgba(18,217,197,0.18)]">
             Invitar a completar perfil
           </button>
         </form>

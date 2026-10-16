@@ -96,7 +96,7 @@ export default async function AdminPage() {
             </h2>
           </div>
           {hasAttention ? (
-            <span className="border-brand-orange/25 bg-brand-orange/10 text-terracotta rounded-full border px-2.5 py-1 text-xs font-extrabold">
+            <span className="text-terracotta rounded-full border border-[#12D9C5]/25 bg-[#12D9C5]/10 px-2.5 py-1 text-xs font-extrabold">
               Acción requerida
             </span>
           ) : null}
@@ -220,7 +220,7 @@ export default async function AdminPage() {
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {tools.map(([href, title, description]) => (
             <Link
-              className="border-ink/[0.08] hover:border-brand-orange/30 min-h-24 rounded-2xl border bg-white p-4 transition-colors dark:border-white/10 dark:bg-[#2a231c]"
+              className="border-ink/[0.08] min-h-24 rounded-2xl border bg-white p-4 transition-colors hover:border-[#12D9C5]/30 dark:border-white/10 dark:bg-[#1b2b3d]"
               href={href}
               key={href}
             >
