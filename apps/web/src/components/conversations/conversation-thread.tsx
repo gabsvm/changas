@@ -35,6 +35,7 @@ import {
 import type { ConversationAttachmentSummary } from "@/lib/conversations/attachments";
 import type { ConversationMessage } from "@/lib/conversations/messages";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+import { ConversationAttachmentCard } from "./image-lightbox";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { compressInputFiles } from "@/lib/media/image-compression";
 import { createClient } from "@/lib/supabase/client";
@@ -698,41 +699,12 @@ function MessageBubble({
         {attachments.length > 0 ? (
           <div className="space-y-2">
             {attachments.map((attachment) => (
-              <a
+              <ConversationAttachmentCard
                 key={attachment.id}
-                href={`/messages/attachments/${attachment.id}`}
-                className={`block overflow-hidden rounded-xl border ${
-                  own
-                    ? "border-white/20 bg-white/10"
-                    : "border-ink/10 bg-canvas"
-                }`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {attachment.mimeType.startsWith("image/") ? (
-                  <img
-                    src={`/messages/attachments/${attachment.id}`}
-                    alt={attachment.originalName}
-                    loading="lazy"
-                    className="h-40 w-full object-cover"
-                  />
-                ) : null}
-                <span className="block px-3 py-2">
-                  <span className="block truncate font-semibold">
-                    {attachment.mimeType.startsWith("image/")
-                      ? "Imagen"
-                      : "Archivo"}{" "}
-                    · {attachment.originalName}
-                  </span>
-                  <span
-                    className={`text-[11px] ${
-                      own ? "text-white/65" : "text-ink/70"
-                    }`}
-                  >
-                    {formatBytes(attachment.sizeBytes)}
-                  </span>
-                </span>
-              </a>
+                attachment={attachment}
+                own={own}
+                sizeLabel={formatBytes(attachment.sizeBytes)}
+              />
             ))}
           </div>
         ) : message.kind === "IMAGE" || message.kind === "FILE" ? (

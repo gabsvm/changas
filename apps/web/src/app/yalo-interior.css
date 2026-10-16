@@ -539,3 +539,15 @@
 .yalo-ui .service-card-shell .aspect-video {
   max-height: 245px;
 }
+
+/* La acción principal del servicio comparte el acento luminoso de la landing. */
+.yalo-ui .service-hire-top .cta-ink {
+  border: 1px solid rgb(101 236 145 / 35%);
+  background: linear-gradient(112deg, #08a9f4, #12d9c5 62%, #65ec91);
+  color: #062333;
+  box-shadow: 0 10px 30px rgb(18 217 197 / 22%);
+}
+.yalo-ui .service-hire-top .cta-ink:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 12px 34px rgb(18 217 197 / 30%);
+}
