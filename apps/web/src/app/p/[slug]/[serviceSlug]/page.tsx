@@ -149,6 +149,41 @@ export default async function PublicServicePage({
           className="sm:flex"
         />
 
+        <section
+          className="service-hire-top mt-4 rounded-[1.5rem] border border-[#12D9C5]/30 bg-[#132638] px-5 py-5 shadow-[0_16px_40px_rgb(0_0_0/17%)] sm:px-6 sm:py-6"
+          aria-label="Cotización y contratación"
+        >
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[11px] font-extrabold tracking-[0.13em] text-[#83EADA] uppercase">
+                Servicio de {provider.display_name}
+              </p>
+              <h1 className="font-display mt-2 text-[23px] leading-tight font-extrabold tracking-[-0.035em] text-white sm:text-3xl">
+                {service.title}
+              </h1>
+              <p className="mt-2 text-[22px] font-extrabold text-[#9DF6DB]">
+                {price}
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[#B7C9D8]">
+                {instantEligible
+                  ? "Consultá disponibilidad y coordiná la reserva."
+                  : "Conversá con el prestador y acordá los detalles antes de contratar."}
+              </p>
+            </div>
+            <form
+              action={startServiceConversation}
+              className="w-full shrink-0 sm:w-auto sm:min-w-[260px]"
+            >
+              <input type="hidden" name="providerSlug" value={providerSlug} />
+              <input type="hidden" name="serviceSlug" value={serviceSlug} />
+              <input type="hidden" name="hireKind" value={hireKind} />
+              <div className="[&_button]:w-full">
+                <ConsultButton label={hireCtaLabel} />
+              </div>
+            </form>
+          </div>
+        </section>
+
         <GuideHeader step={2} steps={CLIENT_HIRE_STEPS} className="mt-5" />
 
         <article className="service-hero-card consumer-card bg-surface mt-5 overflow-hidden sm:mt-8">
@@ -194,9 +229,6 @@ export default async function PublicServicePage({
               ) : null}
             </div>
 
-            <h1 className="font-display mt-4 text-[24px] leading-8 font-extrabold tracking-[-0.03em] sm:text-4xl sm:leading-10">
-              {service.title}
-            </h1>
             <p className="text-ink/70 mt-3 max-w-2xl text-[15px] leading-7 sm:text-base">
               {service.description}
             </p>
@@ -360,35 +392,6 @@ export default async function PublicServicePage({
                   YALO te acompaña.
                 </p>
               </div>
-            </div>
-          </div>
-          <div className="service-cta-bar service-cta-bar-no-nav bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:static sm:mx-0 sm:mt-8 sm:border-0 sm:bg-transparent sm:p-0">
-            <div className="mx-auto flex max-w-3xl items-stretch gap-3 sm:items-center sm:justify-between">
-              <div className="bg-surface border-ink/[0.08] hidden min-w-40 flex-col justify-center rounded-2xl border px-4 py-2 sm:flex">
-                <p className="text-[15px] leading-5 font-extrabold">{price}</p>
-                <p className="text-ink/70 text-xs">
-                  Alcance y tiempos por chat
-                </p>
-              </div>
-              <form
-                action={startServiceConversation}
-                className="flex min-w-0 flex-1 items-center gap-2"
-              >
-                <input type="hidden" name="providerSlug" value={providerSlug} />
-                <input type="hidden" name="serviceSlug" value={serviceSlug} />
-                <input type="hidden" name="hireKind" value={hireKind} />
-                <div className="bg-surface border-ink/[0.08] flex min-w-0 flex-1 flex-col justify-center rounded-2xl border px-4 py-2 sm:hidden">
-                  <p className="truncate text-[15px] leading-5 font-extrabold">
-                    {price}
-                  </p>
-                  <p className="text-ink/70 truncate text-xs">
-                    {instantEligible
-                      ? "Reserva directa · coordinás día y hora"
-                      : "Por chat · coordinás día y precio"}
-                  </p>
-                </div>
-                <ConsultButton label={hireCtaLabel} />
-              </form>
             </div>
           </div>
         </article>

@@ -47,9 +47,13 @@ describe("public marketplace detail UI", () => {
     expect(searchPage).toContain("clearHref");
   });
 
-  it("keeps fixed CTA bars clear of the system gesture area", () => {
-    expect(servicePage).toContain("service-cta-bar");
-    expect(servicePage).toContain("safe-area-inset-bottom");
+  it("shows hiring above the service details and keeps profile actions safe on mobile", () => {
+    expect(servicePage).toContain("service-hire-top");
+    expect(servicePage.indexOf("service-hire-top")).toBeLessThan(
+      servicePage.indexOf("service-hero-card"),
+    );
+    expect(servicePage).not.toContain("service-cta-bar-no-nav");
+    expect(servicePage).toContain("startServiceConversation");
     expect(providerPage).toContain("service-cta-bar");
     expect(providerPage).toContain("safe-area-inset-bottom");
   });

@@ -218,7 +218,7 @@ describe("marketplace polish contracts", () => {
     expect(serviceSource).toContain("service-hero-card");
     expect(serviceSource).toContain("service-price-panel");
     expect(serviceSource).toContain("<AppHeader");
-    expect(serviceSource).toContain("service-cta-bar");
+    expect(serviceSource).toContain("service-hire-top");
     expect(serviceCardSource).toContain("service-card-shell");
     expect(serviceCardSource).toContain("consumer-card-pressed");
   });
