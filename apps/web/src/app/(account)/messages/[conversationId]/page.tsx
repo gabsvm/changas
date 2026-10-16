@@ -169,7 +169,7 @@ export default async function ConversationPage({
     : null;
   const openProposal =
     proposals.find((proposal) => proposal.proposal_status === "OPEN") ?? null;
-  const hireSpotlight =
+  const actionableProposalId =
     openProposal !== null &&
     openProposal.price_amount !== null &&
     canActorTransitionProposal({
@@ -178,13 +178,7 @@ export default async function ConversationPage({
       from: openProposal.proposal_status,
       to: "ACCEPTED",
     })
-      ? {
-          kind: "hire" as const,
-          title: `Contratar · ${formatMinorUnits(openProposal.price_amount, openProposal.currency_code)}`,
-          sub: "Sin pago por adelantado. Tocá para revisar y confirmar.",
-          cta: "Contratar",
-          href: "#propuestas",
-        }
+      ? openProposal.proposal_id
       : null;
   const spotlightJob =
     conversationJobs.find(
@@ -217,7 +211,7 @@ export default async function ConversationPage({
           helpHref: `/jobs/${spotlightJob.job_id}#ayuda`,
         }
       : null;
-  const spotlight = hireSpotlight ?? jobSpotlight;
+  const spotlight = jobSpotlight;
 
   return (
     <section className="space-y-4 py-4 sm:py-6">
@@ -230,6 +224,9 @@ export default async function ConversationPage({
         currentUserId={user.id}
         peerUserId={peerUserId}
         peerName={peerName}
+        currentUserIsClient={currentUserIsClient}
+        allowDirectBooking={canOfferInstant}
+        actionableProposalId={actionableProposalId}
         serviceTitle={context.service_title}
         providerHref={`/p/${context.provider_slug}/${context.service_slug}`}
         initialMessages={messages}
