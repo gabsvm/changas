@@ -84,7 +84,7 @@ export default async function PublicProviderPage({
 
   const [
     { data: skills },
-    { data: services },
+    { data: rawServices },
     { data: experiences },
     { data: education },
     { data: certifications },
@@ -126,6 +126,13 @@ export default async function PublicProviderPage({
       .select("*")
       .eq("provider_slug", slug),
   ]);
+
+  const services =
+    process.env.NODE_ENV === "production"
+      ? (rawServices ?? []).filter(
+          (service) => !/\(\s*prueba\s*\)\s*$/i.test(service.title),
+        )
+      : rawServices;
 
   return (
     <main
