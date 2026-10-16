@@ -78,8 +78,10 @@ describe("public marketplace detail UI", () => {
     expect(brandHero).toContain("<section");
     expect(brandHero).toContain("<h1");
     expect(categoryTile).toContain("Link");
-    expect(categoryTile).toContain("CategoryIcon");
-    expect(categoryTile).toContain("linear-gradient");
+    expect(categoryTile).toContain("next/image");
+    expect(categoryTile).toContain("PHOTOS");
+    expect(categoryTile).toContain("aria-label");
+    expect(categoryTile).toContain('alt=""');
     expect(nearbyServiceRail).toContain("ServiceCard");
     expect(nearbyServiceRail).toContain("aria-label");
     for (const file of [brandHero, categoryTile, nearbyServiceRail]) {

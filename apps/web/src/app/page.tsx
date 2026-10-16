@@ -1,6 +1,7 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Link from "next/link";
 import "./yalo-showcase.css";
+import "./yalo-category-photography.css";
 import type { Metadata } from "next";
 
 import { parseDiscoveryFilters } from "@changas/domain";

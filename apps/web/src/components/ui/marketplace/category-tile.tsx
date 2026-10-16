@@ -1,37 +1,22 @@
+﻿import Image from "next/image";
 import Link from "next/link";
 
-import { CategoryIcon } from "./category-icon";
+type CategoryPhoto = { match: RegExp; src: string };
 
-type CategoryVisual = {
-  from: string;
-  to: string;
-};
-
-const VISUALS: ReadonlyArray<{ match: RegExp; visual: CategoryVisual }> = [
-  { match: /hogar|limpieza|casa/i, visual: { from: "#243145", to: "#0D121B" } },
+const PHOTOS: readonly CategoryPhoto[] = [
+  { match: /hogar|limpieza|casa/i, src: "/categories/hogar.webp" },
   {
     match: /tecno|comput|inform|diseño|program/i,
-    visual: { from: "#08A9F4", to: "#166491" },
+    src: "/categories/tecnologia.webp",
   },
-  {
-    match: /educa|clase|curso|idioma/i,
-    visual: { from: "#12D9C5", to: "#146962" },
-  },
-  {
-    match: /mascota|perro|gato|paseo/i,
-    visual: { from: "#1D778E", to: "#11445D" },
-  },
+  { match: /educa|clase|curso|idioma/i, src: "/categories/educacion.webp" },
+  { match: /mascota|perro|gato|paseo/i, src: "/categories/mascotas.webp" },
   {
     match: /profesional|admin|contab|legal/i,
-    visual: { from: "#245C80", to: "#132D4A" },
+    src: "/categories/profesionales.webp",
   },
-  {
-    match: /belleza|bienestar|salud|pelu/i,
-    visual: { from: "#3C806B", to: "#144D44" },
-  },
+  { match: /belleza|bienestar|salud|pelu/i, src: "/categories/belleza.webp" },
 ];
-
-const FALLBACK_VISUAL: CategoryVisual = { from: "#A8A29E", to: "#78716C" };
 
 export function CategoryTile({
   href,
@@ -44,38 +29,45 @@ export function CategoryTile({
   description?: string | null;
   icon: string;
 }) {
-  const visual =
-    VISUALS.find((entry) => entry.match.test(icon))?.visual ?? FALLBACK_VISUAL;
+  const src =
+    PHOTOS.find((entry) => entry.match.test(icon))?.src ??
+    "/categories/otros.svg";
+
   return (
     <Link
       href={href}
-      className="consumer-pressable group flex min-w-0 flex-col items-stretch gap-1.5 text-center"
-      aria-label={description ? `${label}: ${description}` : label}
+      className="yalo-category-card group"
+      aria-label={description ? label + ": " + description : label}
     >
-      <span
-        className="relative grid aspect-square w-full place-items-center overflow-hidden rounded-2xl shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] transition-transform duration-200 group-active:scale-[0.96] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
-        style={{
-          backgroundImage: `linear-gradient(135deg, ${visual.from} 0%, ${visual.to} 100%)`,
-        }}
-        aria-hidden="true"
-      >
-        <span
-          className="absolute inset-0 opacity-25"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-            backgroundSize: "12px 12px",
-          }}
+      <span className="yalo-category-photo" aria-hidden="true">
+        <Image
+          src={src}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 46vw, (max-width: 900px) 30vw, 24vw"
+          className="yalo-category-photo-image"
         />
-        <span className="absolute -right-4 -bottom-5 h-16 w-16 rounded-full bg-white/20" />
-        <span className="absolute -top-3 -left-3 h-10 w-10 rounded-full bg-white/15" />
-        <CategoryIcon
-          slug={icon}
-          className="relative h-9 w-9 text-white drop-shadow-[0_2px_6px_rgb(0_0_0/25%)]"
-        />
-      </span>
-      <span className="text-ink line-clamp-2 min-h-8 px-0.5 text-xs leading-4 font-bold">
-        {label}
+        <span className="yalo-category-photo-tone" />
+        <span className="yalo-category-photo-dots" />
+        <span className="yalo-category-photo-orb" />
+        <span className="yalo-category-photo-footer">
+          <span className="yalo-category-photo-title">{label}</span>
+          <span className="yalo-category-photo-arrow">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 18 18 6M8 6h10v10" />
+            </svg>
+          </span>
+        </span>
       </span>
     </Link>
   );
