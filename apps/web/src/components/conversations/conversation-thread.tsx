@@ -382,10 +382,21 @@ export function ConversationThread({
   }
 
   const showHireAction = currentUserIsClient || actionableProposalId !== null;
+  // The dominant action follows the actual hiring state; a client who still
+  // needs a price should see quoting as the primary next step.
+  const hireIsPrimary =
+    actionableProposalId !== null ||
+    (currentUserIsClient && allowDirectBooking && spotlight === null);
+  const actionBase =
+    "consumer-pressable inline-flex min-h-12 min-w-0 items-center justify-center rounded-xl px-2.5 py-2 text-center text-[14px] leading-5 font-extrabold transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-[15px]";
+  const actionPrimary = "cta-ink";
+  // Contrast against the card in both themes: ~3.38:1 light, ~3.62:1 dark.
+  const actionSecondary =
+    "border border-ink/50 bg-surface text-ink shadow-sm hover:bg-ink/[0.04] dark:border-ink/40";
 
   return (
     <div className="consumer-card bg-surface mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-clip sm:min-h-[calc(100dvh-4rem)]">
-      <header className="border-ink/[0.08] bg-canvas/95 sticky top-0 z-10 overflow-hidden border-b px-4 pt-0 pb-3 backdrop-blur sm:px-6">
+      <header className="border-ink/[0.08] bg-canvas/95 sticky top-0 z-20 overflow-visible border-b px-4 pt-0 pb-3 shadow-[0_2px_10px_rgb(13_18_27/6%)] backdrop-blur sm:px-6">
         <div
           className="relative -mx-4 mb-3 h-1.5 overflow-hidden sm:-mx-6"
           style={{
@@ -439,7 +450,7 @@ export function ConversationThread({
               {serviceTitle}
             </Link>
           </div>
-          <details className="relative">
+          <details className="relative z-30">
             <summary className="consumer-pressable hover:bg-ink/[0.05] grid h-12 w-12 cursor-pointer list-none place-items-center rounded-full [&::-webkit-details-marker]:hidden">
               <svg
                 aria-hidden="true"
@@ -453,7 +464,7 @@ export function ConversationThread({
               </svg>
               <span className="sr-only">Opciones de conversación</span>
             </summary>
-            <div className="border-ink/[0.08] bg-surface absolute right-0 mt-2 w-60 max-w-[70vw] rounded-2xl border p-2 shadow-lg">
+            <div className="border-ink/[0.08] bg-surface absolute right-0 z-40 mt-2 w-60 max-w-[70vw] rounded-2xl border p-2 shadow-lg">
               <button
                 type="button"
                 onClick={toggleBlock}
@@ -481,11 +492,14 @@ export function ConversationThread({
                   ? `propuesta-${actionableProposalId}`
                   : "nueva-propuesta"
               }
-              className="consumer-pressable inline-flex min-h-12 items-center justify-center rounded-xl border border-[#65EC91]/40 px-3 text-sm font-extrabold text-[#062333] shadow-[0_8px_24px_rgb(18_217_197/20%)] disabled:cursor-not-allowed disabled:opacity-50"
-              style={{
-                backgroundImage:
-                  "linear-gradient(112deg, #08A9F4, #12D9C5 62%, #65EC91)",
-              }}
+              className={`${actionBase} ${hireIsPrimary ? actionPrimary : actionSecondary}`}
+              aria-label={
+                actionableProposalId
+                  ? "Revisar propuesta y contratar"
+                  : allowDirectBooking
+                    ? "Reservar el servicio"
+                    : "Proponer precio y alcance para contratar"
+              }
             >
               {currentUserIsClient ? "Contratar" : "Aceptar oferta"}
             </button>
@@ -499,13 +513,13 @@ export function ConversationThread({
             }
             disabled={blockedByMe}
             aria-controls="nueva-propuesta"
-            className="consumer-pressable border-ink/15 bg-surface text-ink inline-flex min-h-12 items-center justify-center rounded-xl border px-3 text-sm font-extrabold shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+            className={`${actionBase} ${hireIsPrimary ? actionSecondary : actionPrimary}`}
           >
             {currentUserIsClient ? "Cotizar" : "Enviar cotización"}
           </button>
         </div>
         {currentUserIsClient && !actionableProposalId && !allowDirectBooking ? (
-          <p className="text-ink/70 mt-1.5 text-[11px] leading-4">
+          <p className="text-ink/75 mt-2 text-[12px] leading-[18px] sm:text-[13px]">
             Para contratar, proponé precio y alcance; se confirma cuando la otra parte acepta.
           </p>
         ) : null}
@@ -513,15 +527,12 @@ export function ConversationThread({
           <div
             aria-label={`${spotlight.title}. ${spotlight.sub}`}
             role="group"
-            className="bg-brand-primary-strong mt-3 flex items-center gap-3 rounded-2xl px-4 py-3 text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/50%)]"
+            className="bg-brand-primary-strong mt-2 flex items-center gap-3 rounded-xl px-3 py-2 text-white shadow-sm sm:px-4"
           >
             <span
-              className="relative flex h-2.5 w-2.5 shrink-0"
+              className="bg-success h-2.5 w-2.5 shrink-0 rounded-full"
               aria-hidden="true"
-            >
-              <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-              <span className="bg-success relative inline-flex h-2.5 w-2.5 rounded-full" />
-            </span>
+            />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-extrabold">
                 {spotlight.title}
@@ -561,10 +572,10 @@ export function ConversationThread({
             hasta desbloquearla.
           </div>
         ) : null}
-        {deal ? (
+        {deal && !spotlight ? (
           <a
             href="#propuestas"
-            className="consumer-card consumer-card-pressed consumer-pressable border-ink/[0.08] bg-surface mt-3 flex items-center gap-2.5 rounded-2xl border px-3.5 py-2.5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] transition-all duration-200 hover:-translate-y-0.5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+            className="consumer-pressable border-ink/[0.12] bg-surface mt-2 flex min-h-10 items-center gap-2 rounded-xl border px-3 py-1.5 shadow-sm transition-colors hover:bg-ink/[0.04]"
             aria-label={`Ver acuerdo: ${deal.statusLabel}, ${deal.amountLabel}`}
           >
             <StatusChip tone={deal.statusTone}>{deal.statusLabel}</StatusChip>
