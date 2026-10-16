@@ -4,7 +4,7 @@
 -- Todo hace rollback al final del archivo.
 begin;
 
-select plan(38);
+select plan(48);
 
 -- Estructura: tabla, estados, RLS y firmas.
 select ok(
@@ -280,13 +280,21 @@ select throws_ok(
 );
 
 -- Topes: ni declarar ni confirmar por encima del acuerdo.
-select throws_ok(
-  $$select public.declare_external_payment(
+select ok(
+  public.declare_external_payment(
     (select id from public.jobs where conversation_id = (select id from public.conversations where service_id = '18000000-0000-4000-8000-000000000010')),
     200000, 'EFECTIVO', null, null,
-    '18000000-0000-4000-8000-0000000000b2', null)$$,
-  '22023', 'declared amount exceeds the agreed total',
-  'over-agreement declaration is rejected'
+    '18000000-0000-4000-8000-0000000000b2', null
+  ) is not null,
+  'over-agreement declaration is allowed (pending bilateral confirmation)'
+);
+select is(
+  public.void_external_payment(
+    (select id from public.external_payment_declarations
+     where idempotency_key = '18000000-0000-4000-8000-0000000000b2')
+  ),
+  'VOIDED',
+  'declared but unconfirmed overpayment can still be voided'
 );
 
 -- Confirmar por encima del acuerdo con dos parciales también se rechaza.
@@ -297,13 +305,27 @@ select public.declare_external_payment(
   '18000000-0000-4000-8000-0000000000b9', null
 );
 select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
-select throws_ok(
-  $$select public.respond_external_payment(
+select is(
+  public.respond_external_payment(
     (select id from public.external_payment_declarations
      where idempotency_key = '18000000-0000-4000-8000-0000000000b9'),
-    true, null)$$,
-  '22023', 'confirmed amount exceeds the agreed total',
-  'second partial confirmation past the agreement is rejected'
+    true, null),
+  'CONFIRMED_BY_BOTH',
+  'second payment may exceed the remaining price; excess is a tip'
+);
+select is(
+  (select tip_amount_minor from public.external_payment_declarations
+   where idempotency_key = '18000000-0000-4000-8000-0000000000b9'),
+  10000::bigint,
+  'second confirmed payment allocates 10000 as tip'
+);
+select is(
+  (select external_confirmed_minor from public.external_payment_ledger(
+    (select j.id from public.jobs j
+     where j.service_id = '18000000-0000-4000-8000-000000000010')
+  )),
+  100000::bigint,
+  'contractual confirmed total stays capped at agreed amount'
 );
 
 -- Contestar con motivo congela sin revertir el trabajo.
@@ -505,8 +527,83 @@ select is(
     (select j.id from public.jobs j
      where j.service_id = '18000000-0000-4000-8000-000000000010')
   )),
-  70000::bigint,
-  'confirmed 60000 leaves 70000 including accepted additional'
+  30000::bigint,
+  'confirmed contractual 100000 leaves 30000 after accepted additional'
 );
+-- A third payment finishes the remaining agreement and includes a tip.
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
+select public.declare_external_payment(
+  (select j.id from public.jobs j where j.service_id = '18000000-0000-4000-8000-000000000010'),
+  40000, 'EFECTIVO', null, 'cierre y propina',
+  '18000000-0000-4000-8000-0000000000c1', null
+);
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
+select is(
+  public.respond_external_payment(
+    (select id from public.external_payment_declarations
+     where idempotency_key = '18000000-0000-4000-8000-0000000000c1'),
+    true, null),
+  'CONFIRMED_BY_BOTH',
+  'cash received above outstanding contract confirms successfully'
+);
+select is(
+  (select tip_amount_minor from public.external_payment_declarations
+   where idempotency_key = '18000000-0000-4000-8000-0000000000c1'),
+  10000::bigint,
+  'third confirmation separates 10000 into tips'
+);
+select is(
+  (select external_outstanding_minor from public.external_payment_ledger(
+    (select j.id from public.jobs j where j.service_id = '18000000-0000-4000-8000-000000000010')
+  )),
+  0::bigint,
+  'contractual outstanding remains zero after overpayment'
+);
+
+-- Tip only: confirmed after the agreed amount has been covered.
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000001', true);
+select public.declare_external_payment(
+  (select j.id from public.jobs j where j.service_id = '18000000-0000-4000-8000-000000000010'),
+  5000, 'EFECTIVO', null, 'propina extra',
+  '18000000-0000-4000-8000-0000000000c2', null
+);
+select set_config('request.jwt.claim.sub', '18000000-0000-4000-8000-000000000002', true);
+select is(
+  public.respond_external_payment(
+    (select id from public.external_payment_declarations
+     where idempotency_key = '18000000-0000-4000-8000-0000000000c2'),
+    true, null),
+  'CONFIRMED_BY_BOTH',
+  'tip-only receipt can be confirmed after contract settlement'
+);
+select is(
+  (select tip_amount_minor from public.external_payment_declarations
+   where idempotency_key = '18000000-0000-4000-8000-0000000000c2'),
+  5000::bigint,
+  'tip-only receipt is fully allocated to tip'
+);
+select is(
+  (select coalesce(sum(d.tip_amount_minor), 0) from public.external_payment_declarations d
+   where d.job_id = (select j.id from public.jobs j where j.service_id = '18000000-0000-4000-8000-000000000010')
+   and d.state = 'CONFIRMED_BY_BOTH'),
+  25000::numeric,
+  'separate tip sum tracks 10000 plus 10000 plus 5000'
+);
+select is(
+  (select external_confirmed_minor from public.external_payment_ledger(
+    (select j.id from public.jobs j where j.service_id = '18000000-0000-4000-8000-000000000010')
+  )),
+  130000::bigint,
+  'confirming more tips cannot inflate the contractual total'
+);
+select is(
+  (select count(*)::integer from public.external_payment_declarations d
+   where d.job_id = (select j.id from public.jobs j where j.service_id = '18000000-0000-4000-8000-000000000010')
+   and d.state = 'CONFIRMED_BY_BOTH'
+   and d.tip_amount_minor > d.amount_minor),
+  0,
+  'tip allocation never exceeds its receipt'
+);
+
 select * from finish();
 rollback;
