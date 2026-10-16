@@ -50,6 +50,31 @@ export type ExternalMoneyLedger = {
   outstandingMinor: number;
 };
 
+/** A pending declaration is not a confirmed payment; never count it twice. */
+export function externalMoneyAvailableToConfirm(
+  ledger: ExternalMoneyLedger,
+): number {
+  return Math.max(0, ledger.agreedTotalMinor - ledger.confirmedMinor);
+}
+
+/** Unclaimed balance for a new declaration; pending amounts reserve it in UX. */
+export function externalMoneyAvailableToDeclare(
+  ledger: ExternalMoneyLedger,
+): number {
+  return Math.max(0, externalMoneyAvailableToConfirm(ledger) - ledger.claimedMinor);
+}
+
+export function canConfirmExternalPayment(
+  ledger: ExternalMoneyLedger,
+  amountMinor: number,
+): boolean {
+  return (
+    Number.isSafeInteger(amountMinor) &&
+    amountMinor > 0 &&
+    amountMinor <= externalMoneyAvailableToConfirm(ledger)
+  );
+}
+
 export function externalMoneyStatusLabel(ledger: ExternalMoneyLedger): string {
   if (ledger.outstandingMinor <= 0 && ledger.confirmedMinor > 0) {
     return "Confirmado por ambas partes";
