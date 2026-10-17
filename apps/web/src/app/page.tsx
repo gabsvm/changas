@@ -9,6 +9,7 @@ import { ExampleServices } from "@/components/discovery/example-services";
 import { BottomNav } from "@/components/ui/nav-with-counts";
 import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import { CategoryTile } from "@/components/ui/marketplace/category-tile";
+import { ActionArrowIcon } from "@/components/ui/marketplace/action-arrow-icon";
 import { HowItWorks } from "@/components/ui/marketplace/how-it-works";
 import { MagneticRibbons } from "@/components/ui/marketplace/magnetic-ribbons";
 import { NearbyServiceRail } from "@/components/ui/marketplace/nearby-service-rail";
@@ -143,38 +144,14 @@ export default async function HomePage() {
             >
               Ofrecer mis servicios{" "}
               <span aria-hidden="true">
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  width="14"
-                  height="14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.9"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M6 18 18 6M8 6h10v10" />
-                </svg>
+                <ActionArrowIcon />
               </span>
             </Link>
           </div>
           <Link className="yalo-nav-mobile" href={user ? "/account" : "/login"}>
             {user ? "Mi cuenta" : "Ingresar"}{" "}
             <span aria-hidden="true">
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M6 18 18 6M8 6h10v10" />
-              </svg>
+              <ActionArrowIcon />
             </span>
           </Link>
         </header>
@@ -201,20 +178,7 @@ export default async function HomePage() {
               </small>
             </span>
             <span className="yalo-live-link">
-              Ver seguimiento{" "}
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M6 18 18 6M8 6h10v10" />
-              </svg>
+              Ver seguimiento <ActionArrowIcon />
             </span>
           </Link>
         ) : null}
@@ -230,19 +194,7 @@ export default async function HomePage() {
               <span className="yalo-eyebrow-spark" aria-hidden="true" />
               TRABAJÁ · CONTRATÁ · CRECÉ
               <span className="yalo-eyebrow-arrow" aria-hidden="true">
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  width="14"
-                  height="14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.9"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M6 18 18 6M8 6h10v10" />
-                </svg>
+                ✦
               </span>
             </div>
             <h1 id="home-search-title" className="yalo-stage-title">
@@ -285,19 +237,7 @@ export default async function HomePage() {
                     <span>Encontrar alguien que me ayude</span>
                   </span>
                   <span className="yalo-intent-arrow" aria-hidden="true">
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      width="14"
-                      height="14"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.9"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M6 18 18 6M8 6h10v10" />
-                    </svg>
+                    <ActionArrowIcon />
                   </span>
                 </Link>
                 <Link
@@ -328,19 +268,7 @@ export default async function HomePage() {
                     <span>Ofrecer mis servicios</span>
                   </span>
                   <span className="yalo-intent-arrow" aria-hidden="true">
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      width="14"
-                      height="14"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.9"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M6 18 18 6M8 6h10v10" />
-                    </svg>
+                    <ActionArrowIcon />
                   </span>
                 </Link>
               </div>
@@ -364,19 +292,7 @@ export default async function HomePage() {
               <button className="yalo-search-submit" type="submit">
                 Buscar{" "}
                 <span aria-hidden="true">
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 24 24"
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.9"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 18 18 6M8 6h10v10" />
-                  </svg>
+                  <ActionArrowIcon />
                 </span>
               </button>
             </form>
@@ -390,55 +306,19 @@ export default async function HomePage() {
               <Link href="/buscar?mode=presencial">
                 Presencial{" "}
                 <span aria-hidden="true">
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 24 24"
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.9"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 18 18 6M8 6h10v10" />
-                  </svg>
+                  <ActionArrowIcon />
                 </span>
               </Link>
               <Link href="/buscar?mode=remoto">
                 Remoto{" "}
                 <span aria-hidden="true">
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 24 24"
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.9"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 18 18 6M8 6h10v10" />
-                  </svg>
+                  <ActionArrowIcon />
                 </span>
               </Link>
               <Link href="/buscar?offers=true">
                 Con ofertas{" "}
                 <span aria-hidden="true">
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 24 24"
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.9"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 18 18 6M8 6h10v10" />
-                  </svg>
+                  <ActionArrowIcon />
                 </span>
               </Link>
             </div>
@@ -461,22 +341,8 @@ export default async function HomePage() {
             identidad verificada
           </span>
           <span>
-            <span className="yalo-confidence-icon">
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M6 18 18 6M8 6h10v10" />
-              </svg>
-            </span>{" "}
-            Conversá sin intermediarios
+            <span className="yalo-confidence-icon">✓</span> Conversá sin
+            intermediarios
           </span>
           <span>
             <span className="yalo-confidence-icon">✦</span> Reseñas de trabajos
@@ -501,19 +367,7 @@ export default async function HomePage() {
             <Link href="/buscar" className="yalo-section-link">
               Ver todos los servicios{" "}
               <span aria-hidden="true">
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  width="14"
-                  height="14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.9"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M6 18 18 6M8 6h10v10" />
-                </svg>
+                <ActionArrowIcon />
               </span>
             </Link>
           </div>
@@ -559,19 +413,7 @@ export default async function HomePage() {
             <Link href="/buscar" className="yalo-section-link">
               Explorar YALO{" "}
               <span aria-hidden="true">
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  width="14"
-                  height="14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.9"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M6 18 18 6M8 6h10v10" />
-                </svg>
+                <ActionArrowIcon />
               </span>
             </Link>
           </div>
@@ -624,19 +466,7 @@ export default async function HomePage() {
                 <div className="yalo-value-top">
                   <span className="yalo-value-number">{benefit.number} /</span>
                   <span className="yalo-value-glyph" aria-hidden="true">
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      width="14"
-                      height="14"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.9"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M6 18 18 6M8 6h10v10" />
-                    </svg>
+                    ✦
                   </span>
                 </div>
                 <span className="yalo-value-label">{benefit.detail}</span>

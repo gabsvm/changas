@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { ActionArrowIcon } from "./action-arrow-icon";
+
 import {
   distanceBucketLabels,
   formatServicePrice,
@@ -331,7 +333,8 @@ export function ServiceCard({
                     href={providerHref}
                     className="focus-visible:ring-focus/45 text-brand-primary mt-1.5 inline-flex min-h-11 items-center text-[13px] font-bold focus-visible:ring-2 dark:text-white"
                   >
-                    Ver perfil del proveedor <span aria-hidden="true">→</span>
+                    Ver perfil del proveedor{" "}
+                    <ActionArrowIcon className="ml-1 h-4 w-4 shrink-0" />
                   </Link>
                 )}
               </div>

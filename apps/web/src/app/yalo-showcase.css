@@ -1224,3 +1224,120 @@
   background: rgb(255 255 255 / 13%);
   box-shadow: none;
 }
+
+/* Button/arrow polish — one vector weight, consistent vessels and optical gaps.
+   Preserve existing YALO dark surfaces and brand gradients. */
+.yalo-showcase :is(.yalo-nav-primary, .yalo-nav-mobile) {
+  gap: 0.6rem;
+}
+.yalo-showcase .yalo-intent-arrow {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2.125rem;
+  width: 2.125rem;
+  height: 2.125rem;
+  margin-left: auto;
+  border: 1px solid rgb(6 35 51 / 15%);
+  border-radius: 50%;
+  background: rgb(6 35 51 / 11%);
+}
+.yalo-showcase .yalo-intent-work .yalo-intent-arrow {
+  border-color: rgb(255 255 255 / 16%);
+  background: rgb(255 255 255 / 8%);
+}
+.yalo-showcase .yalo-intent-arrow .yalo-action-arrow {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+.yalo-showcase .yalo-search-submit {
+  gap: 0.6rem;
+}
+.yalo-showcase .yalo-section-link {
+  gap: 0.625rem;
+  padding-right: 0.5rem;
+}
+.yalo-showcase .yalo-section-link > span {
+  display: grid;
+  flex: 0 0 1.75rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border: 1px solid rgb(101 236 145 / 20%);
+  border-radius: 50%;
+  background: rgb(101 236 145 / 10%);
+}
+.yalo-showcase .yalo-hero-shortcuts a {
+  gap: 0.4rem;
+}
+.yalo-showcase .yalo-hero-shortcuts .yalo-action-arrow {
+  width: 0.8125rem;
+  height: 0.8125rem;
+}
+.yalo-showcase .yalo-action-arrow {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  transform: translateZ(0);
+  transition: transform 180ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .yalo-showcase
+    :is(
+      .yalo-intent-link,
+      .yalo-nav-primary,
+      .yalo-nav-mobile,
+      .yalo-section-link,
+      .yalo-search-submit,
+      .yalo-hero-shortcuts a,
+      .yalo-category-card
+    ):hover
+    .yalo-action-arrow {
+    transform: translate(0.125rem, -0.125rem);
+  }
+}
+.yalo-showcase
+  :is(
+    .yalo-intent-link,
+    .yalo-nav-primary,
+    .yalo-nav-mobile,
+    .yalo-section-link,
+    .yalo-search-submit,
+    .yalo-hero-shortcuts a,
+    .yalo-category-card
+  ):focus-visible {
+  outline: 2px solid #65ec91;
+  outline-offset: 3px;
+}
+.yalo-showcase
+  :is(
+    .yalo-intent-link,
+    .yalo-nav-primary,
+    .yalo-nav-mobile,
+    .yalo-section-link,
+    .yalo-search-submit,
+    .yalo-hero-shortcuts a,
+    .yalo-category-card
+  ):focus-visible
+  .yalo-action-arrow {
+  transform: translate(0.125rem, -0.125rem);
+}
+@media (max-width: 640px) {
+  .yalo-showcase .yalo-intent-arrow {
+    flex-basis: 2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+  .yalo-showcase .yalo-section-link {
+    min-height: 2.75rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yalo-showcase .yalo-action-arrow {
+    transition: none !important;
+    transform: none !important;
+  }
+  .yalo-showcase :is(a, button):focus-visible .yalo-action-arrow {
+    transform: none !important;
+  }
+}
