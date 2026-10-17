@@ -16,6 +16,7 @@ import { getNotificationKindLabel } from "@/lib/ui/notifications";
 import {
   markAllNotificationsReadAction,
   markNotificationReadAction,
+  openNotificationAction,
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -159,12 +160,36 @@ export default async function NotificationCenterPage({
                                       </StatusChip>
                                     ) : null}
                                   </div>
-                                  <Link
-                                    href={item.actionUrl}
-                                    className="text-ink hover:text-terracotta mt-1 block text-[0.98rem] leading-6 font-semibold before:absolute before:inset-0"
-                                  >
-                                    {item.title}
-                                  </Link>
+                                  {item.unread ? (
+                                    <form
+                                      action={openNotificationAction}
+                                      className="mt-1"
+                                    >
+                                      <input
+                                        type="hidden"
+                                        name="notificationId"
+                                        value={item.id}
+                                      />
+                                      <input
+                                        type="hidden"
+                                        name="actionUrl"
+                                        value={item.actionUrl}
+                                      />
+                                      <button
+                                        type="submit"
+                                        className="consumer-pressable text-ink hover:text-terracotta block min-h-11 text-left text-[0.98rem] leading-6 font-semibold"
+                                      >
+                                        {item.title}
+                                      </button>
+                                    </form>
+                                  ) : (
+                                    <Link
+                                      href={item.actionUrl}
+                                      className="consumer-pressable text-ink hover:text-terracotta mt-1 inline-flex min-h-11 items-center text-[0.98rem] leading-6 font-semibold"
+                                    >
+                                      {item.title}
+                                    </Link>
+                                  )}
                                 </div>
                                 <div className="relative z-10 flex shrink-0 flex-col items-end gap-1">
                                   <time

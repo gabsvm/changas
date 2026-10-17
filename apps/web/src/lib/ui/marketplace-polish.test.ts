@@ -117,7 +117,7 @@ describe("marketplace polish contracts", () => {
       "navigator.geolocation.getCurrentPosition",
     );
     expect(locationSource).toContain("Usar mi ubicación");
-    expect(locationSource).toContain("Sin ubicación");
+    expect(locationSource).toContain("Elegir zona");
     expect(rootSource).toContain("mode=remoto");
     expect(locationSource).toContain("findNearestManualLocation");
     expect(locationSource).toContain("Ubicación actual");

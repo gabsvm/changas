@@ -226,7 +226,7 @@ export default async function SearchPage({
                       key={item.slug ?? "all"}
                       href={categoryHref(item.slug)}
                       aria-current={selected ? "true" : undefined}
-                      className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-sm font-bold transition-all duration-200 ${
+                      className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-bold transition-all duration-200 ${
                         selected
                           ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
                           : "yalo-filter-pill border-white/20 bg-white/10 text-white backdrop-blur-sm hover:bg-white/15"

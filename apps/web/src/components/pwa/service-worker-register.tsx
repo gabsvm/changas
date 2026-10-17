@@ -7,6 +7,14 @@ export function ServiceWorkerRegister() {
     null,
   );
   const reloadOnControllerChange = useRef(false);
+  const [postponed, setPostponed] = useState(false);
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("yalo:pwa-update-visibility", {
+        detail: { visible: Boolean(waitingWorker) && !postponed },
+      }),
+    );
+  }, [waitingWorker, postponed]);
 
   useEffect(() => {
     if (
@@ -64,7 +72,7 @@ export function ServiceWorkerRegister() {
     };
   }, []);
 
-  if (!waitingWorker) return null;
+  if (!waitingWorker || postponed) return null;
 
   return (
     <aside
@@ -114,19 +122,28 @@ export function ServiceWorkerRegister() {
       </div>
       <div className="overflow-y-auto p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
         <p className="text-ink/70 mt-1 text-sm leading-6">
-          Recargá YALO para usar la última versión, con las mejoras y
-          arreglos más recientes.
+          Recargá YALO para usar la última versión, con las mejoras y arreglos
+          más recientes.
         </p>
-        <button
-          className="button-primary mt-4 w-full whitespace-nowrap"
-          type="button"
-          onClick={() => {
-            reloadOnControllerChange.current = true;
-            waitingWorker.postMessage({ type: "SKIP_WAITING" });
-          }}
-        >
-          Recargar
-        </button>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <button
+            className="button-secondary min-h-11 w-full"
+            type="button"
+            onClick={() => setPostponed(true)}
+          >
+            Más tarde
+          </button>
+          <button
+            className="button-primary min-h-11 w-full whitespace-nowrap"
+            type="button"
+            onClick={() => {
+              reloadOnControllerChange.current = true;
+              waitingWorker.postMessage({ type: "SKIP_WAITING" });
+            }}
+          >
+            Recargar
+          </button>
+        </div>
       </div>
     </aside>
   );

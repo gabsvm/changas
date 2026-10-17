@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { createPortal } from "react-dom";
@@ -174,7 +174,7 @@ export function LocationPicker({
               <option value="">
                 {usingDeviceLocation
                   ? `${deviceLocationLabel ?? "Ubicación actual"} · actual`
-                  : "Sin ubicación"}
+                  : "Elegir zona"}
               </option>
               {manualLocations.map((location) => (
                 <option key={location.slug} value={location.slug}>
@@ -184,7 +184,7 @@ export function LocationPicker({
             </select>
           </label>
           <button
-            className="location-picker-trigger consumer-pressable text-ink ml-auto inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-white/60 bg-white/85 px-3 text-xs font-bold shadow-[0_5px_14px_rgba(32,33,36,0.1)] transition-all duration-200 hover:-translate-y-px hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+            className="location-picker-trigger consumer-pressable text-ink ml-auto inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-white/60 bg-white/85 px-3 text-xs font-bold shadow-[0_5px_14px_rgba(32,33,36,0.1)] transition-all duration-200 hover:-translate-y-px hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
             type="button"
             onClick={() => setLocationSheetOpen(true)}
             aria-haspopup="dialog"
@@ -289,7 +289,7 @@ export function LocationPicker({
                           setLocationSheetOpen(false);
                         }}
                       >
-                        <option value="">Sin ubicación</option>
+                        <option value="">Elegir zona</option>
                         {manualLocations.map((location) => (
                           <option key={location.slug} value={location.slug}>
                             {location.label}
@@ -323,7 +323,7 @@ export function LocationPicker({
         name="location"
         onChange={(event) => selectManualLocation(event.currentTarget.value)}
       >
-        <option value="">Sin ubicación</option>
+        <option value="">Elegir zona</option>
         {manualLocations.map((location) => (
           <option key={location.slug} value={location.slug}>
             {location.label}

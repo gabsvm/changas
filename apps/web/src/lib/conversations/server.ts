@@ -217,6 +217,55 @@ export async function listConversationsThrough(
   );
 }
 
+/**
+ * The unread inbox scans conversations on the server until it has a page of
+ * unread threads. This avoids empty client-side pages while respecting the
+ * existing conversation RLS RPC and stable cursor order.
+ *
+ * No new Supabase schema is required. A dedicated indexed DB RPC remains
+ * preferable if the inbox becomes very large.
+ */
+async function listUnreadConversationPage(
+  cursor: ConversationCursor = {},
+  pageSize = 20,
+): Promise<ConversationSummary[]> {
+  const unread: ConversationSummary[] = [];
+  let position = cursor;
+  while (unread.length < pageSize) {
+    const batch = await listMyConversations(position, 50);
+    if (batch.length === 0) break;
+    for (const item of batch) {
+      if (item.unread_count > 0) unread.push(item);
+      if (unread.length >= pageSize) break;
+    }
+    if (unread.length >= pageSize || batch.length < 50) break;
+    const last = batch[batch.length - 1];
+    if (!last) break;
+    position = {
+      beforeUpdatedAt: last.updated_at,
+      beforeId: last.conversation_id,
+    };
+  }
+  return unread;
+}
+
+/** Paged collection whose cursor advances only through unread conversations. */
+export async function listUnreadConversationsThrough(
+  through: PageKey | null,
+): Promise<PagedResult<ConversationSummary>> {
+  return accumulateThrough(
+    (cursor, limit) =>
+      listUnreadConversationPage(
+        cursor ? { beforeUpdatedAt: cursor.at, beforeId: cursor.id } : {},
+        limit,
+      ),
+    (row) => ({ at: row.updated_at, id: row.conversation_id }),
+    (row) => row.conversation_id,
+    through,
+    20,
+  );
+}
+
 /** Batched OPEN-proposal lookup for the inbox. Throws so callers can fall back. */
 export async function listInboxOpenDeals(
   conversationIds: string[],

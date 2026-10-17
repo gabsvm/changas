@@ -16,7 +16,8 @@ describe("Phase 08 notification center UI contract", () => {
     expect(page).toContain("listNotifications");
     expect(page).toContain("markAllNotificationsReadAction");
     expect(page).toContain("/account/settings/notifications");
-    expect(page).toContain("before:absolute before:inset-0");
+    expect(page).toContain("action={openNotificationAction}");
+    expect(page).toContain('name="notificationId"');
     expect(page).toContain("Todo al día");
   });
 

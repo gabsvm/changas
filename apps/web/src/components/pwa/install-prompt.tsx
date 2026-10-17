@@ -51,6 +51,18 @@ export function InstallPrompt() {
     useState<BeforeInstallPromptEvent | null>(null);
   const [showIosGuide, setShowIosGuide] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [updateVisible, setUpdateVisible] = useState(false);
+  const [updateShownThisSession, setUpdateShownThisSession] = useState(false);
+  useEffect(() => {
+    function updateNotice(event: Event) {
+      const { visible } = (event as CustomEvent<{ visible: boolean }>).detail;
+      setUpdateVisible(visible);
+      if (visible) setUpdateShownThisSession(true);
+    }
+    window.addEventListener("yalo:pwa-update-visibility", updateNotice);
+    return () =>
+      window.removeEventListener("yalo:pwa-update-visibility", updateNotice);
+  }, []);
 
   function dismiss() {
     persistDismissal();
@@ -75,7 +87,21 @@ export function InstallPrompt() {
     if (!touchDevice && !isIosDevice()) return;
 
     if (isIosDevice()) {
-      queueMicrotask(() => setShowIosGuide(true));
+      // Don't interrupt the first visit. Count separate browser sessions,
+      // not route changes, before suggesting Add to Home Screen.
+      try {
+        const sessionKey = "yalo:install-visit-recorded";
+        const countKey = "yalo:install-visit-count";
+        let visits = Number(window.localStorage.getItem(countKey) ?? "0");
+        if (!window.sessionStorage.getItem(sessionKey)) {
+          visits = Math.min(20, Number.isFinite(visits) ? visits + 1 : 1);
+          window.localStorage.setItem(countKey, String(visits));
+          window.sessionStorage.setItem(sessionKey, "1");
+        }
+        if (visits >= 2) queueMicrotask(() => setShowIosGuide(true));
+      } catch {
+        // Disabled storage: prefer not to interrupt with a first-visit prompt.
+      }
     }
 
     function handleBeforeInstallPrompt(event: Event) {
@@ -102,7 +128,13 @@ export function InstallPrompt() {
     };
   }, []);
 
-  if (dismissed || pathname === "/offline" || (!deferredPrompt && !showIosGuide))
+  if (
+    dismissed ||
+    updateVisible ||
+    updateShownThisSession ||
+    pathname === "/offline" ||
+    (!deferredPrompt && !showIosGuide)
+  )
     return null;
 
   return (
@@ -148,7 +180,7 @@ export function InstallPrompt() {
       <div className="overflow-y-auto p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
         <div className="flex items-start justify-end">
           <button
-            className="consumer-pressable text-ink/70 hover:bg-ink/[0.05] inline-flex min-h-10 shrink-0 items-center rounded-full px-3 text-sm font-semibold"
+            className="consumer-pressable text-ink/70 hover:bg-ink/[0.05] inline-flex min-h-11 shrink-0 items-center rounded-full px-3 text-sm font-semibold"
             type="button"
             onClick={dismiss}
             aria-label="Cerrar sugerencia de instalación"
@@ -159,9 +191,9 @@ export function InstallPrompt() {
         {deferredPrompt ? (
           <>
             <p className="text-ink/70 mt-1 text-sm leading-6">
-              Instalá YALO y abrila en un toque desde tu pantalla de
-              inicio: volvés a tus conversaciones y avisos más rápido, sin
-              buscar la pestaña del navegador.
+              Instalá YALO y abrila en un toque desde tu pantalla de inicio:
+              volvés a tus conversaciones y avisos más rápido, sin buscar la
+              pestaña del navegador.
             </p>
             <button
               className="button-primary mt-4 w-full whitespace-nowrap"

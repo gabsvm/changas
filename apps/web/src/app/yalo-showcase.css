@@ -1162,3 +1162,65 @@
     display: none;
   }
 }
+
+/* Better Design: real SVG arrows and consistent 44px mobile touch targets. */
+.yalo-hero-shortcuts a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.yalo-header-logo,
+.yalo-header-brand,
+.yalo-nav-login {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.yalo-nav-mobile {
+  min-height: 44px;
+}
+.yalo-section-link {
+  min-height: 44px;
+}
+.yalo-hero-shortcuts a svg,
+.yalo-section-link svg,
+.yalo-nav-primary svg,
+.yalo-nav-mobile svg {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* A two-card rail is centered rather than leaving an empty half-grid on wide screens. */
+@media (min-width: 900px) {
+  .yalo-featured-results--compact > section {
+    max-width: 920px;
+    margin-inline: auto;
+  }
+}
+/* Clear active state and comfortably tappable links on narrow screens. */
+@media (max-width: 767px) {
+  .yalo-home .yalo-nav-mobile {
+    min-height: 44px;
+  }
+  .yalo-home .yalo-hero-shortcuts {
+    row-gap: 10px;
+  }
+  .yalo-home .yalo-hero-shortcuts a {
+    min-height: 44px;
+  }
+}
+
+/* The repeated work link stays available in the sticky nav but doesn't
+   compete with the two large intent cards in the first fold. */
+.yalo-showcase .yalo-nav-primary {
+  color: #d6e1ea;
+  background: rgb(255 255 255 / 7%);
+  border: 1px solid rgb(255 255 255 / 15%);
+  box-shadow: none;
+}
+.yalo-showcase .yalo-nav-primary:hover {
+  background: rgb(255 255 255 / 13%);
+  box-shadow: none;
+}

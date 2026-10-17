@@ -409,7 +409,7 @@ export function DiscoveryResults({
               ? "Buscando…"
               : gpsMode
                 ? "Actualizar ubicación"
-                : "Cerca mío"}
+                : "Usar mi ubicación"}
           </button>
         ) : null}
       </div>
