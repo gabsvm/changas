@@ -1,6 +1,8 @@
 ﻿import Image from "next/image";
 import Link from "next/link";
 
+import { ActionArrowIcon } from "./action-arrow-icon";
+
 type CategoryPhoto = { match: RegExp; src: string };
 
 const PHOTOS: readonly CategoryPhoto[] = [
@@ -53,19 +55,7 @@ export function CategoryTile({
         <span className="yalo-category-photo-footer">
           <span className="yalo-category-photo-title">{label}</span>
           <span className="yalo-category-photo-arrow">
-            <svg
-              viewBox="0 0 24 24"
-              width="18"
-              height="18"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M6 18 18 6M8 6h10v10" />
-            </svg>
+            <ActionArrowIcon />
           </span>
         </span>
       </span>

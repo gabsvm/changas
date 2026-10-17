@@ -160,3 +160,16 @@
     transition: none !important;
   }
 }
+
+/* Maintain a comfortable icon-to-vessel ratio on phone and desktop. */
+.yalo-showcase .yalo-category-photo-arrow .yalo-action-arrow {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+@media (max-width: 640px) {
+  .yalo-showcase .yalo-category-photo-arrow .yalo-action-arrow {
+    width: 1rem;
+    height: 1rem;
+  }
+}
