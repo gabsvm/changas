@@ -80,7 +80,7 @@ describe("Better Design audit — visual, safety and UX regressions", () => {
     expect(
       source("../../components/discovery/discovery-results.tsx"),
     ).toContain("Usar mi ubicación");
-    expect(location).toContain("Sin zona elegida");
+    expect(location).toContain("Elegir zona");
     expect(location).toContain("min-h-11 shrink-0 items-center gap-1.5");
   });
 

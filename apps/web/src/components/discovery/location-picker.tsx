@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { createPortal } from "react-dom";
@@ -174,7 +174,7 @@ export function LocationPicker({
               <option value="">
                 {usingDeviceLocation
                   ? `${deviceLocationLabel ?? "Ubicación actual"} · actual`
-                  : "Sin zona elegida"}
+                  : "Elegir zona"}
               </option>
               {manualLocations.map((location) => (
                 <option key={location.slug} value={location.slug}>
@@ -289,7 +289,7 @@ export function LocationPicker({
                           setLocationSheetOpen(false);
                         }}
                       >
-                        <option value="">Sin zona elegida</option>
+                        <option value="">Elegir zona</option>
                         {manualLocations.map((location) => (
                           <option key={location.slug} value={location.slug}>
                             {location.label}
@@ -323,7 +323,7 @@ export function LocationPicker({
         name="location"
         onChange={(event) => selectManualLocation(event.currentTarget.value)}
       >
-        <option value="">Sin zona elegida</option>
+        <option value="">Elegir zona</option>
         {manualLocations.map((location) => (
           <option key={location.slug} value={location.slug}>
             {location.label}
