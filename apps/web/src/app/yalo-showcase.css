@@ -1254,7 +1254,7 @@
 }
 .yalo-showcase .yalo-section-link {
   gap: 0.625rem;
-  padding-right: 0.5rem;
+  padding-inline: 1rem;
 }
 .yalo-showcase .yalo-section-link > span {
   display: grid;
