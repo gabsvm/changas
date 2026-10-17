@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { isUuid } from "@changas/validation";
 
@@ -15,6 +16,7 @@ import {
   type BrowserPushSubscription,
 } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeNotificationActionUrl } from "@/lib/notifications/templates";
 
 function checkbox(formData: FormData, name: string): boolean {
   return formData.get(name) === "on";
@@ -35,6 +37,34 @@ export async function markNotificationReadAction(
   }
 
   revalidatePath("/account/notifications");
+}
+
+/**
+ * Clicking an unread notification acknowledges it and follows its sanitized
+ * internal destination in a single keyboard-accessible form submission.
+ * The RPC verifies ownership. No user-supplied external redirect is allowed.
+ */
+export async function openNotificationAction(
+  formData: FormData,
+): Promise<void> {
+  const notificationId = formData.get("notificationId");
+  const actionUrl = formData.get("actionUrl");
+  if (typeof notificationId !== "string" || !isUuid(notificationId)) {
+    throw new Error("Notificación inválida.");
+  }
+  const supabase = await createClient();
+  const updated = await markNotificationRead(supabase, notificationId);
+  if (!updated) {
+    throw new Error(
+      "No pudimos abrir la notificación. Actualizá e intentá de nuevo.",
+    );
+  }
+  revalidatePath("/account/notifications");
+  redirect(
+    sanitizeNotificationActionUrl(
+      typeof actionUrl === "string" ? actionUrl : "/account/notifications",
+    ),
+  );
 }
 
 export async function markAllNotificationsReadAction(): Promise<void> {
@@ -91,13 +121,8 @@ function decodedBase64UrlLength(value: string): number | null {
   }
 }
 
-function validPushSubscription(
-  subscription: BrowserPushSubscription,
-): boolean {
-  if (
-    subscription.endpoint.length < 8 ||
-    subscription.endpoint.length > 4096
-  ) {
+function validPushSubscription(subscription: BrowserPushSubscription): boolean {
+  if (subscription.endpoint.length < 8 || subscription.endpoint.length > 4096) {
     return false;
   }
   let endpointHost: string;

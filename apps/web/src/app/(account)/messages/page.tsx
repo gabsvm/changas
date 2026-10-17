@@ -6,6 +6,7 @@ import { formatMinorUnits } from "@changas/domain";
 import {
   getUnreadConversationCount,
   listConversationsThrough,
+  listUnreadConversationsThrough,
   listInboxOpenDeals,
 } from "@/lib/conversations/server";
 import { parsePageCursor } from "@/lib/cursor-pages";
@@ -105,8 +106,9 @@ export default async function MessagesPage({
   if (!user) redirect("/login?next=/messages");
 
   const through = parsePageCursor(params);
-  const { items: conversations, next } =
-    await listConversationsThrough(through);
+  const { items: conversations, next } = showUnreadOnly
+    ? await listUnreadConversationsThrough(through)
+    : await listConversationsThrough(through);
   const moreHref = next
     ? `/messages?${showUnreadOnly ? "filter=unread&" : ""}before=${encodeURIComponent(next.at)}&beforeId=${next.id}`
     : null;
@@ -114,9 +116,7 @@ export default async function MessagesPage({
     conversations.map((conversation) => conversation.conversation_id),
   );
   const unreadTotal = await getUnreadConversationCount();
-  const visible = showUnreadOnly
-    ? conversations.filter((conversation) => conversation.unread_count > 0)
-    : conversations;
+  const visible = conversations; // Unread filtering now runs before pagination.
 
   return (
     <section className="pb-6 sm:py-10">

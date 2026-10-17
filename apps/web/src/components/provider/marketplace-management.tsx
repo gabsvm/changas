@@ -221,14 +221,53 @@ function ActionForm({
 function DeleteForm({
   action,
   recordId,
+  recordLabel = "este registro",
 }: {
   action: ProviderAction;
   recordId: string;
+  recordLabel?: string;
 }) {
+  const [confirming, setConfirming] = useState(false);
+  if (!confirming) {
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        className="consumer-pressable text-danger inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-bold"
+        aria-label={"Eliminar " + recordLabel}
+      >
+        Eliminar…
+      </button>
+    );
+  }
   return (
-    <ActionForm action={action} submitLabel="Eliminar" className="mt-3">
-      <input type="hidden" name="recordId" value={recordId} />
-    </ActionForm>
+    <div
+      className="border-danger/20 bg-danger/[0.04] mt-3 rounded-xl border p-3"
+      role="group"
+      aria-label={"Confirmar eliminación de " + recordLabel}
+    >
+      <p className="text-ink text-sm font-bold">¿Eliminar {recordLabel}?</p>
+      <p className="text-ink/70 mt-1 text-xs leading-5">
+        Esta acción puede ser irreversible. Revisá que elegiste el registro
+        correcto.
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setConfirming(false)}
+          className="consumer-pressable bg-surface border-ink/20 text-ink inline-flex min-h-11 items-center rounded-xl border px-5 text-sm font-bold"
+        >
+          Cancelar
+        </button>
+        <ActionForm
+          action={action}
+          submitLabel="Sí, eliminar"
+          className="flex items-center"
+        >
+          <input type="hidden" name="recordId" value={recordId} />
+        </ActionForm>
+      </div>
+    </div>
   );
 }
 
@@ -994,7 +1033,7 @@ export function MarketplaceManagement({
         <div className="space-y-5">
           <details
             open={services.length === 0}
-            className="border-ink/10 rounded-2xl border bg-white/45 px-4 py-3 dark:border-white/10 dark:bg-[#1b2b3d]"
+            className="border-ink/10 bg-surface/75 rounded-2xl border px-4 py-3 dark:border-white/10 dark:bg-[#1b2b3d]"
           >
             <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
               + Nuevo servicio
@@ -1013,7 +1052,7 @@ export function MarketplaceManagement({
           </details>
           {services.map((service) => (
             <div
-              className="border-ink/10 rounded-xl border bg-white/45 p-4 dark:border-white/10 dark:bg-[#1b2b3d]"
+              className="border-ink/10 bg-surface/75 rounded-xl border p-4 dark:border-white/10 dark:bg-[#1b2b3d]"
               key={service.id}
             >
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -1081,6 +1120,7 @@ export function MarketplaceManagement({
                     <DeleteForm
                       action={actions.deleteService}
                       recordId={service.id}
+                      recordLabel={"el servicio «" + service.title + "»"}
                     />
                   </div>
                 </div>

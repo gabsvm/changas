@@ -24,7 +24,10 @@ describe("Phase 08 PWA install contract", () => {
     expect(prompt).toContain("async function installApp");
     expect(prompt).toContain("await deferredPrompt.prompt()");
     expect(prompt).toContain('type="button"');
-    expect(prompt).not.toMatch(/useEffect\([\s\S]{0,700}\.prompt\(\)/);
+    // Browser install is requested by this click handler exactly once.
+    // Other effects may now subscribe to banner coordination events.
+    expect(prompt.match(/await deferredPrompt\.prompt\(\)/g)).toHaveLength(1);
+    expect(prompt).toContain("onClick={installApp}");
   });
 
   it("contains iOS add-to-home-screen guidance instead of fabricating a native prompt", () => {

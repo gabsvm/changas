@@ -40,7 +40,11 @@ function categoryIconPath(categorySlug: string): string {
 
 // YALO D1: covers sobrios sobre navy (texto blanco encima, AA sobrado).
 // Sin naranjas/rosas legacy; el verde/dorado profundo son semánticos.
-const COVER_VISUALS: ReadonlyArray<{ match: RegExp; from: string; to: string }> = [
+const COVER_VISUALS: ReadonlyArray<{
+  match: RegExp;
+  from: string;
+  to: string;
+}> = [
   { match: /hogar/i, from: "#243145", to: "#0D121B" },
   { match: /tecnologia/i, from: "#14568A", to: "#0D121B" },
   { match: /educacion/i, from: "#166B45", to: "#0B1F16" },
@@ -58,25 +62,25 @@ function coverVisual(categorySlug: string): { from: string; to: string } {
   );
 }
 
- function CoverFallback({
-   categorySlug,
-   categoryName,
-   serviceTitle,
- }: {
-   categorySlug: string;
-   categoryName: string;
-   serviceTitle: string;
- }) {
+function CoverFallback({
+  categorySlug,
+  categoryName,
+  serviceTitle,
+}: {
+  categorySlug: string;
+  categoryName: string;
+  serviceTitle: string;
+}) {
   const visual = coverVisual(categorySlug);
-   return (
-     <span
+  return (
+    <span
       className="relative grid aspect-video w-full place-items-center overflow-hidden"
       style={{
         backgroundImage: `linear-gradient(135deg, ${visual.from} 0%, ${visual.to} 100%)`,
       }}
-       role="img"
-       aria-label={`Imagen ilustrativa de ${serviceTitle}`}
-     >
+      role="img"
+      aria-label={`Imagen ilustrativa de ${serviceTitle}`}
+    >
       <span
         className="absolute inset-0 opacity-25"
         style={{
@@ -95,25 +99,25 @@ function coverVisual(categorySlug: string): { from: string; to: string } {
         aria-hidden="true"
       />
       <span className="relative flex flex-col items-center gap-1.5 px-4 text-center">
-         <svg
-           aria-hidden="true"
-           viewBox="0 0 24 24"
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
           className="h-8 w-8 text-white drop-shadow-[0_2px_6px_rgb(0_0_0/25%)]"
-           fill="none"
-           stroke="currentColor"
-           strokeWidth="1.8"
-           strokeLinecap="round"
-           strokeLinejoin="round"
-         >
-           <path d={categoryIconPath(categorySlug)} />
-         </svg>
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d={categoryIconPath(categorySlug)} />
+        </svg>
         <span className="text-xs font-bold tracking-wide text-white/90 uppercase drop-shadow-[0_1px_4px_rgb(0_0_0/25%)]">
-           {categoryName}
-         </span>
-       </span>
-     </span>
-   );
- }
+          {categoryName}
+        </span>
+      </span>
+    </span>
+  );
+}
 
 export function ServiceCard({
   row,
@@ -156,7 +160,7 @@ export function ServiceCard({
 
   return (
     <article
-      className={`service-card-shell consumer-card group bg-surface relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:border-brand-primary/25 hover:shadow-[0_4px_8px_rgb(16_24_39/7%),0_26px_52px_-14px_rgb(16_24_39/22%)] dark:hover:border-white/20 ${example ? "border-ink/30! border-dashed!" : "consumer-card-pressed"}`}
+      className={`service-card-shell consumer-card group bg-surface hover:border-brand-primary/25 relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_4px_8px_rgb(16_24_39/7%),0_26px_52px_-14px_rgb(16_24_39/22%)] dark:hover:border-white/20 ${example ? "border-ink/30! border-dashed!" : "consumer-card-pressed"}`}
     >
       {example ? (
         <div
@@ -185,23 +189,27 @@ export function ServiceCard({
                     </span>
                   ) : null}
                 </p>
-                <h3 className="text-ink mt-0.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
+                <h3 className="text-ink mt-1.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
                   {row.service_title}
                 </h3>
                 <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
                   <span className="text-ink inline-flex items-center gap-1 font-bold">
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      className="fill-[#F0B429] stroke-warning h-3.5 w-3.5"
-                      strokeWidth="1.5"
-                    >
-                      <path
-                        d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    {hasRating ? row.rating_average!.toFixed(1) : "Nuevo"}
+                    {hasRating ? (
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        className="stroke-warning h-3.5 w-3.5 fill-[#F0B429]"
+                        strokeWidth="1.5"
+                      >
+                        <path
+                          d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ) : null}
+                    {hasRating
+                      ? row.rating_average!.toFixed(1)
+                      : "Nuevo en YALO"}
                   </span>
                   {hasRating ? (
                     <span className="text-ink/70 font-medium">
@@ -264,7 +272,7 @@ export function ServiceCard({
                 <p className="text-ink/70 flex items-center gap-1.5 truncate text-[13px] font-semibold">
                   <Link
                     href={providerHref}
-                    className="focus-visible:ring-2 focus-visible:ring-focus/45 truncate rounded underline-offset-4 hover:underline"
+                    className="focus-visible:ring-focus/45 inline-flex min-h-11 max-w-full items-center truncate rounded underline-offset-4 hover:underline focus-visible:ring-2"
                   >
                     {row.provider_display_name}
                   </Link>
@@ -274,10 +282,10 @@ export function ServiceCard({
                     </span>
                   ) : null}
                 </p>
-                <h3 className="text-ink mt-0.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
+                <h3 className="text-ink mt-1.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
                   <Link
                     href={serviceHref}
-                    className="focus-visible:ring-2 focus-visible:ring-focus/45 rounded"
+                    className="focus-visible:ring-focus/45 inline-flex min-h-11 items-center rounded focus-visible:ring-2"
                     aria-label={`${row.service_title}, ${row.provider_display_name}, ${price}`}
                   >
                     {row.service_title}
@@ -285,18 +293,22 @@ export function ServiceCard({
                 </h3>
                 <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
                   <span className="text-ink inline-flex items-center gap-1 font-bold">
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      className="fill-[#F0B429] stroke-warning h-3.5 w-3.5"
-                      strokeWidth="1.5"
-                    >
-                      <path
-                        d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    {hasRating ? row.rating_average!.toFixed(1) : "Nuevo"}
+                    {hasRating ? (
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        className="stroke-warning h-3.5 w-3.5 fill-[#F0B429]"
+                        strokeWidth="1.5"
+                      >
+                        <path
+                          d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ) : null}
+                    {hasRating
+                      ? row.rating_average!.toFixed(1)
+                      : "Nuevo en YALO"}
                   </span>
                   {hasRating ? (
                     <span className="text-ink/70 font-medium">
@@ -307,7 +319,7 @@ export function ServiceCard({
                     </span>
                   ) : (
                     <span className="text-ink/70 font-medium">
-                      Nuevo en YALO · sin reseñas aún
+                      Sin reseñas aún
                     </span>
                   )}
                   <span className="text-brand-primary ml-auto shrink-0 text-[15px] font-extrabold dark:text-white">
@@ -317,7 +329,7 @@ export function ServiceCard({
                 {hasRating ? null : (
                   <Link
                     href={providerHref}
-                    className="focus-visible:ring-2 focus-visible:ring-focus/45 text-brand-primary mt-1.5 inline-flex min-h-11 items-center text-[13px] font-bold dark:text-white"
+                    className="focus-visible:ring-focus/45 text-brand-primary mt-1.5 inline-flex min-h-11 items-center text-[13px] font-bold focus-visible:ring-2 dark:text-white"
                   >
                     Ver perfil del proveedor <span aria-hidden="true">→</span>
                   </Link>
