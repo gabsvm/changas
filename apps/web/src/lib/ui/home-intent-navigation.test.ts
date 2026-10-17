@@ -23,8 +23,8 @@ describe("home: obvious hire or work entrypoints", () => {
   });
 
   it("preserves clear navigation to discovery and provider onboarding", () => {
-    expect(home).toContain('<Link href="/buscar" className="yalo-intent-link yalo-intent-hire">');
-    expect(home).toContain('href="/provider/onboarding"\n                  className="yalo-intent-link yalo-intent-work"');
+    expect(home).toMatch(/<Link\s+href="\/buscar"\s+className="yalo-intent-link yalo-intent-hire"/);
+    expect(home).toMatch(/href="\/provider\/onboarding"\s+className="yalo-intent-link yalo-intent-work"/);
     expect(home).toContain('aria-label="Elegí qué querés hacer en YALO"');
     expect(home).toContain('action="/buscar"');
     expect(home).toContain('name="q"');

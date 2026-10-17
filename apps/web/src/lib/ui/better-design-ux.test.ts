@@ -49,9 +49,7 @@ describe("Better Design audit — visual, safety and UX regressions", () => {
     expect(notificationActions).toContain(
       "await markNotificationRead(supabase, notificationId)",
     );
-    expect(notificationActions).toContain(
-      "redirect(sanitizeNotificationActionUrl(",
-    );
+    expect(notificationActions).toMatch(/redirect\s*\(\s*sanitizeNotificationActionUrl/);
     expect(notifications).toContain("markNotificationReadAction");
   });
 
@@ -69,7 +67,7 @@ describe("Better Design audit — visual, safety and UX regressions", () => {
     expect(start).toBeLessThan(home.indexOf("yalo-hero-search"));
     expect(home).not.toContain("↗");
     expect(home).toContain('viewBox="0 0 24 24"');
-    expect(showcaseCss).toContain(".yalo-hero-shortcuts a { min-height: 44px");
+    expect(showcaseCss).toMatch(/\.yalo-hero-shortcuts a\s*\{\s*min-height:\s*44px/);
     expect(showcaseCss).toContain("yalo-featured-results--compact");
   });
 
