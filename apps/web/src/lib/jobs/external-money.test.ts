@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   externalPaymentStateLabel,
-  canConfirmExternalPayment,
+  splitExternalMoneyPayment,
+  externalMoneyStatusLabel,
   externalMoneyAvailableToConfirm,
   externalMoneyAvailableToDeclare,
   type ExternalMoneyLedger,
@@ -45,41 +46,52 @@ function ledger(agreed: number, confirmed: number, claimed: number): ExternalMon
     confirmedMinor: confirmed,
     claimedMinor: claimed,
     outstandingMinor: Math.max(agreed - confirmed, 0),
+    confirmedTipMinor: 0,
   };
 }
 
-describe("external cash/transfer confirmation limits", () => {
-  it("allows confirmation for the exact remaining balance", () => {
-    const current = ledger(500_00, 200_00, 300_00);
-    expect(externalMoneyAvailableToConfirm(current)).toBe(300_00);
-    expect(canConfirmExternalPayment(current, 300_00)).toBe(true);
+describe("external payments with voluntary tips", () => {
+  it("covers the agreed balance first and allocates the excess as a tip", () => {
+    const pending = ledger(100_000, 0, 120_000);
+    expect(externalMoneyAvailableToConfirm(pending)).toBe(100_000);
+    expect(splitExternalMoneyPayment(100_000, 120_000)).toEqual({
+      contractMinor: 100_000,
+      tipMinor: 20_000,
+    });
+    expect(externalMoneyAvailableToDeclare(pending)).toBe(0);
   });
 
-  it("does not double-count the declaration currently being accepted", () => {
-    const current = ledger(1_000_00, 0, 1_000_00);
-    expect(canConfirmExternalPayment(current, 1_000_00)).toBe(true);
+  it("preserves exact payments without creating fictitious tips", () => {
+    expect(splitExternalMoneyPayment(50_000, 50_000)).toEqual({
+      contractMinor: 50_000, tipMinor: 0,
+    });
+  });
+
+  it("allows a tip-only declaration after the contract is fully paid", () => {
+    const paid = ledger(100_000, 100_000, 0);
+    expect(externalMoneyAvailableToDeclare(paid)).toBe(0);
+    expect(splitExternalMoneyPayment(externalMoneyAvailableToConfirm(paid), 25_000))
+      .toEqual({ contractMinor: 0, tipMinor: 25_000 });
+  });
+
+  it("keeps the contractual outstanding amount independent of tips", () => {
+    const current = ledger(100_000, 75_000, 40_000);
+    expect(externalMoneyAvailableToConfirm(current)).toBe(25_000);
+    expect(splitExternalMoneyPayment(25_000, 40_000))
+      .toEqual({ contractMinor: 25_000, tipMinor: 15_000 });
     expect(externalMoneyAvailableToDeclare(current)).toBe(0);
   });
 
-  it("blocks a second confirmation that exceeds the agreement", () => {
-    const current = ledger(1_000_00, 750_00, 600_00);
-    expect(externalMoneyAvailableToConfirm(current)).toBe(250_00);
-    expect(canConfirmExternalPayment(current, 600_00)).toBe(false);
-    expect(externalMoneyAvailableToDeclare(current)).toBe(0);
+  it("does not fabricate a value for invalid amounts", () => {
+    for (const amount of [0, -1, NaN, Infinity, 1.5]) {
+      expect(splitExternalMoneyPayment(100_000, amount)).toEqual({
+        contractMinor: 0, tipMinor: 0,
+      });
+    }
   });
 
-  it("prevents negative balances and invalid confirmation amounts", () => {
-    const current = ledger(500_00, 700_00, 150_00);
-    expect(externalMoneyAvailableToConfirm(current)).toBe(0);
-    expect(externalMoneyAvailableToDeclare(current)).toBe(0);
-    expect(canConfirmExternalPayment(current, 1)).toBe(false);
-    expect(canConfirmExternalPayment(ledger(500_00, 0, 0), 0)).toBe(false);
-    expect(canConfirmExternalPayment(ledger(500_00, 0, 0), Number.NaN)).toBe(false);
-  });
-
-  it("allows partial payments when the sum stays within the agreement", () => {
-    const current = ledger(900_00, 300_00, 200_00);
-    expect(externalMoneyAvailableToDeclare(current)).toBe(400_00);
-    expect(canConfirmExternalPayment(current, 200_00)).toBe(true);
+  it("shows pending tips as pending even when the contract is paid", () => {
+    expect(externalMoneyStatusLabel(ledger(100_000, 100_000, 10_000)))
+      .toBe("Pendiente de confirmación");
   });
 });
