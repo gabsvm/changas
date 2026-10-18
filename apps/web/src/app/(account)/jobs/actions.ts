@@ -217,25 +217,29 @@ function moneyMinorField(formData: FormData): number {
   return minor;
 }
 
-// Declarar dinero externo (quien paga o quien recibe). Solo COMPLETED.
+// External payments remain bilateral declarations; tips are allocated on
+// counterpart acceptance by the DB, never by trusting client-sent amounts.
+export type ExternalPaymentDeclarationState = { error: string | null };
+
 export async function declareExternalPaymentAction(
+  _previousState: ExternalPaymentDeclarationState,
   formData: FormData,
-): Promise<void> {
-  const jobId = uuidField(formData, "jobId");
-  const method = stringField(formData, "method");
-  if (!EXTERNAL_MONEY_METHODS.includes(method as (typeof EXTERNAL_MONEY_METHODS)[number])) {
-    throw new Error("El método de pago informado no es válido.");
-  }
-  const paidOnRaw = stringField(formData, "paidOn");
-  const reference = stringField(formData, "reference");
-  if (reference.length > 140) {
-    throw new Error("La referencia admite hasta 140 caracteres, sin datos bancarios.");
-  }
-  // Clave del formulario (estable por render); si falta o es inválida se
-  // genera una fresca para no romper envíos antiguos.
-  const rawKey = stringField(formData, "idempotencyKey");
-  const idempotencyKey = isUuid(rawKey) ? rawKey : randomUUID();
+): Promise<ExternalPaymentDeclarationState> {
+  let jobId: string;
   try {
+    jobId = uuidField(formData, "jobId");
+    const method = stringField(formData, "method");
+    if (!EXTERNAL_MONEY_METHODS.includes(method as (typeof EXTERNAL_MONEY_METHODS)[number])) {
+      return { error: "El método de pago informado no es válido." };
+    }
+    const paidOnRaw = stringField(formData, "paidOn");
+    const reference = stringField(formData, "reference");
+    if (reference.length > 140) {
+      return { error: "La referencia admite hasta 140 caracteres, sin datos bancarios." };
+    }
+    const rawKey = stringField(formData, "idempotencyKey");
+    const idempotencyKey = isUuid(rawKey) ? rawKey : randomUUID();
+
     await declareExternalPayment({
       jobId,
       amountMinor: moneyMinorField(formData),
@@ -246,11 +250,23 @@ export async function declareExternalPaymentAction(
       supersedesId: stringField(formData, "supersedesId") === "" ? null : uuidField(formData, "supersedesId"),
     });
   } catch (error) {
-    if (error instanceof JobServerError) throw new Error(error.message);
-    throw error;
+    if (error instanceof JobServerError) {
+      if (["CONFLICT", "FORBIDDEN", "UNAUTHORIZED", "NOT_FOUND"].includes(error.code)) {
+        return { error: error.message };
+      }
+    }
+    if (error instanceof Error && (
+      error.message === "El monto declarado debe ser positivo." ||
+      error.message === "Identificador inválido."
+    )) {
+      return { error: error.message };
+    }
+    console.error("[jobs] No se pudo registrar el pago externo", error);
+    return { error: "No pudimos registrar el importe. Actualizá la página e intentá de nuevo." };
   }
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");
+  return { error: null };
 }
 
 // La contraparte confirma o contesta con motivo. Los conflictos financieros son

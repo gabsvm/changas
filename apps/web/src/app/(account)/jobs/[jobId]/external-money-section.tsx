@@ -1,22 +1,18 @@
 import { formatMinorUnits } from "@changas/domain";
 
-import {
-  declareExternalPaymentAction,
-  voidExternalPaymentAction,
-} from "@/app/(account)/jobs/actions";
+import { voidExternalPaymentAction } from "@/app/(account)/jobs/actions";
+import { ExternalPaymentDeclarationForm } from "@/app/(account)/jobs/[jobId]/external-payment-declaration-form";
 import {
   externalMoneyStatusLabel,
   externalMoneyAvailableToConfirm,
   externalMoneyAvailableToDeclare,
-  canConfirmExternalPayment,
+  splitExternalMoneyPayment,
   externalPaymentMethodLabel,
   externalPaymentStateLabel,
   type ExternalMoneyLedger,
 } from "@/lib/jobs/external-money";
 import type { ExternalPaymentDeclaration } from "@/lib/jobs/server";
 import { ExternalPaymentResponseForm } from "@/app/(account)/jobs/[jobId]/external-payment-response-form";
-
-const METHOD_OPTIONS = ["EFECTIVO", "TRANSFERENCIA", "OTRO_ACORDADO"] as const;
 
 function formatPaidOn(paidOn: string | null): string {
   if (!paidOn) return "sin fecha informada";
@@ -63,21 +59,29 @@ export function ExternalMoneySection({
           </dd>
         </div>
         <div className="flex justify-between gap-3">
-          <dt className="text-ink/70">Confirmado por ambas partes</dt>
+          <dt className="text-ink/70">Del precio acordado, confirmado</dt>
           <dd className="font-bold">
             {formatMinorUnits(ledger.confirmedMinor, "ARS")}
           </dd>
         </div>
+        {ledger.confirmedTipMinor > 0 ? (
+          <div className="flex justify-between gap-3">
+            <dt className="text-ink/70">Propinas confirmadas</dt>
+            <dd className="font-bold text-success">
+              {formatMinorUnits(ledger.confirmedTipMinor, "ARS")}
+            </dd>
+          </div>
+        ) : null}
         {ledger.claimedMinor > 0 ? (
           <div className="flex justify-between gap-3">
-            <dt className="text-ink/70">Pendiente de confirmación</dt>
+            <dt className="text-ink/70">Declarado, sin confirmar (incluye propinas)</dt>
             <dd className="font-bold">
               {formatMinorUnits(ledger.claimedMinor, "ARS")}
             </dd>
           </div>
         ) : null}
         <div className="border-ink/10 flex justify-between gap-3 border-t pt-1">
-          <dt className="font-extrabold">Saldo</dt>
+          <dt className="font-extrabold">Saldo del precio acordado</dt>
           <dd className="font-extrabold">
             {formatMinorUnits(ledger.outstandingMinor, "ARS")}
           </dd>
@@ -91,7 +95,20 @@ export function ExternalMoneySection({
         custodia el dinero; lo declarado acá no está verificado por YALO.
       </p>
 
-      {pending.map((declaration) => {
+      {pending.map((declaration, index) => {
+        // Pending records reserve the contractual portion in chronological order.
+        // This is an estimate only; the atomic DB response makes the final split.
+        const previousPendingMinor = pending
+          .slice(0, index)
+          .reduce((sum, item) => sum + item.amount_minor, 0);
+        const estimatedContractMinor = Math.max(
+          availableToConfirmMinor - previousPendingMinor,
+          0,
+        );
+        const estimate = splitExternalMoneyPayment(
+          estimatedContractMinor,
+          declaration.amount_minor,
+        );
         const mine = isClient
           ? declaration.declared_by_user_id === clientUserId
           : declaration.declared_by_user_id !== clientUserId;
@@ -117,27 +134,19 @@ export function ExternalMoneySection({
             </p>
             {counterpart ? (
               <div className="mt-2 grid gap-2">
-                {!canConfirmExternalPayment(ledger, declaration.amount_minor) ? (
-                  <p
-                    role="alert"
-                    className="border-warning/30 bg-warning/[0.08] text-ink rounded-xl border px-3 py-2.5 text-[13px] leading-5"
-                  >
-                    <strong>Este importe no se puede confirmar.</strong>{" "}
-                    La declaración es de{" "}
-                    {formatMinorUnits(declaration.amount_minor, "ARS")}, pero
-                    quedan {formatMinorUnits(availableToConfirmMinor, "ARS")} del
-                    total acordado sin confirmar. Pedile a quien la registró que
-                    la anule y vuelva a informar el importe correcto.
-                    No confirmamos un pago que supere lo acordado.
+                {estimate.tipMinor > 0 ? (
+                  <p className="bg-success/[0.07] border-success/20 rounded-xl border px-3 py-2 text-[13px] leading-5">
+                    Propina estimada:{" "}
+                    <strong>{formatMinorUnits(estimate.tipMinor, "ARS")}</strong>.
+                    Se definirá al confirmar el pago.
                   </p>
-                ) : (
-                  <ExternalPaymentResponseForm
-                    jobId={jobId}
-                    declarationId={declaration.id}
-                    decision="accept"
-                    isClient={isClient}
-                  />
-                )}
+                ) : null}
+                <ExternalPaymentResponseForm
+                  jobId={jobId}
+                  declarationId={declaration.id}
+                  decision="accept"
+                  isClient={isClient}
+                />
                 <details className="border-ink/10 rounded-xl border">
                   <summary className="consumer-pressable min-h-11 cursor-pointer px-4 py-2.5 text-sm font-bold">
                     {isClient ? "No lo pagué" : "No lo recibí"}
@@ -167,78 +176,13 @@ export function ExternalMoneySection({
         );
       })}
 
-      {unallocatedMinor > 0 ? (
-        <details className="border-ink/10 rounded-xl border">
-        <summary className="consumer-pressable min-h-[52px] cursor-pointer px-4 py-3 text-sm font-bold">
-          {isClient ? "Informar que pagué" : "Registrar dinero recibido"}
-        </summary>
-        <form
-          action={declareExternalPaymentAction}
-          className="grid gap-3 p-4 pt-0"
-        >
-          <input type="hidden" name="jobId" value={jobId} />
-          <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
-          <p className="text-ink/70 text-xs leading-5">
-            Esta declaración se envía a la otra parte; todavía no significa que
-            esté confirmada.
-          </p>
-          <label className="text-[13px] font-bold">
-            Monto en ARS
-            <input
-              name="amount"
-              required
-              inputMode="decimal"
-              defaultValue={(Math.min(defaultAmountMinor, unallocatedMinor) / 100).toLocaleString("es-AR")}
-              className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal"
-            />
-          </label>
-          <label className="text-[13px] font-bold">
-            Método
-            <select
-              name="method"
-              required
-              defaultValue="TRANSFERENCIA"
-              className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal"
-            >
-              {METHOD_OPTIONS.map((method) => (
-                <option key={method} value={method}>
-                  {externalPaymentMethodLabel(method)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="text-[13px] font-bold">
-            Fecha aproximada (opcional)
-            <input
-              name="paidOn"
-              type="date"
-              className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal"
-            />
-          </label>
-          <label className="text-[13px] font-bold">
-            Referencia (opcional, sin datos bancarios)
-            <input
-              name="reference"
-              maxLength={140}
-              placeholder="Ej: comprobante 1234"
-              className="border-ink/15 mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal"
-            />
-          </label>
-          <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
-            Enviar declaración
-          </button>
-        </form>
-        </details>
-      ) : (
-        <p
-          role="status"
-          className="border-ink/10 bg-ink/[0.04] text-ink/80 rounded-xl border px-3 py-3 text-[13px] leading-5"
-        >
-          {ledger.claimedMinor > 0
-            ? "Ya está declarado el importe pendiente. Esperá la respuesta de la otra parte antes de informar otro pago."
-            : "El importe acordado ya está confirmado por ambas partes."}
-        </p>
-      )}
+      <ExternalPaymentDeclarationForm
+        jobId={jobId}
+        idempotencyKey={idempotencyKey}
+        defaultAmountMinor={Math.max(0, Math.min(defaultAmountMinor, unallocatedMinor))}
+        unclaimedContractMinor={unallocatedMinor}
+        isClient={isClient}
+      />
 
       {declarations.length > 0 ? (
         <div>
@@ -252,6 +196,10 @@ export function ExternalMoneySection({
                 {formatMinorUnits(declaration.amount_minor, "ARS")} ·{" "}
                 {externalPaymentMethodLabel(declaration.method)} ·{" "}
                 {externalPaymentStateLabel(declaration.state)}
+                {declaration.state === "CONFIRMED_BY_BOTH" &&
+                declaration.tip_amount_minor > 0
+                  ? ` · Propina: ${formatMinorUnits(declaration.tip_amount_minor, "ARS")}`
+                  : ""}
                 {declaration.state === "CONTESTED" &&
                 declaration.counterpart_reason
                   ? ` · Motivo: ${declaration.counterpart_reason}`

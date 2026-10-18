@@ -34,7 +34,7 @@ describe("home: obvious hire or work entrypoints", () => {
     expect(styles).toContain(".yalo-intent-link {");
     expect(styles).toContain("min-height: 90px;");
     expect(styles).toContain("min-height: 70px;");
-    expect(styles).toContain(".yalo-intent-actions {\n    grid-template-columns: minmax(0, 1fr);");
+    expect(styles).toMatch(/\.yalo-intent-actions\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\);/);
     expect(styles).not.toContain(".yalo-final-cta");
   });
 
