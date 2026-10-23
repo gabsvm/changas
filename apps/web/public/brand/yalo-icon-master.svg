@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="118" fill="#0D121B"/><svg x="89.6" y="122.88" width="332.8" height="266.24" viewBox="0 0 320 256" preserveAspectRatio="xMidYMid meet"><defs>
+    <linearGradient id="yalo-body" x1="0" y1="128" x2="320" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#08A9F4"/>
+      <stop offset="0.52" stop-color="#12D9C5"/>
+      <stop offset="1" stop-color="#65EC91"/>
+    </linearGradient>
+  </defs>
+  <path d="M36 36 160 164 284 36M160 164V220" fill="none" stroke="url(#yalo-body)" stroke-width="72" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="160" cy="36" r="34" fill="#12D9C5"/></svg></svg>

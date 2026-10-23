@@ -121,12 +121,15 @@ export default async function HomePage() {
               <Image
                 src="/brand/yalo-symbol.svg"
                 width={35}
-                height={35}
+                height={28}
                 alt=""
                 priority
               />
             </span>
-            <span className="yalo-header-wordmark">YALO</span>
+            <span
+              className="brand-wordmark yalo-header-wordmark"
+              aria-hidden="true"
+            />
           </Link>
           <div className="yalo-desktop-navigation">
             <DesktopNav authenticated={Boolean(user)} />
@@ -387,14 +390,20 @@ export default async function HomePage() {
             {categoriesError ? (
               <p className="yalo-empty-copy" role="status">
                 No pudimos cargar las categorías.{" "}
-                <Link className="font-extrabold underline underline-offset-4" href="/">
+                <Link
+                  className="font-extrabold underline underline-offset-4"
+                  href="/"
+                >
                   Reintentar
                 </Link>
               </p>
             ) : visibleCategories.length === 0 ? (
               <p className="yalo-empty-copy" role="status">
                 Todavía no hay categorías para mostrar.{" "}
-                <Link className="font-extrabold underline underline-offset-4" href="/buscar">
+                <Link
+                  className="font-extrabold underline underline-offset-4"
+                  href="/buscar"
+                >
                   Buscar servicios
                 </Link>
               </p>
@@ -433,7 +442,10 @@ export default async function HomePage() {
             {discovery.error ? (
               <p role="status" className="yalo-empty-copy">
                 No pudimos cargar profesionales en este momento.{" "}
-                <Link className="font-extrabold underline underline-offset-4" href="/">
+                <Link
+                  className="font-extrabold underline underline-offset-4"
+                  href="/"
+                >
                   Reintentar
                 </Link>
               </p>

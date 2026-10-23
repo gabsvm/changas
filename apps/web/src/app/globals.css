@@ -95,11 +95,7 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   /* Superficie hero YALO: navy sobrio (texto blanco encima). El gradiente
      multicolor vive solo en --yalo-symbol-gradient. */
-  --consumer-hero-gradient: linear-gradient(
-    180deg,
-    #161d2a 0%,
-    #0d121b 100%
-  );
+  --consumer-hero-gradient: linear-gradient(180deg, #161d2a 0%, #0d121b 100%);
 
   --mobile-bottom-nav-height: calc(
     var(--consumer-nav-height) + max(0.75rem, env(safe-area-inset-bottom))
@@ -129,11 +125,7 @@ body {
       rgb(18 217 197 / 8%),
       transparent 65%
     ),
-    radial-gradient(
-      55rem 26rem at 0% 75%,
-      rgb(22 29 42 / 6%),
-      transparent 65%
-    );
+    radial-gradient(55rem 26rem at 0% 75%, rgb(22 29 42 / 6%), transparent 65%);
   background-repeat: no-repeat;
   color: #101827;
   font-family: var(--font-sans);
@@ -213,6 +205,15 @@ textarea {
 
 .skip-link:focus {
   transform: translateY(0);
+}
+
+.brand-wordmark {
+  display: inline-block;
+  width: 4.6875em;
+  height: 1em;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask: url("/brand/yalo-wordmark-navy.svg") center / contain no-repeat;
 }
 
 .brand-mark {
@@ -886,11 +887,7 @@ a[aria-current="page"] .nav-icon {
   --consumer-shadow-card: 0 8px 20px rgb(0 0 0 / 35%);
   --consumer-shadow-float: 0 12px 32px rgb(0 0 0 / 45%);
   --consumer-shadow-hero: 0 24px 60px rgb(0 0 0 / 50%);
-  --consumer-hero-gradient: linear-gradient(
-    180deg,
-    #1e293b 0%,
-    #0d121b 100%
-  );
+  --consumer-hero-gradient: linear-gradient(180deg, #1e293b 0%, #0d121b 100%);
 }
 
 .dark body {
@@ -949,7 +946,6 @@ a[aria-current="page"] .nav-icon {
 .dark .brand-info-link {
   color: var(--color-focus);
 }
-
 
 .dark .button-secondary {
   border-color: rgb(245 248 252 / 16%);

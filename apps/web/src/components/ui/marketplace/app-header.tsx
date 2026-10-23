@@ -48,30 +48,26 @@ export function AppHeader({
       ) : brand ? (
         <Link
           href="/"
-          className="flex min-w-0 items-center gap-2.5"
+          className="flex min-h-11 min-w-0 items-center gap-2.5"
           aria-label="YALO, inicio"
         >
           <span className="brand-mark h-9 w-9" aria-hidden="true">
             C
           </span>
-          <span className="truncate text-lg font-bold tracking-[-0.025em]">
-            YALO
-          </span>
+          <span className="brand-wordmark text-lg" aria-hidden="true" />
         </Link>
       ) : null}
 
       {backHref ? (
         <Link
           href="/"
-          className="hidden min-w-0 items-center gap-2.5 sm:flex"
+          className="hidden min-h-11 min-w-0 items-center gap-2.5 sm:flex"
           aria-label="YALO, inicio"
         >
           <span className="brand-mark h-9 w-9" aria-hidden="true">
             C
           </span>
-          <span className="truncate text-lg font-bold tracking-[-0.025em]">
-            YALO
-          </span>
+          <span className="brand-wordmark text-lg" aria-hidden="true" />
         </Link>
       ) : null}
 

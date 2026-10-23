@@ -35,14 +35,15 @@ export default function AuthLayout({
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-6xl flex-col">
         <header className="yalo-auth-header border-ink/10 flex items-center justify-between border-b pb-5">
           <Link
-            className="flex items-center gap-3"
+            className="flex min-h-11 items-center gap-3"
             href="/"
             aria-label="YALO, inicio"
           >
             <span className="brand-mark" role="img" aria-label="YALO" />
-            <span className="font-display text-xl font-extrabold tracking-[-0.06em] text-white">
-              YALO
-            </span>
+            <span
+              className="brand-wordmark text-xl text-white"
+              aria-hidden="true"
+            />
           </Link>
           <span className="text-xs font-extrabold tracking-[0.16em] text-[#12D9C5] uppercase">
             Cuenta
@@ -82,7 +83,11 @@ export default function AuthLayout({
               <div className="relative">
                 <span className="font-display inline-flex items-center gap-2.5 text-3xl font-extrabold tracking-[-0.06em] text-white">
                   <span className="brand-mark h-11 w-11" aria-hidden="true" />
-                  YALO
+                  <span
+                    className="brand-wordmark"
+                    role="img"
+                    aria-label="YALO"
+                  />
                 </span>
                 <p className="mt-4 text-xs font-extrabold tracking-[0.18em] text-white/85 uppercase">
                   YALO · trabajo de barrio

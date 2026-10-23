@@ -1,33 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 360" role="img" aria-labelledby="title desc">
-  <title id="title">YALO — lockup horizontal sobre claro</title>
-  <desc id="desc">Símbolo Y multicolor a la izquierda, YALO en navy y lema debajo. Lettering interino a trazos; requiere master definitivo.</desc>
-  <defs>
-    <linearGradient id="yhArmLeft" x1="132" y1="178" x2="252" y2="296" gradientUnits="userSpaceOnUse">
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="160" viewBox="0 0 520 160"><svg x="16" y="24" width="140" height="112" viewBox="0 0 320 256" preserveAspectRatio="xMidYMid meet"><defs>
+    <linearGradient id="yalo-body" x1="0" y1="128" x2="320" y2="128" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#08A9F4"/>
-      <stop offset="1" stop-color="#12D9C5"/>
-    </linearGradient>
-    <linearGradient id="yhArmRight" x1="380" y1="178" x2="260" y2="296" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#65EC91"/>
-      <stop offset="1" stop-color="#12D9C5"/>
-    </linearGradient>
-    <linearGradient id="yhTrunk" x1="256" y1="290" x2="256" y2="398" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#12D9C5"/>
-      <stop offset="1" stop-color="#0FB5A6"/>
+      <stop offset="0.52" stop-color="#12D9C5"/>
+      <stop offset="1" stop-color="#65EC91"/>
     </linearGradient>
   </defs>
-  <g transform="translate(24,38) scale(0.7)">
-    <g fill="none" stroke-linecap="round" stroke-width="56">
-      <path d="M132 178 252 296" stroke="url(#yhArmLeft)"/>
-      <path d="M380 178 260 296" stroke="url(#yhArmRight)"/>
-      <path d="M256 290 256 398" stroke="url(#yhTrunk)"/>
-    </g>
-    <circle cx="256" cy="166" r="34" fill="#12D9C5"/>
-  </g>
-  <g transform="translate(336,80) scale(0.68)" fill="none" stroke="#0D121B" stroke-width="44" stroke-linejoin="miter" stroke-linecap="square">
-    <path d="M52 16 110 88 168 16M110 88V152"/>
-    <path d="M242 152 300 14 358 152M264 106H336"/>
-    <path d="M432 14V152H542"/>
-    <rect x="592" y="14" width="116" height="138" rx="30"/>
-  </g>
-  <text x="336" y="262" font-family="Verdana, Arial, sans-serif" font-size="24" font-weight="bold" letter-spacing="3" fill="#0D121B" opacity="0.7">TRABAJÁ · CONTRATÁ · CRECÉ</text>
-</svg>
+  <path d="M36 36 160 164 284 36M160 164V220" fill="none" stroke="url(#yalo-body)" stroke-width="72" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="160" cy="36" r="34" fill="#12D9C5"/></svg><svg x="190" y="25" width="300" height="64" viewBox="0 0 600 128" preserveAspectRatio="xMidYMid meet"><g fill="#0D121B">
+    <path d="M0 0H34L66 44 98 0H132L81 72V128H51V72Z"/>
+    <path d="M144 128 204 0H236L296 128H262L220 35 178 128Z"/>
+    <path d="M318 0H348V100H422V128H318Z"/>
+    <path fill-rule="evenodd" d="M520 0C468 0 440 22 440 64S468 128 520 128 600 106 600 64 572 0 520 0ZM520 27C553 27 568 39 568 64S553 101 520 101 472 89 472 64 487 27 520 27Z"/>
+  </g></svg><text x="192" y="128" fill="#0D121B" font-family="Arial, sans-serif" font-size="12" letter-spacing="1" text-anchor="start">TRABAJÁ · CONTRATÁ · CRECÉ</text></svg>

@@ -93,11 +93,7 @@
 }
 .yalo-header-wordmark {
   color: white;
-  font-family: var(--font-display);
-  font-size: 1.43rem;
-  font-weight: 800;
-  letter-spacing: -0.085em;
-  padding-right: 0.06em;
+  font-size: 1.125rem;
 }
 .yalo-desktop-navigation {
   flex: 1;
@@ -926,10 +922,10 @@
   }
   .yalo-header-symbol img {
     width: 29px;
-    height: 29px;
+    height: auto;
   }
   .yalo-header-wordmark {
-    font-size: 1.24rem;
+    font-size: 1rem;
   }
   .yalo-nav-actions {
     display: none;

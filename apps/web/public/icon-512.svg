@@ -1,26 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
-  <title id="title">YALO</title>
-  <defs>
-    <linearGradient id="yiArmLeft" x1="132" y1="178" x2="252" y2="296" gradientUnits="userSpaceOnUse">
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="118" fill="#0D121B"/><svg x="89.6" y="122.88" width="332.8" height="266.24" viewBox="0 0 320 256" preserveAspectRatio="xMidYMid meet"><defs>
+    <linearGradient id="yalo-body" x1="0" y1="128" x2="320" y2="128" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#08A9F4"/>
-      <stop offset="1" stop-color="#12D9C5"/>
-    </linearGradient>
-    <linearGradient id="yiArmRight" x1="380" y1="178" x2="260" y2="296" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#65EC91"/>
-      <stop offset="1" stop-color="#12D9C5"/>
-    </linearGradient>
-    <linearGradient id="yiTrunk" x1="256" y1="290" x2="256" y2="398" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#12D9C5"/>
-      <stop offset="1" stop-color="#0FB5A6"/>
+      <stop offset="0.52" stop-color="#12D9C5"/>
+      <stop offset="1" stop-color="#65EC91"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="118" fill="#0D121B"/>
-  <g transform="translate(102.5,96) scale(0.8)">
-    <g fill="none" stroke-linecap="round" stroke-width="56">
-      <path d="M132 178 252 296" stroke="url(#yiArmLeft)"/>
-      <path d="M380 178 260 296" stroke="url(#yiArmRight)"/>
-      <path d="M256 290 256 398" stroke="url(#yiTrunk)"/>
-    </g>
-    <circle cx="256" cy="166" r="34" fill="#12D9C5"/>
-  </g>
-</svg>
+  <path d="M36 36 160 164 284 36M160 164V220" fill="none" stroke="url(#yalo-body)" stroke-width="72" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="160" cy="36" r="34" fill="#12D9C5"/></svg></svg>

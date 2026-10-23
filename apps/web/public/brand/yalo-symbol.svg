@@ -1,24 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="64 80 384 400" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 256" role="img" aria-labelledby="title desc">
   <title id="title">YALO — símbolo</title>
-  <desc id="desc">Persona abstracta en forma de Y: brazo izquierdo cian, cuerpo turquesa, brazo derecho menta y cabeza circular separada. Reconstrucción interina fiel a la referencia aprobada; requiere validación del master definitivo.</desc>
+  <desc id="desc">Persona en Y compacta, brazos redondeados y cabeza separada. Reconstrucción vectorial de la referencia YALO aportada; colores aproximados de la captura.</desc>
   <defs>
-    <linearGradient id="yaloArmLeft" x1="132" y1="178" x2="252" y2="296" gradientUnits="userSpaceOnUse">
+    <linearGradient id="yalo-body" x1="0" y1="128" x2="320" y2="128" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#08A9F4"/>
-      <stop offset="1" stop-color="#12D9C5"/>
-    </linearGradient>
-    <linearGradient id="yaloArmRight" x1="380" y1="178" x2="260" y2="296" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#65EC91"/>
-      <stop offset="1" stop-color="#12D9C5"/>
-    </linearGradient>
-    <linearGradient id="yaloTrunk" x1="256" y1="290" x2="256" y2="398" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#12D9C5"/>
-      <stop offset="1" stop-color="#0FB5A6"/>
+      <stop offset="0.52" stop-color="#12D9C5"/>
+      <stop offset="1" stop-color="#65EC91"/>
     </linearGradient>
   </defs>
-  <g fill="none" stroke-linecap="round" stroke-width="56">
-    <path d="M132 178 252 296" stroke="url(#yaloArmLeft)"/>
-    <path d="M380 178 260 296" stroke="url(#yaloArmRight)"/>
-    <path d="M256 290 256 398" stroke="url(#yaloTrunk)"/>
-  </g>
-  <circle cx="256" cy="166" r="34" fill="#12D9C5"/>
+  <path d="M36 36 160 164 284 36M160 164V220" fill="none" stroke="url(#yalo-body)" stroke-width="72" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="160" cy="36" r="34" fill="#12D9C5"/>
 </svg>

@@ -26,7 +26,7 @@ export default async function ProviderLayout({
             <span className="brand-mark" aria-hidden="true">
               C
             </span>
-            <span className="text-lg font-bold tracking-[-0.025em]">YALO</span>
+            <span className="brand-wordmark text-lg" aria-hidden="true" />
           </Link>
           <nav
             className="flex items-center justify-end gap-1 text-sm font-semibold"
