@@ -11,6 +11,7 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
+import { ActionArrowIcon } from "@/components/ui/marketplace/action-arrow-icon";
 import { getProviderEarningsSummary } from "@/lib/jobs/earnings-summary";
 import {
   getProviderPaymentAccountState,
@@ -19,6 +20,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 import { NextStepBanner } from "@/components/ui/guided";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { getProviderNextAction } from "@/lib/ui/guided";
 
 import {
@@ -301,7 +303,8 @@ export default async function ProviderMarketplaceManagePage({
               href={`/p/${provider.public_slug}`}
               target="_blank"
             >
-              Ver perfil público ↗
+              Ver perfil público{" "}
+              <span aria-hidden="true"><ActionArrowIcon /></span>
             </Link>
           </div>
         </div>
@@ -318,14 +321,16 @@ export default async function ProviderMarketplaceManagePage({
             <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-6" />
           );
         })()}
-        <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-          <Link
-            href="/oportunidades"
-            className="consumer-pressable bg-surface border-ink/[0.08] inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border px-4 text-sm font-bold"
-          >
-            Ver oportunidades para ofertar
-          </Link>
-        </div>
+        {arePublicNeedsEnabled() ? (
+          <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+            <Link
+              href="/oportunidades"
+              className="consumer-pressable bg-surface border-ink/[0.08] inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border px-4 text-sm font-bold"
+            >
+              Ver oportunidades para ofertar
+            </Link>
+          </div>
+        ) : null}
         {incomeResult.ok ? (
           (() => {
             const income = incomeResult.summary;

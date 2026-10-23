@@ -1066,10 +1066,15 @@ export function MarketplaceManagement({
                     )}
                   </p>
                   <p className="text-ink/70 text-xs">
-                    {service.public_slug} ·{" "}
-                    {service.is_published ? "publicado" : "borrador"}
+                    {service.is_published ? "Publicado" : "Borrador"}
                     {service.is_paused ? " · pausado" : ""}
                   </p>
+                  <details className="text-ink/60 mt-1 text-xs">
+                    <summary className="consumer-pressable inline-flex min-h-8 cursor-pointer items-center">
+                      Ver enlace técnico
+                    </summary>
+                    <p>{service.public_slug}</p>
+                  </details>
                 </div>
                 <span className="bg-moss/10 text-moss rounded-full px-3 py-1 text-xs font-semibold">
                   {formatServicePrice(
@@ -1422,40 +1427,49 @@ export function MarketplaceManagement({
             <ActionForm action={actions.saveArea} submitLabel="Agregar zona">
               <Field label="Etiqueta pública" name="label" required />
               <UseLocationButton />
-              <div className="grid gap-4 md:grid-cols-3">
-                <Field
-                  label="Latitud privada"
-                  name="latitude"
-                  type="number"
-                  min={-90}
-                  max={90}
-                  step="any"
-                  inputMode="decimal"
-                  placeholder="Ej: -34.6037"
-                  required
-                />
-                <Field
-                  label="Longitud privada"
-                  name="longitude"
-                  type="number"
-                  min={-180}
-                  max={180}
-                  step="any"
-                  inputMode="decimal"
-                  placeholder="Ej: -58.3816"
-                  required
-                />
-                <Field
-                  label="Radio en metros"
-                  name="radiusMeters"
-                  type="number"
-                  min={100}
-                  max={100000}
-                  inputMode="numeric"
-                  placeholder="Ej: 5000"
-                  required
-                />
-              </div>
+              <details className="rounded-xl border border-ink/10 px-4 dark:border-white/10">
+                <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center text-sm font-semibold">
+                  Ingresar coordenadas manualmente (opcional)
+                </summary>
+                <p className="text-ink/70 pb-3 text-xs">
+                  Usá esta opción si no querés compartir tu ubicación actual.
+                  Las coordenadas son privadas.
+                </p>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field
+                    label="Latitud privada"
+                    name="latitude"
+                    type="number"
+                    min={-90}
+                    max={90}
+                    step="any"
+                    inputMode="decimal"
+                    placeholder="Ej: -34.6037"
+                    required
+                  />
+                  <Field
+                    label="Longitud privada"
+                    name="longitude"
+                    type="number"
+                    min={-180}
+                    max={180}
+                    step="any"
+                    inputMode="decimal"
+                    placeholder="Ej: -58.3816"
+                    required
+                  />
+                </div>
+              </details>
+              <Field
+                label="Radio en metros"
+                name="radiusMeters"
+                type="number"
+                min={100}
+                max={100000}
+                inputMode="numeric"
+                placeholder="Ej: 5000"
+                required
+              />
               <Check label="Zona activa" name="isActive" defaultChecked />
             </ActionForm>
           </div>
@@ -1464,7 +1478,7 @@ export function MarketplaceManagement({
           anchor="disponibilidad"
           eyebrow="Disponibilidad"
           title="Reglas y bloqueos"
-          description="Esto sólo prepara disponibilidad; no crea reservas ni agenda turnos en Phase 02."
+          description="La disponibilidad guardada todavía no permite reservar ni agenda turnos."
         >
           <div className="space-y-3">
             {availabilityRules.map((item) => (

@@ -2,6 +2,14 @@
 
 Changas is a mobile-first marketplace PWA for offering and hiring practical skills and trades. Live product: public discovery with reputation-ranked search, provider profiles with portfolio covers, conversations with structured proposals, **hire-on-accept** (accepting hires instantly, no upfront payment; settled at completion), Web Push with rich content, manual Claro/Oscuro/Sistema theme, and Mercado Pago Split 1:1 + Checkout Pro (wired for completion-time charging). See [`docs/CONTEXTO.md`](./docs/CONTEXTO.md) for current state and roadmap, and [`CHANGAS_MASTER_PLAN.md`](./CHANGAS_MASTER_PLAN.md) for the original V1 vision (partially superseded).
 
+## YALO marketplace behavior
+
+- `YALO_PUBLIC_NEEDS_ENABLED` gates public provider opportunities.
+- Emulator test-category skills are excluded from public pickers and the profile list in production; management, admin, and history views remain intact.
+- Chat shows job lifecycle status; detailed financial progress is available in job tracking.
+- The completed-job review prompt follows client permission and state.
+- Optional manually entered location coordinates remain private.
+
 ## Prerequisites
 
 - Node.js 24.20.0 or newer

@@ -1,5 +1,6 @@
 ﻿import Link from "next/link";
 
+import { ActionArrowIcon } from "@/components/ui/marketplace/action-arrow-icon";
 import { guideProgress, type GuidedStep } from "@/lib/ui/guided";
 
 /**
@@ -120,9 +121,11 @@ export function NextStepBanner({
       {href ? (
         <Link
           href={href}
-          className="consumer-pressable relative mt-4 inline-flex min-h-14 w-full items-center justify-center rounded-2xl bg-white px-6 text-base font-extrabold text-[#C84010] shadow-[0_10px_24px_-10px_rgb(0_0_0/45%)] sm:w-auto sm:min-w-56"
+          className="button-primary consumer-pressable relative mt-4 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl px-6 text-base font-extrabold shadow-[0_10px_24px_-10px_rgb(0_0_0/45%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 sm:w-auto sm:min-w-56"
+          style={{ backgroundImage: "var(--yalo-symbol-gradient)", color: "#062233" }}
         >
-          {cta} →
+          {cta}
+          <span aria-hidden="true"><ActionArrowIcon /></span>
         </Link>
       ) : null}
     </section>

@@ -79,36 +79,44 @@ export default async function AdminCatalogPage() {
           </a>
         ))}
       </nav>
-      <div id="crear" className="grid scroll-mt-40 gap-4 lg:grid-cols-2">
-        <AdminPanel>
-          <form action={createCategoryAction}>
+      <div id="crear" className="grid w-full min-w-0 grid-cols-1 scroll-mt-40 gap-4 lg:grid-cols-2">
+        <AdminPanel className="w-full min-w-0">
+          <form action={createCategoryAction} className="w-full min-w-0">
             <h3 className="text-ink text-base font-extrabold">
               Nueva categoría
             </h3>
-            <div className="mt-3 grid gap-2">
+            <div className="mt-3 grid w-full min-w-0 gap-2">
+              <label className="grid gap-1 text-xs font-semibold text-ink">Nombre de categoría
               <input
                 className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="name"
                 required
                 placeholder="Nombre"
               />
+              </label>
+              <label className="grid gap-1 text-xs font-semibold text-ink">Slug de categoría
               <input
                 className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="slug"
                 required
                 placeholder="slug"
               />
+              </label>
+              <label className="grid gap-1 text-xs font-semibold text-ink">Descripción de categoría
               <input
                 className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="description"
                 placeholder="Descripción"
               />
+              </label>
+              <label className="grid gap-1 text-xs font-semibold text-ink">Orden de visualización de categoría
               <input
                 className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="sortOrder"
                 type="number"
                 defaultValue="0"
               />
+              </label>
               <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
                 Crear categoría
               </button>
@@ -116,10 +124,11 @@ export default async function AdminCatalogPage() {
           </form>
         </AdminPanel>
 
-        <AdminPanel>
-          <form action={createSkillAction}>
+        <AdminPanel className="w-full min-w-0">
+          <form action={createSkillAction} className="w-full min-w-0">
             <h3 className="text-ink text-base font-extrabold">Nueva skill</h3>
-            <div className="mt-3 grid gap-2">
+            <div className="mt-3 grid w-full min-w-0 gap-2">
+              <label className="grid gap-1 text-xs font-semibold text-ink">Categoría de la nueva skill
               <select
                 className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="categoryId"
@@ -134,29 +143,38 @@ export default async function AdminCatalogPage() {
                   </option>
                 ))}
               </select>
+              </label>
+              <label className="grid gap-1 text-xs font-semibold text-ink">Nombre de la nueva skill
               <input
                 className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="name"
                 required
                 placeholder="Nombre"
               />
+              </label>
+              <label className="grid gap-1 text-xs font-semibold text-ink">Slug de la nueva skill
               <input
                 className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="slug"
                 required
                 placeholder="slug"
               />
+              </label>
+              <label className="grid gap-1 text-xs font-semibold text-ink">Descripción de la nueva skill
               <input
                 className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="description"
                 placeholder="Descripción"
               />
+              </label>
+              <label className="grid gap-1 text-xs font-semibold text-ink">Orden de visualización de la nueva skill
               <input
                 className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="sortOrder"
                 type="number"
                 defaultValue="0"
               />
+              </label>
               <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
                 Crear skill
               </button>
@@ -165,15 +183,16 @@ export default async function AdminCatalogPage() {
         </AdminPanel>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <AdminPanel>
-          <form action={createSkillSynonymAction}>
+      <div className="grid w-full min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
+        <AdminPanel className="w-full min-w-0">
+          <form action={createSkillSynonymAction} className="w-full min-w-0">
             <h3 className="text-ink text-base font-extrabold">
               Nuevo sinónimo
             </h3>
-            <div className="mt-3 grid gap-2">
+            <div className="mt-3 grid w-full min-w-0 gap-2">
+              <label className="grid min-w-0 gap-1 break-words text-xs font-semibold text-ink">Skill del nuevo sinónimo
               <select
-                className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                className="border-ink/10 text-ink w-full min-w-0 max-w-full rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="skillId"
                 required
               >
@@ -183,27 +202,30 @@ export default async function AdminCatalogPage() {
                   </option>
                 ))}
               </select>
+              </label>
+              <label className="grid min-w-0 gap-1 break-words text-xs font-semibold text-ink">Frase equivalente del nuevo sinónimo
               <input
-                className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                className="border-ink/10 text-ink w-full min-w-0 max-w-full rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="phrase"
                 required
                 minLength={2}
                 maxLength={120}
                 placeholder="Frase equivalente"
               />
+              </label>
               <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
                 Crear sinónimo
               </button>
             </div>
           </form>
         </AdminPanel>
-
-        <AdminPanel>
-          <form action={createServiceTagAction}>
+        <AdminPanel className="w-full min-w-0">
+          <form action={createServiceTagAction} className="w-full min-w-0">
             <h3 className="text-ink text-base font-extrabold">Nuevo tag</h3>
-            <div className="mt-3 grid gap-2">
+            <div className="mt-3 grid w-full min-w-0 gap-2">
+              <label className="grid gap-1 text-xs font-semibold text-ink">Servicio del nuevo tag
               <select
-                className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                className="border-ink/10 text-ink w-full min-w-0 max-w-full rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="serviceId"
                 required
               >
@@ -213,14 +235,17 @@ export default async function AdminCatalogPage() {
                   </option>
                 ))}
               </select>
+              </label>
+              <label className="grid gap-1 text-xs font-semibold text-ink">Tag de búsqueda nuevo
               <input
-                className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                className="border-ink/10 text-ink w-full min-w-0 max-w-full rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
                 name="tag"
                 required
                 minLength={2}
                 maxLength={80}
                 placeholder="Tag de búsqueda"
               />
+              </label>
               <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
                 Crear tag
               </button>
@@ -239,10 +264,10 @@ export default async function AdminCatalogPage() {
             acá.
           </p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
             {skillRequests.map((request) => (
               <article
-                className="border-ink/[0.08] bg-surface rounded-3xl border p-4 sm:p-5"
+                className="border-ink/[0.08] bg-surface w-full min-w-0 rounded-3xl border p-4 sm:p-5"
                 key={request.request_id}
               >
                 <div className="flex justify-between gap-3">
@@ -303,21 +328,24 @@ export default async function AdminCatalogPage() {
                         value={request.request_id}
                       />
                       <input type="hidden" name="decision" value="MERGE" />
-                      <select
-                        className="border-ink/10 text-ink w-full rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                        name="matchedSkillId"
-                        required
-                        defaultValue=""
-                      >
-                        <option value="" disabled>
-                          Fusionar a…
-                        </option>
-                        {skills.map((skill) => (
-                          <option value={skill.skill_id} key={skill.skill_id}>
-                            {skill.name}
+                      <label className="grid gap-1 text-xs font-semibold text-ink">
+                        Skill existente para fusionar la solicitud de {request.name}
+                        <select
+                          className="border-ink/10 text-ink w-full min-w-0 rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                          name="matchedSkillId"
+                          required
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
+                            Fusionar a…
                           </option>
-                        ))}
-                      </select>
+                          {skills.map((skill) => (
+                            <option value={skill.skill_id} key={skill.skill_id}>
+                              {skill.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
                       <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-extrabold">
                         Fusionar a existente
                       </button>
@@ -329,13 +357,16 @@ export default async function AdminCatalogPage() {
                         value={request.request_id}
                       />
                       <input type="hidden" name="decision" value="REJECT" />
-                      <input
-                        className="border-ink/10 text-ink w-full rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                        name="reviewerNote"
-                        required
-                        minLength={2}
-                        placeholder="Motivo del rechazo"
-                      />
+                      <label className="grid gap-1 text-xs font-semibold text-ink">
+                        Motivo del rechazo de {request.name}
+                        <input
+                          className="border-ink/10 text-ink w-full min-w-0 rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                          name="reviewerNote"
+                          required
+                          minLength={2}
+                          placeholder="Motivo del rechazo"
+                        />
+                      </label>
                       <button className="border-danger/25 text-danger mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-extrabold">
                         Rechazar
                       </button>
@@ -350,10 +381,10 @@ export default async function AdminCatalogPage() {
 
       <div id="categorias" className="scroll-mt-40">
         <h3 className="text-ink mb-3 text-base font-extrabold">Categorías</h3>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
           {categories.map((category) => (
             <article
-              className="border-ink/[0.08] bg-surface rounded-3xl border p-4 sm:p-5"
+              className="border-ink/[0.08] bg-surface w-full min-w-0 rounded-3xl border p-4 sm:p-5"
               key={category.category_id}
             >
               <div className="flex justify-between gap-3">
@@ -435,29 +466,20 @@ export default async function AdminCatalogPage() {
                     name="nextActive"
                     value={String(category.is_active)}
                   />
-                  <input
-                    className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                    name="name"
-                    required
-                    defaultValue={category.name}
-                  />
-                  <input
-                    className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                    name="slug"
-                    required
-                    defaultValue={category.slug}
-                  />
-                  <input
-                    className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                    name="description"
-                    defaultValue={category.description ?? ""}
-                  />
-                  <input
-                    className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                    name="sortOrder"
-                    type="number"
-                    defaultValue={category.sort_order}
-                  />
+                  <label className="grid gap-1 text-xs font-semibold text-ink">Nombre de categoría: {category.name}
+                    <input className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white" name="name" required defaultValue={category.name} />
+                  </label>
+                  <label className="grid gap-1 text-xs font-semibold text-ink">Slug de categoría: {category.name}
+                    <input className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white" name="slug" required defaultValue={category.slug} />
+                    <span className="font-normal text-ink/60">Identificador corto usado en enlaces.</span>
+                  </label>
+                  <label className="grid gap-1 text-xs font-semibold text-ink">Descripción de categoría: {category.name}
+                    <input className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white" name="description" defaultValue={category.description ?? ""} />
+                  </label>
+                  <label className="grid gap-1 text-xs font-semibold text-ink">Orden de visualización de categoría: {category.name}
+                    <input className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white" name="sortOrder" type="number" defaultValue={category.sort_order} />
+                    <span className="font-normal text-ink/60">Número menor aparece primero.</span>
+                  </label>
                   <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
                     Guardar cambios
                   </button>
@@ -470,10 +492,10 @@ export default async function AdminCatalogPage() {
 
       <div id="skills" className="scroll-mt-40">
         <h3 className="text-ink mb-3 text-base font-extrabold">Skills</h3>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
           {skills.map((skill) => (
             <article
-              className="border-ink/[0.08] bg-surface rounded-3xl border p-4 sm:p-5"
+              className="border-ink/[0.08] bg-surface w-full min-w-0 rounded-3xl border p-4 sm:p-5"
               key={skill.skill_id}
             >
               <div className="flex justify-between gap-3">
@@ -552,43 +574,58 @@ export default async function AdminCatalogPage() {
                     name="nextActive"
                     value={String(skill.is_active)}
                   />
-                  <select
-                    className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                    name="categoryId"
-                    defaultValue={skill.category_id}
-                  >
-                    {categories.map((category) => (
-                      <option
-                        value={category.category_id}
-                        key={category.category_id}
-                      >
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                    name="name"
-                    required
-                    defaultValue={skill.name}
-                  />
-                  <input
-                    className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                    name="slug"
-                    required
-                    defaultValue={skill.slug}
-                  />
-                  <input
-                    className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                    name="description"
-                    defaultValue={skill.description ?? ""}
-                  />
-                  <input
-                    className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                    name="sortOrder"
-                    type="number"
-                    defaultValue={skill.sort_order}
-                  />
+                  <label className="grid gap-1 text-xs font-semibold text-ink">
+                    Categoría de la skill {skill.name}
+                    <select
+                      className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                      name="categoryId"
+                      defaultValue={skill.category_id}
+                    >
+                      {categories.map((category) => (
+                        <option
+                          value={category.category_id}
+                          key={category.category_id}
+                        >
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="grid gap-1 text-xs font-semibold text-ink">
+                    Nombre de la skill {skill.name}
+                    <input
+                      className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                      name="name"
+                      required
+                      defaultValue={skill.name}
+                    />
+                  </label>
+                  <label className="grid gap-1 text-xs font-semibold text-ink">
+                    Slug de la skill {skill.name}
+                    <input
+                      className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                      name="slug"
+                      required
+                      defaultValue={skill.slug}
+                    />
+                  </label>
+                  <label className="grid gap-1 text-xs font-semibold text-ink">
+                    Descripción de la skill {skill.name}
+                    <input
+                      className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                      name="description"
+                      defaultValue={skill.description ?? ""}
+                    />
+                  </label>
+                  <label className="grid gap-1 text-xs font-semibold text-ink">
+                    Orden de visualización de la skill {skill.name}
+                    <input
+                      className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                      name="sortOrder"
+                      type="number"
+                      defaultValue={skill.sort_order}
+                    />
+                  </label>
                   <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
                     Guardar cambios
                   </button>
@@ -604,7 +641,7 @@ export default async function AdminCatalogPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           {synonyms.map((synonym) => (
             <article
-              className="border-ink/[0.08] bg-surface rounded-3xl border p-4 sm:p-5"
+              className="border-ink/[0.08] bg-surface w-full min-w-0 rounded-3xl border p-4 sm:p-5"
               key={synonym.synonym_id}
             >
               <p className="text-ink font-extrabold">{synonym.phrase}</p>
@@ -613,21 +650,19 @@ export default async function AdminCatalogPage() {
               </p>
               <form
                 action={updateSkillSynonymAction}
-                className="mt-3 grid gap-2"
+                className="mt-3 grid w-full min-w-0 gap-2"
               >
-                <input
-                  type="hidden"
-                  name="synonymId"
-                  value={synonym.synonym_id}
-                />
-                <input
-                  className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                  name="phrase"
-                  required
-                  minLength={2}
-                  maxLength={120}
-                  defaultValue={synonym.phrase}
-                />
+                <label className="grid gap-1 text-xs font-semibold text-ink">
+                  Frase equivalente del sinónimo “{synonym.phrase}”
+                  <input
+                    className="border-ink/10 text-ink w-full min-w-0 rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                    name="phrase"
+                    required
+                    minLength={2}
+                    maxLength={120}
+                    defaultValue={synonym.phrase}
+                  />
+                </label>
                 <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
                   Actualizar
                 </button>
@@ -659,28 +694,31 @@ export default async function AdminCatalogPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           {tags.map((tag) => (
             <article
-              className="border-ink/[0.08] bg-surface rounded-3xl border p-4 sm:p-5"
+              className="border-ink/[0.08] bg-surface w-full min-w-0 rounded-3xl border p-4 sm:p-5"
               key={`${tag.service_id}:${tag.normalized_tag}`}
             >
               <p className="text-ink font-extrabold">{tag.tag}</p>
               <p className="text-ink/60 text-xs">
                 {tag.service_title} · {tag.normalized_tag}
               </p>
-              <form action={updateServiceTagAction} className="mt-3 grid gap-2">
+              <form action={updateServiceTagAction} className="mt-3 grid w-full min-w-0 gap-2">
                 <input type="hidden" name="serviceId" value={tag.service_id} />
                 <input
                   type="hidden"
                   name="normalizedTag"
                   value={tag.normalized_tag}
                 />
-                <input
-                  className="border-ink/10 text-ink rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
-                  name="tag"
-                  required
-                  minLength={2}
-                  maxLength={80}
-                  defaultValue={tag.tag}
-                />
+                <label className="grid gap-1 text-xs font-semibold text-ink">
+                  Tag de búsqueda de {tag.service_title}
+                  <input
+                    className="border-ink/10 text-ink w-full min-w-0 rounded-lg border bg-white px-3 py-2 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                    name="tag"
+                    required
+                    minLength={2}
+                    maxLength={80}
+                    defaultValue={tag.tag}
+                  />
+                </label>
                 <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
                   Actualizar
                 </button>
@@ -735,11 +773,11 @@ export default async function AdminCatalogPage() {
                   tone={moderationTone(service.moderation_state)}
                 />
               </div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+              <div className="mt-3 grid w-full min-w-0 grid-cols-1 gap-2 sm:grid-cols-3">
                 {(["FLAGGED", "DISABLED", "CLEAR"] as const).map((state) => (
                   <form
                     action={setServiceModerationAction}
-                    className="border-ink/[0.08] bg-surface rounded-2xl border p-3"
+                    className="border-ink/[0.08] bg-surface w-full min-w-0 rounded-2xl border p-3"
                     key={state}
                   >
                     <input
@@ -749,13 +787,16 @@ export default async function AdminCatalogPage() {
                     />
                     <input type="hidden" name="state" value={state} />
                     {state === "CLEAR" ? null : (
-                      <input
-                        className="border-ink/10 text-ink w-full rounded-md border bg-white px-2 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
-                        name="reason"
-                        required
-                        minLength={3}
-                        placeholder="Motivo"
-                      />
+                      <label className="grid gap-1 text-xs font-semibold text-ink">
+                        Motivo para {state === "DISABLED" ? "deshabilitar" : "marcar"} {service.service_title}
+                        <input
+                          className="border-ink/10 text-ink w-full min-w-0 rounded-md border bg-white px-2 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
+                          name="reason"
+                          required
+                          minLength={3}
+                          placeholder="Motivo"
+                        />
+                      </label>
                     )}
                     <button
                       className={

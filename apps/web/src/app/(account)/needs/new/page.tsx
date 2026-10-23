@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { NeedWizard } from "./need-wizard";
 import { createClient } from "@/lib/supabase/server";
+import { filterPublicSkillsByCategoryId, isExcludedPublicTestCategory } from "@/lib/public-catalog";
 import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 
@@ -23,11 +24,25 @@ export default async function NewNeedPage() {
 
   if (!user) redirect("/login?next=/needs/new");
 
-  const { data: skills } = await supabase
-    .from("skills")
-    .select("id, name")
-    .eq("is_active", true)
-    .order("sort_order");
+  const [{ data: skills }, { data: categories }] = await Promise.all([
+    supabase
+      .from("skills")
+      .select("id, name, category_id")
+      .eq("is_active", true)
+      .order("sort_order"),
+    supabase
+      .from("categories")
+      .select("id, slug, name")
+      .eq("is_active", true),
+  ]);
+  const excludedCategoryIds = new Set(
+    (categories ?? [])
+      .filter((category) => isExcludedPublicTestCategory(category))
+      .map((category) => category.id),
+  );
+  const publicSkills = categories
+    ? filterPublicSkillsByCategoryId(skills ?? [], excludedCategoryIds)
+    : [];
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
@@ -37,7 +52,7 @@ export default async function NewNeedPage() {
         por fuera de YALO; contratar no implica un adelanto.
       </p>
       <NeedWizard
-        skills={(skills ?? []).map((skill) => ({ id: skill.id, name: skill.name }))}
+        skills={publicSkills.map((skill) => ({ id: skill.id, name: skill.name }))}
         idempotencyKey={randomUUID()}
       />
     </main>

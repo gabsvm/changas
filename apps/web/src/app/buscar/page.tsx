@@ -17,6 +17,7 @@ import { SearchField } from "@/components/ui/marketplace/search-field";
 import { GuideHeader } from "@/components/ui/guided";
 import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
+import { filterPublicSkillsByCategoryId, isExcludedPublicTestCategory } from "@/lib/public-catalog";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -66,24 +67,31 @@ export default async function SearchPage({
     searchDiscovery({ query, filters }, supabase),
     supabase
       .from("categories")
-      .select("slug, name")
+      .select("id, slug, name")
       .eq("is_active", true)
       .order("sort_order"),
     supabase
       .from("skills")
-      .select("slug, name")
+      .select("slug, name, category_id")
       .eq("is_active", true)
       .order("sort_order"),
     supabase.auth.getUser(),
   ]);
   const { rows, hasMore } = searchResult;
   const categories = (categoriesResult.data ?? []).filter(
-    (category) =>
-      process.env.NODE_ENV !== "production" ||
-      (category.slug !== "prueba-emulador" &&
-        !/prueba emulador/i.test(category.name)),
+    (category) => !isExcludedPublicTestCategory(category),
   );
-  const skills = skillsResult.data ?? [];
+  const excludedCategoryIds = new Set(
+    (categoriesResult.data ?? [])
+      .filter((category) => isExcludedPublicTestCategory(category))
+      .map((category) => category.id),
+  );
+  const skills = categoriesResult.data
+    ? filterPublicSkillsByCategoryId(
+        skillsResult.data ?? [],
+        excludedCategoryIds,
+      )
+    : [];
   const activeCategory = categories.find(
     (item) => item.slug === filters.categorySlug,
   )?.name;

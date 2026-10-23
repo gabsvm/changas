@@ -17,24 +17,25 @@ export default async function AdminJobsPage() {
         description="Inspección rápida del estado de las contrataciones. Los datos sensibles siguen detrás de RPCs administrativos."
       />
       {jobs.length ? (
-        <div className="grid gap-2 lg:grid-cols-2">
+        <div className="grid min-w-0 gap-2 lg:grid-cols-2">
           {jobs.map((job) => {
             const presentation = getJobStatusPresentation(job.status);
             return (
             <article
-              className="rounded-3xl border border-ink/[0.08] bg-surface p-4"
+              className="min-w-0 rounded-3xl border border-ink/[0.08] bg-surface p-4"
               key={job.job_id}
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-extrabold text-ink">
+                  <p className="break-words text-sm font-extrabold text-ink">
                     {job.service_title}
                   </p>
-                  <p className="mt-1 truncate text-[11px] text-ink/60">
+                  <p className="mt-1 break-all text-[11px] text-ink/60">
                     {job.job_id}
                   </p>
                 </div>
-                <AdminStatusBadge
+                <div className="min-w-0 max-w-full">
+                  <AdminStatusBadge
                   label={presentation.label}
                   tone={
                     presentation.tone === "warning"
@@ -43,18 +44,19 @@ export default async function AdminJobsPage() {
                         ? "pink"
                         : presentation.tone
                   }
-                />
+                  />
+                </div>
               </div>
-              <div className="mt-4 grid gap-2 rounded-2xl border border-ink/[0.08] bg-surface p-3 text-xs sm:grid-cols-2">
-                <div>
+              <div className="mt-4 grid min-w-0 gap-2 rounded-2xl border border-ink/[0.08] bg-surface p-3 text-xs sm:grid-cols-2">
+                <div className="min-w-0">
                   <p className="font-bold text-ink/60">Cliente</p>
-                  <p className="mt-1 truncate font-semibold text-ink">
+                  <p className="mt-1 break-all font-semibold text-ink">
                     {job.client_display_name ?? job.client_user_id}
                   </p>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="font-bold text-ink/60">Prestador</p>
-                  <p className="mt-1 truncate font-semibold text-ink">
+                  <p className="mt-1 break-all font-semibold text-ink">
                     {job.provider_display_name ?? job.provider_user_id}
                   </p>
                 </div>

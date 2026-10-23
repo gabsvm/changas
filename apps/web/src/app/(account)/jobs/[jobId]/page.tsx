@@ -25,6 +25,7 @@ import { ExternalMoneySection } from "@/app/(account)/jobs/[jobId]/external-mone
 import { PaymentSubmitButton } from "@/components/jobs/payment-submit-button";
 import { JobReputationPanel } from "@/components/reputation/job-reputation-panel";
 import { JobTracker } from "@/components/jobs/job-tracker";
+import { getJobReviewState } from "@/lib/reputation/server";
 import {
   getJobNextAction,
   getJobTracking,
@@ -211,6 +212,10 @@ export default async function JobPage({
 
   const isClient = user.id === detail.client_user_id;
   const isProvider = user.id === detail.provider_user_id;
+  const reviewState =
+    detail.job_status === "COMPLETED"
+      ? await getJobReviewState(supabase, jobId)
+      : null;
   // Untyped RPC (mirrors lib/admin/server.ts): generated Database types do
   // not include is_current_user_admin.
   const { data: adminFlag } = await (
@@ -369,9 +374,11 @@ export default async function JobPage({
               <p className="text-[17px] leading-6 font-extrabold">
                 ¡Trabajo completado!
               </p>
-              <p className="text-ink/70 text-sm leading-5">
-                Dejá tu reseña para ayudar a la próxima persona.
-              </p>
+              {reviewState?.can_review && !reviewState.review_id ? (
+                <p className="text-ink/70 text-sm leading-5">
+                  Dejá tu reseña para ayudar a la próxima persona.
+                </p>
+              ) : null}
             </div>
           </div>
         ) : null}
@@ -836,6 +843,7 @@ export default async function JobPage({
             status={detail.job_status}
             isClient={isClient}
             isProvider={isProvider}
+            reviewState={reviewState}
           />
         </div>
 

@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { ReputationDiscoveryServiceRow } from "./types";
 import { isValidPortfolioMediaPath } from "./public-media";
 import type { Database, ServiceModalityType } from "../supabase/database.types";
+import { isExcludedPublicTestCategory } from "../public-catalog";
 
 export type DiscoverySearchInput = {
   query: string;
@@ -91,7 +92,9 @@ export async function searchDiscovery(
       ? allRows.filter(
           (row) =>
             !/\(\s*prueba\s*\)\s*$/i.test(row.service_title) &&
-            row.category_slug !== "prueba-emulador",
+            !isExcludedPublicTestCategory({
+              slug: row.category_slug,
+            }),
         )
       : allRows;
 

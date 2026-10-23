@@ -14,6 +14,7 @@ import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { SearchField } from "@/components/ui/marketplace/search-field";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
+import { isExcludedPublicTestCategory } from "@/lib/public-catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,9 @@ export async function generateMetadata({
   try {
     const { slug } = await params;
     const { data: category } = await getCategory(slug);
-    if (!category) return { title: "Categoría no encontrada" };
+    if (!category || isExcludedPublicTestCategory(category)) {
+      return { title: "Categoría no encontrada" };
+    }
     return {
       title: category.name,
       description:
@@ -64,7 +67,7 @@ export default async function CategoryPage({
   const { slug } = await params;
   const queryParams = await searchParams;
   const { data: category } = await getCategory(slug);
-  if (!category) notFound();
+  if (!category || isExcludedPublicTestCategory(category)) notFound();
   const categorySlug = category.slug;
   const pageParam = Array.isArray(queryParams.page)
     ? queryParams.page[0]

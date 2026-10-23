@@ -26,14 +26,8 @@ import {
 } from "@/lib/proposals/server";
 import { createClient } from "@/lib/supabase/server";
 import { listConversationJobs, type ConversationJob } from "@/lib/jobs/server";
-import {
-  getJobNextAction,
-  getJobTracking,
-} from "@/components/jobs/job-tracking";
-import {
-  JOB_TERMINAL_STATUSES,
-  getJobStatusPresentation,
-} from "@/lib/ui/job-status";
+import { getJobNextAction } from "@/components/jobs/job-tracking";
+import { JOB_TERMINAL_STATUSES, getJobStatusPresentation } from "@/lib/ui/job-status";
 import { GuideHeader } from "@/components/ui/guided";
 import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 
@@ -183,9 +177,6 @@ export default async function ConversationPage({
     conversationJobs.find(
       (job) => !JOB_TERMINAL_STATUSES.includes(job.job_status),
     ) ?? null;
-  const spotlightTracking = spotlightJob
-    ? getJobTracking(spotlightJob.job_status, null)
-    : null;
   const spotlightStatus = spotlightJob
     ? getJobStatusPresentation(spotlightJob.job_status)
     : null;
@@ -198,13 +189,11 @@ export default async function ConversationPage({
       })
     : null;
   const jobSpotlight =
-    spotlightJob && spotlightTracking && spotlightStatus && spotlightNext
+    spotlightJob && spotlightStatus && spotlightNext
       ? {
           kind: "job" as const,
           title: spotlightStatus.label,
-          sub: spotlightTracking.exception
-            ? spotlightNext.heading
-            : `Paso ${spotlightTracking.currentIndex + 1} de ${spotlightTracking.steps.length} · ${spotlightNext.heading}`,
+          sub: spotlightNext.heading,
           cta: "Ver seguimiento",
           href: `/jobs/${spotlightJob.job_id}`,
           helpHref: `/jobs/${spotlightJob.job_id}#ayuda`,
@@ -242,11 +231,10 @@ export default async function ConversationPage({
           <div className="border-moss/20 bg-moss/[0.06] space-y-2 rounded-2xl border px-4 py-3">
             <p className="text-sm font-bold">
               {conversationJobs.length === 1
-                ? "Este chat ya tiene un servicio en marcha."
-                : "Este chat ya tiene servicios en marcha."}
+                ? "Este chat tiene un servicio asociado."
+                : "Este chat tiene servicios asociados."}
             </p>
             {conversationJobs.map((job) => {
-              const tracking = getJobTracking(job.job_status, null);
               const status = getJobStatusPresentation(job.job_status);
               return (
                 <div
@@ -254,9 +242,7 @@ export default async function ConversationPage({
                   className="flex flex-wrap items-center gap-x-3 gap-y-1"
                 >
                   <span className="text-ink/70 text-[13px] font-semibold">
-                    {tracking.exception
-                      ? status.label
-                      : `Paso ${tracking.currentIndex + 1} de ${tracking.steps.length} · ${status.label}`}
+                    {status.label}
                   </span>
                   <Link
                     href={`/jobs/${job.job_id}`}

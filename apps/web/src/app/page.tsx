@@ -15,13 +15,14 @@ import { MagneticRibbons } from "@/components/ui/marketplace/magnetic-ribbons";
 import { NearbyServiceRail } from "@/components/ui/marketplace/nearby-service-rail";
 import { SearchField } from "@/components/ui/marketplace/search-field";
 import { SiteFooter } from "@/components/ui/site-footer";
-import { searchDiscovery } from "@/lib/discovery/server";
+import { isExcludedPublicTestCategory } from "@/lib/public-catalog";
 import { listMyUpcomingJobs, type UpcomingJob } from "@/lib/jobs/server";
 import {
   JOB_TERMINAL_STATUSES,
   getJobStatusPresentation,
 } from "@/lib/ui/job-status";
 import { getJobTracking } from "@/components/jobs/job-tracking";
+import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -68,8 +69,7 @@ export default async function HomePage() {
       .from("categories")
       .select("slug, name, description")
       .eq("is_active", true)
-      .order("sort_order")
-      .limit(8),
+      .order("sort_order"),
     searchDiscovery({ query: "", filters }),
   ]);
 
@@ -86,6 +86,9 @@ export default async function HomePage() {
     user?.email?.split("@")[0] ||
     "Tu cuenta";
 
+  const visibleCategories = (categories ?? [])
+    .filter((category) => !isExcludedPublicTestCategory(category))
+    .slice(0, 8);
   let activeJobs: UpcomingJob[] = [];
   if (user) {
     try {
@@ -372,23 +375,16 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="yalo-category-grid">
-            {(categories ?? [])
-              .filter(
-                (category) =>
-                  process.env.NODE_ENV !== "production" ||
-                  (category.slug !== "prueba-emulador" &&
-                    !/prueba emulador/i.test(category.name)),
-              )
-              .map((category) => (
-                <CategoryTile
-                  key={category.slug}
-                  href={"/categoria/" + category.slug}
-                  label={category.name}
-                  description={category.description}
-                  icon={category.slug}
-                />
-              ))}
-            {!categories || categories.length === 0 ? (
+            {visibleCategories.map((category) => (
+              <CategoryTile
+                key={category.slug}
+                href={"/categoria/" + category.slug}
+                label={category.name}
+                description={category.description}
+                icon={category.slug}
+              />
+            ))}
+            {visibleCategories.length === 0 ? (
               <p className="yalo-empty-copy">
                 Explorá los servicios disponibles en YALO.
               </p>

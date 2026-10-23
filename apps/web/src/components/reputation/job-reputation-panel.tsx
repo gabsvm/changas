@@ -7,8 +7,7 @@ import {
   reportJobReviewAction,
 } from "@/app/(account)/jobs/actions";
 import { getJobDetail } from "@/lib/jobs/server";
-import { getJobReviewState } from "@/lib/reputation/server";
-import { createClient } from "@/lib/supabase/server";
+import type { JobReviewState } from "@/lib/reputation/server";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
@@ -65,16 +64,17 @@ export async function JobReputationPanel({
   status,
   isClient,
   isProvider,
+  reviewState,
 }: {
   jobId: string;
   status: JobStatus;
   isClient: boolean;
   isProvider: boolean;
+  reviewState: JobReviewState | null;
 }) {
   if (status !== "COMPLETED") return null;
 
-  const supabase = await createClient();
-  const state = await getJobReviewState(supabase, jobId);
+  const state = reviewState;
   if (!state) return null;
 
   // El prestador puede pedir reseña solo si el trabajo ya está cobrado

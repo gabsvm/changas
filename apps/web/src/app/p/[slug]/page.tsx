@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { ActionArrowIcon } from "@/components/ui/marketplace/action-arrow-icon";
 import { formatServicePrice } from "@changas/domain";
 
 import { ProviderReputation } from "@/components/reputation/provider-reputation";
@@ -17,6 +18,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getServiceModalityLabel } from "@/lib/ui/service-modality";
 import { GuideHeader } from "@/components/ui/guided";
 import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
+import { isExcludedPublicTestCategory } from "@/lib/public-catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -133,6 +135,9 @@ export default async function PublicProviderPage({
           (service) => !/\(\s*prueba\s*\)\s*$/i.test(service.title),
         )
       : rawServices;
+  const publicSkills = (skills ?? []).filter(
+    (skill) => !isExcludedPublicTestCategory({ slug: skill.category_slug }),
+  );
 
   return (
     <main
@@ -147,7 +152,7 @@ export default async function PublicProviderPage({
               className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
               href="/buscar"
             >
-              Buscar servicios <span aria-hidden="true">→</span>
+              Buscar servicios <span aria-hidden="true"><ActionArrowIcon /></span>
             </Link>
           }
           className="sm:flex"
@@ -335,7 +340,7 @@ export default async function PublicProviderPage({
             aria-label="Resumen del perfil"
           >
             <ProfileFact label="Servicios" value={services?.length ?? 0} />
-            <ProfileFact label="Habilidades" value={skills?.length ?? 0} />
+            <ProfileFact label="Habilidades" value={publicSkills.length} />
             <ProfileFact label="Zonas" value={areas?.length ?? 0} />
           </div>
 
@@ -464,13 +469,13 @@ export default async function PublicProviderPage({
           )}
         </PublicSection>
 
-        {(skills ?? []).length ? (
+        {publicSkills.length ? (
           <PublicSection
             title="Habilidades"
             badge={{ tone: "blue", icon: "sparkle" }}
           >
             <div className="flex flex-wrap gap-2">
-              {(skills ?? []).map((skill) => (
+              {publicSkills.map((skill) => (
                 <StatusChip tone="neutral" key={skill.skill_slug}>
                   {skill.skill_name}
                 </StatusChip>
