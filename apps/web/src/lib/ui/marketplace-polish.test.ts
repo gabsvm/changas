@@ -156,11 +156,12 @@ describe("marketplace polish contracts", () => {
     expect(nearbySource).not.toContain('from "./service-row"');
   });
 
-  it("keeps magnetic motion optional, brand-consistent and accessible", () => {
+  it("renders decorative brand ribbons without a client animation loop", () => {
     expect(rootSource).toContain("<MagneticRibbons");
-    expect(magneticSource).toContain("prefers-reduced-motion: reduce");
-    expect(magneticSource).toContain("pointer: fine");
-    expect(magneticSource).toContain("33");
+    expect(magneticSource).toContain('aria-hidden="true"');
+    expect(magneticSource).not.toContain("<canvas");
+    expect(magneticSource).not.toContain("requestAnimationFrame");
+    expect(magneticSource).not.toContain('"use client"');
     expect(magneticSource).toContain("#08A9F4");
     expect(magneticSource).toContain("#12D9C5");
     expect(homeThemeSource).toContain("@media (max-width: 360px)");

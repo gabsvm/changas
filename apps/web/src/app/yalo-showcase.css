@@ -1,6 +1,14 @@
 /* YALO Magnetic / premium public home
    Page-scoped: leaves auth, operational flows, provider and admin untouched. */
 .yalo-showcase {
+  --font-sans: var(--font-inter, Inter, ui-sans-serif, system-ui, sans-serif);
+  --font-display: var(
+    --font-space-grotesk,
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    sans-serif
+  );
   --color-ink: #f5f8fc;
   --color-surface: #171f2c;
   --color-canvas: #0d121b;
@@ -62,12 +70,10 @@
   padding: 9px 13px 9px 20px;
   border: 1px solid rgb(255 255 255 / 13%);
   border-radius: 999px;
-  background: rgb(21 32 46 / 76%);
+  background: rgb(18 29 43 / 96%);
   box-shadow:
     inset 0 1px rgb(255 255 255 / 9%),
     0 14px 42px rgb(0 0 0 / 22%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%);
 }
 
 .yalo-header-brand {
@@ -263,23 +269,22 @@
   position: absolute;
   display: block;
   border-radius: 50%;
-  filter: blur(54px);
 }
 .yalo-stage-orb-one {
   width: 370px;
   height: 370px;
   top: -170px;
   right: -80px;
-  background: rgb(8 169 244 / 18%);
+  background: radial-gradient(circle, rgb(8 169 244 / 20%), transparent 70%);
 }
 .yalo-stage-orb-two {
   width: 300px;
   height: 300px;
   bottom: -220px;
   left: 4%;
-  background: rgb(18 217 197 / 15%);
+  background: radial-gradient(circle, rgb(18 217 197 / 18%), transparent 70%);
 }
-.yalo-magnetic-canvas {
+.yalo-magnetic-art {
   position: absolute;
   z-index: 0;
   inset: 0;
@@ -305,13 +310,11 @@
   padding: 11px 18px;
   border: 1px solid rgb(255 255 255 / 14%);
   border-radius: 100px;
-  background: rgb(255 255 255 / 5%);
+  background: rgb(24 38 52 / 96%);
   color: #d8f6f2;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.155em;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
 }
 .yalo-eyebrow-spark {
   width: 7px;
@@ -459,10 +462,8 @@
   padding: 7px;
   border-radius: 20px;
   border: 1px solid rgb(255 255 255 / 18%);
-  background: rgb(255 255 255 / 9%);
+  background: rgb(24 38 52 / 96%);
   box-shadow: 0 16px 45px rgb(0 0 0 / 20%);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
 }
 .yalo-hero-search .consumer-control {
   flex: 1;
@@ -721,6 +722,73 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 17px;
 }
+.yalo-featured-results--compact ul {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 28rem));
+  justify-content: center;
+}
+.yalo-featured-results--compact .service-card-shell {
+  width: 100%;
+  max-width: 28rem;
+}
+.yalo-featured-results--compact li {
+  display: flex;
+  justify-content: center;
+}
+.yalo-featured-results .service-card-content {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: start;
+  gap: 0 12px;
+}
+.yalo-featured-results .service-card-provider-row,
+.yalo-featured-results .service-card-provider {
+  display: contents;
+}
+.yalo-featured-results .service-card-provider-row > :first-child {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+}
+.yalo-featured-results .service-card-provider > p {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  margin: 0;
+}
+.yalo-featured-results .service-card-provider-link {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.yalo-featured-results .service-card-title,
+.yalo-featured-results .service-card-meta,
+.yalo-featured-results .service-card-tags {
+  grid-column: 1 / -1;
+}
+.yalo-featured-results .service-card-title {
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+.yalo-featured-results .service-card-title a {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.yalo-featured-results .service-card-meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 12px;
+}
+.yalo-featured-results .service-card-rating {
+  min-width: 0;
+  margin: 0;
+}
+.yalo-featured-results .service-card-price {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.yalo-featured-results .service-card-tags {
+  margin-top: 12px;
+}
 .yalo-featured-results .service-card-shell {
   background: #162232 !important;
   border: 1px solid rgb(255 255 255 / 10%);
@@ -805,12 +873,17 @@
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
+.yalo-value-card h3,
+.yalo-how-it-works li h3 {
+  font-family: var(--font-display);
+  font-size: clamp(19px, 2vw, 24px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+}
 .yalo-value-card h3 {
   margin: 8px 0 0;
   color: #f5f9fc;
-  font-family: var(--font-display);
-  font-size: clamp(19px, 2vw, 24px);
-  letter-spacing: -0.04em;
 }
 .yalo-value-card p {
   margin: 10px 0 0;
@@ -840,12 +913,12 @@
   display: none;
 }
 .yalo-how-it-works li h3 {
-  font-family: var(--font-display);
-  font-size: 17px;
   color: #f8fbff;
 }
 .yalo-how-it-works li p {
   color: #98adbf;
+  font-size: 13px;
+  line-height: 1.7;
 }
 .yalo-how-it-works li > span:nth-child(2) {
   background: #123a3c !important;
@@ -974,13 +1047,12 @@
     line-height: 1.6;
     max-width: 330px;
   }
-  .yalo-magnetic-canvas {
+  .yalo-magnetic-art {
     display: none;
   }
   .yalo-stage-orb-one {
     right: -180px;
     top: -40px;
-    filter: blur(45px);
   }
   .yalo-stage-orb-two {
     bottom: -150px;
@@ -1147,7 +1219,7 @@
     transition-duration: 0ms !important;
     scroll-behavior: auto !important;
   }
-  .yalo-magnetic-canvas {
+  .yalo-magnetic-art {
     display: none !important;
   }
 }
@@ -1191,7 +1263,7 @@
 /* A two-card rail is centered rather than leaving an empty half-grid on wide screens. */
 @media (min-width: 900px) {
   .yalo-featured-results--compact > section {
-    max-width: 920px;
+    max-width: 58rem;
     margin-inline: auto;
   }
 }

@@ -171,8 +171,8 @@ export function ServiceCard({
           aria-label={`Ejemplo ficticio: ${row.service_title}, ${price}`}
         >
           {cover}
-          <div className="p-4">
-            <div className="flex items-start gap-3">
+          <div className="service-card-content p-4">
+            <div className="service-card-provider-row flex items-start gap-3">
               <Avatar
                 name={row.provider_display_name}
                 src={
@@ -182,7 +182,7 @@ export function ServiceCard({
                 }
                 size="md"
               />
-              <div className="min-w-0 flex-1">
+              <div className="service-card-provider min-w-0 flex-1">
                 <p className="text-ink/70 flex items-center gap-1.5 truncate text-[13px] font-semibold">
                   <span className="truncate">{row.provider_display_name}</span>
                   {row.provider_zone ? (
@@ -191,48 +191,50 @@ export function ServiceCard({
                     </span>
                   ) : null}
                 </p>
-                <h3 className="text-ink mt-1.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
+                <h3 className="service-card-title text-ink mt-1.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
                   {row.service_title}
                 </h3>
-                <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
-                  <span className="text-ink inline-flex items-center gap-1 font-bold">
+                <div className="service-card-meta mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
+                  <p className="service-card-rating flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="text-ink inline-flex items-center gap-1 font-bold">
+                      {hasRating ? (
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 24 24"
+                          className="stroke-warning h-3.5 w-3.5 fill-[#F0B429]"
+                          strokeWidth="1.5"
+                        >
+                          <path
+                            d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      ) : null}
+                      {hasRating
+                        ? row.rating_average!.toFixed(1)
+                        : "Nuevo en YALO"}
+                    </span>
                     {hasRating ? (
-                      <svg
-                        aria-hidden="true"
-                        viewBox="0 0 24 24"
-                        className="stroke-warning h-3.5 w-3.5 fill-[#F0B429]"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    ) : null}
-                    {hasRating
-                      ? row.rating_average!.toFixed(1)
-                      : "Nuevo en YALO"}
-                  </span>
-                  {hasRating ? (
-                    <span className="text-ink/70 font-medium">
-                      ({row.review_count})
-                      {row.completed_jobs > 0
-                        ? ` · ${row.completed_jobs} hechos`
-                        : ""}
-                    </span>
-                  ) : (
-                    <span className="text-ink/70 font-medium">
-                      Sin reseñas aún
-                    </span>
-                  )}
-                  <span className="text-brand-primary ml-auto shrink-0 text-[15px] font-extrabold dark:text-white">
+                      <span className="text-ink/70 font-medium">
+                        ({row.review_count})
+                        {row.completed_jobs > 0
+                          ? ` · ${row.completed_jobs} hechos`
+                          : ""}
+                      </span>
+                    ) : (
+                      <span className="text-ink/70 font-medium">
+                        Sin reseñas aún
+                      </span>
+                    )}
+                  </p>
+                  <span className="service-card-price text-brand-primary ml-auto shrink-0 text-[15px] font-extrabold dark:text-white">
                     {price}
                   </span>
-                </p>
+                </div>
               </div>
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            <div className="service-card-tags mt-3 flex flex-wrap items-center gap-1.5">
               <StatusChip tone="warning">Ejemplo</StatusChip>
               <StatusChip tone="neutral">
                 {modalityLabels[row.modality]}
@@ -259,8 +261,8 @@ export function ServiceCard({
             {cover}
           </Link>
 
-          <div className="p-4">
-            <div className="flex items-start gap-3">
+          <div className="service-card-content p-4">
+            <div className="service-card-provider-row flex items-start gap-3">
               <Avatar
                 name={row.provider_display_name}
                 src={
@@ -270,7 +272,7 @@ export function ServiceCard({
                 }
                 size="md"
               />
-              <div className="min-w-0 flex-1">
+              <div className="service-card-provider min-w-0 flex-1">
                 <p className="text-ink/70 flex items-center gap-1.5 truncate text-[13px] font-semibold">
                   <Link
                     href={providerHref}
@@ -284,7 +286,7 @@ export function ServiceCard({
                     </span>
                   ) : null}
                 </p>
-                <h3 className="text-ink mt-1.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
+                <h3 className="service-card-title text-ink mt-1.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
                   <Link
                     href={serviceHref}
                     className="focus-visible:ring-focus/45 inline-flex min-h-11 items-center rounded focus-visible:ring-2"
@@ -293,45 +295,47 @@ export function ServiceCard({
                     {row.service_title}
                   </Link>
                 </h3>
-                <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
-                  <span className="text-ink inline-flex items-center gap-1 font-bold">
+                <div className="service-card-meta mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
+                  <p className="service-card-rating flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="text-ink inline-flex items-center gap-1 font-bold">
+                      {hasRating ? (
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 24 24"
+                          className="stroke-warning h-3.5 w-3.5 fill-[#F0B429]"
+                          strokeWidth="1.5"
+                        >
+                          <path
+                            d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      ) : null}
+                      {hasRating
+                        ? row.rating_average!.toFixed(1)
+                        : "Nuevo en YALO"}
+                    </span>
                     {hasRating ? (
-                      <svg
-                        aria-hidden="true"
-                        viewBox="0 0 24 24"
-                        className="stroke-warning h-3.5 w-3.5 fill-[#F0B429]"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    ) : null}
-                    {hasRating
-                      ? row.rating_average!.toFixed(1)
-                      : "Nuevo en YALO"}
-                  </span>
-                  {hasRating ? (
-                    <span className="text-ink/70 font-medium">
-                      ({row.review_count})
-                      {row.completed_jobs > 0
-                        ? ` · ${row.completed_jobs} hechos`
-                        : ""}
-                    </span>
-                  ) : (
-                    <span className="text-ink/70 font-medium">
-                      Sin reseñas aún
-                    </span>
-                  )}
-                  <span className="text-brand-primary ml-auto shrink-0 text-[15px] font-extrabold dark:text-white">
+                      <span className="text-ink/70 font-medium">
+                        ({row.review_count})
+                        {row.completed_jobs > 0
+                          ? ` · ${row.completed_jobs} hechos`
+                          : ""}
+                      </span>
+                    ) : (
+                      <span className="text-ink/70 font-medium">
+                        Sin reseñas aún
+                      </span>
+                    )}
+                  </p>
+                  <span className="service-card-price text-brand-primary ml-auto shrink-0 text-[15px] font-extrabold dark:text-white">
                     {price}
                   </span>
-                </p>
+                </div>
                 {hasRating ? null : (
                   <Link
                     href={providerHref}
-                    className="focus-visible:ring-focus/45 text-brand-primary mt-1.5 inline-flex min-h-11 items-center text-[13px] font-bold focus-visible:ring-2 dark:text-white"
+                    className="service-card-provider-link focus-visible:ring-focus/45 text-brand-primary mt-1.5 inline-flex min-h-11 items-center text-[13px] font-bold focus-visible:ring-2 dark:text-white"
                   >
                     Ver perfil del proveedor{" "}
                     <ActionArrowIcon className="ml-1 h-4 w-4 shrink-0" />
@@ -340,7 +344,7 @@ export function ServiceCard({
               </div>
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            <div className="service-card-tags mt-3 flex flex-wrap items-center gap-1.5">
               <StatusChip tone="neutral">
                 {modalityLabels[row.modality]}
               </StatusChip>
