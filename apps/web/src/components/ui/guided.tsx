@@ -34,7 +34,7 @@ export function GuideHeader({
           {current}
         </span>
         <div className="min-w-0">
-          <p className="text-terracotta text-xs font-extrabold tracking-[0.14em] uppercase">
+          <p className="text-ink text-xs font-extrabold tracking-[0.14em] uppercase">
             Paso {current} de {total}
           </p>
           <h2 className="font-display mt-0.5 text-2xl leading-7 font-extrabold tracking-[-0.02em]">
