@@ -45,7 +45,7 @@ function TrackerRow({
     step.state === "done"
       ? "bg-success text-white border-success dark:text-brand-primary-strong"
       : step.state === "current" && !frozen
-        ? "bg-brand-primary text-white border-brand-primary dark:bg-white dark:text-ink dark:border-white"
+        ? "bg-brand-primary text-white border-brand-primary"
         : "bg-surface text-ink/40 border-ink/15 border";
   return (
     <li className="relative flex gap-3 pb-4 last:pb-0">

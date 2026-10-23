@@ -106,8 +106,9 @@ export function IllustratedBadge({
       style={{
         backgroundImage: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
       }}
-      role="img"
+      role={label ? "img" : undefined}
       aria-label={label}
+      aria-hidden={label ? undefined : true}
     >
       <span
         className="absolute inset-0 opacity-25"

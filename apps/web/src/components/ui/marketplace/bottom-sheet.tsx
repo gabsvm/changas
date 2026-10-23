@@ -31,7 +31,7 @@ export function BottomSheet({
     return animatePanelEntrance(rootRef.current);
   }, [open]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
   return createPortal(
     <div

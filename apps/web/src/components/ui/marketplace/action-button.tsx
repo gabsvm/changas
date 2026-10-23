@@ -14,7 +14,7 @@ export function actionButtonClass(
     secondary:
       "border border-ink/10 bg-white text-ink hover:border-ink/16 hover:bg-surface dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15",
     ghost: "bg-transparent text-ink/75 hover:bg-ink/[0.045] hover:text-ink",
-    danger: "bg-danger text-white hover:bg-[#b9342c] dark:text-[#171310]",
+    danger: "bg-danger text-white hover:bg-[#b9342c] dark:text-[#171310] dark:hover:text-white",
   };
 
   return `${base} ${tones[tone]} ${className}`.trim();

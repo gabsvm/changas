@@ -188,7 +188,7 @@ export default async function SearchPage({
               className="pointer-events-none absolute -top-10 -left-10 h-32 w-32 rounded-full bg-white/15"
               aria-hidden="true"
             />
-            <h1 className="relative z-10 text-[22px] leading-8 font-extrabold tracking-[-0.025em] sm:text-3xl sm:leading-10">
+            <h1 className="relative z-10 text-[22px] leading-8 font-extrabold tracking-[-0.025em] text-white sm:text-3xl sm:leading-10">
               {query ? `Resultados para “${query}”` : "Explorar servicios"}
             </h1>
             <form action="/buscar" className="relative z-10 mt-4">
@@ -355,7 +355,7 @@ export default async function SearchPage({
                 </Link>
               ) : null}
               {activeFilterCount === 0 ? (
-                <p className="text-ink/75 py-1 text-[13px] leading-5">
+                <p className="py-1 text-[13px] leading-5 text-white/85">
                   Usá los filtros para afinar por zona, modalidad o precio.
                 </p>
               ) : null}

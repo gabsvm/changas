@@ -61,7 +61,7 @@ export default async function HomePage() {
     {
       data: { user },
     },
-    { data: categories },
+    { data: categories, error: categoriesError },
     discovery,
   ] = await Promise.all([
     supabase.auth.getUser(),
@@ -384,9 +384,19 @@ export default async function HomePage() {
                 icon={category.slug}
               />
             ))}
-            {visibleCategories.length === 0 ? (
-              <p className="yalo-empty-copy">
-                Explorá los servicios disponibles en YALO.
+            {categoriesError ? (
+              <p className="yalo-empty-copy" role="status">
+                No pudimos cargar las categorías.{" "}
+                <Link className="font-extrabold underline underline-offset-4" href="/">
+                  Reintentar
+                </Link>
+              </p>
+            ) : visibleCategories.length === 0 ? (
+              <p className="yalo-empty-copy" role="status">
+                Todavía no hay categorías para mostrar.{" "}
+                <Link className="font-extrabold underline underline-offset-4" href="/buscar">
+                  Buscar servicios
+                </Link>
               </p>
             ) : null}
           </div>
@@ -422,8 +432,10 @@ export default async function HomePage() {
           >
             {discovery.error ? (
               <p role="status" className="yalo-empty-copy">
-                La búsqueda está momentáneamente en mantenimiento. Probá de
-                nuevo más tarde.
+                No pudimos cargar profesionales en este momento.{" "}
+                <Link className="font-extrabold underline underline-offset-4" href="/">
+                  Reintentar
+                </Link>
               </p>
             ) : discovery.rows.length > 0 ? (
               <NearbyServiceRail

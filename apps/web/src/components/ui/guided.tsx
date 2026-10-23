@@ -68,8 +68,8 @@ export function GuideHeader({
         {steps.map((item, index) => (
           <li
             key={item.action}
-            className={`flex-1 truncate text-center text-[11px] font-bold ${
-              index === current - 1 ? "text-ink" : "text-ink/45"
+            className={`min-w-0 flex-1 text-center text-[11px] leading-tight font-bold ${
+              index === current - 1 ? "text-ink" : "text-ink/70"
             }`}
           >
             {item.action}

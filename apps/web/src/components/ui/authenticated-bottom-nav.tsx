@@ -197,7 +197,7 @@ export function AuthenticatedBottomNav({
               }`}
             >
               <span
-                className={`nav-icon relative grid h-8 min-w-11 place-items-center rounded-full px-2.5 ${active ? "bg-brand-primary dark:text-ink text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:bg-white" : ""}`}
+                className={`nav-icon relative grid h-8 min-w-11 place-items-center rounded-full px-2.5 ${active ? "bg-brand-primary text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)]" : ""}`}
               >
                 <NavIcon name={item.icon} active={active} />
                 {badge > 0 ? (

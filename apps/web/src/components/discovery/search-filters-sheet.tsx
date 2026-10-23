@@ -61,7 +61,11 @@ export function SearchFiltersSheet({
       </button>
 
       <BottomSheet open={open} title="Filtros" onClose={() => setOpen(false)}>
-        <form action="/buscar" className="mt-2 grid gap-6 sm:grid-cols-2">
+        <form
+          action="/buscar"
+          className="mt-2 grid gap-6 sm:grid-cols-2"
+          onSubmit={(event) => event.stopPropagation()}
+        >
           {query ? <input type="hidden" name="q" value={query} /> : null}
           {filters.locationSlug ? (
             <input type="hidden" name="location" value={filters.locationSlug} />
