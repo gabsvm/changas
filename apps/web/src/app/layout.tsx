@@ -54,11 +54,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es-AR" suppressHydrationWarning>
+    <html
+      lang="es-AR"
+      className={`${displayFont.variable} ${bodyFont.variable}`}
+      suppressHydrationWarning
+    >
       <Script id="changas-theme" strategy="beforeInteractive">
         {themeInitScript}
       </Script>
-      <body className={`${displayFont.variable} ${bodyFont.variable}`}>
+      <body>
         <a className="skip-link" href="#main-content">
           Ir al contenido principal
         </a>

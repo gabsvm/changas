@@ -73,7 +73,7 @@ export function AppHeader({
 
       {title ? (
         <span
-          className={`min-w-0 flex-1 truncate text-[17px] font-extrabold tracking-[-0.02em] ${backHref ? "sm:hidden" : ""}`}
+          className={`font-display min-w-0 flex-1 truncate text-[17px] font-extrabold tracking-[-0.02em] ${backHref ? "sm:hidden" : ""}`}
         >
           {title}
         </span>
