@@ -15,10 +15,6 @@ export default async function AdminLayout({
 
   return (
     <div className="admin-shell bg-canvas text-ink min-h-dvh">
-      <a className="skip-link" href="#admin-main">
-        Ir al contenido
-      </a>
-
       <header className="bg-canvas/90 border-ink/[0.06] sticky top-0 z-40 h-[4.5rem] border-b backdrop-blur-xl">
         <div className="flex h-full items-center gap-3 px-4 sm:px-6 lg:px-7">
           <Link
@@ -56,7 +52,7 @@ export default async function AdminLayout({
       <AdminNavigation />
 
       <main
-        id="admin-main"
+        id="main-content"
         className="admin-main min-h-[calc(100dvh-4.5rem)] px-4 pt-5 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:px-6 sm:pt-7 lg:ml-64 lg:px-8 lg:pb-12"
       >
         <div className="mx-auto w-full max-w-6xl">{children}</div>

@@ -4,11 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { JobPostParsedData } from "./job-post-input";
 
 export type JobPostErrorCode =
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "CONFLICT"
-  | "TRANSIENT";
+  "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TRANSIENT";
 
 export class JobPostServerError extends Error {
   constructor(
@@ -137,12 +133,17 @@ type JobPostOffersRpc = {
 };
 
 /** Solo el dueno: el RPC comprueba ownership. No cuenta chats vacios. */
-export async function listJobPostOfferCards(postId: string): Promise<JobPostOfferCard[]> {
+export async function listJobPostOfferCards(
+  postId: string,
+): Promise<JobPostOfferCard[]> {
   await requireUserId();
   const supabase = await createClient();
-  const { data, error } = await (supabase as unknown as JobPostOffersRpc).rpc("list_job_post_offer_cards", {
-    target_post_id: postId,
-  });
+  const { data, error } = await (supabase as unknown as JobPostOffersRpc).rpc(
+    "list_job_post_offer_cards",
+    {
+      target_post_id: postId,
+    },
+  );
   if (error) throw mapError(error);
   return (data ?? []) as JobPostOfferCard[];
 }
@@ -151,9 +152,12 @@ export async function countPostOffers(postId: string): Promise<number> {
   await requireUserId();
   const supabase = await createClient();
   // Oferta ≠ chat abierto. Contar cotizaciones reales, no eventos OFFER_RECEIVED.
-  const { data, error } = await (supabase as unknown as JobPostOffersRpc).rpc("list_job_post_offer_cards", {
-    target_post_id: postId,
-  });
+  const { data, error } = await (supabase as unknown as JobPostOffersRpc).rpc(
+    "list_job_post_offer_cards",
+    {
+      target_post_id: postId,
+    },
+  );
   if (error) throw mapError(error);
   return data?.length ?? 0;
 }
@@ -195,8 +199,11 @@ export async function listOpenJobPosts(options?: {
     .order("created_at", { ascending: false })
     .order("id", { ascending: false })
     .range(
-      Math.max(0, Math.trunc(options?.page ?? 0)) * Math.min(50, Math.max(1, options?.limit ?? 30)),
-      (Math.max(0, Math.trunc(options?.page ?? 0)) + 1) * Math.min(50, Math.max(1, options?.limit ?? 30)) - 1,
+      Math.max(0, Math.trunc(options?.page ?? 0)) *
+        Math.min(50, Math.max(1, options?.limit ?? 30)),
+      (Math.max(0, Math.trunc(options?.page ?? 0)) + 1) *
+        Math.min(50, Math.max(1, options?.limit ?? 30)) -
+        1,
     );
   if (options?.skillId) query = query.eq("skill_id", options.skillId);
   if (options?.skillIds && options.skillIds.length > 0)
@@ -206,7 +213,10 @@ export async function listOpenJobPosts(options?: {
   return withSkillNames((data ?? []) as PostRow[]);
 }
 
-export async function listMyJobPosts(page = 0, pageSize = 20): Promise<JobPostSummary[]> {
+export async function listMyJobPosts(
+  page = 0,
+  pageSize = 20,
+): Promise<JobPostSummary[]> {
   const userId = await requireUserId();
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -217,7 +227,9 @@ export async function listMyJobPosts(page = 0, pageSize = 20): Promise<JobPostSu
     .order("id", { ascending: false })
     .range(
       Math.max(0, Math.trunc(page)) * Math.min(50, Math.max(1, pageSize)),
-      (Math.max(0, Math.trunc(page)) + 1) * Math.min(50, Math.max(1, pageSize)) - 1,
+      (Math.max(0, Math.trunc(page)) + 1) *
+        Math.min(50, Math.max(1, pageSize)) -
+        1,
     );
   if (error) throw mapError(error);
   return withSkillNames((data ?? []) as PostRow[]);
@@ -233,7 +245,10 @@ export async function getJobPost(postId: string): Promise<JobPostSummary> {
     .maybeSingle();
   if (error) throw mapError(error);
   if (!data) {
-    throw new JobPostServerError("NOT_FOUND", "No encontramos la necesidad solicitada.");
+    throw new JobPostServerError(
+      "NOT_FOUND",
+      "No encontramos la necesidad solicitada.",
+    );
   }
   const [summary] = await withSkillNames([data as PostRow]);
   if (!summary) throw mapError(null);

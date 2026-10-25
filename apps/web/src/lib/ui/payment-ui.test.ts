@@ -46,10 +46,7 @@ describe("notification preferences UI", () => {
 });
 
 const servicePageSource = readFileSync(
-  new URL(
-    "../../app/p/[slug]/[serviceSlug]/page.tsx",
-    import.meta.url,
-  ),
+  new URL("../../app/p/[slug]/[serviceSlug]/page.tsx", import.meta.url),
   "utf8",
 );
 

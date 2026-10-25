@@ -12,11 +12,7 @@ const ctaClass =
 
 type DesktopNavLink = { href: string; label: string; exact?: boolean };
 
-function isActiveLink(
-  pathname: string,
-  href: string,
-  exact = false,
-): boolean {
+function isActiveLink(pathname: string, href: string, exact = false): boolean {
   if (pathname === href) return true;
   if (exact) return false;
   return pathname.startsWith(`${href}/`);

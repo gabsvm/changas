@@ -1,3 +1,4 @@
+import nextDynamic from "next/dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
@@ -8,7 +9,6 @@ import {
   type ProposalKind,
 } from "@changas/domain";
 
-import { ConversationThread } from "@/components/conversations/conversation-thread";
 import { ProposalCard } from "@/components/conversations/proposal-card";
 import { ProposalComposer } from "@/components/conversations/proposal-composer";
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
@@ -27,9 +27,19 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { listConversationJobs, type ConversationJob } from "@/lib/jobs/server";
 import { getJobNextAction } from "@/components/jobs/job-tracking";
-import { JOB_TERMINAL_STATUSES, getJobStatusPresentation } from "@/lib/ui/job-status";
+import {
+  JOB_TERMINAL_STATUSES,
+  getJobStatusPresentation,
+} from "@/lib/ui/job-status";
 import { GuideHeader } from "@/components/ui/guided";
 import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
+
+// Code-splitting del hilo (client component pesado); SSR sigue activo.
+const ConversationThread = nextDynamic(() =>
+  import("@/components/conversations/conversation-thread").then(
+    (mod) => mod.ConversationThread,
+  ),
+);
 
 export const dynamic = "force-dynamic";
 

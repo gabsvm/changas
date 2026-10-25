@@ -212,6 +212,13 @@ test.describe("YALO Dual Model Validation Suite (PR #29)", () => {
 
     await instantCta.click();
     await expect(clientPage).toHaveURL(/\/messages\/[0-9a-f-]{36}/i);
+    await clientPage
+      .locator("summary")
+      .filter({ hasText: "Opciones de conversación" })
+      .click();
+    await clientPage.getByText("Reportar conversación").click();
+    await expect(clientPage.getByLabel("Motivo")).toBeVisible();
+    await expect(clientPage.getByLabel("Detalle opcional")).toBeVisible();
     await captureScreenshot(clientPage, "02-model-a1-instant-conversation.png");
 
     await clientCtx.close();
@@ -329,8 +336,8 @@ test.describe("YALO Dual Model Validation Suite (PR #29)", () => {
       clientPage.getByText("Apertura técnica y cambio de perno.").first(),
     ).toBeVisible();
     await clientPage
-      .getByRole("button", { name: "Contratar" })
-      .click({ force: true });
+      .getByRole("button", { name: "Contratar", exact: true })
+      .click();
     await clientPage
       .getByRole("button", { name: "Confirmar contratación" })
       .click({ force: true });
@@ -400,7 +407,20 @@ test.describe("YALO Dual Model Validation Suite (PR #29)", () => {
     // 9. Declaración y confirmación de pago externo
     await pPage.reload();
     await openDetails(pPage, "Registrar dinero recibido");
-    await pPage.locator('input[name="amount"]').fill("15000");
+    const paymentAmount = pPage.locator('input[name="amount"]');
+    await paymentAmount.fill("0");
+    const invalidSubmitRequest = pPage
+      .waitForRequest((request) => Boolean(request.headers()["next-action"]), {
+        timeout: 300,
+      })
+      .catch(() => null);
+    await pPage.getByRole("button", { name: "Enviar declaración" }).click();
+    await expect(pPage.getByRole("alert")).toContainText(
+      /importe mayor que \$0/,
+    );
+    expect(await invalidSubmitRequest).toBeNull();
+    await paymentAmount.fill("15000");
+    await expect(pPage.getByRole("alert")).toHaveCount(0);
     await pPage.locator('select[name="method"]').selectOption("TRANSFERENCIA");
     await pPage
       .getByRole("button", { name: "Enviar declaración" })
@@ -558,11 +578,9 @@ test.describe("YALO Dual Model Validation Suite (PR #29)", () => {
       .click({ force: true });
     await expect(p1Page).toHaveURL(/\/messages\/[0-9a-f-]{36}/i);
     await openDetails(p1Page, /Enviar una cotización|Proponer un acuerdo/);
-    const formP1 = p1Page
-      .locator("form")
-      .filter({
-        has: p1Page.getByRole("button", { name: "Enviar propuesta" }),
-      });
+    const formP1 = p1Page.locator("form").filter({
+      has: p1Page.getByRole("button", { name: "Enviar propuesta" }),
+    });
     await formP1.locator('input[name="price"]').fill("45000");
     await formP1
       .locator('textarea[name="scope"]')
@@ -580,11 +598,9 @@ test.describe("YALO Dual Model Validation Suite (PR #29)", () => {
       .click({ force: true });
     await expect(p2Page).toHaveURL(/\/messages\/[0-9a-f-]{36}/i);
     await openDetails(p2Page, /Enviar una cotización|Proponer un acuerdo/);
-    const formP2 = p2Page
-      .locator("form")
-      .filter({
-        has: p2Page.getByRole("button", { name: "Enviar propuesta" }),
-      });
+    const formP2 = p2Page.locator("form").filter({
+      has: p2Page.getByRole("button", { name: "Enviar propuesta" }),
+    });
     await formP2.locator('input[name="price"]').fill("50000");
     await formP2
       .locator('textarea[name="scope"]')

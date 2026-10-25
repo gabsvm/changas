@@ -41,8 +41,13 @@ export async function requestJobReviewNudgeAction(
   if (!state || detail.provider_user_id !== user.id) {
     throw new Error("Solo el prestador del trabajo puede pedir la reseña.");
   }
-  if (detail.job_status !== "COMPLETED" || detail.settlement_status !== "SETTLED") {
-    throw new Error("El trabajo todavía no está cobrado: el pedido de reseña espera al pago.");
+  if (
+    detail.job_status !== "COMPLETED" ||
+    detail.settlement_status !== "SETTLED"
+  ) {
+    throw new Error(
+      "El trabajo todavía no está cobrado: el pedido de reseña espera al pago.",
+    );
   }
   if (state.review_id) throw new Error("Este trabajo ya tiene reseña.");
 

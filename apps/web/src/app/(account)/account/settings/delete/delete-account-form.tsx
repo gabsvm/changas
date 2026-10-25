@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 
 import { ActionButton } from "@/components/ui/marketplace/action-button";
 import type { AuthActionState } from "@/lib/forms/action-state";
@@ -8,12 +8,16 @@ import { initialActionState } from "@/lib/forms/action-state";
 
 export function DeleteAccountForm({
   action,
+  hasPasswordProvider,
 }: {
   action: (
     previousState: AuthActionState,
     formData: FormData,
   ) => Promise<AuthActionState>;
+  hasPasswordProvider: boolean;
 }) {
+  const passwordId = useId();
+  const confirmationId = useId();
   const [state, formAction, pending] = useActionState(
     action,
     initialActionState,
@@ -23,25 +27,37 @@ export function DeleteAccountForm({
 
   return (
     <form action={formAction} className="mt-6 space-y-4">
-      <label className="block text-sm font-semibold">
-        Contraseña
+      {hasPasswordProvider ? (
+        <div>
+          <label htmlFor={passwordId} className="block text-sm font-semibold">
+            Contraseña
+          </label>
+          <input
+            id={passwordId}
+            className={input}
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+          />
+        </div>
+      ) : (
+        <p className="text-ink/70 text-sm leading-6">
+          Confirmá con tu sesión de Google: escribí ELIMINAR
+        </p>
+      )}
+      <div>
+        <label htmlFor={confirmationId} className="block text-sm font-semibold">
+          Escribí ELIMINAR para confirmar
+        </label>
         <input
-          className={input}
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-        />
-      </label>
-      <label className="block text-sm font-semibold">
-        Escribí ELIMINAR para confirmar
-        <input
+          id={confirmationId}
           className={input}
           name="confirmation"
           autoComplete="off"
           required
         />
-      </label>
+      </div>
       {state.error ? (
         <p className="text-danger text-sm font-semibold" role="alert">
           {state.error}

@@ -18,7 +18,13 @@ export type AdminNavigationItem = {
 };
 
 export const adminNavigationItems: readonly AdminNavigationItem[] = [
-  { id: "overview", href: "/admin", label: "Resumen", mobileGroup: "primary", navGroup: "Principal" },
+  {
+    id: "overview",
+    href: "/admin",
+    label: "Resumen",
+    mobileGroup: "primary",
+    navGroup: "Principal",
+  },
   {
     id: "identity",
     href: "/admin/identity",
@@ -33,7 +39,13 @@ export const adminNavigationItems: readonly AdminNavigationItem[] = [
     mobileGroup: "primary",
     navGroup: "Principal",
   },
-  { id: "jobs", href: "/admin/jobs", label: "Trabajos", mobileGroup: "more", navGroup: "Operación" },
+  {
+    id: "jobs",
+    href: "/admin/jobs",
+    label: "Trabajos",
+    mobileGroup: "more",
+    navGroup: "Operación",
+  },
   {
     id: "reports",
     href: "/admin/reports",

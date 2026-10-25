@@ -183,8 +183,15 @@ export function DocumentUploader({
       <section className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
         <div className="flex items-center justify-between gap-3">
           <span className="flex min-w-0 items-center gap-2.5">
-            <IllustratedBadge tone="neutral" icon="doc" size="sm" label="Documentos privados" />
-            <h2 className="font-display truncate text-base font-bold">Documentos privados</h2>
+            <IllustratedBadge
+              tone="neutral"
+              icon="doc"
+              size="sm"
+              label="Documentos privados"
+            />
+            <h2 className="font-display truncate text-base font-bold">
+              Documentos privados
+            </h2>
           </span>
           <StatusChip tone="warning">Carga bloqueada</StatusChip>
         </div>
@@ -203,191 +210,198 @@ export function DocumentUploader({
         aria-hidden="true"
       />
       <div className="p-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 items-start gap-2.5">
-          <IllustratedBadge tone="blue" icon="doc" size="sm" label="Subí un documento" />
-          <div className="min-w-0">
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
-              Privado
-            </p>
-            <h2 className="font-display mt-1 text-lg font-bold">Subí un documento</h2>
-          </div>
-        </div>
-        <StatusChip tone="neutral">Máx. 10 MiB</StatusChip>
-      </div>
-      <p className="text-ink/70 mt-1 text-sm leading-6">
-        JPG, PNG o PDF. La ruta privada del archivo nunca se muestra
-        públicamente.
-      </p>
-
-      <form
-        action={formAction}
-        encType="multipart/form-data"
-        className="mt-4 space-y-4"
-      >
-        {directMetadata ? (
-          <>
-            <input
-              type="hidden"
-              name="storagePath"
-              value={directMetadata.path}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-start gap-2.5">
+            <IllustratedBadge
+              tone="blue"
+              icon="doc"
+              size="sm"
+              label="Subí un documento"
             />
-            <input
-              type="hidden"
-              name="storageMimeType"
-              value={directMetadata.mimeType}
-            />
-            <input
-              type="hidden"
-              name="storageFileSizeBytes"
-              value={directMetadata.size}
-            />
-          </>
-        ) : null}
-
-        <label className="block text-sm font-semibold">
-          Tipo de documento
-          <select
-            className="border-ink/15 bg-surface focus:border-moss focus:ring-moss/20 mt-1.5 min-h-11 w-full rounded-xl border px-3 text-sm outline-none focus:ring-2"
-            name="documentType"
-            value={documentType}
-            onChange={(event) => setDocumentType(event.currentTarget.value)}
-            disabled={pending}
-          >
-            <option value="DNI_FRONT">DNI frente</option>
-            <option value="DNI_BACK">DNI dorso</option>
-            <option value="SELFIE">Selfie de validación</option>
-          </select>
-        </label>
-
-        <input
-          ref={inputRef}
-          className="sr-only"
-          name="document"
-          type="file"
-          accept="image/jpeg,image/png,application/pdf"
-          onChange={handleFileChange}
-          disabled={pending || compressing || uploading}
-          tabIndex={-1}
-        />
-
-        {selected ? (
-          <div className="border-ink/10 overflow-hidden rounded-xl border">
-            {selected.previewUrl ? (
-              <div className="bg-ink/[0.04] aspect-[16/9] w-full overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={selected.previewUrl}
-                  alt="Vista previa del documento seleccionado"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ) : null}
-            <div className="flex min-h-14 items-center gap-3 px-3 py-2.5">
-              <span
-                className="bg-moss/8 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-full text-[11px] font-bold"
-                aria-hidden="true"
-              >
-                {selected.file.type === "application/pdf" ? "PDF" : "IMG"}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">
-                  {selected.file.name}
-                </p>
-                <p className="text-ink/70 mt-0.5 text-xs">
-                  {getDocumentTypeLabel(documentType)} ·{" "}
-                  {formatFileSize(selected.file.size)}
-                </p>
-              </div>
-              <button
-                type="button"
-                className="consumer-pressable text-danger min-h-11 shrink-0 rounded-lg px-2 text-xs font-bold"
-                onClick={clearSelection}
-                disabled={pending || compressing}
-              >
-                Quitar
-              </button>
+            <div className="min-w-0">
+              <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
+                Privado
+              </p>
+              <h2 className="font-display mt-1 text-lg font-bold">
+                Subí un documento
+              </h2>
             </div>
           </div>
-        ) : (
-          <div className="border-ink/15 text-ink/70 rounded-xl border border-dashed px-4 py-5 text-center text-sm">
-            Tomá una foto o elegí un archivo guardado.
-          </div>
-        )}
-
-        <div className="grid gap-2 sm:grid-cols-2">
-          <button
-            type="button"
-            className="button-secondary w-full"
-            onClick={() => openPicker("camera")}
-            disabled={pending || compressing || uploading}
-          >
-            Tomar foto
-          </button>
-          <button
-            type="button"
-            className="button-secondary w-full"
-            onClick={() => openPicker("file")}
-            disabled={pending || compressing || uploading}
-          >
-            Elegir archivo
-          </button>
+          <StatusChip tone="neutral">Máx. 10 MiB</StatusChip>
         </div>
+        <p className="text-ink/70 mt-1 text-sm leading-6">
+          JPG, PNG o PDF. La ruta privada del archivo nunca se muestra
+          públicamente.
+        </p>
 
-        {localError ? (
-          <p
-            className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm"
-            role="alert"
-          >
-            {localError}
-          </p>
-        ) : null}
-        {compressionNotice ? (
-          <p
-            className="bg-moss/[0.07] text-moss rounded-xl px-3 py-2.5 text-sm"
-            role="status"
-          >
-            {compressionNotice}
-          </p>
-        ) : null}
-        {state.error ? (
-          <p
-            className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm"
-            role="alert"
-          >
-            {state.error}
-          </p>
-        ) : null}
-        {state.success ? (
-          <p
-            className="bg-success/[0.07] text-success rounded-xl px-3 py-2.5 text-sm"
-            role="status"
-            aria-live="polite"
-          >
-            {state.success}{" "}
-            <a
-              className="font-bold underline underline-offset-2"
-              href="#documentos"
-            >
-              Ver en la lista ↓
-            </a>
-          </p>
-        ) : null}
-
-        <button
-          className="consumer-pressable cta-ink w-full disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto inline-flex min-h-[52px] items-center justify-center rounded-xl px-6 text-[15px] font-extrabold"
-          type="submit"
-          disabled={pending || compressing || uploading || !selected}
+        <form
+          action={formAction}
+          encType="multipart/form-data"
+          className="mt-4 space-y-4"
         >
-          {compressing
-            ? "Optimizando…"
-            : uploading
-              ? "Preparando…"
-              : pending
-                ? "Registrando…"
-                : "Subir documento privado"}
-        </button>
-      </form>
+          {directMetadata ? (
+            <>
+              <input
+                type="hidden"
+                name="storagePath"
+                value={directMetadata.path}
+              />
+              <input
+                type="hidden"
+                name="storageMimeType"
+                value={directMetadata.mimeType}
+              />
+              <input
+                type="hidden"
+                name="storageFileSizeBytes"
+                value={directMetadata.size}
+              />
+            </>
+          ) : null}
+
+          <label className="block text-sm font-semibold">
+            Tipo de documento
+            <select
+              className="border-ink/15 bg-surface focus:border-moss focus:ring-moss/20 mt-1.5 min-h-11 w-full rounded-xl border px-3 text-sm outline-none focus:ring-2"
+              name="documentType"
+              value={documentType}
+              onChange={(event) => setDocumentType(event.currentTarget.value)}
+              disabled={pending}
+            >
+              <option value="DNI_FRONT">DNI frente</option>
+              <option value="DNI_BACK">DNI dorso</option>
+              <option value="SELFIE">Selfie de validación</option>
+            </select>
+          </label>
+
+          <input
+            ref={inputRef}
+            className="sr-only"
+            name="document"
+            type="file"
+            accept="image/jpeg,image/png,application/pdf"
+            onChange={handleFileChange}
+            disabled={pending || compressing || uploading}
+            tabIndex={-1}
+          />
+
+          {selected ? (
+            <div className="border-ink/10 overflow-hidden rounded-xl border">
+              {selected.previewUrl ? (
+                <div className="bg-ink/[0.04] aspect-[16/9] w-full overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={selected.previewUrl}
+                    alt="Vista previa del documento seleccionado"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : null}
+              <div className="flex min-h-14 items-center gap-3 px-3 py-2.5">
+                <span
+                  className="bg-moss/8 text-moss grid h-9 w-9 shrink-0 place-items-center rounded-full text-[11px] font-bold"
+                  aria-hidden="true"
+                >
+                  {selected.file.type === "application/pdf" ? "PDF" : "IMG"}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">
+                    {selected.file.name}
+                  </p>
+                  <p className="text-ink/70 mt-0.5 text-xs">
+                    {getDocumentTypeLabel(documentType)} ·{" "}
+                    {formatFileSize(selected.file.size)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="consumer-pressable text-danger min-h-11 shrink-0 rounded-lg px-2 text-xs font-bold"
+                  onClick={clearSelection}
+                  disabled={pending || compressing}
+                >
+                  Quitar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="border-ink/15 text-ink/70 rounded-xl border border-dashed px-4 py-5 text-center text-sm">
+              Tomá una foto o elegí un archivo guardado.
+            </div>
+          )}
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              className="button-secondary w-full"
+              onClick={() => openPicker("camera")}
+              disabled={pending || compressing || uploading}
+            >
+              Tomar foto
+            </button>
+            <button
+              type="button"
+              className="button-secondary w-full"
+              onClick={() => openPicker("file")}
+              disabled={pending || compressing || uploading}
+            >
+              Elegir archivo
+            </button>
+          </div>
+
+          {localError ? (
+            <p
+              className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm"
+              role="alert"
+            >
+              {localError}
+            </p>
+          ) : null}
+          {compressionNotice ? (
+            <p
+              className="bg-moss/[0.07] text-moss rounded-xl px-3 py-2.5 text-sm"
+              role="status"
+            >
+              {compressionNotice}
+            </p>
+          ) : null}
+          {state.error ? (
+            <p
+              className="bg-danger/[0.07] text-danger rounded-xl px-3 py-2.5 text-sm"
+              role="alert"
+            >
+              {state.error}
+            </p>
+          ) : null}
+          {state.success ? (
+            <p
+              className="bg-success/[0.07] text-success rounded-xl px-3 py-2.5 text-sm"
+              role="status"
+              aria-live="polite"
+            >
+              {state.success}{" "}
+              <a
+                className="font-bold underline underline-offset-2"
+                href="#documentos"
+              >
+                Ver en la lista ↓
+              </a>
+            </p>
+          ) : null}
+
+          <button
+            className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            type="submit"
+            disabled={pending || compressing || uploading || !selected}
+          >
+            {compressing
+              ? "Optimizando…"
+              : uploading
+                ? "Preparando…"
+                : pending
+                  ? "Registrando…"
+                  : "Subir documento privado"}
+          </button>
+        </form>
       </div>
     </section>
   );

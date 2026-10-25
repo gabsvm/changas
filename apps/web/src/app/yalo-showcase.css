@@ -437,13 +437,29 @@
 .yalo-intent-link:active {
   transform: translateY(0);
 }
-.yalo-hero-search-caption {
-  margin: 26px auto -17px;
-  color: #bed0dd;
-  font-size: 12px;
-  font-weight: 700;
+.yalo-hero-offer {
+  margin: 20px auto 0;
+  color: #8fa6b9;
+  font-size: 13px;
+  font-weight: 600;
   line-height: 1.5;
 }
+.yalo-hero-offer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 4px;
+  border-radius: 8px;
+  color: #ddebf2;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.yalo-hero-offer a:hover {
+  color: #65ec91;
+}
+
 
 .yalo-hero-search {
   display: flex;
@@ -1068,14 +1084,7 @@
     height: 40px;
     border-radius: 12px;
   }
-  .yalo-intent-text strong {
-    font-size: 16px;
-  }
   .yalo-intent-text > span {
-    font-size: 12px;
-  }
-  .yalo-hero-search-caption {
-    margin: 21px auto 0;
     font-size: 12px;
   }
   .yalo-hero-search {

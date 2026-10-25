@@ -20,10 +20,10 @@ export default function TermsPage() {
     >
       <LegalSection title="1. Quiénes somos">
         <p>
-          YALO es una plataforma digital que acerca a personas que necesitan
-          un servicio (clientes) con personas que lo ofrecen de forma
-          independiente (prestadores). Es operada por [COMPLETAR: razón social],
-          CUIT [COMPLETAR], con domicilio en [COMPLETAR: domicilio] y correo de
+          YALO es una plataforma digital que acerca a personas que necesitan un
+          servicio (clientes) con personas que lo ofrecen de forma independiente
+          (prestadores). Es operada por [COMPLETAR: razón social], CUIT
+          [COMPLETAR], con domicilio en [COMPLETAR: domicilio] y correo de
           contacto [COMPLETAR: correo].
         </p>
         <p>
@@ -100,9 +100,9 @@ export default function TermsPage() {
       <LegalSection title="7. Pagos">
         <p>
           Cuando el pago en línea esté disponible, se procesa a través de
-          Mercado Pago, con la cuenta que el prestador vincula a YALO.
-          YALO no almacena los datos de tu tarjeta. Comisiones, plazos y
-          condiciones de reintegro: [COMPLETAR].
+          Mercado Pago, con la cuenta que el prestador vincula a YALO. YALO no
+          almacena los datos de tu tarjeta. Comisiones, plazos y condiciones de
+          reintegro: [COMPLETAR].
         </p>
       </LegalSection>
 
@@ -117,8 +117,8 @@ export default function TermsPage() {
       <LegalSection title="9. Reportes, bloqueos y suspensión">
         <p>
           Podés bloquear a otra persona o reportar conversaciones, reseñas o
-          perfiles. YALO puede restringir o suspender cuentas y contenidos
-          que incumplan estos términos o la ley, y conservar los registros
+          perfiles. YALO puede restringir o suspender cuentas y contenidos que
+          incumplan estos términos o la ley, y conservar los registros
           necesarios para atender el caso.
         </p>
       </LegalSection>
@@ -139,10 +139,9 @@ export default function TermsPage() {
 
       <LegalSection title="11. Propiedad intelectual">
         <p>
-          La marca, el diseño y el software de YALO pertenecen a su titular.
-          Vos conservás los derechos sobre el contenido que subís y nos das
-          permiso para mostrarlo en la plataforma con el fin de prestar el
-          servicio.
+          La marca, el diseño y el software de YALO pertenecen a su titular. Vos
+          conservás los derechos sobre el contenido que subís y nos das permiso
+          para mostrarlo en la plataforma con el fin de prestar el servicio.
         </p>
       </LegalSection>
 

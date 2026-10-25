@@ -60,7 +60,9 @@ describe("YALO brand theme", () => {
   });
 
   it("uses the YALO symbol artwork for the app icon", () => {
-    expect(globals).toContain('background-image: url("/brand/yalo-symbol.svg")');
+    expect(globals).toContain(
+      'background-image: url("/brand/yalo-symbol.svg")',
+    );
     expect(icon).toContain("#0D121B");
     expect(icon).toContain("#08A9F4");
     expect(icon).toContain("#12D9C5");

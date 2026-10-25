@@ -23,9 +23,7 @@ describe("manual discovery locations", () => {
     ]) {
       expect(slugs).toContain(slug);
     }
-    expect(getManualLocation("cordoba-capital")?.label).toBe(
-      "Córdoba Capital",
-    );
+    expect(getManualLocation("cordoba-capital")?.label).toBe("Córdoba Capital");
     expect(getManualLocation("villa-carlos-paz")?.label).toBe(
       "Villa Carlos Paz",
     );

@@ -65,6 +65,9 @@ export function ImageLightbox({
           </button>
         </div>
         <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-2xl bg-black/30">
+          {/* unoptimized: adjunto privado; /messages/attachments exige sesión y
+              redirige a una URL firmada. El optimizador no debe cachearlo para
+              otros usuarios. */}
           <Image
             unoptimized
             src={`/messages/attachments/${image.id}`}
@@ -101,6 +104,7 @@ export function ConversationAttachmentCard({
   const content = (
     <>
       {isImage ? (
+        // unoptimized: adjunto privado (ver lightbox).
         <Image
           unoptimized
           width={480}

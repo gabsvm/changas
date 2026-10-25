@@ -5,6 +5,10 @@
  * opcional positivo, ventana opcional con fin posterior al inicio.
  */
 
+import { parseArsMinorUnits } from "@changas/validation";
+
+import { parseProductDateTime } from "@/lib/product-time";
+
 export type JobPostFormRaw = {
   skillId: string;
   title: string;
@@ -26,25 +30,12 @@ export type JobPostParsedData = {
 };
 
 export type ParsedJobPostForm =
-  | { ok: true; data: JobPostParsedData }
-  | { ok: false; message: string };
-
-function parseBudgetMinorUnits(raw: string): number | undefined {
-  const trimmed = raw.trim();
-  if (trimmed === "") return undefined;
-  const normalized = trimmed.replace(/\./g, "").replace(",", ".");
-  if (!/^\d+(\.\d{1,2})?$/.test(normalized)) return undefined;
-  const value = Math.round(Number(normalized) * 100);
-  if (!Number.isSafeInteger(value) || value <= 0) return undefined;
-  return value;
-}
+  { ok: true; data: JobPostParsedData } | { ok: false; message: string };
 
 function parseDateTime(raw: string): Date | undefined | null {
   const trimmed = raw.trim();
   if (trimmed === "") return undefined;
-  const parsed = new Date(trimmed);
-  if (Number.isNaN(parsed.getTime())) return null;
-  return parsed;
+  return parseProductDateTime(trimmed);
 }
 
 export function parseJobPostForm(raw: JobPostFormRaw): ParsedJobPostForm {
@@ -73,14 +64,17 @@ export function parseJobPostForm(raw: JobPostFormRaw): ParsedJobPostForm {
   }
 
   const locationText = raw.locationText.trim();
-  if (locationText !== "" && (locationText.length < 2 || locationText.length > 200)) {
+  if (
+    locationText !== "" &&
+    (locationText.length < 2 || locationText.length > 200)
+  ) {
     return {
       ok: false,
       message: "La ubicación admite entre 2 y 200 caracteres, o dejala vacía.",
     };
   }
 
-  const desiredBudgetAmount = parseBudgetMinorUnits(raw.desiredBudgetAmount);
+  const desiredBudgetAmount = parseArsMinorUnits(raw.desiredBudgetAmount);
   if (
     raw.desiredBudgetAmount.trim() !== "" &&
     desiredBudgetAmount === undefined

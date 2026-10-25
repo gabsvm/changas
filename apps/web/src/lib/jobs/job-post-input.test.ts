@@ -95,4 +95,29 @@ describe("parseJobPostForm", () => {
       expect(parsed.data.scheduleEndAt).toBeInstanceOf(Date);
     }
   });
+
+  it("convierte horarios del wizard desde Buenos Aires sin depender de TZ del host", () => {
+    const parsed = parseJobPostForm({
+      ...BASE,
+      scheduleStartAt: "2030-05-10T09:00",
+      scheduleEndAt: "2030-05-10T10:00",
+    });
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) {
+      expect(parsed.data.scheduleStartAt?.toISOString()).toBe(
+        "2030-05-10T12:00:00.000Z",
+      );
+      expect(parsed.data.scheduleEndAt?.toISOString()).toBe(
+        "2030-05-10T13:00:00.000Z",
+      );
+    }
+  });
+
+  it("rechaza una fecha calendario imposible", () => {
+    const parsed = parseJobPostForm({
+      ...BASE,
+      scheduleStartAt: "2030-02-30T09:00",
+    });
+    expect(parsed.ok).toBe(false);
+  });
 });

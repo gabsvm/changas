@@ -8,7 +8,8 @@ const toneClasses: Record<Tone, string> = {
   success: "bg-success/10 text-success",
   warning: "bg-warning/12 text-warning",
   danger: "bg-danger/10 text-danger",
-  brand: "bg-brand-primary/[0.08] text-brand-primary dark:bg-white/10 dark:text-white",
+  brand:
+    "bg-brand-primary/[0.08] text-brand-primary dark:bg-white/10 dark:text-white",
 };
 
 export function StatusChip({

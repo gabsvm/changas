@@ -140,6 +140,7 @@ export async function listNotifications(
 export async function listNotificationsThrough(
   client: SupabaseClient<Database>,
   through: PageKey | null,
+  startFromCursor = false,
 ): Promise<PagedResult<NotificationItem>> {
   return accumulateThrough(
     (cursor, limit) =>
@@ -152,6 +153,8 @@ export async function listNotificationsThrough(
     (item) => item.id,
     through,
     30,
+    undefined,
+    startFromCursor,
   );
 }
 

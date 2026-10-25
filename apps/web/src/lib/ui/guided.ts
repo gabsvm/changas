@@ -55,7 +55,13 @@ export function getProviderNextAction(args: {
   paymentConnected: boolean;
   paymentsEnabled?: boolean;
 }): ProviderNextAction {
-  const { isProvider, providerActive, hasServices, paymentConnected, paymentsEnabled = false } = args;
+  const {
+    isProvider,
+    providerActive,
+    hasServices,
+    paymentConnected,
+    paymentsEnabled = false,
+  } = args;
 
   if (!isProvider) {
     return {

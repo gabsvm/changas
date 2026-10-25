@@ -31,7 +31,12 @@ export default async function AccountIdentityPage() {
       <MobileAppBar title="Identidad y seguridad" backHref="/account" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <header className="flex items-center gap-3">
-          <IllustratedBadge tone="green" icon="shield" size="md" label="Identidad y seguridad" />
+          <IllustratedBadge
+            tone="green"
+            icon="shield"
+            size="md"
+            label="Identidad y seguridad"
+          />
           <div>
             <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
               Identidad y seguridad

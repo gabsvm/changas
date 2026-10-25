@@ -11,6 +11,8 @@ import type {
   TransactionalEmail,
 } from "./types";
 
+const PROVIDER_TIMEOUT_MS = 4_000;
+
 function retryableProviderError(errorCode: string): DeliveryResult {
   return { ok: false, retryable: true, errorCode };
 }
@@ -61,6 +63,7 @@ export class WebPushProvider implements PushProvider {
             privateKey: this.config.privateKey,
           },
           TTL: 300,
+          timeout: PROVIDER_TIMEOUT_MS,
         },
       );
 
@@ -108,7 +111,10 @@ export class ResendEmailProvider implements EmailProvider {
     });
 
     try {
-      const response = await fetch(request.url, request.init);
+      const response = await fetch(request.url, {
+        ...request.init,
+        signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
+      });
       return classifyDeliveryHttpStatus(response.status);
     } catch {
       return retryableProviderError("EMAIL_NETWORK_ERROR");

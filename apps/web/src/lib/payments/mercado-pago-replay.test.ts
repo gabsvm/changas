@@ -19,7 +19,9 @@ function createProvider() {
 
 function signFor(dataId: string, requestId: string, tsSeconds: number): string {
   const manifest = `id:${dataId};request-id:${requestId};ts:${tsSeconds};`;
-  const v1 = createHmac("sha256", WEBHOOK_SECRET).update(manifest).digest("hex");
+  const v1 = createHmac("sha256", WEBHOOK_SECRET)
+    .update(manifest)
+    .digest("hex");
   return `ts=${tsSeconds},v1=${v1}`;
 }
 

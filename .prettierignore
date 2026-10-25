@@ -6,5 +6,5 @@ playwright-report
 test-results
 pnpm-lock.yaml
 supabase/.temp
-CHANGAS_MASTER_PLAN.md
+docs/archive/CHANGAS_MASTER_PLAN.md
 docs/superpowers/plans/2026-09-07-mobile-premium-redesign.md

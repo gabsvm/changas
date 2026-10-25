@@ -23,24 +23,24 @@ YALO es el marketplace donde una persona encuentra quien resuelva una necesidad 
 
 Los valores son **aproximaciones inferidas de píxeles de la captura**, no normas oficiales del diseñador. Muse debe ajustarlos visualmente con la referencia y validar contraste en ambas modalidades.
 
-| Token semántico | Valor inicial | Uso |
-|---|---|---|
-| `yalo.navy.950` | `#0D121B` | Superficie de marca, iconos oscuros, portada e ícono app |
-| `yalo.navy.900` | `#161D2A` | Panel oscuro y encabezado corporativo |
-| `yalo.navy.800` | `#1E293B` | Bordes/diferenciación en paneles navy |
-| `yalo.cyan.500` | `#08A9F4` | Ala izquierda del símbolo, acento azul |
-| `yalo.teal.500` | `#12D9C5` | Centro del símbolo, progreso decorativo |
-| `yalo.mint.400` | `#65EC91` | Ala derecha, éxito de marca cuando aplique |
-| `yalo.canvas.light` | `#F6F9FC` | Fondo claro neutral frío |
-| `yalo.surface.light` | `#FFFFFF` | Tarjetas/forms en claro |
-| `yalo.ink.light` | `#101827` | Texto principal en tema claro |
-| `yalo.muted.light` | `#526174` | Texto secundario en claro |
-| `yalo.border.light` | `#DCE5EE` | Bordes de control |
-| `yalo.canvas.dark` | `#0D121B` | Fondo oscuro |
-| `yalo.surface.dark` | `#171F2C` | Tarjetas/forms en oscuro |
-| `yalo.ink.dark` | `#F5F8FC` | Texto principal oscuro |
-| `yalo.focus` | `#1576D2` | Anillo de foco accesible, revisar en dark |
-| `yalo.danger` | `#C83D46` | Errores; no sustituir semántica por mint |
+| Token semántico      | Valor inicial | Uso                                                      |
+| -------------------- | ------------- | -------------------------------------------------------- |
+| `yalo.navy.950`      | `#0D121B`     | Superficie de marca, iconos oscuros, portada e ícono app |
+| `yalo.navy.900`      | `#161D2A`     | Panel oscuro y encabezado corporativo                    |
+| `yalo.navy.800`      | `#1E293B`     | Bordes/diferenciación en paneles navy                    |
+| `yalo.cyan.500`      | `#08A9F4`     | Ala izquierda del símbolo, acento azul                   |
+| `yalo.teal.500`      | `#12D9C5`     | Centro del símbolo, progreso decorativo                  |
+| `yalo.mint.400`      | `#65EC91`     | Ala derecha, éxito de marca cuando aplique               |
+| `yalo.canvas.light`  | `#F6F9FC`     | Fondo claro neutral frío                                 |
+| `yalo.surface.light` | `#FFFFFF`     | Tarjetas/forms en claro                                  |
+| `yalo.ink.light`     | `#101827`     | Texto principal en tema claro                            |
+| `yalo.muted.light`   | `#526174`     | Texto secundario en claro                                |
+| `yalo.border.light`  | `#DCE5EE`     | Bordes de control                                        |
+| `yalo.canvas.dark`   | `#0D121B`     | Fondo oscuro                                             |
+| `yalo.surface.dark`  | `#171F2C`     | Tarjetas/forms en oscuro                                 |
+| `yalo.ink.dark`      | `#F5F8FC`     | Texto principal oscuro                                   |
+| `yalo.focus`         | `#1576D2`     | Anillo de foco accesible, revisar en dark                |
+| `yalo.danger`        | `#C83D46`     | Errores; no sustituir semántica por mint                 |
 
 **Gradiente identitario:** `linear-gradient(115deg, #08A9F4 0%, #12D9C5 52%, #65EC91 100%)`. Reservarlo para isotipo, pequeños acentos, algunos estados activos y momentos de marca; **no tapizar tarjetas, headers, formularios ni pantallas de gradiente**. Las funciones «destructive», «warning», «info» y «success» conservan colores semánticos validados, no se vuelven todas verde/azul por marketing.
 
@@ -69,7 +69,7 @@ Los valores son **aproximaciones inferidas de píxeles de la captura**, no norma
 
 Mantener inicialmente **Inter** en cuerpo y **Space Grotesk** en títulos si sus renders funcionan: ya están integradas en `app/layout.tsx`. No gastar un sprint cambiando fuentes de interfaz por gusto: el **wordmark YALO es un asset separado**. Escalas móviles: texto base 16px, ayudas >=12–13px con contraste, heading moderado, 44–48px mínimo táctil, foco visible; respetar `prefers-reduced-motion`.
 
-Diseño comparable por *calidad de interacción* a Facebook/Instagram/X, pero propio para marketplace: tarjetas simples, separación consistente, una CTA dominante por etapa, chips solo si agregan datos, mensajes que se sienten mensajería real, estados y errores recuperables. Sin jerarquía visual decorativa que compita con precio, reputación, aceptación o siguiente paso.
+Diseño comparable por _calidad de interacción_ a Facebook/Instagram/X, pero propio para marketplace: tarjetas simples, separación consistente, una CTA dominante por etapa, chips solo si agregan datos, mensajes que se sienten mensajería real, estados y errores recuperables. Sin jerarquía visual decorativa que compita con precio, reputación, aceptación o siguiente paso.
 
 **Vistas de referencia para la transformación:** inicio, búsqueda/filtros, categorías, detalle del servicio, perfil del prestador, conversaciones/propuestas, seguimiento del trabajo, alta de prestador/gestión, cuenta/notificaciones y revisión/admin. Evitar mezcla de orange/pink heredados con navy/teal/mint nuevos.
 
@@ -77,14 +77,14 @@ Diseño comparable por *calidad de interacción* a Facebook/Instagram/X, pero pr
 
 No usar reemplazo global de cadenas hexadecimales. Introducir tokens semánticos y migrar componente a componente, dejando rastreables excepciones:
 
-| Token actual | Destino conceptual |
-|---|---|
-| `--color-canvas`, `--color-surface`, `--color-ink` | colores YALO light/dark |
-| `--color-brand-orange`, `--color-terracotta` | tokens nuevos `--color-brand-primary`, `--color-brand-primary-strong` |
-| `--color-brand-yellow`, `--color-brand-pink` | retirar usos identitarios y mantener solo semántica si corresponde |
-| `--brand-gradient`, `--consumer-hero-gradient` | `--yalo-symbol-gradient`, acentos decorativos mesurados |
-| `--consumer-shadow-*`, `--consumer-radius-*` | sombras menos profundas, radios coherentes |
-| `--color-moss` (actual azul de foco) | `--color-focus` semántico e independiente |
+| Token actual                                       | Destino conceptual                                                    |
+| -------------------------------------------------- | --------------------------------------------------------------------- |
+| `--color-canvas`, `--color-surface`, `--color-ink` | colores YALO light/dark                                               |
+| `--color-brand-orange`, `--color-terracotta`       | tokens nuevos `--color-brand-primary`, `--color-brand-primary-strong` |
+| `--color-brand-yellow`, `--color-brand-pink`       | retirar usos identitarios y mantener solo semántica si corresponde    |
+| `--brand-gradient`, `--consumer-hero-gradient`     | `--yalo-symbol-gradient`, acentos decorativos mesurados               |
+| `--consumer-shadow-*`, `--consumer-radius-*`       | sombras menos profundas, radios coherentes                            |
+| `--color-moss` (actual azul de foco)               | `--color-focus` semántico e independiente                             |
 
 Estrategia: primero definir base en `apps/web/src/app/globals.css`, luego migrar componentes explícitos (`brand-gradient-surface`, `cta-ink`, `StatusChip`, `IllustratedBadge`, `ServiceCard`, tabs/BottomNav/desktop nav, light/dark). Revisar `bg-white`, `text-white`, `#FF6B35`, `#EE5A24`, `#FF0A78`, `#FFC857` y gradientes hardcoded. **No cambiar el admin deliberadamente por accidente:** o asignar un tema YALO-admin intencionado o preservar su lenguaje operacional documentando la excepción.
 

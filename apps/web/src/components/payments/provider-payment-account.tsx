@@ -55,8 +55,8 @@ export function ProviderPaymentAccount({
               Mercado Pago
             </h2>
             <p className="text-ink/70 mt-1.5 max-w-2xl text-sm leading-6">
-              Vinculá tu cuenta para los futuros cobros online. Tus
-              credenciales nunca se exponen al navegador.
+              Vinculá tu cuenta para los futuros cobros online. Tus credenciales
+              nunca se exponen al navegador.
             </p>
           </div>
         </div>
@@ -69,8 +69,7 @@ export function ProviderPaymentAccount({
         <div
           className="relative h-14 overflow-hidden"
           style={{
-            backgroundImage:
-              "var(--consumer-hero-gradient)",
+            backgroundImage: "var(--consumer-hero-gradient)",
           }}
           aria-hidden="true"
         >
@@ -138,8 +137,8 @@ export function ProviderPaymentAccount({
           ) : (
             <p className="text-ink/70 mt-3 text-sm leading-6" role="status">
               Los cobros online aún no están disponibles. Podés trabajar y
-              cobrar directamente en efectivo o transferencia sin vincular
-              nada; tu estado y tus requisitos se muestran arriba.
+              cobrar directamente en efectivo o transferencia sin vincular nada;
+              tu estado y tus requisitos se muestran arriba.
             </p>
           )}
         </div>

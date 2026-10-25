@@ -22,6 +22,7 @@ import {
 import { createProposalCheckout } from "@/lib/payments/server";
 import { createClient } from "@/lib/supabase/server";
 import { getConversationContext } from "@/lib/conversations/server";
+import { parseProductDateTime } from "@/lib/product-time";
 
 export type ProposalActionState = {
   status: "IDLE" | "SUCCESS" | "ERROR";
@@ -42,9 +43,9 @@ function requiredUuid(formData: FormData, name: string): string {
 function optionalIso(formData: FormData, name: string): string | null {
   const value = stringField(formData, name);
   if (!value) return null;
-  const timestamp = Date.parse(value);
-  if (!Number.isFinite(timestamp)) throw new Error("Fecha inválida.");
-  return new Date(timestamp).toISOString();
+  const timestamp = parseProductDateTime(value);
+  if (!timestamp) throw new Error("Fecha inválida.");
+  return timestamp.toISOString();
 }
 
 function optionalPrice(formData: FormData): number | null {
@@ -76,7 +77,9 @@ function actionError(error: unknown): ProposalActionState {
 /** Defense in depth while the legacy S1 RPC is still installed in prod.
  * The S1 migration additionally enforces this under a DB lock.
  */
-async function requireInstantPreauthorization(conversationId: string): Promise<void> {
+async function requireInstantPreauthorization(
+  conversationId: string,
+): Promise<void> {
   const supabase = await createClient();
   const thread = await getConversationContext(conversationId);
   if (!thread) throw new Error("No podemos consultar este servicio.");
@@ -86,7 +89,9 @@ async function requireInstantPreauthorization(conversationId: string): Promise<v
     .eq("id", thread.service_id)
     .maybeSingle();
   if (serviceError || service?.instant_booking_enabled !== true) {
-    throw new Error("Este servicio requiere aceptación del prestador. Usá «Solicitar cotización».");
+    throw new Error(
+      "Este servicio requiere aceptación del prestador. Usá «Solicitar cotización».",
+    );
   }
 }
 
@@ -98,7 +103,8 @@ export async function createProposalAction(
     const conversationId = requiredUuid(formData, "conversationId");
     const rawKey = stringField(formData, "idempotencyKey");
     const kind = proposalKind(formData);
-    if (kind === "DIRECT_BOOKING") await requireInstantPreauthorization(conversationId);
+    if (kind === "DIRECT_BOOKING")
+      await requireInstantPreauthorization(conversationId);
     await createConversationProposal({
       conversationId,
       kind,

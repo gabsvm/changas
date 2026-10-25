@@ -102,7 +102,7 @@ export function IdentityDocumentPreview({
               ) : selected.mimeType.startsWith("image/") ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  className="mx-auto max-h-[70vh] w-auto max-w-full object-contain"
+                  className="mx-auto aspect-[4/3] max-h-[70vh] w-full max-w-full object-contain"
                   src={documentUrl}
                   alt={`Vista previa de ${selected.documentType}`}
                   onError={() => setLoadError(true)}

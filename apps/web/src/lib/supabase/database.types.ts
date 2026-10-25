@@ -258,7 +258,8 @@ export type ExternalPaymentState =
   | "CONTESTED"
   | "VOIDED";
 
-export type ExternalPaymentMethod = "EFECTIVO" | "TRANSFERENCIA" | "OTRO_ACORDADO";
+export type ExternalPaymentMethod =
+  "EFECTIVO" | "TRANSFERENCIA" | "OTRO_ACORDADO";
 
 type ExternalPaymentDeclarationsRow = {
   id: string;
@@ -724,7 +725,10 @@ export type Database = {
       services: TableDefinition<ServicesRow, ServicesInsert, ServicesUpdate>;
       external_payment_declarations: TableDefinition<
         ExternalPaymentDeclarationsRow,
-        Omit<ExternalPaymentDeclarationsRow, "id" | "created_at" | "updated_at">,
+        Omit<
+          ExternalPaymentDeclarationsRow,
+          "id" | "created_at" | "updated_at"
+        >,
         Partial<ExternalPaymentDeclarationsRow>
       >;
       job_posts: TableDefinition<JobPostsRow, JobPostsInsert, JobPostsUpdate>;

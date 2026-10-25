@@ -106,11 +106,13 @@ export default async function MessagesPage({
   if (!user) redirect("/login?next=/messages");
 
   const through = parsePageCursor(params);
-  const { items: conversations, next } = showUnreadOnly
-    ? await listUnreadConversationsThrough(through)
-    : await listConversationsThrough(through);
+  const startFromCursor = params.windowed === "1";
+  const page = showUnreadOnly
+    ? await listUnreadConversationsThrough(through, startFromCursor)
+    : await listConversationsThrough(through, startFromCursor);
+  const { items: conversations, next } = page;
   const moreHref = next
-    ? `/messages?${showUnreadOnly ? "filter=unread&" : ""}before=${encodeURIComponent(next.at)}&beforeId=${next.id}`
+    ? `/messages?${showUnreadOnly ? "filter=unread&" : ""}before=${encodeURIComponent(next.at)}&beforeId=${next.id}${page.windowed ? "&windowed=1" : ""}`
     : null;
   const deals = await loadOpenDeals(
     conversations.map((conversation) => conversation.conversation_id),
@@ -122,6 +124,17 @@ export default async function MessagesPage({
     <section className="pb-6 sm:py-10">
       <MobileAppBar title="Mensajes" />
       <div className="pt-4 sm:pt-0">
+        {page.windowed ? (
+          <p className="text-ink/60 mb-3 text-sm">
+            Mostrando un bloque del historial. {" "}
+            <Link
+              href={`/messages?${showUnreadOnly ? "filter=unread" : ""}`}
+              className="text-ink underline"
+            >
+              Volver al inicio
+            </Link>
+          </p>
+        ) : null}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
             <h1 className="hidden text-3xl font-extrabold tracking-[-0.03em] sm:block">
@@ -143,7 +156,7 @@ export default async function MessagesPage({
           <Link
             href="/messages"
             aria-current={showUnreadOnly ? undefined : "page"}
-            className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
+            className={`consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-[13px] font-bold ${
               showUnreadOnly
                 ? "bg-surface border-ink/[0.08] border"
                 : "text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
@@ -162,7 +175,7 @@ export default async function MessagesPage({
           <Link
             href="/messages?filter=unread"
             aria-current={showUnreadOnly ? "page" : undefined}
-            className={`consumer-pressable inline-flex min-h-10 items-center rounded-full px-4 text-[13px] font-bold ${
+            className={`consumer-pressable inline-flex min-h-11 items-center rounded-full px-4 text-[13px] font-bold ${
               showUnreadOnly
                 ? "text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                 : "bg-surface border-ink/[0.08] border"

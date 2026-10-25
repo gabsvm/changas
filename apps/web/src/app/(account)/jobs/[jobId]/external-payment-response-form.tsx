@@ -49,7 +49,7 @@ export function ExternalPaymentResponseForm({
       {state.error ? (
         <p
           role="alert"
-          className="border-danger/25 bg-danger/[0.07] text-danger rounded-xl border px-3 py-2 text-[13px] font-semibold leading-5"
+          className="border-danger/25 bg-danger/[0.07] text-danger rounded-xl border px-3 py-2 text-[13px] leading-5 font-semibold"
         >
           {state.error}
         </p>

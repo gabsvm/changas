@@ -28,9 +28,7 @@ export function getServiceHireKind(service: HirableService): ServiceHireKind {
 }
 
 /** Reserva instantanea: precio fijo + monto + flag del prestador. */
-export function isInstantBookingEligible(
-  service: HirableService,
-): boolean {
+export function isInstantBookingEligible(service: HirableService): boolean {
   return (
     getServiceHireKind(service) === "DIRECT_BOOKING" &&
     service.instant_booking_enabled === true

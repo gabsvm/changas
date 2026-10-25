@@ -150,7 +150,6 @@ export function ServiceCard({
       height={360}
       sizes="(max-width: 640px) 100vw, 640px"
       loading="lazy"
-      unoptimized
     />
   ) : (
     <CoverFallback
@@ -285,6 +284,15 @@ export function ServiceCard({
                       · {row.provider_zone}
                     </span>
                   ) : null}
+                  {/* Toda fila de discovery trae prestadores con status ACTIVE
+                      (revisión de identidad aprobada por el servidor en
+                      search_discovery_services_v4): el badge es dato real. */}
+                  <span
+                    className="shrink-0 font-bold text-ink"
+                    title="Identidad verificada por YALO"
+                  >
+                    ✓ Verificado
+                  </span>
                 </p>
                 <h3 className="service-card-title text-ink mt-1.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
                   <Link

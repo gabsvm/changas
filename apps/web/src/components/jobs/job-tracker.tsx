@@ -53,7 +53,11 @@ function TrackerRow({
         <span
           className={`flex h-7 w-7 items-center justify-center rounded-full border-2 text-[13px] font-extrabold ${dot}`}
         >
-          {step.state === "done" ? "✓" : step.state === "current" && !frozen ? "●" : "○"}
+          {step.state === "done"
+            ? "✓"
+            : step.state === "current" && !frozen
+              ? "●"
+              : "○"}
         </span>
         <span className="bg-ink/10 w-0.5 flex-1 last:hidden" />
       </span>

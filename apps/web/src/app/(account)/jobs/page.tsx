@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { formatMinorUnits } from "@changas/domain";
 
@@ -6,6 +7,8 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { parsePageCursor } from "@/lib/cursor-pages";
+import { createClient } from "@/lib/supabase/server";
+import { formatProductDateTime, PRODUCT_TIME_ZONE } from "@/lib/product-time";
 import {
   listMyPastJobsPage,
   listMyPastJobsThrough,
@@ -22,13 +25,10 @@ import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 
 function scheduleLabel(job: UpcomingJob) {
   if (job.starts_at) {
-    return new Intl.DateTimeFormat("es-AR", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(job.starts_at));
+    return formatProductDateTime(job.starts_at);
   }
   if (job.deadline_at) {
-    return `Entrega ${new Intl.DateTimeFormat("es-AR", { dateStyle: "medium" }).format(new Date(job.deadline_at))}`;
+    return `Entrega ${new Intl.DateTimeFormat("es-AR", { timeZone: PRODUCT_TIME_ZONE, dateStyle: "medium" }).format(new Date(job.deadline_at))}`;
   }
   return "A coordinar";
 }
@@ -101,6 +101,11 @@ export default async function JobsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/jobs");
   const rawStatus = params.status;
   const activeFilter: StatusFilter = statusFilters.some(
     (option) =>
@@ -110,13 +115,15 @@ export default async function JobsPage({
     : "all";
   const { past, filter: rpcFilter } = rpcFilterFor(activeFilter);
   const through = parsePageCursor(params);
+  const startFromCursor = params.windowed === "1";
   const paymentsEnabled = isPaymentsEnabled();
-  const { items: jobs, next } = past
-    ? await listMyPastJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE)
-    : await listMyUpcomingJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE);
+  const page = past
+    ? await listMyPastJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE, startFromCursor)
+    : await listMyUpcomingJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE, startFromCursor);
+  const { items: jobs, next } = page;
   const statusQuery = activeFilter === "all" ? "" : `status=${activeFilter}&`;
   const moreHref = next
-    ? `/jobs?${statusQuery}before=${encodeURIComponent(next.at)}&beforeId=${next.id}`
+    ? `/jobs?${statusQuery}before=${encodeURIComponent(next.at)}&beforeId=${next.id}${page.windowed ? "&windowed=1" : ""}`
     : null;
   // Vacío global vs. sin resultados para el filtro: con filtro server-side,
   // una página vacía no distingue; una sonda sin filtro (1 fila) decide.
@@ -138,6 +145,14 @@ export default async function JobsPage({
     <section className="pb-6 sm:py-14">
       <MobileAppBar title="Mis trabajos" backHref="/account" />
       <div className="mx-auto max-w-3xl pt-5 sm:pt-0">
+        {page.windowed ? (
+          <p className="text-ink/60 mb-3 text-sm">
+            Mostrando un bloque del historial. {" "}
+            <Link href={`/jobs?${statusQuery}`} className="text-ink underline">
+              Volver al inicio
+            </Link>
+          </p>
+        ) : null}
         <h1 className="mt-1.5 text-[24px] leading-8 font-extrabold tracking-[-0.03em]">
           Mis trabajos
         </h1>
@@ -196,7 +211,7 @@ export default async function JobsPage({
                   option.key === "all" ? "/jobs" : `/jobs?status=${option.key}`
                 }
                 aria-current={active ? "page" : undefined}
-                className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-bold ${
+                className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[13px] font-bold ${
                   active
                     ? "text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                     : "bg-surface border-ink/[0.08] border"

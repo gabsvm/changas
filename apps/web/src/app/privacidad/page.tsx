@@ -122,9 +122,9 @@ export default function PrivacyPage() {
 
       <LegalSection title="8. Menores de edad">
         <p>
-          YALO no está dirigida a menores de 18 años y no recolectamos sus
-          datos de forma intencional. Si creés que una persona menor creó una
-          cuenta, escribinos y la eliminaremos.
+          YALO no está dirigida a menores de 18 años y no recolectamos sus datos
+          de forma intencional. Si creés que una persona menor creó una cuenta,
+          escribinos y la eliminaremos.
         </p>
       </LegalSection>
 

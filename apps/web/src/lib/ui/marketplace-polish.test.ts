@@ -16,10 +16,6 @@ const magneticSource = readFileSync(
   ),
   "utf8",
 );
-const heroSource = readFileSync(
-  new URL("../../components/ui/marketplace/brand-hero.tsx", import.meta.url),
-  "utf8",
-);
 const nearbySource = readFileSync(
   new URL(
     "../../components/ui/marketplace/nearby-service-rail.tsx",
@@ -94,10 +90,10 @@ describe("marketplace polish contracts", () => {
     expect(rootSource).toContain("mode=remoto");
     expect(rootSource).toContain("offers=true");
     expect(homeThemeSource).toContain("box-shadow");
-    expect(rootSource).not.toContain("<BrandHero");
+    expect(rootSource).not.toContain("brand-hero-panel");
     expect(rootSource).not.toContain("home-search-panel");
     expect(rootSource).not.toContain("quick-action-card");
-    expect(heroSource).toContain("shadow");
+    expect(rootSource).not.toContain("BrandHero");
   });
 
   it("keeps a single responsive home search instead of mobile/desktop duplicates", () => {

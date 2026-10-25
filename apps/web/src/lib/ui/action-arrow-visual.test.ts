@@ -5,6 +5,7 @@ const read = (path: string) =>
   readFileSync(new URL(path, import.meta.url), "utf8");
 const icon = read("../../components/ui/marketplace/action-arrow-icon.tsx");
 const home = read("../../app/page.tsx");
+const trustStrip = read("../../components/ui/marketplace/trust-strip.tsx");
 const styles = read("../../app/yalo-showcase.css");
 const categories = read("../../components/ui/marketplace/category-tile.tsx");
 const categoryStyles = read("../../app/yalo-category-photography.css");
@@ -42,7 +43,7 @@ describe("Better Design — directional CTA and button polish", () => {
     expect(home).toMatch(
       /className="yalo-value-glyph" aria-hidden="true">\s*✦\s*<\/span>/,
     );
-    expect(home).toContain('className="yalo-confidence-icon">✓</span>');
+    expect(trustStrip).toContain('className="yalo-confidence-icon">✓</span>');
     expect(home).toMatch(
       /className="yalo-eyebrow-arrow" aria-hidden="true">\s*✦\s*<\/span>/,
     );

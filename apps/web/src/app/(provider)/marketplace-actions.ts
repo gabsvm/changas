@@ -15,6 +15,7 @@ import { revalidatePath } from "next/cache";
 import type { ActionState } from "@/lib/forms/action-state";
 import { getFormString } from "@/lib/forms/form-data";
 import { createClient } from "@/lib/supabase/server";
+import { parseProductDateTime } from "@/lib/product-time";
 
 const certificationBucket = "provider-certification-evidence";
 const portfolioBucket = "provider-portfolio";
@@ -723,8 +724,8 @@ export async function saveAvailabilityBlock(
   formData: FormData,
 ): Promise<ActionState> {
   const parsed = availabilityBlockSchema.safeParse({
-    startsAt: getFormString(formData, "startsAt"),
-    endsAt: getFormString(formData, "endsAt"),
+    startsAt: parseProductDateTime(getFormString(formData, "startsAt"))?.toISOString(),
+    endsAt: parseProductDateTime(getFormString(formData, "endsAt"))?.toISOString(),
     reason: getFormString(formData, "reason"),
   });
   if (!parsed.success)

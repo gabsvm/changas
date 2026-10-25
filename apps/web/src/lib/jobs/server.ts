@@ -32,10 +32,7 @@ export class JobServerError extends Error {
 export type SettlementStatus = "NOT_DUE" | "DUE" | "SETTLED" | "NOT_REQUIRED";
 
 export type JobStatusFilter =
-  | "CONFIRMED"
-  | "IN_PROGRESS"
-  | "CLOSING"
-  | "PENDING_SETTLEMENT";
+  "CONFIRMED" | "IN_PROGRESS" | "CLOSING" | "PENDING_SETTLEMENT";
 
 export type JobCursor = {
   beforeSortKey?: string;
@@ -411,6 +408,7 @@ export async function listMyUpcomingJobsThrough(
   through: PageKey | null,
   statusFilter: JobStatusFilter | null = null,
   pageSize = 20,
+  startFromCursor = false,
 ): Promise<PagedResult<UpcomingJob>> {
   return accumulateThrough(
     (cursor, limit) =>
@@ -423,6 +421,8 @@ export async function listMyUpcomingJobsThrough(
     (job) => job.job_id,
     through,
     pageSize,
+    undefined,
+    startFromCursor,
   );
 }
 
@@ -430,6 +430,7 @@ export async function listMyPastJobsThrough(
   through: PageKey | null,
   statusFilter: JobStatusFilter | null = null,
   pageSize = 20,
+  startFromCursor = false,
 ): Promise<PagedResult<UpcomingJob>> {
   return accumulateThrough(
     (cursor, limit) =>
@@ -442,6 +443,8 @@ export async function listMyPastJobsThrough(
     (job) => job.job_id,
     through,
     pageSize,
+    undefined,
+    startFromCursor,
   );
 }
 
@@ -493,7 +496,10 @@ export async function getJobDetail(jobId: string): Promise<JobDetail> {
       : 0;
   return {
     ...row,
-    delivery_flow_available: Object.prototype.hasOwnProperty.call(row, "delivery_submitted_at"),
+    delivery_flow_available: Object.prototype.hasOwnProperty.call(
+      row,
+      "delivery_submitted_at",
+    ),
     confirmation_code:
       typeof row.confirmation_code === "string" &&
       row.confirmation_code.length > 0
@@ -665,7 +671,8 @@ export async function chooseJobEffectiveModality(
     requested_modality: modality,
   });
   if (error) throw mapTransitionError(error.code, error.message);
-  if (data !== modality) throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
+  if (data !== modality)
+    throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
 }
 
 // YALO S3: enviar la entrega para revisión (sin código). En remoto mueve
@@ -734,7 +741,9 @@ const EXTERNAL_DECLARATION_STATES: ExternalDeclarationState[] = [
   "VOIDED",
 ];
 
-function asDeclaration(row: Record<string, unknown>): ExternalPaymentDeclaration {
+function asDeclaration(
+  row: Record<string, unknown>,
+): ExternalPaymentDeclaration {
   const state = EXTERNAL_DECLARATION_STATES.includes(
     row.state as ExternalDeclarationState,
   )
@@ -745,9 +754,12 @@ function asDeclaration(row: Record<string, unknown>): ExternalPaymentDeclaration
     job_id: String(row.job_id ?? ""),
     declared_by_user_id: String(row.declared_by_user_id ?? ""),
     amount_minor:
-      typeof row.amount_minor === "number" ? row.amount_minor : Number(row.amount_minor ?? 0),
+      typeof row.amount_minor === "number"
+        ? row.amount_minor
+        : Number(row.amount_minor ?? 0),
     tip_amount_minor: Number(row.tip_amount_minor ?? 0),
-    currency_code: typeof row.currency_code === "string" ? row.currency_code : "ARS",
+    currency_code:
+      typeof row.currency_code === "string" ? row.currency_code : "ARS",
     method:
       row.method === "EFECTIVO" ||
       row.method === "TRANSFERENCIA" ||
@@ -755,10 +767,14 @@ function asDeclaration(row: Record<string, unknown>): ExternalPaymentDeclaration
         ? row.method
         : "OTRO_ACORDADO",
     paid_on: typeof row.paid_on === "string" ? row.paid_on : null,
-    reference: typeof row.reference === "string" && row.reference.length > 0 ? row.reference : null,
+    reference:
+      typeof row.reference === "string" && row.reference.length > 0
+        ? row.reference
+        : null,
     state,
     counterpart_reason:
-      typeof row.counterpart_reason === "string" && row.counterpart_reason.length > 0
+      typeof row.counterpart_reason === "string" &&
+      row.counterpart_reason.length > 0
         ? row.counterpart_reason
         : null,
     created_at: typeof row.created_at === "string" ? row.created_at : "",
@@ -812,7 +828,9 @@ export async function respondExternalPayment(input: {
 }
 
 // YALO S4: quien declaró anula su pendiente (corrección = void + nueva).
-export async function voidExternalPayment(declarationId: string): Promise<void> {
+export async function voidExternalPayment(
+  declarationId: string,
+): Promise<void> {
   const { supabase } = await authenticatedClient();
   const { data, error } = await supabase.rpc("void_external_payment", {
     target_declaration_id: declarationId,
@@ -841,7 +859,10 @@ export async function getExternalPaymentLedger(jobId: string): Promise<{
     if (isMissingExternalMoneySchema(error)) throw error;
     throw mapMoneyError(error.code, error.message);
   }
-  const row = (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | null;
+  const row = (Array.isArray(data) ? data[0] : data) as Record<
+    string,
+    unknown
+  > | null;
   if (!row) {
     throw new JobServerError("TRANSIENT", "Respuesta inválida del servidor.");
   }
@@ -855,7 +876,13 @@ export async function getExternalPaymentLedger(jobId: string): Promise<{
 
 // YALO S4: ledger + historial juntos para la tarjeta de dinero.
 export async function getExternalMoney(jobId: string): Promise<{
-  ledger: { agreedTotalMinor: number; confirmedMinor: number; claimedMinor: number; outstandingMinor: number; confirmedTipMinor: number };
+  ledger: {
+    agreedTotalMinor: number;
+    confirmedMinor: number;
+    claimedMinor: number;
+    outstandingMinor: number;
+    confirmedTipMinor: number;
+  };
   declarations: ExternalPaymentDeclaration[];
 } | null> {
   try {
@@ -880,7 +907,11 @@ export async function getExternalMoney(jobId: string): Promise<{
 function isMissingExternalMoneySchema(error: unknown): boolean {
   if (typeof error !== "object" || error === null) return false;
   const shape = error as { code?: unknown; message?: unknown };
-  if (shape.code === "42883" || shape.code === "PGRST202" || shape.code === "PGRST205") {
+  if (
+    shape.code === "42883" ||
+    shape.code === "PGRST202" ||
+    shape.code === "PGRST205"
+  ) {
     return true;
   }
   return (
@@ -918,10 +949,15 @@ export async function listExternalDeclarations(
     if (isMissingExternalMoneySchema(error)) throw error;
     throw mapMoneyError(error.code, error.message);
   }
-  return ((data ?? []) as unknown as Record<string, unknown>[]).map(asDeclaration);
+  return ((data ?? []) as unknown as Record<string, unknown>[]).map(
+    asDeclaration,
+  );
 }
 
-function mapMoneyError(code?: string | null, message?: string | null): JobServerError {
+function mapMoneyError(
+  code?: string | null,
+  message?: string | null,
+): JobServerError {
   const detail = `${code ?? ""} ${message ?? ""}`;
   if (/authentication required/i.test(detail)) {
     return new JobServerError(
@@ -929,13 +965,21 @@ function mapMoneyError(code?: string | null, message?: string | null): JobServer
       "Necesitás iniciar sesión para administrar trabajos.",
     );
   }
-  if (code === "42501" || /job access denied|only the counterpart|only the declarer|only the declarer supersedes/i.test(detail)) {
+  if (
+    code === "42501" ||
+    /job access denied|only the counterpart|only the declarer|only the declarer supersedes/i.test(
+      detail,
+    )
+  ) {
     return new JobServerError(
       "FORBIDDEN",
       "No tenés permiso para esa acción sobre el dinero externo.",
     );
   }
-  if (code === "P0002" || /declaration not found|superseded declaration not found/i.test(detail)) {
+  if (
+    code === "P0002" ||
+    /declaration not found|superseded declaration not found/i.test(detail)
+  ) {
     return new JobServerError(
       "NOT_FOUND",
       "No encontramos esa declaración. Actualizá la página.",
@@ -960,13 +1004,22 @@ function mapMoneyError(code?: string | null, message?: string | null): JobServer
     );
   }
   if (/must be positive|amount/i.test(detail) && /positive/i.test(detail)) {
-    return new JobServerError("CONFLICT", "El monto declarado debe ser positivo.");
+    return new JobServerError(
+      "CONFLICT",
+      "El monto declarado debe ser positivo.",
+    );
   }
   if (/payment method is invalid/i.test(detail)) {
-    return new JobServerError("CONFLICT", "El método de pago informado no es válido.");
+    return new JobServerError(
+      "CONFLICT",
+      "El método de pago informado no es válido.",
+    );
   }
   if (/payment date is invalid/i.test(detail)) {
-    return new JobServerError("CONFLICT", "La fecha aproximada del pago no es válida.");
+    return new JobServerError(
+      "CONFLICT",
+      "La fecha aproximada del pago no es válida.",
+    );
   }
   if (/payment reference is invalid/i.test(detail)) {
     return new JobServerError(

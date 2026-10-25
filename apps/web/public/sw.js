@@ -1,4 +1,4 @@
-const STATIC_CACHE = "yalo-static-v5";
+const STATIC_CACHE = "yalo-static-v6";
 // P1-08: el worker nunca cachea HTML navegacional. `/` y `/buscar` son
 // force-dynamic personalizadas (saludo/sesión); servirlas desde caché filtra
 // la sesión anterior. Solo assets inmutables + `/offline` precacheado.
@@ -11,8 +11,6 @@ const STATIC_URLS = [
   "/icon-512.png",
   "/icon-maskable-512.png",
   "/brand/yalo-symbol.svg",
-  "/screenshots/inicio-390x844.png",
-  "/screenshots/buscar-1280x720.png",
 ];
 // Rutas con estado privado o autenticado: el worker nunca las lee ni las
 // escribe en ninguna caché (ni siquiera como fallback).

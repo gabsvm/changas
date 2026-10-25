@@ -33,9 +33,30 @@ const securityHeaders = [
   { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicy },
 ];
 
+const immutableCacheControl = {
+  key: "Cache-Control",
+  value: "public, max-age=31536000, immutable",
+};
+
+// Assets estáticos de /public que no cambian entre despliegues.
+const immutableAssetSources = [
+  "/categories/:path*",
+  "/brand/:path*",
+  "/fonts/:path*",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/icon-maskable-512.png",
+  "/icon-192.svg",
+  "/icon-512.svg",
+  "/apple-touch-icon.png",
+  "/apple-icon.png",
+];
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 2592000,
     remotePatterns: [
       {
         protocol: "https",
@@ -49,19 +70,23 @@ const nextConfig: NextConfig = {
     "@changas/domain",
     "@changas/validation",
   ],
-  // CSRF de Server Actions: solo el host propio y previews de Vercel
-  // pueden invocar actions cross-site. El dominio prod va por env para
-  // no hardcodearlo.
-  serverActions: {
-    allowedOrigins: [
-      "*.vercel.app",
-      ...(process.env.SITE_ALLOWED_ORIGIN
+  // Next's default same-origin check covers the app host; allow only the
+  // explicitly configured origin when a reverse proxy requires it.
+  experimental: {
+    serverActions: {
+      allowedOrigins: process.env.SITE_ALLOWED_ORIGIN
         ? [process.env.SITE_ALLOWED_ORIGIN]
-        : []),
-    ],
+        : [],
+    },
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      ...immutableAssetSources.map((source) => ({
+        source,
+        headers: [immutableCacheControl],
+      })),
+    ];
   },
 };
 

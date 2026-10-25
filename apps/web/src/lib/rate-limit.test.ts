@@ -50,6 +50,24 @@ describe("fixed window rate limiter", () => {
       createFixedWindowRateLimiter({ limit: 5, windowMs: -1 }),
     ).toThrow();
   });
+
+  it("bounds retained keys without evicting active limits and prunes expired keys", () => {
+    let now = 1_000;
+    const limiter = createFixedWindowRateLimiter({
+      limit: 1,
+      windowMs: 1_000,
+      now: () => now,
+    });
+
+    for (let index = 0; index < 10_000; index++) {
+      expect(limiter.check(`identity-${index}`).allowed).toBe(true);
+    }
+    expect(limiter.check("overflow").allowed).toBe(false);
+    expect(limiter.check("identity-0").allowed).toBe(false);
+
+    now += 1_000;
+    expect(limiter.check("after-expiry").allowed).toBe(true);
+  });
 });
 
 describe("client ip y origen", () => {

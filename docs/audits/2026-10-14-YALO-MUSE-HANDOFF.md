@@ -119,6 +119,7 @@
 ### D3 · Renombrar textos públicos, no ids operativos
 
 Buscar `Changas`, `CHANGAS`, `changas` y colores antiguos; clasificar hallazgos:
+
 1. **Marca pública:** cambiar a YALO.
 2. **Texto histórico/legal/administrativo:** revisar con cuidado, conservar razones sociales verdaderas.
 3. **Identidad técnica estable:** NO renombrar `@changas/*`, paquetes, nombres DB, rutas, env keys, cron, secretos, scope OAuth, callback, prefijos de storage ni cookies de sesión. `changas-theme` es key de preferencia instalada: compatibilidad de lectura/migración antes de cambiarla.
@@ -128,22 +129,22 @@ Buscar `Changas`, `CHANGAS`, `changas` y colores antiguos; clasificar hallazgos:
 
 ## 3. Matriz de QA obligatoria (manual + pruebas)
 
-| Caso | Cliente | Prestador | Resultado esperado |
-|---|---|---|---|
-| Primer registro | Busca → ficha → consultar → login → chat | Alta desde CTA principal | Sin bucles; contexto conservado |
-| Negociación | Solicita cotización/rechaza/contraoferta | Cotiza/revisa/acepta | Estados mutan una vez, errores inline |
-| Contratación | Acepta precio y alcance | Recibe `CONFIRMED` | **Sin adelanto**, estado consistente en ambas cuentas |
-| Inicio/agenda | Ve inicio, fecha y chat | Inicia, reprograma | Roles correctos; información privada protegida |
-| Extras | Acepta/rechaza cambios | Propone alcance y adicional | Sin exigencia de pago imposible cuando OFF |
-| Código de entrega | Consulta código privado | Envía código | Límite de 5 real; sin bypass RPC ni deadlock |
-| Cierre | Ve base/extras/total y confirma | Recibe cierre | Confirmación no cobra; estados correctos |
-| Autocierre | Puede apelar si corresponde | Ve disputa/resultado | No pisa cancelado/disputa; reloj y elegibilidad correctos |
-| Cobro OFF | Ve saldo pendiente y mensaje honesto | Ve deuda sin «cobrado real» | No enlaces OAuth/checkout ni notificaciones falsas |
-| Reseña | Puede valorar trabajo terminado | Responde y ve reputación | No default 5; sin depender de liquidación |
-| Escala | 51+ trabajos, 25+ conversaciones | Igual | Filtros reales y badges agregados |
-| UI móvil | 360/390/412 Android, teclado y nav | Igual | Sin cortes, CTAs táctiles, safe-area |
-| Accesibilidad | Luz/oscuro/sistema, zoom 200%, teclado | Igual | WCAG AA target; foco, contraste, alerts |
-| Identidad | PWA/install/icon/OG/nav dicen YALO | Igual | Cero mezcla visual/textual de Changas/YALO |
+| Caso              | Cliente                                  | Prestador                   | Resultado esperado                                        |
+| ----------------- | ---------------------------------------- | --------------------------- | --------------------------------------------------------- |
+| Primer registro   | Busca → ficha → consultar → login → chat | Alta desde CTA principal    | Sin bucles; contexto conservado                           |
+| Negociación       | Solicita cotización/rechaza/contraoferta | Cotiza/revisa/acepta        | Estados mutan una vez, errores inline                     |
+| Contratación      | Acepta precio y alcance                  | Recibe `CONFIRMED`          | **Sin adelanto**, estado consistente en ambas cuentas     |
+| Inicio/agenda     | Ve inicio, fecha y chat                  | Inicia, reprograma          | Roles correctos; información privada protegida            |
+| Extras            | Acepta/rechaza cambios                   | Propone alcance y adicional | Sin exigencia de pago imposible cuando OFF                |
+| Código de entrega | Consulta código privado                  | Envía código                | Límite de 5 real; sin bypass RPC ni deadlock              |
+| Cierre            | Ve base/extras/total y confirma          | Recibe cierre               | Confirmación no cobra; estados correctos                  |
+| Autocierre        | Puede apelar si corresponde              | Ve disputa/resultado        | No pisa cancelado/disputa; reloj y elegibilidad correctos |
+| Cobro OFF         | Ve saldo pendiente y mensaje honesto     | Ve deuda sin «cobrado real» | No enlaces OAuth/checkout ni notificaciones falsas        |
+| Reseña            | Puede valorar trabajo terminado          | Responde y ve reputación    | No default 5; sin depender de liquidación                 |
+| Escala            | 51+ trabajos, 25+ conversaciones         | Igual                       | Filtros reales y badges agregados                         |
+| UI móvil          | 360/390/412 Android, teclado y nav       | Igual                       | Sin cortes, CTAs táctiles, safe-area                      |
+| Accesibilidad     | Luz/oscuro/sistema, zoom 200%, teclado   | Igual                       | WCAG AA target; foco, contraste, alerts                   |
+| Identidad         | PWA/install/icon/OG/nav dicen YALO       | Igual                       | Cero mezcla visual/textual de Changas/YALO                |
 
 Casos negativos extra: usuario anon en `/jobs` debe ir a login, no pantalla de error; usuario sin permisos no accede a trabajo, código ni documentos privados; reconectar realtime no duplica mensajes; logout A → login B no sirve HTML de A desde el SW.
 

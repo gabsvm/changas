@@ -353,6 +353,15 @@ export function DiscoveryResults({
   const activeCover = coverForDiscovery(
     filters.categorySlug ?? filters.skillSlug ?? query ?? null,
   );
+  // Conteo real de la página cargada ("+" si hay más por paginar). "Cerca de
+  // vos" solo cuando la búsqueda usa ubicación (GPS o zona manual).
+  const located = gpsMode || Boolean(filters.locationSlug);
+  const resultCountLabel =
+    rows.length === 0
+      ? "No encontramos servicios con esos criterios."
+      : located
+        ? `${rows.length} servicio${rows.length === 1 ? "" : "s"} cerca de vos${hasMore ? "+" : ""}`
+        : `${rows.length} resultado${rows.length === 1 ? "" : "s"}${hasMore ? "+" : ""}`;
   return (
     <section
       aria-label="Resultados de búsqueda"
@@ -374,9 +383,7 @@ export function DiscoveryResults({
         >
           {resultsError
             ? resultsError
-            : rows.length === 0
-              ? "No encontramos servicios con esos criterios."
-              : `${rows.length} resultado${rows.length === 1 ? "" : "s"}${hasMore ? "+" : ""}`}
+            : resultCountLabel}
         </p>
         {enableNearby ? (
           <button

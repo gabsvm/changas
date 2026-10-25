@@ -34,7 +34,7 @@
 - Hacer **3–5 preguntas de alto impacto por ronda** como máximo; menos cuando basten. Priorizar aquellas cuya respuesta cambie arquitectura, alcance, flujo o aceptación. Conversación natural, sin formularios extensos por defecto.
 - Si hay suficientes datos, **proponer un borrador** y pedir corregir únicamente suposiciones materiales; no exigir responder veinte detalles antes de mostrar trabajo útil.
 - Registrar incógnitas menores como `Pendiente / TBD` y continuar **solo en partes reversibles y seguras**. No decidir silenciosamente permisos, dinero, tratamiento de datos, borrados o requisitos legales.
-- *Completo* significa **listo para decidir e implementar**, no documentar cada pantalla, tabla y excepción imaginable. Evitar specs que reproduzcan todo el código.
+- _Completo_ significa **listo para decidir e implementar**, no documentar cada pantalla, tabla y excepción imaginable. Evitar specs que reproduzcan todo el código.
 - Antes de construir un producto nuevo o implementar un alcance importante, resumir lo acordado y pedir confirmación del **alcance de producto** cuando faltó aprobación. No pedir permiso redundante para cada paso técnico ya autorizado.
 
 ### 2.4 Jerarquía de documentos y control del alcance
@@ -49,11 +49,11 @@
 
 ## 3. Tres modos proporcionales
 
-| Modo | Ejemplos | Documentación | Validación |
-|---|---|---|---|
-| **Rápido** | Texto, estilo menor, bug localizado | Pedido y criterios simples; **sin spec nuevo** | Diff + prueba enfocada/manual pertinente |
-| **Estándar** | Feature, múltiples pantallas, API + UI, cambio visible de negocio | Feature Spec breve; plan de pasos si ayuda | Tests de comportamiento y regresiones relacionadas |
-| **Crítico** | Autorización, privacidad, dinero, migración riesgosa, operación irreversible | Spec con invariantes, riesgos, reversibilidad y ADR **solo si hay decisión duradera** | Tests positivos/negativos, permisos, integridad, plan de entrega y rollback |
+| Modo         | Ejemplos                                                                     | Documentación                                                                         | Validación                                                                  |
+| ------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| **Rápido**   | Texto, estilo menor, bug localizado                                          | Pedido y criterios simples; **sin spec nuevo**                                        | Diff + prueba enfocada/manual pertinente                                    |
+| **Estándar** | Feature, múltiples pantallas, API + UI, cambio visible de negocio            | Feature Spec breve; plan de pasos si ayuda                                            | Tests de comportamiento y regresiones relacionadas                          |
+| **Crítico**  | Autorización, privacidad, dinero, migración riesgosa, operación irreversible | Spec con invariantes, riesgos, reversibilidad y ADR **solo si hay decisión duradera** | Tests positivos/negativos, permisos, integridad, plan de entrega y rollback |
 
 El modo se determina por **impacto y reversibilidad**, no por líneas de código ni por entusiasmo del agente. Un bug pequeño de seguridad puede ser crítico. Un cambio muy grande puramente cosmético no exige la burocracia de un cambio monetario.
 
@@ -68,11 +68,13 @@ Trabajar en incrementos pequeños y revisables. Si un cambio produce comportamie
 ## 5. Evidencia, severidad y triaje
 
 **Tipo de observación:**
+
 - **Confirmado:** falla demostrada por prueba/pasos verificables o por una propiedad determinista del código.
 - **Riesgo fundamentado:** mecanismo plausible e impacto relevante; especificar hipótesis, límites y **validación mínima**.
 - **Mejora opcional:** el producto funciona; la propuesta podría optimizarlo. **No rotularla como bug.**
 
 **Prioridad (impacto × exposición/probabilidad × alternativas × reversibilidad):**
+
 - **P0:** incidente activo grave, corrupción/pérdida crítica de datos, vulneración grave o servicio esencial totalmente indisponible. **Bloquea.**
 - **P1:** flujo esencial inutilizable, violación seria de permisos/privacidad, error monetario importante o riesgo serio sustentado. **Bloquea release** salvo mitigación explícita apropiada.
 - **P2:** defecto moderado, localizado o con alternativa. **No bloquea por defecto.**
@@ -87,6 +89,7 @@ No asignar P1 por un escenario simplemente imaginable. Seguridad e integridad pu
 **Pruebas:** asegurar comportamientos de negocio y regresiones razonables; evitar tests redundantes, mocks que solo se prueban a sí mismos, snapshots gigantes y suites nuevas para detalles irrelevantes. A mayor criticidad, más pruebas de error, permisos y datos. CI verde no demuestra comportamiento en producción.
 
 **Auditoría:**
+
 1. Definir objetivo, SHA/versión, spec/criterios relevantes y superficie de riesgo.
 2. En primera revisión de un hito: inspección proporcional, con prioridad en flujos esenciales y seguridad. En seguimiento: **revisar solo el delta, hallazgos pactados y regresiones cercanas**.
 3. Separar defectos confirmados, riesgos fundamentados y sugerencias. Para cada ítem accionable: impacto para el usuario, evidencia, localización y cambio mínimo.

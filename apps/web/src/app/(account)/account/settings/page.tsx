@@ -28,7 +28,12 @@ export default async function AccountSettingsPage() {
       <MobileAppBar title="Configuración" backHref="/account" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-center gap-3">
-          <IllustratedBadge tone="neutral" icon="gear" size="md" label="Configuración" />
+          <IllustratedBadge
+            tone="neutral"
+            icon="gear"
+            size="md"
+            label="Configuración"
+          />
           <div>
             <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Cuenta

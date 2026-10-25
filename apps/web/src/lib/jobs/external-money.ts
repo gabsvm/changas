@@ -62,7 +62,10 @@ export function externalMoneyAvailableToConfirm(
 export function externalMoneyAvailableToDeclare(
   ledger: ExternalMoneyLedger,
 ): number {
-  return Math.max(0, externalMoneyAvailableToConfirm(ledger) - ledger.claimedMinor);
+  return Math.max(
+    0,
+    externalMoneyAvailableToConfirm(ledger) - ledger.claimedMinor,
+  );
 }
 
 /** Allocation preview: first cover the outstanding contract, remainder is a tip.
@@ -80,7 +83,10 @@ export function splitExternalMoneyPayment(
   ) {
     return { contractMinor: 0, tipMinor: 0 };
   }
-  const contractMinor = Math.min(Math.max(0, remainingContractMinor), amountMinor);
+  const contractMinor = Math.min(
+    Math.max(0, remainingContractMinor),
+    amountMinor,
+  );
   return { contractMinor, tipMinor: amountMinor - contractMinor };
 }
 

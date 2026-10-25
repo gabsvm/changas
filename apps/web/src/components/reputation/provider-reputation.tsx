@@ -58,7 +58,11 @@ export async function ProviderReputation({
         <div id="reputation-title">
           <SectionHeader
             title="Reputación"
-            badge={{ tone: "gold", icon: "star", label: "Reputación verificada" }}
+            badge={{
+              tone: "gold",
+              icon: "star",
+              label: "Reputación verificada",
+            }}
           />
         </div>
         <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
@@ -69,7 +73,12 @@ export async function ProviderReputation({
             <p className="font-display mt-2 flex flex-wrap items-center gap-2 text-3xl font-semibold">
               {summary.review_count > 0 && summary.rating_average !== null ? (
                 <>
-                  <IllustratedBadge tone="gold" icon="star" size="sm" label={`Promedio ${summary.rating_average.toFixed(1)} de 5`} />
+                  <IllustratedBadge
+                    tone="gold"
+                    icon="star"
+                    size="sm"
+                    label={`Promedio ${summary.rating_average.toFixed(1)} de 5`}
+                  />
                   <span>{summary.rating_average.toFixed(1)} de 5</span>
                 </>
               ) : (
@@ -148,7 +157,12 @@ export async function ProviderReputation({
 
       <div className="border-ink/[0.08] consumer-card bg-surface rounded-3xl border p-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-6 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
         <span className="flex min-w-0 items-center gap-2.5">
-          <IllustratedBadge tone="blue" icon="chat" size="sm" label="Reseñas verificadas" />
+          <IllustratedBadge
+            tone="blue"
+            icon="chat"
+            size="sm"
+            label="Reseñas verificadas"
+          />
           <h2 className="font-display text-2xl font-semibold">
             Reseñas verificadas
           </h2>
@@ -170,13 +184,19 @@ export async function ProviderReputation({
                       }}
                       aria-hidden="true"
                     >
-                      {review.reviewer_display_name.trim().charAt(0).toUpperCase() || "C"}
+                      {review.reviewer_display_name
+                        .trim()
+                        .charAt(0)
+                        .toUpperCase() || "C"}
                     </span>
                     <div className="min-w-0">
                       <p className="truncate font-semibold">
                         {review.reviewer_display_name}
                       </p>
-                      <StarRow value={review.rating} label={`${review.rating} de 5 estrellas`} />
+                      <StarRow
+                        value={review.rating}
+                        label={`${review.rating} de 5 estrellas`}
+                      />
                     </div>
                   </div>
                   <div className="shrink-0 text-right">

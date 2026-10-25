@@ -74,11 +74,11 @@ export default async function AdminIdentityPage({
         title="Revisión de identidad"
         description="Sólo aparecen en la cola los prestadores que realmente enviaron su identidad. Los archivos siguen privados y cada apertura genera acceso temporal al documento exacto."
         action={
-          <div className="rounded-2xl border border-brand-yellow/30 bg-brand-yellow/15 px-4 py-3 text-center">
-            <p className="text-2xl font-extrabold text-warning">
+          <div className="border-brand-yellow/30 bg-brand-yellow/15 rounded-2xl border px-4 py-3 text-center">
+            <p className="text-warning text-2xl font-extrabold">
               {queue.length}
             </p>
-            <p className="text-[11px] font-extrabold tracking-[0.08em] text-ink/60 uppercase">
+            <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.08em] uppercase">
               pendientes
             </p>
           </div>
@@ -89,15 +89,15 @@ export default async function AdminIdentityPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-[11px] font-extrabold tracking-[0.14em] text-ink/60 uppercase">
+              <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.14em] uppercase">
                 Caso seleccionado
               </p>
-              <h2 className="mt-1 truncate font-display text-xl font-extrabold text-ink">
+              <h2 className="font-display text-ink mt-1 truncate text-xl font-extrabold">
                 {identityCase.display_name ??
                   identityCase.email ??
                   identityCase.provider_user_id}
               </h2>
-              <p className="mt-1 truncate text-sm text-ink/70">
+              <p className="text-ink/70 mt-1 truncate text-sm">
                 {identityCase.email ?? identityCase.provider_user_id}
               </p>
             </div>
@@ -107,14 +107,12 @@ export default async function AdminIdentityPage({
             />
           </div>
 
-          <div className="rounded-2xl border border-ink/[0.08] bg-surface p-4">
-            <p className="text-xs font-bold text-ink/60">
-              Identidad declarada
-            </p>
-            <p className="mt-1 text-sm font-extrabold text-ink">
+          <div className="border-ink/[0.08] bg-surface rounded-2xl border p-4">
+            <p className="text-ink/60 text-xs font-bold">Identidad declarada</p>
+            <p className="text-ink mt-1 text-sm font-extrabold">
               {identityCase.legal_name ?? "Sin nombre legal"}
             </p>
-            <p className="mt-1 text-xs text-ink/70">
+            <p className="text-ink/70 mt-1 text-xs">
               DNI y fecha de nacimiento se consultan sólo dentro de este
               contexto administrativo.
             </p>
@@ -122,10 +120,10 @@ export default async function AdminIdentityPage({
 
           <div>
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h3 className="text-sm font-extrabold text-ink">
+              <h3 className="text-ink text-sm font-extrabold">
                 Evidencia privada
               </h3>
-              <span className="text-xs font-bold text-ink/60">
+              <span className="text-ink/60 text-xs font-bold">
                 {documents.length} archivos
               </span>
             </div>
@@ -143,7 +141,7 @@ export default async function AdminIdentityPage({
             <div className="grid gap-3 sm:grid-cols-2">
               <form
                 action={decideIdentityAction}
-                className="rounded-2xl border border-success/25 bg-success/10 p-3"
+                className="border-success/25 bg-success/10 rounded-2xl border p-3"
               >
                 <input
                   type="hidden"
@@ -151,10 +149,10 @@ export default async function AdminIdentityPage({
                   value={identityCase.provider_user_id}
                 />
                 <input type="hidden" name="decision" value="APPROVE" />
-                <label className="text-xs font-bold text-ink/70">
+                <label className="text-ink/70 text-xs font-bold">
                   Nota opcional
                   <input
-                    className="mt-1 w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
+                    className="border-ink/10 text-ink mt-1 w-full border bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                     name="reason"
                     placeholder="Ej: documentación coincidente"
                   />
@@ -165,7 +163,7 @@ export default async function AdminIdentityPage({
               </form>
               <form
                 action={decideIdentityAction}
-                className="rounded-2xl border border-danger/25 bg-danger/10 p-3"
+                className="border-danger/25 bg-danger/10 rounded-2xl border p-3"
               >
                 <input
                   type="hidden"
@@ -173,10 +171,10 @@ export default async function AdminIdentityPage({
                   value={identityCase.provider_user_id}
                 />
                 <input type="hidden" name="decision" value="REJECT" />
-                <label className="text-xs font-bold text-ink/70">
+                <label className="text-ink/70 text-xs font-bold">
                   Motivo obligatorio
                   <input
-                    className="mt-1 w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink dark:border-white/10 dark:bg-white/10 dark:text-white"
+                    className="border-ink/10 text-ink mt-1 w-full border bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                     name="reason"
                     required
                     minLength={2}
@@ -189,18 +187,18 @@ export default async function AdminIdentityPage({
               </form>
             </div>
           ) : (
-            <div className="rounded-2xl border border-ink/[0.08] bg-surface p-4">
-              <p className="text-sm font-extrabold text-ink">
+            <div className="border-ink/[0.08] bg-surface rounded-2xl border p-4">
+              <p className="text-ink text-sm font-extrabold">
                 Caso sin decisión pendiente
               </p>
-              <p className="mt-1 text-xs leading-5 text-ink/70">
+              <p className="text-ink/70 mt-1 text-xs leading-5">
                 Los controles de decisión quedan bloqueados una vez resuelto el
                 caso. El historial permanece disponible abajo para trazabilidad.
               </p>
               {identityCase.status === "ACTIVE" ? (
                 <button
                   aria-label="Aprobar identidad"
-                  className="mt-3 min-h-12 w-full rounded-2xl border border-success/25 bg-success/10 px-4 py-3 text-sm font-extrabold text-success"
+                  className="border-success/25 bg-success/10 text-success mt-3 min-h-12 w-full rounded-2xl border px-4 py-3 text-sm font-extrabold"
                   disabled
                   type="button"
                 >
@@ -209,7 +207,7 @@ export default async function AdminIdentityPage({
               ) : identityCase.status === "REJECTED" ? (
                 <button
                   aria-label="Rechazar identidad"
-                  className="mt-3 min-h-12 w-full rounded-2xl border border-danger/25 bg-danger/10 px-4 py-3 text-sm font-extrabold text-danger"
+                  className="border-danger/25 bg-danger/10 text-danger mt-3 min-h-12 w-full rounded-2xl border px-4 py-3 text-sm font-extrabold"
                   disabled
                   type="button"
                 >
@@ -220,17 +218,17 @@ export default async function AdminIdentityPage({
           )}
 
           {history.length ? (
-            <details className="rounded-2xl border border-ink/[0.08] bg-surface p-3">
-              <summary className="cursor-pointer text-sm font-extrabold text-ink">
+            <details className="border-ink/[0.08] bg-surface rounded-2xl border p-3">
+              <summary className="text-ink cursor-pointer text-sm font-extrabold">
                 Historial de decisiones ({history.length})
               </summary>
               <ul className="mt-3 space-y-2">
                 {history.map((item) => (
                   <li
-                    className="rounded-xl border border-ink/[0.08] bg-surface p-3 text-xs text-ink/70"
+                    className="border-ink/[0.08] bg-surface text-ink/70 rounded-xl border p-3 text-xs"
                     key={String(item.id ?? item.created_at)}
                   >
-                    <span className="font-extrabold text-ink">
+                    <span className="text-ink font-extrabold">
                       {String(item.decision ?? "DECISIÓN")}
                     </span>{" "}
                     · {dateTime(item.created_at)}
@@ -245,61 +243,73 @@ export default async function AdminIdentityPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-base font-extrabold text-ink">
+          <h2 className="font-display text-ink text-base font-extrabold">
             Cola de revisión
           </h2>
-          <span className="text-xs font-bold text-ink/60">
+          <span className="text-ink/60 text-xs font-bold">
             Más antiguos primero
           </span>
         </div>
 
         {queue.length ? (
           <div className="consumer-scrollbar-none -mx-1 overflow-x-auto px-1">
-          <table className="w-full min-w-[640px] border-separate border-spacing-2">
-            <caption className="sr-only">
-              Cola de revisión de identidad ({queue.length})
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
-                  Prestador
-                </th>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
-                  Evidencia
-                </th>
-                <th scope="col" className="px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] text-ink/70 uppercase">
-                  Estado
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {queue.map((row) => (
-                <tr
-                  key={row.provider_user_id}
-                  className="rounded-3xl border border-ink/[0.08] bg-surface transition-colors hover:border-brand-yellow/30 hover:bg-ink/[0.04]"
-                >
-                  <th scope="row" className="min-w-0 rounded-l-3xl p-4 text-left">
-                    <Link
-                      className="block truncate text-sm font-extrabold text-ink hover:underline"
-                      href={`/admin/identity?provider=${row.provider_user_id}`}
-                    >
-                      {row.display_name ?? row.email ?? row.provider_user_id}
-                    </Link>
+            <table className="w-full min-w-[640px] border-separate border-spacing-2">
+              <caption className="sr-only">
+                Cola de revisión de identidad ({queue.length})
+              </caption>
+              <thead>
+                <tr>
+                  <th
+                    scope="col"
+                    className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                  >
+                    Prestador
                   </th>
-                  <td className="p-4 text-xs text-ink/70">
-                    {row.document_count} documentos · enviado{" "}
-                    {dateTime(row.submitted_at ?? row.updated_at)}
-                  </td>
-                  <td className="rounded-r-3xl p-4 text-right">
-                    <AdminStatusBadge
-                      label={getProviderStatusPresentation(row.status).label}
-                      tone="pending"
-                    />
-                  </td>
+                  <th
+                    scope="col"
+                    className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                  >
+                    Evidencia
+                  </th>
+                  <th
+                    scope="col"
+                    className="text-ink/70 px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] uppercase"
+                  >
+                    Estado
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {queue.map((row) => (
+                  <tr
+                    key={row.provider_user_id}
+                    className="border-ink/[0.08] bg-surface hover:border-brand-yellow/30 hover:bg-ink/[0.04] rounded-3xl border transition-colors"
+                  >
+                    <th
+                      scope="row"
+                      className="min-w-0 rounded-l-3xl p-4 text-left"
+                    >
+                      <Link
+                        className="text-ink block truncate text-sm font-extrabold hover:underline"
+                        href={`/admin/identity?provider=${row.provider_user_id}`}
+                      >
+                        {row.display_name ?? row.email ?? row.provider_user_id}
+                      </Link>
+                    </th>
+                    <td className="text-ink/70 p-4 text-xs">
+                      {row.document_count} documentos · enviado{" "}
+                      {dateTime(row.submitted_at ?? row.updated_at)}
+                    </td>
+                    <td className="rounded-r-3xl p-4 text-right">
+                      <AdminStatusBadge
+                        label={getProviderStatusPresentation(row.status).label}
+                        tone="pending"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
           <AdminEmptyState

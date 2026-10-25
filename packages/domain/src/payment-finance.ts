@@ -1,5 +1,3 @@
-import type { PaymentStatus } from "./payments";
-
 function assertPositiveSafeInteger(value: number, label: string): void {
   if (!Number.isSafeInteger(value) || value <= 0) {
     throw new Error(`${label} must be a positive safe integer.`);
@@ -36,33 +34,4 @@ export function calculateProviderExpectedNetMinor(
     throw new Error("Marketplace fee cannot exceed gross amount.");
   }
   return grossMinor - marketplaceFeeMinor;
-}
-
-export function assertValidRefundAmount(
-  originalMinor: number,
-  alreadyRefundedMinor: number,
-  requestedMinor: number,
-): void {
-  assertPositiveSafeInteger(originalMinor, "Original amount");
-  assertNonNegativeSafeInteger(alreadyRefundedMinor, "Already-refunded amount");
-  assertPositiveSafeInteger(requestedMinor, "Requested refund amount");
-
-  if (alreadyRefundedMinor > originalMinor) {
-    throw new Error("Already-refunded amount cannot exceed original amount.");
-  }
-
-  if (
-    BigInt(alreadyRefundedMinor) + BigInt(requestedMinor) >
-    BigInt(originalMinor)
-  ) {
-    throw new Error("Requested refund exceeds remaining refundable amount.");
-  }
-}
-
-export function canTransitionPaymentStatus(
-  from: PaymentStatus,
-  to: PaymentStatus,
-): boolean {
-  if (from === to) return true;
-  return from === "PENDING" && (to === "SUCCEEDED" || to === "FAILED");
 }

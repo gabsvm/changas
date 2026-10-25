@@ -40,7 +40,11 @@ describe("externalPaymentStateLabel", () => {
   });
 });
 
-function ledger(agreed: number, confirmed: number, claimed: number): ExternalMoneyLedger {
+function ledger(
+  agreed: number,
+  confirmed: number,
+  claimed: number,
+): ExternalMoneyLedger {
   return {
     agreedTotalMinor: agreed,
     confirmedMinor: confirmed,
@@ -63,35 +67,41 @@ describe("external payments with voluntary tips", () => {
 
   it("preserves exact payments without creating fictitious tips", () => {
     expect(splitExternalMoneyPayment(50_000, 50_000)).toEqual({
-      contractMinor: 50_000, tipMinor: 0,
+      contractMinor: 50_000,
+      tipMinor: 0,
     });
   });
 
   it("allows a tip-only declaration after the contract is fully paid", () => {
     const paid = ledger(100_000, 100_000, 0);
     expect(externalMoneyAvailableToDeclare(paid)).toBe(0);
-    expect(splitExternalMoneyPayment(externalMoneyAvailableToConfirm(paid), 25_000))
-      .toEqual({ contractMinor: 0, tipMinor: 25_000 });
+    expect(
+      splitExternalMoneyPayment(externalMoneyAvailableToConfirm(paid), 25_000),
+    ).toEqual({ contractMinor: 0, tipMinor: 25_000 });
   });
 
   it("keeps the contractual outstanding amount independent of tips", () => {
     const current = ledger(100_000, 75_000, 40_000);
     expect(externalMoneyAvailableToConfirm(current)).toBe(25_000);
-    expect(splitExternalMoneyPayment(25_000, 40_000))
-      .toEqual({ contractMinor: 25_000, tipMinor: 15_000 });
+    expect(splitExternalMoneyPayment(25_000, 40_000)).toEqual({
+      contractMinor: 25_000,
+      tipMinor: 15_000,
+    });
     expect(externalMoneyAvailableToDeclare(current)).toBe(0);
   });
 
   it("does not fabricate a value for invalid amounts", () => {
     for (const amount of [0, -1, NaN, Infinity, 1.5]) {
       expect(splitExternalMoneyPayment(100_000, amount)).toEqual({
-        contractMinor: 0, tipMinor: 0,
+        contractMinor: 0,
+        tipMinor: 0,
       });
     }
   });
 
   it("shows pending tips as pending even when the contract is paid", () => {
-    expect(externalMoneyStatusLabel(ledger(100_000, 100_000, 10_000)))
-      .toBe("Pendiente de confirmación");
+    expect(externalMoneyStatusLabel(ledger(100_000, 100_000, 10_000))).toBe(
+      "Pendiente de confirmación",
+    );
   });
 });

@@ -67,14 +67,16 @@ export function ExternalMoneySection({
         {ledger.confirmedTipMinor > 0 ? (
           <div className="flex justify-between gap-3">
             <dt className="text-ink/70">Propinas confirmadas</dt>
-            <dd className="font-bold text-success">
+            <dd className="text-success font-bold">
               {formatMinorUnits(ledger.confirmedTipMinor, "ARS")}
             </dd>
           </div>
         ) : null}
         {ledger.claimedMinor > 0 ? (
           <div className="flex justify-between gap-3">
-            <dt className="text-ink/70">Declarado, sin confirmar (incluye propinas)</dt>
+            <dt className="text-ink/70">
+              Declarado, sin confirmar (incluye propinas)
+            </dt>
             <dd className="font-bold">
               {formatMinorUnits(ledger.claimedMinor, "ARS")}
             </dd>
@@ -137,8 +139,10 @@ export function ExternalMoneySection({
                 {estimate.tipMinor > 0 ? (
                   <p className="bg-success/[0.07] border-success/20 rounded-xl border px-3 py-2 text-[13px] leading-5">
                     Propina estimada:{" "}
-                    <strong>{formatMinorUnits(estimate.tipMinor, "ARS")}</strong>.
-                    Se definirá al confirmar el pago.
+                    <strong>
+                      {formatMinorUnits(estimate.tipMinor, "ARS")}
+                    </strong>
+                    . Se definirá al confirmar el pago.
                   </p>
                 ) : null}
                 <ExternalPaymentResponseForm
@@ -167,7 +171,7 @@ export function ExternalMoneySection({
                   name="declarationId"
                   value={declaration.id}
                 />
-                <button className="consumer-pressable text-ink/70 hover:bg-ink/[0.045] inline-flex min-h-10 items-center rounded-xl px-3 text-[13px] font-bold">
+                <button className="consumer-pressable text-ink/70 hover:bg-ink/[0.045] inline-flex min-h-11 items-center rounded-xl px-3 text-[13px] font-bold">
                   Anular esta declaración
                 </button>
               </form>
@@ -179,7 +183,10 @@ export function ExternalMoneySection({
       <ExternalPaymentDeclarationForm
         jobId={jobId}
         idempotencyKey={idempotencyKey}
-        defaultAmountMinor={Math.max(0, Math.min(defaultAmountMinor, unallocatedMinor))}
+        defaultAmountMinor={Math.max(
+          0,
+          Math.min(defaultAmountMinor, unallocatedMinor),
+        )}
         unclaimedContractMinor={unallocatedMinor}
         isClient={isClient}
       />

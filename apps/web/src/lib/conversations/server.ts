@@ -203,6 +203,7 @@ export async function listMyConversations(
 
 export async function listConversationsThrough(
   through: PageKey | null,
+  startFromCursor = false,
 ): Promise<PagedResult<ConversationSummary>> {
   return accumulateThrough(
     (cursor, limit) =>
@@ -214,6 +215,8 @@ export async function listConversationsThrough(
     (row) => row.conversation_id,
     through,
     20,
+    undefined,
+    startFromCursor,
   );
 }
 
@@ -252,6 +255,7 @@ async function listUnreadConversationPage(
 /** Paged collection whose cursor advances only through unread conversations. */
 export async function listUnreadConversationsThrough(
   through: PageKey | null,
+  startFromCursor = false,
 ): Promise<PagedResult<ConversationSummary>> {
   return accumulateThrough(
     (cursor, limit) =>
@@ -263,6 +267,8 @@ export async function listUnreadConversationsThrough(
     (row) => row.conversation_id,
     through,
     20,
+    undefined,
+    startFromCursor,
   );
 }
 

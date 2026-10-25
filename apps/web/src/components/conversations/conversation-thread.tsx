@@ -352,18 +352,23 @@ export function ConversationThread({
   }, [refreshThread, scrollToBottom]);
 
   function openProposalComposer(
-    kind: "DIRECT_BOOKING" | "QUOTE_REQUEST" | "CLIENT_OFFER" | "PROVIDER_QUOTE",
+    kind:
+      "DIRECT_BOOKING" | "QUOTE_REQUEST" | "CLIENT_OFFER" | "PROVIDER_QUOTE",
   ) {
     const details = document.getElementById("nueva-propuesta");
     if (!(details instanceof HTMLDetailsElement)) return;
     details.open = true;
-    const kindSelect = details.querySelector<HTMLSelectElement>('select[name="kind"]');
+    const kindSelect = details.querySelector<HTMLSelectElement>(
+      'select[name="kind"]',
+    );
     if (kindSelect) kindSelect.value = kind;
     details.scrollIntoView({ behavior: "smooth", block: "start" });
     window.requestAnimationFrame(() => {
       details
         .querySelector<HTMLInputElement | HTMLTextAreaElement>(
-          kind === "QUOTE_REQUEST" ? 'textarea[name="scope"]' : 'input[name="price"]',
+          kind === "QUOTE_REQUEST"
+            ? 'textarea[name="scope"]'
+            : 'input[name="price"]',
         )
         ?.focus({ preventScroll: true });
     });
@@ -377,7 +382,9 @@ export function ConversationThread({
       return;
     }
     if (currentUserIsClient) {
-      openProposalComposer(allowDirectBooking ? "DIRECT_BOOKING" : "CLIENT_OFFER");
+      openProposalComposer(
+        allowDirectBooking ? "DIRECT_BOOKING" : "CLIENT_OFFER",
+      );
     }
   }
 
@@ -450,7 +457,15 @@ export function ConversationThread({
               {serviceTitle}
             </Link>
           </div>
-          <details className="relative z-30">
+          <details
+            className="relative z-30"
+            onKeyDown={(event) => {
+              if (event.key !== "Escape" || !event.currentTarget.open) return;
+              event.preventDefault();
+              event.currentTarget.open = false;
+              event.currentTarget.querySelector("summary")?.focus();
+            }}
+          >
             <summary className="consumer-pressable hover:bg-ink/[0.05] grid h-12 w-12 cursor-pointer list-none place-items-center rounded-full [&::-webkit-details-marker]:hidden">
               <svg
                 aria-hidden="true"
@@ -520,7 +535,8 @@ export function ConversationThread({
         </div>
         {currentUserIsClient && !actionableProposalId && !allowDirectBooking ? (
           <p className="text-ink/75 mt-2 text-[12px] leading-[18px] sm:text-[13px]">
-            Para contratar, proponé precio y alcance; se confirma cuando la otra parte acepta.
+            Para contratar, proponé precio y alcance; se confirma cuando la otra
+            parte acepta.
           </p>
         ) : null}
         {spotlight ? (
@@ -575,7 +591,7 @@ export function ConversationThread({
         {deal && !spotlight ? (
           <a
             href="#propuestas"
-            className="consumer-pressable border-ink/[0.12] bg-surface mt-2 flex min-h-10 items-center gap-2 rounded-xl border px-3 py-1.5 shadow-sm transition-colors hover:bg-ink/[0.04]"
+            className="consumer-pressable border-ink/[0.12] bg-surface hover:bg-ink/[0.04] mt-2 flex min-h-10 items-center gap-2 rounded-xl border px-3 py-1.5 shadow-sm transition-colors"
             aria-label={`Ver acuerdo: ${deal.statusLabel}, ${deal.amountLabel}`}
           >
             <StatusChip tone={deal.statusTone}>{deal.statusLabel}</StatusChip>
@@ -1161,7 +1177,14 @@ function ReportForm({ conversationId }: { conversationId: string }) {
       </summary>
       <form action={action} className="space-y-2 p-2">
         <input type="hidden" name="conversationId" value={conversationId} />
+        <label
+          htmlFor="conversation-report-category"
+          className="block text-xs font-semibold"
+        >
+          Motivo
+        </label>
         <select
+          id="conversation-report-category"
           name="category"
           required
           defaultValue=""
@@ -1175,11 +1198,17 @@ function ReportForm({ conversationId }: { conversationId: string }) {
           <option value="OFF_PLATFORM">Intento de sacar la operación</option>
           <option value="OTHER">Otro</option>
         </select>
+        <label
+          htmlFor="conversation-report-reason"
+          className="block text-xs font-semibold"
+        >
+          Detalle opcional
+        </label>
         <textarea
+          id="conversation-report-reason"
           name="reason"
           maxLength={2000}
           rows={3}
-          placeholder="Detalle opcional"
           className="border-ink/10 w-full resize-none rounded-xl border bg-white px-3 py-2 text-xs dark:bg-white/[0.06]"
         />
         <button

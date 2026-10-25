@@ -24,7 +24,12 @@ export default function NotFound() {
           />
           <span className="absolute -right-4 -bottom-5 h-16 w-16 rounded-full bg-white/20" />
           <span className="absolute -top-3 -left-3 h-10 w-10 rounded-full bg-white/15" />
-          <IllustratedBadge tone="violet" icon="compass" size="lg" label="Página no encontrada" />
+          <IllustratedBadge
+            tone="violet"
+            icon="compass"
+            size="lg"
+            label="Página no encontrada"
+          />
         </span>
         <p className="text-terracotta mt-6 text-sm font-semibold tracking-[0.18em] uppercase">
           404

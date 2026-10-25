@@ -50,13 +50,11 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { getJobStatusPresentation } from "@/lib/ui/job-status";
 import { getServiceModalityLabel } from "@/lib/ui/service-modality";
+import { formatProductDateTime } from "@/lib/product-time";
 
 function dateTime(value: string | null) {
   if (!value) return null;
-  return new Intl.DateTimeFormat("es-AR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
+  return formatProductDateTime(value);
 }
 
 function scheduleTypeLabel(value: string): string {
@@ -1016,7 +1014,7 @@ export default async function JobPage({
                               <button
                                 name="action"
                                 value="ACCEPT"
-                                className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
+                                className="consumer-pressable cta-ink inline-flex min-h-11 items-center rounded-xl px-4 text-xs font-extrabold"
                               >
                                 Aceptar
                               </button>
@@ -1048,14 +1046,17 @@ export default async function JobPage({
               >
                 <form action={requestScopeChangeAction} className="grid gap-3">
                   <input type="hidden" name="jobId" value={jobId} />
-                  <textarea
-                    name="scope"
-                    required
-                    minLength={3}
-                    rows={4}
-                    className="border-ink/10 rounded-xl border bg-white px-3 py-3 text-sm"
-                    placeholder="Describí exactamente qué cambia"
-                  />
+                  <label className="text-sm font-semibold">
+                    Qué cambia en el alcance
+                    <textarea
+                      name="scope"
+                      required
+                      minLength={3}
+                      rows={4}
+                      className="border-ink/10 mt-1 block w-full rounded-xl border bg-white px-3 py-3 text-sm font-normal"
+                      placeholder="Describí exactamente qué cambia"
+                    />
+                  </label>
                   <label className="text-sm font-semibold">
                     Adicional en ARS (0 si no cambia el precio)
                     <input
@@ -1155,7 +1156,7 @@ export default async function JobPage({
                               <button
                                 name="action"
                                 value="ACCEPT"
-                                className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
+                                className="consumer-pressable cta-ink inline-flex min-h-11 items-center rounded-xl px-4 text-xs font-extrabold"
                               >
                                 Aceptar cambio
                               </button>
@@ -1228,7 +1229,7 @@ export default async function JobPage({
                                   value="SUCCESS"
                                   idleLabel="Simular pago aprobado"
                                   pendingLabel="Simulando…"
-                                  className="consumer-pressable cta-ink inline-flex min-h-10 items-center rounded-xl px-4 text-xs font-extrabold"
+                                  className="consumer-pressable cta-ink inline-flex min-h-11 items-center rounded-xl px-4 text-xs font-extrabold"
                                 />
                                 <PaymentSubmitButton
                                   name="outcome"
@@ -1269,19 +1270,25 @@ export default async function JobPage({
                   ) ? (
                   <form action={setJobLocationAction} className="space-y-3">
                     <input type="hidden" name="jobId" value={jobId} />
-                    <input
-                      name="address"
-                      required
-                      minLength={5}
-                      placeholder="Dirección exacta"
-                      className="border-ink/10 h-11 w-full rounded-xl border bg-white px-3 text-sm"
-                    />
-                    <textarea
-                      name="notes"
-                      rows={2}
-                      placeholder="Piso, timbre o indicaciones"
-                      className="border-ink/10 w-full rounded-xl border bg-white px-3 py-2 text-sm"
-                    />
+                    <label className="block text-sm font-semibold">
+                      Dirección exacta
+                      <input
+                        name="address"
+                        required
+                        minLength={5}
+                        placeholder="Calle, número y localidad"
+                        className="border-ink/10 mt-1 h-11 w-full rounded-xl border bg-white px-3 text-sm font-normal"
+                      />
+                    </label>
+                    <label className="block text-sm font-semibold">
+                      Indicaciones de acceso (opcional)
+                      <textarea
+                        name="notes"
+                        rows={2}
+                        placeholder="Piso, timbre o indicaciones"
+                        className="border-ink/10 mt-1 block w-full rounded-xl border bg-white px-3 py-2 text-sm font-normal"
+                      />
+                    </label>
                     <button className="button-secondary w-full">
                       Guardar ubicación
                     </button>

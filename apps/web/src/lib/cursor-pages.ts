@@ -23,6 +23,7 @@ export function parsePageCursor(input: {
 export type PagedResult<T> = {
   items: T[];
   next: PageKey | null;
+  windowed?: boolean;
 };
 
 /**
@@ -40,6 +41,7 @@ export async function accumulateThrough<T>(
   through: PageKey | null,
   pageSize: number,
   maxPages = 8,
+  startFromCursor = false,
 ): Promise<PagedResult<T>> {
   const items: T[] = [];
   const seen = new Set<string>();
@@ -51,6 +53,24 @@ export async function accumulateThrough<T>(
       items.push(item);
     }
   };
+
+  const nextPage = async (
+    cursor: PageKey,
+    windowed: boolean,
+  ): Promise<PagedResult<T>> => {
+    const batch = await fetchPage(cursor, pageSize + 1);
+    const hasMore = batch.length > pageSize;
+    const page = batch.slice(0, pageSize);
+    return {
+      items: page,
+      next: hasMore && page.length > 0 ? keyOf(page[page.length - 1] as T) : null,
+      ...(windowed ? { windowed: true } : {}),
+    };
+  };
+
+  if (through !== null && startFromCursor) {
+    return nextPage(through, true);
+  }
 
   let cursor: PageKey | null = null;
   for (let page = 0; page < maxPages; page++) {
@@ -73,6 +93,9 @@ export async function accumulateThrough<T>(
     }
     cursor = pageKey;
   }
-  const tail = items[items.length - 1];
-  return { items, next: tail === undefined ? null : keyOf(tail) };
+  // Keep pagination moving when an older visible cursor is beyond the bounded
+  // reconstruction window. The caller labels this as a history window.
+  return through === null
+    ? { items, next: null }
+    : nextPage(through, true);
 }

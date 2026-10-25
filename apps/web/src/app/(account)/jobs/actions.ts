@@ -12,7 +12,7 @@ import {
   type JobStatus,
   type ScheduleType,
 } from "@changas/domain";
-import { isUuid } from "@changas/validation";
+import { isUuid, parseArsMinorUnits } from "@changas/validation";
 
 import {
   applyFakeAdditionalPayment,
@@ -40,6 +40,7 @@ import {
   type ReviewReportReason,
 } from "@/lib/reputation/server";
 import { createClient } from "@/lib/supabase/server";
+import { parseProductDateTime } from "@/lib/product-time";
 import { isPaymentsEnabled } from "@changas/config/server";
 import {
   createJobSettlementCheckout,
@@ -71,9 +72,9 @@ function uuidField(formData: FormData, name: string): string {
 function optionalIso(formData: FormData, name: string): string | null {
   const value = stringField(formData, name);
   if (!value) return null;
-  const parsed = Date.parse(value);
-  if (!Number.isFinite(parsed)) throw new Error("Fecha inválida.");
-  return new Date(parsed).toISOString();
+  const parsed = parseProductDateTime(value);
+  if (!parsed) throw new Error("Fecha inválida.");
+  return parsed.toISOString();
 }
 
 function optionalNumber(formData: FormData, name: string): number | null {
@@ -145,7 +146,9 @@ export async function requestCompletionAction(
   return { error: null };
 }
 
-export async function chooseJobModalityAction(formData: FormData): Promise<void> {
+export async function chooseJobModalityAction(
+  formData: FormData,
+): Promise<void> {
   const jobId = uuidField(formData, "jobId");
   const modality = stringField(formData, "modality");
   if (modality !== "IN_PERSON" && modality !== "REMOTE") {
@@ -167,8 +170,14 @@ export async function submitDeliveryAction(
   const jobId = uuidField(formData, "jobId");
   const summary = stringField(formData, "deliverySummary");
   const evidenceUrl = stringField(formData, "deliveryEvidenceUrl");
-  if (evidenceUrl && (!evidenceUrl.startsWith("https://") || evidenceUrl.length > 2048)) {
-    return { error: "El enlace de entrega debe comenzar con https:// y tener hasta 2048 caracteres." };
+  if (
+    evidenceUrl &&
+    (!evidenceUrl.startsWith("https://") || evidenceUrl.length > 2048)
+  ) {
+    return {
+      error:
+        "El enlace de entrega debe comenzar con https:// y tener hasta 2048 caracteres.",
+    };
   }
   if (summary.length < 3 || summary.length > 2000) {
     return {
@@ -193,7 +202,9 @@ export async function requestCorrectionAction(
   const jobId = uuidField(formData, "jobId");
   const reason = stringField(formData, "correctionReason");
   if (reason.length < 2 || reason.length > 1000) {
-    throw new Error("El motivo de la corrección necesita entre 2 y 1000 caracteres.");
+    throw new Error(
+      "El motivo de la corrección necesita entre 2 y 1000 caracteres.",
+    );
   }
   try {
     await requestJobCorrection(jobId, reason);
@@ -205,13 +216,15 @@ export async function requestCorrectionAction(
   revalidatePath("/jobs");
 }
 
-const EXTERNAL_MONEY_METHODS = ["EFECTIVO", "TRANSFERENCIA", "OTRO_ACORDADO"] as const;
+const EXTERNAL_MONEY_METHODS = [
+  "EFECTIVO",
+  "TRANSFERENCIA",
+  "OTRO_ACORDADO",
+] as const;
 
 function moneyMinorField(formData: FormData): number {
-  const raw = stringField(formData, "amount").replace(/\./g, "").replace(",", ".");
-  if (!/^\d+(\.\d{1,2})?$/.test(raw)) throw new Error("El monto declarado debe ser positivo.");
-  const minor = Math.round(Number(raw) * 100);
-  if (!Number.isSafeInteger(minor) || minor <= 0) {
+  const minor = parseArsMinorUnits(stringField(formData, "amount"));
+  if (minor === undefined) {
     throw new Error("El monto declarado debe ser positivo.");
   }
   return minor;
@@ -229,13 +242,20 @@ export async function declareExternalPaymentAction(
   try {
     jobId = uuidField(formData, "jobId");
     const method = stringField(formData, "method");
-    if (!EXTERNAL_MONEY_METHODS.includes(method as (typeof EXTERNAL_MONEY_METHODS)[number])) {
+    if (
+      !EXTERNAL_MONEY_METHODS.includes(
+        method as (typeof EXTERNAL_MONEY_METHODS)[number],
+      )
+    ) {
       return { error: "El método de pago informado no es válido." };
     }
     const paidOnRaw = stringField(formData, "paidOn");
     const reference = stringField(formData, "reference");
     if (reference.length > 140) {
-      return { error: "La referencia admite hasta 140 caracteres, sin datos bancarios." };
+      return {
+        error:
+          "La referencia admite hasta 140 caracteres, sin datos bancarios.",
+      };
     }
     const rawKey = stringField(formData, "idempotencyKey");
     const idempotencyKey = isUuid(rawKey) ? rawKey : randomUUID();
@@ -247,22 +267,33 @@ export async function declareExternalPaymentAction(
       paidOn: paidOnRaw === "" ? null : paidOnRaw,
       reference: reference === "" ? null : reference,
       idempotencyKey,
-      supersedesId: stringField(formData, "supersedesId") === "" ? null : uuidField(formData, "supersedesId"),
+      supersedesId:
+        stringField(formData, "supersedesId") === ""
+          ? null
+          : uuidField(formData, "supersedesId"),
     });
   } catch (error) {
     if (error instanceof JobServerError) {
-      if (["CONFLICT", "FORBIDDEN", "UNAUTHORIZED", "NOT_FOUND"].includes(error.code)) {
+      if (
+        ["CONFLICT", "FORBIDDEN", "UNAUTHORIZED", "NOT_FOUND"].includes(
+          error.code,
+        )
+      ) {
         return { error: error.message };
       }
     }
-    if (error instanceof Error && (
-      error.message === "El monto declarado debe ser positivo." ||
-      error.message === "Identificador inválido."
-    )) {
+    if (
+      error instanceof Error &&
+      (error.message === "El monto declarado debe ser positivo." ||
+        error.message === "Identificador inválido.")
+    ) {
       return { error: error.message };
     }
     console.error("[jobs] No se pudo registrar el pago externo", error);
-    return { error: "No pudimos registrar el importe. Actualizá la página e intentá de nuevo." };
+    return {
+      error:
+        "No pudimos registrar el importe. Actualizá la página e intentá de nuevo.",
+    };
   }
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");
@@ -288,7 +319,10 @@ export async function respondExternalPaymentAction(
     const accepted = decision === "accept";
     const reason = stringField(formData, "reason");
     if (!accepted && (reason.length < 1 || reason.length > 1000)) {
-      return { error: "Para marcar desacuerdo contanos el motivo (hasta 1000 caracteres)." };
+      return {
+        error:
+          "Para marcar desacuerdo contanos el motivo (hasta 1000 caracteres).",
+      };
     }
 
     await respondExternalPayment({
@@ -300,9 +334,10 @@ export async function respondExternalPaymentAction(
     if (error instanceof JobServerError) {
       if (error.code === "CONFLICT") {
         return {
-          error: error.message === "El monto supera el total acordado del trabajo."
-            ? "No pudimos confirmar: este importe, sumado a pagos ya confirmados, supera el total acordado. Revisá el historial; quien informó el pago puede anular la declaración y registrar el importe correcto."
-            : error.message,
+          error:
+            error.message === "El monto supera el total acordado del trabajo."
+              ? "No pudimos confirmar: este importe, sumado a pagos ya confirmados, supera el total acordado. Revisá el historial; quien informó el pago puede anular la declaración y registrar el importe correcto."
+              : error.message,
         };
       }
       if (error.code === "UNAUTHORIZED" || error.code === "FORBIDDEN") {
@@ -310,10 +345,16 @@ export async function respondExternalPaymentAction(
       }
     }
     if (error instanceof Error && error.message === "Identificador inválido.") {
-      return { error: "El pago informado no es válido. Actualizá la página y probá otra vez." };
+      return {
+        error:
+          "El pago informado no es válido. Actualizá la página y probá otra vez.",
+      };
     }
     console.error("[jobs] Error al responder a una declaración de pago", error);
-    return { error: "No pudimos registrar la respuesta. Tus pagos no cambiaron; actualizá la página y probá otra vez." };
+    return {
+      error:
+        "No pudimos registrar la respuesta. Tus pagos no cambiaron; actualizá la página y probá otra vez.",
+    };
   }
 
   revalidatePath(`/jobs/${jobId}`);

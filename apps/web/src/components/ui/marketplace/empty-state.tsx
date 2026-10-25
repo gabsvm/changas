@@ -30,7 +30,7 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-     <div
+    <div
       className={`empty-state-card mx-auto max-w-md px-5 py-12 text-center ${className}`}
     >
       <div className="flex justify-center">

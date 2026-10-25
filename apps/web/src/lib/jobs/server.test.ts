@@ -310,10 +310,7 @@ function applyJobListArgs(
 ): Array<Record<string, unknown>> {
   const upcoming = name === "list_my_upcoming_jobs";
   const limit = Math.min(
-    Math.max(
-      typeof args.limit_count === "number" ? args.limit_count : 20,
-      1,
-    ),
+    Math.max(typeof args.limit_count === "number" ? args.limit_count : 20, 1),
     50,
   );
   const statusFilter =
@@ -335,9 +332,7 @@ function applyJobListArgs(
     return true;
   });
   const keyOf = (row: Record<string, unknown>): string =>
-    upcoming
-      ? String(row.sort_key ?? row.updated_at)
-      : String(row.updated_at);
+    upcoming ? String(row.sort_key ?? row.updated_at) : String(row.updated_at);
   const compareKeys = (a: string, b: string): number =>
     a === b ? 0 : a > b ? 1 : -1;
   const ordered = [...filtered].sort((a, b) => {
@@ -354,8 +349,7 @@ function applyJobListArgs(
       ? ordered.filter((row) => {
           const key = keyOf(row);
           if (key === beforeKey) {
-            const afterId =
-              String(row.job_id) > beforeId ? 1 : -1;
+            const afterId = String(row.job_id) > beforeId ? 1 : -1;
             return upcoming ? afterId > 0 : afterId < 0;
           }
           return upcoming ? key > beforeKey : key < beforeKey;

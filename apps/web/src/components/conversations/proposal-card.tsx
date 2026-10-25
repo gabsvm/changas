@@ -135,7 +135,10 @@ export function ProposalCard({
       : "COUNTEROFFER";
 
   return (
-    <article id={`propuesta-${proposal.proposal_id}`} className="border-ink/[0.08] bg-surface consumer-card scroll-mt-24 overflow-hidden rounded-2xl border shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]">
+    <article
+      id={`propuesta-${proposal.proposal_id}`}
+      className="border-ink/[0.08] bg-surface consumer-card scroll-mt-24 overflow-hidden rounded-2xl border shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
+    >
       <div
         className="relative flex items-center gap-3 overflow-hidden px-4 py-3"
         style={{

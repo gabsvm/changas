@@ -16,12 +16,11 @@
     "@changas/validation": "workspace:*",
     "@supabase/ssr": "0.12.5",
     "@supabase/supabase-js": "2.112.4",
-    "animejs": "4.5.0",
     "next": "16.4.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "sharp": "0.35.5",
     "server-only": "0.0.1",
+    "sharp": "0.35.5",
     "web-push": "^3.6.7"
   },
   "devDependencies": {

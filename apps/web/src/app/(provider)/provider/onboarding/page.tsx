@@ -152,12 +152,8 @@ export default async function ProviderOnboardingPage() {
   const missingByStep: string[][] = [
     missingPublic,
     missingPrivate,
-    missingDocuments.map(
-      (type) => documentTypeLabels[type] ?? type,
-    ),
-    readyForSubmission
-      ? []
-      : ["los pasos anteriores"],
+    missingDocuments.map((type) => documentTypeLabels[type] ?? type),
+    readyForSubmission ? [] : ["los pasos anteriores"],
   ];
   const firstOpen = requirementDone.findIndex((done) => !done);
   const baseSteps = getOnboardingSteps(provider.onboarding_step);
@@ -191,16 +187,15 @@ export default async function ProviderOnboardingPage() {
           : current?.id === "review"
             ? "Revisar y enviar"
             : "Continuar verificación";
-  const primaryHref =
-    approved
-      ? "/provider/manage"
-      : editable && current
-        ? current.id === "review" && readyForSubmission && !submitted
-          ? "/provider/onboarding/review"
-          : current.href
-        : editable
-          ? getNextOnboardingHref(provider.onboarding_step)
-          : "/account";
+  const primaryHref = approved
+    ? "/provider/manage"
+    : editable && current
+      ? current.id === "review" && readyForSubmission && !submitted
+        ? "/provider/onboarding/review"
+        : current.href
+      : editable
+        ? getNextOnboardingHref(provider.onboarding_step)
+        : "/account";
   const primaryLabel = approved
     ? "Gestionar servicios"
     : editable && current
@@ -278,9 +273,7 @@ export default async function ProviderOnboardingPage() {
           </ol>
           <div className="mt-4 flex items-center justify-between gap-4 text-xs font-bold">
             <span>Progreso</span>
-            <span className="text-ink/70">
-              {doneCount} de 4 requisitos
-            </span>
+            <span className="text-ink/70">{doneCount} de 4 requisitos</span>
           </div>
           <div className="mt-2.5">
             <ProgressBar value={progress} label="Progreso de verificación" />

@@ -49,7 +49,9 @@ describe("Better Design audit — visual, safety and UX regressions", () => {
     expect(notificationActions).toContain(
       "await markNotificationRead(supabase, notificationId)",
     );
-    expect(notificationActions).toMatch(/redirect\s*\(\s*sanitizeNotificationActionUrl/);
+    expect(notificationActions).toMatch(
+      /redirect\s*\(\s*sanitizeNotificationActionUrl/,
+    );
     expect(notifications).toContain("markNotificationReadAction");
   });
 
@@ -61,13 +63,15 @@ describe("Better Design audit — visual, safety and UX regressions", () => {
     expect(install).toContain("updateShownThisSession");
   });
 
-  it("keeps hiring and working decisions before search with consistent vector arrows", () => {
-    const start = home.indexOf("yalo-intent-actions");
+  it("keeps a single primary search with consistent vector arrows", () => {
+    const start = home.indexOf("yalo-hero-search");
     expect(start).toBeGreaterThan(-1);
-    expect(start).toBeLessThan(home.indexOf("yalo-hero-search"));
+    expect(home).not.toContain("yalo-intent-actions");
     expect(home).not.toContain("↗");
-    expect(home).toContain('viewBox="0 0 24 24"');
-    expect(showcaseCss).toMatch(/\.yalo-hero-shortcuts a\s*\{\s*min-height:\s*44px/);
+    expect(home).toContain("<ActionArrowIcon />");
+    expect(showcaseCss).toMatch(
+      /\.yalo-hero-shortcuts a\s*\{\s*min-height:\s*44px/,
+    );
     expect(showcaseCss).toContain("yalo-featured-results--compact");
   });
 
@@ -83,7 +87,9 @@ describe("Better Design audit — visual, safety and UX regressions", () => {
   });
 
   it("filters unread inbox conversations before building the visible page", () => {
-    expect(inbox).toContain("listUnreadConversationsThrough(through)");
+    expect(inbox).toContain(
+      "listUnreadConversationsThrough(through, startFromCursor)",
+    );
     expect(conversations).toContain("listUnreadConversationPage");
     expect(conversations).toContain("item.unread_count > 0");
     expect(conversations).toContain("batch.length < 50");

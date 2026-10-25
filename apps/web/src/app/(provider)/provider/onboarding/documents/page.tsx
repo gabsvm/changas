@@ -67,7 +67,12 @@ export default async function ProviderOnboardingDocumentsPage() {
       <MobileAppBar title="Tus papeles" backHref="/provider/onboarding" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-center gap-3">
-          <IllustratedBadge tone="blue" icon="doc" size="md" label="Paso 3 de 4" />
+          <IllustratedBadge
+            tone="blue"
+            icon="doc"
+            size="md"
+            label="Paso 3 de 4"
+          />
           <div>
             <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
               Paso 3 de 4
@@ -149,8 +154,15 @@ export default async function ProviderOnboardingDocumentsPage() {
 
         <section id="documentos" className="mt-6 scroll-mt-24">
           <div className="flex min-w-0 items-center gap-2.5">
-            <IllustratedBadge tone="green" icon="id" size="sm" label="Tus documentos" />
-            <h2 className="font-display min-w-0 flex-1 truncate text-lg font-bold">Tus documentos</h2>
+            <IllustratedBadge
+              tone="green"
+              icon="id"
+              size="sm"
+              label="Tus documentos"
+            />
+            <h2 className="font-display min-w-0 flex-1 truncate text-lg font-bold">
+              Tus documentos
+            </h2>
             <span className="text-ink/70 shrink-0 text-xs font-semibold">
               {receivedDocuments.length}
             </span>

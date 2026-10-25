@@ -139,7 +139,7 @@ export function LocationPicker({
 
   if (compact) {
     return (
-      <div className="yalo-location-compact location-picker-compact border-ink/[0.08] rounded-2xl border bg-white/75 p-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] backdrop-blur-sm dark:border-white/10 dark:bg-[#2a231c]/85">
+      <div className="yalo-location-compact location-picker-compact border-ink/[0.08] rounded-2xl border bg-white/75 p-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] backdrop-blur-sm dark:border-white/10 dark:bg-surface/85">
         <div className="flex w-full items-center justify-between gap-2">
           <label className="text-ink/75 flex min-h-11 min-w-0 items-center gap-2 text-sm font-semibold">
             <svg
@@ -163,7 +163,7 @@ export function LocationPicker({
             </svg>
             <span className="sr-only">Zona</span>
             <select
-              className="focus:border-moss/35 text-ink min-h-11 max-w-[12rem] min-w-0 rounded-lg border border-transparent bg-transparent px-1.5 text-sm font-semibold outline-none focus:bg-white dark:focus:bg-[#2a231c]"
+              className="focus:border-moss/35 focus-visible:ring-moss/45 text-ink min-h-11 max-w-[12rem] min-w-0 rounded-lg border border-transparent bg-transparent px-1.5 text-sm font-semibold outline-none focus:bg-white focus-visible:ring-2 dark:focus:bg-surface"
               value={manualLocation}
               id="location"
               name="location"

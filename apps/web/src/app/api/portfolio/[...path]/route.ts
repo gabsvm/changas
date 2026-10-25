@@ -39,7 +39,8 @@ export async function GET(
     );
   return new Response(data, {
     headers: {
-      "Cache-Control": "private, no-store",
+      "Cache-Control":
+        "private, max-age=86400, stale-while-revalidate=604800",
       "Content-Type":
         publicItem.media_mime_type || data.type || "application/octet-stream",
     },

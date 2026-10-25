@@ -171,16 +171,26 @@ export function getJobNextAction(args: {
   const deliverySubmitted = args.deliverySubmitted ?? false;
   const handoverVerified = args.handoverVerified ?? false;
   const needsHandover = modality !== "REMOTE";
-  if (isProvider && status === "IN_PROGRESS" && args.deliveryFlowAvailable === false) {
+  if (
+    isProvider &&
+    status === "IN_PROGRESS" &&
+    args.deliveryFlowAvailable === false
+  ) {
     return {
       heading: "Solicitá el código de cierre al cliente",
       sub: "Por ahora la entrega se confirma con el código del cliente. El nuevo flujo de entregas aún no está habilitado.",
       kind: "verify_handover",
     };
   }
-  if (args.deliveryFlowAvailable === true && modality === "BOTH" && status === "CONFIRMED") {
+  if (
+    args.deliveryFlowAvailable === true &&
+    modality === "BOTH" &&
+    status === "CONFIRMED"
+  ) {
     return {
-      heading: isClient ? "Elegí si el trabajo es presencial o remoto" : "Esperando elección de modalidad",
+      heading: isClient
+        ? "Elegí si el trabajo es presencial o remoto"
+        : "Esperando elección de modalidad",
       sub: isClient
         ? "El prestador ofrece ambas. Elegí cómo se hará el trabajo antes de comenzar."
         : "El cliente debe elegir presencial o remoto para evitar un PIN incorrecto.",

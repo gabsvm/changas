@@ -1,6 +1,7 @@
 import { BottomNav } from "@/components/ui/nav-with-counts";
 import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import Link from "next/link";
+import { cache } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -18,7 +19,8 @@ import { isExcludedPublicTestCategory } from "@/lib/public-catalog";
 
 export const dynamic = "force-dynamic";
 
-async function getCategory(slug: string) {
+// cache(): generateMetadata y la page comparten un único roundtrip por request.
+const getCategory = cache(async (slug: string) => {
   const supabase = await createClient();
   return supabase
     .from("categories")
@@ -26,7 +28,7 @@ async function getCategory(slug: string) {
     .eq("slug", slug)
     .eq("is_active", true)
     .maybeSingle();
-}
+});
 
 export async function generateMetadata({
   params,
@@ -211,7 +213,7 @@ export default async function CategoryPage({
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.modality === "IN_PERSON"
                     ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-surface"
                 }`}
               >
                 Presencial
@@ -224,7 +226,7 @@ export default async function CategoryPage({
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.modality === "REMOTE"
                     ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-surface"
                 }`}
               >
                 Remoto
@@ -237,7 +239,7 @@ export default async function CategoryPage({
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
                   filters.acceptsOffers
                     ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-[#2a231c] dark:text-[#f5efe8]"
+                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-surface"
                 }`}
               >
                 Acepta ofertas

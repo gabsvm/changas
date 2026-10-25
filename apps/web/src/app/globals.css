@@ -268,11 +268,6 @@ textarea {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%);
 }
 
-.brand-hero-panel {
-  border: 1px solid rgb(255 255 255 / 72%);
-  background: var(--consumer-surface-raised);
-}
-
 .brand-hero-search .consumer-control,
 .brand-hero-search input,
 .brand-hero-search select {
@@ -936,10 +931,6 @@ a[aria-current="page"] .nav-icon {
 
 .dark .brand-gradient-surface {
   box-shadow: var(--consumer-shadow-float);
-}
-
-.dark .brand-hero-panel {
-  border-color: rgb(245 248 252 / 16%);
 }
 
 .dark .brand-hero-search .consumer-control,

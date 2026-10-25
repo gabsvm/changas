@@ -14,11 +14,7 @@ import {
 import { safeNextPath } from "@/lib/auth/redirect";
 import type { AuthActionState } from "@/lib/forms/action-state";
 import { getFormString } from "@/lib/forms/form-data";
-import {
-  authRateLimiter,
-  getClientIp,
-  rateLimitKey,
-} from "@/lib/rate-limit";
+import { authRateLimiter, getClientIp, rateLimitKey } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 const genericAuthError =
@@ -29,10 +25,8 @@ const authThrottleMessage =
 
 async function authThrottleExceeded(identity: string): Promise<boolean> {
   const headerList = await headers();
-  return (
-    !authRateLimiter.check(rateLimitKey(getClientIp(headerList), identity))
-      .allowed
-  );
+  return !authRateLimiter.check(rateLimitKey(getClientIp(headerList), identity))
+    .allowed;
 }
 function invalidForm(): AuthActionState {
   return { error: "Revisá los datos ingresados." };

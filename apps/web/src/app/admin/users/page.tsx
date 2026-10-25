@@ -148,6 +148,7 @@ export default async function AdminUsersPage({
                   <input
                     className="border-ink/10 text-ink w-full border bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                     name="reason"
+                    aria-label={`Motivo ${kind === "SUSPENDED" ? "de la suspensión" : "de la restricción"}`}
                     required
                     minLength={3}
                     placeholder={`Motivo ${kind === "SUSPENDED" ? "de suspensión" : "de restricción"}`}
@@ -167,6 +168,7 @@ export default async function AdminUsersPage({
                 <input
                   className="border-ink/10 text-ink w-full border bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-white/10 dark:text-white"
                   name="reason"
+                  aria-label="Motivo de la restauración (opcional)"
                   placeholder="Motivo de restauración"
                 />
                 <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-extrabold">

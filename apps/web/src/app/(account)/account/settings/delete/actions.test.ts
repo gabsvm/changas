@@ -2,8 +2,21 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   calls: [] as string[],
+  signIns: 0,
   failTable: null as string | null,
   failBan: false,
+  jobCount: 0 as number | null,
+  jobError: false,
+  documents: [] as { storage_path: string }[],
+  failDocumentRead: false,
+  failStorageRemove: false,
+  passwordError: false,
+  user: {
+    id: "user-1",
+    email: "a@b.c",
+    identities: [{ provider: "email" }],
+    app_metadata: { provider: "email", providers: ["email"] },
+  } as Record<string, unknown>,
 }));
 
 vi.mock("next/navigation", () => ({
@@ -16,15 +29,23 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
     auth: {
       getUser: async () => ({
-        data: { user: { id: "user-1", email: "a@b.c" } },
+        data: { user: mocks.user },
       }),
-      signInWithPassword: async () => ({ error: null }),
+      signInWithPassword: async () => {
+        mocks.signIns += 1;
+        return { error: mocks.passwordError ? new Error("bad") : null };
+      },
       getSession: async () => ({ data: { session: null } }),
       signOut: async () => ({ error: null }),
     },
     from: () => ({
       select: () => ({
-        or: () => ({ in: async () => ({ count: 0 }) }),
+        or: () => ({
+          in: async () => ({
+            count: mocks.jobCount,
+            error: mocks.jobError ? new Error("jobs unavailable") : null,
+          }),
+        }),
       }),
     }),
   }),
@@ -33,7 +54,17 @@ vi.mock("@/lib/supabase/server", () => ({
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({
     from: (table: string) => ({
-      select: () => ({ eq: async () => ({ data: [] }) }),
+      select: () => ({
+        eq: async () => {
+          mocks.calls.push(`select:${table}`);
+          return table === "provider_documents"
+            ? {
+                data: mocks.documents,
+                error: mocks.failDocumentRead ? new Error("boom") : null,
+              }
+            : { data: [], error: null };
+        },
+      }),
       update: () => ({
         eq: async () => {
           mocks.calls.push(`update:${table}`);
@@ -55,7 +86,9 @@ vi.mock("@/lib/supabase/admin", () => ({
       from: () => ({
         remove: async () => {
           mocks.calls.push("storage:remove");
-          return { error: null };
+          return {
+            error: mocks.failStorageRemove ? new Error("storage unavailable") : null,
+          };
         },
       }),
     },
@@ -86,8 +119,64 @@ function deleteForm(): FormData {
 describe("deleteAccount", () => {
   afterEach(() => {
     mocks.calls = [];
+    mocks.signIns = 0;
     mocks.failTable = null;
     mocks.failBan = false;
+    mocks.jobCount = 0;
+    mocks.jobError = false;
+    mocks.documents = [];
+    mocks.failDocumentRead = false;
+    mocks.failStorageRemove = false;
+    mocks.passwordError = false;
+    mocks.user = {
+      id: "user-1",
+      email: "a@b.c",
+      identities: [{ provider: "email" }],
+      app_metadata: { provider: "email", providers: ["email"] },
+    };
+  });
+
+  it("verifies the password for email accounts", async () => {
+    await deleteAccount({}, deleteForm()).catch(() => undefined);
+
+    expect(mocks.signIns).toBe(1);
+  });
+
+  it("rejects a wrong password for email accounts before touching anything", async () => {
+    mocks.passwordError = true;
+
+    const result = await deleteAccount({}, deleteForm());
+
+    expect(result).toEqual({ error: "La contraseña no es correcta." });
+    expect(mocks.signIns).toBe(1);
+    expect(mocks.calls).toEqual([]);
+  });
+
+  it("skips the password for OAuth-only accounts but still requires ELIMINAR", async () => {
+    mocks.user = {
+      id: "user-1",
+      email: "a@b.c",
+      identities: [{ provider: "google" }],
+      app_metadata: { provider: "google", providers: ["google"] },
+    };
+    const formData = new FormData();
+    formData.set("confirmation", "ELIMINAR");
+
+    const result = await deleteAccount({}, formData).catch(
+      (thrown: unknown) => thrown,
+    );
+
+    expect(String((result as Error).message)).toBe("redirect:/");
+    expect(mocks.signIns).toBe(0);
+    expect(mocks.calls[0]).toBe("ban");
+
+    mocks.calls = [];
+    const wrong = new FormData();
+    wrong.set("confirmation", "eliminar ya");
+    expect(await deleteAccount({}, wrong)).toEqual({
+      error: 'Escribí "ELIMINAR" para confirmar.',
+    });
+    expect(mocks.calls).toEqual([]);
   });
 
   it("bans before wiping so a ban failure destroys nothing", async () => {
@@ -112,6 +201,33 @@ describe("deleteAccount", () => {
     expect(mocks.calls).toEqual(["ban"]);
   });
 
+  it("fails closed when open jobs cannot be verified", async () => {
+    mocks.jobError = true;
+
+    const result = await deleteAccount({}, deleteForm());
+
+    expect(result.error).toContain("verificar tus trabajos");
+    expect(mocks.calls).toEqual([]);
+  });
+
+  it("fails closed when the open-job count is missing", async () => {
+    mocks.jobCount = null;
+
+    const result = await deleteAccount({}, deleteForm());
+
+    expect(result.error).toContain("verificar tus trabajos");
+    expect(mocks.calls).toEqual([]);
+  });
+
+  it("does not ban an account with open jobs", async () => {
+    mocks.jobCount = 1;
+
+    const result = await deleteAccount({}, deleteForm());
+
+    expect(result.error).toContain("trabajos en curso");
+    expect(mocks.calls).toEqual([]);
+  });
+
   it("collects wipe failures without stranding the other steps", async () => {
     mocks.failTable = "profile_private";
 
@@ -124,5 +240,37 @@ describe("deleteAccount", () => {
     expect(mocks.calls).toContain("delete:provider_documents");
     expect(mocks.calls).toContain("update:services");
     expect(mocks.calls).toContain("update:provider_profiles");
+  });
+
+  it("keeps document metadata available for admin recovery if storage removal fails", async () => {
+    mocks.documents = [{ storage_path: "user-1/front.jpg" }];
+    mocks.failStorageRemove = true;
+
+    const result = await deleteAccount({}, deleteForm());
+
+    expect(result.error).toContain("algunos datos");
+    expect(mocks.calls).toContain("storage:remove");
+    expect(mocks.calls).not.toContain("delete:provider_documents");
+    expect(mocks.calls).toContain("delete:profile_private");
+  });
+
+  it("removes document blobs before deleting their metadata", async () => {
+    mocks.documents = [{ storage_path: "user-1/front.jpg" }];
+
+    await deleteAccount({}, deleteForm()).catch(() => undefined);
+
+    expect(mocks.calls.indexOf("storage:remove")).toBeLessThan(
+      mocks.calls.indexOf("delete:provider_documents"),
+    );
+  });
+
+  it("keeps document metadata if reading its storage paths fails", async () => {
+    mocks.failDocumentRead = true;
+
+    const result = await deleteAccount({}, deleteForm());
+
+    expect(result.error).toContain("algunos datos");
+    expect(mocks.calls).not.toContain("storage:remove");
+    expect(mocks.calls).not.toContain("delete:provider_documents");
   });
 });

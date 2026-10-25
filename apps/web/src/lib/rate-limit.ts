@@ -14,6 +14,8 @@ export type RateLimitDecision = {
 };
 
 type WindowState = { windowStart: number; count: number };
+const MAX_RATE_LIMIT_KEYS = 10_000;
+const EXPIRY_SWEEP_INTERVAL = 256;
 
 /**
  * Rate limiter de ventana fija en memoria, por clave (IP + identidad).
@@ -31,12 +33,35 @@ export function createFixedWindowRateLimiter(options: RateLimiterOptions) {
   }
   const now = options.now ?? Date.now;
   const states = new Map<string, WindowState>();
+  let checks = 0;
+  let nextExpiryAt = Number.POSITIVE_INFINITY;
+
+  function removeExpired(timestamp: number): void {
+    nextExpiryAt = Number.POSITIVE_INFINITY;
+    for (const [key, state] of states) {
+      if (timestamp - state.windowStart >= windowMs) states.delete(key);
+      else nextExpiryAt = Math.min(nextExpiryAt, state.windowStart + windowMs);
+    }
+  }
 
   function check(key: string): RateLimitDecision {
     const timestamp = now();
+    checks += 1;
+    if (checks % EXPIRY_SWEEP_INTERVAL === 0) removeExpired(timestamp);
     const state = states.get(key);
     if (!state || timestamp - state.windowStart >= windowMs) {
+      if (state) states.delete(key);
+      if (states.size >= MAX_RATE_LIMIT_KEYS && timestamp >= nextExpiryAt) {
+        removeExpired(timestamp);
+      }
+      if (states.size >= MAX_RATE_LIMIT_KEYS) {
+        return {
+          allowed: false,
+          retryAfterSeconds: Math.max(1, Math.ceil(windowMs / 1000)),
+        };
+      }
       states.set(key, { windowStart: timestamp, count: 1 });
+      nextExpiryAt = Math.min(nextExpiryAt, timestamp + windowMs);
       return { allowed: true, retryAfterSeconds: 0 };
     }
     if (state.count < limit) {

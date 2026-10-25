@@ -74,8 +74,8 @@ export const privateProfileUpdateSchema = z.object({
     .trim()
     .min(6, "Dejanos un teléfono válido para contactarte.")
     .max(40, "El teléfono no puede superar los 40 caracteres."),
-  dateOfBirth: z
-    .iso.date("Indicá tu fecha de nacimiento con un día válido.")
+  dateOfBirth: z.iso
+    .date("Indicá tu fecha de nacimiento con un día válido.")
     .refine((value) => new Date(`${value}T00:00:00Z`) <= new Date(), {
       message: "La fecha de nacimiento no puede estar en el futuro.",
     }),
@@ -383,3 +383,21 @@ export const providerMarketplaceSettingsSchema = z.object({
   marketplacePaused: z.boolean(),
   availabilityPaused: z.boolean(),
 });
+
+const ARS_AMOUNT_PATTERN = /^\d+(\.\d{1,2})?$/;
+
+/**
+ * Parsea un monto ARS escrito en formato es-AR ("1.234,56": punto de miles,
+ * coma decimal) a unidades menores (centavos). Devuelve `undefined` si el
+ * texto esta vacio, es invalido, tiene mas de 2 decimales, no es positivo o
+ * excede el rango entero seguro.
+ */
+export function parseArsMinorUnits(raw: string): number | undefined {
+  const trimmed = raw.trim();
+  if (trimmed === "") return undefined;
+  const normalized = trimmed.replace(/\./g, "").replace(",", ".");
+  if (!ARS_AMOUNT_PATTERN.test(normalized)) return undefined;
+  const value = Math.round(Number(normalized) * 100);
+  if (!Number.isSafeInteger(value) || value <= 0) return undefined;
+  return value;
+}

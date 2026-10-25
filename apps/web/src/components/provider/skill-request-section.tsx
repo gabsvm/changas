@@ -1,10 +1,7 @@
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 
-import {
-  SkillRequestForm,
-  type RequestCategory,
-} from "./skill-request-form";
+import { SkillRequestForm, type RequestCategory } from "./skill-request-form";
 
 export type SkillRequestSummary = {
   id: string;

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { ActionButton } from "@/components/ui/marketplace/action-button";
+import { formatProductDateTime, parseProductDateTime } from "@/lib/product-time";
 import {
   FormField,
   marketplaceInputClass,
@@ -63,6 +64,12 @@ export function NeedWizard({
   const isMountedRef = useRef(false);
   const [error, setError] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
+  const scheduleStartDate = draft.scheduleStartAt
+    ? parseProductDateTime(draft.scheduleStartAt)
+    : null;
+  const scheduleEndDate = draft.scheduleEndAt
+    ? parseProductDateTime(draft.scheduleEndAt)
+    : null;
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -99,14 +106,22 @@ export function NeedWizard({
         return;
       }
     }
-    if (
-      step === 1 &&
-      draft.scheduleStartAt &&
-      draft.scheduleEndAt &&
-      new Date(draft.scheduleEndAt) <= new Date(draft.scheduleStartAt)
-    ) {
-      setError("La fecha de fin debe ser posterior al inicio.");
-      return;
+    if (step === 1) {
+      if (
+        (draft.scheduleStartAt && !scheduleStartDate) ||
+        (draft.scheduleEndAt && !scheduleEndDate)
+      ) {
+        setError("Revisá las fechas y horarios.");
+        return;
+      }
+      if (
+        scheduleStartDate &&
+        scheduleEndDate &&
+        scheduleEndDate <= scheduleStartDate
+      ) {
+        setError("La fecha de fin debe ser posterior al inicio.");
+        return;
+      }
     }
     setStep((prev) => Math.min(2, prev + 1));
   }
@@ -271,11 +286,15 @@ export function NeedWizard({
               <dt className="text-ink/60">Horario</dt>
               <dd>
                 {draft.scheduleStartAt
-                  ? new Date(draft.scheduleStartAt).toLocaleString("es-AR")
+                  ? scheduleStartDate
+                    ? formatProductDateTime(scheduleStartDate)
+                    : "Fecha no válida"
                   : "A coordinar"}
                 {draft.scheduleEndAt
                   ? " — " +
-                    new Date(draft.scheduleEndAt).toLocaleString("es-AR")
+                    (scheduleEndDate
+                      ? formatProductDateTime(scheduleEndDate)
+                      : "Fecha no válida")
                   : ""}
               </dd>
             </div>

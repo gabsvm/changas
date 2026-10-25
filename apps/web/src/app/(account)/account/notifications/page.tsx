@@ -64,12 +64,15 @@ export default async function NotificationCenterPage({
   if (!user) redirect("/login?next=/account/notifications");
 
   const params = await searchParams;
-  const { items: notifications, next } = await listNotificationsThrough(
+  const startFromCursor = params.windowed === "1";
+  const page = await listNotificationsThrough(
     supabase,
     parsePageCursor(params),
+    startFromCursor,
   );
+  const { items: notifications, next } = page;
   const moreHref = next
-    ? `/account/notifications?before=${encodeURIComponent(next.at)}&beforeId=${next.id}`
+    ? `/account/notifications?before=${encodeURIComponent(next.at)}&beforeId=${next.id}${page.windowed ? "&windowed=1" : ""}`
     : null;
   const unreadCount = await getUnreadNotificationCount(supabase);
   const groups = new Map<string, typeof notifications>();
@@ -83,6 +86,17 @@ export default async function NotificationCenterPage({
     <section className="pb-6 sm:py-10">
       <MobileAppBar title="Actividad" />
       <div className="pt-4 sm:pt-0">
+        {page.windowed ? (
+          <p className="text-ink/60 mb-3 text-sm">
+            Mostrando un bloque del historial. {" "}
+            <Link
+              href="/account/notifications"
+              className="text-ink underline"
+            >
+              Volver al inicio
+            </Link>
+          </p>
+        ) : null}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
             <IllustratedBadge

@@ -12,6 +12,7 @@ import {
   marketplaceInputClass,
 } from "@/components/ui/marketplace/form-field";
 import { createClient } from "@/lib/supabase/server";
+import { formatProductDateTime } from "@/lib/product-time";
 import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 import {
@@ -33,13 +34,9 @@ const STATUS_LABELS = {
 } as const;
 
 function scheduleLabel(start: string | null, end: string | null): string {
-  const format = new Intl.DateTimeFormat("es-AR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
   if (start && end)
-    return `${format.format(new Date(start))} → ${format.format(new Date(end))}`;
-  if (start) return `Desde ${format.format(new Date(start))}`;
+    return `${formatProductDateTime(start)} → ${formatProductDateTime(end)}`;
+  if (start) return `Desde ${formatProductDateTime(start)}`;
   return "A coordinar";
 }
 
@@ -97,7 +94,7 @@ export default async function NeedDetailPage({
     : { data: null };
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
+    <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
       <MobileAppBar
         title="Necesidad"
         backHref={isOwner ? "/needs" : "/oportunidades"}
@@ -282,6 +279,6 @@ export default async function NeedDetailPage({
           Esta necesidad ya no está abierta.
         </p>
       )}
-    </main>
+    </div>
   );
 }

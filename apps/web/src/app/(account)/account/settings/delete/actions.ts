@@ -1,18 +1,19 @@
 "use server";
 
+import { jobStatuses, isTerminalJobStatus } from "@changas/domain";
 import { redirect } from "next/navigation";
 
+import { requiresPasswordConfirmation } from "@/lib/auth/account-deletion";
 import type { AuthActionState } from "@/lib/forms/action-state";
 import { getFormString } from "@/lib/forms/form-data";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-const OPEN_JOB_STATUSES = [
-  "CONFIRMED",
-  "IN_PROGRESS",
-  "COMPLETION_REQUESTED",
-  "DISPUTED",
-] as const;
+// Every non-terminal status blocks deletion (derived from the domain so new
+// statuses cannot silently slip past this check).
+const OPEN_JOB_STATUSES = jobStatuses.filter(
+  (status) => !isTerminalJobStatus(status),
+);
 
 // These tables are not in the generated database types yet.
 type UntypedTable = {
@@ -24,7 +25,7 @@ type UntypedTable = {
       in(
         column: string,
         values: string[],
-      ): PromiseLike<{ count: number | null }>;
+      ): PromiseLike<{ count: number | null; error: unknown }>;
     };
   };
   delete(): {
@@ -53,20 +54,25 @@ export async function deleteAccount(
     redirect("/login?next=/account/settings/delete");
   }
 
-  const { error: passwordError } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password,
-  });
-  if (passwordError) {
-    return { error: "La contraseña no es correcta." };
+  if (requiresPasswordConfirmation(user)) {
+    const { error: passwordError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password,
+    });
+    if (passwordError) {
+      return { error: "La contraseña no es correcta." };
+    }
   }
 
-  const { count } = await (supabase as unknown as UntypedClient)
+  const { count, error: jobsError } = await (supabase as unknown as UntypedClient)
     .from("jobs")
     .select("id", { count: "exact", head: true })
     .or(`client_user_id.eq.${user.id},provider_user_id.eq.${user.id}`)
-    .in("status", [...OPEN_JOB_STATUSES]);
-  if (count) {
+    .in("status", OPEN_JOB_STATUSES);
+  if (jobsError || count === null) {
+    return { error: "No pudimos verificar tus trabajos. Intentá de nuevo." };
+  }
+  if (count > 0) {
     return {
       error:
         "Tenés trabajos en curso. Terminalos o cancelalos antes de eliminar la cuenta.",
@@ -91,7 +97,7 @@ export async function deleteAccount(
 
   // Los blobs viven en el bucket privado `identity-documents`; hay que
   // borrarlos ANTES de borrar las filas de metadatos que guardan su path.
-  const { data: documents } = await admin
+  const { data: documents, error: documentReadError } = await admin
     .from("provider_documents")
     .select("storage_path")
     .eq("user_id", user.id);
@@ -100,11 +106,16 @@ export async function deleteAccount(
     .filter(
       (path): path is string => typeof path === "string" && path.length > 0,
     );
-  if (blobPaths.length > 0) {
+  if (documentReadError) wipeFailures.push("identity_metadata_read");
+  let blobRemovalFailed = false;
+  if (!documentReadError && blobPaths.length > 0) {
     const { error: blobError } = await admin.storage
       .from("identity-documents")
       .remove(blobPaths);
-    if (blobError) wipeFailures.push("identity_blobs");
+    if (blobError) {
+      wipeFailures.push("identity_blobs");
+      blobRemovalFailed = true;
+    }
   }
 
   const steps = await Promise.all([
@@ -122,7 +133,9 @@ export async function deleteAccount(
       .from("push_subscriptions")
       .delete()
       .eq("user_id", user.id),
-    admin.from("provider_documents").delete().eq("user_id", user.id),
+    documentReadError || blobRemovalFailed
+      ? Promise.resolve({ error: new Error("identity_documents_retained") })
+      : admin.from("provider_documents").delete().eq("user_id", user.id),
     admin
       .from("services")
       .update({ is_published: false, is_paused: true })

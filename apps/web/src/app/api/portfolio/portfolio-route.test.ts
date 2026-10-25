@@ -49,7 +49,9 @@ describe("portfolio media route", () => {
 
     expect(response.status).toBe(200);
     expect(await response.text()).toBe("synthetic image");
-    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("Cache-Control")).toBe(
+      "private, max-age=86400, stale-while-revalidate=604800",
+    );
     expect(response.headers.get("Content-Type")).toBe("image/png");
     expect(download).toHaveBeenCalledWith(path);
   });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { formatMinorUnits } from "@changas/domain";
 
@@ -31,6 +31,7 @@ export function ConfirmCompletionReview({
   compact = false,
 }: ConfirmCompletionReviewProps) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   if (compact && !open) {
     return (
@@ -43,78 +44,81 @@ export function ConfirmCompletionReview({
     );
   }
 
-  if (!open) {
-    return (
+  return (
+    <>
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setOpen(true)}
-        aria-expanded={false}
+        onClick={() => setOpen((current) => !current)}
+        aria-expanded={open}
         aria-controls={`confirm-review-${jobId}`}
-        className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+        className={`consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold ${open ? "mb-3" : ""}`}
       >
         Revisar y confirmar
       </button>
-    );
-  }
-
-  return (
-    <div
-      id={`confirm-review-${jobId}`}
-      className="rounded-xl border border-white/25 bg-white/10 p-4"
-    >
-      <dl className="space-y-1 text-sm leading-6 text-white">
-        <div className="flex justify-between gap-3">
-          <dt className="text-white/75">Precio base</dt>
-          <dd className="font-bold">
-            {formatMinorUnits(baseMinor, currencyCode)}
-          </dd>
-        </div>
-        {extrasMinor > 0 ? (
+      <div
+        id={`confirm-review-${jobId}`}
+        hidden={!open}
+        className="rounded-xl border border-white/25 bg-white/10 p-4"
+      >
+        <dl className="space-y-1 text-sm leading-6 text-white">
           <div className="flex justify-between gap-3">
-            <dt className="text-white/75">Adicionales pendientes</dt>
+            <dt className="text-white/75">Precio base</dt>
             <dd className="font-bold">
-              {formatMinorUnits(extrasMinor, currencyCode)}
+              {formatMinorUnits(baseMinor, currencyCode)}
             </dd>
           </div>
-        ) : null}
-        <div className="flex justify-between gap-3 border-t border-white/20 pt-1">
-          <dt className="font-extrabold">Total pendiente</dt>
-          <dd className="font-extrabold">
-            {formatMinorUnits(totalMinor, currencyCode)}
-          </dd>
+          {extrasMinor > 0 ? (
+            <div className="flex justify-between gap-3">
+              <dt className="text-white/75">Adicionales pendientes</dt>
+              <dd className="font-bold">
+                {formatMinorUnits(extrasMinor, currencyCode)}
+              </dd>
+            </div>
+          ) : null}
+          <div className="flex justify-between gap-3 border-t border-white/20 pt-1">
+            <dt className="font-extrabold">Total pendiente</dt>
+            <dd className="font-extrabold">
+              {formatMinorUnits(totalMinor, currencyCode)}
+            </dd>
+          </div>
+        </dl>
+        <p className="mt-2 text-xs leading-5 text-white/75">
+          Confirmar no cobra nada todavía: el pago se hace después, por
+          separado.
+        </p>
+        <form action={transitionJobAction} className="mt-3">
+          <input type="hidden" name="jobId" value={jobId} />
+          <input
+            type="hidden"
+            name="expectedStatus"
+            value="COMPLETION_REQUESTED"
+          />
+          <input type="hidden" name="requestedStatus" value="COMPLETED" />
+          <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
+            Confirmar trabajo por {formatMinorUnits(totalMinor, currencyCode)}
+          </button>
+        </form>
+        <div className="mt-2 grid gap-2">
+          <CorrectionForm jobId={jobId} />
+          <a
+            href="#ayuda"
+            className="consumer-pressable inline-flex min-h-[52px] w-full items-center justify-center rounded-xl border border-white/25 px-4 text-sm font-bold text-white"
+          >
+            Reportar problema
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              triggerRef.current?.focus();
+            }}
+            className="min-h-11 text-sm font-semibold text-white/75 underline"
+          >
+            Volver
+          </button>
         </div>
-      </dl>
-      <p className="mt-2 text-xs leading-5 text-white/75">
-        Confirmar no cobra nada todavía: el pago se hace después, por separado.
-      </p>
-      <form action={transitionJobAction} className="mt-3">
-        <input type="hidden" name="jobId" value={jobId} />
-        <input
-          type="hidden"
-          name="expectedStatus"
-          value="COMPLETION_REQUESTED"
-        />
-        <input type="hidden" name="requestedStatus" value="COMPLETED" />
-        <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
-          Confirmar trabajo por {formatMinorUnits(totalMinor, currencyCode)}
-        </button>
-      </form>
-      <div className="mt-2 grid gap-2">
-        <CorrectionForm jobId={jobId} />
-        <a
-          href="#ayuda"
-          className="consumer-pressable inline-flex min-h-[52px] w-full items-center justify-center rounded-xl border border-white/25 px-4 text-sm font-bold text-white"
-        >
-          Reportar problema
-        </a>
-        <button
-          type="button"
-          onClick={() => setOpen(false)}
-          className="min-h-11 text-sm font-semibold text-white/75 underline"
-        >
-          Volver
-        </button>
       </div>
-    </div>
+    </>
   );
 }

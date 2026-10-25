@@ -86,7 +86,7 @@ export function AppHeader({
       ) : null}
 
       {action ? (
-        <div className={`${desktopNav ? "" : "ml-auto"}shrink-0`}>{action}</div>
+        <div className={`${desktopNav ? "" : "ml-auto "}shrink-0`}>{action}</div>
       ) : backHref ? (
         <span className="h-12 w-12" aria-hidden="true" />
       ) : null}

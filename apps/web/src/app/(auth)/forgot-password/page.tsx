@@ -14,7 +14,9 @@ export default async function ForgotPasswordPage({
     <AuthForm
       action={requestPasswordReset}
       mode="reset"
-      nextPath={safeNextPath(Array.isArray(raw) ? (raw[0] ?? null) : (raw ?? null))}
+      nextPath={safeNextPath(
+        Array.isArray(raw) ? (raw[0] ?? null) : (raw ?? null),
+      )}
     />
   );
 }

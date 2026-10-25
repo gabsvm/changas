@@ -11,6 +11,7 @@ import {
 import { formatServicePrice, minorUnitsToMajorInput } from "@changas/domain";
 
 import type { ActionState } from "@/lib/forms/action-state";
+import { formatProductDateTime } from "@/lib/product-time";
 import { initialActionState } from "@/lib/forms/action-state";
 import { compressInputFiles } from "@/lib/media/image-compression";
 import { animateConfirmedSave } from "@/lib/ui/panel-motion";
@@ -893,7 +894,7 @@ export function MarketplaceManagement({
               href={`#${id}`}
               onClick={() => setActiveSection(id)}
               aria-current={active ? "true" : undefined}
-              className={`consumer-pressable inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-all duration-200 ${
+              className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-all duration-200 ${
                 active
                   ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
                   : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#1b2b3d] dark:text-[#f5efe8]"
@@ -1070,7 +1071,7 @@ export function MarketplaceManagement({
                     {service.is_paused ? " · pausado" : ""}
                   </p>
                   <details className="text-ink/60 mt-1 text-xs">
-                    <summary className="consumer-pressable inline-flex min-h-8 cursor-pointer items-center">
+                    <summary className="consumer-pressable inline-flex min-h-11 cursor-pointer items-center">
                       Ver enlace técnico
                     </summary>
                     <p>{service.public_slug}</p>
@@ -1427,7 +1428,7 @@ export function MarketplaceManagement({
             <ActionForm action={actions.saveArea} submitLabel="Agregar zona">
               <Field label="Etiqueta pública" name="label" required />
               <UseLocationButton />
-              <details className="rounded-xl border border-ink/10 px-4 dark:border-white/10">
+              <details className="border-ink/10 rounded-xl border px-4 dark:border-white/10">
                 <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center text-sm font-semibold">
                   Ingresar coordenadas manualmente (opcional)
                 </summary>
@@ -1546,8 +1547,8 @@ export function MarketplaceManagement({
                 key={item.id}
               >
                 <p className="text-sm">
-                  {new Date(item.starts_at).toLocaleString("es-AR")} →{" "}
-                  {new Date(item.ends_at).toLocaleString("es-AR")}
+                  {formatProductDateTime(item.starts_at)} →{" "}
+                  {formatProductDateTime(item.ends_at)}
                 </p>
                 <p className="text-ink/70 mt-1 text-xs">
                   {item.reason ?? "Sin motivo"}

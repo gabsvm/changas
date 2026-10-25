@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
 import { formatServicePrice } from "@changas/domain";
 
@@ -23,6 +24,27 @@ import { startServiceConversation } from "./actions";
 
 export const dynamic = "force-dynamic";
 
+// cache(): generateMetadata y la page comparten un único roundtrip por request.
+const getServiceAndProvider = cache(
+  async (providerSlug: string, serviceSlug: string) => {
+    const supabase = await createClient();
+    const [{ data: service }, { data: provider }] = await Promise.all([
+      supabase
+        .from("public_provider_services")
+        .select("*")
+        .eq("provider_slug", providerSlug)
+        .eq("public_slug", serviceSlug)
+        .maybeSingle(),
+      supabase
+        .from("public_provider_profiles")
+        .select("*")
+        .eq("public_slug", providerSlug)
+        .maybeSingle(),
+    ]);
+    return { service, provider };
+  },
+);
+
 export async function generateMetadata({
   params,
 }: {
@@ -30,20 +52,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug, serviceSlug } = await params;
-    const supabase = await createClient();
-    const [{ data: service }, { data: provider }] = await Promise.all([
-      supabase
-        .from("public_provider_services")
-        .select("public_slug, title, description, skill_name")
-        .eq("provider_slug", slug)
-        .eq("public_slug", serviceSlug)
-        .maybeSingle(),
-      supabase
-        .from("public_provider_profiles")
-        .select("public_slug, display_name")
-        .eq("public_slug", slug)
-        .maybeSingle(),
-    ]);
+    const { service, provider } = await getServiceAndProvider(
+      slug,
+      serviceSlug,
+    );
     if (!service || !provider) return { title: "Servicio no encontrado" };
     const description = service.description;
     const canonical = "/p/" + provider.public_slug + "/" + service.public_slug;
@@ -86,25 +98,14 @@ export default async function PublicServicePage({
       "Ocurrió un problema temporal. Probá de nuevo.")
     : null;
   const supabase = await createClient();
-  const [{ data: service }, { data: provider }, { data: tags }] =
-    await Promise.all([
-      supabase
-        .from("public_provider_services")
-        .select("*")
-        .eq("provider_slug", providerSlug)
-        .eq("public_slug", serviceSlug)
-        .maybeSingle(),
-      supabase
-        .from("public_provider_profiles")
-        .select("*")
-        .eq("public_slug", providerSlug)
-        .maybeSingle(),
-      supabase
-        .from("public_service_tags")
-        .select("tag")
-        .eq("provider_slug", providerSlug)
-        .eq("service_public_slug", serviceSlug),
-    ]);
+  const [{ service, provider }, { data: tags }] = await Promise.all([
+    getServiceAndProvider(providerSlug, serviceSlug),
+    supabase
+      .from("public_service_tags")
+      .select("tag")
+      .eq("provider_slug", providerSlug)
+      .eq("service_public_slug", serviceSlug),
+  ]);
   if (!service || !provider) notFound();
 
   const price = formatServicePrice(

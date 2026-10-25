@@ -1,11 +1,11 @@
-export function isExcludedPublicTestCategory(
-  category: { slug: string; name?: string | null },
-): boolean {
+export function isExcludedPublicTestCategory(category: {
+  slug: string;
+  name?: string | null;
+}): boolean {
   return (
     process.env.NODE_ENV === "production" &&
     (category.slug === "prueba-emulador" ||
-      (category.name != null &&
-        /prueba emulador/i.test(category.name)))
+      (category.name != null && /prueba emulador/i.test(category.name)))
   );
 }
 

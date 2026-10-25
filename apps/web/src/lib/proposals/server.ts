@@ -268,7 +268,11 @@ export function normalizeProposalSummary(value: unknown): ProposalSummary {
     ) ||
     !isNullableString(row.includes_text) ||
     !isNullableString(row.materials_notes_text) ||
-    !(row.response_reason === null || row.response_reason === undefined || typeof row.response_reason === "string") ||
+    !(
+      row.response_reason === null ||
+      row.response_reason === undefined ||
+      typeof row.response_reason === "string"
+    ) ||
     !isDateLike(row.expires_at) ||
     !isDateLike(row.created_at) ||
     row.created_at === null ||

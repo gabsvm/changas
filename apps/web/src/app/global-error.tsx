@@ -93,7 +93,11 @@ export default function GlobalError({
             </h1>
             {error.digest ? (
               <p
-                style={{ marginTop: "0.75rem", fontSize: "0.75rem", opacity: 0.75 }}
+                style={{
+                  marginTop: "0.75rem",
+                  fontSize: "0.75rem",
+                  opacity: 0.75,
+                }}
                 data-testid="error-reference"
               >
                 Referencia: {error.digest}

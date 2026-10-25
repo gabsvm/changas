@@ -2,7 +2,7 @@
 
 > **Estado:** Borrador (reconstruido desde código; NO confirmado por propietario)
 > **Última revisión:** 2026-10-13
-> **Fuentes consultadas:** `docs/CONTEXTO.md` (2026-10-11), `README.md`, `apps/web` (Next.js 16, PWA), `packages/domain` + `packages/validation`, `docs/design/changas-brand-system.md`, `CHANGAS_MASTER_PLAN.md` (visión V1, parcialmente superseded según README). Lo no observado se marca `[INFERENCE]` o TBD.
+> **Fuentes consultadas:** `docs/CONTEXTO.md` (2026-10-11), `README.md`, `apps/web` (Next.js 16, PWA), `packages/domain` + `packages/validation`, `docs/design/changas-brand-system.md`, `docs/archive/CHANGAS_MASTER_PLAN.md` (visión V1, parcialmente superseded según README). Lo no observado se marca `[INFERENCE]` o TBD.
 
 > **Regla de uso:** este archivo describe el PRODUCTO, no la implementación. Decisiones no confirmadas van en §8.
 
@@ -14,12 +14,12 @@
 
 ## 2. Usuarios y permisos relevantes
 
-| Actor | Necesita lograr | Restricciones de acceso conocidas |
-|---|---|---|
-| Visitante | descubrir servicios, ver perfil público y precio | solo lectura pública (`/`, `/buscar`, `/p/[slug]`) |
-| Cliente (logueado) | consultar por chat, aceptar propuesta (= contratar), seguir el job, confirmar finalización, pagar al cierre, reseñar | solo sus conversaciones/jobs; confirmar finalización genera obligación de pago |
-| Proveedor (misma cuenta) | publicar servicios, responder chat, enviar propuesta, ejecutar job, ingresar código de 4 dígitos | onboarding con identidad privada (5 datos) + revisión; sus servicios en borrador hasta publicar |
-| Admin | catálogo, identidad, proveedores, usuarios | tablas internas sin RLS pública; borrado de cuenta exige contraseña + escribir ELIMINAR |
+| Actor                    | Necesita lograr                                                                                                      | Restricciones de acceso conocidas                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Visitante                | descubrir servicios, ver perfil público y precio                                                                     | solo lectura pública (`/`, `/buscar`, `/p/[slug]`)                                              |
+| Cliente (logueado)       | consultar por chat, aceptar propuesta (= contratar), seguir el job, confirmar finalización, pagar al cierre, reseñar | solo sus conversaciones/jobs; confirmar finalización genera obligación de pago                  |
+| Proveedor (misma cuenta) | publicar servicios, responder chat, enviar propuesta, ejecutar job, ingresar código de 4 dígitos                     | onboarding con identidad privada (5 datos) + revisión; sus servicios en borrador hasta publicar |
+| Admin                    | catálogo, identidad, proveedores, usuarios                                                                           | tablas internas sin RLS pública; borrado de cuenta exige contraseña + escribir ELIMINAR         |
 
 ## 3. Flujos esenciales
 
@@ -55,12 +55,12 @@
 
 ## 8. Decisiones por resolver
 
-| Pregunta pendiente | Por qué importa | Estado / responsable |
-|---|---|---|
-| CTA primario: ¿naranja + texto tinta (brand doc) o tinta + blanco (código actual)? Contradicción real entre `docs/design/changas-brand-system.md` y `globals.css` | cambia el sistema visual completo | Pendiente / propietario |
-| Geografía y alcance de lanzamiento | define filtros "cerca", zonas y rollout | Pendiente / propietario |
-| ¿Existe métrica de tiempo de respuesta del proveedor? (el sticky dice "responde rápido" sin dato) | copy con o sin evidencia | Pendiente / propietario |
-| Reprogramar en `IN_PROGRESS`: ¿regla de negocio o faltante? | cambia spec de lifecycle | Pendiente / propietario |
+| Pregunta pendiente                                                                                                                                                | Por qué importa                         | Estado / responsable    |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | ----------------------- |
+| CTA primario: ¿naranja + texto tinta (brand doc) o tinta + blanco (código actual)? Contradicción real entre `docs/design/changas-brand-system.md` y `globals.css` | cambia el sistema visual completo       | Pendiente / propietario |
+| Geografía y alcance de lanzamiento                                                                                                                                | define filtros "cerca", zonas y rollout | Pendiente / propietario |
+| ¿Existe métrica de tiempo de respuesta del proveedor? (el sticky dice "responde rápido" sin dato)                                                                 | copy con o sin evidencia                | Pendiente / propietario |
+| Reprogramar en `IN_PROGRESS`: ¿regla de negocio o faltante?                                                                                                       | cambia spec de lifecycle                | Pendiente / propietario |
 
 ## 9. Historial mínimo
 

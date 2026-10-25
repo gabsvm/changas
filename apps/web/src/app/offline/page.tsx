@@ -33,7 +33,12 @@ export default function OfflinePage() {
           />
           <span className="absolute -right-4 -bottom-5 h-16 w-16 rounded-full bg-white/20" />
           <span className="absolute -top-3 -left-3 h-10 w-10 rounded-full bg-white/15" />
-          <IllustratedBadge tone="blue" icon="wifi" size="lg" label="Sin conexión" />
+          <IllustratedBadge
+            tone="blue"
+            icon="wifi"
+            size="lg"
+            label="Sin conexión"
+          />
         </span>
         <p className="text-terracotta mt-8 text-xs font-semibold tracking-[0.18em] uppercase">
           Sin conexión

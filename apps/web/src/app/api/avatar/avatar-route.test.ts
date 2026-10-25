@@ -57,7 +57,9 @@ describe("private avatar delivery", () => {
     expect(await response.text()).toBe("avatar");
     expect(response.headers.get("Content-Type")).toBe("image/jpeg");
     expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
-    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(response.headers.get("Cache-Control")).toBe(
+      "private, max-age=86400, stale-while-revalidate=604800",
+    );
     expect(download).toHaveBeenCalledWith("owner/avatar.jpg");
   });
 

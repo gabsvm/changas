@@ -13,7 +13,11 @@ import {
 
 const initialState: ProposalActionState = { status: "IDLE", message: "" };
 
-const CLIENT_KINDS: ProposalKind[] = ["DIRECT_BOOKING", "QUOTE_REQUEST", "CLIENT_OFFER"];
+const CLIENT_KINDS: ProposalKind[] = [
+  "DIRECT_BOOKING",
+  "QUOTE_REQUEST",
+  "CLIENT_OFFER",
+];
 
 export function ProposalComposer({
   conversationId,
@@ -41,13 +45,20 @@ export function ProposalComposer({
     ? "QUOTE_REQUEST"
     : "PROVIDER_QUOTE";
   const effectiveDefaultKind =
-    defaultKind && proposalKinds.includes(defaultKind) &&
-    (currentUserIsClient ? CLIENT_KINDS.includes(defaultKind) && (defaultKind !== "DIRECT_BOOKING" || allowDirectBooking) : defaultKind === "PROVIDER_QUOTE")
+    defaultKind &&
+    proposalKinds.includes(defaultKind) &&
+    (currentUserIsClient
+      ? CLIENT_KINDS.includes(defaultKind) &&
+        (defaultKind !== "DIRECT_BOOKING" || allowDirectBooking)
+      : defaultKind === "PROVIDER_QUOTE")
       ? defaultKind
       : roleDefaultKind;
 
   return (
-    <details id="nueva-propuesta" className="border-ink/[0.08] bg-surface consumer-card relative scroll-mt-24 overflow-hidden rounded-2xl border shadow-[var(--consumer-shadow-card)]">
+    <details
+      id="nueva-propuesta"
+      className="border-ink/[0.08] bg-surface consumer-card relative scroll-mt-24 overflow-hidden rounded-2xl border shadow-[var(--consumer-shadow-card)]"
+    >
       <summary className="consumer-pressable inline-flex min-h-12 w-full cursor-pointer items-center gap-2.5 p-4 text-[15px] font-extrabold">
         <IllustratedBadge
           tone="gold"
@@ -100,7 +111,9 @@ export function ProposalComposer({
               {currentUserIsClient ? (
                 <>
                   {allowDirectBooking ? (
-                    <option value="DIRECT_BOOKING">Reservar al precio publicado</option>
+                    <option value="DIRECT_BOOKING">
+                      Reservar al precio publicado
+                    </option>
                   ) : null}
                   <option value="QUOTE_REQUEST">Solicitar cotización</option>
                   <option value="CLIENT_OFFER">Hacer una oferta</option>

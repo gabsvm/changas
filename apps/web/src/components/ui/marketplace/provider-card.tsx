@@ -18,7 +18,7 @@ export function ProviderCard({
   return (
     <Link
       href={href}
-      className="consumer-pressable consumer-card bg-surface group flex min-h-16 items-center gap-3 border border-transparent p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/[0.08] hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:hover:border-white/10 dark:hover:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
+      className="consumer-pressable consumer-card bg-surface group hover:border-ink/[0.08] flex min-h-16 items-center gap-3 border border-transparent p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:hover:border-white/10 dark:hover:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
     >
       <Avatar name={name} src={avatarUrl} />
       <span className="min-w-0 flex-1">

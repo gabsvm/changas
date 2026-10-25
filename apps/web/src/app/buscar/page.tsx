@@ -17,7 +17,10 @@ import { SearchField } from "@/components/ui/marketplace/search-field";
 import { GuideHeader } from "@/components/ui/guided";
 import { CLIENT_HIRE_STEPS } from "@/lib/ui/guided";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
-import { filterPublicSkillsByCategoryId, isExcludedPublicTestCategory } from "@/lib/public-catalog";
+import {
+  filterPublicSkillsByCategoryId,
+  isExcludedPublicTestCategory,
+} from "@/lib/public-catalog";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -170,25 +173,8 @@ export default async function SearchPage({
         />
 
         <section className="pt-3 sm:pt-8">
-          <div className="yalo-search-hero brand-gradient-surface relative overflow-hidden rounded-3xl p-5 text-white shadow-[var(--consumer-shadow-hero)] sm:p-6">
-            <span
-              className="pointer-events-none absolute inset-0 opacity-25"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                backgroundSize: "12px 12px",
-              }}
-              aria-hidden="true"
-            />
-            <span
-              className="pointer-events-none absolute -right-10 -bottom-16 h-48 w-48 rounded-full bg-white/20"
-              aria-hidden="true"
-            />
-            <span
-              className="pointer-events-none absolute -top-10 -left-10 h-32 w-32 rounded-full bg-white/15"
-              aria-hidden="true"
-            />
-            <h1 className="relative z-10 text-[22px] leading-8 font-extrabold tracking-[-0.025em] text-white sm:text-3xl sm:leading-10">
+          <div className="border-ink/[0.08] bg-surface text-ink relative overflow-hidden rounded-3xl border p-5 shadow-[var(--consumer-shadow-hero)] sm:p-6 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+            <h1 className="relative z-10 text-[22px] leading-8 font-extrabold tracking-[-0.025em] sm:text-3xl sm:leading-10">
               {query ? `Resultados para “${query}”` : "Explorar servicios"}
             </h1>
             <form action="/buscar" className="relative z-10 mt-4">
@@ -237,7 +223,7 @@ export default async function SearchPage({
                       className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-bold transition-all duration-200 ${
                         selected
                           ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                          : "yalo-filter-pill border-white/20 bg-white/10 text-white backdrop-blur-sm hover:bg-white/15"
+                          : "yalo-filter-pill border-ink/10 bg-canvas text-ink/70 hover:bg-ink/[0.04]"
                       }`}
                     >
                       {item.name}
@@ -355,7 +341,7 @@ export default async function SearchPage({
                 </Link>
               ) : null}
               {activeFilterCount === 0 ? (
-                <p className="py-1 text-[13px] leading-5 text-white/85">
+                <p className="text-ink/70 py-1 text-[13px] leading-5">
                   Usá los filtros para afinar por zona, modalidad o precio.
                 </p>
               ) : null}

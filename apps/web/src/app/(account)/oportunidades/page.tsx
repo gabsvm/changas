@@ -46,7 +46,7 @@ export default async function OpportunitiesPage({
   const posts = allPosts.filter((post) => post.owner_user_id !== user.id);
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
+    <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
       <MobileAppBar title="Oportunidades" backHref="/provider/manage" />
       <nav className="mt-5 flex gap-3" aria-label="Páginas de oportunidades">
         {page > 0 ? (
@@ -120,6 +120,6 @@ export default async function OpportunitiesPage({
           ))}
         </ul>
       )}
-    </main>
+    </div>
   );
 }

@@ -12,7 +12,7 @@ export function SiteFooter({ className = "" }: { className?: string }) {
         aria-hidden="true"
         className="brand-gradient-surface pointer-events-none absolute inset-x-0 top-0 h-[2px] opacity-60"
       />
-      <span className="flex items-center gap-2 font-bold text-ink dark:text-white">
+      <span className="text-ink flex items-center gap-2 font-bold dark:text-white">
         <span className="brand-mark h-6 w-6 !rounded-lg" aria-hidden="true">
           C
         </span>

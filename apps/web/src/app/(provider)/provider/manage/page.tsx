@@ -304,7 +304,9 @@ export default async function ProviderMarketplaceManagePage({
               target="_blank"
             >
               Ver perfil público{" "}
-              <span aria-hidden="true"><ActionArrowIcon /></span>
+              <span aria-hidden="true">
+                <ActionArrowIcon />
+              </span>
             </Link>
           </div>
         </div>
@@ -318,7 +320,13 @@ export default async function ProviderMarketplaceManagePage({
             paymentsEnabled,
           });
           return (
-            <NextStepBanner title={next.title} hint={next.hint} cta={next.cta} href={next.href} className="mt-6" />
+            <NextStepBanner
+              title={next.title}
+              hint={next.hint}
+              cta={next.cta}
+              href={next.href}
+              className="mt-6"
+            />
           );
         })()}
         {arePublicNeedsEnabled() ? (
@@ -386,8 +394,8 @@ export default async function ProviderMarketplaceManagePage({
                     <>
                       {" "}
                       Incluye{" "}
-                      {formatMinorUnits(income.simulatedSettledTotal, "ARS")}{" "}
-                      en pagos de prueba (simulados): no son cobros reales.
+                      {formatMinorUnits(income.simulatedSettledTotal, "ARS")} en
+                      pagos de prueba (simulados): no son cobros reales.
                     </>
                   ) : null}{" "}
                   El detalle está en{" "}
@@ -430,7 +438,10 @@ export default async function ProviderMarketplaceManagePage({
           </p>
         ) : null}
 
-        <div id="cobros" className="border-ink/10 mt-6 scroll-mt-32 border-t pt-5">
+        <div
+          id="cobros"
+          className="border-ink/10 mt-6 scroll-mt-32 border-t pt-5"
+        >
           <ProviderPaymentAccount
             account={paymentAccount}
             feedback={paymentFeedback}

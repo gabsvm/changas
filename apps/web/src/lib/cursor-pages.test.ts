@@ -75,9 +75,10 @@ describe("accumulateThrough", () => {
     expect(result.next).toBeNull();
   });
 
-  it("bounds stale cursors and keeps forward progress", async () => {
-    const fetchPage = keysetFetcher(rows(65));
-    const through = { at: "2020-01-01T00:00:00.000Z", id: "id-999" };
+  it("falls forward from an older cursor outside the reconstruction bound", async () => {
+    const source = rows(120);
+    const fetchPage = keysetFetcher(source);
+    const through = keyOf(source[59] as Row);
 
     const result = await accumulateThrough(
       fetchPage,
@@ -88,9 +89,47 @@ describe("accumulateThrough", () => {
       2,
     );
 
-    expect(result.items).toHaveLength(40);
-    expect(result.next?.id).toBe("id-039");
-    expect(fetchPage).toHaveBeenCalledTimes(2);
+    expect(result.items.map(idOf)).toEqual(source.slice(60, 80).map(idOf));
+    expect(result.next?.id).toBe("id-079");
+    expect(result.windowed).toBe(true);
+    expect(fetchPage).toHaveBeenCalledTimes(3);
+  });
+
+  it("advances through 12+ pages with bounded reads and no gaps across windows", async () => {
+    const source = rows(300);
+    const fetchPage = keysetFetcher(source);
+    const seen = new Set<string>();
+    let through: PageKey | null = null;
+    let startFromCursor = false;
+    let previousIndex = -1;
+
+    for (let advance = 0; advance < 13; advance++) {
+      const callsBefore = fetchPage.mock.calls.length;
+      const result: { items: Row[]; next: PageKey | null; windowed?: boolean } = await accumulateThrough(
+        fetchPage,
+        keyOf,
+        idOf,
+        through,
+        20,
+        8,
+        startFromCursor,
+      );
+      for (const row of result.items) seen.add(row.id);
+      if (through) {
+        const index = Number(through.id.slice(3));
+        expect(index).toBeGreaterThan(previousIndex);
+        previousIndex = index;
+        if (result.windowed) {
+          expect(result.items[0]?.id).toBe(`id-${String(index + 1).padStart(3, "0")}`);
+        }
+      }
+      through = result.next;
+      startFromCursor = result.windowed ?? false;
+      expect(fetchPage.mock.calls.length - callsBefore).toBeLessThanOrEqual(9);
+    }
+
+    expect([...seen].sort()).toEqual(source.slice(0, 260).map(idOf));
+    expect(through?.id).toBe("id-259");
   });
 
   it("parses cursor params and rejects malformed ones", () => {

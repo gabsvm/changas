@@ -1,6 +1,6 @@
 # Changas
 
-Changas is a mobile-first marketplace PWA for offering and hiring practical skills and trades. Live product: public discovery with reputation-ranked search, provider profiles with portfolio covers, conversations with structured proposals, **hire-on-accept** (accepting hires instantly, no upfront payment; settled at completion), Web Push with rich content, manual Claro/Oscuro/Sistema theme, and Mercado Pago Split 1:1 + Checkout Pro (wired for completion-time charging). See [`docs/CONTEXTO.md`](./docs/CONTEXTO.md) for current state and roadmap, and [`CHANGAS_MASTER_PLAN.md`](./CHANGAS_MASTER_PLAN.md) for the original V1 vision (partially superseded).
+Changas is a mobile-first marketplace PWA for offering and hiring practical skills and trades. Live product: public discovery with reputation-ranked search, provider profiles with portfolio covers, conversations with structured proposals, **hire-on-accept** (accepting hires instantly, no upfront payment; settled at completion), Web Push with rich content, manual Claro/Oscuro/Sistema theme, and Mercado Pago Split 1:1 + Checkout Pro (wired for completion-time charging). See [`docs/CONTEXTO.md`](./docs/CONTEXTO.md) for current state and roadmap, and [`docs/archive/CHANGAS_MASTER_PLAN.md`](./docs/archive/CHANGAS_MASTER_PLAN.md) for the original V1 vision (partially superseded).
 
 ## YALO marketplace behavior
 

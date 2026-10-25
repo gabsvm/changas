@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
+import { cache, type ReactNode } from "react";
 
 import { ActionArrowIcon } from "@/components/ui/marketplace/action-arrow-icon";
 import { formatServicePrice } from "@changas/domain";
@@ -22,6 +22,16 @@ import { isExcludedPublicTestCategory } from "@/lib/public-catalog";
 
 export const dynamic = "force-dynamic";
 
+// cache(): generateMetadata y la page comparten un único roundtrip por request.
+const getProvider = cache(async (slug: string) => {
+  const supabase = await createClient();
+  return supabase
+    .from("public_provider_profiles")
+    .select("*")
+    .eq("public_slug", slug)
+    .maybeSingle();
+});
+
 export async function generateMetadata({
   params,
 }: {
@@ -29,12 +39,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
-    const supabase = await createClient();
-    const { data: provider } = await supabase
-      .from("public_provider_profiles")
-      .select("public_slug, display_name, public_headline, bio")
-      .eq("public_slug", slug)
-      .maybeSingle();
+    const { data: provider } = await getProvider(slug);
     if (!provider) return { title: "Proveedor no encontrado" };
     const description =
       provider.bio ??
@@ -65,13 +70,9 @@ export default async function PublicProviderPage({
 }) {
   const { slug } = await params;
   const pageSearchParams = await searchParams;
-  const supabase = await createClient();
-  const { data: provider } = await supabase
-    .from("public_provider_profiles")
-    .select("*")
-    .eq("public_slug", slug)
-    .maybeSingle();
+  const { data: provider } = await getProvider(slug);
   if (!provider) notFound();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -138,6 +139,30 @@ export default async function PublicProviderPage({
   const publicSkills = (skills ?? []).filter(
     (skill) => !isExcludedPublicTestCategory({ slug: skill.category_slug }),
   );
+  // Precio "desde": mínimo real entre los servicios publicados con monto.
+  // Si ninguno tiene monto, se omite (nunca se inventa).
+  const pricedServices = (services ?? []).filter(
+    (service) => typeof service.price_amount === "number",
+  );
+  const cheapestPriced =
+    pricedServices.length > 0
+      ? pricedServices.reduce((a, b) =>
+          (a.price_amount ?? 0) <= (b.price_amount ?? 0) ? a : b,
+        )
+      : null;
+  const fromPrice = cheapestPriced
+    ? formatServicePrice(
+        cheapestPriced.price_model,
+        cheapestPriced.price_amount,
+        cheapestPriced.currency_code,
+        cheapestPriced.price_unit,
+      )
+    : null;
+  // Destino de la cotización: servicio único directo, si no al listado.
+  const quoteHref =
+    (services?.length ?? 0) === 1 && services?.[0]?.public_slug
+      ? `/p/${slug}/${services?.[0]?.public_slug}`
+      : `/p/${slug}#servicios`;
 
   return (
     <main
@@ -152,7 +177,10 @@ export default async function PublicProviderPage({
               className="consumer-pressable text-terracotta inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-bold"
               href="/buscar"
             >
-              Buscar servicios <span aria-hidden="true"><ActionArrowIcon /></span>
+              Buscar servicios{" "}
+              <span aria-hidden="true">
+                <ActionArrowIcon />
+              </span>
             </Link>
           }
           className="sm:flex"
@@ -219,7 +247,14 @@ export default async function PublicProviderPage({
               </span>
               <div className="min-w-0 flex-1 pt-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <StatusChip tone="success">Perfil habilitado</StatusChip>
+                  {/* public_provider_profiles solo expone prestadores con
+                      status ACTIVE (identidad aprobada): existir acá ES la
+                      verificación. Sin hardcodear nada. */}
+                  <StatusChip tone="success">
+                    <span title="Identidad verificada por YALO">
+                      ✓ Verificado
+                    </span>
+                  </StatusChip>
                   {provider.public_zone ? (
                     <span className="text-ink/70 text-[13px] font-medium">
                       {provider.public_zone}
@@ -278,16 +313,25 @@ export default async function PublicProviderPage({
                     </svg>
                   </button>
                 </form>
-                <Link
-                  href={
-                    (services?.length ?? 0) > 1 || !services?.[0]?.public_slug
-                      ? `/p/${slug}#servicios`
-                      : `/p/${slug}/${services?.[0]?.public_slug ?? ""}`
-                  }
-                  className="consumer-pressable cta-ink inline-flex min-h-[52px] flex-1 items-center justify-center rounded-2xl px-5 text-[15px] font-extrabold shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
-                >
-                  Contactar
-                </Link>
+                <div className="min-w-0 flex-1">
+                  {fromPrice ? (
+                    <p className="truncate text-sm leading-5">
+                      <span className="text-ink/70 font-medium">desde </span>
+                      <strong className="text-[15px] font-extrabold">
+                        {fromPrice}
+                      </strong>{" "}
+                      <span className="text-ink/70 text-xs">
+                        · se confirma por chat
+                      </span>
+                    </p>
+                  ) : null}
+                  <Link
+                    href={quoteHref}
+                    className="consumer-pressable cta-ink mt-1 inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-5 text-[15px] font-extrabold shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
+                  >
+                    Pedir cotización
+                  </Link>
+                </div>
               </div>
             </div>
           ) : null}
@@ -297,6 +341,29 @@ export default async function PublicProviderPage({
               {provider.bio}
             </p>
           ) : null}
+
+          <div className="mt-8">
+            <ProviderReputation providerSlug={provider.public_slug} />
+          </div>
+          <div className="profile-guarantee border-brand-yellow/35 bg-surface-muted consumer-card mt-5 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
+            <IllustratedBadge
+              tone="green"
+              icon="shield"
+              size="md"
+              label="Contratación protegida"
+            />
+            <div>
+              <p className="text-sm font-extrabold">
+                Contratación protegida
+              </p>
+              {/* Solo lo que la app ya hace: acuerdo por chat, acompañamiento
+                  y reseña pública. Sin pago anticipado ni garantías externas. */}
+              <p className="text-ink/70 mt-1 text-xs leading-6">
+                El precio se acuerda por chat antes de empezar. YALO te
+                acompaña durante el trabajo y la reseña queda pública.
+              </p>
+            </div>
+          </div>
 
           <div className="profile-trust-strip border-brand-yellow/35 bg-surface-muted consumer-card mt-5 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
             <IllustratedBadge
@@ -369,23 +436,28 @@ export default async function PublicProviderPage({
               </button>
             </form>
             {(services?.length ?? 0) > 0 ? (
-              <Link
-                href={
-                  (services?.length ?? 0) > 1 || !services?.[0]?.public_slug
-                    ? `/p/${slug}#servicios`
-                    : `/p/${slug}/${services?.[0]?.public_slug ?? ""}`
-                }
-                className="consumer-pressable cta-ink inline-flex min-h-12 flex-1 items-center justify-center rounded-xl px-5 text-sm font-extrabold shadow-md"
-              >
-                Contactar
-              </Link>
+              <div className="flex-1">
+                {fromPrice ? (
+                  <p className="mb-1 text-sm leading-5">
+                    <span className="text-ink/70 font-medium">desde </span>
+                    <strong className="text-[15px] font-extrabold">
+                      {fromPrice}
+                    </strong>{" "}
+                    <span className="text-ink/70 text-xs">
+                      · se confirma por chat
+                    </span>
+                  </p>
+                ) : null}
+                <Link
+                  href={quoteHref}
+                  className="consumer-pressable cta-ink inline-flex min-h-12 w-full items-center justify-center rounded-xl px-5 text-sm font-extrabold shadow-md"
+                >
+                  Pedir cotización
+                </Link>
+              </div>
             ) : null}
           </div>
         </section>
-
-        <div className="mt-8">
-          <ProviderReputation providerSlug={provider.public_slug} />
-        </div>
 
         <PublicSection
           title="Servicios"
@@ -540,7 +612,6 @@ export default async function PublicProviderPage({
                       width={640}
                       height={360}
                       sizes="(max-width: 640px) 100vw, 640px"
-                      unoptimized
                     />
                   ) : null}
                   <div className="p-4">

@@ -2,11 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 
-import {
-  JobServerError,
-  listMyPastJobs,
-  listMyUpcomingJobs,
-} from "./server";
+import { JobServerError, listMyPastJobs, listMyUpcomingJobs } from "./server";
 
 export type ProviderEarningsSummary = {
   /** Cobros reales: intentos SUCCEEDED no simulados. */
@@ -47,9 +43,7 @@ function normalizeSummaryRow(row: unknown): SummaryNumbers {
     settledCount: toFiniteInt(record.settled_count),
     settledTotal: toFiniteInt(record.settled_total_minor),
     simulatedSettledCount: toFiniteInt(record.simulated_settled_count),
-    simulatedSettledTotal: toFiniteInt(
-      record.simulated_settled_total_minor,
-    ),
+    simulatedSettledTotal: toFiniteInt(record.simulated_settled_total_minor),
     dueCount: toFiniteInt(record.due_count),
     dueTotal: toFiniteInt(record.due_total_minor),
     inProgressCount: toFiniteInt(record.in_progress_count),
@@ -104,9 +98,7 @@ async function readFallbackSummary(): Promise<SummaryNumbers> {
     listMyPastJobs(50).catch(() => []),
     listMyUpcomingJobs(50).catch(() => []),
   ]);
-  const mine = [...past, ...upcoming].filter(
-    (job) => job.is_client === false,
-  );
+  const mine = [...past, ...upcoming].filter((job) => job.is_client === false);
   const settled = mine.filter((job) => job.settlement_status === "SETTLED");
   const due = mine.filter((job) => job.settlement_status === "DUE");
   const inProgress = mine.filter((job) =>

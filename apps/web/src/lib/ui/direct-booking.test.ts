@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  getServiceHireKind,
-  isInstantBookingEligible,
-} from "./direct-booking";
+import { getServiceHireKind, isInstantBookingEligible } from "./direct-booking";
 
 describe("getServiceHireKind", () => {
   it("reserves instantly bookable fixed services directly", () => {
@@ -28,9 +25,21 @@ describe("getServiceHireKind", () => {
 
   it("asks for a quote when the price is not fixed", () => {
     for (const service of [
-      { price_model: "HOURLY", price_amount: 5000, instant_booking_enabled: true },
-      { price_model: "QUOTE", price_amount: null, instant_booking_enabled: false },
-      { price_model: "FIXED", price_amount: null, instant_booking_enabled: true },
+      {
+        price_model: "HOURLY",
+        price_amount: 5000,
+        instant_booking_enabled: true,
+      },
+      {
+        price_model: "QUOTE",
+        price_amount: null,
+        instant_booking_enabled: false,
+      },
+      {
+        price_model: "FIXED",
+        price_amount: null,
+        instant_booking_enabled: true,
+      },
     ]) {
       expect(getServiceHireKind(service)).toBe("QUOTE_REQUEST");
     }

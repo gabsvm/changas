@@ -31,7 +31,12 @@ export default async function AccountProfilePage() {
       <MobileAppBar title="Perfil público" backHref="/account" />
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <header className="mb-6 flex items-center gap-3">
-          <IllustratedBadge tone="violet" icon="user" size="md" label="Perfil público" />
+          <IllustratedBadge
+            tone="violet"
+            icon="user"
+            size="md"
+            label="Perfil público"
+          />
           <div>
             <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
               Perfil público

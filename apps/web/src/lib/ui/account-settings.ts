@@ -67,8 +67,7 @@ export const NOTIFICATION_PREFERENCE_GROUPS: PreferenceGroupConfig[] = [
       {
         name: "promotionalEnabled",
         title: "Promociones",
-        description:
-          "Consejos y novedades de YALO, solo si querés recibirlos.",
+        description: "Consejos y novedades de YALO, solo si querés recibirlos.",
       },
     ],
   },

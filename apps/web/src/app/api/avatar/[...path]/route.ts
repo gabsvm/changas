@@ -40,7 +40,9 @@ export async function GET(
 
   return new Response(data, {
     headers: {
-      "Cache-Control": "no-store",
+      // Caché privada de navegador: repetidas vistas no pegan a Storage,
+      // pero ninguna CDN comparte la foto tras un cambio/borrado de avatar.
+      "Cache-Control": "private, max-age=86400, stale-while-revalidate=604800",
       "Content-Type": data.type || "image/jpeg",
       "X-Content-Type-Options": "nosniff",
     },

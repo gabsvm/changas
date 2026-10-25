@@ -1,5 +1,6 @@
 ﻿import Image from "next/image";
 import Link from "next/link";
+import { Suspense, cache } from "react";
 import "./yalo-showcase.css";
 import "./yalo-category-photography.css";
 import type { Metadata } from "next";
@@ -13,6 +14,7 @@ import { ActionArrowIcon } from "@/components/ui/marketplace/action-arrow-icon";
 import { HowItWorks } from "@/components/ui/marketplace/how-it-works";
 import { MagneticRibbons } from "@/components/ui/marketplace/magnetic-ribbons";
 import { NearbyServiceRail } from "@/components/ui/marketplace/nearby-service-rail";
+import { TrustStrip } from "@/components/ui/marketplace/trust-strip";
 import { SearchField } from "@/components/ui/marketplace/search-field";
 import { SiteFooter } from "@/components/ui/site-footer";
 import { isExcludedPublicTestCategory } from "@/lib/public-catalog";
@@ -54,59 +56,164 @@ const benefits = [
   },
 ] as const;
 
+// Todo lo que depende de la sesión vive en componentes async detrás de
+// <Suspense>: el catálogo público (categorías + discovery) no espera a
+// getUser / perfil / trabajos. cache() deduplica getUser entre ellos.
+const getHomeUser = cache(async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+});
+
+async function HomeNavigation() {
+  const user = await getHomeUser();
+  let accountName = "Tu cuenta";
+  if (user) {
+    const supabase = await createClient();
+    const { data: greetingProfile } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .maybeSingle();
+    accountName =
+      greetingProfile?.display_name?.trim().split(/\s+/)[0] ||
+      user.email?.split("@")[0] ||
+      "Tu cuenta";
+  }
+
+  return (
+    <>
+      <div className="yalo-desktop-navigation">
+        <DesktopNav authenticated={Boolean(user)} />
+      </div>
+      <div className="yalo-nav-actions">
+        {user ? (
+          <Link className="yalo-nav-login" href="/account">
+            Hola, {accountName}
+          </Link>
+        ) : (
+          <Link className="yalo-nav-login" href="/login">
+            Ingresar
+          </Link>
+        )}
+        <Link
+          className="yalo-nav-primary"
+          href={user ? "/provider/manage" : "/provider/onboarding"}
+        >
+          Ofrecer mis servicios{" "}
+          <span aria-hidden="true">
+            <ActionArrowIcon />
+          </span>
+        </Link>
+      </div>
+      <Link className="yalo-nav-mobile" href={user ? "/account" : "/login"}>
+        {user ? "Mi cuenta" : "Ingresar"}{" "}
+        <span aria-hidden="true">
+          <ActionArrowIcon />
+        </span>
+      </Link>
+    </>
+  );
+}
+
+function HomeNavigationSkeleton() {
+  return (
+    <>
+      <div className="yalo-desktop-navigation" aria-hidden="true">
+        <span className="h-9 w-64 animate-pulse rounded-full bg-white/10" />
+      </div>
+      <div className="yalo-nav-actions" aria-hidden="true">
+        <span className="h-12 w-56 animate-pulse rounded-full bg-white/10" />
+      </div>
+      <span
+        className="yalo-nav-mobile min-w-28 animate-pulse bg-white/10! bg-none!"
+        aria-hidden="true"
+      />
+    </>
+  );
+}
+
+async function HomeLiveJob() {
+  const user = await getHomeUser();
+  if (!user) return null;
+
+  let activeJobs: UpcomingJob[] = [];
+  try {
+    activeJobs = (await listMyUpcomingJobs(5)).filter(
+      (job) => !JOB_TERMINAL_STATUSES.includes(job.job_status),
+    );
+  } catch {
+    activeJobs = [];
+  }
+
+  const heroJob = activeJobs[0] ?? null;
+  if (!heroJob) return null;
+  const heroTracking = getJobTracking(heroJob.job_status, null);
+  const heroStatus = getJobStatusPresentation(heroJob.job_status);
+  if (!heroTracking || !heroStatus) return null;
+
+  return (
+    <Link
+      href={"/jobs/" + heroJob.job_id}
+      className="yalo-live-job"
+      aria-label={
+        "Servicio en marcha: " +
+        heroJob.service_title +
+        ". Ver seguimiento."
+      }
+    >
+      <span className="yalo-live-pulse" aria-hidden="true" />
+      <span className="min-w-0 flex-1">
+        <strong>
+          {activeJobs.length > 1
+            ? "Tenés " + activeJobs.length + " servicios en marcha"
+            : "Tenés un servicio en marcha"}
+        </strong>
+        <small>
+          {heroJob.service_title} · {heroStatus.label}
+        </small>
+      </span>
+      <span className="yalo-live-link">
+        Ver seguimiento <ActionArrowIcon />
+      </span>
+    </Link>
+  );
+}
+
+async function HomeExampleServices() {
+  const user = await getHomeUser();
+  return (
+    <ExampleServices
+      publishHref={
+        user ? "/provider/onboarding" : "/login?next=/provider/onboarding"
+      }
+    />
+  );
+}
+
+async function HomeBottomNav() {
+  const user = await getHomeUser();
+  return <BottomNav authenticated={Boolean(user)} />;
+}
+
 export default async function HomePage() {
   const filters = parseDiscoveryFilters({ pageSize: "6" });
   const supabase = await createClient();
-  const [
-    {
-      data: { user },
-    },
-    { data: categories, error: categoriesError },
-    discovery,
-  ] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase
-      .from("categories")
-      .select("slug, name, description")
-      .eq("is_active", true)
-      .order("sort_order"),
-    searchDiscovery({ query: "", filters }),
-  ]);
-
-  const { data: greetingProfile } = user
-    ? await supabase
-        .from("profiles")
-        .select("display_name")
-        .eq("id", user.id)
-        .maybeSingle()
-    : { data: null };
-
-  const accountName =
-    greetingProfile?.display_name?.trim().split(/\s+/)[0] ||
-    user?.email?.split("@")[0] ||
-    "Tu cuenta";
+  const [{ data: categories, error: categoriesError }, discovery] =
+    await Promise.all([
+      supabase
+        .from("categories")
+        .select("slug, name, description")
+        .eq("is_active", true)
+        .order("sort_order"),
+      searchDiscovery({ query: "", filters }),
+    ]);
 
   const visibleCategories = (categories ?? [])
     .filter((category) => !isExcludedPublicTestCategory(category))
     .slice(0, 8);
-  let activeJobs: UpcomingJob[] = [];
-  if (user) {
-    try {
-      activeJobs = (await listMyUpcomingJobs(5)).filter(
-        (job) => !JOB_TERMINAL_STATUSES.includes(job.job_status),
-      );
-    } catch {
-      activeJobs = [];
-    }
-  }
-
-  const heroJob = activeJobs[0] ?? null;
-  const heroTracking = heroJob
-    ? getJobTracking(heroJob.job_status, null)
-    : null;
-  const heroStatus = heroJob
-    ? getJobStatusPresentation(heroJob.job_status)
-    : null;
 
   return (
     <main id="main-content" className="yalo-showcase mobile-content-with-nav">
@@ -131,63 +238,14 @@ export default async function HomePage() {
               aria-hidden="true"
             />
           </Link>
-          <div className="yalo-desktop-navigation">
-            <DesktopNav authenticated={Boolean(user)} />
-          </div>
-          <div className="yalo-nav-actions">
-            {user ? (
-              <Link className="yalo-nav-login" href="/account">
-                Hola, {accountName}
-              </Link>
-            ) : (
-              <Link className="yalo-nav-login" href="/login">
-                Ingresar
-              </Link>
-            )}
-            <Link
-              className="yalo-nav-primary"
-              href={user ? "/provider/manage" : "/provider/onboarding"}
-            >
-              Ofrecer mis servicios{" "}
-              <span aria-hidden="true">
-                <ActionArrowIcon />
-              </span>
-            </Link>
-          </div>
-          <Link className="yalo-nav-mobile" href={user ? "/account" : "/login"}>
-            {user ? "Mi cuenta" : "Ingresar"}{" "}
-            <span aria-hidden="true">
-              <ActionArrowIcon />
-            </span>
-          </Link>
+          <Suspense fallback={<HomeNavigationSkeleton />}>
+            <HomeNavigation />
+          </Suspense>
         </header>
 
-        {heroJob && heroTracking && heroStatus ? (
-          <Link
-            href={"/jobs/" + heroJob.job_id}
-            className="yalo-live-job"
-            aria-label={
-              "Servicio en marcha: " +
-              heroJob.service_title +
-              ". Ver seguimiento."
-            }
-          >
-            <span className="yalo-live-pulse" aria-hidden="true" />
-            <span className="min-w-0 flex-1">
-              <strong>
-                {activeJobs.length > 1
-                  ? "Tenés " + activeJobs.length + " servicios en marcha"
-                  : "Tenés un servicio en marcha"}
-              </strong>
-              <small>
-                {heroJob.service_title} · {heroStatus.label}
-              </small>
-            </span>
-            <span className="yalo-live-link">
-              Ver seguimiento <ActionArrowIcon />
-            </span>
-          </Link>
-        ) : null}
+        <Suspense fallback={null}>
+          <HomeLiveJob />
+        </Suspense>
 
         <section className="yalo-stage" aria-labelledby="home-search-title">
           <div className="yalo-stage-backdrop" aria-hidden="true">
@@ -198,91 +256,20 @@ export default async function HomePage() {
           <div className="yalo-stage-copy">
             <div className="yalo-hero-eyebrow">
               <span className="yalo-eyebrow-spark" aria-hidden="true" />
-              TRABAJÁ · CONTRATÁ · CRECÉ
+              CONTRATÁ CON CONFIANZA
               <span className="yalo-eyebrow-arrow" aria-hidden="true">
                 ✦
               </span>
             </div>
             <h1 id="home-search-title" className="yalo-stage-title">
               Lo que necesitás.
-              <span>Alguien que sabe hacerlo.</span>
+              <span>Alguien verificado que lo haga.</span>
             </h1>
             <p className="yalo-stage-description">
-              ¿Necesitás resolver algo o querés ofrecer lo que sabés hacer?
-              Elegí cómo empezar.
+              Contratá por chat, acordá el precio y calificá al final. Sin
+              vueltas.
             </p>
 
-            <nav
-              className="yalo-intent"
-              aria-label="Elegí qué querés hacer en YALO"
-            >
-              <div className="yalo-intent-actions">
-                <Link
-                  href="/buscar"
-                  className="yalo-intent-link yalo-intent-hire"
-                >
-                  <span className="yalo-intent-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="23" height="23" fill="none">
-                      <circle
-                        cx="10.7"
-                        cy="10.7"
-                        r="6.3"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      />
-                      <path
-                        d="m15.5 15.5 4.6 4.6"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </span>
-                  <span className="yalo-intent-text">
-                    <strong>Quiero contratar</strong>
-                    <span>Encontrar alguien que me ayude</span>
-                  </span>
-                  <span className="yalo-intent-arrow" aria-hidden="true">
-                    <ActionArrowIcon />
-                  </span>
-                </Link>
-                <Link
-                  href="/provider/onboarding"
-                  className="yalo-intent-link yalo-intent-work"
-                >
-                  <span className="yalo-intent-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="23" height="23" fill="none">
-                      <rect
-                        x="3"
-                        y="7"
-                        width="18"
-                        height="13"
-                        rx="2.5"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                      />
-                      <path
-                        d="M9 7V5.5C9 4.7 9.7 4 10.5 4h3c.8 0 1.5.7 1.5 1.5V7M3 12.5c5.4 3.6 12.6 3.6 18 0"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </span>
-                  <span className="yalo-intent-text">
-                    <strong>Quiero trabajar</strong>
-                    <span>Ofrecer mis servicios</span>
-                  </span>
-                  <span className="yalo-intent-arrow" aria-hidden="true">
-                    <ActionArrowIcon />
-                  </span>
-                </Link>
-              </div>
-            </nav>
-
-            <p className="yalo-hero-search-caption">
-              ¿Ya sabés qué necesitás? Buscá directamente
-            </p>
             <form
               action="/buscar"
               role="search"
@@ -296,12 +283,22 @@ export default async function HomePage() {
                 aria-label="Buscar un servicio o habilidad"
               />
               <button className="yalo-search-submit" type="submit">
-                Buscar{" "}
+                Buscar servicios{" "}
                 <span aria-hidden="true">
                   <ActionArrowIcon />
                 </span>
               </button>
             </form>
+
+            <p className="yalo-hero-offer">
+              ¿Sos profesional?{" "}
+              <Link href="/provider/onboarding">
+                Ofrecer mis servicios{" "}
+                <span aria-hidden="true">
+                  <ActionArrowIcon />
+                </span>
+              </Link>
+            </p>
 
             <div
               className="yalo-hero-shortcuts"
@@ -338,23 +335,13 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section
-          className="yalo-confidence-bar"
-          aria-label="Por qué elegir YALO"
-        >
-          <span>
-            <span className="yalo-confidence-icon">✓</span> Perfiles con
-            identidad verificada
-          </span>
-          <span>
-            <span className="yalo-confidence-icon">✓</span> Conversá sin
-            intermediarios
-          </span>
-          <span>
-            <span className="yalo-confidence-icon">✦</span> Reseñas de trabajos
-            reales
-          </span>
-        </section>
+        <TrustStrip
+          items={[
+            { label: "Identidad verificada" },
+            { label: "Precio acordado por chat" },
+            { label: "Reseñas de trabajos reales" },
+          ]}
+        />
 
         <section
           className="yalo-home-section yalo-category-section"
@@ -456,13 +443,13 @@ export default async function HomePage() {
                 actionHref="/buscar"
               />
             ) : (
-              <ExampleServices
-                publishHref={
-                  user
-                    ? "/provider/onboarding"
-                    : "/login?next=/provider/onboarding"
+              <Suspense
+                fallback={
+                  <ExampleServices publishHref="/login?next=/provider/onboarding" />
                 }
-              />
+              >
+                <HomeExampleServices />
+              </Suspense>
             )}
           </div>
         </section>
@@ -503,7 +490,9 @@ export default async function HomePage() {
         <SiteFooter className="yalo-showcase-footer" />
       </div>
       <div className="yalo-mobile-bottom-nav">
-        <BottomNav authenticated={Boolean(user)} />
+        <Suspense fallback={<BottomNav authenticated={false} />}>
+          <HomeBottomNav />
+        </Suspense>
       </div>
     </main>
   );

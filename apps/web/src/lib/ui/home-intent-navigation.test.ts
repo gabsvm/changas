@@ -6,26 +6,29 @@ const read = (relative: string) =>
 const home = read("../../app/page.tsx");
 const styles = read("../../app/yalo-showcase.css");
 
-describe("home: obvious hire or work entrypoints", () => {
-  it("shows both user intents in the hero before search and discovery", () => {
+describe("home: single primary search with a discrete work entrypoint", () => {
+  it("shows one primary search before shortcuts and keeps work secondary", () => {
     const stage = home.indexOf('className="yalo-stage"');
-    const choices = home.indexOf('className="yalo-intent"');
     const search = home.indexOf('className="yalo-hero-search"');
-    const categories = home.indexOf('className="yalo-home-section yalo-category-section"');
+    const offer = home.indexOf('className="yalo-hero-offer"');
+    const shortcuts = home.indexOf('className="yalo-hero-shortcuts"');
+    const categories = home.indexOf(
+      'className="yalo-home-section yalo-category-section"',
+    );
     // Classes can share a longer className expression; compare section markers instead.
     expect(stage).toBeGreaterThan(-1);
-    expect(choices).toBeGreaterThan(stage);
-    expect(search).toBeGreaterThan(choices);
-    expect(categories).toBeGreaterThan(search);
-    expect((home.match(/Quiero contratar/g) ?? [])).toHaveLength(1);
-    expect((home.match(/Quiero trabajar/g) ?? [])).toHaveLength(1);
+    expect(search).toBeGreaterThan(stage);
+    expect(offer).toBeGreaterThan(search);
+    expect(shortcuts).toBeGreaterThan(offer);
+    expect(categories).toBeGreaterThan(shortcuts);
+    expect(home).not.toContain("Quiero contratar");
+    expect(home).not.toContain("Quiero trabajar");
     expect(home).not.toContain("yalo-final-cta");
   });
 
   it("preserves clear navigation to discovery and provider onboarding", () => {
-    expect(home).toMatch(/<Link\s+href="\/buscar"\s+className="yalo-intent-link yalo-intent-hire"/);
-    expect(home).toMatch(/href="\/provider\/onboarding"\s+className="yalo-intent-link yalo-intent-work"/);
-    expect(home).toContain('aria-label="Elegí qué querés hacer en YALO"');
+    expect(home).toContain('href="/provider/onboarding"');
+    expect(home).toContain("Ofrecer mis servicios");
     expect(home).toContain('action="/buscar"');
     expect(home).toContain('name="q"');
   });
@@ -34,7 +37,9 @@ describe("home: obvious hire or work entrypoints", () => {
     expect(styles).toContain(".yalo-intent-link {");
     expect(styles).toContain("min-height: 90px;");
     expect(styles).toContain("min-height: 70px;");
-    expect(styles).toMatch(/\.yalo-intent-actions\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\);/);
+    expect(styles).toMatch(
+      /\.yalo-intent-actions\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\);/,
+    );
     expect(styles).not.toContain(".yalo-final-cta");
   });
 

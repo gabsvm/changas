@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import type * as JobsServer from "./server";
 
-
 vi.mock("server-only", () => ({}));
 
 const mocks = vi.hoisted(() => ({

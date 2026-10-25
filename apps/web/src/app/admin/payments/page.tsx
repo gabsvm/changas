@@ -146,7 +146,7 @@ export default async function AdminPaymentsPage() {
                   </div>
                   <div className="border-ink/[0.08] bg-surface rounded-2xl border p-3">
                     <dt className="text-ink/60 text-[11px] font-bold">
-                      Comisión Changas
+                      Comisión YALO
                     </dt>
                     <dd className="text-ink mt-1 font-extrabold">
                       {money(payment.marketplaceFeeMinor)}

@@ -148,7 +148,9 @@ export async function updatePrivateIdentity(
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Revisá los datos privados." };
+    return {
+      error: parsed.error.issues[0]?.message ?? "Revisá los datos privados.",
+    };
   }
 
   const { supabase, user } = await getAuthenticatedUser();

@@ -46,7 +46,7 @@ function DimensionSelect({ name, label }: { name: string; label: string }) {
       <select
         name={name}
         defaultValue=""
-        className="border-ink/10 bg-surface mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+        className="border-ink/10 bg-surface focus-visible:ring-moss/45 mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none focus-visible:ring-2 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
       >
         <option value="">Sin elegir (opcional)</option>
         {[5, 4, 3, 2, 1].map((value) => (
@@ -83,7 +83,8 @@ export async function JobReputationPanel({
   // COMPLETED sin SETTLED está permitido (el SQL lo acepta).
   const settlementStatus =
     isProvider && !state.review_id
-      ? (await getJobDetail(jobId).catch(() => null))?.settlement_status ?? null
+      ? ((await getJobDetail(jobId).catch(() => null))?.settlement_status ??
+        null)
       : null;
   const showReviewRequest = settlementStatus === "SETTLED";
 
@@ -109,7 +110,9 @@ export async function JobReputationPanel({
           </p>
           {state.review_id && state.rating ? (
             <p className="mt-2">
-              <StatusChip tone="success">Reseña verificada de este trabajo</StatusChip>
+              <StatusChip tone="success">
+                Reseña verificada de este trabajo
+              </StatusChip>
             </p>
           ) : null}
         </div>
@@ -150,7 +153,7 @@ export async function JobReputationPanel({
               required
               defaultValue=""
               aria-describedby="rating-hint"
-              className="border-ink/10 bg-surface mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none sm:max-w-xs dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+              className="border-ink/10 bg-surface focus-visible:ring-moss/45 mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none focus-visible:ring-2 sm:max-w-xs dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
             >
               <option value="" disabled>
                 Elegí una calificación
@@ -163,8 +166,8 @@ export async function JobReputationPanel({
             </select>
           </label>
           <p id="rating-hint" className="text-ink/70 -mt-2 text-xs leading-5">
-            Tenés que elegir las estrellas para publicar: sin calificación no
-            se envía la reseña.
+            Tenés que elegir las estrellas para publicar: sin calificación no se
+            envía la reseña.
           </p>
           <div className="grid gap-3 sm:grid-cols-3">
             <DimensionSelect name="qualityRating" label="Calidad" />
@@ -177,7 +180,7 @@ export async function JobReputationPanel({
               name="reviewText"
               rows={4}
               maxLength={2000}
-              className="border-ink/10 bg-surface mt-1 block w-full rounded-2xl border px-4 py-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+              className="border-ink/10 bg-surface focus-visible:ring-moss/45 mt-1 block w-full rounded-2xl border px-4 py-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none focus-visible:ring-2 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
               placeholder="Contá cómo fue el trabajo"
             />
           </label>
@@ -192,8 +195,16 @@ export async function JobReputationPanel({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="flex items-center gap-2">
-                <IllustratedBadge tone="gold" icon="star" size="sm" label={`${state.rating} de 5 estrellas`} />
-                <StarRow value={state.rating} label={`${state.rating} de 5 estrellas`} />
+                <IllustratedBadge
+                  tone="gold"
+                  icon="star"
+                  size="sm"
+                  label={`${state.rating} de 5 estrellas`}
+                />
+                <StarRow
+                  value={state.rating}
+                  label={`${state.rating} de 5 estrellas`}
+                />
               </p>
               <p className="text-ink/70 mt-1 text-xs">
                 Reseña verificada de este trabajo
@@ -238,7 +249,7 @@ export async function JobReputationPanel({
                     required
                     defaultValue={state.provider_reply ?? ""}
                     rows={3}
-                    className="border-ink/10 bg-surface mt-1 block w-full rounded-xl border px-3 py-2 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+                    className="border-ink/10 bg-surface focus-visible:ring-moss/45 mt-1 block w-full rounded-xl border px-3 py-2 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none focus-visible:ring-2 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
                   />
                 </label>
                 <button className="button-secondary w-fit" type="submit">
@@ -261,7 +272,7 @@ export async function JobReputationPanel({
                     <select
                       name="reason"
                       defaultValue="OTHER"
-                      className="border-ink/10 bg-surface mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+                      className="border-ink/10 bg-surface focus-visible:ring-moss/45 mt-1 block h-11 w-full rounded-xl border px-3 font-normal shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none focus-visible:ring-2 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
                     >
                       <option value="IRRELEVANT_CONTENT">
                         Contenido irrelevante
@@ -281,7 +292,8 @@ export async function JobReputationPanel({
                     name="details"
                     rows={2}
                     maxLength={1000}
-                    className="border-ink/10 bg-surface rounded-xl border px-3 py-2 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+                    className="border-ink/10 bg-surface focus-visible:ring-moss/45 rounded-xl border px-3 py-2 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] outline-none focus-visible:ring-2 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+                    aria-label="Detalle opcional del reporte"
                     placeholder="Detalle opcional"
                   />
                   <button className="button-secondary w-fit" type="submit">

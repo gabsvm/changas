@@ -347,9 +347,6 @@
 .yalo-ui textarea {
   min-width: 0;
 }
-.yalo-ui .brand-hero-panel {
-  border-radius: 20px;
-}
 .yalo-ui .yalo-bottom-sheet {
   border-radius: 24px 24px 0 0;
   box-shadow: 0 -22px 60px rgb(0 0 0 / 31%);

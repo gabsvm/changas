@@ -183,7 +183,12 @@ export default async function ProviderOnboardingReviewPage() {
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
-            <IllustratedBadge tone="gold" icon="check" size="md" label="Paso 4 de 4" />
+            <IllustratedBadge
+              tone="gold"
+              icon="check"
+              size="md"
+              label="Paso 4 de 4"
+            />
             <div className="min-w-0">
               <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
                 Paso 4 de 4
@@ -238,8 +243,15 @@ export default async function ProviderOnboardingReviewPage() {
 
         <section className="mt-6" aria-label="Lo que cargaste">
           <div className="flex min-w-0 items-center gap-2.5">
-            <IllustratedBadge tone="violet" icon="user" size="sm" label="Lo que cargaste" />
-            <h2 className="font-display min-w-0 flex-1 truncate text-lg leading-7 font-bold">Lo que cargaste</h2>
+            <IllustratedBadge
+              tone="violet"
+              icon="user"
+              size="sm"
+              label="Lo que cargaste"
+            />
+            <h2 className="font-display min-w-0 flex-1 truncate text-lg leading-7 font-bold">
+              Lo que cargaste
+            </h2>
           </div>
           <details className="border-ink/10 mt-3 border-y">
             <summary className="consumer-pressable flex min-h-14 cursor-pointer items-center justify-between gap-3 py-3 text-sm font-bold">
@@ -331,55 +343,72 @@ export default async function ProviderOnboardingReviewPage() {
             aria-hidden="true"
           />
           <div className="p-4">
-          <span className="flex items-center gap-2">
-            <IllustratedBadge tone="gold" icon="shield" size="sm" label={stateTitle} />
-            <StatusChip tone={stateTone}>{stateTitle}</StatusChip>
-          </span>
-          <p className="text-ink/70 mt-2 text-sm leading-6">
-            {pendingReview
-              ? "Un administrador puede revisar ahora la evidencia privada y decidir el estado del perfil."
-              : approved
-                ? "No necesitás volver a enviar documentación desde este flujo."
-                : rejected
-                  ? "La documentación se conserva. Corregí lo observado y reenviala desde Documentos para una nueva revisión."
-                  : readyForSubmission
-                    ? "Tocá “Enviar a revisión” acá abajo para entrar en revisión."
-                    : "Completá los elementos marcados como Revisar antes de enviar."}
-          </p>
-          {rejected && rejectionReason ? (
-            <div className="border-danger/25 bg-danger/[0.04] mt-3 rounded-2xl border p-4">
-              <p className="text-sm font-extrabold">Motivo del rechazo</p>
-              <p className="text-ink/70 mt-1 text-sm leading-6">{rejectionReason}</p>
-            </div>
-          ) : null}
-          {editable && readyForSubmission && !pendingReview && !approved ? (
-            <div className="mt-3">
-              <p className="text-ink/70 mb-2 text-xs leading-5">
-                Al enviar, la evidencia entra en la cola administrativa de revisión.
-              </p>
-              <OnboardingAdvanceForm
-                action={submitProviderIdentityReview}
-                nextStep={4}
-                nextHref="/provider/onboarding/review"
-                label={rejected ? "Corregir y reenviar" : "Enviar a revisión"}
+            <span className="flex items-center gap-2">
+              <IllustratedBadge
+                tone="gold"
+                icon="shield"
+                size="sm"
+                label={stateTitle}
               />
-            </div>
-          ) : null}
-          {!pendingReview && !approved && !(editable && readyForSubmission) ? (
-            <Link
-              className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
-              href="/provider/onboarding/documents"
-            >
-              {rejected ? "Corregir y reenviar" : "Ir a documentos"}
-            </Link>
-          ) : null}
+              <StatusChip tone={stateTone}>{stateTitle}</StatusChip>
+            </span>
+            <p className="text-ink/70 mt-2 text-sm leading-6">
+              {pendingReview
+                ? "Un administrador puede revisar ahora la evidencia privada y decidir el estado del perfil."
+                : approved
+                  ? "No necesitás volver a enviar documentación desde este flujo."
+                  : rejected
+                    ? "La documentación se conserva. Corregí lo observado y reenviala desde Documentos para una nueva revisión."
+                    : readyForSubmission
+                      ? "Tocá “Enviar a revisión” acá abajo para entrar en revisión."
+                      : "Completá los elementos marcados como Revisar antes de enviar."}
+            </p>
+            {rejected && rejectionReason ? (
+              <div className="border-danger/25 bg-danger/[0.04] mt-3 rounded-2xl border p-4">
+                <p className="text-sm font-extrabold">Motivo del rechazo</p>
+                <p className="text-ink/70 mt-1 text-sm leading-6">
+                  {rejectionReason}
+                </p>
+              </div>
+            ) : null}
+            {editable && readyForSubmission && !pendingReview && !approved ? (
+              <div className="mt-3">
+                <p className="text-ink/70 mb-2 text-xs leading-5">
+                  Al enviar, la evidencia entra en la cola administrativa de
+                  revisión.
+                </p>
+                <OnboardingAdvanceForm
+                  action={submitProviderIdentityReview}
+                  nextStep={4}
+                  nextHref="/provider/onboarding/review"
+                  label={rejected ? "Corregir y reenviar" : "Enviar a revisión"}
+                />
+              </div>
+            ) : null}
+            {!pendingReview &&
+            !approved &&
+            !(editable && readyForSubmission) ? (
+              <Link
+                className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
+                href="/provider/onboarding/documents"
+              >
+                {rejected ? "Corregir y reenviar" : "Ir a documentos"}
+              </Link>
+            ) : null}
           </div>
         </div>
 
         <section className="mt-6">
           <div className="flex min-w-0 items-center gap-2.5">
-            <IllustratedBadge tone="green" icon="id" size="sm" label="Archivos recibidos" />
-            <h2 className="font-display min-w-0 flex-1 truncate text-lg font-bold">Archivos recibidos</h2>
+            <IllustratedBadge
+              tone="green"
+              icon="id"
+              size="sm"
+              label="Archivos recibidos"
+            />
+            <h2 className="font-display min-w-0 flex-1 truncate text-lg font-bold">
+              Archivos recibidos
+            </h2>
             <span className="text-ink/70 shrink-0 text-xs font-semibold">
               {receivedDocuments.length}
             </span>
