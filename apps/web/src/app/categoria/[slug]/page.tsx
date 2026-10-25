@@ -14,6 +14,7 @@ import { DiscoveryResults } from "@/components/discovery/discovery-results";
 import { AppHeader } from "@/components/ui/marketplace/app-header";
 import { SearchField } from "@/components/ui/marketplace/search-field";
 import { searchDiscovery } from "@/lib/discovery/server";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { createClient } from "@/lib/supabase/server";
 import { isExcludedPublicTestCategory } from "@/lib/public-catalog";
 
@@ -254,6 +255,7 @@ export default async function CategoryPage({
               initialRows={rows}
               query={query}
               filters={filters}
+              needsEnabled={arePublicNeedsEnabled()}
             />
           </div>
         </section>

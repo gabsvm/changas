@@ -119,6 +119,21 @@ export function ProposalCard({
   );
   const router = useRouter();
   const [confirmingHire, setConfirmingHire] = useState(false);
+  // Abre el composer de la conversación (#nueva-propuesta, mismo mecanismo
+  // que el hilo): lo despliega, lo lleva a la vista y enfoca el alcance.
+  function openNewQuoteComposer() {
+    const composer = document.getElementById("nueva-propuesta");
+    if (!(composer instanceof HTMLElement)) return;
+    if (composer instanceof HTMLDetailsElement) composer.open = true;
+    composer.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.requestAnimationFrame(() => {
+      composer
+        .querySelector<HTMLInputElement | HTMLTextAreaElement>(
+          'textarea[name="scope"], input[name="price"]',
+        )
+        ?.focus({ preventScroll: true });
+    });
+  }
   const priced = proposal.price_amount !== null;
   const canAccept =
     priced &&
@@ -277,6 +292,14 @@ export function ProposalCard({
             {respondState.message}
           </p>
         ) : null}
+        {respondState.status === "SUCCESS" && respondState.jobId ? (
+          <Link
+            href={`/jobs/${respondState.jobId}`}
+            className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+          >
+            Ver seguimiento del servicio
+          </Link>
+        ) : null}
 
         {proposal.proposal_status === "OPEN" ? (
           <div className="mt-4 grid gap-2">
@@ -413,6 +436,30 @@ export function ProposalCard({
               Podés ajustar los términos y enviar una nueva propuesta en esta
               misma conversación.
             </p>
+            <button
+              type="button"
+              onClick={openNewQuoteComposer}
+              className="consumer-pressable border-ink/[0.1] mt-2.5 inline-flex min-h-12 w-full items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold dark:bg-white/[0.06]"
+            >
+              Pedir nueva cotización
+            </button>
+          </div>
+        ) : null}
+
+        {proposal.proposal_status === "EXPIRED" ? (
+          <div className="border-ink/[0.08] bg-ink/[0.03] mt-4 rounded-xl border px-3 py-2.5 text-sm leading-6 dark:bg-white/[0.04]">
+            <p>Esta propuesta venció y ya no se puede responder.</p>
+            <p className="text-ink/70 mt-1 text-[13px]">
+              Pedí una nueva cotización para retomar la conversación con
+              términos actualizados.
+            </p>
+            <button
+              type="button"
+              onClick={openNewQuoteComposer}
+              className="consumer-pressable border-ink/[0.1] mt-2.5 inline-flex min-h-12 w-full items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold dark:bg-white/[0.06]"
+            >
+              Pedir nueva cotización
+            </button>
           </div>
         ) : null}
 

@@ -46,6 +46,9 @@ export default async function NewNeedPage() {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
       <MobileAppBar title="Publicar necesidad" backHref="/jobs" />
+      <h1 className="mt-5 hidden text-[24px] leading-8 font-extrabold tracking-[-0.03em] sm:block">
+        Publicar necesidad
+      </h1>
       <p className="text-ink/70 mt-2 text-[15px] leading-6">
         Contanos qué necesitás y compará las cotizaciones. El pago se acuerda
         por fuera de YALO; contratar no implica un adelanto.

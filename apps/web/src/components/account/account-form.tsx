@@ -62,11 +62,14 @@ export function PublicProfileForm({
   initialValues,
   submitLabel = "Guardar cambios",
   hiddenFields,
+  requireReviewFields = false,
 }: {
   action: AccountAction;
   initialValues: PublicProfileInitialValues;
   submitLabel?: string;
   hiddenFields?: HiddenFields;
+  /** Pasos 1-2 del onboarding: exige zona y presentación (lo que Revisión controla). */
+  requireReviewFields?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(
     action,
@@ -95,15 +98,21 @@ export function PublicProfileForm({
 
       <FormField
         label="Zona aproximada"
-        helper="Tu domicilio exacto nunca se publica."
+        helper={
+          requireReviewFields
+            ? "Tu domicilio exacto nunca se publica. La zona es obligatoria para pasar la revisión."
+            : "Tu domicilio exacto nunca se publica."
+        }
       >
         <input
           className={marketplaceInputClass}
           name="publicZone"
           defaultValue={initialValues.publicZone}
           maxLength={120}
+          minLength={2}
           placeholder="Ej. Palermo, CABA"
           autoComplete="address-level2"
+          required={requireReviewFields}
         />
       </FormField>
 
@@ -111,7 +120,11 @@ export function PublicProfileForm({
         label="Presentación"
         helper={
           <span className="flex items-start justify-between gap-4">
-            <span>Contá en pocas líneas qué hacés y cómo trabajás.</span>
+            <span>
+              {requireReviewFields
+                ? "Contá en pocas líneas qué hacés y cómo trabajás. Es obligatoria para pasar la revisión."
+                : "Contá en pocas líneas qué hacés y cómo trabajás."}
+            </span>
             <span className="shrink-0">{bioLength}/1000</span>
           </span>
         }
@@ -122,7 +135,8 @@ export function PublicProfileForm({
           defaultValue={initialValues.bio}
           maxLength={1000}
           placeholder="Ej. Trabajo con instalaciones eléctricas domiciliarias…"
-          onChange={(event) => setBioLength(event.currentTarget.value.length)}
+          onChange={(event) => setBioLength(event.target.value.length)}
+          required={requireReviewFields}
         />
       </FormField>
 
@@ -169,38 +183,55 @@ export function PrivateIdentityForm({
     <form action={formAction} className="space-y-5">
       <HiddenFormFields fields={hiddenFields} />
 
-      <FormField label="Nombre legal">
+      <FormField
+        label="Nombre legal"
+        helper="Tiene que coincidir con tu DNI. Lo pedimos para verificar tu identidad."
+      >
         <input
           className={marketplaceInputClass}
           name="legalName"
           defaultValue={initialValues.legalName}
           maxLength={160}
+          minLength={2}
           autoComplete="name"
+          required
         />
       </FormField>
 
-      <FormField label="Teléfono privado">
+      <FormField
+        label="Teléfono privado"
+        helper="Solo lo usamos para contactarte por la verificación. Lo pedimos para verificar tu identidad."
+      >
         <input
           className={marketplaceInputClass}
           name="privatePhone"
           defaultValue={initialValues.privatePhone}
           maxLength={40}
+          minLength={6}
           autoComplete="tel"
           inputMode="tel"
+          required
         />
       </FormField>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <FormField label="Fecha de nacimiento">
+        <FormField
+          label="Fecha de nacimiento"
+          helper="Lo pedimos para verificar tu identidad."
+        >
           <input
             className={marketplaceInputClass}
             name="dateOfBirth"
             type="date"
             defaultValue={initialValues.dateOfBirth}
             autoComplete="bday"
+            required
           />
         </FormField>
-        <FormField label="DNI">
+        <FormField
+          label="DNI"
+          helper="Lo pedimos para verificar tu identidad."
+        >
           <input
             className={marketplaceInputClass}
             name="dniNumber"
@@ -208,20 +239,23 @@ export function PrivateIdentityForm({
             maxLength={40}
             inputMode="numeric"
             autoComplete="off"
+            required
           />
         </FormField>
       </div>
 
       <FormField
         label="Domicilio exacto"
-        helper="Sólo se usa para procesos internos que realmente lo requieren."
+        helper="Nunca se publica; sólo se usa para procesos internos que realmente lo requieren. Lo pedimos para verificar tu identidad."
       >
         <textarea
           className={marketplaceTextareaClass}
           name="exactAddress"
           defaultValue={initialValues.exactAddress}
           maxLength={240}
+          minLength={4}
           autoComplete="street-address"
+          required
         />
       </FormField>
 

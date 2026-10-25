@@ -17,6 +17,11 @@ export type AdminNavigationItem = {
   navGroup: "Principal" | "Operación" | "Personas" | "Catálogo" | "Sistema";
 };
 
+export type AdminNavBadgeCounts = {
+  identityPending: number;
+  openReports: number;
+};
+
 export const adminNavigationItems: readonly AdminNavigationItem[] = [
   {
     id: "overview",

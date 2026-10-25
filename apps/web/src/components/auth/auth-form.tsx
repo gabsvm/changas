@@ -92,6 +92,13 @@ export function AuthForm({
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
   const modeCopy = copy[mode];
+  const isChatContext =
+    (mode === "login" || mode === "signup") &&
+    (nextPath.includes("/messages") || nextPath.includes("/p/"));
+  const description = isChatContext
+    ? "Iniciá sesión para chatear y coordinar tu servicio. Volvés directo a donde estabas."
+    : modeCopy.description;
+  const signupDone = mode === "signup" && Boolean(state.success);
   const nextQuery =
     nextPath !== "/account" ? `?next=${encodeURIComponent(nextPath)}` : "";
 
@@ -108,9 +115,28 @@ export function AuthForm({
         {modeCopy.title}
       </h1>
       <p className="text-ink/70 mt-2 text-sm leading-6 sm:mt-3">
-        {modeCopy.description}
+        {description}
       </p>
 
+      {signupDone ? (
+        <div className="mt-6 space-y-5 sm:mt-8">
+          <p
+            className="bg-success/10 text-success rounded-xl px-4 py-3 text-sm leading-6"
+            role="status"
+            aria-live="polite"
+          >
+            {state.success}
+          </p>
+          <p className="text-ink/70 text-sm leading-6">
+            Revisá tu bandeja de entrada y la carpeta de spam, por si el correo
+            cae ahí.
+          </p>
+          <Link className="button-primary w-full" href="/">
+            Ir al inicio
+          </Link>
+        </div>
+      ) : (
+        <>
       <form action={formAction} className="mt-6 space-y-5 sm:mt-8">
         <input type="hidden" name="next" value={nextPath} />
 
@@ -274,6 +300,8 @@ export function AuthForm({
           </Link>
         ) : null}
       </nav>
+        </>
+      )}
     </div>
   );
 }

@@ -173,7 +173,7 @@ describe("marketplace polish contracts", () => {
 
   it("keeps activity rows compact with preferences reachable", () => {
     expect(activitySource).toContain("/account/settings/notifications");
-    expect(activitySource).toContain("Ajustes de avisos");
+    expect(activitySource).toContain("Configurar avisos");
     expect(activitySource).not.toContain("Marcar como leída");
   });
 

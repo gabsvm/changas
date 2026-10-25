@@ -315,6 +315,7 @@ export default async function ProviderMarketplaceManagePage({
             isProvider: true,
             providerActive: provider.status === "ACTIVE",
             onboardingStep: 4,
+            status: provider.status,
             hasServices: (services ?? []).length > 0,
             paymentConnected: paymentAccount.status === "CONNECTED",
             paymentsEnabled,

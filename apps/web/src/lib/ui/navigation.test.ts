@@ -14,11 +14,11 @@ describe("getAuthenticatedNavKey", () => {
     ["/account/notifications", "account"],
     ["/jobs", "jobs"],
     ["/jobs/123", "jobs"],
-    ["/account", "account"],
-    ["/account/profile", "account"],
-    ["/provider/onboarding", "account"],
-    ["/provider/onboarding/documents", "account"],
-    ["/provider/manage", "account"],
+    ["/needs", "jobs"],
+    ["/needs/new", "jobs"],
+    ["/needs/abc", "jobs"],
+    ["/oportunidades", "account"],
+    ["/oportunidades/", "account"],
   ])("maps %s to %s", (pathname, expected) => {
     expect(getAuthenticatedNavKey(pathname)).toBe(expected);
   });

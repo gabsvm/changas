@@ -19,6 +19,7 @@ import {
   type FakePaymentOutcome,
   type ProposalResponseAction,
 } from "@/lib/proposals/server";
+import { listConversationJobs } from "@/lib/jobs/server";
 import { createProposalCheckout } from "@/lib/payments/server";
 import { createClient } from "@/lib/supabase/server";
 import { getConversationContext } from "@/lib/conversations/server";
@@ -27,6 +28,8 @@ import { parseProductDateTime } from "@/lib/product-time";
 export type ProposalActionState = {
   status: "IDLE" | "SUCCESS" | "ERROR";
   message: string;
+  /** Solo en ACCEPT exitoso: job recién creado para enlazar sin redirigir. */
+  jobId?: string | null;
 };
 
 function stringField(formData: FormData, name: string): string {
@@ -261,6 +264,22 @@ export async function respondProposalAction(
           action === "ACCEPT"
             ? "El trabajo o la propuesta cambió de estado mientras respondías. Revisá el estado actual antes de reintentar."
             : "La propuesta ya cambió de estado. Actualizamos la vista: revisá el estado actual antes de reintentar.",
+      };
+    }
+    if (action === "ACCEPT") {
+      // El RPC ordena por creación descendente: el primero es el trabajo
+      // recién creado. Solo para enlazar "Ver seguimiento" (sin redirect);
+      // si la lectura falla, la contratación igual queda confirmada.
+      let jobId: string | null = null;
+      try {
+        jobId = (await listConversationJobs(conversationId))[0]?.job_id ?? null;
+      } catch {
+        jobId = null;
+      }
+      return {
+        status: "SUCCESS",
+        message: respondSuccessMessages[action],
+        jobId,
       };
     }
     return { status: "SUCCESS", message: respondSuccessMessages[action] };

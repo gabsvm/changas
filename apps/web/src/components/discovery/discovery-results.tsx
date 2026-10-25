@@ -128,6 +128,7 @@ export function DiscoveryResults({
   query,
   filters,
   enableNearby = true,
+  needsEnabled = false,
 }: {
   initialRows: ReputationDiscoveryServiceRow[];
   initialHasMore?: boolean;
@@ -135,6 +136,7 @@ export function DiscoveryResults({
   query: string;
   filters: DiscoveryFilters;
   enableNearby?: boolean;
+  needsEnabled?: boolean;
 }) {
   const [rows, setRows] = useState(initialRows);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -468,7 +470,14 @@ export function DiscoveryResults({
             description="Podés cambiar la categoría, la zona o elegir servicios remotos."
             actionHref="/buscar"
             actionLabel="Limpiar filtros"
-            actionTone="secondary"
+            actionTone="primary"
+            secondaryActionTone="secondary"
+            {...(needsEnabled
+              ? {
+                  secondaryActionHref: "/needs/new",
+                  secondaryActionLabel: "Publicá tu necesidad y recibí ofertas",
+                }
+              : {})}
           />
         </div>
       ) : null}

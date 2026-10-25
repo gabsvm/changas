@@ -1,6 +1,8 @@
 import Link from "next/link";
 
+import { AccountHeaderNav } from "@/components/ui/marketplace/account-header-nav";
 import { ActivityBadge, BottomNav } from "@/components/ui/nav-with-counts";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AccountLayout({
@@ -28,41 +30,15 @@ export default async function AccountLayout({
             </span>
             <span className="brand-wordmark text-lg" aria-hidden="true" />
           </Link>
-          <nav
-            className="flex items-center justify-end gap-1 text-sm font-semibold"
-            aria-label="Cuenta"
-          >
-            <DesktopNavLink href="/messages">Mensajes</DesktopNavLink>
-            <DesktopNavLink href="/account/notifications">
-              <span className="flex items-center gap-2">
-                Actividad
-                <ActivityBadge />
-              </span>
-            </DesktopNavLink>
-            <DesktopNavLink href="/account">Cuenta</DesktopNavLink>
-            <DesktopNavLink href="/account/favorites">Guardados</DesktopNavLink>
-          </nav>
+          <AccountHeaderNav
+            variant="account"
+            needsEnabled={arePublicNeedsEnabled()}
+            badge={<ActivityBadge />}
+          />
         </header>
         {children}
       </div>
       {user ? <BottomNav authenticated /> : null}
     </main>
-  );
-}
-
-function DesktopNavLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="consumer-pressable hover:bg-ink/[0.04] text-ink/70 hover:text-ink inline-flex min-h-11 items-center rounded-lg px-3"
-    >
-      {children}
-    </Link>
   );
 }

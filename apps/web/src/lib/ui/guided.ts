@@ -46,6 +46,11 @@ export type ProviderNextAction = {
  * La única próxima acción del prestador según su estado real.
  * Orden pensado como embudo: primero existir, después publicar,
  * después poder cobrar, después trabajar.
+ *
+ * El `status` (provider_status) manda cuando viene: UNDER_REVIEW /
+ * IDENTITY_PENDING no es un alta incompleta (banner tranquilo + borrador),
+ * y REJECTED dice qué corregir con link a revisión. Sin `status` se
+ * conserva el contrato viejo (booleano) para no romper llamadas.
  */
 export function getProviderNextAction(args: {
   isProvider: boolean;
@@ -54,6 +59,7 @@ export function getProviderNextAction(args: {
   hasServices: boolean;
   paymentConnected: boolean;
   paymentsEnabled?: boolean;
+  status?: string | null;
 }): ProviderNextAction {
   const {
     isProvider,
@@ -61,9 +67,10 @@ export function getProviderNextAction(args: {
     hasServices,
     paymentConnected,
     paymentsEnabled = false,
+    status = null,
   } = args;
 
-  if (!isProvider) {
+  if (!isProvider || status === "NOT_STARTED") {
     return {
       title: "Empezá a trabajar",
       hint: "Son 4 pasos cortos.",
@@ -72,11 +79,75 @@ export function getProviderNextAction(args: {
     };
   }
 
-  if (!providerActive) {
+  // Rama por estado real: la revisión pendiente no es alta incompleta.
+  if (status !== null && status !== undefined) {
+    switch (status) {
+      case "PROFILE_INCOMPLETE":
+        return {
+          title: "Terminá tu alta",
+          hint: "Te falta poco. Seguí donde ibas.",
+          cta: "Seguir el paso a paso",
+          href: "/provider/onboarding",
+        };
+      case "IDENTITY_PENDING":
+      case "UNDER_REVIEW":
+        return {
+          title: "Tu identidad está en revisión",
+          hint: "Te avisamos cuando se apruebe. Mientras tanto podés avanzar.",
+          cta: "Crear servicios en borrador",
+          href: "/provider/manage",
+        };
+      case "ACTIVE":
+        break;
+      case "REJECTED":
+        return {
+          title: "La revisión te pide un ajuste",
+          hint: "Mirá el motivo y corregí lo observado.",
+          cta: "Ver qué corregir",
+          href: "/provider/onboarding/review",
+        };
+      case "SUSPENDED":
+        return {
+          title: "Tu perfil está en pausa",
+          hint: "Por ahora no podés publicar ni ofertar.",
+          cta: "Ver mi cuenta",
+          href: "/account",
+        };
+      case "RESTRICTED":
+        return {
+          title: "Tenés una restricción parcial",
+          hint: "Algunas funciones están limitadas.",
+          cta: "Ver mi cuenta",
+          href: "/account",
+        };
+      case "DEACTIVATED":
+        return {
+          title: "Tu perfil de proveedor está desactivado",
+          hint: "Podés empezar el alta de nuevo cuando quieras.",
+          cta: "Empezar de nuevo",
+          href: "/provider/onboarding",
+        };
+      default:
+        break;
+    }
+  }
+
+  if (!providerActive && (status === null || status === undefined)) {
     return {
       title: "Terminá tu alta",
       hint: "Te falta poco. Seguí donde ibas.",
       cta: "Seguir el paso a paso",
+      href: "/provider/onboarding",
+    };
+  }
+
+  if (!providerActive) {
+    // Estado desconocido con perfil no activo: no inventar pasos,
+    // llevar al resumen de verificación que muestra el estado real.
+    return {
+      title: "Revisá el estado de tu alta",
+      hint: "Mirá en qué paso vas.",
+      cta: "Ver mi verificación",
       href: "/provider/onboarding",
     };
   }

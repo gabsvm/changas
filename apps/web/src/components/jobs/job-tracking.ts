@@ -1,4 +1,4 @@
-import type { JobStatus } from "@changas/domain";
+import { formatMinorUnits, type JobStatus } from "@changas/domain";
 
 export type TrackingStepKey =
   "confirmed" | "in_progress" | "review" | "payment" | "rating";
@@ -142,6 +142,9 @@ export type NextAction = {
   heading: string;
   sub: string;
   kind: NextActionKind;
+  /** J1: CTA de enlace directo (ruta o ancla de la página) cuando no hay acción de estado. */
+  href?: string;
+  hrefLabel?: string;
 };
 
 /**
@@ -164,13 +167,112 @@ export function getJobNextAction(args: {
   handoverVerified?: boolean;
   /** While S3 DB is not installed, preserve the legacy PIN-based flow. */
   deliveryFlowAvailable?: boolean;
+  /** J1a: el cliente ya dejó su reseña (review real que la página ya carga). */
+  hasReview?: boolean;
+  /** J1b: flag de /oportunidades para el CTA de recuperación del prestador. */
+  opportunitiesEnabled?: boolean;
+  /** J1f: declaración de pago externo pendiente de respuesta de la contraparte. */
+  externalPaymentPending?: {
+    amountMinor: number;
+    declaredByMe: boolean;
+  } | null;
+  /** J1g: correcciones pedidas + motivo más reciente ya cargado (historial). */
+  correctionCount?: number;
+  correctionReason?: string | null;
 }): NextAction {
   const { status, isClient, isProvider, settlementPending } = args;
   const paymentsEnabled = args.paymentsEnabled ?? false;
   const modality = args.modality ?? "IN_PERSON";
   const deliverySubmitted = args.deliverySubmitted ?? false;
   const handoverVerified = args.handoverVerified ?? false;
+  const hasReview = args.hasReview ?? false;
+  const opportunitiesEnabled = args.opportunitiesEnabled ?? false;
+  const externalPaymentPending = args.externalPaymentPending ?? null;
+  const correctionCount = args.correctionCount ?? 0;
+  const correctionReason =
+    typeof args.correctionReason === "string" &&
+    args.correctionReason.trim().length > 0
+      ? args.correctionReason.trim()
+      : null;
   const needsHandover = modality !== "REMOTE";
+  // J1b: terminales con salida propia (nunca el fallback genérico): título
+  // llano + CTA de recuperación según rol.
+  if (status === "CANCELLED" || status === "NO_SHOW" || status === "EXPIRED") {
+    const headings = {
+      CANCELLED: "Este trabajo se canceló",
+      NO_SHOW: "Se registró una ausencia",
+      EXPIRED: "Este trabajo venció",
+    } as const;
+    const explanations = {
+      CANCELLED:
+        "No quedó ningún pago pendiente por él. Si todavía lo necesitás, podés buscar de nuevo.",
+      NO_SHOW:
+        "Quedó registrado que una de las partes no se presentó. Si creés que es un error, escribinos desde el chat.",
+      EXPIRED:
+        "Venció sin ejecutarse y no quedó ningún pago pendiente. Cuando quieras, volvemos a empezar.",
+    } as const;
+    if (isProvider) {
+      return {
+        heading: headings[status],
+        sub: `${explanations[status]} Podés seguir ofertando en otros trabajos.`,
+        kind: null,
+        href: opportunitiesEnabled ? "/oportunidades" : "/jobs",
+        hrefLabel: opportunitiesEnabled ? "Ver oportunidades" : "Ver mis trabajos",
+      };
+    }
+    return {
+      heading: headings[status],
+      sub: explanations[status],
+      kind: null,
+      href: "/buscar",
+      hrefLabel: "Buscar otro prestador",
+    };
+  }
+  // J1c: devoluciones: estado final sin prometer plazos; solo Ver chat
+  // (el hero siempre lo muestra como acción secundaria).
+  if (status === "REFUNDED" || status === "PARTIALLY_REFUNDED") {
+    return {
+      heading:
+        status === "REFUNDED" ? "Pago devuelto" : "Devolución parcial del pago",
+      sub:
+        status === "REFUNDED"
+          ? "La devolución de este trabajo quedó registrada. Si el movimiento no se refleja en tu cuenta, escribinos por el chat."
+          : "Parte del pago de este trabajo se devolvió y el resto quedó como estaba. Si algo no te cierra, escribinos por el chat.",
+      kind: null,
+    };
+  }
+  // J1e: disputa: qué sigue y por dónde llega la información.
+  if (status === "DISPUTED") {
+    return {
+      heading: "Tu caso está en revisión",
+      sub: "El equipo de YALO lo está viendo con ambas partes. Si necesitamos más información, te la pedimos por el chat.",
+      kind: null,
+    };
+  }
+  // J1f: pago externo declarado esperando confirmación. La contraparte lo
+  // refleja con ancla a #pago; el declarante ve que está en espera.
+  if (externalPaymentPending) {
+    const amount = formatMinorUnits(
+      externalPaymentPending.amountMinor,
+      "ARS",
+    );
+    if (externalPaymentPending.declaredByMe) {
+      return {
+        heading: `Declaraste un pago de ${amount}`,
+        sub: "La otra parte todavía no lo confirma. Podés anular la declaración desde la sección de pago.",
+        kind: null,
+        href: "#pago",
+        hrefLabel: "Ver pago",
+      };
+    }
+    return {
+      heading: `Declararon un pago de ${amount}`,
+      sub: "La otra parte dice que ya pagó. Confirmalo en la sección de pago si lo recibiste, o avisá si no te llegó.",
+      kind: null,
+      href: "#pago",
+      hrefLabel: "Revisar pago",
+    };
+  }
   if (
     isProvider &&
     status === "IN_PROGRESS" &&
@@ -195,6 +297,21 @@ export function getJobNextAction(args: {
         ? "El prestador ofrece ambas. Elegí cómo se hará el trabajo antes de comenzar."
         : "El cliente debe elegir presencial o remoto para evitar un PIN incorrecto.",
       kind: null,
+      // J1h: el cliente salta directo al formulario de modalidad.
+      ...(isClient ? { href: "#modalidad", hrefLabel: "Elegir modalidad" } : {}),
+    };
+  }
+  // J1g: corrección pedida: el prestador ve el motivo más reciente (ya
+  // cargado por la página desde el historial) y salta a la entrega.
+  if (isProvider && status === "IN_PROGRESS" && correctionCount > 0) {
+    return {
+      heading: "Te pidieron una corrección",
+      sub: correctionReason
+        ? `Lo que te marcó el cliente: “${correctionReason}”. Ajustá la entrega y enviala de nuevo para revisión.`
+        : "Revisá lo que te marcó el cliente en el historial, ajustá la entrega y enviala de nuevo.",
+      kind: null,
+      href: "#entrega",
+      hrefLabel: "Ver entrega",
     };
   }
   if (isProvider && status === "CONFIRMED") {
@@ -266,6 +383,32 @@ export function getJobNextAction(args: {
         kind: null,
       };
     }
+    // J1d: con cobro online, el prestador espera el pago del cliente.
+    return {
+      heading: "Esperando el pago del cliente",
+      sub: "El cliente ya puede pagar desde su seguimiento. Te avisamos en cuanto se acredite.",
+      kind: null,
+    };
+  }
+  // J1a: post-reseña con review real ya cargado: estado cerrado, sin pedir
+  // la reseña de nuevo. CTA de salida según rol.
+  if (status === "COMPLETED" && !settlementPending && hasReview) {
+    if (isClient) {
+      return {
+        heading: "Ya dejaste tu reseña",
+        sub: "Gracias por contar cómo te fue: este trabajo ya quedó cerrado.",
+        kind: null,
+        href: "/buscar",
+        hrefLabel: "Buscar otro servicio",
+      };
+    }
+    return {
+      heading: "El cliente ya dejó su reseña",
+      sub: "Este trabajo ya quedó cerrado. Gracias por tu trabajo.",
+      kind: null,
+      href: "/jobs",
+      hrefLabel: "Ver mis trabajos",
+    };
   }
   if (status === "COMPLETED" && !settlementPending) {
     return {
@@ -290,13 +433,6 @@ export function getJobNextAction(args: {
     return {
       heading: "Esperando la revisión del cliente",
       sub: "Ya pediste la finalización. Te avisamos cuando el cliente confirme.",
-      kind: null,
-    };
-  }
-  if (status === "DISPUTED") {
-    return {
-      heading: "Caso en revisión",
-      sub: "Estamos viendo lo reportado con ambas partes.",
       kind: null,
     };
   }

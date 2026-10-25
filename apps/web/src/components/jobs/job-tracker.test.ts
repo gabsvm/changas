@@ -168,3 +168,197 @@ describe("getJobNextAction", () => {
     expect(action.heading).toMatch(/esperando revisión/i);
   });
 });
+
+describe("getJobNextAction J1: estados finales y salidas", () => {
+  it("J1a: post-reseña cierra el hero con CTA de salida en vez de pedir reseña", () => {
+    const client = getJobNextAction({
+      status: "COMPLETED",
+      isClient: true,
+      isProvider: false,
+      settlementPending: false,
+      hasReview: true,
+    });
+    expect(client.kind).toBeNull();
+    expect(client.heading).toMatch(/ya dejaste tu reseña/i);
+    expect(client.href).toBe("/buscar");
+    expect(client.hrefLabel).toMatch(/buscar otro servicio/i);
+    const provider = getJobNextAction({
+      status: "COMPLETED",
+      isClient: false,
+      isProvider: true,
+      settlementPending: false,
+      hasReview: true,
+    });
+    expect(provider.kind).toBeNull();
+    expect(provider.heading).toMatch(/reseña/i);
+    expect(provider.href).toBe("/jobs");
+  });
+
+  it("J1a: sin reseña sigue pidiendo la reseña al cliente", () => {
+    const action = getJobNextAction({
+      status: "COMPLETED",
+      isClient: true,
+      isProvider: false,
+      settlementPending: false,
+    });
+    expect(action.kind).toBe("review");
+  });
+
+  it("J1b: terminales tienen rama propia con CTA de recuperación", () => {
+    for (const status of ["CANCELLED", "NO_SHOW", "EXPIRED"] as const) {
+      const client = getJobNextAction({
+        status,
+        isClient: true,
+        isProvider: false,
+        settlementPending: false,
+      });
+      expect(client.kind).toBeNull();
+      expect(client.href).toBe("/buscar");
+      expect(client.hrefLabel).toMatch(/prestador/i);
+      const providerJobs = getJobNextAction({
+        status,
+        isClient: false,
+        isProvider: true,
+        settlementPending: false,
+      });
+      expect(providerJobs.kind).toBeNull();
+      expect(providerJobs.href).toBe("/jobs");
+      const providerOpo = getJobNextAction({
+        status,
+        isClient: false,
+        isProvider: true,
+        settlementPending: false,
+        opportunitiesEnabled: true,
+      });
+      expect(providerOpo.href).toBe("/oportunidades");
+      expect(providerOpo.hrefLabel).toMatch(/oportunidades/i);
+    }
+    expect(
+      getJobNextAction({
+        status: "CANCELLED",
+        isClient: true,
+        isProvider: false,
+        settlementPending: false,
+      }).heading,
+    ).toMatch(/canceló/i);
+    expect(
+      getJobNextAction({
+        status: "EXPIRED",
+        isClient: true,
+        isProvider: false,
+        settlementPending: false,
+      }).heading,
+    ).toMatch(/venció/i);
+  });
+
+  it("J1c: devoluciones explican el estado final sin plazos ni CTA", () => {
+    for (const status of ["REFUNDED", "PARTIALLY_REFUNDED"] as const) {
+      const action = getJobNextAction({
+        status,
+        isClient: true,
+        isProvider: false,
+        settlementPending: false,
+      });
+      expect(action.kind).toBeNull();
+      expect(action.href).toBeUndefined();
+      expect(action.sub).toMatch(/chat/i);
+      expect(action.sub).not.toMatch(/\d+\s*(días|horas)|plazo/i);
+    }
+    expect(
+      getJobNextAction({
+        status: "PARTIALLY_REFUNDED",
+        isClient: true,
+        isProvider: false,
+        settlementPending: false,
+      }).heading,
+    ).toMatch(/parcial/i);
+  });
+
+  it("J1d: prestador con cobro online pendiente espera el pago del cliente", () => {
+    const action = getJobNextAction({
+      status: "COMPLETED",
+      isClient: false,
+      isProvider: true,
+      settlementPending: true,
+      paymentsEnabled: true,
+    });
+    expect(action.kind).toBeNull();
+    expect(action.heading).toMatch(/esperando el pago del cliente/i);
+  });
+
+  it("J1e: disputa cuenta la revisión en curso y deriva al chat", () => {
+    const action = getJobNextAction({
+      status: "DISPUTED",
+      isClient: true,
+      isProvider: false,
+      settlementPending: false,
+    });
+    expect(action.kind).toBeNull();
+    expect(action.heading).toMatch(/revisión/i);
+    expect(action.sub).toMatch(/chat/i);
+  });
+
+  it("J1f: pago externo declarado se refleja con ancla a #pago", () => {
+    const counterpart = getJobNextAction({
+      status: "COMPLETED",
+      isClient: true,
+      isProvider: false,
+      settlementPending: true,
+      externalPaymentPending: { amountMinor: 150000, declaredByMe: false },
+    });
+    expect(counterpart.kind).toBeNull();
+    expect(counterpart.heading).toMatch(/\$1\.500/);
+    expect(counterpart.href).toBe("#pago");
+    expect(counterpart.sub).toMatch(/confirmalo|avisá/i);
+    const declarant = getJobNextAction({
+      status: "COMPLETED",
+      isClient: false,
+      isProvider: true,
+      settlementPending: true,
+      externalPaymentPending: { amountMinor: 150000, declaredByMe: true },
+    });
+    expect(declarant.heading).toMatch(/declaraste/i);
+    expect(declarant.href).toBe("#pago");
+    expect(declarant.sub).toMatch(/esperando|anular/i);
+  });
+
+  it("J1g: corrección pedida muestra el motivo y ancla a la entrega", () => {
+    const withReason = getJobNextAction({
+      status: "IN_PROGRESS",
+      isClient: false,
+      isProvider: true,
+      settlementPending: false,
+      modality: "IN_PERSON",
+      deliverySubmitted: true,
+      correctionCount: 1,
+      correctionReason: "Falta pintar el marco",
+    });
+    expect(withReason.kind).toBeNull();
+    expect(withReason.heading).toMatch(/corrección/i);
+    expect(withReason.sub).toContain("Falta pintar el marco");
+    expect(withReason.href).toBe("#entrega");
+    const withoutReason = getJobNextAction({
+      status: "IN_PROGRESS",
+      isClient: false,
+      isProvider: true,
+      settlementPending: false,
+      correctionCount: 2,
+    });
+    expect(withoutReason.heading).toMatch(/corrección/i);
+    expect(withoutReason.href).toBe("#entrega");
+  });
+
+  it("J1h: cliente con ambas modalidades enlaza al formulario", () => {
+    const action = getJobNextAction({
+      status: "CONFIRMED",
+      isClient: true,
+      isProvider: false,
+      settlementPending: false,
+      modality: "BOTH",
+      deliveryFlowAvailable: true,
+    });
+    expect(action.kind).toBeNull();
+    expect(action.href).toBe("#modalidad");
+    expect(action.hrefLabel).toMatch(/elegir modalidad/i);
+  });
+});

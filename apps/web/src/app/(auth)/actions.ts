@@ -122,11 +122,16 @@ export async function requestPasswordReset(
     return { error: authThrottleMessage };
   }
 
+  const next = safeNextPath(getFormString(formData, "next"), "");
+  const redirectTo = callbackUrl(
+    next ? `/update-password?next=${next}` : "/update-password",
+  );
+
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(
     parsed.data.email,
     {
-      redirectTo: callbackUrl("/update-password"),
+      redirectTo,
     },
   );
 
@@ -172,7 +177,7 @@ export async function updatePassword(
     return { error: genericAuthError };
   }
 
-  redirect("/account");
+  redirect(safeNextPath(getFormString(formData, "next")));
 }
 
 export async function signOut(_formData: FormData): Promise<void> {

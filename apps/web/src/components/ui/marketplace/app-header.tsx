@@ -1,9 +1,24 @@
 ﻿import Link from "next/link";
 import type { ReactNode } from "react";
 
+const BACK_LABELS: Record<string, string> = {
+  "/account": "Volver a Cuenta",
+  "/account/settings": "Volver a Configuración",
+  "/jobs": "Volver a Trabajos",
+  "/needs": "Volver a Necesidades",
+  "/oportunidades": "Volver a Oportunidades",
+  "/provider/manage": "Volver a Gestionar",
+  "/provider/onboarding": "Volver a Verificación",
+};
+
+export function backLabelFor(backHref: string): string {
+  return BACK_LABELS[backHref] ?? "Volver";
+}
+
 export function AppHeader({
   title,
   backHref,
+  backLabel,
   action,
   desktopNav,
   brand = false,
@@ -11,6 +26,7 @@ export function AppHeader({
 }: {
   title?: string;
   backHref?: string | undefined;
+  backLabel?: string | undefined;
   action?: ReactNode;
   desktopNav?: ReactNode;
   brand?: boolean;
@@ -71,6 +87,28 @@ export function AppHeader({
         </Link>
       ) : null}
 
+      {backHref ? (
+        <Link
+          href={backHref}
+          className="consumer-pressable text-ink/70 hover:bg-ink/[0.05] hover:text-ink hidden min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm font-bold sm:inline-flex"
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="h-4 w-4"
+            fill="none"
+          >
+            <path
+              d="m15 5-7 7 7 7"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          {backLabel ?? backLabelFor(backHref)}
+        </Link>
+      ) : null}
       {title ? (
         <span
           className={`font-display min-w-0 flex-1 truncate text-[17px] font-extrabold tracking-[-0.02em] ${backHref ? "sm:hidden" : ""}`}

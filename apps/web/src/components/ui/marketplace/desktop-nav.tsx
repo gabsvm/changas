@@ -12,7 +12,7 @@ const ctaClass =
 
 type DesktopNavLink = { href: string; label: string; exact?: boolean };
 
-function isActiveLink(pathname: string, href: string, exact = false): boolean {
+export function isActiveLink(pathname: string, href: string, exact = false): boolean {
   if (pathname === href) return true;
   if (exact) return false;
   return pathname.startsWith(`${href}/`);
@@ -25,7 +25,7 @@ export function DesktopNav({ authenticated }: { authenticated: boolean }) {
         { href: "/buscar", label: "Buscar" },
         { href: "/messages", label: "Mensajes" },
         { href: "/jobs", label: "Trabajos" },
-        { href: "/account/notifications", label: "Actividad" },
+        { href: "/account/notifications", label: "Notificaciones" },
         { href: "/account", label: "Cuenta", exact: true },
       ]
     : [{ href: "/buscar", label: "Buscar" }];

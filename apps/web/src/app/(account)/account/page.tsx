@@ -7,6 +7,7 @@ import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge"
 import { SettingsRow } from "@/components/ui/marketplace/settings-row";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { createClient } from "@/lib/supabase/server";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 import { NextStepBanner } from "@/components/ui/guided";
 import { getProviderNextAction } from "@/lib/ui/guided";
@@ -120,6 +121,7 @@ export default async function AccountPage() {
             onboardingStep: step,
             hasServices: false,
             paymentConnected: false,
+            status: provider?.status ?? null,
           });
           if (provider?.status === "ACTIVE") return null;
           return (
@@ -267,11 +269,21 @@ export default async function AccountPage() {
             />
             {provider.status === "ACTIVE" ? (
               <SettingsRow
-                href="/provider/manage"
+                href="/provider/manage#disponibilidad"
                 title="Disponibilidad"
                 description="Zonas, horarios y pausas"
                 leading={
                   <IllustratedBadge tone="blue" icon="clock" size="sm" />
+                }
+              />
+            ) : null}
+            {provider.status === "ACTIVE" && arePublicNeedsEnabled() ? (
+              <SettingsRow
+                href="/oportunidades"
+                title="Oportunidades"
+                description="Necesidades abiertas en tus rubros"
+                leading={
+                  <IllustratedBadge tone="green" icon="compass" size="sm" />
                 }
               />
             ) : null}
@@ -289,6 +301,20 @@ export default async function AccountPage() {
           </AccountGroup>
         ) : null}
 
+        <AccountGroup title="Ayuda">
+          <SettingsRow
+            href="/#como-funciona"
+            title="Cómo funciona"
+            description="Cómo contratar y ofrecer servicios"
+            leading={<IllustratedBadge tone="violet" icon="compass" size="sm" />}
+          />
+          <SettingsRow
+            href="/terminos"
+            title="Términos"
+            description="Condiciones de uso de YALO"
+            leading={<IllustratedBadge tone="neutral" icon="doc" size="sm" />}
+          />
+        </AccountGroup>
         <AccountGroup title="Preferencias">
           <SettingsRow
             href="/account/settings"

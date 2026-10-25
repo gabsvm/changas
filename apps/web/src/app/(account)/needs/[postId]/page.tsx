@@ -190,6 +190,7 @@ export default async function NeedDetailPage({
             </div>
           ) : null}
           {(post.status === "OPEN" || post.status === "PAUSED") && (
+            <>
             <div className="mt-3 flex gap-2">
               <form action={governNeedAction}>
                 <input type="hidden" name="postId" value={post.id} />
@@ -218,6 +219,17 @@ export default async function NeedDetailPage({
                 </ActionButton>
               </form>
             </div>
+          <div className="consumer-card bg-surface mt-6 rounded-2xl border p-4">
+            <h2 className="text-sm font-extrabold">Qué sigue</h2>
+            <p className="text-ink/70 mt-1 text-[13px] leading-5">
+              Te avisamos por notificación cuando lleguen ofertas. Mientras
+              tanto podés mirar perfiles y comparar precios.
+            </p>
+            <ActionLink href="/buscar" tone="secondary" className="mt-3">
+              Explorar servicios mientras tanto
+            </ActionLink>
+            </div>
+            </>
           )}
         </section>
       ) : post.status === "OPEN" ? (

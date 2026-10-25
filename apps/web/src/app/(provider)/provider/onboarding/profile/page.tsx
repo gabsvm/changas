@@ -102,6 +102,7 @@ export default async function ProviderOnboardingProfilePage() {
             }}
             submitLabel="Guardar y continuar"
             hiddenFields={{ step: String(nextStep) }}
+            requireReviewFields
           />
         </div>
       </div>

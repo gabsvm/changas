@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { formatMinorUnits, type JobStatus } from "@changas/domain";
 import { isPaymentsEnabled } from "@changas/config/server";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 
 import {
   chooseJobModalityAction,
@@ -250,6 +251,22 @@ export default async function JobPage({
       ? "SETTLED"
       : detail.settlement_status,
   );
+  // J1a: reseña real ya cargada (misma fuente que JobReputationPanel).
+  const hasReview = (reviewState?.review_id ?? null) !== null;
+  // J1f: declaración de pago externo pendiente de respuesta (misma fuente
+  // que ExternalMoneySection; sin queries nuevas).
+  const pendingExternalDeclaration =
+    externalMoney?.declarations.find(
+      (declaration) =>
+        declaration.state === "DECLARED_BY_CLIENT" ||
+        declaration.state === "DECLARED_BY_PROVIDER",
+    ) ?? null;
+  // J1g: motivo de corrección más reciente del historial ya cargado.
+  const latestCorrectionReason =
+    [...events]
+      .reverse()
+      .find((event) => event.event_type === "JOB_CORRECTION_REQUESTED")
+      ?.reason ?? null;
   const nextAction = getJobNextAction({
     status: detail.job_status,
     isClient,
@@ -260,6 +277,16 @@ export default async function JobPage({
     deliverySubmitted: detail.delivery_submitted_at !== null,
     handoverVerified: detail.handover_verified_at !== null,
     deliveryFlowAvailable: detail.delivery_flow_available,
+    hasReview,
+    opportunitiesEnabled: arePublicNeedsEnabled(),
+    externalPaymentPending: pendingExternalDeclaration
+      ? {
+          amountMinor: pendingExternalDeclaration.amount_minor,
+          declaredByMe: pendingExternalDeclaration.declared_by_user_id === user.id,
+        }
+      : null,
+    correctionCount: detail.correction_count,
+    correctionReason: latestCorrectionReason,
   });
   const needsRescheduleAttention = reschedules.some(
     (request) =>
@@ -514,7 +541,8 @@ export default async function JobPage({
         detail.modality === "BOTH" &&
         ["CONFIRMED", "IN_PROGRESS"].includes(detail.job_status) ? (
           <section
-            className="border-ink/10 bg-surface mt-4 rounded-2xl border p-4"
+            id="modalidad"
+            className="border-ink/10 bg-surface mt-4 scroll-mt-20 rounded-2xl border p-4"
             aria-label="Elegir modalidad efectiva"
           >
             <h2 className="font-display text-lg font-bold">
@@ -551,7 +579,8 @@ export default async function JobPage({
 
         {detail.delivery_submitted_at !== null ? (
           <section
-            className="border-ink/[0.08] bg-surface consumer-card mt-5 rounded-2xl border p-4 sm:p-5"
+            id="entrega"
+            className="border-ink/[0.08] bg-surface consumer-card mt-5 scroll-mt-20 rounded-2xl border p-4 sm:p-5"
             aria-label="Entrega enviada"
           >
             <SectionHeader
@@ -621,6 +650,8 @@ export default async function JobPage({
             <PrimaryAction
               jobId={jobId}
               kind={nextAction.kind}
+              href={nextAction.href}
+              hrefLabel={nextAction.hrefLabel}
               reviewAmounts={{
                 baseMinor: detail.base_price_amount,
                 extrasMinor: detail.settlement_unpaid_extras_minor,
@@ -1340,10 +1371,12 @@ export default async function JobPage({
       <div className="yalo-job-mobile-cta bg-surface/95 border-ink/10 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur md:hidden">
         <div className="mx-auto grid max-w-4xl grid-cols-[1fr_auto] items-center gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="min-w-0">
-            {nextAction.kind ? (
+            {nextAction.kind || nextAction.href ? (
               <PrimaryAction
                 jobId={jobId}
                 kind={nextAction.kind}
+                href={nextAction.href}
+                hrefLabel={nextAction.hrefLabel}
                 compact
                 reviewAmounts={{
                   baseMinor: detail.base_price_amount,
@@ -1468,16 +1501,31 @@ function StatusButton({
 function PrimaryAction({
   jobId,
   kind,
+  href,
+  hrefLabel,
   compact = false,
   reviewAmounts,
   remote,
 }: {
   jobId: string;
   kind: NextAction["kind"];
+  href?: string | undefined;
+  hrefLabel?: string | undefined;
   compact?: boolean;
   reviewAmounts: { baseMinor: number; extrasMinor: number; totalMinor: number };
   remote: boolean;
 }) {
+  // J1: CTA de enlace directo (ruta o ancla) cuando no hay acción de estado.
+  if (!kind && href) {
+    return (
+      <Link
+        href={href}
+        className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+      >
+        {hrefLabel ?? "Ver detalle"}
+      </Link>
+    );
+  }
   if (kind === "start") {
     return (
       <StatusButton

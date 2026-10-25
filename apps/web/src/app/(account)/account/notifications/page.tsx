@@ -84,7 +84,7 @@ export default async function NotificationCenterPage({
 
   return (
     <section className="pb-6 sm:py-10">
-      <MobileAppBar title="Actividad" />
+      <MobileAppBar title="Notificaciones" />
       <div className="pt-4 sm:pt-0">
         {page.windowed ? (
           <p className="text-ink/60 mb-3 text-sm">
@@ -103,11 +103,11 @@ export default async function NotificationCenterPage({
               tone="gold"
               icon="bell"
               size="md"
-              label="Actividad"
+              label="Notificaciones"
             />
             <div className="min-w-0">
               <h1 className="hidden text-3xl font-bold tracking-[-0.035em] sm:block">
-                Actividad
+                Notificaciones
               </h1>
               <p className="text-ink/70 max-w-[22rem] text-sm leading-5 sm:mt-1">
                 Novedades de trabajos, propuestas, pagos y cuenta.
@@ -119,7 +119,7 @@ export default async function NotificationCenterPage({
               href="/account/settings/notifications"
               className="consumer-pressable text-terracotta hover:bg-brand-orange/[0.07] inline-flex min-h-11 items-center rounded-lg px-2.5 text-sm font-bold whitespace-nowrap"
             >
-              Ajustes de avisos
+              Configurar avisos
             </Link>
             {unreadCount > 0 ? (
               <form action={markAllNotificationsReadAction}>

@@ -47,6 +47,9 @@ export default async function NeedsPage({
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
       <MobileAppBar title="Mis necesidades" backHref="/jobs" />
+      <h1 className="mt-5 hidden text-[24px] leading-8 font-extrabold tracking-[-0.03em] sm:block">
+        Mis necesidades
+      </h1>
       <nav className="mt-5 flex gap-3" aria-label="Páginas de mis necesidades">
         {page > 0 ? (
           <ActionLink href={`/needs?page=${page - 1}`} tone="secondary">
@@ -69,6 +72,8 @@ export default async function NeedsPage({
           <EmptyState
             title="Todavía no publicaste necesidades"
             description="Contanos qué necesitás y empezá a comparar ofertas de prestadores."
+            actionHref="/needs/new"
+            actionLabel="Publicar necesidad"
           />
         </div>
       ) : (

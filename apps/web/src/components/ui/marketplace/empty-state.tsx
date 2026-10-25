@@ -17,6 +17,9 @@ export function EmptyState({
   actionHref,
   actionLabel,
   actionTone = "primary",
+  secondaryActionHref,
+  secondaryActionLabel,
+  secondaryActionTone = "secondary",
   tone,
   className = "",
 }: {
@@ -26,6 +29,9 @@ export function EmptyState({
   actionHref?: string;
   actionLabel?: string;
   actionTone?: ActionTone;
+  secondaryActionHref?: string;
+  secondaryActionLabel?: string;
+  secondaryActionTone?: ActionTone;
   tone?: IllustratedTone;
   className?: string;
 }) {
@@ -57,6 +63,15 @@ export function EmptyState({
           className="mt-5 w-full sm:w-auto sm:min-w-52"
         >
           {actionLabel}
+        </ActionLink>
+      ) : null}
+      {secondaryActionHref && secondaryActionLabel ? (
+        <ActionLink
+          href={secondaryActionHref}
+          tone={secondaryActionTone}
+          className="mt-2 w-full sm:w-auto sm:min-w-52"
+        >
+          {secondaryActionLabel}
         </ActionLink>
       ) : null}
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 
 import { reportClientError, type ClientError } from "@/lib/observability";
@@ -29,13 +30,18 @@ export function SegmentError({
             Referencia: {error.digest}
           </p>
         ) : null}
-        <button
-          className="button-primary mt-6"
-          onClick={() => reset()}
-          type="button"
-        >
-          Intentar de nuevo
-        </button>
+        <div className="mt-6 flex flex-col items-center gap-3">
+          <button
+            className="button-primary"
+            onClick={() => reset()}
+            type="button"
+          >
+            Intentar de nuevo
+          </button>
+          <Link className="button-secondary" href="/">
+            Volver al inicio
+          </Link>
+        </div>
       </div>
     </section>
   );

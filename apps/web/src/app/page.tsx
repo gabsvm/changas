@@ -24,6 +24,7 @@ import {
   getJobStatusPresentation,
 } from "@/lib/ui/job-status";
 import { getJobTracking } from "@/components/jobs/job-tracking";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { searchDiscovery } from "@/lib/discovery/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -325,6 +326,17 @@ export default async function HomePage() {
                 </span>
               </Link>
             </div>
+            {arePublicNeedsEnabled() ? (
+              <p className="yalo-hero-offer">
+                ¿No encontrás lo que buscás?{" "}
+                <Link href="/needs/new">
+                  Publicá una necesidad{" "}
+                  <span aria-hidden="true">
+                    <ActionArrowIcon />
+                  </span>
+                </Link>
+              </p>
+            ) : null}
           </div>
 
           <div className="yalo-stage-footnote" aria-hidden="true">

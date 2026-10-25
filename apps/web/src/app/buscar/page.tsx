@@ -22,6 +22,7 @@ import {
   isExcludedPublicTestCategory,
 } from "@/lib/public-catalog";
 import { searchDiscovery } from "@/lib/discovery/server";
+import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -169,7 +170,7 @@ export default async function SearchPage({
         <GuideHeader
           step={1}
           steps={CLIENT_HIRE_STEPS}
-          className="mt-4 hidden sm:mt-6 sm:block"
+          className="mt-4 sm:mt-6"
         />
 
         <section className="pt-3 sm:pt-8">
@@ -364,6 +365,7 @@ export default async function SearchPage({
                 initialRows={rows}
                 query={query}
                 filters={filters}
+                needsEnabled={arePublicNeedsEnabled()}
               />
             )}
           </div>

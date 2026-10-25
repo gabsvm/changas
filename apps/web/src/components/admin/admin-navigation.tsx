@@ -7,14 +7,43 @@ import { useEffect, useRef, useState } from "react";
 import { animatePanelEntrance } from "@/lib/ui/panel-motion";
 import { useDialogFocus } from "@/lib/ui/use-dialog-focus";
 
-import {
-  adminMoreItems,
-  adminNavigationItems,
-  adminPrimaryMobileItems,
-  isAdminNavigationItemActive,
-  type AdminNavigationId,
-} from "@/lib/ui/admin-navigation";
+import { getAdminNavBadgeCounts } from "@/lib/admin/nav-badges";
 
+import {
+   adminMoreItems,
+   adminNavigationItems,
+   adminPrimaryMobileItems,
+   isAdminNavigationItemActive,
+  type AdminNavBadgeCounts,
+   type AdminNavigationId,
+ } from "@/lib/ui/admin-navigation";
+
+const badgeToneClasses: Record<"identity" | "reports", string> = {
+  identity: "border-brand-yellow/30 bg-brand-yellow/15 text-warning",
+  reports: "border-danger/25 bg-danger/10 text-danger",
+};
+
+function badgeForItem(
+  id: AdminNavigationId,
+  counts: AdminNavBadgeCounts | null,
+) {
+  if (!counts) return null;
+  if (id === "identity" && counts.identityPending > 0) {
+    return {
+      count: counts.identityPending,
+      tone: badgeToneClasses.identity,
+      detail: "por revisar",
+    };
+  }
+  if (id === "reports" && counts.openReports > 0) {
+    return {
+      count: counts.openReports,
+      tone: badgeToneClasses.reports,
+      detail: "abiertos",
+    };
+  }
+  return null;
+}
 function NavIcon({ id }: { id: AdminNavigationId | "more" }) {
   const common = {
     width: 20,
@@ -122,6 +151,8 @@ export function AdminNavigation() {
   const moreActive = adminMoreItems.some((item) =>
     isAdminNavigationItemActive(pathname, item.href),
   );
+  const [badgeCounts, setBadgeCounts] =
+    useState<AdminNavBadgeCounts | null>(null);
 
   useDialogFocus(moreOpen, dialogRef, closeRef, () => setMoreOpen(false));
 
@@ -129,6 +160,19 @@ export function AdminNavigation() {
     if (!moreOpen || !motionRef.current) return;
     return animatePanelEntrance(motionRef.current);
   }, [moreOpen]);
+  useEffect(() => {
+    let active = true;
+    getAdminNavBadgeCounts()
+      .then((counts) => {
+        if (active) setBadgeCounts(counts);
+      })
+      .catch(() => {
+        // Sin conteos la navegación sigue funcionando sin badges.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <>
@@ -154,9 +198,15 @@ export function AdminNavigation() {
                     pathname,
                     item.href,
                   );
+                  const badge = badgeForItem(item.id, badgeCounts);
                   return (
                     <Link
                       aria-current={active ? "page" : undefined}
+                      aria-label={
+                        badge
+                          ? `${item.label}: ${badge.count} ${badge.detail}`
+                          : undefined
+                      }
                       className={`consumer-pressable flex min-h-12 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition-colors ${
                         active
                           ? "border-transparent text-[#062433] shadow-[0_10px_24px_-8px_rgb(18_217_197/30%)]"
@@ -175,6 +225,14 @@ export function AdminNavigation() {
                     >
                       <NavIcon id={item.id} />
                       {item.label}
+                      {badge ? (
+                        <span
+                          aria-hidden="true"
+                          className={`ml-auto rounded-full border px-2 py-0.5 text-[11px] font-extrabold ${badge.tone}`}
+                        >
+                          {badge.count}
+                        </span>
+                      ) : null}
                     </Link>
                   );
                 })}
@@ -250,9 +308,15 @@ export function AdminNavigation() {
                             pathname,
                             item.href,
                           );
+                          const badge = badgeForItem(item.id, badgeCounts);
                           return (
                             <Link
                               aria-current={active ? "page" : undefined}
+                              aria-label={
+                                badge
+                                  ? `${item.label}: ${badge.count} ${badge.detail}`
+                                  : undefined
+                              }
                               className={`flex min-h-16 items-center gap-3 rounded-2xl border px-3 py-3 text-sm font-bold ${
                                 active
                                   ? "border-[#12D9C5]/30 bg-[#12D9C5]/10 text-[#12D9C5]"
@@ -264,6 +328,14 @@ export function AdminNavigation() {
                             >
                               <NavIcon id={item.id} />
                               {item.label}
+                              {badge ? (
+                                <span
+                                  aria-hidden="true"
+                                  className={`ml-auto rounded-full border px-2 py-0.5 text-[11px] font-extrabold ${badge.tone}`}
+                                >
+                                  {badge.count}
+                                </span>
+                              ) : null}
                             </Link>
                           );
                         })}
@@ -283,9 +355,15 @@ export function AdminNavigation() {
       >
         {adminPrimaryMobileItems.map((item) => {
           const active = isAdminNavigationItemActive(pathname, item.href);
+          const badge = badgeForItem(item.id, badgeCounts);
           return (
             <Link
               aria-current={active ? "page" : undefined}
+              aria-label={
+                badge
+                  ? `${item.label}: ${badge.count} ${badge.detail}`
+                  : undefined
+              }
               className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
                 active ? "text-[#12D9C5]" : "text-ink/60"
               }`}
@@ -294,6 +372,14 @@ export function AdminNavigation() {
             >
               <NavIcon id={item.id} />
               {item.label}
+              {badge ? (
+                <span
+                  aria-hidden="true"
+                  className={`rounded-full border px-1.5 text-[10px] font-extrabold ${badge.tone}`}
+                >
+                  {badge.count}
+                </span>
+              ) : null}
             </Link>
           );
         })}
