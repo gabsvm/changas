@@ -119,14 +119,14 @@
 
 .admin-shell input::placeholder,
 .admin-shell textarea::placeholder {
-  color: rgb(23 20 15 / 40%);
+  color: #626b78;
 }
 
 .admin-shell input:focus,
 .admin-shell select:focus,
 .admin-shell textarea:focus {
   border-color: rgb(18 217 197 / 70%);
-  outline: 2px solid rgb(18 217 197 / 18%);
+  outline: 2px solid #087681;
   outline-offset: 1px;
 }
 
@@ -220,6 +220,11 @@
   background: #0d131d;
   color: #f8fafc;
 }
+.dark .admin-shell input:focus,
+.dark .admin-shell select:focus,
+.dark .admin-shell textarea:focus {
+  outline-color: #7bf2e7;
+}
 .dark .admin-shell input::placeholder,
 .dark .admin-shell textarea::placeholder {
   color: #9aaac0;
@@ -239,8 +244,11 @@
   color: #72ebe0;
 }
 .admin-shell :focus-visible {
-  outline: 2px solid #12d9c5;
+  outline: 2px solid #087681;
   outline-offset: 3px;
+}
+.dark .admin-shell :focus-visible {
+  outline-color: #7bf2e7;
 }
 .admin-shell .admin-main {
   background-image: radial-gradient(
