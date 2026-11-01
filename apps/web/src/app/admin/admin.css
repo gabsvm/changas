@@ -1,7 +1,7 @@
 .admin-shell {
-  --admin-bg: #fbf8f3;
+  --admin-bg: #f6f9fc;
   --admin-surface: #ffffff;
-  --admin-surface-2: #f3efe9;
+  --admin-surface-2: #e9eff5;
   --admin-border: rgb(23 20 15 / 8%);
   --admin-muted: rgb(23 20 15 / 65%);
   --admin-orange: #08a9f4;
@@ -222,7 +222,7 @@
 }
 .dark .admin-shell input::placeholder,
 .dark .admin-shell textarea::placeholder {
-  color: #596579;
+  color: #9aaac0;
 }
 .dark .admin-shell th {
   color: #697386;

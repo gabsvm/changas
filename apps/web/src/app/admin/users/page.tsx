@@ -193,7 +193,7 @@ export default async function AdminUsersPage({
         {users.length ? (
           <>
             <div
-              className="grid gap-3 md:hidden"
+              className="bg-surface border-ink/10 divide-ink/10 grid divide-y overflow-hidden rounded-2xl border md:hidden"
               aria-label="Cuentas registradas"
             >
               {users.map((user) => (
@@ -205,7 +205,7 @@ export default async function AdminUsersPage({
                     "&user=" +
                     user.user_id
                   }
-                  className="admin-mobile-record consumer-pressable consumer-card bg-surface flex flex-col gap-2 rounded-2xl p-4"
+                  className="admin-mobile-record consumer-pressable hover:bg-ink/[0.04] flex flex-col gap-1.5 px-4 py-3 transition-colors"
                 >
                   <span className="flex items-start justify-between gap-3">
                     <span className="text-ink min-w-0 font-extrabold">
@@ -222,18 +222,18 @@ export default async function AdminUsersPage({
                     {user.email ?? user.user_id}
                   </span>
                   {user.role === "admin" ? (
-                    <span className="text-xs font-extrabold text-[#12D9C5]">
+                    <span className="text-xs font-extrabold text-[#087681] dark:text-[#7BF2E7]">
                       ADMIN
                     </span>
                   ) : null}
-                  <span className="text-xs font-semibold text-[#12D9C5]">
+                  <span className="text-xs font-semibold text-[#087681] dark:text-[#7BF2E7]">
                     Ver cuenta y permisos →
                   </span>
                 </Link>
               ))}
             </div>
             <div className="-mx-1 hidden overflow-x-auto px-1 md:block">
-              <table className="w-full min-w-[640px] border-separate border-spacing-2">
+              <table className="w-full min-w-[640px] border-separate border-spacing-y-0">
                 <caption className="sr-only">
                   Cuentas registradas ({users.length})
                 </caption>
@@ -267,7 +267,7 @@ export default async function AdminUsersPage({
                     >
                       <th
                         scope="row"
-                        className="min-w-0 rounded-l-3xl p-4 text-left"
+                        className="border-ink/10 min-w-0 border-b p-4 text-left"
                       >
                         <Link
                           className="text-ink block truncate text-sm font-extrabold hover:underline"
@@ -284,7 +284,7 @@ export default async function AdminUsersPage({
                       <td className="text-ink/70 max-w-45 truncate p-4 text-xs">
                         {user.email ?? user.user_id}
                       </td>
-                      <td className="rounded-r-3xl p-4 text-right">
+                      <td className="border-ink/10 border-b p-4 text-right">
                         <AdminStatusBadge
                           label={providerLabel(user.provider_status)}
                           tone={providerTone(user.provider_status)}

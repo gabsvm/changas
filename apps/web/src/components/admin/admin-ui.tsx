@@ -25,9 +25,7 @@ export function AdminPageHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-          {eyebrow}
-        </p>
+        <span className="sr-only">{eyebrow}</span>
         <h1 className="font-display text-ink mt-1 text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl">
           {title}
         </h1>
@@ -82,8 +80,8 @@ export function AdminEmptyState({
   description?: string;
 }) {
   return (
-    <div className="border-ink/[0.08] rounded-3xl border border-dashed px-5 py-8 text-center">
-      <div className="bg-ink/[0.04] text-ink/40 mx-auto grid h-11 w-11 place-items-center rounded-2xl text-lg">
+    <div className="border-ink/[0.08] rounded-2xl border border-dashed px-5 py-5 text-center">
+      <div className="bg-ink/[0.04] text-ink/40 mx-auto grid h-9 w-9 place-items-center rounded-2xl text-lg">
         ✓
       </div>
       <p className="text-ink mt-3 text-sm font-extrabold">{title}</p>

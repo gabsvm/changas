@@ -10,13 +10,13 @@ import { useDialogFocus } from "@/lib/ui/use-dialog-focus";
 import { getAdminNavBadgeCounts } from "@/lib/admin/nav-badges";
 
 import {
-   adminMoreItems,
-   adminNavigationItems,
-   adminPrimaryMobileItems,
-   isAdminNavigationItemActive,
+  adminMoreItems,
+  adminNavigationItems,
+  adminPrimaryMobileItems,
+  isAdminNavigationItemActive,
   type AdminNavBadgeCounts,
-   type AdminNavigationId,
- } from "@/lib/ui/admin-navigation";
+  type AdminNavigationId,
+} from "@/lib/ui/admin-navigation";
 
 const badgeToneClasses: Record<"identity" | "reports", string> = {
   identity: "border-brand-yellow/30 bg-brand-yellow/15 text-warning",
@@ -151,8 +151,9 @@ export function AdminNavigation() {
   const moreActive = adminMoreItems.some((item) =>
     isAdminNavigationItemActive(pathname, item.href),
   );
-  const [badgeCounts, setBadgeCounts] =
-    useState<AdminNavBadgeCounts | null>(null);
+  const [badgeCounts, setBadgeCounts] = useState<AdminNavBadgeCounts | null>(
+    null,
+  );
 
   useDialogFocus(moreOpen, dialogRef, closeRef, () => setMoreOpen(false));
 
@@ -319,7 +320,7 @@ export function AdminNavigation() {
                               }
                               className={`flex min-h-16 items-center gap-3 rounded-2xl border px-3 py-3 text-sm font-bold ${
                                 active
-                                  ? "border-[#12D9C5]/30 bg-[#12D9C5]/10 text-[#12D9C5]"
+                                  ? "border-[#12D9C5]/30 bg-[#12D9C5]/10 text-[#087681] dark:text-[#7BF2E7]"
                                   : "border-ink/[0.08] bg-surface text-ink"
                               }`}
                               href={item.href}
@@ -365,7 +366,7 @@ export function AdminNavigation() {
                   : undefined
               }
               className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
-                active ? "text-[#12D9C5]" : "text-ink/60"
+                active ? "text-[#087681] dark:text-[#7BF2E7]" : "text-ink/60"
               }`}
               href={item.href}
               key={item.id}
@@ -388,7 +389,9 @@ export function AdminNavigation() {
           aria-controls="admin-more-menu"
           aria-haspopup="dialog"
           className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
-            moreActive || moreOpen ? "text-[#12D9C5]" : "text-ink/60"
+            moreActive || moreOpen
+              ? "text-[#087681] dark:text-[#7BF2E7]"
+              : "text-ink/60"
           }`}
           onClick={() => setMoreOpen(true)}
           type="button"

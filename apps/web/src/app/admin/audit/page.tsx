@@ -14,8 +14,10 @@ function humanAction(action: string) {
     JOB_DISPUTE_RESOLVED: "Disputa de trabajo resuelta",
     SKILL_REQUEST_APPROVE_NEW: "Habilidad nueva aprobada",
     CATALOG_CATEGORY_CREATED: "Categoría creada",
+    CATALOG_SYNONYM_CREATED: "Sinónimo creado",
+    CATALOG_SYNONYM_DELETED: "Sinónimo eliminado",
   };
-  return labels[action] ?? action.replaceAll("_", " ");
+  return labels[action] ?? action.toLowerCase().replaceAll("_", " ");
 }
 
 export default async function AdminAuditPage() {
@@ -25,7 +27,7 @@ export default async function AdminAuditPage() {
       <AdminPageHeader
         eyebrow="Sistema · Trazabilidad"
         title="Auditoría"
-        description="Historial append-only de decisiones administrativas. Acá vas a ver también las activaciones manuales de prestadores y su motivo."
+        description="Historial de decisiones administrativas. Incluye activaciones manuales y sus motivos."
       />
       {events.length ? (
         <div className="space-y-2">

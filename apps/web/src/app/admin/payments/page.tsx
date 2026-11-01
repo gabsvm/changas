@@ -54,11 +54,20 @@ export default async function AdminPaymentsPage() {
         title="Pagos y conciliación"
         description="Primero los pendientes y desajustes; debajo queda el detalle financiero y el historial de conciliaciones."
         action={
-          <form action={reconcilePaymentsAction}>
-            <button className="min-h-12 w-full rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a] sm:w-auto">
-              Conciliar Mercado Pago
-            </button>
-          </form>
+          <details className="border-ink/10 bg-surface rounded-2xl border px-4 py-2 sm:max-w-sm">
+            <summary className="flex cursor-pointer justify-between gap-3 text-sm font-bold">
+              Conciliar Mercado Pago <span aria-hidden="true">⌄</span>
+            </summary>
+            <p className="text-ink/70 pb-2 text-sm leading-6">
+              Consulta los pagos en Mercado Pago y puede actualizar su estado.
+              La ejecución y su resultado quedan en el historial de abajo.
+            </p>
+            <form action={reconcilePaymentsAction} className="pb-2">
+              <button className="min-h-12 w-full rounded-xl bg-[#12D9C5] px-4 py-3 text-sm font-bold text-[#10131a]">
+                Iniciar conciliación
+              </button>
+            </form>
+          </details>
         }
       />
 

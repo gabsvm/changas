@@ -179,7 +179,7 @@ export default async function AdminProvidersPage({
         {providers.length ? (
           <>
             <div
-              className="grid gap-3 md:hidden"
+              className="bg-surface border-ink/10 divide-ink/10 grid divide-y overflow-hidden rounded-2xl border md:hidden"
               aria-label="Prestadores registrados"
             >
               {providers.map((provider) => (
@@ -191,7 +191,7 @@ export default async function AdminProvidersPage({
                     "&provider=" +
                     provider.provider_user_id
                   }
-                  className="admin-mobile-record consumer-pressable consumer-card bg-surface flex flex-col gap-2 rounded-2xl p-4"
+                  className="admin-mobile-record consumer-pressable hover:bg-ink/[0.04] flex flex-col gap-1.5 px-4 py-3 transition-colors"
                 >
                   <span className="flex items-start justify-between gap-3">
                     <span className="text-ink min-w-0 font-extrabold">
@@ -211,14 +211,14 @@ export default async function AdminProvidersPage({
                     Paso {provider.onboarding_step}/4 ·{" "}
                     {provider.document_count} documentos
                   </span>
-                  <span className="text-xs font-semibold text-[#12D9C5]">
+                  <span className="text-xs font-semibold text-[#087681] dark:text-[#7BF2E7]">
                     Ver prestador y controles →
                   </span>
                 </Link>
               ))}
             </div>
             <div className="-mx-1 hidden overflow-x-auto px-1 md:block">
-              <table className="w-full min-w-[640px] border-separate border-spacing-2">
+              <table className="w-full min-w-[640px] border-separate border-spacing-y-0">
                 <caption className="sr-only">
                   Prestadores registrados ({providers.length})
                 </caption>
@@ -252,7 +252,7 @@ export default async function AdminProvidersPage({
                     >
                       <th
                         scope="row"
-                        className="min-w-0 rounded-l-3xl p-4 text-left"
+                        className="border-ink/10 min-w-0 border-b p-4 text-left"
                       >
                         <Link
                           className="text-ink block truncate text-sm font-extrabold hover:underline"
@@ -268,7 +268,7 @@ export default async function AdminProvidersPage({
                       <td className="text-ink/70 max-w-45 truncate p-4 text-xs">
                         {provider.email ?? provider.public_slug}
                       </td>
-                      <td className="rounded-r-3xl p-4 text-right">
+                      <td className="border-ink/10 border-b p-4 text-right">
                         <AdminStatusBadge
                           label={statusLabel(provider.status)}
                           tone={providerTone(provider.status)}
