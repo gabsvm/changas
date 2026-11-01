@@ -1,14 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import { formatMinorUnits } from "@changas/domain";
 
 import { transitionJobAction } from "@/app/(account)/jobs/actions";
+import { BottomSheet } from "@/components/ui/marketplace/bottom-sheet";
 import { CorrectionForm } from "@/app/(account)/jobs/[jobId]/correction-form";
 
 type ConfirmCompletionReviewProps = {
   jobId: string;
+  providerName: string;
+  conversationId: string;
   baseMinor: number;
   extrasMinor: number;
   totalMinor: number;
@@ -24,6 +27,8 @@ type ConfirmCompletionReviewProps = {
  */
 export function ConfirmCompletionReview({
   jobId,
+  providerName,
+  conversationId,
   baseMinor,
   extrasMinor,
   totalMinor,
@@ -31,7 +36,6 @@ export function ConfirmCompletionReview({
   compact = false,
 }: ConfirmCompletionReviewProps) {
   const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
 
   if (compact && !open) {
     return (
@@ -47,43 +51,42 @@ export function ConfirmCompletionReview({
   return (
     <>
       <button
-        ref={triggerRef}
         type="button"
-        onClick={() => setOpen((current) => !current)}
-        aria-expanded={open}
-        aria-controls={`confirm-review-${jobId}`}
-        className={`consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold ${open ? "mb-3" : ""}`}
+        onClick={() => setOpen(true)}
+        aria-haspopup="dialog"
+        className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
       >
         Revisar y confirmar
       </button>
-      <div
-        id={`confirm-review-${jobId}`}
-        hidden={!open}
-        className="rounded-xl border border-white/25 bg-white/10 p-4"
+      <BottomSheet
+        open={open}
+        title="Revisá antes de confirmar"
+        onClose={() => setOpen(false)}
       >
-        <dl className="space-y-1 text-sm leading-6 text-white">
+        <p className="text-ink/70 mb-3 text-sm">Prestador: {providerName}</p>
+        <dl className="text-ink space-y-1 text-sm leading-6">
           <div className="flex justify-between gap-3">
-            <dt className="text-white/75">Precio base</dt>
+            <dt className="text-ink/70">Precio base</dt>
             <dd className="font-bold">
               {formatMinorUnits(baseMinor, currencyCode)}
             </dd>
           </div>
           {extrasMinor > 0 ? (
             <div className="flex justify-between gap-3">
-              <dt className="text-white/75">Adicionales pendientes</dt>
+              <dt className="text-ink/70">Adicionales pendientes</dt>
               <dd className="font-bold">
                 {formatMinorUnits(extrasMinor, currencyCode)}
               </dd>
             </div>
           ) : null}
-          <div className="flex justify-between gap-3 border-t border-white/20 pt-1">
+          <div className="border-ink/20 flex justify-between gap-3 border-t pt-1">
             <dt className="font-extrabold">Total pendiente</dt>
             <dd className="font-extrabold">
               {formatMinorUnits(totalMinor, currencyCode)}
             </dd>
           </div>
         </dl>
-        <p className="mt-2 text-xs leading-5 text-white/75">
+        <p className="text-ink/70 mt-2 text-xs leading-5">
           Confirmar no cobra nada todavía: el pago se hace después, por
           separado.
         </p>
@@ -99,25 +102,15 @@ export function ConfirmCompletionReview({
             Confirmar trabajo por {formatMinorUnits(totalMinor, currencyCode)}
           </button>
         </form>
-        <div className="mt-2 grid gap-2">
-          <CorrectionForm jobId={jobId} />
-          <a
-            href="#ayuda"
-            className="consumer-pressable inline-flex min-h-[52px] w-full items-center justify-center rounded-xl border border-white/25 px-4 text-sm font-bold text-white"
-          >
-            Reportar problema
-          </a>
-          <button
-            type="button"
-            onClick={() => {
-              setOpen(false);
-              triggerRef.current?.focus();
-            }}
-            className="min-h-11 text-sm font-semibold text-white/75 underline"
-          >
-            Volver
-          </button>
-        </div>
+        <a
+          href={`/messages/${conversationId}`}
+          className="text-ink mt-3 inline-flex min-h-11 items-center text-sm font-bold underline"
+        >
+          Algo salió mal · Volver al chat
+        </a>
+      </BottomSheet>
+      <div className="mt-2">
+        <CorrectionForm jobId={jobId} />
       </div>
     </>
   );

@@ -285,9 +285,6 @@ export default async function ProviderMarketplaceManagePage({
               label="Proveedor"
             />
             <div className="min-w-0">
-              <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-                Proveedor
-              </p>
               <h1 className="font-display mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
                 Gestioná tu oferta
               </h1>

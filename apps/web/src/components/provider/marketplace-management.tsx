@@ -709,13 +709,13 @@ function ServiceForm({
         <Check
           label="Publicado"
           name="isPublished"
+          hint={
+            canPublish
+              ? "Para publicar, agregá una foto pública en tu portfolio."
+              : "Se habilita cuando tu identidad esté verificada. Podés guardarlo como borrador."
+          }
           defaultChecked={service?.is_published}
           disabled={!canPublish}
-          {...(canPublish
-            ? {}
-            : {
-                hint: "Se habilita cuando tu identidad esté verificada. Podés guardarlo como borrador.",
-              })}
         />
         <Check
           label="Pausado"

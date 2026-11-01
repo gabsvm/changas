@@ -152,8 +152,8 @@ describe("marketplace polish contracts", () => {
     expect(nearbySource).not.toContain('from "./service-row"');
   });
 
-  it("renders decorative brand ribbons without a client animation loop", () => {
-    expect(rootSource).toContain("<MagneticRibbons");
+  it("keeps the compact home free of decorative ribbons and preserves their static implementation", () => {
+    expect(rootSource).not.toContain("<MagneticRibbons");
     expect(magneticSource).toContain('aria-hidden="true"');
     expect(magneticSource).not.toContain("<canvas");
     expect(magneticSource).not.toContain("requestAnimationFrame");

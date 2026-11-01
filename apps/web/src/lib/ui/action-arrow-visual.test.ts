@@ -44,8 +44,5 @@ describe("Better Design — directional CTA and button polish", () => {
       /className="yalo-value-glyph" aria-hidden="true">\s*✦\s*<\/span>/,
     );
     expect(trustStrip).toContain('className="yalo-confidence-icon">✓</span>');
-    expect(home).toMatch(
-      /className="yalo-eyebrow-arrow" aria-hidden="true">\s*✦\s*<\/span>/,
-    );
   });
 });

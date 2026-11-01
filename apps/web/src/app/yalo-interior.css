@@ -192,13 +192,6 @@
   border-radius: 22px;
   border-color: rgb(8 169 244 / 11%);
 }
-.yalo-ui .yalo-guide::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  background: var(--yalo-symbol-gradient);
-}
 .yalo-ui .yalo-guide > div > span:first-child {
   width: 59px;
   height: 59px;

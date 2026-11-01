@@ -383,9 +383,7 @@ export function DiscoveryResults({
           role="status"
           className={`text-sm font-semibold ${resultsError ? "text-danger" : "text-ink/75"} ${!resultsError && rows.length === 0 ? "sr-only" : ""}`}
         >
-          {resultsError
-            ? resultsError
-            : resultCountLabel}
+          {resultsError ? resultsError : resultCountLabel}
         </p>
         {enableNearby ? (
           <button
@@ -422,6 +420,16 @@ export function DiscoveryResults({
           </button>
         ) : null}
       </div>
+
+      {resultsError ? (
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="consumer-pressable text-focus min-h-11 rounded-lg px-2 text-sm font-bold underline underline-offset-4"
+        >
+          Reintentar
+        </button>
+      ) : null}
 
       {rows.length > 0 && !resultsError ? (
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">

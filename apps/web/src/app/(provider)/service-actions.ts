@@ -132,6 +132,41 @@ export async function saveServiceTransactional(
     .maybeSingle();
   if (!provider) return errorState("Prepará primero tu perfil de proveedor.");
 
+  const serviceId = getFormString(formData, "serviceId") || null;
+  if (parsed.isPublished) {
+    let alreadyPublished = false;
+    if (serviceId) {
+      const { data: existing, error } = await supabase
+        .from("services")
+        .select("is_published")
+        .eq("id", serviceId)
+        .eq("provider_user_id", user.id)
+        .maybeSingle();
+      if (error)
+        return errorState(
+          "No pudimos verificar el servicio. Intentá de nuevo.",
+        );
+      alreadyPublished = existing?.is_published === true;
+    }
+    if (!alreadyPublished) {
+      const { data: photos, error } = await supabase
+        .from("portfolio_items")
+        .select("id")
+        .eq("provider_user_id", user.id)
+        .eq("is_public", true)
+        .not("media_path", "is", null)
+        .limit(1);
+      if (error)
+        return errorState(
+          "No pudimos verificar tu portfolio. Intentá de nuevo.",
+        );
+      if (!photos?.length)
+        return errorState(
+          "Para publicar, agregá una foto pública en tu portfolio. Podés guardar el servicio como borrador.",
+        );
+    }
+  }
+
   // Offering a service in a skill implies having that skill on the profile.
   const { error: skillError } = await supabase.from("provider_skills").upsert(
     {
@@ -147,7 +182,7 @@ export async function saveServiceTransactional(
   }
 
   const args: SaveServiceRpcArgs = {
-    target_service_id: getFormString(formData, "serviceId") || null,
+    target_service_id: serviceId,
     requested_skill_id: parsed.skillId,
     requested_title: parsed.title,
     requested_description: parsed.description,

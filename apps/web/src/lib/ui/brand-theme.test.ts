@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
+import { runInNewContext } from "node:vm";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 const globals = readFileSync(
   new URL("../../app/globals.css", import.meta.url),
@@ -21,6 +22,27 @@ const badgeSources = [
 ]
   .map((path) => readFileSync(new URL(path, import.meta.url), "utf8"))
   .join("\n");
+
+describe("theme initialization", () => {
+  it.each([
+    [null, true, false, "light"],
+    ["dark", false, true, "dark"],
+    ["system", true, true, "light dark"],
+    ["system", false, false, "light dark"],
+  ])("applies saved preference %s", (saved, systemDark, dark, colorScheme) => {
+    const script = layout.match(/const themeInitScript =\s*'([^']+)'/)?.[1];
+    expect(script).toBeDefined();
+    const toggle = vi.fn();
+    const style = { colorScheme: "" };
+    runInNewContext(script!, {
+      localStorage: { getItem: () => saved },
+      window: { matchMedia: () => ({ matches: systemDark }) },
+      document: { documentElement: { classList: { toggle }, style } },
+    });
+    expect(toggle).toHaveBeenCalledWith("dark", dark);
+    expect(style.colorScheme).toBe(colorScheme);
+  });
+});
 
 describe("YALO brand theme", () => {
   it("uses Space Grotesk + Inter as product typefaces", () => {

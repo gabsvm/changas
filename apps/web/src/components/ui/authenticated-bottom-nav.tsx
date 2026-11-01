@@ -169,7 +169,7 @@ export function AuthenticatedBottomNav({
 
   return (
     <nav
-      className="bottom-nav-shell mobile-safe-bottom border-ink/[0.07] bg-surface/90 fixed inset-x-0 bottom-0 z-50 border-t px-2 pt-1 shadow-[0_-12px_32px_-16px_rgb(16_24_39/20%)] backdrop-blur-xl sm:hidden"
+      className="bottom-nav-shell mobile-safe-bottom border-ink/[0.07] bg-surface/90 fixed inset-x-0 bottom-0 z-50 border-t px-2 pt-1 shadow-[0_-12px_32px_-16px_rgb(16_24_39/20%)] sm:hidden"
       aria-label="Navegación principal"
     >
       {/* Acento medido: franja de 2px con el gradiente identitario YALO. */}
@@ -192,7 +192,7 @@ export function AuthenticatedBottomNav({
               key={item.key}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`consumer-pressable focus-visible:ring-focus/45 relative flex min-h-12 flex-col items-center justify-end gap-1 rounded-xl px-1 pt-1 pb-2 text-[11px] font-bold outline-none focus-visible:ring-2 ${
+              className={`consumer-pressable focus-visible:ring-focus/45 relative flex min-h-12 flex-col items-center justify-end gap-1 rounded-xl px-1 pt-1 pb-1.5 text-xs font-semibold outline-none focus-visible:ring-2 ${
                 active ? "text-ink" : "text-ink/70 hover:text-ink/80"
               }`}
             >

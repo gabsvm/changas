@@ -1,3 +1,5 @@
+> Histórico: reemplazado por el diseño YALO vigente documentado en `docs/DESIGN.md` (2026-11-01).
+
 # Changas Brand System
 
 ## Purpose

@@ -333,10 +333,7 @@
 }
 .yalo-stage-title span {
   display: block;
-  background: linear-gradient(105deg, #81ceff 6%, #12d9c5 52%, #65ec91 91%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: white;
 }
 .yalo-stage-description {
   width: min(100%, 640px);
@@ -459,7 +456,6 @@
 .yalo-hero-offer a:hover {
   color: #65ec91;
 }
-
 
 .yalo-hero-search {
   display: flex;
@@ -1408,5 +1404,121 @@
   }
   .yalo-showcase :is(a, button):focus-visible .yalo-action-arrow {
     transform: none !important;
+  }
+}
+
+/* Home: keep the search and discovery close to the first viewport. */
+.yalo-stage {
+  min-height: 0;
+  justify-content: flex-start;
+  padding: 36px 32px;
+  border: 1px solid rgb(16 24 39 / 8%);
+  border-radius: 24px;
+  background: #f6f9fc;
+  box-shadow: none;
+}
+.yalo-stage::before,
+.yalo-stage::after {
+  display: none;
+}
+.yalo-stage-copy {
+  width: min(100%, 680px);
+  margin: 0;
+  text-align: left;
+}
+.yalo-stage-title {
+  margin: 0;
+  color: #101827;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+.yalo-stage-description {
+  margin: 12px 0 0;
+  color: #526174;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.yalo-hero-search {
+  margin: 22px 0 0;
+  border-color: rgb(16 24 39 / 12%);
+  background: white;
+  box-shadow: none;
+}
+.yalo-hero-search .consumer-control {
+  background: white;
+}
+.yalo-search-submit {
+  background: #161d2a;
+  color: white;
+}
+.yalo-hero-offer {
+  margin: 12px 0 0;
+  color: #526174;
+}
+.yalo-hero-offer a {
+  color: #101827;
+}
+.yalo-hero-offer a:hover {
+  color: #1576d2;
+}
+.yalo-hero-shortcuts {
+  justify-content: flex-start;
+  margin: 8px 0 0;
+}
+.yalo-hero-shortcuts > span {
+  color: #526174;
+  font-size: 13px;
+}
+.yalo-hero-shortcuts a {
+  min-height: 44px;
+  color: #101827;
+  background: white;
+  border-color: rgb(16 24 39 / 12%);
+  font-size: 13px;
+}
+.yalo-hero-shortcuts a span {
+  color: #1576d2;
+}
+.dark .yalo-stage {
+  background: #15202e;
+  border-color: rgb(255 255 255 / 10%);
+}
+.dark .yalo-stage-title,
+.dark .yalo-hero-offer a {
+  color: #f5f8fc;
+}
+.dark .yalo-stage-description,
+.dark .yalo-hero-offer,
+.dark .yalo-hero-shortcuts > span {
+  color: #c4d2df;
+}
+.dark .yalo-hero-shortcuts a {
+  background: #202e3d;
+  border-color: rgb(255 255 255 / 16%);
+  color: #f5f8fc;
+}
+.dark .yalo-hero-shortcuts a span {
+  color: #8ab4f8;
+}
+@media (max-width: 640px) {
+  .yalo-stage {
+    padding: 24px 18px;
+  }
+  .yalo-stage-copy {
+    padding: 0;
+  }
+  .yalo-stage-title {
+    font-size: 2rem;
+  }
+  .yalo-stage-description {
+    max-width: none;
+  }
+  .yalo-hero-search {
+    flex-direction: column;
+    padding: 7px;
+  }
+  .yalo-hero-shortcuts > span {
+    width: auto;
   }
 }

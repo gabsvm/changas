@@ -100,32 +100,16 @@ export function NextStepBanner({
   return (
     <section
       aria-label="Qué sigue"
-      className={`relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] p-5 text-white shadow-[0_18px_40px_-14px_rgb(13_18_27/60%)] ${className}`}
+      className={`bg-surface border-ink/10 rounded-2xl border p-5 ${className}`}
     >
-      <span
-        className="pointer-events-none absolute inset-0 opacity-20"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgb(255 255 255 / 60%) 1px, transparent 1.5px)",
-          backgroundSize: "12px 12px",
-        }}
-        aria-hidden="true"
-      />
-      <p className="relative text-[11px] font-extrabold tracking-[0.16em] text-white/80 uppercase">
-        Qué sigue
-      </p>
-      <h2 className="font-display relative mt-1 text-[22px] leading-7 font-extrabold tracking-[-0.02em]">
+      <h2 className="font-display text-ink text-xl leading-7 font-bold tracking-[-0.02em]">
         {title}
       </h2>
-      <p className="relative mt-1 text-sm leading-5 text-white/85">{hint}</p>
+      <p className="text-ink/70 mt-1 text-sm leading-6">{hint}</p>
       {href ? (
         <Link
           href={href}
-          className="button-primary consumer-pressable relative mt-4 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl px-6 text-base font-extrabold shadow-[0_10px_24px_-10px_rgb(0_0_0/45%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 sm:w-auto sm:min-w-56"
-          style={{
-            backgroundImage: "var(--yalo-symbol-gradient)",
-            color: "#062233",
-          }}
+          className="cta-ink consumer-pressable mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 sm:w-auto"
         >
           {cta}
           <span aria-hidden="true">

@@ -12,7 +12,6 @@ import { DesktopNav } from "@/components/ui/marketplace/desktop-nav";
 import { CategoryTile } from "@/components/ui/marketplace/category-tile";
 import { ActionArrowIcon } from "@/components/ui/marketplace/action-arrow-icon";
 import { HowItWorks } from "@/components/ui/marketplace/how-it-works";
-import { MagneticRibbons } from "@/components/ui/marketplace/magnetic-ribbons";
 import { NearbyServiceRail } from "@/components/ui/marketplace/nearby-service-rail";
 import { TrustStrip } from "@/components/ui/marketplace/trust-strip";
 import { SearchField } from "@/components/ui/marketplace/search-field";
@@ -160,9 +159,7 @@ async function HomeLiveJob() {
       href={"/jobs/" + heroJob.job_id}
       className="yalo-live-job"
       aria-label={
-        "Servicio en marcha: " +
-        heroJob.service_title +
-        ". Ver seguimiento."
+        "Servicio en marcha: " + heroJob.service_title + ". Ver seguimiento."
       }
     >
       <span className="yalo-live-pulse" aria-hidden="true" />
@@ -249,26 +246,12 @@ export default async function HomePage() {
         </Suspense>
 
         <section className="yalo-stage" aria-labelledby="home-search-title">
-          <div className="yalo-stage-backdrop" aria-hidden="true">
-            <span className="yalo-stage-orb yalo-stage-orb-one" />
-            <span className="yalo-stage-orb yalo-stage-orb-two" />
-          </div>
-          <MagneticRibbons />
           <div className="yalo-stage-copy">
-            <div className="yalo-hero-eyebrow">
-              <span className="yalo-eyebrow-spark" aria-hidden="true" />
-              CONTRATÁ CON CONFIANZA
-              <span className="yalo-eyebrow-arrow" aria-hidden="true">
-                ✦
-              </span>
-            </div>
             <h1 id="home-search-title" className="yalo-stage-title">
-              Lo que necesitás.
-              <span>Alguien verificado que lo haga.</span>
+              ¿Qué necesitás hacer?
             </h1>
             <p className="yalo-stage-description">
-              Contratá por chat, acordá el precio y calificá al final. Sin
-              vueltas.
+              Encontrá servicios, conversá y acordá los detalles.
             </p>
 
             <form
@@ -337,13 +320,6 @@ export default async function HomePage() {
                 </Link>
               </p>
             ) : null}
-          </div>
-
-          <div className="yalo-stage-footnote" aria-hidden="true">
-            <span>PERSONAS + HABILIDADES + OPORTUNIDADES</span>
-            <span className="yalo-stage-scroll">
-              DESCUBRÍ YALO <span>↓</span>
-            </span>
           </div>
         </section>
 

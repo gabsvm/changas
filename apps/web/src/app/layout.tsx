@@ -46,7 +46,7 @@ export const viewport: Viewport = {
 };
 
 const themeInitScript =
-  '(function(){try{var t=localStorage.getItem("changas-theme");if(t!=="light"&&t!=="dark"&&t!=="system")t="dark";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var h=document.documentElement;h.classList.toggle("dark",d);h.style.colorScheme=t==="system"?"light dark":t;}catch(e){}})();';
+  '(function(){try{var t=localStorage.getItem("changas-theme");if(t!=="light"&&t!=="dark"&&t!=="system")t="light";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var h=document.documentElement;h.classList.toggle("dark",d);h.style.colorScheme=t==="system"?"light dark":t;}catch(e){}})();';
 
 export default function RootLayout({
   children,
@@ -59,9 +59,11 @@ export default function RootLayout({
       className={`${displayFont.variable} ${bodyFont.variable}`}
       suppressHydrationWarning
     >
-      <Script id="changas-theme" strategy="beforeInteractive">
-        {themeInitScript}
-      </Script>
+      <head>
+        <Script id="changas-theme" strategy="beforeInteractive">
+          {themeInitScript}
+        </Script>
+      </head>
       <body>
         <a className="skip-link" href="#main-content">
           Ir al contenido principal

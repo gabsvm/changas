@@ -282,7 +282,8 @@ export default async function JobPage({
     externalPaymentPending: pendingExternalDeclaration
       ? {
           amountMinor: pendingExternalDeclaration.amount_minor,
-          declaredByMe: pendingExternalDeclaration.declared_by_user_id === user.id,
+          declaredByMe:
+            pendingExternalDeclaration.declared_by_user_id === user.id,
         }
       : null,
     correctionCount: detail.correction_count,
@@ -649,6 +650,8 @@ export default async function JobPage({
           <div className="relative mt-4 grid gap-2 sm:grid-cols-2">
             <PrimaryAction
               jobId={jobId}
+              providerName={detail.counterparty_name}
+              conversationId={detail.conversation_id}
               kind={nextAction.kind}
               href={nextAction.href}
               hrefLabel={nextAction.hrefLabel}
@@ -1374,6 +1377,8 @@ export default async function JobPage({
             {nextAction.kind || nextAction.href ? (
               <PrimaryAction
                 jobId={jobId}
+                providerName={detail.counterparty_name}
+                conversationId={detail.conversation_id}
                 kind={nextAction.kind}
                 href={nextAction.href}
                 hrefLabel={nextAction.hrefLabel}
@@ -1500,6 +1505,8 @@ function StatusButton({
 
 function PrimaryAction({
   jobId,
+  providerName,
+  conversationId,
   kind,
   href,
   hrefLabel,
@@ -1508,6 +1515,8 @@ function PrimaryAction({
   remote,
 }: {
   jobId: string;
+  providerName: string;
+  conversationId: string;
   kind: NextAction["kind"];
   href?: string | undefined;
   hrefLabel?: string | undefined;
@@ -1570,6 +1579,8 @@ function PrimaryAction({
     return (
       <ConfirmCompletionReview
         jobId={jobId}
+        providerName={providerName}
+        conversationId={conversationId}
         baseMinor={reviewAmounts.baseMinor}
         extrasMinor={reviewAmounts.extrasMinor}
         totalMinor={reviewAmounts.totalMinor}

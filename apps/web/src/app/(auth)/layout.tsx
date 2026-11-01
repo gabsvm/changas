@@ -61,7 +61,7 @@ export default function AuthLayout({
           <div className="relative z-10 grid w-full items-center gap-5 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
             <section
               aria-label="Por qué usar YALO"
-              className="yalo-auth-hero order-last lg:order-first"
+              className="yalo-auth-hero order-last hidden lg:order-first lg:block"
             >
               <span
                 className="absolute inset-0 opacity-25"

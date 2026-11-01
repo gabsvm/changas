@@ -126,7 +126,7 @@ export default async function MessagesPage({
       <div className="pt-4 sm:pt-0">
         {page.windowed ? (
           <p className="text-ink/60 mb-3 text-sm">
-            Mostrando un bloque del historial. {" "}
+            Mostrando un bloque del historial.{" "}
             <Link
               href={`/messages?${showUnreadOnly ? "filter=unread" : ""}`}
               className="text-ink underline"
@@ -239,7 +239,7 @@ export default async function MessagesPage({
             />
           )
         ) : (
-          <div className="mt-4 grid gap-3 sm:mt-6">
+          <div className="border-ink/10 bg-surface divide-ink/10 mt-4 grid divide-y overflow-hidden rounded-2xl border sm:mt-6">
             {visible.map((conversation) => (
               <ConversationRow
                 key={conversation.conversation_id}
@@ -272,7 +272,7 @@ function ConversationRow({
   return (
     <Link
       href={`/messages/${conversation.conversation_id}`}
-      className="consumer-card consumer-pressable bg-surface group flex min-h-[76px] items-center gap-3 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] sm:px-4 dark:hover:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
+      className="consumer-pressable hover:bg-ink/[0.04] group flex min-h-[76px] items-center gap-3 p-4 transition-colors sm:px-5"
     >
       <Avatar
         name={conversation.peer_display_name}

@@ -2,7 +2,7 @@
 
 > **Estado:** Borrador (reconstruido desde código; NO confirmado por propietario)
 > **Última revisión:** 2026-10-13
-> **Fuentes consultadas:** `docs/CONTEXTO.md` (2026-10-11), `README.md`, `apps/web` (Next.js 16, PWA), `packages/domain` + `packages/validation`, `docs/design/changas-brand-system.md`, `docs/archive/CHANGAS_MASTER_PLAN.md` (visión V1, parcialmente superseded según README). Lo no observado se marca `[INFERENCE]` o TBD.
+> **Fuentes consultadas:** `docs/CONTEXTO.md` (2026-10-11), `README.md`, `apps/web` (Next.js 16, PWA), `packages/domain` + `packages/validation`, `docs/archive/changas-brand-system.md`, `docs/archive/CHANGAS_MASTER_PLAN.md` (visión V1, parcialmente superseded según README). Lo no observado se marca `[INFERENCE]` o TBD.
 
 > **Regla de uso:** este archivo describe el PRODUCTO, no la implementación. Decisiones no confirmadas van en §8.
 
@@ -55,12 +55,12 @@
 
 ## 8. Decisiones por resolver
 
-| Pregunta pendiente                                                                                                                                                | Por qué importa                         | Estado / responsable    |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | ----------------------- |
-| CTA primario: ¿naranja + texto tinta (brand doc) o tinta + blanco (código actual)? Contradicción real entre `docs/design/changas-brand-system.md` y `globals.css` | cambia el sistema visual completo       | Pendiente / propietario |
-| Geografía y alcance de lanzamiento                                                                                                                                | define filtros "cerca", zonas y rollout | Pendiente / propietario |
-| ¿Existe métrica de tiempo de respuesta del proveedor? (el sticky dice "responde rápido" sin dato)                                                                 | copy con o sin evidencia                | Pendiente / propietario |
-| Reprogramar en `IN_PROGRESS`: ¿regla de negocio o faltante?                                                                                                       | cambia spec de lifecycle                | Pendiente / propietario |
+| Pregunta pendiente                                                                                | Por qué importa                         | Estado / responsable    |
+| ------------------------------------------------------------------------------------------------- | --------------------------------------- | ----------------------- |
+| CTA primario: tinta y blanco, según los tokens YALO vigentes.                                     | Mantiene el sistema visual actual.      | Resuelto                |
+| Geografía y alcance de lanzamiento                                                                | define filtros "cerca", zonas y rollout | Pendiente / propietario |
+| ¿Existe métrica de tiempo de respuesta del proveedor? (el sticky dice "responde rápido" sin dato) | copy con o sin evidencia                | Pendiente / propietario |
+| Reprogramar en `IN_PROGRESS`: ¿regla de negocio o faltante?                                       | cambia spec de lifecycle                | Pendiente / propietario |
 
 ## 9. Historial mínimo
 

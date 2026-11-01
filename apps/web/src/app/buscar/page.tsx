@@ -167,19 +167,13 @@ export default async function SearchPage({
           }
         />
 
-        <GuideHeader
-          step={1}
-          steps={CLIENT_HIRE_STEPS}
-          className="mt-4 sm:mt-6"
-        />
-
-        <section className="pt-3 sm:pt-8">
-          <div className="border-ink/[0.08] bg-surface text-ink relative overflow-hidden rounded-3xl border p-5 shadow-[var(--consumer-shadow-hero)] sm:p-6 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
+        <section className="pt-4 sm:pt-8">
+          <div className="text-ink relative sm:py-2">
             <h1 className="relative z-10 text-[22px] leading-8 font-extrabold tracking-[-0.025em] sm:text-3xl sm:leading-10">
               {query ? `Resultados para “${query}”` : "Explorar servicios"}
             </h1>
             <form action="/buscar" className="relative z-10 mt-4">
-              <div className="grid gap-3">
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">
                 <SearchField
                   defaultValue={query}
                   id="search-query"
@@ -369,6 +363,12 @@ export default async function SearchPage({
               />
             )}
           </div>
+          <details className="border-ink/10 mt-6 rounded-2xl border px-4 py-3">
+            <summary className="consumer-pressable min-h-11 cursor-pointer py-2 text-sm font-bold">
+              ¿Cómo funciona YALO?
+            </summary>
+            <GuideHeader step={1} steps={CLIENT_HIRE_STEPS} className="mt-2" />
+          </details>
         </section>
       </div>
       <BottomNav authenticated={Boolean(user)} />
