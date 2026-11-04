@@ -102,7 +102,7 @@ export default async function NeedDetailPage({
       <p className="text-ink/70 mt-2 text-[13px] font-bold">
         {post.skill_name ?? "Rubro"} · {STATUS_LABELS[post.status]}
       </p>
-      <h1 className="mt-1 text-xl font-extrabold tracking-[-0.02em]">
+      <h1 className="mt-1 text-xl font-semibold tracking-[-0.02em]">
         {post.title}
       </h1>
       <p className="text-ink/80 mt-3 text-[15px] leading-7 whitespace-pre-line">
@@ -152,7 +152,7 @@ export default async function NeedDetailPage({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-extrabold">
+                      <p className="text-sm font-semibold">
                         {offer.provider_name}
                       </p>
                       <p className="text-ink/65 mt-1 text-xs">
@@ -220,7 +220,7 @@ export default async function NeedDetailPage({
               </form>
             </div>
           <div className="consumer-card bg-surface mt-6 rounded-2xl border p-4">
-            <h2 className="text-sm font-extrabold">Qué sigue</h2>
+            <h2 className="text-sm font-semibold">Qué sigue</h2>
             <p className="text-ink/70 mt-1 text-[13px] leading-5">
               Te avisamos por notificación cuando lleguen ofertas. Mientras
               tanto podés mirar perfiles y comparar precios.

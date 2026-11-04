@@ -397,7 +397,7 @@ export default async function JobPage({
           <div className="bg-success/[0.08] text-success mt-0 flex items-center gap-3 rounded-2xl px-4 py-4 sm:mt-5">
             <SuccessCheck className="h-10 w-10" />
             <div>
-              <p className="text-[17px] leading-6 font-extrabold">
+              <p className="text-[17px] leading-6 font-semibold">
                 ¡Trabajo completado!
               </p>
               {reviewState?.can_review && !reviewState.review_id ? (
@@ -413,21 +413,13 @@ export default async function JobPage({
           <div
             className="relative h-20 overflow-hidden sm:h-24"
             style={{
-              backgroundImage:
-                "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)",
+              background:
+                "#F5B942",
             }}
             role="img"
             aria-label={`Ficha ilustrada de ${detail.service_title}`}
           >
-            <span
-              className="absolute inset-0 opacity-25"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                backgroundSize: "12px 12px",
-              }}
-              aria-hidden="true"
-            />
+            
             <span
               className="absolute -right-6 -bottom-8 h-24 w-24 rounded-full bg-white/20"
               aria-hidden="true"
@@ -444,7 +436,7 @@ export default async function JobPage({
                 {getServiceModalityLabel(detail.modality)}
               </StatusChip>
             </div>
-            <h1 className="font-display mt-3 text-[22px] leading-8 font-extrabold tracking-[-0.025em]">
+            <h1 className="font-display mt-3 text-[22px] leading-8 font-semibold tracking-[-0.025em]">
               {detail.service_title}
             </h1>
             <p className="text-ink/70 mt-1.5 text-sm leading-6">
@@ -465,7 +457,7 @@ export default async function JobPage({
                 <p className="text-ink/70 text-xs leading-4 font-semibold">
                   Precio acordado
                 </p>
-                <p className="mt-0.5 font-extrabold">{price}</p>
+                <p className="mt-0.5 font-semibold">{price}</p>
               </div>
             </div>
           </div>
@@ -490,11 +482,11 @@ export default async function JobPage({
             detail.delivery_submitted_at !== null ||
             detail.job_status === "COMPLETION_REQUESTED") ? (
             <div className="border-ink/[0.08] bg-canvas mt-3 rounded-2xl border p-4 text-center">
-              <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.12em] uppercase">
+              <p className="text-ink/60 text-[11px] font-semibold">
                 PIN para el prestador
               </p>
               <p
-                className="font-display mt-1 text-3xl font-extrabold tracking-[0.25em]"
+                className="font-display mt-1 text-3xl font-semibold"
                 aria-label={`PIN de entrega ${detail.confirmation_code}`}
               >
                 {detail.confirmation_code}
@@ -527,7 +519,7 @@ export default async function JobPage({
           ) : null}
           {tracking.exception ? (
             <div className="border-warning/25 bg-warning/[0.06] mt-3 rounded-2xl border p-4">
-              <h3 className="text-sm font-extrabold">
+              <h3 className="text-sm font-semibold">
                 {tracking.exception.title}
               </h3>
               <p className="text-ink/70 mt-1 text-[13px] leading-6">
@@ -618,30 +610,16 @@ export default async function JobPage({
 
         <section
           id="proxima-accion"
-          className="brand-gradient-surface relative mt-5 scroll-mt-20 overflow-hidden rounded-2xl p-5 text-white shadow-[0_4px_10px_rgb(255_107_53/14%),0_30px_64px_-18px_rgb(255_87_34/46%)] dark:shadow-[0_30px_64px_-18px_rgb(0_0_0/70%)]"
+          className="brand-gradient-surface relative mt-5 scroll-mt-20 overflow-hidden rounded-2xl p-5 text-white shadow-[0_30px_64px_-18px_rgb(13_18_27/28%)]"
           aria-label="Qué sigue"
         >
-          <span
-            className="pointer-events-none absolute inset-0 opacity-25"
-            style={{
-              backgroundImage:
-                "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-              backgroundSize: "12px 12px",
-            }}
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute -right-6 -bottom-8 h-24 w-24 rounded-full bg-white/20"
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute -top-4 -left-4 h-14 w-14 rounded-full bg-white/15"
-            aria-hidden="true"
-          />
-          <p className="relative text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">
+          
+          
+          
+          <p className="relative text-[11px] font-semibold text-white/70">
             Qué sigue
           </p>
-          <h2 className="font-display relative mt-1 text-lg leading-7 font-extrabold">
+          <h2 className="font-display relative mt-1 text-lg leading-7 font-semibold">
             {nextAction.heading}
           </h2>
           <p className="relative mt-1 text-sm leading-6 text-white/85">
@@ -750,8 +728,8 @@ export default async function JobPage({
                       </div>
                     ) : null}
                     <div className="border-ink/10 flex justify-between gap-3 border-t pt-1">
-                      <dt className="font-extrabold">Total acordado</dt>
-                      <dd className="font-extrabold">
+                      <dt className="font-semibold">Total acordado</dt>
+                      <dd className="font-semibold">
                         {formatMinorUnits(
                           detail.settlement_total_minor,
                           detail.currency_code as "ARS",
@@ -769,7 +747,7 @@ export default async function JobPage({
                         <PaymentSubmitButton
                           idleLabel="Pagar con Mercado Pago"
                           pendingLabel="Redirigiendo…"
-                          className="consumer-pressable cta-ink inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-extrabold"
+                          className="consumer-pressable cta-ink inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-semibold"
                         />
                       </form>
                       <p className="text-ink/70 mt-2 text-xs leading-5">
@@ -845,7 +823,7 @@ export default async function JobPage({
                     key={change.scope_change_id}
                     className="border-ink/[0.08] bg-ink/[0.03] rounded-xl border px-3 py-2 text-sm leading-6 whitespace-pre-wrap dark:bg-white/[0.04]"
                   >
-                    <span className="text-moss text-xs font-extrabold tracking-[0.06em] uppercase">
+                    <span className="text-moss text-xs font-semibold">
                       Acordado después ·{" "}
                     </span>
                     {change.scope_snapshot}
@@ -894,7 +872,7 @@ export default async function JobPage({
                 ) ? (
                   <>
                     <div className="border-danger/25 bg-danger/[0.04] rounded-2xl border p-4">
-                      <h3 className="text-sm font-extrabold">
+                      <h3 className="text-sm font-semibold">
                         ¿Algo salió mal con este trabajo?
                       </h3>
                       <ol className="text-ink/70 mt-2 list-decimal space-y-1 pl-5 text-[13px] leading-6">
@@ -938,7 +916,7 @@ export default async function JobPage({
                 ) : null}
                 {detail.job_status === "DISPUTED" ? (
                   <div className="border-warning/25 bg-warning/[0.06] rounded-2xl border p-4">
-                    <h3 className="text-sm font-extrabold">Caso en revisión</h3>
+                    <h3 className="text-sm font-semibold">Caso en revisión</h3>
                     <p className="text-ink/70 mt-1 text-[13px] leading-6">
                       El equipo de YALO está revisando lo reportado con ambas
                       partes. Te avisamos por acá cuando haya novedades.
@@ -1048,7 +1026,7 @@ export default async function JobPage({
                               <button
                                 name="action"
                                 value="ACCEPT"
-                                className="consumer-pressable cta-ink inline-flex min-h-11 items-center rounded-xl px-4 text-xs font-extrabold"
+                                className="consumer-pressable cta-ink inline-flex min-h-11 items-center rounded-xl px-4 text-xs font-semibold"
                               >
                                 Aceptar
                               </button>
@@ -1190,7 +1168,7 @@ export default async function JobPage({
                               <button
                                 name="action"
                                 value="ACCEPT"
-                                className="consumer-pressable cta-ink inline-flex min-h-11 items-center rounded-xl px-4 text-xs font-extrabold"
+                                className="consumer-pressable cta-ink inline-flex min-h-11 items-center rounded-xl px-4 text-xs font-semibold"
                               >
                                 Aceptar cambio
                               </button>
@@ -1223,7 +1201,7 @@ export default async function JobPage({
                                   <PaymentSubmitButton
                                     idleLabel="Pagar adicional con Mercado Pago"
                                     pendingLabel="Redirigiendo…"
-                                    className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-sm font-extrabold"
+                                    className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-sm font-semibold"
                                   />
                                 </form>
                                 <p className="text-ink/70 mt-2 text-xs leading-5">
@@ -1263,7 +1241,7 @@ export default async function JobPage({
                                   value="SUCCESS"
                                   idleLabel="Simular pago aprobado"
                                   pendingLabel="Simulando…"
-                                  className="consumer-pressable cta-ink inline-flex min-h-11 items-center rounded-xl px-4 text-xs font-extrabold"
+                                  className="consumer-pressable cta-ink inline-flex min-h-11 items-center rounded-xl px-4 text-xs font-semibold"
                                 />
                                 <PaymentSubmitButton
                                   name="outcome"
@@ -1415,7 +1393,7 @@ export default async function JobPage({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-ink/42 text-[11px] font-bold tracking-[0.08em] uppercase">
+      <p className="text-ink/42 text-[11px] font-bold">
         {label}
       </p>
       <p className="mt-1 text-sm font-semibold">{value}</p>
@@ -1496,7 +1474,7 @@ function StatusButton({
       <input type="hidden" name="jobId" value={jobId} />
       <input type="hidden" name="expectedStatus" value={expected} />
       <input type="hidden" name="requestedStatus" value={requested} />
-      <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold">
+      <button className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold">
         {label}
       </button>
     </form>
@@ -1529,7 +1507,7 @@ function PrimaryAction({
     return (
       <Link
         href={href}
-        className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+        className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold"
       >
         {hrefLabel ?? "Ver detalle"}
       </Link>
@@ -1550,7 +1528,7 @@ function PrimaryAction({
       return (
         <a
           href="#proxima-accion"
-          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold"
         >
           Enviar entrega
         </a>
@@ -1563,7 +1541,7 @@ function PrimaryAction({
       return (
         <a
           href="#proxima-accion"
-          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold"
         >
           Ingresar PIN
         </a>
@@ -1594,7 +1572,7 @@ function PrimaryAction({
       return (
         <Link
           href="#pago"
-          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold"
         >
           Ver pago entre ustedes
         </Link>
@@ -1606,7 +1584,7 @@ function PrimaryAction({
         <PaymentSubmitButton
           idleLabel="Pagar con Mercado Pago"
           pendingLabel="Redirigiendo…"
-          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+          className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold"
         />
       </form>
     );
@@ -1615,7 +1593,7 @@ function PrimaryAction({
     return (
       <Link
         href="#resena"
-        className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+        className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold"
       >
         Dejar reseña
       </Link>

@@ -395,7 +395,7 @@ export function ConversationThread({
     actionableProposalId !== null ||
     (currentUserIsClient && allowDirectBooking && spotlight === null);
   const actionBase =
-    "consumer-pressable inline-flex min-h-12 min-w-0 items-center justify-center rounded-xl px-2.5 py-2 text-center text-[14px] leading-5 font-extrabold transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-[15px]";
+    "consumer-pressable inline-flex min-h-12 min-w-0 items-center justify-center rounded-xl px-2.5 py-2 text-center text-[14px] leading-5 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-[15px]";
   const actionPrimary = "cta-ink";
   // Contrast against the card in both themes: ~3.38:1 light, ~3.62:1 dark.
   const actionSecondary =
@@ -411,14 +411,7 @@ export function ConversationThread({
           }}
           aria-hidden="true"
         >
-          <span
-            className="absolute inset-0 opacity-25"
-            style={{
-              backgroundImage:
-                "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-              backgroundSize: "10px 10px",
-            }}
-          />
+          
         </div>
         <div className="flex min-h-12 items-center gap-2.5">
           <Link
@@ -442,14 +435,14 @@ export function ConversationThread({
             </svg>
           </Link>
           <span
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-[15px] font-extrabold text-white shadow-[0_6px_16px_-6px_rgb(23_20_15/40%)]"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-[15px] font-semibold text-white shadow-[0_6px_16px_-6px_rgb(23_20_15/40%)]"
             style={{ backgroundColor: "var(--color-brand-primary)" }}
             aria-hidden="true"
           >
             {peerName.trim().charAt(0).toUpperCase() || "C"}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[15px] font-extrabold">{peerName}</p>
+            <p className="truncate text-[15px] font-semibold">{peerName}</p>
             <Link
               href={providerHref}
               className="text-ink/70 block truncate text-[13px] underline-offset-4 hover:underline"
@@ -550,7 +543,7 @@ export function ConversationThread({
               aria-hidden="true"
             />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-extrabold">
+              <span className="block truncate text-sm font-semibold">
                 {spotlight.title}
               </span>
               <span className="block truncate text-xs text-white/70">
@@ -567,7 +560,7 @@ export function ConversationThread({
             ) : null}
             <Link
               href={spotlight.href}
-              className="consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-3.5 text-[13px] font-extrabold text-[#0D121B]"
+              className="consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-3.5 text-[13px] font-semibold text-[#0D121B]"
             >
               {spotlight.cta}
             </Link>
@@ -595,7 +588,7 @@ export function ConversationThread({
             aria-label={`Ver acuerdo: ${deal.statusLabel}, ${deal.amountLabel}`}
           >
             <StatusChip tone={deal.statusTone}>{deal.statusLabel}</StatusChip>
-            <span className="truncate text-sm font-extrabold">
+            <span className="truncate text-sm font-semibold">
               {deal.amountLabel}
             </span>
             <span className="text-brand-primary ml-auto shrink-0 text-[13px] font-bold dark:text-white">

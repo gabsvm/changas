@@ -47,7 +47,7 @@ export default async function NeedsPage({
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
       <MobileAppBar title="Mis necesidades" backHref="/jobs" />
-      <h1 className="mt-5 hidden text-[24px] leading-8 font-extrabold tracking-[-0.03em] sm:block">
+      <h1 className="mt-5 hidden text-[24px] leading-8 font-semibold tracking-[-0.03em] sm:block">
         Mis necesidades
       </h1>
       <nav className="mt-5 flex gap-3" aria-label="Páginas de mis necesidades">

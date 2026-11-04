@@ -256,7 +256,7 @@ export default async function ConversationPage({
                   </span>
                   <Link
                     href={`/jobs/${job.job_id}`}
-                    className="consumer-pressable text-moss inline-flex min-h-11 items-center text-sm font-extrabold"
+                    className="consumer-pressable text-moss inline-flex min-h-11 items-center text-sm font-semibold"
                   >
                     Ver seguimiento →
                   </Link>
@@ -281,10 +281,10 @@ export default async function ConversationPage({
                 className="min-w-0 flex-1"
               />
               <span
-                className="inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                className="inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-semibold text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                 style={{
-                  backgroundImage:
-                    "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
+                  background:
+                    "#0D121B",
                 }}
                 aria-label={`${proposals.length} propuestas`}
               >

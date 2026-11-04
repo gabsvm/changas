@@ -137,7 +137,7 @@ export default async function MessagesPage({
         ) : null}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
-            <h1 className="hidden text-3xl font-extrabold tracking-[-0.03em] sm:block">
+            <h1 className="hidden text-3xl font-semibold tracking-[-0.03em] sm:block">
               Mensajes
             </h1>
             <p className="text-ink/70 max-w-[20rem] text-sm leading-6 sm:mt-1">
@@ -165,8 +165,8 @@ export default async function MessagesPage({
               showUnreadOnly
                 ? undefined
                 : {
-                    backgroundImage:
-                      "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
+                    background:
+                      "#0D121B",
                   }
             }
           >
@@ -183,8 +183,8 @@ export default async function MessagesPage({
             style={
               showUnreadOnly
                 ? {
-                    backgroundImage:
-                      "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
+                    background:
+                      "#0D121B",
                   }
                 : undefined
             }

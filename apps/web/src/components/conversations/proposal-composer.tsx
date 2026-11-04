@@ -59,7 +59,7 @@ export function ProposalComposer({
       id="nueva-propuesta"
       className="border-ink/[0.08] bg-surface consumer-card relative scroll-mt-24 overflow-hidden rounded-2xl border shadow-[var(--consumer-shadow-card)]"
     >
-      <summary className="consumer-pressable inline-flex min-h-12 w-full cursor-pointer items-center gap-2.5 p-4 text-[15px] font-extrabold">
+      <summary className="consumer-pressable inline-flex min-h-12 w-full cursor-pointer items-center gap-2.5 p-4 text-[15px] font-semibold">
         <IllustratedBadge
           tone="gold"
           icon="tag"
@@ -162,7 +162,7 @@ export function ProposalComposer({
             <button
               type="submit"
               disabled={pending}
-              className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold disabled:opacity-50 sm:w-auto sm:px-8"
+              className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold disabled:opacity-50 sm:w-auto sm:px-8"
             >
               {pending ? "Guardando…" : "Enviar propuesta"}
             </button>

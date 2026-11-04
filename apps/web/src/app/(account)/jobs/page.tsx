@@ -153,7 +153,7 @@ export default async function JobsPage({
             </Link>
           </p>
         ) : null}
-        <h1 className="mt-1.5 text-[24px] leading-8 font-extrabold tracking-[-0.03em]">
+        <h1 className="mt-1.5 text-[24px] leading-8 font-semibold tracking-[-0.03em]">
           Mis trabajos
         </h1>
         <p className="text-ink/70 mt-1.5 max-w-md text-sm leading-6">
@@ -219,8 +219,8 @@ export default async function JobsPage({
                 style={
                   active
                     ? {
-                        backgroundImage:
-                          "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
+                        background:
+                          "#0D121B",
                       }
                     : undefined
                 }
@@ -277,25 +277,18 @@ export default async function JobsPage({
                 <Link
                   key={job.job_id}
                   href={`/jobs/${job.job_id}`}
-                  className="consumer-card consumer-card-pressed consumer-pressable group bg-surface flex min-h-[76px] items-center gap-3 p-4 transition-all duration-200 hover:-translate-y-0.5"
+                  className="consumer-card consumer-card-pressed consumer-pressable group bg-surface flex min-h-[76px] items-center gap-3 p-4 transition-colors duration-200"
                 >
                   <span
-                    className="relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl text-base font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                    className="relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl text-base font-semibold text-white shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                     style={{
-                      backgroundImage:
-                        "linear-gradient(135deg, #08A9F4 0%, #125C75 100%)",
+                      background:
+                        "#08A9F4",
                     }}
                     aria-hidden="true"
                   >
-                    <span
-                      className="absolute inset-0 opacity-25"
-                      style={{
-                        backgroundImage:
-                          "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                        backgroundSize: "10px 10px",
-                      }}
-                    />
-                    <span className="relative drop-shadow-[0_2px_6px_rgb(0_0_0/25%)]">
+                    
+                    <span className="relative">
                       {job.service_title.trim().charAt(0).toUpperCase() || "C"}
                     </span>
                   </span>
@@ -313,7 +306,7 @@ export default async function JobsPage({
                   {amount || action ? (
                     <span className="flex max-w-[42%] shrink-0 flex-col items-end gap-1 text-right sm:max-w-none">
                       {amount ? (
-                        <span className="text-[15px] font-extrabold">
+                        <span className="text-[15px] font-semibold">
                           {amount}
                         </span>
                       ) : null}

@@ -21,7 +21,7 @@ export function JobTracker({ tracking }: { tracking: JobTracking }) {
   const current = tracking.steps[tracking.currentIndex];
   return (
     <div>
-      <p className="text-[13px] font-extrabold" aria-live="polite">
+      <p className="text-[13px] font-semibold" aria-live="polite">
         Paso {tracking.currentIndex + 1} de {tracking.steps.length} ·{" "}
         {current?.label}
       </p>
@@ -51,7 +51,7 @@ function TrackerRow({
     <li className="relative flex gap-3 pb-4 last:pb-0">
       <span className="flex flex-col items-center" aria-hidden="true">
         <span
-          className={`flex h-7 w-7 items-center justify-center rounded-full border-2 text-[13px] font-extrabold ${dot}`}
+          className={`flex h-7 w-7 items-center justify-center rounded-full border-2 text-[13px] font-semibold ${dot}`}
         >
           {step.state === "done"
             ? "✓"
@@ -63,7 +63,7 @@ function TrackerRow({
       </span>
       <span className="min-w-0 pb-1">
         <span
-          className={`block text-sm font-extrabold ${step.state === "todo" || frozen ? "text-ink/55" : "text-ink"}`}
+          className={`block text-sm font-semibold ${step.state === "todo" || frozen ? "text-ink/55" : "text-ink"}`}
         >
           {step.label}
         </span>

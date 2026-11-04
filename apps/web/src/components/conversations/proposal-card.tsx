@@ -160,28 +160,20 @@ export function ProposalCard({
           backgroundImage: "var(--consumer-hero-gradient)",
         }}
       >
-        <span
-          className="absolute inset-0 opacity-25"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-            backgroundSize: "10px 10px",
-          }}
-          aria-hidden="true"
-        />
+        
         <IllustratedBadge
           tone="orange"
           icon="tag"
           size="sm"
           label={kindLabels[proposal.proposal_kind]}
         />
-        <p className="relative text-xs font-extrabold tracking-[0.06em] text-white uppercase drop-shadow-[0_1px_4px_rgb(0_0_0/30%)]">
+        <p className="relative text-xs font-semibold text-white">
           {kindLabels[proposal.proposal_kind]} · v{proposal.version_number}
         </p>
       </div>
       <div className="p-4 pt-3.5">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="min-w-0 flex-1 truncate text-[15px] font-extrabold">
+          <h3 className="min-w-0 flex-1 truncate text-[15px] font-semibold">
             {proposal.service_title}
           </h3>
           <StatusChip tone={statusTones[proposal.proposal_status]}>
@@ -196,7 +188,7 @@ export function ProposalCard({
         <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
           <div className="border-ink/[0.08] bg-canvas rounded-xl border p-3">
             <dt className="text-ink/70 text-xs font-semibold">Precio total</dt>
-            <dd className="mt-1 text-[15px] font-extrabold">
+            <dd className="mt-1 text-[15px] font-semibold">
               {proposal.price_amount === null
                 ? "A cotizar"
                 : formatMinorUnits(
@@ -207,7 +199,7 @@ export function ProposalCard({
           </div>
           <div className="border-ink/[0.08] bg-canvas rounded-xl border p-3">
             <dt className="text-ink/70 text-xs font-semibold">Modalidad</dt>
-            <dd className="mt-1 text-[15px] font-extrabold">
+            <dd className="mt-1 text-[15px] font-semibold">
               {proposal.modality === "REMOTE"
                 ? "Remoto"
                 : proposal.modality === "IN_PERSON"
@@ -220,7 +212,7 @@ export function ProposalCard({
               <dt className="text-ink/70 text-xs font-semibold">
                 Fecha acordada
               </dt>
-              <dd className="mt-1 text-[15px] font-extrabold">
+              <dd className="mt-1 text-[15px] font-semibold">
                 {scheduleFormatter.format(new Date(proposal.schedule_start_at))}
                 {proposal.schedule_end_at &&
                 proposal.schedule_end_at !== proposal.schedule_start_at
@@ -250,7 +242,7 @@ export function ProposalCard({
                   size="sm"
                   label="Condiciones"
                 />
-                <span className="text-[13px] font-extrabold">
+                <span className="text-[13px] font-semibold">
                   Sin pago por adelantado
                 </span>
               </div>
@@ -295,7 +287,7 @@ export function ProposalCard({
         {respondState.status === "SUCCESS" && respondState.jobId ? (
           <Link
             href={`/jobs/${respondState.jobId}`}
-            className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+            className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold"
           >
             Ver seguimiento del servicio
           </Link>
@@ -341,7 +333,7 @@ export function ProposalCard({
                     <RespondSubmitButton
                       label="Confirmar contratación"
                       pendingLabel="Confirmando…"
-                      className="consumer-pressable cta-ink inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-extrabold disabled:opacity-50"
+                      className="consumer-pressable cta-ink inline-flex min-h-12 items-center justify-center rounded-xl px-4 text-sm font-semibold disabled:opacity-50"
                     />
                   </div>
                 </form>
@@ -352,7 +344,7 @@ export function ProposalCard({
                     setConfirmingHire(true);
                     router.refresh();
                   }}
-                  className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+                  className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold"
                 >
                   Contratar
                 </button>
@@ -466,7 +458,7 @@ export function ProposalCard({
         {proposal.proposal_status === "ACCEPTED" && jobId ? (
           <Link
             href={`/jobs/${jobId}`}
-            className="consumer-pressable cta-ink mt-4 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold"
+            className="consumer-pressable cta-ink mt-4 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold"
           >
             Ver seguimiento del servicio
           </Link>
@@ -516,7 +508,7 @@ export function ProposalCard({
               <button
                 type="submit"
                 disabled={revising}
-                className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-extrabold disabled:opacity-50"
+                className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-[15px] font-semibold disabled:opacity-50"
               >
                 {revising ? "Enviando…" : "Enviar respuesta"}
               </button>
