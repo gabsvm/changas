@@ -67,24 +67,10 @@ export default async function AccountPage() {
   return (
     <section className="pt-5 pb-6 sm:py-10">
       <div className="mx-auto max-w-2xl">
-        <header className="brand-gradient-surface relative overflow-hidden rounded-[1.75rem] p-5 shadow-[0_4px_10px_rgb(255_107_53/14%),0_30px_64px_-18px_rgb(255_87_34/46%)] dark:shadow-[0_30px_64px_-18px_rgb(0_0_0/70%)]">
-          <span
-            className="absolute inset-0 opacity-25"
-            style={{
-              backgroundImage:
-                "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-              backgroundSize: "12px 12px",
-            }}
-            aria-hidden="true"
-          />
-          <span
-            className="absolute -right-8 -bottom-12 h-32 w-32 rounded-full bg-white/20"
-            aria-hidden="true"
-          />
-          <span
-            className="absolute -top-6 -left-6 h-20 w-20 rounded-full bg-white/15"
-            aria-hidden="true"
-          />
+        <header className="brand-gradient-surface relative overflow-hidden rounded-[1.75rem] p-5 shadow-[0_30px_64px_-18px_rgb(13_18_27/28%)]">
+          
+          
+          
           <Link
             href="/account/profile"
             className="consumer-pressable relative flex items-center gap-4 rounded-2xl"
@@ -98,7 +84,7 @@ export default async function AccountPage() {
               />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-xl font-extrabold tracking-[-0.02em] text-white">
+              <span className="block truncate text-xl font-semibold tracking-[-0.02em] text-white">
                 {displayName}
               </span>
               <span className="mt-1 block truncate text-sm leading-5 text-white/85">
@@ -140,7 +126,7 @@ export default async function AccountPage() {
             href="/account/profile"
             className="consumer-pressable border-ink/[0.08] bg-surface mt-5 block rounded-2xl border px-4 py-3.5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
           >
-            <span className="flex items-center justify-between gap-3 text-sm font-extrabold">
+            <span className="flex items-center justify-between gap-3 text-sm font-semibold">
               Completá tu perfil
               <span className="text-ink/70 font-bold">{completion}%</span>
             </span>
@@ -149,7 +135,7 @@ export default async function AccountPage() {
               aria-hidden="true"
             >
               <span
-                className="brand-gradient-surface block h-full rounded-full"
+                className="block h-full rounded-full bg-[#1576D2]"
                 style={{ width: `${Math.max(completion, 8)}%` }}
               />
             </span>
@@ -337,7 +323,7 @@ function AccountGroup({
 }) {
   return (
     <section className="mt-8" aria-label={title}>
-      <h2 className="text-ink/42 px-1 text-xs leading-5 font-bold tracking-[0.08em] uppercase">
+      <h2 className="text-ink/70 px-1 text-xs leading-5 font-semibold">
         {title}
       </h2>
       <div className="consumer-card bg-surface divide-ink/[0.07] border-ink/[0.08] mt-2 divide-y border px-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">

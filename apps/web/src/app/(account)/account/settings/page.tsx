@@ -35,10 +35,7 @@ export default async function AccountSettingsPage() {
             label="Configuración"
           />
           <div>
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-              Cuenta
-            </p>
-            <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+            <h1 className="mt-0.5 text-3xl font-semibold tracking-[-0.035em]">
               Configuración
             </h1>
           </div>

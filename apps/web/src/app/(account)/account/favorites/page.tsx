@@ -52,10 +52,7 @@ export default async function FavoritesPage() {
             label="Guardados"
           />
           <div>
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-              Mi cuenta
-            </p>
-            <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+            <h1 className="mt-0.5 text-3xl font-semibold tracking-[-0.035em]">
               Proveedores guardados
             </h1>
           </div>

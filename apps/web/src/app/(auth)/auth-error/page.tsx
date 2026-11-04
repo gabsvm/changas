@@ -13,19 +13,12 @@ export default function AuthErrorPage() {
         aria-hidden="true"
         className="brand-gradient-surface relative mx-auto grid h-28 w-28 place-items-center overflow-hidden rounded-[1.75rem] shadow-[0_18px_48px_rgb(255_107_53/18%)]"
       >
-        <span
-          className="absolute inset-0 opacity-25"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-            backgroundSize: "12px 12px",
-          }}
-        />
-        <span className="absolute -right-4 -bottom-5 h-16 w-16 rounded-full bg-white/20" />
-        <span className="absolute -top-3 -left-3 h-10 w-10 rounded-full bg-white/15" />
+        
+        
+        
         <IllustratedBadge tone="gold" icon="key" size="lg" label="Acceso" />
       </span>
-      <p className="text-terracotta mt-5 text-xs font-semibold tracking-[0.18em] uppercase">
+      <p className="text-terracotta mt-5 text-xs font-semibold">
         Acceso
       </p>
       <h1 className="font-display mt-3 text-4xl leading-tight font-semibold">

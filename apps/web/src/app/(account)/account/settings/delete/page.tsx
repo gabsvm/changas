@@ -31,7 +31,7 @@ export default async function DeleteAccountPage() {
             size="md"
             label="Eliminar cuenta"
           />
-          <h1 className="text-3xl font-extrabold tracking-[-0.035em]">
+          <h1 className="text-3xl font-semibold tracking-[-0.035em]">
             Eliminar cuenta
           </h1>
         </div>

@@ -149,7 +149,7 @@ export default async function NotificationCenterPage({
                   <section key={label} aria-labelledby={`activity-${label}`}>
                     <h2
                       id={`activity-${label}`}
-                      className="text-ink/70 mb-2 text-xs font-bold tracking-[0.1em] uppercase"
+                      className="text-ink/70 mb-2 text-xs font-semibold"
                     >
                       {label}
                     </h2>
@@ -158,7 +158,7 @@ export default async function NotificationCenterPage({
                         <li key={item.id} className="relative py-3.5 sm:px-1">
                           <div className="flex gap-3">
                             <span
-                              className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.unread ? "brand-gradient-surface" : "bg-ink/18"}`}
+                              className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.unread ? "bg-[#1576D2]" : "bg-ink/18"}`}
                               aria-hidden="true"
                             />
                             <div className="min-w-0 flex-1">

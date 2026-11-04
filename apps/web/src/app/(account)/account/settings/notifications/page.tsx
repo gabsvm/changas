@@ -33,10 +33,7 @@ export default async function NotificationSettingsPage() {
             label="Notificaciones"
           />
           <div>
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
-              Configuración
-            </p>
-            <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+            <h1 className="mt-0.5 text-3xl font-semibold tracking-[-0.035em]">
               Notificaciones
             </h1>
           </div>

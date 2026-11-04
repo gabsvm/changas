@@ -108,7 +108,7 @@ export function AuthForm({
         aria-hidden="true"
         className="brand-gradient-surface pointer-events-none absolute inset-x-0 top-0 h-1.5"
       />
-      <h1 className="font-display mt-2 text-3xl leading-tight font-extrabold tracking-[-0.04em] sm:mt-3 sm:text-4xl">
+      <h1 className="font-display mt-2 text-3xl leading-tight font-semibold tracking-[-0.04em] sm:mt-3 sm:text-4xl">
         {modeCopy.title}
       </h1>
       <p className="text-ink/70 mt-2 text-sm leading-6 sm:mt-3">

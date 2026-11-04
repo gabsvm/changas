@@ -45,43 +45,21 @@ export default function AuthLayout({
               aria-hidden="true"
             />
           </Link>
-          <span className="text-xs font-extrabold tracking-[0.16em] text-[#12D9C5] uppercase">
-            Cuenta
-          </span>
+          
         </header>
         <div className="relative flex flex-1 items-center justify-center py-5 sm:py-12">
-          <div
-            className="pointer-events-none absolute -top-20 -right-24 h-56 w-56 rounded-full bg-[#08A9F4]/15 blur-3xl"
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[#12D9C5]/10 blur-3xl"
-            aria-hidden="true"
-          />
+          
+          
           <div className="relative z-10 grid w-full items-center gap-5 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
             <section
               aria-label="Por qué usar YALO"
               className="yalo-auth-hero order-last hidden lg:order-first lg:block"
             >
-              <span
-                className="absolute inset-0 opacity-25"
-                style={{
-                  backgroundImage:
-                    "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                  backgroundSize: "12px 12px",
-                }}
-                aria-hidden="true"
-              />
-              <span
-                className="absolute -right-10 -bottom-12 h-44 w-44 rounded-full bg-white/20"
-                aria-hidden="true"
-              />
-              <span
-                className="absolute -top-8 -left-8 h-28 w-28 rounded-full bg-white/15"
-                aria-hidden="true"
-              />
+              
+              
+              
               <div className="relative">
-                <span className="font-display inline-flex items-center gap-2.5 text-3xl font-extrabold tracking-[-0.06em] text-white">
+                <span className="font-display inline-flex items-center gap-2.5 text-3xl font-semibold tracking-[-0.06em] text-white">
                   <span className="brand-mark h-11 w-11" aria-hidden="true" />
                   <span
                     className="brand-wordmark"
@@ -89,17 +67,15 @@ export default function AuthLayout({
                     aria-label="YALO"
                   />
                 </span>
-                <p className="mt-4 text-xs font-extrabold tracking-[0.18em] text-white/85 uppercase">
-                  YALO · trabajo de barrio
-                </p>
-                <h2 className="font-display mt-3 text-4xl leading-[1.05] font-extrabold tracking-[-0.035em]">
+                
+                <h2 className="font-display mt-3 text-4xl leading-[1.05] font-semibold tracking-[-0.035em]">
                   La ayuda que necesitás, a unas cuadras.
                 </h2>
                 <ul className="mt-8 space-y-4">
                   {HERO_POINTS.map((point) => (
                     <li
                       key={point.title}
-                      className="flex items-start gap-3 rounded-2xl border border-white/25 bg-white/12 p-3 backdrop-blur-sm"
+                      className="flex items-start gap-3 rounded-2xl border border-white/15 bg-white/[0.06] p-3"
                     >
                       <IllustratedBadge
                         tone={point.tone}
@@ -107,7 +83,7 @@ export default function AuthLayout({
                         size="sm"
                       />
                       <span>
-                        <span className="block text-[15px] font-extrabold">
+                        <span className="block text-[15px] font-semibold">
                           {point.title}
                         </span>
                         <span className="mt-0.5 block text-sm leading-5 text-white/85">
