@@ -498,12 +498,12 @@ const WEEKDAY_NAMES = [
   "Sábado",
 ];
 const PORTFOLIO_COVERS = [
-  "linear-gradient(135deg, #161D2A 0%, #0D121B 100%)",
-  "linear-gradient(135deg, #4F8DFF 0%, #2F4BFE 100%)",
-  "linear-gradient(135deg, #2FBF71 0%, #0E7C46 100%)",
-  "linear-gradient(135deg, #8B7CFF 0%, #5B4BD6 100%)",
-  "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)",
-  "linear-gradient(135deg, #FB6F92 0%, #E14D7A 100%)",
+  "#161D2A",
+  "#161D2A",
+  "#161D2A",
+  "#161D2A",
+  "#161D2A",
+  "#161D2A",
 ];
 
 function Section({
@@ -542,7 +542,7 @@ function Section({
             size="sm"
             label={title}
           />
-          <p className="text-terracotta min-w-0 truncate text-xs font-semibold tracking-[0.16em] uppercase">
+          <p className="text-terracotta min-w-0 truncate text-xs font-semibold">
             {eyebrow}
           </p>
         </div>
@@ -894,7 +894,7 @@ export function MarketplaceManagement({
               href={`#${id}`}
               onClick={() => setActiveSection(id)}
               aria-current={active ? "true" : undefined}
-              className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-all duration-200 ${
+              className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-colors duration-200 ${
                 active
                   ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
                   : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#1b2b3d] dark:text-[#f5efe8]"
@@ -902,8 +902,8 @@ export function MarketplaceManagement({
               style={
                 active
                   ? {
-                      backgroundImage:
-                        "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
+                      background:
+                        "#0D121B",
                     }
                   : undefined
               }
@@ -1036,7 +1036,7 @@ export function MarketplaceManagement({
             open={services.length === 0}
             className="border-ink/10 bg-surface/75 rounded-2xl border px-4 py-3 dark:border-white/10 dark:bg-[#1b2b3d]"
           >
-            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
               + Nuevo servicio
               <span className="text-ink/40 text-xl" aria-hidden="true">
                 ›
@@ -1108,7 +1108,7 @@ export function MarketplaceManagement({
                 </ActionForm>
               </div>
               <details className="border-ink/10 mt-3 border-t pt-2">
-                <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+                <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
                   Editar servicio
                   <span className="text-ink/40 text-xl" aria-hidden="true">
                     ›
@@ -1162,7 +1162,7 @@ export function MarketplaceManagement({
             }}
           />
           <details className="border-ink/10 mt-5 border-t pt-2">
-            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
               + Agregar experiencia
               <span className="text-ink/40 text-xl" aria-hidden="true">
                 ›
@@ -1214,7 +1214,7 @@ export function MarketplaceManagement({
             }}
           />
           <details className="border-ink/10 mt-5 border-t pt-2">
-            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
               + Agregar formación
               <span className="text-ink/40 text-xl" aria-hidden="true">
                 ›
@@ -1271,7 +1271,7 @@ export function MarketplaceManagement({
             }}
           />
           <details className="border-ink/10 mt-5 border-t pt-2">
-            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
               + Agregar certificación
               <span className="text-ink/40 text-xl" aria-hidden="true">
                 ›
@@ -1319,7 +1319,7 @@ export function MarketplaceManagement({
               {portfolioItems.map((item, index) => (
                 <li
                   key={item.id}
-                  className="border-ink/[0.08] bg-surface consumer-card consumer-card-pressed consumer-pressable overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] transition-all duration-200 hover:-translate-y-0.5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
+                  className="border-ink/[0.08] bg-surface consumer-card consumer-card-pressed consumer-pressable overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] transition-colors duration-200 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
                 >
                   <span
                     className="relative block h-16 overflow-hidden"
@@ -1329,14 +1329,7 @@ export function MarketplaceManagement({
                     }}
                     aria-hidden="true"
                   >
-                    <span
-                      className="absolute inset-0 opacity-25"
-                      style={{
-                        backgroundImage:
-                          "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                        backgroundSize: "10px 10px",
-                      }}
-                    />
+                    
                     <span className="absolute -right-4 -bottom-6 h-16 w-16 rounded-full bg-white/20" />
                   </span>
                   <span className="block p-4">
@@ -1366,7 +1359,7 @@ export function MarketplaceManagement({
             </p>
           )}
           <details className="border-ink/10 mt-5 border-t pt-2">
-            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-extrabold">
+            <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
               + Agregar pieza
               <span className="text-ink/40 text-xl" aria-hidden="true">
                 ›

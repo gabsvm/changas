@@ -74,10 +74,10 @@ export default async function ProviderOnboardingDocumentsPage() {
             label="Paso 3 de 4"
           />
           <div>
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[11px] font-semibold">
               Paso 3 de 4
             </p>
-            <h1 className="font-display mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+            <h1 className="font-display mt-0.5 text-3xl font-semibold tracking-[-0.035em]">
               Tus papeles
             </h1>
           </div>

@@ -41,7 +41,7 @@ export async function DocumentListItem({
         />
       ) : (
         <span
-          className="bg-success/10 text-success grid h-14 w-14 shrink-0 place-items-center rounded-xl text-xs font-extrabold"
+          className="bg-success/10 text-success grid h-14 w-14 shrink-0 place-items-center rounded-xl text-xs font-semibold"
           aria-hidden="true"
         >
           {isPdf ? "PDF" : "✓"}

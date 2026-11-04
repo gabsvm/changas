@@ -219,7 +219,7 @@ export function DocumentUploader({
               label="Subí un documento"
             />
             <div className="min-w-0">
-              <p className="text-terracotta text-[11px] font-extrabold tracking-[0.14em] uppercase">
+              <p className="text-terracotta text-[11px] font-semibold">
                 Privado
               </p>
               <h2 className="font-display mt-1 text-lg font-bold">
@@ -389,7 +389,7 @@ export function DocumentUploader({
           ) : null}
 
           <button
-            className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-semibold disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             type="submit"
             disabled={pending || compressing || uploading || !selected}
           >

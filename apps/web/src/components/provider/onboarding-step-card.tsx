@@ -13,7 +13,7 @@ const stateCopy = {
 function StepBadge({ step }: { step: OnboardingStepPresentation }) {
   return (
     <span
-      className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-extrabold ${
+      className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-semibold ${
         step.state === "current"
           ? "cta-ink"
           : step.state === "complete"

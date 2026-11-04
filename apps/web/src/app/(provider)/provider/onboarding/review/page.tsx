@@ -190,10 +190,10 @@ export default async function ProviderOnboardingReviewPage() {
               label="Paso 4 de 4"
             />
             <div className="min-w-0">
-              <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+              <p className="text-terracotta text-[11px] font-semibold">
                 Paso 4 de 4
               </p>
-              <h1 className="font-display mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+              <h1 className="font-display mt-0.5 text-3xl font-semibold tracking-[-0.035em]">
                 Estado de tu verificación
               </h1>
             </div>
@@ -262,7 +262,7 @@ export default async function ProviderOnboardingReviewPage() {
             </summary>
             <dl className="space-y-2.5 pb-4 text-sm">
               <div>
-                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold">
                   Nombre visible
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -270,7 +270,7 @@ export default async function ProviderOnboardingReviewPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold">
                   Zona
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -278,7 +278,7 @@ export default async function ProviderOnboardingReviewPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold">
                   Presentación
                 </dt>
                 <dd className="mt-0.5 leading-6">{profile?.bio ?? "—"}</dd>
@@ -302,7 +302,7 @@ export default async function ProviderOnboardingReviewPage() {
             </summary>
             <dl className="space-y-2.5 pb-4 text-sm">
               <div>
-                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold">
                   Nombre legal
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -310,7 +310,7 @@ export default async function ProviderOnboardingReviewPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold">
                   DNI
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -318,7 +318,7 @@ export default async function ProviderOnboardingReviewPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/70 text-xs font-bold tracking-[0.06em] uppercase">
+                <dt className="text-ink/70 text-xs font-bold">
                   Teléfono
                 </dt>
                 <dd className="mt-0.5 font-semibold">
@@ -365,7 +365,7 @@ export default async function ProviderOnboardingReviewPage() {
             </p>
             {rejected && rejectionReason ? (
               <div className="border-danger/25 bg-danger/[0.04] mt-3 rounded-2xl border p-4">
-                <p className="text-sm font-extrabold">Motivo del rechazo</p>
+                <p className="text-sm font-semibold">Motivo del rechazo</p>
                 <p className="text-ink/70 mt-1 text-sm leading-6">
                   {rejectionReason}
                 </p>
@@ -389,7 +389,7 @@ export default async function ProviderOnboardingReviewPage() {
             !approved &&
             !(editable && readyForSubmission) ? (
               <Link
-                className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
+                className="consumer-pressable cta-ink mt-3 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-semibold sm:w-auto"
                 href="/provider/onboarding/documents"
               >
                 {rejected ? "Corregir y reenviar" : "Ir a documentos"}
@@ -441,7 +441,7 @@ export default async function ProviderOnboardingReviewPage() {
 
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
           <Link
-            className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
+            className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-semibold sm:w-auto"
             href="/provider/onboarding"
           >
             Volver al resumen

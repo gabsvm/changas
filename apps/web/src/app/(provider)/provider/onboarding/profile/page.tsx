@@ -55,10 +55,10 @@ export default async function ProviderOnboardingProfilePage() {
             label="Paso 1 de 4"
           />
           <div>
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[11px] font-semibold">
               Paso 1 de 4
             </p>
-            <h1 className="mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+            <h1 className="mt-0.5 text-3xl font-semibold tracking-[-0.035em]">
               Prepará tu perfil público
             </h1>
           </div>

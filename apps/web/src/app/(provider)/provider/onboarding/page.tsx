@@ -62,10 +62,10 @@ export default async function ProviderOnboardingPage() {
               label="Ser proveedor"
             />
             <div className="min-w-0">
-              <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+              <p className="text-terracotta text-[11px] font-semibold">
                 Proveedor
               </p>
-              <h1 className="font-display mt-1.5 text-3xl font-extrabold tracking-[-0.035em]">
+              <h1 className="font-display mt-1.5 text-3xl font-semibold tracking-[-0.035em]">
                 Empezá tu verificación
               </h1>
             </div>
@@ -212,10 +212,10 @@ export default async function ProviderOnboardingPage() {
       <div className="mx-auto max-w-2xl pt-5 sm:pt-0">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[11px] font-semibold">
               Perfil de proveedor
             </p>
-            <h1 className="font-display mt-2 text-3xl leading-9 font-extrabold tracking-[-0.035em]">
+            <h1 className="font-display mt-2 text-3xl leading-9 font-semibold tracking-[-0.035em]">
               Tu verificación
             </h1>
           </div>
@@ -279,7 +279,7 @@ export default async function ProviderOnboardingPage() {
             <ProgressBar value={progress} label="Progreso de verificación" />
           </div>
           <Link
-            className="consumer-pressable cta-ink mt-5 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-extrabold sm:w-auto"
+            className="consumer-pressable cta-ink mt-5 inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-semibold sm:w-auto"
             href={primaryHref}
           >
             {primaryLabel}

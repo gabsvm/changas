@@ -285,7 +285,7 @@ export default async function ProviderMarketplaceManagePage({
               label="Proveedor"
             />
             <div className="min-w-0">
-              <h1 className="font-display mt-0.5 text-3xl font-extrabold tracking-[-0.035em]">
+              <h1 className="font-display mt-0.5 text-3xl font-semibold tracking-[-0.035em]">
                 Gestioná tu oferta
               </h1>
               <p className="text-ink/70 mt-1 text-sm">
@@ -353,12 +353,12 @@ export default async function ProviderMarketplaceManagePage({
                 className="border-ink/10 bg-surface mt-6 rounded-2xl border p-5"
                 aria-label="Resumen de ingresos"
               >
-                <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+                <p className="text-terracotta text-[11px] font-semibold">
                   Resumen de ingresos
                 </p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-3">
                   <div>
-                    <p className="text-[22px] leading-7 font-extrabold">
+                    <p className="text-[22px] leading-7 font-semibold">
                       {formatMinorUnits(income.settledTotal, "ARS")}
                     </p>
                     <p className="text-ink/70 mt-0.5 text-[13px]">
@@ -367,7 +367,7 @@ export default async function ProviderMarketplaceManagePage({
                     </p>
                   </div>
                   <div>
-                    <p className="text-[22px] leading-7 font-extrabold">
+                    <p className="text-[22px] leading-7 font-semibold">
                       {formatMinorUnits(income.dueTotal, "ARS")}
                     </p>
                     <p className="text-ink/70 mt-0.5 text-[13px]">
@@ -376,7 +376,7 @@ export default async function ProviderMarketplaceManagePage({
                     </p>
                   </div>
                   <div>
-                    <p className="text-[22px] leading-7 font-extrabold">
+                    <p className="text-[22px] leading-7 font-semibold">
                       {income.inProgressCount}
                     </p>
                     <p className="text-ink/70 mt-0.5 text-[13px]">En curso</p>
@@ -413,7 +413,7 @@ export default async function ProviderMarketplaceManagePage({
             className="border-ink/10 bg-surface mt-6 rounded-2xl border p-5"
             aria-label="Resumen de ingresos"
           >
-            <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-[11px] font-semibold">
               Resumen de ingresos
             </p>
             <p

@@ -38,7 +38,7 @@ export function SkillRequestForm({
         aria-controls="proponer-habilidad-form"
         className="consumer-pressable flex min-h-11 w-full cursor-pointer items-center justify-between gap-3"
       >
-        <span className="text-[15px] font-extrabold">
+        <span className="text-[15px] font-semibold">
           Proponer una habilidad nueva
         </span>
         <span
@@ -185,7 +185,7 @@ export function SkillRequestForm({
             <button
               type="submit"
               disabled={pending}
-              className="consumer-pressable cta-ink inline-flex min-h-[52px] items-center justify-center rounded-xl px-4 text-[15px] font-extrabold sm:col-span-2"
+              className="consumer-pressable cta-ink inline-flex min-h-[52px] items-center justify-center rounded-xl px-4 text-[15px] font-semibold sm:col-span-2"
             >
               {pending ? "Enviando…" : "Enviar propuesta"}
             </button>
