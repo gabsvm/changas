@@ -75,10 +75,10 @@ export default async function AdminIdentityPage({
         description="Sólo aparecen en la cola los prestadores que realmente enviaron su identidad. Los archivos siguen privados y cada apertura genera acceso temporal al documento exacto."
         action={
           <div className="border-brand-yellow/30 bg-brand-yellow/15 rounded-2xl border px-4 py-3 text-center">
-            <p className="text-warning text-2xl font-extrabold">
+            <p className="text-warning text-2xl font-semibold">
               {queue.length}
             </p>
-            <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.08em] uppercase">
+            <p className="text-ink/60 text-[11px] font-semibold">
               pendientes
             </p>
           </div>
@@ -89,10 +89,10 @@ export default async function AdminIdentityPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.14em] uppercase">
+              <p className="text-ink/60 text-[11px] font-semibold">
                 Caso seleccionado
               </p>
-              <h2 className="font-display text-ink mt-1 truncate text-xl font-extrabold">
+              <h2 className="font-display text-ink mt-1 truncate text-xl font-semibold">
                 {identityCase.display_name ??
                   identityCase.email ??
                   identityCase.provider_user_id}
@@ -109,7 +109,7 @@ export default async function AdminIdentityPage({
 
           <div className="border-ink/[0.08] bg-surface rounded-2xl border p-4">
             <p className="text-ink/60 text-xs font-bold">Identidad declarada</p>
-            <p className="text-ink mt-1 text-sm font-extrabold">
+            <p className="text-ink mt-1 text-sm font-semibold">
               {identityCase.legal_name ?? "Sin nombre legal"}
             </p>
             <p className="text-ink/70 mt-1 text-xs">
@@ -120,7 +120,7 @@ export default async function AdminIdentityPage({
 
           <div>
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h3 className="text-ink text-sm font-extrabold">
+              <h3 className="text-ink text-sm font-semibold">
                 Evidencia privada
               </h3>
               <span className="text-ink/60 text-xs font-bold">
@@ -157,7 +157,7 @@ export default async function AdminIdentityPage({
                     placeholder="Ej: documentación coincidente"
                   />
                 </label>
-                <button className="mt-2 min-h-12 w-full rounded-2xl bg-[#43c982] px-4 py-3 text-sm font-extrabold text-[#0b1018]">
+                <button className="mt-2 min-h-12 w-full rounded-2xl bg-[#43c982] px-4 py-3 text-sm font-semibold text-[#0b1018]">
                   Aprobar identidad
                 </button>
               </form>
@@ -181,14 +181,14 @@ export default async function AdminIdentityPage({
                     placeholder="Indicá qué debe corregir"
                   />
                 </label>
-                <button className="mt-2 min-h-12 w-full rounded-2xl bg-[#ef5350] px-4 py-3 text-sm font-extrabold text-white">
+                <button className="mt-2 min-h-12 w-full rounded-2xl bg-[#ef5350] px-4 py-3 text-sm font-semibold text-white">
                   Rechazar identidad
                 </button>
               </form>
             </div>
           ) : (
             <div className="border-ink/[0.08] bg-surface rounded-2xl border p-4">
-              <p className="text-ink text-sm font-extrabold">
+              <p className="text-ink text-sm font-semibold">
                 Caso sin decisión pendiente
               </p>
               <p className="text-ink/70 mt-1 text-xs leading-5">
@@ -198,7 +198,7 @@ export default async function AdminIdentityPage({
               {identityCase.status === "ACTIVE" ? (
                 <button
                   aria-label="Aprobar identidad"
-                  className="border-success/25 bg-success/10 text-success mt-3 min-h-12 w-full rounded-2xl border px-4 py-3 text-sm font-extrabold"
+                  className="border-success/25 bg-success/10 text-success mt-3 min-h-12 w-full rounded-2xl border px-4 py-3 text-sm font-semibold"
                   disabled
                   type="button"
                 >
@@ -207,7 +207,7 @@ export default async function AdminIdentityPage({
               ) : identityCase.status === "REJECTED" ? (
                 <button
                   aria-label="Rechazar identidad"
-                  className="border-danger/25 bg-danger/10 text-danger mt-3 min-h-12 w-full rounded-2xl border px-4 py-3 text-sm font-extrabold"
+                  className="border-danger/25 bg-danger/10 text-danger mt-3 min-h-12 w-full rounded-2xl border px-4 py-3 text-sm font-semibold"
                   disabled
                   type="button"
                 >
@@ -219,7 +219,7 @@ export default async function AdminIdentityPage({
 
           {history.length ? (
             <details className="border-ink/[0.08] bg-surface rounded-2xl border p-3">
-              <summary className="text-ink cursor-pointer text-sm font-extrabold">
+              <summary className="text-ink cursor-pointer text-sm font-semibold">
                 Historial de decisiones ({history.length})
               </summary>
               <ul className="mt-3 space-y-2">
@@ -228,7 +228,7 @@ export default async function AdminIdentityPage({
                     className="border-ink/[0.08] bg-surface text-ink/70 rounded-xl border p-3 text-xs"
                     key={String(item.id ?? item.created_at)}
                   >
-                    <span className="text-ink font-extrabold">
+                    <span className="text-ink font-semibold">
                       {String(item.decision ?? "DECISIÓN")}
                     </span>{" "}
                     · {dateTime(item.created_at)}
@@ -243,7 +243,7 @@ export default async function AdminIdentityPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-ink text-base font-extrabold">
+          <h2 className="font-display text-ink text-base font-semibold">
             Cola de revisión
           </h2>
           <span className="text-ink/60 text-xs font-bold">
@@ -261,19 +261,19 @@ export default async function AdminIdentityPage({
                 <tr>
                   <th
                     scope="col"
-                    className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                    className="text-ink/70 px-4 py-2 text-left text-xs font-semibold"
                   >
                     Prestador
                   </th>
                   <th
                     scope="col"
-                    className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                    className="text-ink/70 px-4 py-2 text-left text-xs font-semibold"
                   >
                     Evidencia
                   </th>
                   <th
                     scope="col"
-                    className="text-ink/70 px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] uppercase"
+                    className="text-ink/70 px-4 py-2 text-right text-xs font-semibold"
                   >
                     Estado
                   </th>
@@ -290,7 +290,7 @@ export default async function AdminIdentityPage({
                       className="min-w-0 rounded-l-3xl p-4 text-left"
                     >
                       <Link
-                        className="text-ink block truncate text-sm font-extrabold hover:underline"
+                        className="text-ink block truncate text-sm font-semibold hover:underline"
                         href={`/admin/identity?provider=${row.provider_user_id}`}
                       >
                         {row.display_name ?? row.email ?? row.provider_user_id}

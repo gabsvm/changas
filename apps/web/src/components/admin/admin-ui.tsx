@@ -26,7 +26,7 @@ export function AdminPageHeader({
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         <span className="sr-only">{eyebrow}</span>
-        <h1 className="font-display text-ink mt-1 text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl">
+        <h1 className="font-display text-ink mt-1 text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
           {title}
         </h1>
         {description ? (
@@ -65,7 +65,7 @@ export function AdminStatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex min-h-7 items-center rounded-full border px-2.5 py-1 text-[11px] font-extrabold tracking-[0.04em] uppercase ${toneClasses[tone]}`}
+      className={`inline-flex min-h-7 items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ${toneClasses[tone]}`}
     >
       {label}
     </span>
@@ -84,7 +84,7 @@ export function AdminEmptyState({
       <div className="bg-ink/[0.04] text-ink/40 mx-auto grid h-9 w-9 place-items-center rounded-2xl text-lg">
         ✓
       </div>
-      <p className="text-ink mt-3 text-sm font-extrabold">{title}</p>
+      <p className="text-ink mt-3 text-sm font-semibold">{title}</p>
       {description ? (
         <p className="text-ink/70 mx-auto mt-1 max-w-md text-xs leading-5">
           {description}
@@ -113,7 +113,7 @@ export function AdminMetricCard({
           className={`mt-1 h-2.5 w-2.5 rounded-full border ${toneClasses[tone]}`}
         />
       </div>
-      <p className="font-display text-ink mt-2 text-3xl font-extrabold tracking-[-0.04em]">
+      <p className="font-display text-ink mt-2 text-3xl font-semibold tracking-[-0.04em]">
         {value}
       </p>
       {hint ? <p className="text-ink/60 mt-1 text-xs">{hint}</p> : null}

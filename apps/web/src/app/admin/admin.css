@@ -19,10 +19,7 @@
   --admin-border: #273142;
   --admin-muted: #98a2b3;
   color-scheme: dark;
-  background:
-    radial-gradient(circle at 92% 4%, rgb(8 169 244 / 10%), transparent 28rem),
-    radial-gradient(circle at 10% 80%, rgb(18 217 197 / 7%), transparent 24rem),
-    var(--admin-bg);
+  background: var(--admin-bg);
 }
 
 .admin-shell .admin-main > div > section {
@@ -35,7 +32,7 @@
   margin: 0;
   color: #17140f;
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.2;
 }
@@ -249,13 +246,6 @@
 }
 .dark .admin-shell :focus-visible {
   outline-color: #7bf2e7;
-}
-.admin-shell .admin-main {
-  background-image: radial-gradient(
-    50rem 25rem at 90% -9rem,
-    rgb(8 169 244 / 5%),
-    transparent 85%
-  );
 }
 .admin-shell .admin-mobile-record {
   overflow-wrap: anywhere;

@@ -44,7 +44,7 @@ export function IdentityDocumentPreview({
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {documents.map((document) => (
           <button
-            className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-[#273142] bg-[#0d131d] px-4 py-3 text-left text-sm font-extrabold text-[#d0d5dd] transition-colors hover:border-[#4f7dff]/45 hover:text-white"
+            className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-[#273142] bg-[#0d131d] px-4 py-3 text-left text-sm font-semibold text-[#d0d5dd] transition-colors hover:border-[#4f7dff]/45 hover:text-white"
             key={document.id}
             type="button"
             aria-haspopup="dialog"
@@ -78,7 +78,7 @@ export function IdentityDocumentPreview({
           >
             <div className="flex items-center justify-between gap-3">
               <h2
-                className="text-base font-extrabold text-white"
+                className="text-base font-semibold text-white"
                 id="identity-document-preview-title"
               >
                 {selected.documentType}
@@ -120,7 +120,7 @@ export function IdentityDocumentPreview({
                     Este formato no tiene vista previa integrada.
                   </p>
                   <a
-                    className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[#4f7dff] px-4 py-3 text-sm font-extrabold text-[#0b1018]"
+                    className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[#4f7dff] px-4 py-3 text-sm font-semibold text-[#0b1018]"
                     href={documentUrl}
                   >
                     Abrir documento

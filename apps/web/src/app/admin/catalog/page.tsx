@@ -85,7 +85,7 @@ export default async function AdminCatalogPage() {
       >
         <AdminPanel className="w-full min-w-0">
           <form action={createCategoryAction} className="w-full min-w-0">
-            <h3 className="text-ink text-base font-extrabold">
+            <h3 className="text-ink text-base font-semibold">
               Nueva categoría
             </h3>
             <div className="mt-3 grid w-full min-w-0 gap-2">
@@ -124,7 +124,7 @@ export default async function AdminCatalogPage() {
                   defaultValue="0"
                 />
               </label>
-              <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
+              <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-semibold text-[#10131a]">
                 Crear categoría
               </button>
             </div>
@@ -133,7 +133,7 @@ export default async function AdminCatalogPage() {
 
         <AdminPanel className="w-full min-w-0">
           <form action={createSkillAction} className="w-full min-w-0">
-            <h3 className="text-ink text-base font-extrabold">Nueva skill</h3>
+            <h3 className="text-ink text-base font-semibold">Nueva skill</h3>
             <div className="mt-3 grid w-full min-w-0 gap-2">
               <label className="text-ink grid gap-1 text-xs font-semibold">
                 Categoría de la nueva skill
@@ -187,7 +187,7 @@ export default async function AdminCatalogPage() {
                   defaultValue="0"
                 />
               </label>
-              <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
+              <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-semibold text-[#10131a]">
                 Crear skill
               </button>
             </div>
@@ -198,7 +198,7 @@ export default async function AdminCatalogPage() {
       <div className="grid w-full min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
         <AdminPanel className="w-full min-w-0">
           <form action={createSkillSynonymAction} className="w-full min-w-0">
-            <h3 className="text-ink text-base font-extrabold">
+            <h3 className="text-ink text-base font-semibold">
               Nuevo sinónimo
             </h3>
             <div className="mt-3 grid w-full min-w-0 gap-2">
@@ -227,7 +227,7 @@ export default async function AdminCatalogPage() {
                   placeholder="Frase equivalente"
                 />
               </label>
-              <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
+              <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-semibold text-[#10131a]">
                 Crear sinónimo
               </button>
             </div>
@@ -235,7 +235,7 @@ export default async function AdminCatalogPage() {
         </AdminPanel>
         <AdminPanel className="w-full min-w-0">
           <form action={createServiceTagAction} className="w-full min-w-0">
-            <h3 className="text-ink text-base font-extrabold">Nuevo tag</h3>
+            <h3 className="text-ink text-base font-semibold">Nuevo tag</h3>
             <div className="mt-3 grid w-full min-w-0 gap-2">
               <label className="text-ink grid gap-1 text-xs font-semibold">
                 Servicio del nuevo tag
@@ -262,7 +262,7 @@ export default async function AdminCatalogPage() {
                   placeholder="Tag de búsqueda"
                 />
               </label>
-              <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
+              <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-semibold text-[#10131a]">
                 Crear tag
               </button>
             </div>
@@ -271,7 +271,7 @@ export default async function AdminCatalogPage() {
       </div>
 
       <div id="solicitudes" className="scroll-mt-40">
-        <h3 className="text-ink mb-3 text-base font-extrabold">
+        <h3 className="text-ink mb-3 text-base font-semibold">
           Solicitudes de habilidades
         </h3>
         {skillRequests.length === 0 ? (
@@ -288,7 +288,7 @@ export default async function AdminCatalogPage() {
               >
                 <div className="flex justify-between gap-3">
                   <div>
-                    <p className="text-ink font-extrabold">{request.name}</p>
+                    <p className="text-ink font-semibold">{request.name}</p>
                     <p className="text-ink/60 text-xs">
                       {request.requester_name} · {request.category_name} ·{" "}
                       {request.service_title}
@@ -333,7 +333,7 @@ export default async function AdminCatalogPage() {
                         name="decision"
                         value="APPROVE_NEW"
                       />
-                      <button className="min-h-11 w-full rounded-xl bg-[#12D9C5] px-3 py-2 text-sm font-extrabold text-[#10131a]">
+                      <button className="min-h-11 w-full rounded-xl bg-[#12D9C5] px-3 py-2 text-sm font-semibold text-[#10131a]">
                         Aprobar como nueva
                       </button>
                     </form>
@@ -363,7 +363,7 @@ export default async function AdminCatalogPage() {
                           ))}
                         </select>
                       </label>
-                      <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-extrabold">
+                      <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-semibold">
                         Fusionar a existente
                       </button>
                     </form>
@@ -384,7 +384,7 @@ export default async function AdminCatalogPage() {
                           placeholder="Motivo del rechazo"
                         />
                       </label>
-                      <button className="border-danger/25 text-danger mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-extrabold">
+                      <button className="border-danger/25 text-danger mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-semibold">
                         Rechazar
                       </button>
                     </form>
@@ -397,7 +397,7 @@ export default async function AdminCatalogPage() {
       </div>
 
       <div id="categorias" className="scroll-mt-40">
-        <h3 className="text-ink mb-3 text-base font-extrabold">Categorías</h3>
+        <h3 className="text-ink mb-3 text-base font-semibold">Categorías</h3>
         <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
           {categories.map((category) => (
             <article
@@ -406,7 +406,7 @@ export default async function AdminCatalogPage() {
             >
               <div className="flex justify-between gap-3">
                 <div>
-                  <p className="text-ink font-extrabold">{category.name}</p>
+                  <p className="text-ink font-semibold">{category.name}</p>
                   <p className="text-ink/60 text-xs">
                     {category.slug} · {category.skill_count} skills
                   </p>
@@ -441,14 +441,14 @@ export default async function AdminCatalogPage() {
                     name="nextActive"
                     value={String(!category.is_active)}
                   />
-                  <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
+                  <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-semibold">
                     {category.is_active ? "Desactivar" : "Reactivar"}
                   </button>
                 </form>
 
                 {category.skill_count === 0 ? (
                   <details>
-                    <summary className="bg-danger inline-block cursor-pointer rounded-xl px-3 py-2 text-sm font-extrabold text-white">
+                    <summary className="bg-danger inline-block cursor-pointer rounded-xl px-3 py-2 text-sm font-semibold text-white">
                       Eliminar
                     </summary>
                     <form action={deleteCategoryAction} className="mt-2">
@@ -457,7 +457,7 @@ export default async function AdminCatalogPage() {
                         name="categoryId"
                         value={category.category_id}
                       />
-                      <button className="border-danger/25 text-danger rounded-xl border px-3 py-2 text-sm font-extrabold">
+                      <button className="border-danger/25 text-danger rounded-xl border px-3 py-2 text-sm font-semibold">
                         Confirmar eliminación
                       </button>
                     </form>
@@ -466,7 +466,7 @@ export default async function AdminCatalogPage() {
               </div>
 
               <details className="border-ink/[0.08] bg-surface mt-3 rounded-2xl border p-3">
-                <summary className="text-ink cursor-pointer text-sm font-extrabold">
+                <summary className="text-ink cursor-pointer text-sm font-semibold">
                   Editar categoría
                 </summary>
                 <form
@@ -524,7 +524,7 @@ export default async function AdminCatalogPage() {
                       Número menor aparece primero.
                     </span>
                   </label>
-                  <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
+                  <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-semibold">
                     Guardar cambios
                   </button>
                 </form>
@@ -535,7 +535,7 @@ export default async function AdminCatalogPage() {
       </div>
 
       <div id="skills" className="scroll-mt-40">
-        <h3 className="text-ink mb-3 text-base font-extrabold">Skills</h3>
+        <h3 className="text-ink mb-3 text-base font-semibold">Skills</h3>
         <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
           {skills.map((skill) => (
             <article
@@ -544,7 +544,7 @@ export default async function AdminCatalogPage() {
             >
               <div className="flex justify-between gap-3">
                 <div>
-                  <p className="text-ink font-extrabold">{skill.name}</p>
+                  <p className="text-ink font-semibold">{skill.name}</p>
                   <p className="text-ink/60 text-xs">
                     {skill.category_name} · {skill.service_count} servicios
                   </p>
@@ -580,14 +580,14 @@ export default async function AdminCatalogPage() {
                     name="nextActive"
                     value={String(!skill.is_active)}
                   />
-                  <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
+                  <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-semibold">
                     {skill.is_active ? "Desactivar" : "Reactivar"}
                   </button>
                 </form>
 
                 {skill.service_count === 0 ? (
                   <details>
-                    <summary className="bg-danger inline-block cursor-pointer rounded-xl px-3 py-2 text-sm font-extrabold text-white">
+                    <summary className="bg-danger inline-block cursor-pointer rounded-xl px-3 py-2 text-sm font-semibold text-white">
                       Eliminar
                     </summary>
                     <form action={deleteSkillAction} className="mt-2">
@@ -596,7 +596,7 @@ export default async function AdminCatalogPage() {
                         name="skillId"
                         value={skill.skill_id}
                       />
-                      <button className="border-danger/25 text-danger rounded-xl border px-3 py-2 text-sm font-extrabold">
+                      <button className="border-danger/25 text-danger rounded-xl border px-3 py-2 text-sm font-semibold">
                         Confirmar eliminación
                       </button>
                     </form>
@@ -605,7 +605,7 @@ export default async function AdminCatalogPage() {
               </div>
 
               <details className="border-ink/[0.08] bg-surface mt-3 rounded-2xl border p-3">
-                <summary className="text-ink cursor-pointer text-sm font-extrabold">
+                <summary className="text-ink cursor-pointer text-sm font-semibold">
                   Editar skill
                 </summary>
                 <form
@@ -670,7 +670,7 @@ export default async function AdminCatalogPage() {
                       defaultValue={skill.sort_order}
                     />
                   </label>
-                  <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
+                  <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-semibold">
                     Guardar cambios
                   </button>
                 </form>
@@ -681,14 +681,14 @@ export default async function AdminCatalogPage() {
       </div>
 
       <div id="sinonimos" className="scroll-mt-40">
-        <h3 className="text-ink mb-3 text-base font-extrabold">Sinónimos</h3>
+        <h3 className="text-ink mb-3 text-base font-semibold">Sinónimos</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           {synonyms.map((synonym) => (
             <article
               className="border-ink/[0.08] bg-surface w-full min-w-0 rounded-3xl border p-4 sm:p-5"
               key={synonym.synonym_id}
             >
-              <p className="text-ink font-extrabold">{synonym.phrase}</p>
+              <p className="text-ink font-semibold">{synonym.phrase}</p>
               <p className="text-ink/60 text-xs">
                 {synonym.skill_name} · {synonym.normalized_phrase}
               </p>
@@ -707,12 +707,12 @@ export default async function AdminCatalogPage() {
                     defaultValue={synonym.phrase}
                   />
                 </label>
-                <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
+                <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-semibold">
                   Actualizar
                 </button>
               </form>
               <details className="mt-2">
-                <summary className="bg-danger inline-block cursor-pointer rounded-xl px-3 py-2 text-sm font-extrabold text-white">
+                <summary className="bg-danger inline-block cursor-pointer rounded-xl px-3 py-2 text-sm font-semibold text-white">
                   Eliminar
                 </summary>
                 <form action={deleteSkillSynonymAction} className="mt-2">
@@ -721,7 +721,7 @@ export default async function AdminCatalogPage() {
                     name="synonymId"
                     value={synonym.synonym_id}
                   />
-                  <button className="border-danger/25 text-danger rounded-xl border px-3 py-2 text-sm font-extrabold">
+                  <button className="border-danger/25 text-danger rounded-xl border px-3 py-2 text-sm font-semibold">
                     Confirmar eliminación
                   </button>
                 </form>
@@ -732,7 +732,7 @@ export default async function AdminCatalogPage() {
       </div>
 
       <div id="tags" className="scroll-mt-40">
-        <h3 className="text-ink mb-3 text-base font-extrabold">
+        <h3 className="text-ink mb-3 text-base font-semibold">
           Tags de servicios
         </h3>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -741,7 +741,7 @@ export default async function AdminCatalogPage() {
               className="border-ink/[0.08] bg-surface w-full min-w-0 rounded-3xl border p-4 sm:p-5"
               key={`${tag.service_id}:${tag.normalized_tag}`}
             >
-              <p className="text-ink font-extrabold">{tag.tag}</p>
+              <p className="text-ink font-semibold">{tag.tag}</p>
               <p className="text-ink/60 text-xs">
                 {tag.service_title} · {tag.normalized_tag}
               </p>
@@ -766,12 +766,12 @@ export default async function AdminCatalogPage() {
                     defaultValue={tag.tag}
                   />
                 </label>
-                <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-extrabold">
+                <button className="border-ink/[0.08] text-ink rounded-xl border px-3 py-2 text-sm font-semibold">
                   Actualizar
                 </button>
               </form>
               <details className="mt-2">
-                <summary className="bg-danger inline-block cursor-pointer rounded-xl px-3 py-2 text-sm font-extrabold text-white">
+                <summary className="bg-danger inline-block cursor-pointer rounded-xl px-3 py-2 text-sm font-semibold text-white">
                   Eliminar
                 </summary>
                 <form action={deleteServiceTagAction} className="mt-2">
@@ -785,7 +785,7 @@ export default async function AdminCatalogPage() {
                     name="normalizedTag"
                     value={tag.normalized_tag}
                   />
-                  <button className="border-danger/25 text-danger rounded-xl border px-3 py-2 text-sm font-extrabold">
+                  <button className="border-danger/25 text-danger rounded-xl border px-3 py-2 text-sm font-semibold">
                     Confirmar eliminación
                   </button>
                 </form>
@@ -796,7 +796,7 @@ export default async function AdminCatalogPage() {
       </div>
 
       <div id="moderacion" className="scroll-mt-40">
-        <h3 className="text-ink mb-3 text-base font-extrabold">
+        <h3 className="text-ink mb-3 text-base font-semibold">
           Moderación de servicios
         </h3>
         <div className="space-y-3">
@@ -807,7 +807,7 @@ export default async function AdminCatalogPage() {
             >
               <div className="flex flex-wrap justify-between gap-2">
                 <div>
-                  <p className="text-ink font-extrabold">
+                  <p className="text-ink font-semibold">
                     {service.service_title}
                   </p>
                   <p className="text-ink/60 text-xs">
@@ -850,8 +850,8 @@ export default async function AdminCatalogPage() {
                     <button
                       className={
                         state === "DISABLED"
-                          ? "bg-danger mt-2 w-full rounded-xl px-2 py-2 text-sm font-extrabold text-white"
-                          : "border-ink/[0.08] text-ink mt-2 w-full rounded-xl border px-2 py-2 text-sm font-extrabold"
+                          ? "bg-danger mt-2 w-full rounded-xl px-2 py-2 text-sm font-semibold text-white"
+                          : "border-ink/[0.08] text-ink mt-2 w-full rounded-xl border px-2 py-2 text-sm font-semibold"
                       }
                     >
                       {state === "CLEAR"

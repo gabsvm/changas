@@ -96,7 +96,7 @@ export default async function AdminPaymentsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-ink text-base font-extrabold">
+          <h2 className="font-display text-ink text-base font-semibold">
             Movimientos
           </h2>
           <span className="text-ink/60 text-xs font-bold">
@@ -117,7 +117,7 @@ export default async function AdminPaymentsPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-ink truncate text-sm font-extrabold">
+                    <p className="text-ink truncate text-sm font-semibold">
                       {payment.providerName}
                     </p>
                     <p className="text-ink/60 mt-1 text-[11px] break-all">
@@ -135,7 +135,7 @@ export default async function AdminPaymentsPage() {
                     <dt className="text-ink/60 text-[11px] font-bold">
                       Estado local
                     </dt>
-                    <dd className="text-ink mt-1 font-extrabold">
+                    <dd className="text-ink mt-1 font-semibold">
                       {paymentStatusLabel(payment.localStatus)}
                     </dd>
                   </div>
@@ -143,13 +143,13 @@ export default async function AdminPaymentsPage() {
                     <dt className="text-ink/60 text-[11px] font-bold">
                       Proveedor de pago
                     </dt>
-                    <dd className="text-ink mt-1 font-extrabold">
+                    <dd className="text-ink mt-1 font-semibold">
                       {paymentStatusLabel(payment.providerStatus)}
                     </dd>
                   </div>
                   <div className="border-ink/[0.08] bg-surface rounded-2xl border p-3">
                     <dt className="text-ink/60 text-[11px] font-bold">Bruto</dt>
-                    <dd className="text-ink mt-1 font-extrabold">
+                    <dd className="text-ink mt-1 font-semibold">
                       {money(payment.grossMinor)}
                     </dd>
                   </div>
@@ -157,14 +157,14 @@ export default async function AdminPaymentsPage() {
                     <dt className="text-ink/60 text-[11px] font-bold">
                       Comisión YALO
                     </dt>
-                    <dd className="text-ink mt-1 font-extrabold">
+                    <dd className="text-ink mt-1 font-semibold">
                       {money(payment.marketplaceFeeMinor)}
                     </dd>
                   </div>
                 </dl>
 
                 <details className="border-ink/[0.08] bg-surface mt-3 rounded-2xl border p-3">
-                  <summary className="text-ink cursor-pointer text-sm font-extrabold">
+                  <summary className="text-ink cursor-pointer text-sm font-semibold">
                     Ver detalle financiero
                   </summary>
                   <dl className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
@@ -219,7 +219,7 @@ export default async function AdminPaymentsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-ink text-base font-extrabold">
+          <h2 className="font-display text-ink text-base font-semibold">
             Ejecuciones de conciliación
           </h2>
           <span className="text-ink/60 text-xs font-bold">
@@ -236,7 +236,7 @@ export default async function AdminPaymentsPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-ink truncate text-sm font-extrabold">
+                    <p className="text-ink truncate text-sm font-semibold">
                       {run.providerName ?? "Proveedor de pago"}
                     </p>
                     <p className="text-ink/60 mt-1 text-xs">
@@ -264,7 +264,7 @@ export default async function AdminPaymentsPage() {
                       key={label}
                     >
                       <p className="text-ink/60 font-bold">{label}</p>
-                      <p className="text-ink mt-1 text-base font-extrabold">
+                      <p className="text-ink mt-1 text-base font-semibold">
                         {value}
                       </p>
                     </div>

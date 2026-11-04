@@ -57,7 +57,7 @@ export default async function AdminUsersPage({
           placeholder="Email o nombre"
           aria-label="Buscar usuario"
         />
-        <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
+        <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-semibold text-[#10131a]">
           Buscar
         </button>
       </form>
@@ -77,10 +77,10 @@ export default async function AdminUsersPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.14em] uppercase">
+              <p className="text-ink/60 text-[11px] font-semibold">
                 Cuenta seleccionada
               </p>
-              <h2 className="font-display text-ink mt-1 truncate text-xl font-extrabold">
+              <h2 className="font-display text-ink mt-1 truncate text-xl font-semibold">
                 {detail.display_name ?? detail.email ?? detail.user_id}
               </h2>
               <p className="text-ink/70 mt-1 truncate text-sm">
@@ -118,7 +118,7 @@ export default async function AdminUsersPage({
 
           <div>
             <div className="mb-3">
-              <p className="text-ink text-sm font-extrabold">
+              <p className="text-ink text-sm font-semibold">
                 Habilitación como prestador
               </p>
               <p className="text-ink/70 mt-1 text-xs leading-5">
@@ -133,7 +133,7 @@ export default async function AdminUsersPage({
           </div>
 
           <details className="border-ink/[0.08] bg-surface rounded-2xl border p-3">
-            <summary className="text-ink cursor-pointer text-sm font-extrabold">
+            <summary className="text-ink cursor-pointer text-sm font-semibold">
               Restricciones de cuenta
             </summary>
             <div className="mt-3 grid gap-3 lg:grid-cols-3">
@@ -154,7 +154,7 @@ export default async function AdminUsersPage({
                     placeholder={`Motivo ${kind === "SUSPENDED" ? "de suspensión" : "de restricción"}`}
                   />
                   <button
-                    className={`mt-2 min-h-11 w-full rounded-xl px-3 py-2 text-sm font-extrabold ${kind === "SUSPENDED" ? "bg-[#ef5350] text-white" : "bg-[#ffc857] text-[#10131a]"}`}
+                    className={`mt-2 min-h-11 w-full rounded-xl px-3 py-2 text-sm font-semibold ${kind === "SUSPENDED" ? "bg-[#ef5350] text-white" : "bg-[#ffc857] text-[#10131a]"}`}
                   >
                     {kind === "SUSPENDED" ? "Suspender" : "Restringir"}
                   </button>
@@ -171,7 +171,7 @@ export default async function AdminUsersPage({
                   aria-label="Motivo de la restauración (opcional)"
                   placeholder="Motivo de restauración"
                 />
-                <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-extrabold">
+                <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-semibold">
                   Restaurar cuenta
                 </button>
               </form>
@@ -182,7 +182,7 @@ export default async function AdminUsersPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-ink text-base font-extrabold">
+          <h2 className="font-display text-ink text-base font-semibold">
             Cuentas
           </h2>
           <span className="border-ink/[0.08] bg-surface text-ink/70 rounded-full border px-2.5 py-1 text-xs font-bold">
@@ -208,7 +208,7 @@ export default async function AdminUsersPage({
                   className="admin-mobile-record consumer-pressable hover:bg-ink/[0.04] flex flex-col gap-1.5 px-4 py-3 transition-colors"
                 >
                   <span className="flex items-start justify-between gap-3">
-                    <span className="text-ink min-w-0 font-extrabold">
+                    <span className="text-ink min-w-0 font-semibold">
                       {user.display_name ?? user.email ?? user.user_id}
                     </span>
                     <span className="shrink-0">
@@ -222,7 +222,7 @@ export default async function AdminUsersPage({
                     {user.email ?? user.user_id}
                   </span>
                   {user.role === "admin" ? (
-                    <span className="text-xs font-extrabold text-[#087681] dark:text-[#7BF2E7]">
+                    <span className="text-xs font-semibold text-[#087681] dark:text-[#7BF2E7]">
                       ADMIN
                     </span>
                   ) : null}
@@ -241,19 +241,19 @@ export default async function AdminUsersPage({
                   <tr>
                     <th
                       scope="col"
-                      className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                      className="text-ink/70 px-4 py-2 text-left text-xs font-semibold"
                     >
                       Cuenta
                     </th>
                     <th
                       scope="col"
-                      className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                      className="text-ink/70 px-4 py-2 text-left text-xs font-semibold"
                     >
                       Contacto
                     </th>
                     <th
                       scope="col"
-                      className="text-ink/70 px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] uppercase"
+                      className="text-ink/70 px-4 py-2 text-right text-xs font-semibold"
                     >
                       Estado
                     </th>
@@ -270,13 +270,13 @@ export default async function AdminUsersPage({
                         className="border-ink/10 min-w-0 border-b p-4 text-left"
                       >
                         <Link
-                          className="text-ink block truncate text-sm font-extrabold hover:underline"
+                          className="text-ink block truncate text-sm font-semibold hover:underline"
                           href={`/admin/users?q=${encodeURIComponent(query)}&user=${user.user_id}`}
                         >
                           {user.display_name ?? user.email ?? user.user_id}
                         </Link>
                         {user.role === "admin" ? (
-                          <span className="text-terracotta text-[11px] font-extrabold">
+                          <span className="text-terracotta text-[11px] font-semibold">
                             ADMIN
                           </span>
                         ) : null}

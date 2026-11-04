@@ -187,7 +187,7 @@ export function AdminNavigation() {
           if (items.length === 0) return null;
           return (
             <div key={group}>
-              <p className="text-ink/60 px-3 pb-2 text-[11px] font-extrabold tracking-[0.18em] uppercase">
+              <p className="text-ink/60 px-3 pb-2 text-[11px] font-semibold">
                 {group}
               </p>
               <nav
@@ -216,8 +216,8 @@ export function AdminNavigation() {
                       style={
                         active
                           ? {
-                              backgroundImage:
-                                "linear-gradient(135deg, #08A9F4 0%, #12D9C5 65%, #65EC91 100%)",
+                              background:
+                                "#08A9F4",
                             }
                           : undefined
                       }
@@ -229,7 +229,7 @@ export function AdminNavigation() {
                       {badge ? (
                         <span
                           aria-hidden="true"
-                          className={`ml-auto rounded-full border px-2 py-0.5 text-[11px] font-extrabold ${badge.tone}`}
+                          className={`ml-auto rounded-full border px-2 py-0.5 text-[11px] font-semibold ${badge.tone}`}
                         >
                           {badge.count}
                         </span>
@@ -268,12 +268,12 @@ export function AdminNavigation() {
             <div className="bg-ink/15 mx-auto mb-4 h-1 w-10 rounded-full" />
             <div className="mb-4 flex items-center justify-between gap-3 px-1">
               <div>
-                <p className="text-terracotta text-xs font-extrabold tracking-[0.14em] uppercase">
+                <p className="text-terracotta text-xs font-semibold">
                   Administración
                 </p>
                 <h2
                   id="admin-more-menu-title"
-                  className="text-ink mt-1 text-xl font-extrabold"
+                  className="text-ink mt-1 text-xl font-semibold"
                 >
                   Más herramientas
                 </h2>
@@ -297,7 +297,7 @@ export function AdminNavigation() {
                   if (items.length === 0) return null;
                   return (
                     <div key={group}>
-                      <p className="text-ink/60 px-1 pb-1.5 text-[11px] font-extrabold tracking-[0.16em] uppercase">
+                      <p className="text-ink/60 px-1 pb-1.5 text-[11px] font-semibold">
                         {group}
                       </p>
                       <nav
@@ -332,7 +332,7 @@ export function AdminNavigation() {
                               {badge ? (
                                 <span
                                   aria-hidden="true"
-                                  className={`ml-auto rounded-full border px-2 py-0.5 text-[11px] font-extrabold ${badge.tone}`}
+                                  className={`ml-auto rounded-full border px-2 py-0.5 text-[11px] font-semibold ${badge.tone}`}
                                 >
                                   {badge.count}
                                 </span>
@@ -365,7 +365,7 @@ export function AdminNavigation() {
                   ? `${item.label}: ${badge.count} ${badge.detail}`
                   : undefined
               }
-              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
+              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-semibold ${
                 active ? "text-[#087681] dark:text-[#7BF2E7]" : "text-ink/60"
               }`}
               href={item.href}
@@ -376,7 +376,7 @@ export function AdminNavigation() {
               {badge ? (
                 <span
                   aria-hidden="true"
-                  className={`rounded-full border px-1.5 text-[10px] font-extrabold ${badge.tone}`}
+                  className={`rounded-full border px-1.5 text-[10px] font-semibold ${badge.tone}`}
                 >
                   {badge.count}
                 </span>
@@ -388,7 +388,7 @@ export function AdminNavigation() {
           aria-expanded={moreOpen}
           aria-controls="admin-more-menu"
           aria-haspopup="dialog"
-          className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-extrabold ${
+          className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-semibold ${
             moreActive || moreOpen
               ? "text-[#087681] dark:text-[#7BF2E7]"
               : "text-ink/60"

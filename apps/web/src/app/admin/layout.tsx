@@ -27,10 +27,10 @@ export default async function AdminLayout({
               aria-hidden="true"
             />
             <div className="min-w-0">
-              <p className="text-terracotta truncate text-[11px] font-extrabold tracking-[0.19em] uppercase">
+              <p className="text-terracotta truncate text-[11px] font-semibold">
                 YALO
               </p>
-              <p className="text-ink truncate text-sm font-extrabold tracking-[-0.01em]">
+              <p className="text-ink truncate text-sm font-semibold tracking-[-0.01em]">
                 Administración
               </p>
             </div>

@@ -88,12 +88,12 @@ export default async function AdminPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="font-display text-ink mt-1 text-lg font-extrabold">
+            <h2 className="font-display text-ink mt-1 text-lg font-semibold">
               Necesita atención
             </h2>
           </div>
           {hasAttention ? (
-            <span className="text-terracotta rounded-full border border-[#12D9C5]/25 bg-[#12D9C5]/10 px-2.5 py-1 text-xs font-extrabold">
+            <span className="text-terracotta rounded-full border border-[#12D9C5]/25 bg-[#12D9C5]/10 px-2.5 py-1 text-xs font-semibold">
               Acción requerida
             </span>
           ) : null}
@@ -108,10 +108,10 @@ export default async function AdminPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-warning text-sm font-extrabold">
+                    <p className="text-warning text-sm font-semibold">
                       Identidades por revisar
                     </p>
-                    <p className="text-ink mt-2 text-3xl font-extrabold">
+                    <p className="text-ink mt-2 text-3xl font-semibold">
                       {identityQueue.length}
                     </p>
                   </div>
@@ -132,10 +132,10 @@ export default async function AdminPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-danger text-sm font-extrabold">
+                    <p className="text-danger text-sm font-semibold">
                       Reportes abiertos
                     </p>
-                    <p className="text-ink mt-2 text-3xl font-extrabold">
+                    <p className="text-ink mt-2 text-3xl font-semibold">
                       {openReports.length}
                     </p>
                   </div>
@@ -156,10 +156,10 @@ export default async function AdminPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-danger text-sm font-extrabold">
+                    <p className="text-danger text-sm font-semibold">
                       Disputas por resolver
                     </p>
-                    <p className="text-ink mt-2 text-3xl font-extrabold">
+                    <p className="text-ink mt-2 text-3xl font-semibold">
                       {disputedJobs.length}
                     </p>
                   </div>
@@ -180,10 +180,10 @@ export default async function AdminPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-moss text-sm font-extrabold">
+                    <p className="text-moss text-sm font-semibold">
                       Onboarding incompleto
                     </p>
-                    <p className="text-ink mt-2 text-3xl font-extrabold">
+                    <p className="text-ink mt-2 text-3xl font-semibold">
                       {incompleteProviders.length}
                     </p>
                   </div>
@@ -219,7 +219,7 @@ export default async function AdminPage() {
                 key={href}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-ink text-sm font-extrabold">{title}</h3>
+                  <h3 className="text-ink text-sm font-semibold">{title}</h3>
                   <span className="text-ink/40" aria-hidden="true">
                     ↗
                   </span>

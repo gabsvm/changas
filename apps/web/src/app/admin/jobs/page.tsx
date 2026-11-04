@@ -88,7 +88,7 @@ export default async function AdminJobsPage({
       >
         <Link
           aria-current={selected === null ? "page" : undefined}
-          className={`rounded-full border px-3 py-2 text-xs font-extrabold transition-colors ${
+          className={`rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
             selected === null
               ? "border-[#12D9C5]/40 bg-[#12D9C5]/15 text-ink"
               : "border-ink/[0.08] bg-surface text-ink/70 hover:text-ink"
@@ -102,7 +102,7 @@ export default async function AdminJobsPage({
           return (
             <Link
               aria-current={active ? "page" : undefined}
-              className={`rounded-full border px-3 py-2 text-xs font-extrabold transition-colors ${
+              className={`rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
                 active
                   ? "border-[#12D9C5]/40 bg-[#12D9C5]/15 text-ink"
                   : "border-ink/[0.08] bg-surface text-ink/70 hover:text-ink"
@@ -127,7 +127,7 @@ export default async function AdminJobsPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-ink text-base font-extrabold">
+          <h2 className="font-display text-ink text-base font-semibold">
             {selectedLabel ?? "Trabajos"}
           </h2>
           <span className="border-ink/[0.08] bg-surface text-ink/70 rounded-full border px-2.5 py-1 text-xs font-bold">
@@ -146,7 +146,7 @@ export default async function AdminJobsPage({
                 >
                   <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-ink text-sm font-extrabold break-words">
+                      <p className="text-ink text-sm font-semibold break-words">
                         {job.service_title}
                       </p>
                       <p className="text-ink/60 mt-1 text-[11px] break-all">
@@ -226,7 +226,7 @@ export default async function AdminJobsPage({
                             minLength={2}
                             placeholder="Motivo de la resolución"
                           />
-                          <button className="border-ink/[0.08] text-ink mt-2 w-full rounded-xl border px-2 py-2 text-sm font-extrabold">
+                          <button className="border-ink/[0.08] text-ink mt-2 w-full rounded-xl border px-2 py-2 text-sm font-semibold">
                             {label}
                           </button>
                         </form>

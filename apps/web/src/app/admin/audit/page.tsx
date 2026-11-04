@@ -38,10 +38,10 @@ export default async function AdminAuditPage() {
             >
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-ink text-sm font-extrabold">
+                  <p className="text-ink text-sm font-semibold">
                     {humanAction(event.action_type)}
                   </p>
-                  <code className="text-ink/40 mt-1 block truncate text-[11px] font-bold tracking-[0.04em]">
+                  <code className="text-ink/40 mt-1 block truncate text-[11px] font-bold">
                     {event.action_type}
                   </code>
                   <p className="text-ink/70 mt-1 truncate text-xs">

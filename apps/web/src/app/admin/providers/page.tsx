@@ -52,7 +52,7 @@ export default async function AdminProvidersPage({
           placeholder="Nombre, email o slug"
           aria-label="Buscar prestador"
         />
-        <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
+        <button className="min-h-12 rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-semibold text-[#10131a]">
           Buscar
         </button>
       </form>
@@ -61,10 +61,10 @@ export default async function AdminProvidersPage({
         <AdminPanel className="space-y-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-ink/60 text-[11px] font-extrabold tracking-[0.14em] uppercase">
+              <p className="text-ink/60 text-[11px] font-semibold">
                 Prestador seleccionado
               </p>
-              <h2 className="font-display text-ink mt-1 truncate text-xl font-extrabold">
+              <h2 className="font-display text-ink mt-1 truncate text-xl font-semibold">
                 {detail.display_name ?? detail.public_slug}
               </h2>
               <p className="text-ink/70 mt-1 truncate text-sm">
@@ -92,7 +92,7 @@ export default async function AdminProvidersPage({
                 key={label}
               >
                 <p className="text-ink/60 text-[11px] font-bold">{label}</p>
-                <p className="text-ink mt-1 text-sm font-extrabold">{value}</p>
+                <p className="text-ink mt-1 text-sm font-semibold">{value}</p>
               </div>
             ))}
           </div>
@@ -103,7 +103,7 @@ export default async function AdminProvidersPage({
           />
 
           <details className="border-ink/[0.08] bg-surface rounded-2xl border p-3">
-            <summary className="text-ink cursor-pointer text-sm font-extrabold">
+            <summary className="text-ink cursor-pointer text-sm font-semibold">
               Restricciones operativas
             </summary>
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -122,7 +122,7 @@ export default async function AdminProvidersPage({
                   minLength={3}
                   placeholder="Motivo"
                 />
-                <button className="mt-2 min-h-11 w-full rounded-xl bg-[#ffc857] px-3 py-2 text-sm font-extrabold text-[#10131a]">
+                <button className="mt-2 min-h-11 w-full rounded-xl bg-[#ffc857] px-3 py-2 text-sm font-semibold text-[#10131a]">
                   Restringir
                 </button>
               </form>
@@ -141,7 +141,7 @@ export default async function AdminProvidersPage({
                   minLength={3}
                   placeholder="Motivo"
                 />
-                <button className="mt-2 min-h-11 w-full rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-extrabold text-white">
+                <button className="mt-2 min-h-11 w-full rounded-xl bg-[#ef5350] px-3 py-2 text-sm font-semibold text-white">
                   Suspender
                 </button>
               </form>
@@ -157,7 +157,7 @@ export default async function AdminProvidersPage({
                   aria-label="Motivo de la restauración (opcional)"
                   placeholder="Motivo"
                 />
-                <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-extrabold">
+                <button className="border-ink/[0.08] text-ink mt-2 min-h-11 w-full rounded-xl border px-3 py-2 text-sm font-semibold">
                   Restaurar
                 </button>
               </form>
@@ -168,7 +168,7 @@ export default async function AdminProvidersPage({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-ink text-base font-extrabold">
+          <h2 className="font-display text-ink text-base font-semibold">
             Prestadores registrados
           </h2>
           <span className="border-ink/[0.08] bg-surface text-ink/70 rounded-full border px-2.5 py-1 text-xs font-bold">
@@ -194,7 +194,7 @@ export default async function AdminProvidersPage({
                   className="admin-mobile-record consumer-pressable hover:bg-ink/[0.04] flex flex-col gap-1.5 px-4 py-3 transition-colors"
                 >
                   <span className="flex items-start justify-between gap-3">
-                    <span className="text-ink min-w-0 font-extrabold">
+                    <span className="text-ink min-w-0 font-semibold">
                       {provider.display_name ?? provider.public_slug}
                     </span>
                     <span className="shrink-0">
@@ -226,19 +226,19 @@ export default async function AdminProvidersPage({
                   <tr>
                     <th
                       scope="col"
-                      className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                      className="text-ink/70 px-4 py-2 text-left text-xs font-semibold"
                     >
                       Prestador
                     </th>
                     <th
                       scope="col"
-                      className="text-ink/70 px-4 py-2 text-left text-xs font-extrabold tracking-[0.08em] uppercase"
+                      className="text-ink/70 px-4 py-2 text-left text-xs font-semibold"
                     >
                       Contacto
                     </th>
                     <th
                       scope="col"
-                      className="text-ink/70 px-4 py-2 text-right text-xs font-extrabold tracking-[0.08em] uppercase"
+                      className="text-ink/70 px-4 py-2 text-right text-xs font-semibold"
                     >
                       Estado
                     </th>
@@ -255,7 +255,7 @@ export default async function AdminProvidersPage({
                         className="border-ink/10 min-w-0 border-b p-4 text-left"
                       >
                         <Link
-                          className="text-ink block truncate text-sm font-extrabold hover:underline"
+                          className="text-ink block truncate text-sm font-semibold hover:underline"
                           href={`/admin/providers?q=${encodeURIComponent(query)}&provider=${provider.provider_user_id}`}
                         >
                           {provider.display_name ?? provider.public_slug}

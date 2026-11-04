@@ -29,10 +29,10 @@ export default async function AdminReportsPage() {
         description="Casos abiertos primero, decisiones reversibles y evidencia preservada sin borrado destructivo."
         action={
           <div className="border-danger/25 bg-danger/10 rounded-2xl border px-4 py-3 text-center">
-            <p className="text-danger text-2xl font-extrabold">
+            <p className="text-danger text-2xl font-semibold">
               {openReports.length}
             </p>
-            <p className="text-danger text-[11px] font-extrabold tracking-[0.08em] uppercase">
+            <p className="text-danger text-[11px] font-semibold">
               abiertos
             </p>
           </div>
@@ -41,7 +41,7 @@ export default async function AdminReportsPage() {
 
       <AdminPanel>
         <details>
-          <summary className="text-ink cursor-pointer text-sm font-extrabold">
+          <summary className="text-ink cursor-pointer text-sm font-semibold">
             Moderación puntual de mensaje
           </summary>
           <p className="text-ink/70 mt-2 text-xs leading-5">
@@ -68,7 +68,7 @@ export default async function AdminReportsPage() {
               aria-label="Motivo de política"
             />
             <input type="hidden" name="disposition" value="HIDDEN_POLICY" />
-            <button className="bg-danger min-h-12 rounded-2xl px-4 py-3 text-sm font-extrabold text-white">
+            <button className="bg-danger min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold text-white">
               Ocultar mensaje
             </button>
           </form>
@@ -77,7 +77,7 @@ export default async function AdminReportsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-ink text-base font-extrabold">
+          <h2 className="font-display text-ink text-base font-semibold">
             Necesitan decisión
           </h2>
           <AdminStatusBadge
@@ -102,7 +102,7 @@ export default async function AdminReportsPage() {
                       />
                       <AdminStatusBadge label="Abierto" tone="danger" />
                     </div>
-                    <h3 className="text-ink mt-3 text-base font-extrabold">
+                    <h3 className="text-ink mt-3 text-base font-semibold">
                       {report.category}
                     </h3>
                     <p className="text-ink/60 mt-1 text-[11px] break-all">
@@ -119,7 +119,7 @@ export default async function AdminReportsPage() {
 
                 {report.report_type === "REVIEW_REPORT" ? (
                   <details className="border-ink/[0.08] bg-surface mt-4 rounded-2xl border p-3">
-                    <summary className="text-ink cursor-pointer text-sm font-extrabold">
+                    <summary className="text-ink cursor-pointer text-sm font-semibold">
                       Moderar reseña reportada
                     </summary>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -141,7 +141,7 @@ export default async function AdminReportsPage() {
                           minLength={2}
                           placeholder="Motivo de ocultación"
                         />
-                        <button className="bg-danger mt-2 min-h-12 w-full rounded-2xl px-3 py-2 text-sm font-extrabold text-white">
+                        <button className="bg-danger mt-2 min-h-12 w-full rounded-2xl px-3 py-2 text-sm font-semibold text-white">
                           Ocultar reseña
                         </button>
                       </form>
@@ -161,7 +161,7 @@ export default async function AdminReportsPage() {
                           name="reason"
                           placeholder="Nota de restauración"
                         />
-                        <button className="border-ink/[0.08] text-ink mt-2 min-h-12 w-full rounded-2xl border px-3 py-2 text-sm font-extrabold">
+                        <button className="border-ink/[0.08] text-ink mt-2 min-h-12 w-full rounded-2xl border px-3 py-2 text-sm font-semibold">
                           Restaurar reseña
                         </button>
                       </form>
@@ -191,7 +191,7 @@ export default async function AdminReportsPage() {
                       placeholder="Resolución del caso"
                     />
                   </label>
-                  <button className="min-h-12 w-full rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a]">
+                  <button className="min-h-12 w-full rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-semibold text-[#10131a]">
                     Resolver reporte
                   </button>
                 </form>
@@ -208,7 +208,7 @@ export default async function AdminReportsPage() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-display text-ink text-base font-extrabold">
+          <h2 className="font-display text-ink text-base font-semibold">
             Historial resuelto
           </h2>
           <span className="text-ink/60 text-xs font-bold">
@@ -224,7 +224,7 @@ export default async function AdminReportsPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-ink text-sm font-extrabold">
+                    <p className="text-ink text-sm font-semibold">
                       {report.category}
                     </p>
                     <p className="text-ink/70 mt-1 text-xs leading-5">

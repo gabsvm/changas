@@ -28,7 +28,7 @@ export function AdminProviderControls({
       {providerStatus === null ? (
         <form action={prepareProviderAction}>
           <input type="hidden" name="userId" value={userId} />
-          <button className="min-h-12 w-full rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-extrabold text-[#10131a] shadow-[0_8px_22px_rgba(18,217,197,0.18)]">
+          <button className="min-h-12 w-full rounded-2xl bg-[#12D9C5] px-4 py-3 text-sm font-semibold text-[#10131a] shadow-[0_8px_22px_rgba(18,217,197,0.18)]">
             Invitar a completar perfil
           </button>
         </form>
@@ -36,7 +36,7 @@ export function AdminProviderControls({
 
       {pending ? (
         <Link
-          className="flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#ffc857]/35 bg-[#ffc857]/10 px-4 py-3 text-sm font-extrabold text-[#ffd878]"
+          className="flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#ffc857]/35 bg-[#ffc857]/10 px-4 py-3 text-sm font-semibold text-[#ffd878]"
           href={`/admin/identity?provider=${userId}`}
         >
           Revisar identidad pendiente
@@ -45,7 +45,7 @@ export function AdminProviderControls({
 
       {providerStatus === "PROFILE_INCOMPLETE" ? (
         <Link
-          className="flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#4f7dff]/30 bg-[#2563eb]/10 px-4 py-3 text-sm font-extrabold text-[#7ea2ff]"
+          className="flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#4f7dff]/30 bg-[#2563eb]/10 px-4 py-3 text-sm font-semibold text-[#7ea2ff]"
           href={`/admin/providers?provider=${userId}`}
         >
           Ver progreso de prestador
@@ -62,7 +62,7 @@ export function AdminProviderControls({
 
       {canManualActivate ? (
         <details className="rounded-2xl border border-[#d60060]/25 bg-[#d60060]/8 p-3">
-          <summary className="cursor-pointer text-sm font-extrabold text-[#ff79ad]">
+          <summary className="cursor-pointer text-sm font-semibold text-[#ff79ad]">
             Activar manualmente
           </summary>
           <p className="mt-2 text-xs leading-5 text-[#a7b0bf]">
@@ -82,7 +82,7 @@ export function AdminProviderControls({
                 placeholder="Ej: socio fundador verificado presencialmente"
               />
             </label>
-            <button className="min-h-12 w-full rounded-2xl bg-[#d60060] px-4 py-3 text-sm font-extrabold text-white">
+            <button className="min-h-12 w-full rounded-2xl bg-[#d60060] px-4 py-3 text-sm font-semibold text-white">
               Confirmar activación manual
             </button>
           </form>
