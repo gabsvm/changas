@@ -76,7 +76,7 @@ export function ServiceWorkerRegister() {
 
   return (
     <aside
-      className="border-ink/[0.08] bg-surface text-ink fixed right-3 bottom-[calc(var(--mobile-bottom-nav-height)+0.5rem)] left-3 z-[60] mx-auto flex max-h-[calc(100dvh-1rem)] max-w-lg flex-col overflow-hidden rounded-3xl border shadow-[0_1px_2px_rgb(23_20_15/8%),0_-18px_50px_rgba(32,33,36,0.18),0_24px_64px_-20px_rgb(255_107_53/35%)] backdrop-blur-xl sm:right-4 sm:bottom-4 sm:left-4 dark:shadow-[0_-18px_50px_rgba(0,0,0,0.5)]"
+      className="border-ink/[0.08] bg-surface text-ink fixed right-3 bottom-[calc(var(--mobile-bottom-nav-height)+0.5rem)] left-3 z-[60] mx-auto flex max-h-[calc(100dvh-1rem)] max-w-lg flex-col overflow-hidden rounded-3xl border shadow-[0_1px_2px_rgb(23_20_15/8%),0_-18px_50px_rgba(32,33,36,0.18),0_24px_64px_-20px_rgb(13_18_27/35%)] backdrop-blur-xl sm:right-4 sm:bottom-4 sm:left-4 dark:shadow-[0_-18px_50px_rgba(0,0,0,0.5)]"
       aria-label="Actualización disponible"
       role="status"
       aria-live="polite"
@@ -85,16 +85,9 @@ export function ServiceWorkerRegister() {
         className="brand-gradient-surface relative shrink-0 overflow-hidden px-5 pt-5 pb-4"
         aria-hidden="true"
       >
-        <span
-          className="absolute inset-0 opacity-25"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-            backgroundSize: "12px 12px",
-          }}
-        />
-        <span className="absolute -right-6 -bottom-10 h-24 w-24 rounded-full bg-white/20" />
-        <span className="absolute -top-5 -left-5 h-16 w-16 rounded-full bg-white/15" />
+        
+        
+        
         <span className="relative flex items-center gap-3">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/20 text-white backdrop-blur-sm">
             <svg
@@ -111,10 +104,10 @@ export function ServiceWorkerRegister() {
             </svg>
           </span>
           <span>
-            <span className="block text-xs font-extrabold tracking-[0.16em] text-white/85 uppercase">
+            <span className="block text-xs font-semibold text-white/85">
               Actualización
             </span>
-            <span className="font-display mt-0.5 block text-xl leading-6 font-extrabold tracking-[-0.02em] text-white">
+            <span className="font-display mt-0.5 block text-xl leading-6 font-semibold tracking-[-0.02em] text-white">
               Hay una versión nueva lista
             </span>
           </span>

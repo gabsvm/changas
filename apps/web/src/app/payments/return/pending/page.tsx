@@ -10,7 +10,7 @@ export default async function PaymentReturnPendingPage({
   const params = await searchParams;
   return (
     <section className="mx-auto max-w-2xl py-16 sm:py-24">
-      <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
+      <p className="text-terracotta text-xs font-semibold">
         Pago en proceso
       </p>
       <h1 className="font-display mt-3 text-4xl font-semibold tracking-[-0.03em]">

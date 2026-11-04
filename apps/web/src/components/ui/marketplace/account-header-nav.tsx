@@ -9,7 +9,7 @@ import { isActiveLink } from "./desktop-nav";
 const baseLinkClass =
   "consumer-pressable hover:bg-ink/[0.04] text-ink/70 hover:text-ink inline-flex min-h-11 items-center rounded-lg px-3";
 const activeLinkClass =
-  "consumer-pressable bg-ink/[0.07] text-ink inline-flex min-h-11 items-center rounded-lg px-3 font-extrabold";
+  "consumer-pressable bg-ink/[0.07] text-ink inline-flex min-h-11 items-center rounded-lg px-3 font-semibold";
 
 function HeaderNavLink({
   href,

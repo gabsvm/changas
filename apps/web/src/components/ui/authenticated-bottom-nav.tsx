@@ -209,7 +209,7 @@ export function AuthenticatedBottomNav({
                   </span>
                 ) : null}
               </span>
-              <span className={active ? "font-extrabold" : undefined}>
+              <span className={active ? "font-semibold" : undefined}>
                 {item.label}
               </span>
             </Link>

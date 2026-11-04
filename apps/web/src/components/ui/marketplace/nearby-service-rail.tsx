@@ -21,7 +21,7 @@ export function NearbyServiceRail({
       <div className="flex min-h-11 items-center justify-between gap-3">
         <h2
           id="nearby-services-title"
-          className="text-base font-extrabold tracking-[-0.02em]"
+          className="text-base font-semibold tracking-[-0.02em]"
         >
           {title}
         </h2>

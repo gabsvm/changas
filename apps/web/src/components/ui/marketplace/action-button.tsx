@@ -8,7 +8,7 @@ export function actionButtonClass(
   className = "",
 ): string {
   const base =
-    "consumer-pressable inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl px-5 text-[15px] font-extrabold transition focus-visible:ring-2 focus-visible:ring-moss/45 disabled:cursor-not-allowed disabled:opacity-55";
+    "consumer-pressable inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl px-5 text-[15px] font-semibold transition focus-visible:ring-2 focus-visible:ring-moss/45 disabled:cursor-not-allowed disabled:opacity-55";
   const tones: Record<ActionTone, string> = {
     primary: "cta-ink",
     secondary:

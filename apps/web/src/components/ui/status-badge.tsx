@@ -16,7 +16,7 @@ export function StatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex min-h-7 items-center rounded-full px-3 py-1 text-[0.7rem] font-bold tracking-[0.08em] uppercase ${toneClasses[tone]}`}
+      className={`inline-flex min-h-7 items-center rounded-full px-3 py-1 text-[0.7rem] font-bold ${toneClasses[tone]}`}
     >
       {label}
     </span>

@@ -48,7 +48,7 @@ export function EmptyState({
           />
         )}
       </div>
-      <h2 className="mt-4 text-lg font-extrabold tracking-[-0.02em]">
+      <h2 className="mt-4 text-lg font-semibold tracking-[-0.02em]">
         {title}
       </h2>
       {description ? (

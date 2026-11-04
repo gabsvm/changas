@@ -32,7 +32,7 @@ export function SectionHeader({
             label={badge.label ?? title}
           />
         ) : null}
-        <h2 className="truncate text-lg font-extrabold tracking-[-0.025em] sm:text-2xl">
+        <h2 className="truncate text-lg font-semibold tracking-[-0.025em] sm:text-2xl">
           {title}
         </h2>
       </span>

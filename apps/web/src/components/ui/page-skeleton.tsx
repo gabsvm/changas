@@ -15,16 +15,9 @@ export function PageSkeleton({
           className="brand-gradient-surface relative overflow-hidden rounded-3xl px-5 py-6"
           aria-hidden="true"
         >
-          <span
-            className="absolute inset-0 opacity-25"
-            style={{
-              backgroundImage:
-                "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-              backgroundSize: "12px 12px",
-            }}
-          />
-          <span className="absolute -right-6 -bottom-10 h-24 w-24 rounded-full bg-white/20" />
-          <span className="absolute -top-5 -left-5 h-16 w-16 rounded-full bg-white/15" />
+          
+          
+          
           <span className="relative flex items-center gap-3">
             <span className="skeleton-shimmer h-11 w-11 shrink-0 rounded-2xl" />
             <span className="min-w-0 flex-1 space-y-2">

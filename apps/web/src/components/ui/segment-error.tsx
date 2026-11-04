@@ -19,7 +19,7 @@ export function SegmentError({
   return (
     <section className="grid min-h-[60vh] place-items-center px-2 text-center">
       <div className="max-w-md">
-        <h1 className="font-display text-2xl font-extrabold">
+        <h1 className="font-display text-2xl font-semibold">
           No pudimos cargar esta sección
         </h1>
         <p className="text-ink/70 mt-3 text-sm leading-6">

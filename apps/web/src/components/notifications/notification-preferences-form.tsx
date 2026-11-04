@@ -62,7 +62,7 @@ export function NotificationPreferencesForm({
         className="pointer-events-none fixed inset-x-4 bottom-[calc(var(--mobile-bottom-nav-height)+0.75rem)] z-40 flex justify-center sm:bottom-6"
       >
         {pending || savedVisible ? (
-          <p className="pop-in inline-flex items-center gap-2.5 rounded-full bg-[#132538] py-2 pr-5 pl-2 text-sm font-semibold text-white shadow-[0_1px_2px_rgb(23_20_15/12%),0_16px_36px_-10px_rgb(23_20_15/28%),0_24px_64px_-20px_rgb(255_107_53/40%)]">
+          <p className="pop-in inline-flex items-center gap-2.5 rounded-full bg-[#132538] py-2 pr-5 pl-2 text-sm font-semibold text-white shadow-[0_1px_2px_rgb(23_20_15/12%),0_16px_36px_-10px_rgb(23_20_15/28%),0_24px_64px_-20px_rgb(13_18_27/40%)]">
             {pending ? null : <SuccessCheck />}
             {pending ? "Guardando cambio…" : "Cambios guardados"}
           </p>

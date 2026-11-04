@@ -32,7 +32,7 @@ export function LegalPage({
             ← Volver a YALO
           </Link>
         </header>
-        <h1 className="mt-4 text-3xl font-extrabold tracking-[-0.035em]">
+        <h1 className="mt-4 text-3xl font-semibold tracking-[-0.035em]">
           {title}
         </h1>
         <p className="text-ink/70 mt-2 text-sm leading-6">{intro}</p>
@@ -78,7 +78,7 @@ export function LegalSection({
 }) {
   return (
     <section>
-      <h2 className="text-lg font-extrabold tracking-[-0.02em]">{title}</h2>
+      <h2 className="text-lg font-semibold tracking-[-0.02em]">{title}</h2>
       <div className="text-ink/80 mt-2 space-y-3 text-[15px] leading-7">
         {children}
       </div>

@@ -5,8 +5,7 @@ import { useEffect } from "react";
 import { reportClientError, type ClientError } from "@/lib/observability";
 
 const COVER: React.CSSProperties = {
-  backgroundImage:
-    "radial-gradient(120% 90% at 0% 0%, rgb(255 255 255 / 30%), transparent 55%), linear-gradient(135deg, #ffb340 0%, #ff7a2f 46%, #f2531c 100%)",
+  background: "#161D2A",
 };
 
 export default function GlobalError({
@@ -22,7 +21,7 @@ export default function GlobalError({
 
   return (
     <html lang="es">
-      <body style={{ margin: 0, background: "#fbf8f3", color: "#17140f" }}>
+      <body style={{ margin: 0, background: "#F6F9FC", color: "#17140f" }}>
         <main
           style={{
             display: "grid",
@@ -44,7 +43,7 @@ export default function GlobalError({
               background: "#ffffff",
               padding: "2.5rem 1.5rem",
               boxShadow:
-                "0 1px 2px rgb(23 20 15 / 6%), 0 8px 20px -6px rgb(23 20 15 / 12%), 0 24px 70px -20px rgb(255 107 53 / 28%)",
+                "0 1px 2px rgb(23 20 15 / 6%), 0 8px 20px -6px rgb(23 20 15 / 12%)",
             }}
           >
             <span
@@ -69,8 +68,8 @@ export default function GlobalError({
                 borderRadius: "1.75rem",
                 color: "white",
                 fontSize: "2.5rem",
-                fontWeight: 800,
-                boxShadow: "0 18px 48px rgb(255 107 53 / 30%)",
+                fontWeight: 600,
+                boxShadow: "0 18px 48px rgb(13 18 27 / 24%)",
                 ...COVER,
               }}
             >
@@ -81,9 +80,7 @@ export default function GlobalError({
                 marginTop: "1.5rem",
                 fontSize: "0.875rem",
                 fontWeight: 600,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "#c84010",
+                color: "#526174",
               }}
             >
               YALO
@@ -118,7 +115,7 @@ export default function GlobalError({
                   background: "#17140f",
                   padding: "0.75rem 1.25rem",
                   fontSize: "0.875rem",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   color: "white",
                   border: "none",
                   cursor: "pointer",
@@ -134,7 +131,7 @@ export default function GlobalError({
                   border: "1px solid rgb(23 20 15 / 25%)",
                   padding: "0.75rem 1.25rem",
                   fontSize: "0.875rem",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   color: "#17140f",
                   textDecoration: "none",
                 }}
