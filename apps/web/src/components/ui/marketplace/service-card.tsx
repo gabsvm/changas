@@ -78,33 +78,25 @@ function CoverFallback({
     <span
       className="relative grid aspect-video w-full place-items-center overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(135deg, ${visual.from} 0%, ${visual.to} 100%)`,
+        background: visual.from,
       }}
       role="img"
       aria-label={`Imagen ilustrativa de ${serviceTitle}`}
     >
+      
       <span
-        className="absolute inset-0 opacity-25"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-          backgroundSize: "12px 12px",
-        }}
+        className="hidden"
         aria-hidden="true"
       />
       <span
-        className="absolute -right-6 -bottom-8 h-28 w-28 rounded-full bg-white/20"
-        aria-hidden="true"
-      />
-      <span
-        className="absolute -top-5 -left-5 h-16 w-16 rounded-full bg-white/15"
+        className="hidden"
         aria-hidden="true"
       />
       <span className="relative flex flex-col items-center gap-1.5 px-4 text-center">
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"
-          className="h-8 w-8 text-white drop-shadow-[0_2px_6px_rgb(0_0_0/25%)]"
+          className="h-8 w-8 text-white"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.8"
@@ -113,7 +105,7 @@ function CoverFallback({
         >
           <path d={categoryIconPath(categorySlug)} />
         </svg>
-        <span className="text-xs font-bold tracking-wide text-white/90 uppercase drop-shadow-[0_1px_4px_rgb(0_0_0/25%)]">
+        <span className="text-xs font-semibold text-white/90">
           {categoryName}
         </span>
       </span>
@@ -161,7 +153,7 @@ export function ServiceCard({
 
   return (
     <article
-      className={`service-card-shell consumer-card group bg-surface hover:border-brand-primary/25 relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_4px_8px_rgb(16_24_39/7%),0_26px_52px_-14px_rgb(16_24_39/22%)] dark:hover:border-white/20 ${example ? "border-ink/30! border-dashed!" : "consumer-card-pressed"}`}
+      className={`service-card-shell consumer-card group bg-surface hover:border-brand-primary/25 relative overflow-hidden transition-colors duration-200 dark:hover:border-white/20 ${example ? "border-ink/30! border-dashed!" : "consumer-card-pressed"}`}
     >
       {example ? (
         <div
@@ -226,7 +218,7 @@ export function ServiceCard({
                       </span>
                     )}
                   </p>
-                  <span className="service-card-price text-brand-primary ml-auto shrink-0 text-[15px] font-extrabold dark:text-white">
+                  <span className="service-card-price text-brand-primary ml-auto shrink-0 text-[15px] font-semibold dark:text-white">
                     {price}
                   </span>
                 </div>
@@ -291,7 +283,7 @@ export function ServiceCard({
                     className="shrink-0 font-bold text-ink"
                     title="Identidad verificada por YALO"
                   >
-                    ✓ Verificado
+                    <svg aria-hidden="true" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{display:"inline",verticalAlign:"-2px"}}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg> Verificado
                   </span>
                 </p>
                 <h3 className="service-card-title text-ink mt-1.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
@@ -336,7 +328,7 @@ export function ServiceCard({
                       </span>
                     )}
                   </p>
-                  <span className="service-card-price text-brand-primary ml-auto shrink-0 text-[15px] font-extrabold dark:text-white">
+                  <span className="service-card-price text-brand-primary ml-auto shrink-0 text-[15px] font-semibold dark:text-white">
                     {price}
                   </span>
                 </div>

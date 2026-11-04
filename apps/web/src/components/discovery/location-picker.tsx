@@ -224,11 +224,11 @@ export function LocationPicker({
                   />
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-terracotta text-[11px] font-extrabold tracking-[0.16em] uppercase">
+                      <p className="text-terracotta text-[11px] font-semibold">
                         Tu zona
                       </p>
                       <h2
-                        className="font-display mt-1 text-2xl font-extrabold tracking-[-0.035em]"
+                        className="font-display mt-1 text-2xl font-semibold tracking-[-0.035em]"
                         id="location-picker-title"
                       >
                         ¿Dónde estás buscando?

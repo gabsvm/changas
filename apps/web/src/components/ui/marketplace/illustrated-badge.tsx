@@ -32,14 +32,14 @@ export type IllustratedIconName =
 // pero los valores son navy/semánticos sobrios. Nada de neón identitario.
 // "orange" es el acento de marca (navy); rose/green/gold son semánticos
 // (danger/success/warning), NO azules/verdes de marca.
-const TONES: Record<IllustratedTone, { from: string; to: string }> = {
-  orange: { from: "#1E293B", to: "#0D121B" },
-  blue: { from: "#1576D2", to: "#0D121B" },
-  green: { from: "#1E7A4C", to: "#0B1F16" },
-  rose: { from: "#A92E37", to: "#5C1620" },
-  violet: { from: "#3B4A6B", to: "#0D121B" },
-  gold: { from: "#8A5F00", to: "#3A2700" },
-  neutral: { from: "#A8A29E", to: "#78716C" },
+const TONES: Record<IllustratedTone, string> = {
+  orange: "#1E293B",
+  blue: "#14568A",
+  green: "#1E7A4C",
+  rose: "#A92E37",
+  violet: "#3B4A6B",
+  gold: "#8A5F00",
+  neutral: "#6B7280",
 };
 
 const PATHS: Record<IllustratedIconName, string> = {
@@ -93,31 +93,21 @@ export function IllustratedBadge({
   size?: keyof typeof SIZES;
   label?: string;
 }) {
-  const gradient = TONES[tone];
+  const color = TONES[tone];
   const dims = SIZES[size];
   return (
     <span
-      className={`relative grid shrink-0 place-items-center overflow-hidden ${dims.box} shadow-[0_6px_16px_-6px_rgb(23_20_15/40%)] dark:shadow-[0_6px_16px_-6px_rgb(0_0_0/70%)]`}
-      style={{
-        backgroundImage: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
-      }}
+      className={`relative grid shrink-0 place-items-center overflow-hidden ${dims.box}`}
+      style={{ background: color }}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
     >
-      <span
-        className="absolute inset-0 opacity-25"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-          backgroundSize: "10px 10px",
-        }}
-        aria-hidden="true"
-      />
+      
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"
-        className={`relative ${dims.icon} text-white drop-shadow-[0_1px_4px_rgb(0_0_0/30%)]`}
+        className={`relative ${dims.icon} text-white`}
         fill="none"
         stroke="currentColor"
         strokeWidth="1.8"

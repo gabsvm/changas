@@ -67,7 +67,7 @@ export async function ProviderReputation({
         </div>
         <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-terracotta text-xs font-semibold tracking-[0.16em] uppercase">
+            <p className="text-terracotta text-xs font-semibold">
               Reputación verificada
             </p>
             <p className="font-display mt-2 flex flex-wrap items-center gap-2 text-3xl font-semibold">
@@ -134,7 +134,7 @@ export async function ProviderReputation({
 
         {contexts.length > 0 ? (
           <div className="border-ink/10 mt-5 border-t pt-5">
-            <p className="text-ink/70 text-xs font-semibold tracking-wide uppercase">
+            <p className="text-ink/70 text-xs font-semibold">
               Historial por servicio y habilidad
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -177,10 +177,9 @@ export async function ProviderReputation({
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="flex min-w-0 items-center gap-2.5">
                     <span
-                      className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-extrabold text-white"
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-semibold text-white"
                       style={{
-                        backgroundImage:
-                          "linear-gradient(135deg, #F5B942 0%, #DE7E1F 100%)",
+                        background: "#8A5F00",
                       }}
                       aria-hidden="true"
                     >
@@ -220,7 +219,7 @@ export async function ProviderReputation({
                 ) : null}
                 {review.provider_reply ? (
                   <div className="bg-canvas mt-3 rounded-xl p-3 text-sm">
-                    <p className="text-ink/70 text-xs font-bold tracking-wide uppercase">
+                    <p className="text-ink/70 text-xs font-semibold">
                       Respuesta del proveedor
                     </p>
                     <p className="mt-1 leading-6 whitespace-pre-wrap">
@@ -246,7 +245,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="border-ink/[0.08] bg-surface consumer-card min-w-24 rounded-2xl border px-3 py-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
       <p className="font-display text-xl font-semibold">{value}</p>
-      <p className="text-ink/70 text-[10px] font-semibold tracking-wide uppercase">
+      <p className="text-ink/70 text-[11px] font-semibold">
         {label}
       </p>
     </div>
@@ -260,7 +259,7 @@ function Dimension({ label, value }: { label: string; value: number | null }) {
     <div className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border px-3.5 py-3 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
       <div className="flex items-baseline justify-between gap-2">
         <p className="text-ink/70 text-xs font-semibold">{label}</p>
-        <p className="flex items-center gap-1.5 text-sm font-extrabold">
+        <p className="flex items-center gap-1.5 text-sm font-semibold">
           <StarRow value={value} label={`${label}: ${value.toFixed(1)} de 5`} />
           {value.toFixed(1)} / 5
         </p>
@@ -274,8 +273,7 @@ function Dimension({ label, value }: { label: string; value: number | null }) {
           className="h-full rounded-full"
           style={{
             width: `${pct}%`,
-            backgroundImage:
-              "linear-gradient(135deg, #0D121B 0%, #1E293B 100%)",
+            background: "#161D2A",
           }}
         />
       </div>

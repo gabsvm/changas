@@ -133,7 +133,7 @@ export default async function PublicServicePage({
             role="alert"
             className="border-danger/25 bg-danger/[0.06] mb-4 rounded-2xl border px-4 py-3"
           >
-            <p className="text-sm font-extrabold">No pudimos abrir el chat</p>
+            <p className="text-sm font-semibold">No pudimos abrir el chat</p>
             <p className="text-ink/70 mt-0.5 text-sm">{consultErrorMessage}</p>
           </div>
         ) : null}
@@ -156,13 +156,13 @@ export default async function PublicServicePage({
         >
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <p className="text-[11px] font-extrabold tracking-[0.13em] text-[#83EADA] uppercase">
+              <p className="text-xs font-semibold text-[#83EADA]">
                 Servicio de {provider.display_name}
               </p>
-              <h1 className="font-display mt-2 text-[23px] leading-tight font-extrabold tracking-[-0.035em] text-white sm:text-3xl">
+              <h1 className="font-display mt-2 text-[23px] leading-tight font-semibold tracking-[-0.035em] text-white sm:text-3xl">
                 {service.title}
               </h1>
-              <p className="mt-2 text-[22px] font-extrabold text-[#9DF6DB]">
+              <p className="mt-2 text-[22px] font-semibold text-[#9DF6DB]">
                 {price}
               </p>
               <p className="mt-1 text-xs leading-5 text-[#B7C9D8]">
@@ -190,27 +190,13 @@ export default async function PublicServicePage({
         <article className="service-hero-card consumer-card bg-surface mt-5 overflow-hidden sm:mt-8">
           <div
             className="relative flex min-h-44 items-end overflow-hidden p-5 sm:min-h-52 sm:p-8"
-            style={{ backgroundImage: coverFor(serviceSlug).css }}
+            style={{ background: coverFor(serviceSlug).css }}
             role="img"
             aria-label={`Portada ilustrada de ${service.title}`}
           >
-            <span
-              className="absolute inset-0 opacity-25"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                backgroundSize: "12px 12px",
-              }}
-              aria-hidden="true"
-            />
-            <span
-              className="absolute -right-10 -bottom-12 h-40 w-40 rounded-full bg-white/20"
-              aria-hidden="true"
-            />
-            <span
-              className="absolute -top-8 -left-8 h-24 w-24 rounded-full bg-white/15"
-              aria-hidden="true"
-            />
+            
+            
+            
             <span className="relative flex flex-wrap items-center gap-1.5">
               <IllustratedBadge
                 tone={coverFor(serviceSlug).tone}
@@ -275,20 +261,20 @@ export default async function PublicServicePage({
                       </span>
                     </div>
                     <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
-                      <span className="text-[13px] font-extrabold">
+                      <span className="text-[13px] font-semibold">
                         Total a pagar
                       </span>
-                      <span className="text-[15px] font-extrabold">
+                      <span className="text-[15px] font-semibold">
                         {price}
                       </span>
                     </div>
                   </>
                 ) : (
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-[13px] font-extrabold">
+                    <span className="text-[13px] font-semibold">
                       Precio de referencia
                     </span>
-                    <span className="text-[15px] font-extrabold">{price}</span>
+                    <span className="text-[15px] font-semibold">{price}</span>
                   </div>
                 )}
                 <p className="text-ink/70 mt-2 text-xs leading-5">
@@ -347,7 +333,7 @@ export default async function PublicServicePage({
             <section className="border-ink/10 mt-8 border-t pt-6">
               <Link
                 href={`/p/${providerSlug}`}
-                className="consumer-card consumer-pressable bg-surface border-ink/[0.08] flex min-h-14 items-center gap-4 rounded-2xl border p-3 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)]"
+                className="consumer-card consumer-pressable bg-surface border-ink/[0.08] flex min-h-14 items-center gap-4 rounded-2xl border p-3 "
               >
                 <Avatar
                   name={provider.display_name}
@@ -384,7 +370,7 @@ export default async function PublicServicePage({
                 label="Garantía YALO"
               />
               <div>
-                <p className="text-sm font-extrabold">
+                <p className="text-sm font-semibold">
                   Sin pago por adelantado + soporte
                 </p>
                 <p className="text-ink/70 mt-1 text-xs leading-6">
@@ -404,10 +390,10 @@ export default async function PublicServicePage({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-ink/70 text-xs leading-5 font-bold tracking-[0.06em] uppercase">
+      <p className="text-ink/70 text-xs leading-5 font-semibold">
         {label}
       </p>
-      <p className="mt-1.5 text-[15px] leading-6 font-extrabold">{value}</p>
+      <p className="mt-1.5 text-[15px] leading-6 font-semibold">{value}</p>
     </div>
   );
 }
@@ -423,12 +409,12 @@ function Info({ title, value }: { title: string; value: string | null }) {
 }
 
 const SERVICE_COVERS = [
-  { css: "linear-gradient(135deg, #22354A 0%, #0D121B 100%)", tone: "orange" },
-  { css: "linear-gradient(135deg, #164F6B 0%, #112033 100%)", tone: "blue" },
-  { css: "linear-gradient(135deg, #185253 0%, #10282F 100%)", tone: "green" },
-  { css: "linear-gradient(135deg, #235346 0%, #12282E 100%)", tone: "rose" },
-  { css: "linear-gradient(135deg, #28455C 0%, #121E2C 100%)", tone: "violet" },
-  { css: "linear-gradient(135deg, #1B4D57 0%, #10222D 100%)", tone: "gold" },
+  { css: "#22354A", tone: "orange" },
+  { css: "#164F6B", tone: "blue" },
+  { css: "#185253", tone: "green" },
+  { css: "#235346", tone: "rose" },
+  { css: "#28455C", tone: "violet" },
+  { css: "#1B4D57", tone: "gold" },
 ] as const;
 
 function coverFor(slug: string) {

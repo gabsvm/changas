@@ -10,7 +10,7 @@ export function ExampleServices({ publishHref }: { publishHref: string }) {
       <div className="flex flex-wrap items-center gap-2">
         <h2
           id="example-services-title"
-          className="text-base font-extrabold tracking-[-0.02em]"
+          className="text-base font-semibold tracking-[-0.02em]"
         >
           Así se verán los servicios
         </h2>

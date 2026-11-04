@@ -169,7 +169,7 @@ export default async function SearchPage({
 
         <section className="pt-4 sm:pt-8">
           <div className="text-ink relative sm:py-2">
-            <h1 className="relative z-10 text-[22px] leading-8 font-extrabold tracking-[-0.025em] sm:text-3xl sm:leading-10">
+            <h1 className="relative z-10 text-[22px] leading-8 font-semibold tracking-[-0.025em] sm:text-3xl sm:leading-10">
               {query ? `Resultados para “${query}”` : "Explorar servicios"}
             </h1>
             <form action="/buscar" className="relative z-10 mt-4">
@@ -193,7 +193,7 @@ export default async function SearchPage({
                     />
                   </div>
                   <button
-                    className="consumer-pressable cta-ink inline-flex min-h-12 shrink-0 items-center rounded-2xl px-7 text-[15px] font-extrabold"
+                    className="consumer-pressable cta-ink inline-flex min-h-12 shrink-0 items-center rounded-2xl px-7 text-[15px] font-semibold"
                     type="submit"
                   >
                     Buscar
@@ -215,9 +215,9 @@ export default async function SearchPage({
                       key={item.slug ?? "all"}
                       href={categoryHref(item.slug)}
                       aria-current={selected ? "true" : undefined}
-                      className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-bold transition-all duration-200 ${
+                      className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-semibold transition-colors duration-200 ${
                         selected
-                          ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
+                          ? "border-transparent bg-[#161D2A] text-white"
                           : "yalo-filter-pill border-ink/10 bg-canvas text-ink/70 hover:bg-ink/[0.04]"
                       }`}
                     >

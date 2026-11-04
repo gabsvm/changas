@@ -201,27 +201,13 @@ export default async function PublicProviderPage({
           <div className="consumer-card bg-surface overflow-hidden">
             <div
               className="relative h-28 overflow-hidden sm:h-36"
-              style={{ backgroundImage: coverFor(provider.public_slug).css }}
+              style={{ background: coverFor(provider.public_slug).css }}
               role="img"
               aria-label={`Portada ilustrada de ${provider.display_name}`}
             >
-              <span
-                className="absolute inset-0 opacity-25"
-                style={{
-                  backgroundImage:
-                    "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                  backgroundSize: "12px 12px",
-                }}
-                aria-hidden="true"
-              />
-              <span
-                className="absolute -right-8 -bottom-10 h-32 w-32 rounded-full bg-white/20"
-                aria-hidden="true"
-              />
-              <span
-                className="absolute -top-6 -left-6 h-20 w-20 rounded-full bg-white/15"
-                aria-hidden="true"
-              />
+              
+              
+              
               <span className="absolute top-3 right-4">
                 <IllustratedBadge
                   tone={coverFor(provider.public_slug).tone}
@@ -252,7 +238,7 @@ export default async function PublicProviderPage({
                       verificación. Sin hardcodear nada. */}
                   <StatusChip tone="success">
                     <span title="Identidad verificada por YALO">
-                      ✓ Verificado
+                      <svg aria-hidden="true" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{display:"inline",verticalAlign:"-2px"}}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg> Verificado
                     </span>
                   </StatusChip>
                   {provider.public_zone ? (
@@ -261,7 +247,7 @@ export default async function PublicProviderPage({
                     </span>
                   ) : null}
                 </div>
-                <h1 className="font-display mt-3 text-[26px] leading-8 font-extrabold tracking-[-0.03em]">
+                <h1 className="font-display mt-3 text-[26px] leading-8 font-semibold tracking-[-0.03em]">
                   {provider.display_name}
                 </h1>
                 {provider.public_headline ? (
@@ -317,7 +303,7 @@ export default async function PublicProviderPage({
                   {fromPrice ? (
                     <p className="truncate text-sm leading-5">
                       <span className="text-ink/70 font-medium">desde </span>
-                      <strong className="text-[15px] font-extrabold">
+                      <strong className="text-[15px] font-semibold">
                         {fromPrice}
                       </strong>{" "}
                       <span className="text-ink/70 text-xs">
@@ -327,7 +313,7 @@ export default async function PublicProviderPage({
                   ) : null}
                   <Link
                     href={quoteHref}
-                    className="consumer-pressable cta-ink mt-1 inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-5 text-[15px] font-extrabold shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
+                    className="consumer-pressable cta-ink mt-1 inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-5 text-[15px] font-semibold shadow-[0_6px_16px_rgba(255,107,53,0.22)]"
                   >
                     Pedir cotización
                   </Link>
@@ -353,7 +339,7 @@ export default async function PublicProviderPage({
               label="Contratación protegida"
             />
             <div>
-              <p className="text-sm font-extrabold">
+              <p className="text-sm font-semibold">
                 Contratación protegida
               </p>
               {/* Solo lo que la app ya hace: acuerdo por chat, acompañamiento
@@ -373,7 +359,7 @@ export default async function PublicProviderPage({
               label="Información pública clara"
             />
             <div>
-              <p className="text-sm font-extrabold">
+              <p className="text-sm font-semibold">
                 Información pública clara
               </p>
               <p className="text-ink/70 mt-1 text-xs leading-6">
@@ -391,7 +377,7 @@ export default async function PublicProviderPage({
               label="Verificación de identidad"
             />
             <div>
-              <p className="text-sm font-extrabold">
+              <p className="text-sm font-semibold">
                 Verificación de identidad
               </p>
               <p className="text-ink/70 mt-1 text-xs leading-6">
@@ -440,7 +426,7 @@ export default async function PublicProviderPage({
                 {fromPrice ? (
                   <p className="mb-1 text-sm leading-5">
                     <span className="text-ink/70 font-medium">desde </span>
-                    <strong className="text-[15px] font-extrabold">
+                    <strong className="text-[15px] font-semibold">
                       {fromPrice}
                     </strong>{" "}
                     <span className="text-ink/70 text-xs">
@@ -450,7 +436,7 @@ export default async function PublicProviderPage({
                 ) : null}
                 <Link
                   href={quoteHref}
-                  className="consumer-pressable cta-ink inline-flex min-h-12 w-full items-center justify-center rounded-xl px-5 text-sm font-extrabold shadow-md"
+                  className="consumer-pressable cta-ink inline-flex min-h-12 w-full items-center justify-center rounded-xl px-5 text-sm font-semibold shadow-md"
                 >
                   Pedir cotización
                 </Link>
@@ -468,26 +454,19 @@ export default async function PublicProviderPage({
             <div className="grid gap-3">
               {(services ?? []).map((service) => (
                 <Link
-                  className="consumer-card consumer-pressable bg-surface group flex min-h-[5.25rem] items-start gap-4 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:hover:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
+                  className="consumer-card consumer-pressable bg-surface group flex min-h-[5.25rem] items-start gap-4 p-4 transition-colors duration-200"
                   href={`/p/${slug}/${service.public_slug}`}
                   key={service.public_slug}
                 >
                   <span
-                    className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl text-lg font-extrabold text-white shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
+                    className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl text-lg font-semibold text-white shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                     style={{
                       backgroundImage: coverFor(service.public_slug).css,
                     }}
                     aria-hidden="true"
                   >
-                    <span
-                      className="absolute inset-0 opacity-25"
-                      style={{
-                        backgroundImage:
-                          "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                        backgroundSize: "10px 10px",
-                      }}
-                    />
-                    <span className="relative drop-shadow-[0_2px_6px_rgb(0_0_0/25%)]">
+                    
+                    <span className="relative">
                       {service.title.trim().charAt(0).toUpperCase() || "C"}
                     </span>
                   </span>
@@ -508,7 +487,7 @@ export default async function PublicProviderPage({
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-3">
-                    <p className="text-[15px] font-extrabold">
+                    <p className="text-[15px] font-semibold">
                       {formatServicePrice(
                         service.price_model,
                         service.price_amount,
@@ -544,7 +523,7 @@ export default async function PublicProviderPage({
         {publicSkills.length ? (
           <PublicSection
             title="Habilidades"
-            badge={{ tone: "blue", icon: "sparkle" }}
+            badge={{ tone: "blue", icon: "tag" }}
           >
             <div className="flex flex-wrap gap-2">
               {publicSkills.map((skill) => (
@@ -593,17 +572,17 @@ export default async function PublicProviderPage({
         {(portfolio ?? []).length ? (
           <PublicSection
             title="Portfolio"
-            badge={{ tone: "violet", icon: "sparkle" }}
+            badge={{ tone: "violet", icon: "tag" }}
           >
             <div className="grid gap-4 sm:grid-cols-2">
               {(portfolio ?? []).map((item) => (
                 <article
-                  className="border-ink/[0.08] bg-surface consumer-card group overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] dark:hover:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
+                  className="border-ink/[0.08] bg-surface consumer-card group overflow-hidden rounded-2xl border transition-colors duration-200"
                   key={item.id}
                 >
                   {item.media_path ? (
                     <Image
-                      className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      className="aspect-video w-full object-cover"
                       src={`/api/portfolio/${item.media_path
                         .split("/")
                         .map(encodeURIComponent)
@@ -719,7 +698,7 @@ export default async function PublicProviderPage({
         ) : null}
 
         <footer className="border-ink/10 mt-10 border-t py-6 text-center">
-          <p className="text-moss text-xs leading-5 font-extrabold">
+          <p className="text-moss text-xs leading-5 font-semibold">
             Sin pago por adelantado: acordás y realizás el pago directamente con
             el prestador. YALO te acompaña durante el trabajo.
           </p>
@@ -771,10 +750,10 @@ function PublicSection({
 function ProfileFact({ label, value }: { label: string; value: number }) {
   return (
     <div className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border px-3 py-4 text-center shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-      <p className="text-xl leading-7 font-extrabold tracking-[-0.03em]">
+      <p className="text-xl leading-7 font-semibold tracking-[-0.03em]">
         {value}
       </p>
-      <p className="text-ink/70 mt-1 text-[11px] leading-4 font-bold uppercase">
+      <p className="text-ink/70 mt-1 text-[11px] leading-4 font-bold ">
         {label}
       </p>
     </div>
@@ -782,12 +761,12 @@ function ProfileFact({ label, value }: { label: string; value: number }) {
 }
 
 const PROFILE_COVERS = [
-  { css: "linear-gradient(135deg, #22354A 0%, #0D121B 100%)", tone: "orange" },
-  { css: "linear-gradient(135deg, #164F6B 0%, #112033 100%)", tone: "blue" },
-  { css: "linear-gradient(135deg, #185253 0%, #10282F 100%)", tone: "green" },
-  { css: "linear-gradient(135deg, #235346 0%, #12282E 100%)", tone: "rose" },
-  { css: "linear-gradient(135deg, #28455C 0%, #121E2C 100%)", tone: "violet" },
-  { css: "linear-gradient(135deg, #1B4D57 0%, #10222D 100%)", tone: "gold" },
+  { css: "#22354A", tone: "orange" },
+  { css: "#164F6B", tone: "blue" },
+  { css: "#185253", tone: "green" },
+  { css: "#235346", tone: "rose" },
+  { css: "#28455C", tone: "violet" },
+  { css: "#1B4D57", tone: "gold" },
 ] as const;
 
 function coverFor(slug: string) {

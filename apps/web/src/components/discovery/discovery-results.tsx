@@ -9,7 +9,6 @@ import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge"
 import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { actionButtonClass } from "@/components/ui/marketplace/action-button";
 import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
-import { riseStyle } from "@/lib/ui/motion";
 import { readStoredLocation } from "./location-picker";
 import { DiscoveryCard } from "./discovery-card";
 
@@ -67,12 +66,12 @@ function signatureOf(query: string, filters: DiscoveryFilters): string {
 }
 
 const DISCOVERY_COVERS = [
-  { css: "linear-gradient(135deg, #22354A 0%, #0D121B 100%)", tone: "orange" },
-  { css: "linear-gradient(135deg, #164F6B 0%, #112033 100%)", tone: "blue" },
-  { css: "linear-gradient(135deg, #185253 0%, #10282F 100%)", tone: "green" },
-  { css: "linear-gradient(135deg, #235346 0%, #12282E 100%)", tone: "rose" },
-  { css: "linear-gradient(135deg, #28455C 0%, #121E2C 100%)", tone: "violet" },
-  { css: "linear-gradient(135deg, #1B4D57 0%, #10222D 100%)", tone: "gold" },
+  { css: "#22354A", tone: "orange" },
+  { css: "#164F6B", tone: "blue" },
+  { css: "#185253", tone: "green" },
+  { css: "#235346", tone: "rose" },
+  { css: "#28455C", tone: "violet" },
+  { css: "#1B4D57", tone: "gold" },
 ] as const;
 
 function coverForDiscovery(
@@ -96,15 +95,8 @@ function LoadingSkeletons() {
           className="border-ink/[0.07] bg-surface consumer-card animate-pulse overflow-hidden rounded-[1.25rem] border"
         >
           <div className="brand-gradient-surface relative h-16 overflow-hidden opacity-60">
-            <span
-              className="absolute inset-0 opacity-25"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                backgroundSize: "10px 10px",
-              }}
-            />
-            <span className="absolute -right-4 -bottom-6 h-20 w-20 rounded-full bg-white/20" />
+            
+            
           </div>
           <div className="p-5">
             <div className="bg-ink/[0.08] h-5 w-2/3 rounded-full" />
@@ -434,7 +426,7 @@ export function DiscoveryResults({
       {rows.length > 0 && !resultsError ? (
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
           {rows.map((row, index) => (
-            <div key={rowKey(row)} className="rise-in" style={riseStyle(index)}>
+            <div key={rowKey(row)}>
               <DiscoveryCard row={row} />
             </div>
           ))}
@@ -443,26 +435,12 @@ export function DiscoveryResults({
         <div className="border-ink/[0.08] bg-surface consumer-card mt-3 overflow-hidden rounded-[1.25rem] border">
           <div
             className="relative flex h-24 items-end overflow-hidden p-4"
-            style={{ backgroundImage: activeCover.css }}
+            style={{ background: activeCover.css }}
             role="presentation"
           >
-            <span
-              className="absolute inset-0 opacity-25"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                backgroundSize: "12px 12px",
-              }}
-              aria-hidden="true"
-            />
-            <span
-              className="absolute -right-6 -bottom-10 h-28 w-28 rounded-full bg-white/20"
-              aria-hidden="true"
-            />
-            <span
-              className="absolute -top-6 -left-6 h-16 w-16 rounded-full bg-white/15"
-              aria-hidden="true"
-            />
+            
+            
+            
             <span className="relative">
               <IllustratedBadge
                 tone={activeCover.tone}
