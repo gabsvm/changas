@@ -29,15 +29,15 @@ export function GuideHeader({
       <div className="flex items-center gap-4">
         <span
           aria-hidden="true"
-          className="font-display grid h-16 w-16 shrink-0 place-items-center rounded-3xl bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-3xl font-extrabold text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
+          className="font-display grid h-16 w-16 shrink-0 place-items-center rounded-3xl bg-[#161D2A] text-3xl font-semibold text-white"
         >
           {current}
         </span>
         <div className="min-w-0">
-          <p className="text-ink text-xs font-extrabold tracking-[0.14em] uppercase">
+          <p className="text-ink/70 text-xs font-semibold">
             Paso {current} de {total}
           </p>
-          <h2 className="font-display mt-0.5 text-2xl leading-7 font-extrabold tracking-[-0.02em]">
+          <h2 className="font-display mt-0.5 text-2xl leading-7 font-semibold tracking-[-0.02em]">
             {active?.action}
           </h2>
           <p className="text-ink/70 mt-0.5 text-sm leading-5">{active?.hint}</p>
@@ -46,7 +46,7 @@ export function GuideHeader({
           className="ml-auto hidden shrink-0 text-right sm:block"
           aria-hidden="true"
         >
-          <span className="font-display block text-3xl font-extrabold">
+          <span className="font-display block text-3xl font-semibold">
             {percent}%
           </span>
           <span className="text-ink/60 block text-xs font-bold">listo</span>

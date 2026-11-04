@@ -132,25 +132,11 @@ export default async function CategoryPage({
           className="sm:flex"
         />
         <section className="pt-5 sm:pt-9">
-          <div className="yalo-category-hero brand-gradient-surface relative overflow-hidden rounded-3xl p-5 text-white shadow-[var(--consumer-shadow-hero)] sm:p-6">
-            <span
-              className="pointer-events-none absolute inset-0 opacity-25"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgb(255 255 255 / 55%) 1px, transparent 1.5px)",
-                backgroundSize: "12px 12px",
-              }}
-              aria-hidden="true"
-            />
-            <span
-              className="pointer-events-none absolute -right-10 -bottom-16 h-48 w-48 rounded-full bg-white/20"
-              aria-hidden="true"
-            />
-            <span
-              className="pointer-events-none absolute -top-10 -left-10 h-32 w-32 rounded-full bg-white/15"
-              aria-hidden="true"
-            />
-            <p className="brand-kicker relative z-10 text-xs font-extrabold tracking-[0.14em] uppercase">
+          <div className="yalo-category-hero relative overflow-hidden rounded-3xl bg-[#161D2A] p-5 text-white sm:p-6">
+            
+            
+            
+            <p className="relative z-10 text-xs font-semibold text-white/70">
               Explorá por categoría
             </p>
             <h1 className="relative z-10 mt-2 text-3xl leading-9 font-bold tracking-[-0.04em] sm:text-4xl">
@@ -196,7 +182,7 @@ export default async function CategoryPage({
                 />
               </div>
               <button
-                className="consumer-pressable cta-ink inline-flex min-h-[52px] shrink-0 items-center rounded-2xl px-5 text-sm font-extrabold"
+                className="consumer-pressable cta-ink inline-flex min-h-[52px] shrink-0 items-center rounded-2xl px-5 text-sm font-semibold"
                 type="submit"
               >
                 Buscar
@@ -211,9 +197,9 @@ export default async function CategoryPage({
                   mode: filters.modality === "IN_PERSON" ? null : "presencial",
                 })}
                 aria-pressed={filters.modality === "IN_PERSON"}
-                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
+                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-semibold transition-colors duration-200 ${
                   filters.modality === "IN_PERSON"
-                    ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
+                    ? "border-transparent bg-[#161D2A] text-white"
                     : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-surface"
                 }`}
               >
@@ -224,9 +210,9 @@ export default async function CategoryPage({
                   mode: filters.modality === "REMOTE" ? null : "remoto",
                 })}
                 aria-pressed={filters.modality === "REMOTE"}
-                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
+                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-semibold transition-colors duration-200 ${
                   filters.modality === "REMOTE"
-                    ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
+                    ? "border-transparent bg-[#161D2A] text-white"
                     : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-surface"
                 }`}
               >
@@ -237,9 +223,9 @@ export default async function CategoryPage({
                   offers: filters.acceptsOffers ? null : "true",
                 })}
                 aria-pressed={filters.acceptsOffers === true}
-                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-bold transition-all duration-200 ${
+                className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-semibold transition-colors duration-200 ${
                   filters.acceptsOffers
-                    ? "border-transparent bg-[linear-gradient(135deg,#0D121B_0%,#1E293B_100%)] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
+                    ? "border-transparent bg-[#161D2A] text-white"
                     : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-surface"
                 }`}
               >

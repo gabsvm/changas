@@ -94,7 +94,7 @@ function LoadingSkeletons() {
           key={index}
           className="border-ink/[0.07] bg-surface consumer-card animate-pulse overflow-hidden rounded-[1.25rem] border"
         >
-          <div className="brand-gradient-surface relative h-16 overflow-hidden opacity-60">
+          <div className="relative h-16 overflow-hidden bg-[#162232] opacity-60">
             
             
           </div>

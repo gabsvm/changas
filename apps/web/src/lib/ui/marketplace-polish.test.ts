@@ -206,7 +206,8 @@ describe("marketplace polish contracts", () => {
 
   it("gives public discovery surfaces a shared tactile composition", () => {
     expect(rootSource).toContain("CategoryTile");
-    expect(categorySource).toContain("brand-gradient-surface");
+    expect(categorySource).toContain("bg-[#161D2A]");
+    expect(categorySource).not.toContain("brand-gradient-surface");
     expect(categorySource).toContain("discovery-results-shell");
     expect(providerSource).toContain("coverFor");
     expect(providerSource).toContain("profile-trust-strip");
