@@ -40,9 +40,9 @@ describe("Better Design — directional CTA and button polish", () => {
   });
 
   it("does not imply navigation through non-interactive trust or benefit badges", () => {
-    expect(home).toMatch(
-      /className="yalo-value-glyph" aria-hidden="true">\s*✦\s*<\/span>/,
-    );
-    expect(trustStrip).toContain('className="yalo-confidence-icon">✓</span>');
+    expect(home).not.toContain("✦");
+    expect(home).not.toContain("yalo-value-glyph");
+    expect(trustStrip).not.toContain("✓");
+    expect(trustStrip).toContain("<CheckIcon />");
   });
 });

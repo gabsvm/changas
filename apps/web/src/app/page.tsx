@@ -337,7 +337,7 @@ export default async function HomePage() {
         >
           <div className="yalo-section-heading">
             <div>
-              <p className="yalo-section-kicker">ENCONTRÁ TU SOLUCIÓN</p>
+              <p className="yalo-section-kicker">Encontrá tu solución</p>
               <h2 id="categories-title">
                 ¿Qué hacemos hoy<span className="yalo-period">?</span>
               </h2>
@@ -392,7 +392,7 @@ export default async function HomePage() {
         >
           <div className="yalo-section-heading">
             <div>
-              <p className="yalo-section-kicker">PERSONAS QUE HACEN</p>
+              <p className="yalo-section-kicker">Personas que hacen</p>
               <h2 id="featured-title">
                 Talento para lo que venga<span className="yalo-period">.</span>
               </h2>
@@ -448,7 +448,7 @@ export default async function HomePage() {
         >
           <div className="yalo-section-heading">
             <div>
-              <p className="yalo-section-kicker">ASÍ DE SIMPLE</p>
+              <p className="yalo-section-kicker">Así de simple</p>
               <h2 id="values-title">
                 Un buen contacto cambia todo
                 <span className="yalo-period">.</span>
@@ -460,9 +460,6 @@ export default async function HomePage() {
               <article key={benefit.number} className="yalo-value-card">
                 <div className="yalo-value-top">
                   <span className="yalo-value-number">{benefit.number} /</span>
-                  <span className="yalo-value-glyph" aria-hidden="true">
-                    ✦
-                  </span>
                 </div>
                 <span className="yalo-value-label">{benefit.detail}</span>
                 <h3>{benefit.title}</h3>

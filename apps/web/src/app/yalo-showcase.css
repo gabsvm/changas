@@ -129,7 +129,7 @@
 .yalo-nav-login {
   color: #d6e1ea;
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 500;
   white-space: nowrap;
 }
 .yalo-nav-primary,
@@ -141,11 +141,11 @@
   min-height: 48px;
   padding-inline: 20px;
   border-radius: 999px;
-  background: linear-gradient(112deg, #08a9f4, #12d9c5 55%, #65ec91);
+  background: #65ec91;
   color: #062132;
   font-size: 13px;
-  font-weight: 800;
-  box-shadow: 0 7px 25px rgb(18 217 197 / 18%);
+  font-weight: 600;
+  box-shadow: 0 7px 25px rgb(0 0 0 / 18%);
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -156,7 +156,7 @@
 .yalo-nav-mobile:hover {
   transform: translateY(-2px);
   filter: brightness(1.07);
-  box-shadow: 0 10px 28px rgb(18 217 197 / 25%);
+  box-shadow: 0 10px 28px rgb(0 0 0 / 22%);
 }
 .yalo-nav-mobile {
   display: none;
@@ -192,11 +192,11 @@
   background: #65ec91;
   box-shadow:
     0 0 0 5px rgb(101 236 145 / 12%),
-    0 0 15px #65ec91;
+    0 0 0 0 transparent;
 }
 .yalo-live-link {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: #84e8dd;
   white-space: nowrap;
 }
@@ -305,7 +305,7 @@
   background: rgb(24 38 52 / 96%);
   color: #d8f6f2;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.155em;
 }
 .yalo-eyebrow-spark {
@@ -313,7 +313,7 @@
   height: 7px;
   border-radius: 50%;
   background: #65ec91;
-  box-shadow: 0 0 16px rgb(101 236 145 / 70%);
+  box-shadow: none;
 }
 .yalo-eyebrow-arrow {
   color: #65ec91;
@@ -327,7 +327,7 @@
   font-family: var(--font-display);
   font-size: clamp(2.75rem, 6.3vw, 5.5rem);
   line-height: 1.055;
-  font-weight: 780;
+  font-weight: 600;
   letter-spacing: -0.065em;
   text-wrap: balance;
 }
@@ -371,9 +371,9 @@
 }
 .yalo-intent-hire {
   border: 1px solid rgb(101 236 145 / 52%);
-  background: linear-gradient(110deg, #08a9f4, #12d9c5 60%, #65ec91);
+  background: #65ec91;
   color: #062333;
-  box-shadow: 0 10px 30px rgb(18 217 197 / 18%);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 20%);
 }
 .yalo-intent-work {
   border: 1px solid rgb(177 220 230 / 45%);
@@ -403,14 +403,14 @@
 .yalo-intent-text strong {
   color: inherit;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.02em;
 }
 .yalo-intent-text > span {
   color: inherit;
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 500;
   line-height: 1.3;
   opacity: 0.88;
 }
@@ -419,13 +419,13 @@
   flex-shrink: 0;
   color: inherit;
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .yalo-intent-link:hover {
   transform: translateY(-2px);
 }
 .yalo-intent-hire:hover {
-  box-shadow: 0 13px 34px rgb(18 217 197 / 27%);
+  box-shadow: 0 13px 34px rgb(0 0 0 / 24%);
 }
 .yalo-intent-work:hover {
   background: rgb(42 70 86 / 95%);
@@ -449,7 +449,7 @@
   padding: 0 4px;
   border-radius: 8px;
   color: #ddebf2;
-  font-weight: 800;
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -500,10 +500,10 @@
   padding: 0 25px;
   border: 0;
   border-radius: 14px;
-  background: linear-gradient(110deg, #08a9f4, #12d9c5 65%, #65ec91);
-  color: #072333;
+  background: #161d2a;
+  color: #ffffff;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   transition:
     transform 180ms ease,
@@ -538,7 +538,7 @@
   background: rgb(255 255 255 / 5%);
   color: #ddebf2;
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 600;
   transition:
     background 180ms ease,
     border-color 180ms ease;
@@ -562,7 +562,7 @@
   color: #7d96a9;
   font-size: 9px;
   letter-spacing: 0.18em;
-  font-weight: 750;
+  font-weight: 600;
 }
 .yalo-stage-scroll {
   display: flex;
@@ -590,7 +590,7 @@
   color: #aebfce;
   font-size: 12px;
   line-height: 1.5;
-  font-weight: 650;
+  font-weight: 500;
   text-align: center;
 }
 .yalo-confidence-icon {
@@ -621,10 +621,10 @@
 .yalo-section-kicker {
   margin: 0 0 14px;
   color: #74deda;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.4;
-  font-weight: 800;
-  letter-spacing: 0.19em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 .yalo-section-heading h2 {
   margin: 0;
@@ -633,7 +633,7 @@
   font-size: clamp(1.85rem, 3.8vw, 3.4rem);
   line-height: 1.12;
   letter-spacing: -0.055em;
-  font-weight: 760;
+  font-weight: 600;
   text-wrap: balance;
 }
 .yalo-period {
@@ -658,7 +658,7 @@
   background: rgb(255 255 255 / 4%);
   color: #e2f5f2;
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 600;
   white-space: nowrap;
   transition:
     transform 180ms ease,
@@ -684,7 +684,7 @@
 .yalo-category-grid > a > span:first-child {
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 22px;
-  background: linear-gradient(150deg, #20334a 0%, #131e2d 95%) !important;
+  background: #162232 !important;
   box-shadow:
     inset 0 1px rgb(255 255 255 / 7%),
     0 12px 30px rgb(0 0 0 / 15%);
@@ -694,14 +694,13 @@
     box-shadow 220ms ease;
 }
 .yalo-category-grid > a:nth-child(3n + 2) > span:first-child {
-  background: linear-gradient(150deg, #173e46, #13222c) !important;
+  background: #162232 !important;
 }
 .yalo-category-grid > a:nth-child(4n + 3) > span:first-child {
-  background: linear-gradient(150deg, #234035, #142329) !important;
+  background: #162232 !important;
 }
 .yalo-category-grid > a:hover > span:first-child {
-  transform: translateY(-5px);
-  border-color: rgb(18 217 197 / 38%);
+  border-color: rgb(255 255 255 / 28%);
   box-shadow: 0 18px 38px rgb(0 0 0 / 27%);
 }
 .yalo-category-grid > a > span:last-child {
@@ -819,7 +818,7 @@
   transition: transform 450ms ease;
 }
 .yalo-featured-results .service-card-shell:hover img {
-  transform: scale(1.035);
+  transform: none;
 }
 .yalo-empty-copy {
   color: #99b0c0;
@@ -837,7 +836,7 @@
   padding: 27px;
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 25px;
-  background: linear-gradient(150deg, rgb(28 44 61 / 80%), rgb(15 27 41 / 95%));
+  background: #162232;
   box-shadow: inset 0 1px rgb(255 255 255 / 5%);
   transition:
     border-color 180ms ease,
@@ -855,27 +854,16 @@
 .yalo-value-number {
   color: #6d889d;
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 500;
   letter-spacing: 0.13em;
-}
-.yalo-value-glyph {
-  display: grid;
-  place-items: center;
-  width: 35px;
-  height: 35px;
-  border: 1px solid rgb(255 255 255 / 14%);
-  border-radius: 12px;
-  color: #8ceadb;
-  font-size: 16px;
 }
 .yalo-value-label {
   display: inline-block;
   margin-top: 30px;
   color: #85e5d9;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 .yalo-value-card h3,
 .yalo-how-it-works li h3 {

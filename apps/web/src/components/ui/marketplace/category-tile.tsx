@@ -50,8 +50,7 @@ export function CategoryTile({
           className="yalo-category-photo-image"
         />
         <span className="yalo-category-photo-tone" />
-        <span className="yalo-category-photo-dots" />
-        <span className="yalo-category-photo-orb" />
+        
         <span className="yalo-category-photo-footer">
           <span className="yalo-category-photo-title">{label}</span>
           <span className="yalo-category-photo-arrow">
