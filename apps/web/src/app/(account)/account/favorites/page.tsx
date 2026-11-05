@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
@@ -6,6 +7,8 @@ import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge"
 import { ProviderCard } from "@/components/ui/marketplace/provider-card";
 import { isTrustedPublicAvatarUrl } from "@/lib/discovery/public-media";
 import { createClient } from "@/lib/supabase/server";
+export const metadata: Metadata = { title: "Guardados" };
+
 export const dynamic = "force-dynamic";
 
 function percent(value: number | null): string {

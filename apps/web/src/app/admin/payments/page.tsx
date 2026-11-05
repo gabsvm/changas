@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   AdminEmptyState,
   AdminMetricCard,
@@ -39,6 +40,8 @@ function paymentStatusLabel(status: string | null) {
   };
   return labels[status] ?? status.replaceAll("_", " ");
 }
+
+export const metadata: Metadata = { title: "Pagos y conciliación" };
 
 export default async function AdminPaymentsPage() {
   const { payments, runs } = await listAdminPayments();

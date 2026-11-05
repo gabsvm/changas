@@ -11,7 +11,7 @@ import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 import { listOpenJobPosts } from "@/lib/jobs/job-posts-server";
 
 export const metadata = {
-  title: "Oportunidades | YALO",
+  title: "Oportunidades",
   description:
     "Necesidades abiertas de clientes en tus rubros para ofertar tu trabajo.",
 };

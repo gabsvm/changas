@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { canSelfManageProviderStatus } from "@changas/domain";
 import { redirect } from "next/navigation";
 
@@ -9,6 +10,8 @@ import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge"
 import { createClient } from "@/lib/supabase/server";
 
 import { saveProviderProfileStep } from "../../../actions";
+
+export const metadata: Metadata = { title: "Datos del proveedor" };
 
 export const dynamic = "force-dynamic";
 

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { resolveJobDisputeAction } from "@/app/admin/actions";
@@ -39,6 +40,8 @@ function parseStatus(value: string): JobStatusTab | null {
     : null;
 }
 
+export const metadata: Metadata = { title: "Trabajos administrados" };
+
 export default async function AdminJobsPage({
   searchParams,
 }: {
@@ -79,7 +82,7 @@ export default async function AdminJobsPage({
       <AdminPageHeader
         eyebrow="Operación · Trabajos"
         title="Trabajos"
-        description="Inspección rápida del estado de las contrataciones. Los datos sensibles siguen detrás de RPCs administrativos."
+        description="Revisá el estado de las contrataciones y accedé al detalle de cada trabajo."
       />
 
       <nav

@@ -13,7 +13,7 @@ import { listMyJobPosts } from "@/lib/jobs/job-posts-server";
 import { governNeedAction } from "./actions";
 
 export const metadata = {
-  title: "Mis necesidades | YALO",
+  title: "Mis necesidades",
   description: "Seguí tus necesidades publicadas y las ofertas recibidas.",
 };
 

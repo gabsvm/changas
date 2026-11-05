@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PublicProfileForm } from "@/components/account/account-form";
@@ -7,6 +8,8 @@ import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge"
 import { createClient } from "@/lib/supabase/server";
 
 import { updatePublicProfile } from "../../actions";
+
+export const metadata: Metadata = { title: "Perfil público" };
 
 export const dynamic = "force-dynamic";
 

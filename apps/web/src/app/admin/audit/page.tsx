@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   AdminEmptyState,
   AdminPageHeader,
@@ -19,6 +20,8 @@ function humanAction(action: string) {
   };
   return labels[action] ?? action.toLowerCase().replaceAll("_", " ");
 }
+
+export const metadata: Metadata = { title: "Auditoría administrativa" };
 
 export default async function AdminAuditPage() {
   const events = await listAdminAuditEvents();

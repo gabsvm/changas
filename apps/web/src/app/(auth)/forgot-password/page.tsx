@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { AuthForm } from "@/components/auth/auth-form";
 import { safeNextPath } from "@/lib/auth/redirect";
 
 import { requestPasswordReset } from "../actions";
+
+export const metadata: Metadata = { title: "Recuperar acceso" };
 
 export default async function ForgotPasswordPage({
   searchParams,

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   createCategoryAction,
   createServiceTagAction,
@@ -37,6 +38,8 @@ function moderationTone(
   return "info";
 }
 
+export const metadata: Metadata = { title: "Catálogo y servicios" };
+
 export default async function AdminCatalogPage() {
   const [categories, skills, services, synonyms, tags, skillRequests] =
     await Promise.all([
@@ -53,7 +56,7 @@ export default async function AdminCatalogPage() {
       <AdminPageHeader
         eyebrow="Catálogo"
         title="Catálogo y servicios"
-        description="CRUD administrativo con desactivación reversible como camino normal."
+        description="Gestioná categorías, habilidades y servicios. Podés desactivarlos sin borrar su historial."
       />
       <nav
         aria-label="Secciones del catálogo"

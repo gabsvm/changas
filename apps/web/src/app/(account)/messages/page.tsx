@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -17,6 +18,8 @@ import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { Avatar } from "@/components/ui/marketplace/avatar";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
+
+export const metadata: Metadata = { title: "Mensajes" };
 
 export const dynamic = "force-dynamic";
 

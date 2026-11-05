@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { AuthForm } from "@/components/auth/auth-form";
 import { safeNextPath } from "@/lib/auth/redirect";
 
 import { updatePassword } from "../actions";
+
+export const metadata: Metadata = { title: "Nueva contraseña" };
 
 export default async function UpdatePasswordPage({
   searchParams,

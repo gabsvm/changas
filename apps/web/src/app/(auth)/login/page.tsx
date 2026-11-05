@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { signIn, signInWithGoogle } from "../actions";
 import { AuthForm } from "@/components/auth/auth-form";
 import { safeNextPath } from "@/lib/auth/redirect";
+
+export const metadata: Metadata = { title: "Iniciar sesión" };
 
 export default async function LoginPage({
   searchParams,

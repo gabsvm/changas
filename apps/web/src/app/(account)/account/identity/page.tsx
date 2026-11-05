@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PrivateIdentityForm } from "@/components/account/account-form";
@@ -7,6 +8,8 @@ import { PrivacyNotice } from "@/components/ui/privacy-notice";
 import { createClient } from "@/lib/supabase/server";
 
 import { updatePrivateIdentity } from "../../actions";
+
+export const metadata: Metadata = { title: "Identidad y seguridad" };
 
 export const dynamic = "force-dynamic";
 

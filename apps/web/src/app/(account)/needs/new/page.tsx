@@ -12,7 +12,7 @@ import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { NeedsComingSoon } from "@/components/jobs/needs-coming-soon";
 
 export const metadata = {
-  title: "Publicar necesidad | YALO",
+  title: "Publicar necesidad",
   description:
     "Contanos qué necesitás y recibí ofertas de prestadores verificados.",
 };

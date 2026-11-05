@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -13,6 +14,8 @@ import { NextStepBanner } from "@/components/ui/guided";
 import { getProviderNextAction } from "@/lib/ui/guided";
 
 import { startProviderOnboarding } from "../../(provider)/actions";
+
+export const metadata: Metadata = { title: "Mi cuenta" };
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +69,7 @@ export default async function AccountPage() {
 
   return (
     <section className="pt-5 pb-6 sm:py-10">
+      <h1 className="sr-only">Mi cuenta</h1>
       <div className="mx-auto max-w-2xl">
         <header className="brand-gradient-surface relative overflow-hidden rounded-[1.75rem] p-5 shadow-[0_30px_64px_-18px_rgb(13_18_27/28%)]">
           

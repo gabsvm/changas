@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
+
+export const metadata: Metadata = { title: "Error de acceso" };
 
 export default function AuthErrorPage() {
   return (

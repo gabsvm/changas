@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import nextDynamic from "next/dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -40,6 +41,8 @@ const ConversationThread = nextDynamic(() =>
     (mod) => mod.ConversationThread,
   ),
 );
+
+export const metadata: Metadata = { title: "Conversación" };
 
 export const dynamic = "force-dynamic";
 

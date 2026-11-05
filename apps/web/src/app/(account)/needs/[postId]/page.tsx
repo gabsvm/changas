@@ -23,7 +23,7 @@ import {
 import { governNeedAction, offerOnNeedAction } from "../actions";
 
 export const metadata = {
-  title: "Necesidad | YALO",
+  title: "Necesidad",
 };
 
 const STATUS_LABELS = {

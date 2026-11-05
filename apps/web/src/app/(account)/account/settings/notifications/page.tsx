@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { NotificationPreferencesForm } from "@/components/notifications/notification-preferences-form";
@@ -8,6 +9,8 @@ import { getNotificationPreferences } from "@/lib/notifications/server";
 import { createClient } from "@/lib/supabase/server";
 
 import { updateNotificationPreferencesAction } from "../../notifications/actions";
+
+export const metadata: Metadata = { title: "Preferencias de notificaciones" };
 
 export const dynamic = "force-dynamic";
 

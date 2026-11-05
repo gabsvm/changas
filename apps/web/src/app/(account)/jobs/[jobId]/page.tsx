@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 ﻿import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
@@ -177,6 +178,8 @@ function eventActorLabel(
   if (actorUserId === providerUserId) return "Prestador";
   return "Equipo YALO";
 }
+
+export const metadata: Metadata = { title: "Detalle del trabajo" };
 
 export default async function JobPage({
   params,

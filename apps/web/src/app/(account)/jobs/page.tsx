@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -94,6 +95,8 @@ function rpcFilterFor(filter: StatusFilter): {
       return { past: false, filter: null };
   }
 }
+
+export const metadata: Metadata = { title: "Mis trabajos" };
 
 export default async function JobsPage({
   searchParams,

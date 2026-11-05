@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
@@ -26,6 +27,8 @@ const tools = [
   ["/admin/payments", "Pagos", "Conciliación y desajustes financieros."],
   ["/admin/audit", "Auditoría", "Historial administrativo inmutable."],
 ] as const;
+
+export const metadata: Metadata = { title: "Resumen administrativo" };
 
 export default async function AdminPage() {
   const [identityQueue, openReports, providers, users, jobs] =

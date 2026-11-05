@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { resolveJobReturnHref } from "../return-href";
+
+export const metadata: Metadata = { title: "Pago enviado" };
 
 export default async function PaymentReturnSuccessPage({
   searchParams,

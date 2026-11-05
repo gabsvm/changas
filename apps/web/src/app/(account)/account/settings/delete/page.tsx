@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
@@ -7,6 +8,8 @@ import { createClient } from "@/lib/supabase/server";
 
 import { deleteAccount } from "./actions";
 import { DeleteAccountForm } from "./delete-account-form";
+
+export const metadata: Metadata = { title: "Eliminar cuenta" };
 
 export const dynamic = "force-dynamic";
 

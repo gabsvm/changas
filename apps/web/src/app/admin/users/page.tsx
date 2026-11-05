@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { isUuid } from "@changas/validation";
@@ -24,6 +25,8 @@ const first = (value: string | string[] | undefined) =>
 function providerLabel(status: string | null) {
   return status ? getProviderStatusPresentation(status).label : "Solo cliente";
 }
+
+export const metadata: Metadata = { title: "Usuarios" };
 
 export default async function AdminUsersPage({
   searchParams,

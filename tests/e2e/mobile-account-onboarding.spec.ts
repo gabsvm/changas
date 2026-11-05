@@ -161,6 +161,29 @@ for (const width of [320, 360, 390] as const) {
     const user = await createTestUser(width);
     await login(page, user);
 
+    await page.goto("/account/settings");
+    for (const stored of ["light", "dark", "system"] as const) {
+      await page.evaluate(
+        (value) => localStorage.setItem("changas-theme", value),
+        stored,
+      );
+      await page.reload();
+      const group = page.getByRole("group", { name: "Tema de apariencia" });
+      const labels = { light: "Claro", dark: "Oscuro", system: "Sistema" };
+      await expect(group.locator('[aria-pressed="true"]')).toHaveCount(1);
+      await expect(
+        group.getByRole("button", { name: labels[stored], exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+      for (const label of ["Claro", "Oscuro", "Sistema"]) {
+        await group.getByRole("button", { name: label, exact: true }).click();
+        await expect(group.locator('[aria-pressed="true"]')).toHaveCount(1);
+        await expect(
+          group.getByRole("button", { name: label, exact: true }),
+        ).toHaveAttribute("aria-pressed", "true");
+      }
+    }
+    await page.goto("/account");
+
     await expectNoHorizontalOverflow(page);
     await expectMobileNavigation(page);
 

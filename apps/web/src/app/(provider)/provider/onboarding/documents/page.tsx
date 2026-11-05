@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { canSelfManageProviderStatus } from "@changas/domain";
 import { redirect } from "next/navigation";
 
@@ -20,6 +21,8 @@ import {
 } from "@/lib/ui/provider-submission";
 
 import { submitProviderIdentityReview } from "./actions";
+
+export const metadata: Metadata = { title: "Documentos del proveedor" };
 
 export const dynamic = "force-dynamic";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 export type ThemeChoice = "light" | "dark" | "system";
 
@@ -36,20 +36,27 @@ function applyTheme(choice: ThemeChoice): void {
     choice === "system" ? "light dark" : choice;
 }
 
+const subscribe = () => () => {};
+const getServerSnapshot = (): ThemeChoice => "system";
+
 export function ThemeSelector({ className = "" }: { className?: string }) {
-  const [choice, setChoice] = useState<ThemeChoice>(() =>
-    typeof window === "undefined" ? "system" : readStoredChoice(),
+  const storedChoice = useSyncExternalStore(
+    subscribe,
+    readStoredChoice,
+    getServerSnapshot,
   );
+  const [selectedChoice, setChoice] = useState<ThemeChoice | null>(null);
+  const choice = selectedChoice ?? storedChoice;
 
   useEffect(() => {
-    applyTheme(readStoredChoice());
+    applyTheme(choice);
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const onSystemChange = () => {
-      if (readStoredChoice() === "system") applyTheme("system");
+      if (choice === "system") applyTheme("system");
     };
     media.addEventListener("change", onSystemChange);
     return () => media.removeEventListener("change", onSystemChange);
-  }, []);
+  }, [choice]);
 
   const select = (next: ThemeChoice) => {
     setChoice(next);

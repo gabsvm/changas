@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { canSelfManageProviderStatus } from "@changas/domain";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -15,6 +16,8 @@ import { hasRequiredIdentityDocuments } from "@/lib/ui/provider-submission";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 import { OnboardingAdvanceForm } from "@/components/provider/onboarding-advance-form";
 import { submitProviderIdentityReview } from "../documents/actions";
+
+export const metadata: Metadata = { title: "Estado de verificación" };
 
 export const dynamic = "force-dynamic";
 

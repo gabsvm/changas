@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
@@ -22,6 +23,8 @@ const first = (value: string | string[] | undefined) =>
 function statusLabel(status: string) {
   return getProviderStatusPresentation(status).label;
 }
+
+export const metadata: Metadata = { title: "Prestadores" };
 
 export default async function AdminProvidersPage({
   searchParams,

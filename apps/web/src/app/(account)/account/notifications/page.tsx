@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -18,6 +19,8 @@ import {
   markNotificationReadAction,
   openNotificationAction,
 } from "./actions";
+
+export const metadata: Metadata = { title: "Notificaciones" };
 
 export const dynamic = "force-dynamic";
 

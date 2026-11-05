@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { SiteFooter } from "@/components/ui/site-footer";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -10,6 +11,8 @@ import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge"
 import { createClient } from "@/lib/supabase/server";
 
 import { signOut } from "../../../(auth)/actions";
+
+export const metadata: Metadata = { title: "Configuración" };
 
 export const dynamic = "force-dynamic";
 

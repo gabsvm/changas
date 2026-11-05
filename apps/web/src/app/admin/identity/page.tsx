@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { decideIdentityAction } from "@/app/admin/actions";
@@ -27,6 +28,8 @@ function dateTime(value: unknown) {
     timeStyle: "short",
   }).format(new Date(value));
 }
+
+export const metadata: Metadata = { title: "Revisión de identidad" };
 
 export default async function AdminIdentityPage({
   searchParams,

@@ -442,7 +442,7 @@ export function ConversationThread({
             {peerName.trim().charAt(0).toUpperCase() || "C"}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[15px] font-semibold">{peerName}</p>
+            <h1 className="truncate text-[15px] font-semibold">{peerName}</h1>
             <Link
               href={providerHref}
               className="text-ink/70 block truncate text-[13px] underline-offset-4 hover:underline"

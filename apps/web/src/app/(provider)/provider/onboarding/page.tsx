@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { canSelfManageProviderStatus } from "@changas/domain";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -20,6 +21,8 @@ import {
 import { NextStepBanner } from "@/components/ui/guided";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 import { startProviderOnboarding } from "../../actions";
+
+export const metadata: Metadata = { title: "Verificación de proveedor" };
 
 export const dynamic = "force-dynamic";
 const STEP_VISUALS: Record<

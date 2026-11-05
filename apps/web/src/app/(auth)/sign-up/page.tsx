@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { AuthForm } from "@/components/auth/auth-form";
 import { safeNextPath } from "@/lib/auth/redirect";
 
 import { signInWithGoogle, signUp } from "../actions";
+
+export const metadata: Metadata = { title: "Crear cuenta" };
 
 export default async function SignUpPage({
   searchParams,

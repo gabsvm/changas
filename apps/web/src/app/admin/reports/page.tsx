@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   resolveReportAction,
   setMessageModerationAction,
@@ -14,6 +15,8 @@ import { listAdminReports } from "@/lib/admin/server";
 function reportTypeLabel(type: string) {
   return type === "REVIEW_REPORT" ? "Reseña" : "Conversación";
 }
+
+export const metadata: Metadata = { title: "Reportes" };
 
 export default async function AdminReportsPage() {
   const [openReports, resolvedReports] = await Promise.all([

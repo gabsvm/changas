@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -45,6 +46,8 @@ import {
   updateMarketplaceSettings,
 } from "../../marketplace-actions";
 import { saveServiceTransactional } from "../../service-actions";
+
+export const metadata: Metadata = { title: "Gestionar servicios" };
 
 export const dynamic = "force-dynamic";
 
