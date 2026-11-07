@@ -541,3 +541,16 @@
   filter: brightness(1.08);
   box-shadow: 0 12px 34px rgb(18 217 197 / 30%);
 }
+
+/* Categoría: el CTA de búsqueda usa el mismo botón oscuro que la landing y
+   /buscar; el borde lo separa del fondo del hero. */
+.yalo-ui .yalo-category-hero .cta-ink {
+  border: 1px solid rgb(255 255 255 / 22%);
+  background: #0b1220;
+  color: #ffffff;
+  box-shadow: none;
+}
+.yalo-ui .yalo-category-hero .cta-ink:hover {
+  background: #121b2c;
+  filter: none;
+}

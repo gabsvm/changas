@@ -112,6 +112,28 @@ export default async function CategoryPage({
 
   const { rows, hasMore } = searchResult;
 
+  // Categoría sin servicios y sin refinamientos: estado vacío propio, con
+  // salida a otras categorías en lugar de "Limpiar filtros".
+  const isBareEmptyCategory =
+    rows.length === 0 &&
+    !searchResult.error &&
+    !query &&
+    !raw.mode &&
+    !raw.offers;
+  let otherCategories: { slug: string; name: string }[] = [];
+  if (isBareEmptyCategory) {
+    const { data } = await supabase
+      .from("categories")
+      .select("slug, name")
+      .eq("is_active", true)
+      .neq("slug", categorySlug)
+      .order("sort_order")
+      .limit(6);
+    otherCategories = (data ?? [])
+      .filter((item) => !isExcludedPublicTestCategory(item))
+      .slice(0, 3);
+  }
+
   return (
     <main
       id="main-content"
@@ -133,9 +155,6 @@ export default async function CategoryPage({
         />
         <section className="pt-5 sm:pt-9">
           <div className="yalo-category-hero relative overflow-hidden rounded-3xl bg-[#161D2A] p-5 text-white sm:p-6">
-            
-            
-            
             <p className="relative z-10 text-xs font-semibold text-white/70">
               Explorá por categoría
             </p>
@@ -147,21 +166,9 @@ export default async function CategoryPage({
                 {category.description}
               </p>
             ) : null}
-            <Link
-              href={
-                query ? `/buscar?q=${encodeURIComponent(query)}` : "/buscar"
-              }
-              aria-label={`Quitar filtro de categoría ${category.name}`}
-              className="consumer-pressable text-ink relative z-10 mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-white/60 bg-white/70 px-3.5 text-[13px] font-bold backdrop-blur-sm hover:bg-white"
-            >
-              {category.name}
-              <span aria-hidden="true" className="text-sm leading-none">
-                ×
-              </span>
-            </Link>
             <form
               action={`/categoria/${categorySlug}`}
-              className="relative z-10 mt-3 flex gap-2"
+              className="relative z-10 mt-4 flex gap-2"
             >
               {raw.mode ? (
                 <input type="hidden" name="mode" value={raw.mode} />
@@ -182,14 +189,14 @@ export default async function CategoryPage({
                 />
               </div>
               <button
-                className="consumer-pressable cta-ink inline-flex min-h-[52px] shrink-0 items-center rounded-2xl px-5 text-sm font-semibold"
+                className="consumer-pressable cta-ink inline-flex min-h-[52px] shrink-0 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
                 type="submit"
               >
                 Buscar
               </button>
             </form>
             <div
-              className="relative z-10 mt-3 flex flex-wrap gap-2"
+              className="consumer-scrollbar-none relative z-10 -mx-5 mt-3 flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0"
               aria-label="Refinar por modalidad"
             >
               <Link
@@ -200,7 +207,7 @@ export default async function CategoryPage({
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-semibold transition-colors duration-200 ${
                   filters.modality === "IN_PERSON"
                     ? "border-transparent bg-[#161D2A] text-white"
-                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-surface"
+                    : "text-ink dark:bg-surface border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10"
                 }`}
               >
                 Presencial
@@ -213,7 +220,7 @@ export default async function CategoryPage({
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-semibold transition-colors duration-200 ${
                   filters.modality === "REMOTE"
                     ? "border-transparent bg-[#161D2A] text-white"
-                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-surface"
+                    : "text-ink dark:bg-surface border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10"
                 }`}
               >
                 Remoto
@@ -226,7 +233,7 @@ export default async function CategoryPage({
                 className={`consumer-pressable inline-flex min-h-10 items-center rounded-full border px-4 text-[13px] font-semibold transition-colors duration-200 ${
                   filters.acceptsOffers
                     ? "border-transparent bg-[#161D2A] text-white"
-                    : "text-ink border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10 dark:bg-surface"
+                    : "text-ink dark:bg-surface border-white/60 bg-white/70 backdrop-blur-sm hover:bg-white dark:border-white/10"
                 }`}
               >
                 Acepta ofertas
@@ -242,6 +249,19 @@ export default async function CategoryPage({
               query={query}
               filters={filters}
               needsEnabled={arePublicNeedsEnabled()}
+              emptyState={
+                isBareEmptyCategory
+                  ? {
+                      title: `Todavía no hay servicios de ${category.name}`,
+                      description:
+                        "Estamos sumando prestadores. Mientras tanto, podés ver todos los servicios o explorar otra categoría.",
+                      suggestions: otherCategories.map((item) => ({
+                        href: `/categoria/${item.slug}`,
+                        label: item.name,
+                      })),
+                    }
+                  : undefined
+              }
             />
           </div>
         </section>

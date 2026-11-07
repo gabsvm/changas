@@ -73,13 +73,14 @@ describe("Landing — auditoría de placing 2026-11-07", () => {
     expect(featured).toContain("yalo-featured-more");
   });
 
-  it("achica el placeholder de cover sólo dentro de destacados", () => {
+  it("muestra el cover sin foto como franja compacta de categoría", () => {
     expect(serviceCard).toContain("service-card-cover-fallback ");
     expect(serviceCard).toContain("service-card-cover-fallback-label");
-    expect(styles).toContain(
-      ".yalo-featured-results .service-card-cover-fallback {",
+    const fallback = serviceCard.slice(
+      serviceCard.indexOf("function CoverFallback"),
+      serviceCard.indexOf("export function ServiceCard"),
     );
-    expect(styles).not.toMatch(/^\.service-card-cover-fallback/m);
+    expect(fallback).not.toContain("aspect-video");
   });
 
   it("dice una sola vez cómo funciona: sin tarjetas de beneficios duplicadas", () => {

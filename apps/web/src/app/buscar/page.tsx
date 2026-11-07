@@ -155,7 +155,7 @@ export default async function SearchPage({
       <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-8 sm:pt-5">
         <AppHeader
           backHref="/"
-          title={query ? `“${query}”` : "Buscar"}
+          title={query ? `“${query}”` : "Explorar servicios"}
           desktopNav={<DesktopNav authenticated={Boolean(user)} />}
           action={
             <Link
@@ -169,10 +169,12 @@ export default async function SearchPage({
 
         <section className="pt-4 sm:pt-8">
           <div className="text-ink relative sm:py-2">
-            <h1 className="relative z-10 text-[22px] leading-8 font-semibold tracking-[-0.025em] sm:text-3xl sm:leading-10">
+            {/* En mobile el header ya muestra el título: el H1 queda para
+                lectores de pantalla y se ve desde sm. */}
+            <h1 className="relative z-10 text-[22px] leading-8 font-semibold tracking-[-0.025em] max-sm:sr-only sm:text-3xl sm:leading-10">
               {query ? `Resultados para “${query}”` : "Explorar servicios"}
             </h1>
-            <form action="/buscar" className="relative z-10 mt-4">
+            <form action="/buscar" className="relative z-10 sm:mt-4">
               <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">
                 <SearchField
                   defaultValue={query}
@@ -181,9 +183,12 @@ export default async function SearchPage({
                   placeholder="Electricista, clases de inglés…"
                   aria-label="Buscar un servicio o habilidad"
                 />
-                <LocationPicker compact selected={filters.locationSlug} />
+                {/* Zona, Filtros y Buscar en una sola fila. */}
                 <div className="flex items-stretch gap-2">
                   <div className="min-w-0 flex-1">
+                    <LocationPicker compact selected={filters.locationSlug} />
+                  </div>
+                  <div className="shrink-0">
                     <SearchFiltersSheet
                       query={query}
                       filters={filters}
@@ -193,7 +198,7 @@ export default async function SearchPage({
                     />
                   </div>
                   <button
-                    className="consumer-pressable cta-ink inline-flex min-h-12 shrink-0 items-center rounded-2xl px-7 text-[15px] font-semibold"
+                    className="consumer-pressable cta-ink inline-flex min-h-12 shrink-0 items-center rounded-2xl px-4 text-[15px] font-semibold sm:px-7"
                     type="submit"
                   >
                     Buscar
@@ -205,7 +210,7 @@ export default async function SearchPage({
             {categories.length ? (
               <nav
                 aria-label="Categorías"
-                className="yalo-category-filters consumer-scrollbar-none relative z-10 mt-4 flex flex-wrap gap-2 pb-1"
+                className="yalo-category-filters consumer-scrollbar-none relative z-10 -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 py-1 sm:mx-0 sm:flex-wrap sm:px-0"
               >
                 {[{ slug: null, name: "Todas" }, ...categories].map((item) => {
                   const selected =
@@ -229,7 +234,7 @@ export default async function SearchPage({
             ) : null}
 
             <div
-              className="consumer-scrollbar-none relative z-10 -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pt-1 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
+              className="consumer-scrollbar-none relative z-10 -mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pt-1 pb-2 empty:hidden sm:mx-0 sm:flex-wrap sm:px-0"
               role="group"
               aria-label="Filtros activos"
             >
@@ -335,15 +340,10 @@ export default async function SearchPage({
                   </StatusChip>
                 </Link>
               ) : null}
-              {activeFilterCount === 0 ? (
-                <p className="text-ink/70 py-1 text-[13px] leading-5">
-                  Usá los filtros para afinar por zona, modalidad o precio.
-                </p>
-              ) : null}
             </div>
           </div>
 
-          <div className="discovery-results-shell mt-5">
+          <div className="discovery-results-shell mt-2">
             {marketplaceIsEmpty ? (
               <ExampleServices
                 publishHref={

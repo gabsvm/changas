@@ -1480,23 +1480,6 @@
   border-top-color: rgb(255 255 255 / 10%);
 }
 
-/* Destacados: sin foto, la categoría va en una franja compacta en lugar de
-   un bloque 16:9 que empuja la información del servicio. */
-.yalo-featured-results .service-card-cover-fallback {
-  aspect-ratio: auto;
-  place-items: center start;
-  padding: 10px 16px;
-}
-.yalo-featured-results .service-card-cover-fallback-label {
-  flex-direction: row;
-  gap: 8px;
-  padding: 0;
-  text-align: left;
-}
-.yalo-featured-results .service-card-cover-fallback-label svg {
-  width: 18px;
-  height: 18px;
-}
 .yalo-featured-more {
   display: flex;
   justify-content: center;

@@ -1,12 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getManualLocation, type DiscoveryFilters } from "@changas/domain";
 
 import { EmptyState } from "@/components/ui/marketplace/empty-state";
-import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
-import { SectionHeader } from "@/components/ui/marketplace/section-header";
 import { actionButtonClass } from "@/components/ui/marketplace/action-button";
 import type { ReputationDiscoveryServiceRow } from "@/lib/discovery/types";
 import { readStoredLocation } from "./location-picker";
@@ -65,27 +64,6 @@ function signatureOf(query: string, filters: DiscoveryFilters): string {
   return JSON.stringify({ query, filters });
 }
 
-const DISCOVERY_COVERS = [
-  { css: "#22354A", tone: "orange" },
-  { css: "#164F6B", tone: "blue" },
-  { css: "#185253", tone: "green" },
-  { css: "#235346", tone: "rose" },
-  { css: "#28455C", tone: "violet" },
-  { css: "#1B4D57", tone: "gold" },
-] as const;
-
-function coverForDiscovery(
-  key: string | null,
-): (typeof DISCOVERY_COVERS)[number] {
-  if (!key) return DISCOVERY_COVERS[0];
-  let hash = 0;
-  for (let i = 0; i < key.length; i += 1)
-    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-  return (
-    DISCOVERY_COVERS[hash % DISCOVERY_COVERS.length] ?? DISCOVERY_COVERS[0]
-  );
-}
-
 function LoadingSkeletons() {
   return (
     <div aria-hidden="true" className="mt-3 grid gap-3 md:grid-cols-2">
@@ -94,10 +72,7 @@ function LoadingSkeletons() {
           key={index}
           className="border-ink/[0.07] bg-surface consumer-card animate-pulse overflow-hidden rounded-[1.25rem] border"
         >
-          <div className="relative h-16 overflow-hidden bg-[#162232] opacity-60">
-            
-            
-          </div>
+          <div className="relative h-16 overflow-hidden bg-[#162232] opacity-60"></div>
           <div className="p-5">
             <div className="bg-ink/[0.08] h-5 w-2/3 rounded-full" />
             <div className="bg-ink/[0.06] mt-3 h-4 w-1/2 rounded-full" />
@@ -121,6 +96,7 @@ export function DiscoveryResults({
   filters,
   enableNearby = true,
   needsEnabled = false,
+  emptyState,
 }: {
   initialRows: ReputationDiscoveryServiceRow[];
   initialHasMore?: boolean;
@@ -129,6 +105,14 @@ export function DiscoveryResults({
   filters: DiscoveryFilters;
   enableNearby?: boolean;
   needsEnabled?: boolean;
+  /** Estado vacío propio de la página (p. ej. una categoría sin servicios). */
+  emptyState?:
+    | {
+        title: string;
+        description: string;
+        suggestions?: { href: string; label: string }[];
+      }
+    | undefined;
 }) {
   const [rows, setRows] = useState(initialRows);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -344,8 +328,13 @@ export function DiscoveryResults({
     );
   }
 
-  const activeCover = coverForDiscovery(
-    filters.categorySlug ?? filters.skillSlug ?? query ?? null,
+  const hasRefinements = Boolean(
+    query ||
+    filters.categorySlug ||
+    filters.skillSlug ||
+    filters.locationSlug ||
+    filters.modality ||
+    filters.acceptsOffers,
   );
   // Conteo real de la página cargada ("+" si hay más por paginar). "Cerca de
   // vos" solo cuando la búsqueda usa ubicación (GPS o zona manual).
@@ -361,19 +350,17 @@ export function DiscoveryResults({
       aria-label="Resultados de búsqueda"
       aria-busy={loadingMore || nearbyLoading}
     >
-      <SectionHeader
-        title="Resultados"
-        badge={{
-          tone: "orange",
-          icon: "star",
-          label: "Resultados de búsqueda",
-        }}
-      />
-      <div className="mt-1 flex min-h-12 flex-wrap items-center justify-between gap-2">
+      {/* El conteo hace de encabezado: sin título "Resultados" ni ícono
+          (y nada encima del estado vacío cuando no hay resultados). */}
+      <div
+        className={`flex flex-wrap items-center justify-between gap-2 ${
+          rows.length === 0 && !resultsError && !enableNearby ? "" : "min-h-12"
+        }`}
+      >
         <p
           aria-live="polite"
           role="status"
-          className={`text-sm font-semibold ${resultsError ? "text-danger" : "text-ink/75"} ${!resultsError && rows.length === 0 ? "sr-only" : ""}`}
+          className={`text-[15px] font-semibold ${resultsError ? "text-danger" : "text-ink"} ${!resultsError && rows.length === 0 ? "sr-only" : ""}`}
         >
           {resultsError ? resultsError : resultCountLabel}
         </p>
@@ -383,6 +370,7 @@ export function DiscoveryResults({
             type="button"
             onClick={searchNearby}
             disabled={nearbyLoading}
+            title="Usamos tu ubicación aproximada sólo para ordenar resultados; nunca se publica."
           >
             <svg
               aria-hidden="true"
@@ -408,7 +396,7 @@ export function DiscoveryResults({
               ? "Buscando…"
               : gpsMode
                 ? "Actualizar ubicación"
-                : "Usar mi ubicación"}
+                : "Cerca mío"}
           </button>
         ) : null}
       </div>
@@ -433,29 +421,19 @@ export function DiscoveryResults({
         </div>
       ) : !resultsError ? (
         <div className="border-ink/[0.08] bg-surface consumer-card mt-3 overflow-hidden rounded-[1.25rem] border">
-          <div
-            className="relative flex h-24 items-end overflow-hidden p-4"
-            style={{ background: activeCover.css }}
-            role="presentation"
-          >
-            
-            
-            
-            <span className="relative">
-              <IllustratedBadge
-                tone={activeCover.tone}
-                icon="search"
-                size="md"
-                label="Sin resultados"
-              />
-            </span>
-          </div>
           <EmptyState
-            className="py-10"
-            title="Probá otra búsqueda"
-            description="Podés cambiar la categoría, la zona o elegir servicios remotos."
+            className="py-6"
+            title={emptyState?.title ?? "Probá otra búsqueda"}
+            description={
+              emptyState?.description ??
+              "Podés cambiar la categoría, la zona o elegir servicios remotos."
+            }
             actionHref="/buscar"
-            actionLabel="Limpiar filtros"
+            actionLabel={
+              hasRefinements && !emptyState
+                ? "Limpiar filtros"
+                : "Ver todos los servicios"
+            }
             actionTone="primary"
             secondaryActionTone="secondary"
             {...(needsEnabled
@@ -465,12 +443,28 @@ export function DiscoveryResults({
                 }
               : {})}
           />
+          {emptyState?.suggestions?.length ? (
+            <nav
+              aria-label="Otras categorías"
+              className="flex flex-wrap justify-center gap-2 px-5 pb-6"
+            >
+              {emptyState.suggestions.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="consumer-pressable border-ink/10 text-ink/80 hover:bg-ink/[0.04] inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-semibold"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          ) : null}
         </div>
       ) : null}
 
       {loadingMore && !resultsError ? <LoadingSkeletons /> : null}
 
-      {!resultsError ? (
+      {!resultsError && (rows.length > 0 || hasMore) ? (
         <nav
           aria-label={gpsMode ? "Más resultados cercanos" : "Más resultados"}
           className="mt-6 grid gap-2"

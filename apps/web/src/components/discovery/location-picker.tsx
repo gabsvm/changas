@@ -1,11 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { createPortal } from "react-dom";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import { manualLocations } from "@changas/domain";
-import { useDialogFocus } from "@/lib/ui/use-dialog-focus";
 
 export const browserLocationStorageKey = "changas:search-location";
 
@@ -81,13 +79,6 @@ export function LocationPicker({
     null,
   );
   const [locationMessage, setLocationMessage] = useState<string | null>(null);
-  const [locationSheetOpen, setLocationSheetOpen] = useState(false);
-  const locationDialogRef = useRef<HTMLDivElement>(null);
-  const locationCloseRef = useRef<HTMLButtonElement>(null);
-
-  useDialogFocus(locationSheetOpen, locationDialogRef, locationCloseRef, () =>
-    setLocationSheetOpen(false),
-  );
 
   function clearDeviceLocation() {
     clearStoredLocation();
@@ -139,7 +130,7 @@ export function LocationPicker({
 
   if (compact) {
     return (
-      <div className="yalo-location-compact location-picker-compact border-ink/[0.08] dark:bg-surface/85 rounded-2xl border bg-white/75 p-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] backdrop-blur-sm dark:border-white/10">
+      <div className="yalo-location-compact location-picker-compact border-ink/[0.08] dark:bg-surface/85 flex min-h-12 items-center rounded-2xl border bg-white/75 px-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] backdrop-blur-sm dark:border-white/10">
         <div className="flex w-full items-center justify-between gap-2">
           <label className="text-ink/75 flex min-h-11 min-w-0 flex-1 items-center gap-2 text-sm font-semibold">
             <svg
@@ -163,7 +154,7 @@ export function LocationPicker({
             </svg>
             <span className="sr-only">Zona</span>
             <select
-              className="focus:border-moss/35 focus-visible:ring-moss/45 text-ink dark:focus:bg-surface min-h-11 w-full max-w-[12rem] min-w-0 rounded-lg border border-transparent bg-transparent px-1.5 text-sm font-semibold outline-none focus:bg-white focus-visible:ring-2"
+              className="focus:border-moss/35 focus-visible:ring-moss/45 text-ink dark:focus:bg-surface min-h-11 w-full min-w-0 rounded-lg border border-transparent bg-transparent px-1.5 text-sm font-semibold outline-none focus:bg-white focus-visible:ring-2"
               value={manualLocation}
               id="location"
               name="location"
@@ -183,17 +174,6 @@ export function LocationPicker({
               ))}
             </select>
           </label>
-          <button
-            className="location-picker-trigger consumer-pressable text-ink ml-auto inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-white/60 bg-white/85 px-3 text-xs font-bold shadow-[0_5px_14px_rgba(32,33,36,0.1)] transition-all duration-200 hover:-translate-y-px hover:bg-white dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
-            type="button"
-            onClick={() => setLocationSheetOpen(true)}
-            aria-haspopup="dialog"
-          >
-            <span aria-hidden="true">⌖</span>
-            {usingDeviceLocation
-              ? (deviceLocationLabel ?? "Ubicación actual")
-              : "Usar ubicación"}
-          </button>
         </div>
         {locationMessage ? (
           <span
@@ -203,110 +183,6 @@ export function LocationPicker({
             {locationMessage}
           </span>
         ) : null}
-        {locationSheetOpen
-          ? createPortal(
-              <div
-                className="bg-ink/35 fixed inset-0 z-[10000] flex items-end p-3 sm:items-center sm:justify-center"
-                role="presentation"
-                onClick={() => setLocationSheetOpen(false)}
-              >
-                <div
-                  ref={locationDialogRef}
-                  className="location-picker-sheet bg-surface relative w-full max-w-lg overflow-hidden overflow-y-auto rounded-3xl border border-white/80 p-5 shadow-[0_24px_70px_rgba(32,33,36,0.2)] sm:p-6 dark:border-white/10"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-labelledby="location-picker-title"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <span
-                    className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-[var(--yalo-symbol-gradient)]"
-                    aria-hidden="true"
-                  />
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-terracotta text-[11px] font-semibold">
-                        Tu zona
-                      </p>
-                      <h2
-                        className="font-display mt-1 text-2xl font-semibold tracking-[-0.035em]"
-                        id="location-picker-title"
-                      >
-                        ¿Dónde estás buscando?
-                      </h2>
-                    </div>
-                    <button
-                      ref={locationCloseRef}
-                      className="consumer-pressable text-ink/75 hover:bg-ink/[0.05] grid h-11 w-11 shrink-0 place-items-center rounded-full text-2xl leading-none"
-                      type="button"
-                      onClick={() => setLocationSheetOpen(false)}
-                      aria-label="Cerrar selector de ubicación"
-                    >
-                      ×
-                    </button>
-                  </div>
-                  <p className="text-ink/75 mt-2 max-w-[28rem] text-sm leading-5">
-                    Usamos una zona aproximada para mostrarte opciones
-                    relevantes. Tu ubicación exacta nunca se publica.
-                  </p>
-                  <button
-                    className="consumer-pressable border-moss/20 bg-moss/[0.07] text-ink hover:bg-moss/[0.11] mt-5 flex min-h-16 w-full items-center gap-3 rounded-2xl border px-4 text-left shadow-[0_6px_18px_rgba(37,99,235,0.08)]"
-                    type="button"
-                    onClick={() => {
-                      setLocationSheetOpen(false);
-                      requestDeviceLocation();
-                    }}
-                  >
-                    <span
-                      className="bg-moss/12 text-moss grid h-10 w-10 shrink-0 place-items-center rounded-full text-lg"
-                      aria-hidden="true"
-                    >
-                      ⌖
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold">
-                        Usar mi ubicación actual
-                      </span>
-                      <span className="text-ink/75 mt-0.5 block text-xs">
-                        Te pediremos permiso al dispositivo
-                      </span>
-                    </span>
-                    <span className="text-moss text-lg" aria-hidden="true">
-                      →
-                    </span>
-                  </button>
-                  <div className="border-ink/10 mt-5 border-t pt-5">
-                    <label
-                      className="text-sm font-bold"
-                      htmlFor="location-sheet"
-                    >
-                      O elegí una zona manualmente
-                      <select
-                        className="consumer-control focus:border-moss/45 focus:ring-moss/10 mt-2 w-full px-3 text-sm outline-none focus:ring-2"
-                        value={manualLocation}
-                        id="location-sheet"
-                        onChange={(event) => {
-                          selectManualLocation(event.currentTarget.value);
-                          setLocationSheetOpen(false);
-                        }}
-                      >
-                        <option value="">Elegir zona</option>
-                        {manualLocations.map((location) => (
-                          <option key={location.slug} value={location.slug}>
-                            {location.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
-                  <p className="text-ink/75 mt-4 text-xs leading-5">
-                    Podés cambiar esta elección cuando quieras desde la
-                    búsqueda.
-                  </p>
-                </div>
-              </div>,
-              document.body,
-            )
-          : null}
       </div>
     );
   }

@@ -79,11 +79,13 @@ describe("Better Design audit — visual, safety and UX regressions", () => {
     expect(search).toContain(
       "min-h-11 shrink-0 items-center rounded-full border",
     );
-    expect(
-      source("../../components/discovery/discovery-results.tsx"),
-    ).toContain("Usar mi ubicación");
+    // Auditoría 2026-11-07: un único control de ubicación ("Cerca mío") junto
+    // al conteo; el selector de zona queda sólo con el select.
+    const results = source("../../components/discovery/discovery-results.tsx");
+    expect(results).toContain('"Cerca mío"');
+    expect(results).toContain("nunca se publica");
     expect(location).toContain("Elegir zona");
-    expect(location).toContain("min-h-11 shrink-0 items-center gap-1.5");
+    expect(location).toContain('name="location"');
   });
 
   it("filters unread inbox conversations before building the visible page", () => {

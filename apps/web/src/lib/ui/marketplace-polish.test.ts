@@ -119,12 +119,17 @@ describe("marketplace polish contracts", () => {
     expect(locationSource).toContain("Ubicación actual");
   });
 
-  it("makes the compact location action right-aligned and explains its sheet", () => {
-    expect(locationSource).toContain("justify-between");
-    expect(locationSource).toContain("location-picker-sheet");
-    expect(locationSource).toContain("¿Dónde estás buscando?");
-    expect(locationSource).toContain("Usar mi ubicación actual");
-    expect(locationSource).toContain('aria-modal="true"');
+  it("keeps the compact zone picker to a single select (location lives next to the results)", () => {
+    const compact = locationSource.slice(
+      locationSource.indexOf("if (compact)"),
+      locationSource.indexOf(
+        "return (",
+        locationSource.indexOf("if (compact)") + 30,
+      ),
+    );
+    expect(compact).toContain('name="location"');
+    expect(compact).not.toContain("location-picker-trigger");
+    expect(locationSource).not.toContain("createPortal");
   });
 
   it("explains the public profile link without exposing technical slug jargon", () => {
