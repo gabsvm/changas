@@ -11,15 +11,47 @@ export function GuideHeader({
   step,
   steps,
   className = "",
+  variant = "card",
 }: {
   step: number;
   steps: readonly GuidedStep[];
   className?: string;
+  /** "inline": una línea con progreso, para ubicarla debajo del contenido
+      principal sin competir con él (perfil y detalle de servicio). */
+  variant?: "card" | "inline";
 }) {
   const total = steps.length;
   const current = Math.min(total, Math.max(1, Math.trunc(step) || 1));
   const active = steps[current - 1];
   const percent = guideProgress(current, total);
+
+  if (variant === "inline") {
+    return (
+      <section
+        aria-label={`Paso ${current} de ${total}: ${active?.action ?? ""}`}
+        className={`yalo-guide-inline flex items-center gap-3 ${className}`}
+      >
+        <p className="shrink-0 text-xs font-semibold">
+          <span className="opacity-70">
+            Paso {current} de {total} ·{" "}
+          </span>
+          {active?.action}
+        </p>
+        <ol className="flex min-w-0 flex-1 gap-1" aria-hidden="true">
+          {steps.map((item, index) => (
+            <li
+              key={item.action}
+              className={`h-1.5 flex-1 rounded-full ${
+                index < current
+                  ? "[background:var(--yalo-symbol-gradient)]"
+                  : "bg-current opacity-15"
+              }`}
+            />
+          ))}
+        </ol>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -58,7 +90,7 @@ export function GuideHeader({
             key={item.action}
             className={`h-2 flex-1 rounded-full ${
               index < current
-                ? "bg-[var(--yalo-symbol-gradient)]"
+                ? "[background:var(--yalo-symbol-gradient)]"
                 : "bg-ink/[0.08]"
             }`}
           />

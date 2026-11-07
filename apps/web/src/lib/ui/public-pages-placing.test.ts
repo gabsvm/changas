@@ -7,6 +7,10 @@ const search = read("../../app/buscar/page.tsx");
 const category = read("../../app/categoria/[slug]/page.tsx");
 const results = read("../../components/discovery/discovery-results.tsx");
 const interior = read("../../app/yalo-interior.css");
+const globals = read("../../app/globals.css");
+const guided = read("../../components/ui/guided.tsx");
+const profile = read("../../app/p/[slug]/page.tsx");
+const service = read("../../app/p/[slug]/[serviceSlug]/page.tsx");
 
 describe("Páginas públicas — auditoría de placing 2026-11-07", () => {
   describe("/buscar", () => {
@@ -64,6 +68,62 @@ describe("Páginas públicas — auditoría de placing 2026-11-07", () => {
       expect(results).toContain('aria-label="Otras categorías"');
       // Sin el bloque decorativo de color sobre el estado vacío.
       expect(results).not.toContain('label="Sin resultados"');
+    });
+  });
+
+  describe("/p/[prestador]", () => {
+    it("muestra el progreso en una línea debajo de la identidad", () => {
+      expect(guided).toContain('variant === "inline"');
+      expect(profile.indexOf('variant="inline"')).toBeGreaterThan(
+        profile.indexOf("{provider.display_name}"),
+      );
+      expect(profile).not.toMatch(/<GuideHeader[^>]*className="mt-5" \/>/);
+    });
+
+    it("pinta los segmentos completados con el gradiente (no como color)", () => {
+      expect(guided).not.toContain("bg-[var(--yalo-symbol-gradient)]");
+      expect(guided).toContain("[background:var(--yalo-symbol-gradient)]");
+    });
+
+    it("superpone el avatar completo y quita el ícono decorativo del banner", () => {
+      expect(profile).toContain("relative z-10 -mt-12");
+      expect(profile).not.toContain('label="Proveedor verificado de YALO"');
+    });
+
+    it("pega la barra de CTA al borde inferior", () => {
+      expect(profile).toContain("service-cta-bar service-cta-bar-flush");
+      expect(globals).toMatch(/\.service-cta-bar-flush \{\s*bottom: 0;/);
+    });
+
+    it("deja una sola garantía y oculta contadores y habilidades duplicadas", () => {
+      expect(profile).toContain("Identidad verificada · sin pago por");
+      expect(profile).not.toContain("Información pública clara");
+      expect(profile).not.toContain("ProfileFact");
+      expect(profile).toContain("extraSkills.length ?");
+    });
+  });
+
+  describe("/p/[prestador]/[servicio]", () => {
+    it("lleva el progreso dentro del hero y quita el placeholder alto", () => {
+      const hero = service.slice(
+        service.indexOf("service-hire-top"),
+        service.indexOf("</section>", service.indexOf("service-hire-top")),
+      );
+      expect(hero).toContain('variant="inline"');
+      expect(service).not.toContain("min-h-44");
+    });
+
+    it("muestra el precio una sola vez y la garantía dentro del panel", () => {
+      expect(service).toContain('"Precio total"');
+      expect(service).not.toContain("Subtotal del servicio");
+      expect(service).not.toContain("Total a pagar");
+      expect(service).not.toContain("Sin pago por adelantado + soporte");
+    });
+
+    it("sólo muestra 'Detalles del servicio' si hay contenido", () => {
+      expect(service).toContain(
+        "service.includes || service.excludes || service.materials_notes",
+      );
     });
   });
 });

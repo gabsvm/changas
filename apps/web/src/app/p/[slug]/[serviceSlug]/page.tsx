@@ -183,27 +183,29 @@ export default async function PublicServicePage({
               </div>
             </form>
           </div>
+          <GuideHeader
+            step={2}
+            steps={CLIENT_HIRE_STEPS}
+            variant="inline"
+            className="mt-5 text-[#B7C9D8]"
+          />
         </section>
 
-        <GuideHeader step={2} steps={CLIENT_HIRE_STEPS} className="mt-5" />
-
         <article className="service-hero-card consumer-card bg-surface mt-5 overflow-hidden sm:mt-8">
+          {/* Sin foto: franja compacta con la habilidad (antes, un bloque de
+              ~176px sin información). */}
           <div
-            className="relative flex min-h-44 items-end overflow-hidden p-5 sm:min-h-52 sm:p-8"
+            className="relative flex items-center gap-2.5 px-5 py-2.5 sm:px-8"
             style={{ background: coverFor(serviceSlug).css }}
-            role="img"
-            aria-label={`Portada ilustrada de ${service.title}`}
           >
-            
-            
-            
-            <span className="relative flex flex-wrap items-center gap-1.5">
-              <IllustratedBadge
-                tone={coverFor(serviceSlug).tone}
-                icon="tag"
-                size="lg"
-                label={service.skill_name}
-              />
+            <IllustratedBadge
+              tone={coverFor(serviceSlug).tone}
+              icon="tag"
+              size="sm"
+              label={service.skill_name}
+            />
+            <span className="text-sm font-semibold text-white">
+              {service.skill_name}
             </span>
           </div>
           <div className="p-5 sm:p-8 sm:pt-6">
@@ -224,7 +226,12 @@ export default async function PublicServicePage({
               className="service-price-panel border-ink/[0.08] bg-surface consumer-card mt-6 grid grid-cols-2 gap-x-4 gap-y-4 rounded-2xl border px-5 py-5 shadow-[0_2px_4px_rgb(23_20_15/5%),0_16px_36px_-10px_rgb(23_20_15/20%)] sm:grid-cols-3 dark:shadow-[0_16px_36px_-10px_rgb(0_0_0/70%)]"
               aria-label="Precio y condiciones"
             >
-              <Metric label="Precio" value={price} />
+              <Metric
+                label={
+                  service.price_model === "FIXED" ? "Precio total" : "Precio"
+                }
+                value={price}
+              />
               <Metric
                 label="Duración"
                 value={
@@ -237,75 +244,41 @@ export default async function PublicServicePage({
                 label="Propuestas"
                 value={service.accepts_offers ? "Acepta" : "Precio fijo"}
               />
+              {/* Una sola mención del precio y de la garantía (antes: desglose
+                  subtotal/comisión/total con el mismo monto + tarjeta aparte). */}
+              <p className="border-ink/[0.08] text-ink/70 col-span-full border-t pt-3 text-xs leading-5">
+                {service.price_model === "FIXED"
+                  ? "Acordás el precio al contratar. "
+                  : "Precio de referencia: el total se acuerda en la propuesta. "}
+                {
+                  "Sin cobro online: el pago se realiza directamente entre las partes y YALO permite registrar lo declarado. Si algo sale mal, YALO te acompaña."
+                }
+              </p>
             </section>
 
-            {service.price_amount !== null ? (
-              <section
-                className="border-ink/[0.08] bg-surface consumer-card mt-4 rounded-2xl border px-5 py-4 text-sm shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:bg-white/[0.05] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
-                aria-label="Desglose del precio"
-              >
-                {service.price_model === "FIXED" ? (
-                  <>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-ink/70 text-[13px] font-semibold">
-                        Subtotal del servicio
-                      </span>
-                      <span className="font-bold">{price}</span>
-                    </div>
-                    <div className="mt-1.5 flex items-center justify-between gap-3">
-                      <span className="text-ink/70 text-[13px] font-semibold">
-                        Comisión de YALO
-                      </span>
-                      <span className="text-moss text-[13px] font-bold">
-                        Sin cobro online
-                      </span>
-                    </div>
-                    <div className="border-ink/[0.08] mt-2 flex items-center justify-between gap-3 border-t pt-2">
-                      <span className="text-[13px] font-semibold">
-                        Total a pagar
-                      </span>
-                      <span className="text-[15px] font-semibold">
-                        {price}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-[13px] font-semibold">
-                      Precio de referencia
-                    </span>
-                    <span className="text-[15px] font-semibold">{price}</span>
-                  </div>
-                )}
-                <p className="text-ink/70 mt-2 text-xs leading-5">
-                  {service.price_model === "FIXED"
-                    ? "Acordás el precio al contratar. El pago se realiza directamente entre las partes; YALO permite registrar lo declarado."
-                    : "Precio de referencia — el total se acuerda en la propuesta. El pago se realiza directamente entre las partes."}
-                </p>
+            {service.includes || service.excludes || service.materials_notes ? (
+              <section className="border-ink/[0.08] bg-surface consumer-card mt-8 rounded-2xl border p-5 sm:p-6">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <IllustratedBadge
+                    tone="blue"
+                    icon="doc"
+                    size="sm"
+                    label="Detalles del servicio"
+                  />
+                  <h2 className="font-display text-lg leading-7 font-bold">
+                    Detalles del servicio
+                  </h2>
+                </span>
+                <div className="mt-4 grid gap-2">
+                  <Info title="Incluye" value={service.includes} />
+                  <Info title="No incluye" value={service.excludes} />
+                  <Info
+                    title="Materiales y notas"
+                    value={service.materials_notes}
+                  />
+                </div>
               </section>
             ) : null}
-
-            <section className="border-ink/[0.08] bg-surface consumer-card mt-8 rounded-2xl border p-5 sm:p-6">
-              <span className="flex min-w-0 items-center gap-2.5">
-                <IllustratedBadge
-                  tone="blue"
-                  icon="doc"
-                  size="sm"
-                  label="Detalles del servicio"
-                />
-                <h2 className="font-display text-lg leading-7 font-bold">
-                  Detalles del servicio
-                </h2>
-              </span>
-              <div className="mt-4 grid gap-2">
-                <Info title="Incluye" value={service.includes} />
-                <Info title="No incluye" value={service.excludes} />
-                <Info
-                  title="Materiales y notas"
-                  value={service.materials_notes}
-                />
-              </div>
-            </section>
 
             {(tags ?? []).length ? (
               <section className="border-ink/[0.08] bg-surface consumer-card mt-4 rounded-2xl border p-5 sm:p-6">
@@ -333,7 +306,7 @@ export default async function PublicServicePage({
             <section className="border-ink/10 mt-8 border-t pt-6">
               <Link
                 href={`/p/${providerSlug}`}
-                className="consumer-card consumer-pressable bg-surface border-ink/[0.08] flex min-h-14 items-center gap-4 rounded-2xl border p-3 "
+                className="consumer-card consumer-pressable bg-surface border-ink/[0.08] flex min-h-14 items-center gap-4 rounded-2xl border p-3"
               >
                 <Avatar
                   name={provider.display_name}
@@ -361,25 +334,6 @@ export default async function PublicServicePage({
                 </span>
               </Link>
             </section>
-
-            <div className="border-moss/25 bg-moss/[0.07] consumer-card mt-8 flex items-start gap-3.5 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-              <IllustratedBadge
-                tone="green"
-                icon="shield"
-                size="md"
-                label="Garantía YALO"
-              />
-              <div>
-                <p className="text-sm font-semibold">
-                  Sin pago por adelantado + soporte
-                </p>
-                <p className="text-ink/70 mt-1 text-xs leading-6">
-                  Sin pago por adelantado: coordinás por chat y el pago se hace
-                  directamente entre las partes. Si algo sale mal, el equipo de
-                  YALO te acompaña.
-                </p>
-              </div>
-            </div>
           </div>
         </article>
       </div>
@@ -390,9 +344,7 @@ export default async function PublicServicePage({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-ink/70 text-xs leading-5 font-semibold">
-        {label}
-      </p>
+      <p className="text-ink/70 text-xs leading-5 font-semibold">{label}</p>
       <p className="mt-1.5 text-[15px] leading-6 font-semibold">{value}</p>
     </div>
   );

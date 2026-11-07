@@ -1102,3 +1102,8 @@ a[aria-current="page"] .nav-icon {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Perfil público: no hay nav inferior, la barra de CTA va al borde. */
+.service-cta-bar-flush {
+  bottom: 0;
+}

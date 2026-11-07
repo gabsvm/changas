@@ -215,8 +215,11 @@ describe("marketplace polish contracts", () => {
     expect(categorySource).not.toContain("brand-gradient-surface");
     expect(categorySource).toContain("discovery-results-shell");
     expect(providerSource).toContain("coverFor");
-    expect(providerSource).toContain("profile-trust-strip");
-    expect(providerSource).toContain("profile-facts");
+    // Auditoría 2026-11-07: una sola garantía, sin tira de confianza ni
+    // contadores (Servicios/Habilidades/Zonas) duplicados.
+    expect(providerSource).toContain("profile-guarantee");
+    expect(providerSource).not.toContain("profile-trust-strip");
+    expect(providerSource).not.toContain("profile-facts");
     expect(providerSource).toContain("<AppHeader");
     expect(serviceSource).toContain("service-hero-card");
     expect(serviceSource).toContain("service-price-panel");

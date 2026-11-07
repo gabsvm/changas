@@ -139,6 +139,13 @@ export default async function PublicProviderPage({
   const publicSkills = (skills ?? []).filter(
     (skill) => !isExcludedPublicTestCategory({ slug: skill.category_slug }),
   );
+  // "Habilidades" sólo suma si hay alguna que no aparece ya en un servicio.
+  const serviceSkillNames = new Set(
+    (services ?? []).map((service) => service.skill_name),
+  );
+  const extraSkills = publicSkills.filter(
+    (skill) => !serviceSkillNames.has(skill.skill_name),
+  );
   // Precio "desde": mínimo real entre los servicios publicados con monto.
   // Si ninguno tiene monto, se omite (nunca se inventa).
   const pricedServices = (services ?? []).filter(
@@ -186,8 +193,6 @@ export default async function PublicProviderPage({
           className="sm:flex"
         />
 
-        <GuideHeader step={2} steps={CLIENT_HIRE_STEPS} className="mt-5" />
-
         <section className="pt-6 sm:pt-8">
           {pageSearchParams.favoriteError ? (
             <p
@@ -200,26 +205,15 @@ export default async function PublicProviderPage({
 
           <div className="consumer-card bg-surface overflow-hidden">
             <div
-              className="relative h-28 overflow-hidden sm:h-36"
+              className="relative h-16 overflow-hidden sm:h-24"
               style={{ background: coverFor(provider.public_slug).css }}
               role="img"
               aria-label={`Portada ilustrada de ${provider.display_name}`}
-            >
-              
-              
-              
-              <span className="absolute top-3 right-4">
-                <IllustratedBadge
-                  tone={coverFor(provider.public_slug).tone}
-                  icon="sparkle"
-                  size="sm"
-                  label="Proveedor verificado de YALO"
-                />
-              </span>
-            </div>
+            ></div>
             <div className="flex items-start gap-5 p-5 sm:p-7">
-              <span className="-mt-12 sm:-mt-14">
-                <span className="block rounded-full ring-4 ring-white dark:ring-[#1c1712]">
+              {/* relative + z-10: el avatar se superpone completo al banner. */}
+              <span className="relative z-10 -mt-12 sm:-mt-14">
+                <span className="block rounded-full bg-white ring-4 ring-white dark:bg-[#1c1712] dark:ring-[#1c1712]">
                   <Avatar
                     name={provider.display_name}
                     src={
@@ -238,7 +232,21 @@ export default async function PublicProviderPage({
                       verificación. Sin hardcodear nada. */}
                   <StatusChip tone="success">
                     <span title="Identidad verificada por YALO">
-                      <svg aria-hidden="true" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{display:"inline",verticalAlign:"-2px"}}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg> Verificado
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        width="13"
+                        height="13"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{ display: "inline", verticalAlign: "-2px" }}
+                      >
+                        <path d="M5 12.5l4.5 4.5L19 7.5" />
+                      </svg>{" "}
+                      Verificado
                     </span>
                   </StatusChip>
                   {provider.public_zone ? (
@@ -259,8 +267,15 @@ export default async function PublicProviderPage({
             </div>
           </div>
 
+          <GuideHeader
+            step={2}
+            steps={CLIENT_HIRE_STEPS}
+            variant="inline"
+            className="text-ink mt-4"
+          />
+
           {(services?.length ?? 0) > 0 ? (
-            <div className="service-cta-bar bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:hidden">
+            <div className="service-cta-bar service-cta-bar-flush bg-canvas/95 border-ink/[0.08] fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:hidden">
               <div className="mx-auto flex max-w-4xl items-center gap-3">
                 <form action={toggleProviderFavorite} className="shrink-0">
                   <input
@@ -331,70 +346,25 @@ export default async function PublicProviderPage({
           <div className="mt-8">
             <ProviderReputation providerSlug={provider.public_slug} />
           </div>
-          <div className="profile-guarantee border-brand-yellow/35 bg-surface-muted consumer-card mt-5 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
+          {/* Una sola garantía (antes: tres tarjetas + nota al pie). Sólo lo
+              que la app ya hace: identidad aprobada, acuerdo por chat, pago
+              directo y acompañamiento. */}
+          <div className="profile-guarantee border-moss/25 bg-surface-muted consumer-card mt-5 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
             <IllustratedBadge
               tone="green"
               icon="shield"
               size="md"
-              label="Contratación protegida"
+              label="Identidad verificada y sin pago por adelantado"
             />
             <div>
               <p className="text-sm font-semibold">
-                Contratación protegida
-              </p>
-              {/* Solo lo que la app ya hace: acuerdo por chat, acompañamiento
-                  y reseña pública. Sin pago anticipado ni garantías externas. */}
-              <p className="text-ink/70 mt-1 text-xs leading-6">
-                El precio se acuerda por chat antes de empezar. YALO te
-                acompaña durante el trabajo y la reseña queda pública.
-              </p>
-            </div>
-          </div>
-
-          <div className="profile-trust-strip border-brand-yellow/35 bg-surface-muted consumer-card mt-5 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
-            <IllustratedBadge
-              tone="gold"
-              icon="sparkle"
-              size="md"
-              label="Información pública clara"
-            />
-            <div>
-              <p className="text-sm font-semibold">
-                Información pública clara
+                Identidad verificada · sin pago por adelantado
               </p>
               <p className="text-ink/70 mt-1 text-xs leading-6">
-                Conocé sus servicios, zona aproximada y experiencia antes de
-                escribirle.
+                El precio se acuerda por chat y pagás directo al prestador. Si
+                algo sale mal, YALO te acompaña y la reseña queda pública.
               </p>
             </div>
-          </div>
-
-          <div className="profile-verification border-moss/25 bg-surface-muted consumer-card mt-3 flex items-start gap-4 rounded-2xl border p-4 sm:p-5">
-            <IllustratedBadge
-              tone="green"
-              icon="check"
-              size="md"
-              label="Verificación de identidad"
-            />
-            <div>
-              <p className="text-sm font-semibold">
-                Verificación de identidad
-              </p>
-              <p className="text-ink/70 mt-1 text-xs leading-6">
-                Este perfil completó el alta de proveedor y está habilitado para
-                publicar. Por privacidad no mostramos documentos ni fechas de
-                revisión.
-              </p>
-            </div>
-          </div>
-
-          <div
-            className="profile-facts mt-5 grid grid-cols-3 gap-3"
-            aria-label="Resumen del perfil"
-          >
-            <ProfileFact label="Servicios" value={services?.length ?? 0} />
-            <ProfileFact label="Habilidades" value={publicSkills.length} />
-            <ProfileFact label="Zonas" value={areas?.length ?? 0} />
           </div>
 
           <div className="mt-5 hidden gap-3 sm:flex">
@@ -465,7 +435,6 @@ export default async function PublicProviderPage({
                     }}
                     aria-hidden="true"
                   >
-                    
                     <span className="relative">
                       {service.title.trim().charAt(0).toUpperCase() || "C"}
                     </span>
@@ -520,13 +489,13 @@ export default async function PublicProviderPage({
           )}
         </PublicSection>
 
-        {publicSkills.length ? (
+        {extraSkills.length ? (
           <PublicSection
             title="Habilidades"
             badge={{ tone: "blue", icon: "tag" }}
           >
             <div className="flex flex-wrap gap-2">
-              {publicSkills.map((skill) => (
+              {extraSkills.map((skill) => (
                 <StatusChip tone="neutral" key={skill.skill_slug}>
                   {skill.skill_name}
                 </StatusChip>
@@ -698,11 +667,7 @@ export default async function PublicProviderPage({
         ) : null}
 
         <footer className="border-ink/10 mt-10 border-t py-6 text-center">
-          <p className="text-moss text-xs leading-5 font-semibold">
-            Sin pago por adelantado: acordás y realizás el pago directamente con
-            el prestador. YALO te acompaña durante el trabajo.
-          </p>
-          <p className="text-ink/38 mt-1 text-xs leading-5">
+          <p className="text-ink/38 text-xs leading-5">
             YALO · información publicada por el proveedor
           </p>
         </footer>
@@ -744,19 +709,6 @@ function PublicSection({
       </span>
       <div className="mt-4">{children}</div>
     </section>
-  );
-}
-
-function ProfileFact({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="border-ink/[0.08] bg-surface consumer-card rounded-2xl border px-3 py-4 text-center shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-      <p className="text-xl leading-7 font-semibold tracking-[-0.03em]">
-        {value}
-      </p>
-      <p className="text-ink/70 mt-1 text-[11px] leading-4 font-bold ">
-        {label}
-      </p>
-    </div>
   );
 }
 
