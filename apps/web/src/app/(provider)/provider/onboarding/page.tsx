@@ -73,9 +73,8 @@ export default async function ProviderOnboardingPage() {
               </h1>
             </div>
           </div>
-          <StartProviderForm action={startProviderOnboarding} />
           <p className="text-ink/70 mt-2 max-w-xl text-sm leading-6">
-            Son 4 pasos cortos. Empezá ahora.
+            Son 4 pasos cortos.
           </p>
 
           <section className="border-ink/[0.08] bg-surface divide-ink/[0.07] consumer-card mt-6 divide-y rounded-2xl border px-2 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
@@ -83,6 +82,8 @@ export default async function ProviderOnboardingPage() {
               <OnboardingStepCard key={step.id} step={step} disabled />
             ))}
           </section>
+          {/* Un solo inicio, después de ver los pasos. */}
+          <StartProviderForm action={startProviderOnboarding} />
         </div>
       </section>
     );

@@ -45,7 +45,7 @@ export default async function NeedsPage({
   const posts = await listMyJobPosts(page, 20);
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
+    <div className="mx-auto w-full max-w-2xl pb-6 sm:pt-6">
       <MobileAppBar title="Mis necesidades" backHref="/jobs" />
       <h1 className="mt-5 hidden text-[24px] leading-8 font-semibold tracking-[-0.03em] sm:block">
         Mis necesidades
@@ -62,11 +62,14 @@ export default async function NeedsPage({
           </ActionLink>
         ) : null}
       </nav>
-      <div className="mt-4">
-        <ActionLink href="/needs/new" className="w-full">
-          Publicar necesidad
-        </ActionLink>
-      </div>
+      {/* Sin necesidades, el estado vacío ya ofrece publicar. */}
+      {posts.length > 0 ? (
+        <div className="mt-4">
+          <ActionLink href="/needs/new" className="w-full">
+            Publicar necesidad
+          </ActionLink>
+        </div>
+      ) : null}
       {posts.length === 0 ? (
         <div className="mt-6">
           <EmptyState

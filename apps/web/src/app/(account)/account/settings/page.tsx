@@ -82,8 +82,8 @@ export default async function AccountSettingsPage() {
           />
         </section>
 
-        <SiteFooter className="mt-8" />
-
+        {/* Sesión y baja dentro del contenido, antes del pie: la barra
+            inferior ya no las tapa. */}
         <form action={signOut} className="border-ink/10 mt-7 border-t pt-5">
           <ActionButton
             tone="danger"
@@ -99,6 +99,8 @@ export default async function AccountSettingsPage() {
         >
           Eliminar mi cuenta
         </Link>
+
+        <SiteFooter className="mt-8" />
       </div>
     </section>
   );

@@ -168,8 +168,7 @@ export default async function MessagesPage({
               showUnreadOnly
                 ? undefined
                 : {
-                    background:
-                      "#0D121B",
+                    background: "#0D121B",
                   }
             }
           >
@@ -186,8 +185,7 @@ export default async function MessagesPage({
             style={
               showUnreadOnly
                 ? {
-                    background:
-                      "#0D121B",
+                    background: "#0D121B",
                   }
                 : undefined
             }
@@ -242,7 +240,7 @@ export default async function MessagesPage({
             />
           )
         ) : (
-          <div className="border-ink/10 bg-surface divide-ink/10 mt-4 grid divide-y overflow-hidden rounded-2xl border sm:mt-6">
+          <div className="border-ink/10 bg-surface divide-ink/10 mt-4 grid grid-cols-[minmax(0,1fr)] divide-y overflow-hidden rounded-2xl border sm:mt-6">
             {visible.map((conversation) => (
               <ConversationRow
                 key={conversation.conversation_id}

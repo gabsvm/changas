@@ -81,4 +81,46 @@ describe("Secciones con sesión — auditoría de placing 2026-11-07", () => {
       expect(detail).not.toContain('aria-label="Abrir chat del servicio"');
     });
   });
+  describe("ajustes menores", () => {
+    it("deja cerrar sesión y baja antes del pie en Configuración", () => {
+      const settings = read("../../app/(account)/account/settings/page.tsx");
+      expect(settings.indexOf("Eliminar mi cuenta")).toBeLessThan(
+        settings.indexOf("<SiteFooter"),
+      );
+    });
+
+    it("muestra los pasos antes del único botón de alta", () => {
+      const onboarding = read(
+        "../../app/(provider)/provider/onboarding/page.tsx",
+      );
+      const notStarted = onboarding.slice(
+        0,
+        onboarding.indexOf("const editable"),
+      );
+      expect(notStarted.indexOf("emptySteps.map")).toBeLessThan(
+        notStarted.indexOf("<StartProviderForm"),
+      );
+      expect(notStarted).not.toContain("Empezá ahora.");
+    });
+
+    it("usa el margen del layout en necesidades y oportunidades", () => {
+      for (const path of [
+        "../../app/(account)/needs/page.tsx",
+        "../../app/(account)/needs/new/page.tsx",
+        "../../app/(account)/needs/[postId]/page.tsx",
+        "../../app/(account)/oportunidades/page.tsx",
+      ]) {
+        expect(read(path)).not.toContain("max-w-2xl px-4 py-6 sm:px-8");
+      }
+      expect(read("../../app/(account)/needs/page.tsx")).toContain(
+        "{posts.length > 0 ? (",
+      );
+    });
+
+    it("evita que las filas de mensajes desborden la tarjeta", () => {
+      expect(read("../../app/(account)/messages/page.tsx")).toContain(
+        "grid grid-cols-[minmax(0,1fr)] divide-y",
+      );
+    });
+  });
 });

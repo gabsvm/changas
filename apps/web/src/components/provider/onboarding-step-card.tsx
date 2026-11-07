@@ -70,7 +70,7 @@ export function OnboardingStepCard({
   if (disabled) {
     return (
       <div aria-disabled="true" className="opacity-60">
-        <ListRow {...common} />
+        <ListRow {...common} trailing={null} />
       </div>
     );
   }

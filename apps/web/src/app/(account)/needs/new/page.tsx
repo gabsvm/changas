@@ -44,7 +44,7 @@ export default async function NewNeedPage() {
     : [];
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
+    <div className="mx-auto w-full max-w-2xl pb-6 sm:pt-6">
       <MobileAppBar title="Publicar necesidad" backHref="/jobs" />
       <h1 className="mt-5 hidden text-[24px] leading-8 font-semibold tracking-[-0.03em] sm:block">
         Publicar necesidad

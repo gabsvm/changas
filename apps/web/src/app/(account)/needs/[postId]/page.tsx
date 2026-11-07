@@ -94,7 +94,7 @@ export default async function NeedDetailPage({
     : { data: null };
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-8">
+    <div className="mx-auto w-full max-w-2xl pb-6 sm:pt-6">
       <MobileAppBar
         title="Necesidad"
         backHref={isOwner ? "/needs" : "/oportunidades"}
@@ -191,44 +191,44 @@ export default async function NeedDetailPage({
           ) : null}
           {(post.status === "OPEN" || post.status === "PAUSED") && (
             <>
-            <div className="mt-3 flex gap-2">
-              <form action={governNeedAction}>
-                <input type="hidden" name="postId" value={post.id} />
-                <input
-                  type="hidden"
-                  name="status"
-                  value={post.status === "OPEN" ? "PAUSED" : "OPEN"}
-                />
-                <ActionButton
-                  type="submit"
-                  tone="secondary"
-                  className="min-h-0 px-3 py-2 text-sm"
-                >
-                  {post.status === "OPEN" ? "Pausar" : "Reanudar"}
-                </ActionButton>
-              </form>
-              <form action={governNeedAction}>
-                <input type="hidden" name="postId" value={post.id} />
-                <input type="hidden" name="status" value="CLOSED" />
-                <ActionButton
-                  type="submit"
-                  tone="ghost"
-                  className="min-h-0 px-3 py-2 text-sm"
-                >
-                  Cerrar
-                </ActionButton>
-              </form>
-            </div>
-          <div className="consumer-card bg-surface mt-6 rounded-2xl border p-4">
-            <h2 className="text-sm font-semibold">Qué sigue</h2>
-            <p className="text-ink/70 mt-1 text-[13px] leading-5">
-              Te avisamos por notificación cuando lleguen ofertas. Mientras
-              tanto podés mirar perfiles y comparar precios.
-            </p>
-            <ActionLink href="/buscar" tone="secondary" className="mt-3">
-              Explorar servicios mientras tanto
-            </ActionLink>
-            </div>
+              <div className="mt-3 flex gap-2">
+                <form action={governNeedAction}>
+                  <input type="hidden" name="postId" value={post.id} />
+                  <input
+                    type="hidden"
+                    name="status"
+                    value={post.status === "OPEN" ? "PAUSED" : "OPEN"}
+                  />
+                  <ActionButton
+                    type="submit"
+                    tone="secondary"
+                    className="min-h-0 px-3 py-2 text-sm"
+                  >
+                    {post.status === "OPEN" ? "Pausar" : "Reanudar"}
+                  </ActionButton>
+                </form>
+                <form action={governNeedAction}>
+                  <input type="hidden" name="postId" value={post.id} />
+                  <input type="hidden" name="status" value="CLOSED" />
+                  <ActionButton
+                    type="submit"
+                    tone="ghost"
+                    className="min-h-0 px-3 py-2 text-sm"
+                  >
+                    Cerrar
+                  </ActionButton>
+                </form>
+              </div>
+              <div className="consumer-card bg-surface mt-6 rounded-2xl border p-4">
+                <h2 className="text-sm font-semibold">Qué sigue</h2>
+                <p className="text-ink/70 mt-1 text-[13px] leading-5">
+                  Te avisamos por notificación cuando lleguen ofertas. Mientras
+                  tanto podés mirar perfiles y comparar precios.
+                </p>
+                <ActionLink href="/buscar" tone="secondary" className="mt-3">
+                  Explorar servicios mientras tanto
+                </ActionLink>
+              </div>
             </>
           )}
         </section>
