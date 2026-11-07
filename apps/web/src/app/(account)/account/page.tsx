@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { StartProviderForm } from "@/components/account/account-form";
 import { Avatar } from "@/components/ui/marketplace/avatar";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
 import { SettingsRow } from "@/components/ui/marketplace/settings-row";
@@ -12,8 +11,11 @@ import { arePublicNeedsEnabled } from "@/lib/jobs/needs-rollout";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 import { NextStepBanner } from "@/components/ui/guided";
 import { getProviderNextAction } from "@/lib/ui/guided";
-
-import { startProviderOnboarding } from "../../(provider)/actions";
+import { listMyUpcomingJobs, type UpcomingJob } from "@/lib/jobs/server";
+import {
+  JOB_TERMINAL_STATUSES,
+  getJobStatusPresentation,
+} from "@/lib/ui/job-status";
 
 export const metadata: Metadata = { title: "Mi cuenta" };
 
@@ -48,6 +50,21 @@ export default async function AccountPage() {
       ).rpc("is_current_user_admin"),
     ]);
 
+  // Lo que está en curso manda: un cliente con un trabajo activo ve eso
+  // primero, no el alta de prestador.
+  let activeJobs: UpcomingJob[] = [];
+  try {
+    activeJobs = (await listMyUpcomingJobs(5)).filter(
+      (job) => !JOB_TERMINAL_STATUSES.includes(job.job_status),
+    );
+  } catch {
+    activeJobs = [];
+  }
+  const activeJob = activeJobs[0] ?? null;
+  const activeJobStatus = activeJob
+    ? getJobStatusPresentation(activeJob.job_status)
+    : null;
+
   const displayName =
     profile?.display_name || user.email?.split("@")[0] || "Tu cuenta";
   const providerPresentation = provider
@@ -72,9 +89,6 @@ export default async function AccountPage() {
       <h1 className="sr-only">Mi cuenta</h1>
       <div className="mx-auto max-w-2xl">
         <header className="brand-gradient-surface relative overflow-hidden rounded-[1.75rem] p-5 shadow-[0_30px_64px_-18px_rgb(13_18_27/28%)]">
-          
-          
-          
           <Link
             href="/account/profile"
             className="consumer-pressable relative flex items-center gap-4 rounded-2xl"
@@ -104,7 +118,32 @@ export default async function AccountPage() {
           </Link>
         </header>
 
+        {activeJob && activeJobStatus ? (
+          <Link
+            href={`/jobs/${activeJob.job_id}`}
+            className="account-active-job consumer-pressable bg-surface mt-5 block rounded-2xl border border-[#12D9C5]/60 px-5 py-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)]"
+          >
+            <span className="text-moss block text-xs font-semibold">
+              {activeJobs.length > 1
+                ? `Tenés ${activeJobs.length} trabajos en marcha`
+                : `Trabajo ${activeJobStatus.label.toLowerCase()}`}
+            </span>
+            <span className="mt-1 block truncate text-lg leading-7 font-bold tracking-[-0.02em]">
+              {activeJob.service_title}
+            </span>
+            <span className="text-ink/70 block truncate text-sm">
+              Con {activeJob.counterparty_name}
+            </span>
+            <span className="cta-ink mt-3 flex min-h-12 items-center justify-center rounded-xl text-[15px] font-semibold">
+              Ver seguimiento
+            </span>
+          </Link>
+        ) : null}
+
         {(() => {
+          // Sin alta de prestador no hay "próximo paso" de prestador: el
+          // acceso queda como una fila del menú Cuenta.
+          if (!provider) return null;
           const next = getProviderNextAction({
             isProvider: Boolean(provider),
             providerActive: provider?.status === "ACTIVE",
@@ -147,11 +186,14 @@ export default async function AccountPage() {
               Falta: {missing.map((check) => check.label).join(", ")}. Un perfil
               completo genera más confianza.
             </span>
+            <span className="border-ink/[0.12] mt-3 flex min-h-11 items-center justify-center rounded-xl border text-sm font-bold">
+              Completar perfil
+            </span>
           </Link>
         ) : null}
 
-        <section className="consumer-card bg-surface border-ink/[0.08] mt-6 border px-5 py-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-          {provider ? (
+        {provider ? (
+          <section className="consumer-card bg-surface border-ink/[0.08] mt-6 border px-5 py-5 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
             <div>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -194,21 +236,20 @@ export default async function AccountPage() {
                 </span>
               </Link>
             </div>
-          ) : (
-            <div>
-              <h2 className="text-lg leading-7 font-bold tracking-[-0.02em]">
-                ¿Querés ofrecer servicios?
-              </h2>
-              <p className="text-ink/70 mt-1.5 text-sm leading-6">
-                Creá tu perfil profesional sin cambiar cómo usás YALO para
-                contratar.
-              </p>
-              <StartProviderForm action={startProviderOnboarding} />
-            </div>
-          )}
-        </section>
+          </section>
+        ) : null}
 
         <AccountGroup title="Cuenta">
+          {!provider ? (
+            <SettingsRow
+              href="/provider/onboarding"
+              title="Ofrecer mis servicios"
+              description="Perfil profesional · 4 pasos"
+              leading={
+                <IllustratedBadge tone="green" icon="briefcase" size="sm" />
+              }
+            />
+          ) : null}
           <SettingsRow
             href="/account/profile"
             title="Perfil público"
@@ -296,7 +337,9 @@ export default async function AccountPage() {
             href="/#como-funciona"
             title="Cómo funciona"
             description="Cómo contratar y ofrecer servicios"
-            leading={<IllustratedBadge tone="violet" icon="compass" size="sm" />}
+            leading={
+              <IllustratedBadge tone="violet" icon="compass" size="sm" />
+            }
           />
           <SettingsRow
             href="/terminos"
