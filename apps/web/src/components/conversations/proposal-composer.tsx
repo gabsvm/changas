@@ -24,9 +24,13 @@ export function ProposalComposer({
   currentUserIsClient,
   defaultKind,
   allowDirectBooking = false,
+  openFromHeaderOnly = false,
 }: {
   conversationId: string;
   allowDirectBooking?: boolean;
+  /** Oculta el resumen plegado: el formulario se abre desde la acción del
+      header del chat (evita repetir "Enviar una cotización"). */
+  openFromHeaderOnly?: boolean;
   currentUserIsClient: boolean;
   defaultKind?: ProposalKind | undefined;
 }) {
@@ -57,7 +61,7 @@ export function ProposalComposer({
   return (
     <details
       id="nueva-propuesta"
-      className="border-ink/[0.08] bg-surface consumer-card relative scroll-mt-24 overflow-hidden rounded-2xl border shadow-[var(--consumer-shadow-card)]"
+      className={`border-ink/[0.08] bg-surface consumer-card relative scroll-mt-24 overflow-hidden rounded-2xl border shadow-[var(--consumer-shadow-card)] ${openFromHeaderOnly ? "[&:not([open])]:hidden" : ""}`}
     >
       <summary className="consumer-pressable inline-flex min-h-12 w-full cursor-pointer items-center gap-2.5 p-4 text-[15px] font-semibold">
         <IllustratedBadge

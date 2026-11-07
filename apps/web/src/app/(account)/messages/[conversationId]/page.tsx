@@ -205,8 +205,9 @@ export default async function ConversationPage({
     spotlightJob && spotlightStatus && spotlightNext
       ? {
           kind: "job" as const,
-          title: spotlightStatus.label,
-          sub: spotlightNext.heading,
+          title: `Trabajo ${spotlightStatus.label.toLowerCase()}`,
+          // El título ya dice el estado; el subtítulo suma el monto acordado.
+          sub: deal?.amountLabel ?? spotlightNext.heading,
           cta: "Ver seguimiento",
           href: `/jobs/${spotlightJob.job_id}`,
           helpHref: `/jobs/${spotlightJob.job_id}#ayuda`,
@@ -239,39 +240,52 @@ export default async function ConversationPage({
         spotlight={spotlight}
       />
 
-      {conversationJobs.length > 0 ? (
-        <div className="mx-auto w-full max-w-4xl px-4 sm:px-0">
-          <div className="border-moss/20 bg-moss/[0.06] space-y-2 rounded-2xl border px-4 py-3">
-            <p className="text-sm font-bold">
-              {conversationJobs.length === 1
-                ? "Este chat tiene un servicio asociado."
-                : "Este chat tiene servicios asociados."}
-            </p>
-            {conversationJobs.map((job) => {
-              const status = getJobStatusPresentation(job.job_status);
-              return (
-                <div
-                  key={job.job_id}
-                  className="flex flex-wrap items-center gap-x-3 gap-y-1"
-                >
-                  <span className="text-ink/70 text-[13px] font-semibold">
-                    {status.label}
-                  </span>
-                  <Link
-                    href={`/jobs/${job.job_id}`}
-                    className="consumer-pressable text-moss inline-flex min-h-11 items-center text-sm font-semibold"
-                  >
-                    Ver seguimiento →
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-
+      {/* El estado del trabajo ya está en la franja del chat ("Ver
+          seguimiento"); no se repite acá abajo. */}
       <div className="mx-auto w-full max-w-4xl space-y-3 px-4 sm:px-0">
-        {proposals.length > 0 ? (
+        {proposals.length > 0 && spotlightJob ? (
+          // Con un trabajo en curso las propuestas son historial: quedan
+          // plegadas para no competir con el chat.
+          <details
+            className="border-ink/[0.08] bg-surface consumer-card group rounded-2xl border"
+            id="propuestas"
+          >
+            <summary className="consumer-pressable flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold [&::-webkit-details-marker]:hidden">
+              <span>
+                Propuestas ({proposals.length})
+                {deal ? (
+                  <span className="text-ink/70 font-medium">
+                    {" "}
+                    · {deal.statusLabel} · {deal.amountLabel}
+                  </span>
+                ) : null}
+              </span>
+              <span
+                className="text-ink/50 transition-transform group-open:rotate-180"
+                aria-hidden="true"
+              >
+                ⌄
+              </span>
+            </summary>
+            <div className="space-y-3 px-3 pb-3">
+              {proposals.map((proposal) => (
+                <ProposalCard
+                  key={`${proposal.proposal_id}:${proposal.current_version_id}:${proposal.proposal_status}`}
+                  proposal={proposal}
+                  conversationId={conversationId}
+                  currentUserId={user.id}
+                  clientUserId={context.client_user_id}
+                  providerUserId={context.provider_user_id}
+                  jobId={
+                    proposal.accepted_version_id
+                      ? (jobByVersion.get(proposal.accepted_version_id) ?? null)
+                      : null
+                  }
+                />
+              ))}
+            </div>
+          </details>
+        ) : proposals.length > 0 ? (
           <section
             className="scroll-mt-56 space-y-3"
             id="propuestas"
@@ -286,8 +300,7 @@ export default async function ConversationPage({
               <span
                 className="inline-flex min-h-10 shrink-0 items-center rounded-full px-4 text-[13px] font-semibold text-white shadow-[0_8px_20px_-8px_rgb(13_18_27/60%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                 style={{
-                  background:
-                    "#0D121B",
+                  background: "#0D121B",
                 }}
                 aria-label={`${proposals.length} propuestas`}
               >
@@ -312,6 +325,7 @@ export default async function ConversationPage({
           </section>
         ) : null}
         <ProposalComposer
+          openFromHeaderOnly={!currentUserIsClient || spotlightJob !== null}
           allowDirectBooking={canOfferInstant}
           defaultKind={defaultProposalKind}
           conversationId={conversationId}

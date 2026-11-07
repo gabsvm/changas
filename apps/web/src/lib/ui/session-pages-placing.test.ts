@@ -26,4 +26,33 @@ describe("Secciones con sesión — auditoría de placing 2026-11-07", () => {
       expect(account).toContain("Completar perfil");
     });
   });
+  describe("/messages/[id]", () => {
+    const thread = read(
+      "../../components/conversations/conversation-thread.tsx",
+    );
+    const page = read("../../app/(account)/messages/[conversationId]/page.tsx");
+    const composer = read(
+      "../../components/conversations/proposal-composer.tsx",
+    );
+
+    it("no ofrece contratar/cotizar cuando ya hay un trabajo", () => {
+      expect(thread).toContain("{spotlight ? null : (");
+      expect(thread).toMatch(/currentUserIsClient &&\s*!spotlight &&/);
+    });
+
+    it("deja un solo 'Ver seguimiento' y pasa 'Ayuda' al menú", () => {
+      expect(page).not.toContain("Este chat tiene un servicio asociado.");
+      expect(page).toContain("Trabajo ${spotlightStatus.label.toLowerCase()}");
+      expect(thread).toContain("Ayuda con este servicio");
+      expect(thread).not.toMatch(/>\s*Ayuda\s*</);
+    });
+
+    it("pliega las propuestas cuando hay trabajo y no repite la cotización", () => {
+      expect(page).toContain("proposals.length > 0 && spotlightJob ?");
+      expect(page).toContain(
+        "openFromHeaderOnly={!currentUserIsClient || spotlightJob !== null}",
+      );
+      expect(composer).toContain("[&:not([open])]:hidden");
+    });
+  });
 });

@@ -410,9 +410,7 @@ export function ConversationThread({
             backgroundImage: "var(--yalo-symbol-gradient)",
           }}
           aria-hidden="true"
-        >
-          
-        </div>
+        ></div>
         <div className="flex min-h-12 items-center gap-2.5">
           <Link
             href="/messages"
@@ -481,52 +479,67 @@ export function ConversationThread({
               >
                 {blockedByMe ? "Desbloquear persona" : "Bloquear persona"}
               </button>
+              {spotlight?.helpHref ? (
+                <Link
+                  href={spotlight.helpHref}
+                  className="hover:bg-ink/5 block w-full rounded-xl px-3 py-2 text-left text-sm font-semibold"
+                >
+                  Ayuda con este servicio
+                </Link>
+              ) : null}
               <ReportForm conversationId={conversationId} />
             </div>
           </details>
         </div>
-        <div
-          className={`mt-3 grid gap-2 ${showHireAction ? "grid-cols-2" : "grid-cols-1"}`}
-          role="group"
-          aria-label={showHireAction ? "Cotizar y contratar" : "Cotizaciones"}
-        >
-          {showHireAction ? (
+        {/* Con un trabajo en curso no se ofrece volver a contratar/cotizar:
+            la franja de estado lleva al seguimiento. */}
+        {spotlight ? null : (
+          <div
+            className={`mt-3 grid gap-2 ${showHireAction ? "grid-cols-2" : "grid-cols-1"}`}
+            role="group"
+            aria-label={showHireAction ? "Cotizar y contratar" : "Cotizaciones"}
+          >
+            {showHireAction ? (
+              <button
+                type="button"
+                onClick={startHire}
+                disabled={blockedByMe}
+                aria-controls={
+                  actionableProposalId
+                    ? `propuesta-${actionableProposalId}`
+                    : "nueva-propuesta"
+                }
+                className={`${actionBase} ${hireIsPrimary ? actionPrimary : actionSecondary}`}
+                aria-label={
+                  actionableProposalId
+                    ? "Revisar propuesta y contratar"
+                    : allowDirectBooking
+                      ? "Reservar el servicio"
+                      : "Proponer precio y alcance para contratar"
+                }
+              >
+                {currentUserIsClient ? "Contratar" : "Aceptar oferta"}
+              </button>
+            ) : null}
             <button
               type="button"
-              onClick={startHire}
+              onClick={() =>
+                openProposalComposer(
+                  currentUserIsClient ? "QUOTE_REQUEST" : "PROVIDER_QUOTE",
+                )
+              }
               disabled={blockedByMe}
-              aria-controls={
-                actionableProposalId
-                  ? `propuesta-${actionableProposalId}`
-                  : "nueva-propuesta"
-              }
-              className={`${actionBase} ${hireIsPrimary ? actionPrimary : actionSecondary}`}
-              aria-label={
-                actionableProposalId
-                  ? "Revisar propuesta y contratar"
-                  : allowDirectBooking
-                    ? "Reservar el servicio"
-                    : "Proponer precio y alcance para contratar"
-              }
+              aria-controls="nueva-propuesta"
+              className={`${actionBase} ${hireIsPrimary ? actionSecondary : actionPrimary}`}
             >
-              {currentUserIsClient ? "Contratar" : "Aceptar oferta"}
+              {currentUserIsClient ? "Cotizar" : "Enviar cotización"}
             </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={() =>
-              openProposalComposer(
-                currentUserIsClient ? "QUOTE_REQUEST" : "PROVIDER_QUOTE",
-              )
-            }
-            disabled={blockedByMe}
-            aria-controls="nueva-propuesta"
-            className={`${actionBase} ${hireIsPrimary ? actionSecondary : actionPrimary}`}
-          >
-            {currentUserIsClient ? "Cotizar" : "Enviar cotización"}
-          </button>
-        </div>
-        {currentUserIsClient && !actionableProposalId && !allowDirectBooking ? (
+          </div>
+        )}
+        {currentUserIsClient &&
+        !spotlight &&
+        !actionableProposalId &&
+        !allowDirectBooking ? (
           <p className="text-ink/75 mt-2 text-[12px] leading-[18px] sm:text-[13px]">
             Para contratar, proponé precio y alcance; se confirma cuando la otra
             parte acepta.
@@ -550,14 +563,6 @@ export function ConversationThread({
                 {spotlight.sub}
               </span>
             </span>
-            {spotlight.helpHref ? (
-              <Link
-                href={spotlight.helpHref}
-                className="consumer-pressable inline-flex min-h-11 shrink-0 items-center text-[13px] font-bold text-white/80 underline underline-offset-4"
-              >
-                Ayuda
-              </Link>
-            ) : null}
             <Link
               href={spotlight.href}
               className="consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-3.5 text-[13px] font-semibold text-[#0D121B]"
