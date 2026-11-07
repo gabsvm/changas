@@ -1,17 +1,17 @@
 const steps = [
   {
     title: "Descubrí",
-    body: "Explorá servicios y elegí a la persona indicada.",
+    body: "Explorá servicios de personas con identidad verificada.",
     color: "#161D2A",
   },
   {
     title: "Acordá",
-    body: "Conversá y definí el alcance, el precio y el momento.",
+    body: "Conversá y definí el alcance, el precio y el momento por chat.",
     color: "#161D2A",
   },
   {
     title: "Resolvé y calificá",
-    body: "Seguí el trabajo, acordá el pago por fuera de YALO y compartí tu experiencia.",
+    body: "Seguí el trabajo, acordá el pago por fuera de YALO y dejá tu reseña.",
     color: "#161D2A",
   },
 ] as const;

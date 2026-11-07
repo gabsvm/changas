@@ -142,11 +142,11 @@ describe("marketplace polish contracts", () => {
 
   it("organizes the home as a polished marketplace feed", () => {
     expect(rootSource).toContain("yalo-showcase");
-    expect(rootSource).toContain("¿Qué hacemos hoy");
+    expect(rootSource).toContain("Explorá por categoría");
     expect(rootSource).toContain("Talento para lo que venga");
     expect(rootSource).toContain("Ofrecer mis servicios");
     expect(rootSource).toContain("NearbyServiceRail");
-    expect(rootSource).toContain("Personas reales");
+    expect(rootSource).toContain("Cómo funciona YALO");
     expect(rootSource).toContain('id="home-query"');
     expect(nearbySource).toContain("ServiceCard");
     expect(nearbySource).not.toContain('from "./service-row"');

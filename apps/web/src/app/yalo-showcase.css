@@ -825,63 +825,12 @@
   font-size: 14px;
 }
 
-.yalo-values-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-.yalo-value-card {
-  position: relative;
-  min-width: 0;
-  padding: 27px;
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 25px;
-  background: #162232;
-  box-shadow: inset 0 1px rgb(255 255 255 / 5%);
-  transition:
-    border-color 180ms ease,
-    transform 180ms ease;
-}
-.yalo-value-card:hover {
-  border-color: rgb(18 217 197 / 30%);
-  transform: translateY(-3px);
-}
-.yalo-value-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-.yalo-value-number {
-  color: #6d889d;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.13em;
-}
-.yalo-value-label {
-  display: inline-block;
-  margin-top: 30px;
-  color: #85e5d9;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-.yalo-value-card h3,
 .yalo-how-it-works li h3 {
   font-family: var(--font-display);
   font-size: clamp(19px, 2vw, 24px);
   font-weight: 400;
   line-height: 1.2;
   letter-spacing: -0.04em;
-}
-.yalo-value-card h3 {
-  margin: 8px 0 0;
-  color: #f5f9fc;
-}
-.yalo-value-card p {
-  margin: 10px 0 0;
-  color: #9fb4c6;
-  font-size: 13px;
-  line-height: 1.7;
 }
 .yalo-how-it-works {
   margin-top: 28px;
@@ -1156,17 +1105,6 @@
   .yalo-featured-results ul {
     grid-template-columns: minmax(0, 1fr);
     gap: 14px;
-  }
-  .yalo-values-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  .yalo-value-card {
-    padding: 22px;
-    border-radius: 20px;
-  }
-  .yalo-value-label {
-    margin-top: 15px;
   }
   .yalo-how-it-works ol {
     grid-template-columns: 1fr;
@@ -1508,5 +1446,116 @@
   }
   .yalo-hero-shortcuts > span {
     width: auto;
+  }
+}
+
+/* Landing — auditoría de placing (2026-11-07).
+   Sólo jerarquía y espacio: mismos tokens, superficies y tipografía. */
+
+/* Atajos del hero: una fila; en pantallas angostas desliza en vez de
+   dejar un chip huérfano en una segunda línea. El padding conserva visible
+   el anillo de foco dentro del contenedor con scroll. */
+.yalo-hero-shortcuts {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  margin: 14px -5px 0;
+  padding: 5px;
+}
+.yalo-hero-shortcuts::-webkit-scrollbar {
+  display: none;
+}
+.yalo-hero-shortcuts a {
+  flex: 0 0 auto;
+}
+
+/* Oferta del lado prestador: al pie del hero, separada por un divisor. */
+.yalo-hero-offer--provider {
+  margin-top: 16px;
+  padding-top: 8px;
+  border-top: 1px solid rgb(16 24 39 / 9%);
+}
+.dark .yalo-hero-offer--provider {
+  border-top-color: rgb(255 255 255 / 10%);
+}
+
+/* Destacados: sin foto, la categoría va en una franja compacta en lugar de
+   un bloque 16:9 que empuja la información del servicio. */
+.yalo-featured-results .service-card-cover-fallback {
+  aspect-ratio: auto;
+  place-items: center start;
+  padding: 10px 16px;
+}
+.yalo-featured-results .service-card-cover-fallback-label {
+  flex-direction: row;
+  gap: 8px;
+  padding: 0;
+  text-align: left;
+}
+.yalo-featured-results .service-card-cover-fallback-label svg {
+  width: 18px;
+  height: 18px;
+}
+.yalo-featured-more {
+  display: flex;
+  justify-content: center;
+  width: fit-content;
+  margin: 22px auto 0;
+}
+
+/* Cómo funciona: número a la izquierda y texto a la derecha. */
+.yalo-how-it-works li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 14px;
+  align-items: start;
+}
+.yalo-how-it-works li > span:nth-child(2) {
+  grid-row: span 2;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  font-size: 14px;
+}
+.yalo-how-it-works li h3 {
+  margin-top: 4px;
+}
+
+@media (max-width: 640px) {
+  /* Garantías en una sola fila compacta: devuelve ~100px al primer viewport. */
+  .yalo-confidence-bar {
+    grid-template-columns: repeat(3, minmax(0, auto));
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px 2px;
+  }
+  .yalo-confidence-bar > span {
+    gap: 6px;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  .yalo-confidence-icon {
+    width: 18px;
+    height: 18px;
+  }
+  .yalo-confidence-icon svg {
+    width: 11px;
+    height: 11px;
+  }
+  /* Las primeras categorías asoman en el primer viewport. */
+  .yalo-category-section {
+    margin-top: 36px;
+  }
+  .yalo-featured-more {
+    width: 100%;
+  }
+  .yalo-how-it-works ol {
+    gap: 10px;
+  }
+  .yalo-how-it-works li {
+    padding: 14px 16px;
+    border-radius: 18px;
   }
 }

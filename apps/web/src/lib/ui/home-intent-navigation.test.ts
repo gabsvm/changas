@@ -10,17 +10,18 @@ describe("home: single primary search with a discrete work entrypoint", () => {
   it("shows one primary search before shortcuts and keeps work secondary", () => {
     const stage = home.indexOf('className="yalo-stage"');
     const search = home.indexOf('className="yalo-hero-search"');
-    const offer = home.indexOf('className="yalo-hero-offer"');
     const shortcuts = home.indexOf('className="yalo-hero-shortcuts"');
+    const offer = home.indexOf("yalo-hero-offer--provider");
     const categories = home.indexOf(
       'className="yalo-home-section yalo-category-section"',
     );
-    // Classes can share a longer className expression; compare section markers instead.
+    // Auditoría 2026-11-07: la oferta del prestador va al pie del hero,
+    // después de los atajos, para no cortar el recorrido de búsqueda.
     expect(stage).toBeGreaterThan(-1);
     expect(search).toBeGreaterThan(stage);
-    expect(offer).toBeGreaterThan(search);
-    expect(shortcuts).toBeGreaterThan(offer);
-    expect(categories).toBeGreaterThan(shortcuts);
+    expect(shortcuts).toBeGreaterThan(search);
+    expect(offer).toBeGreaterThan(shortcuts);
+    expect(categories).toBeGreaterThan(offer);
     expect(home).not.toContain("Quiero contratar");
     expect(home).not.toContain("Quiero trabajar");
     expect(home).not.toContain("yalo-final-cta");

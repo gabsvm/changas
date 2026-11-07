@@ -76,7 +76,7 @@ function CoverFallback({
   const visual = coverVisual(categorySlug);
   return (
     <span
-      className="relative grid aspect-video w-full place-items-center overflow-hidden"
+      className="service-card-cover-fallback relative grid aspect-video w-full place-items-center overflow-hidden"
       style={{
         background: visual.from,
       }}
@@ -92,7 +92,7 @@ function CoverFallback({
         className="hidden"
         aria-hidden="true"
       />
-      <span className="relative flex flex-col items-center gap-1.5 px-4 text-center">
+      <span className="service-card-cover-fallback-label relative flex flex-col items-center gap-1.5 px-4 text-center">
         <svg
           aria-hidden="true"
           viewBox="0 0 24 24"

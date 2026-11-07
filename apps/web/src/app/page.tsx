@@ -35,27 +35,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-const benefits = [
-  {
-    number: "01",
-    title: "Personas reales",
-    body: "Perfiles con identidad verificada antes de ofrecer servicios.",
-    detail: "Identidad",
-  },
-  {
-    number: "02",
-    title: "Todo más claro",
-    body: "Consultá, conversá y acordá el alcance y el precio.",
-    detail: "Acuerdos",
-  },
-  {
-    number: "03",
-    title: "De principio a fin",
-    body: "Seguimiento del trabajo y reseñas de experiencias reales.",
-    detail: "Confianza",
-  },
-] as const;
-
 // Todo lo que depende de la sesión vive en componentes async detrás de
 // <Suspense>: el catálogo público (categorías + discovery) no espera a
 // getUser / perfil / trabajos. cache() deduplica getUser entre ellos.
@@ -263,7 +242,7 @@ export default async function HomePage() {
               <SearchField
                 id="home-query"
                 name="q"
-                placeholder="¿Qué necesitás resolver hoy?"
+                placeholder="Ej: plomero, clases de inglés"
                 aria-label="Buscar un servicio o habilidad"
               />
               <button className="yalo-search-submit" type="submit">
@@ -274,60 +253,38 @@ export default async function HomePage() {
               </button>
             </form>
 
-            <p className="yalo-hero-offer">
-              ¿Sos profesional?{" "}
-              <Link href="/provider/onboarding">
-                Ofrecer mis servicios{" "}
-                <span aria-hidden="true">
-                  <ActionArrowIcon />
-                </span>
-              </Link>
-            </p>
-
+            {/* Atajos: una sola fila (scroll horizontal en mobile) y sin
+                flechas; la flecha queda reservada al CTA primario. */}
             <div
               className="yalo-hero-shortcuts"
               role="group"
-              aria-label="Explorar servicios"
+              aria-label="Explorar servicios por modalidad"
             >
-              <span>Explorá por</span>
-              <Link href="/buscar?mode=presencial">
-                Presencial{" "}
-                <span aria-hidden="true">
-                  <ActionArrowIcon />
-                </span>
-              </Link>
-              <Link href="/buscar?mode=remoto">
-                Remoto{" "}
-                <span aria-hidden="true">
-                  <ActionArrowIcon />
-                </span>
-              </Link>
-              <Link href="/buscar?offers=true">
-                Con ofertas{" "}
-                <span aria-hidden="true">
-                  <ActionArrowIcon />
-                </span>
-              </Link>
+              <Link href="/buscar?mode=presencial">Presencial</Link>
+              <Link href="/buscar?mode=remoto">Remoto</Link>
+              <Link href="/buscar?offers=true">Con ofertas</Link>
             </div>
             {arePublicNeedsEnabled() ? (
               <p className="yalo-hero-offer">
                 ¿No encontrás lo que buscás?{" "}
-                <Link href="/needs/new">
-                  Publicá una necesidad{" "}
-                  <span aria-hidden="true">
-                    <ActionArrowIcon />
-                  </span>
-                </Link>
+                <Link href="/needs/new">Publicá una necesidad</Link>
               </p>
             ) : null}
+
+            {/* Oferta (lado prestador) al pie del hero: secundaria, sin
+                cortar el recorrido de quien busca. */}
+            <p className="yalo-hero-offer yalo-hero-offer--provider">
+              ¿Sos profesional?{" "}
+              <Link href="/provider/onboarding">Ofrecer mis servicios</Link>
+            </p>
           </div>
         </section>
 
         <TrustStrip
           items={[
             { label: "Identidad verificada" },
-            { label: "Precio acordado por chat" },
-            { label: "Reseñas de trabajos reales" },
+            { label: "Precio por chat" },
+            { label: "Reseñas reales" },
           ]}
         />
 
@@ -339,7 +296,7 @@ export default async function HomePage() {
             <div>
               <p className="yalo-section-kicker">Encontrá tu solución</p>
               <h2 id="categories-title">
-                ¿Qué hacemos hoy<span className="yalo-period">?</span>
+                Explorá por categoría<span className="yalo-period">.</span>
               </h2>
               <p className="yalo-section-description">
                 Desde algo puntual hasta ese proyecto que venís postergando.
@@ -400,12 +357,6 @@ export default async function HomePage() {
                 Mirá perfiles, compará propuestas y elegí con información.
               </p>
             </div>
-            <Link href="/buscar" className="yalo-section-link">
-              Explorar YALO{" "}
-              <span aria-hidden="true">
-                <ActionArrowIcon />
-              </span>
-            </Link>
           </div>
           <div
             className={
@@ -425,11 +376,22 @@ export default async function HomePage() {
                 </Link>
               </p>
             ) : discovery.rows.length > 0 ? (
-              <NearbyServiceRail
-                rows={discovery.rows.slice(0, 6)}
-                title="Servicios disponibles"
-                actionHref="/buscar"
-              />
+              <>
+                <NearbyServiceRail
+                  rows={discovery.rows.slice(0, 6)}
+                  title="Servicios disponibles"
+                  actionHref="/buscar"
+                />
+                <Link
+                  href="/buscar"
+                  className="yalo-section-link yalo-featured-more"
+                >
+                  Ver más servicios{" "}
+                  <span aria-hidden="true">
+                    <ActionArrowIcon />
+                  </span>
+                </Link>
+              </>
             ) : (
               <Suspense
                 fallback={
@@ -450,23 +412,13 @@ export default async function HomePage() {
             <div>
               <p className="yalo-section-kicker">Así de simple</p>
               <h2 id="values-title">
-                Un buen contacto cambia todo
+                Cómo funciona YALO
                 <span className="yalo-period">.</span>
               </h2>
             </div>
           </div>
-          <div className="yalo-values-grid">
-            {benefits.map((benefit) => (
-              <article key={benefit.number} className="yalo-value-card">
-                <div className="yalo-value-top">
-                  <span className="yalo-value-number">{benefit.number} /</span>
-                </div>
-                <span className="yalo-value-label">{benefit.detail}</span>
-                <h3>{benefit.title}</h3>
-                <p>{benefit.body}</p>
-              </article>
-            ))}
-          </div>
+          {/* Una sola lista de pasos: absorbe los beneficios (identidad,
+              precio por chat, reseñas) que antes se repetían en tarjetas. */}
           <div className="yalo-how-it-works">
             <HowItWorks />
           </div>
