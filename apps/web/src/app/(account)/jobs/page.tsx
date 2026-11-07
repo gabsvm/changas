@@ -121,8 +121,18 @@ export default async function JobsPage({
   const startFromCursor = params.windowed === "1";
   const paymentsEnabled = isPaymentsEnabled();
   const page = past
-    ? await listMyPastJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE, startFromCursor)
-    : await listMyUpcomingJobsThrough(through, rpcFilter, JOBS_PAGE_SIZE, startFromCursor);
+    ? await listMyPastJobsThrough(
+        through,
+        rpcFilter,
+        JOBS_PAGE_SIZE,
+        startFromCursor,
+      )
+    : await listMyUpcomingJobsThrough(
+        through,
+        rpcFilter,
+        JOBS_PAGE_SIZE,
+        startFromCursor,
+      );
   const { items: jobs, next } = page;
   const statusQuery = activeFilter === "all" ? "" : `status=${activeFilter}&`;
   const moreHref = next
@@ -150,19 +160,31 @@ export default async function JobsPage({
       <div className="mx-auto max-w-3xl pt-5 sm:pt-0">
         {page.windowed ? (
           <p className="text-ink/60 mb-3 text-sm">
-            Mostrando un bloque del historial. {" "}
+            Mostrando un bloque del historial.{" "}
             <Link href={`/jobs?${statusQuery}`} className="text-ink underline">
               Volver al inicio
             </Link>
           </p>
         ) : null}
-        <h1 className="mt-1.5 text-[24px] leading-8 font-semibold tracking-[-0.03em]">
+        {/* En mobile el título ya está en la barra superior. */}
+        <h1 className="mt-1.5 text-[24px] leading-8 font-semibold tracking-[-0.03em] max-sm:sr-only">
           Mis trabajos
         </h1>
-        <p className="text-ink/70 mt-1.5 max-w-md text-sm leading-6">
+        <p className="text-ink/70 max-w-md text-sm leading-6 sm:mt-1.5">
           Tocá un trabajo. Mirá qué sigue.
         </p>
         {(() => {
+          const activeCount = bannerJobs.filter((job) =>
+            ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
+              job.job_status,
+            ),
+          ).length;
+          const pendingPayment = bannerJobs.some(
+            (job) => job.settlement_status === "DUE",
+          );
+          // "Seguí tu trabajo" repetía la fila de abajo: el banner sólo
+          // aparece cuando suma algo (pago pendiente o lista vacía).
+          if (activeCount > 0 && !pendingPayment) return null;
           const next = getClientNextAction({
             activeJobs: bannerJobs.filter((job) =>
               ["CONFIRMED", "IN_PROGRESS", "COMPLETION_REQUESTED"].includes(
@@ -222,8 +244,7 @@ export default async function JobsPage({
                 style={
                   active
                     ? {
-                        background:
-                          "#0D121B",
+                        background: "#0D121B",
                       }
                     : undefined
                 }
@@ -285,12 +306,10 @@ export default async function JobsPage({
                   <span
                     className="relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl text-base font-semibold text-white shadow-[0_8px_20px_-8px_rgb(23_20_15/35%)] dark:shadow-[0_8px_20px_-8px_rgb(0_0_0/70%)]"
                     style={{
-                      background:
-                        "#08A9F4",
+                      background: "#08A9F4",
                     }}
                     aria-hidden="true"
                   >
-                    
                     <span className="relative">
                       {job.service_title.trim().charAt(0).toUpperCase() || "C"}
                     </span>

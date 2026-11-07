@@ -55,4 +55,30 @@ describe("Secciones con sesión — auditoría de placing 2026-11-07", () => {
       expect(composer).toContain("[&:not([open])]:hidden");
     });
   });
+  describe("/jobs y /jobs/[id]", () => {
+    const list = read("../../app/(account)/jobs/page.tsx");
+    const detail = read("../../app/(account)/jobs/[jobId]/page.tsx");
+
+    it("no repite el título ni la única fila en la lista", () => {
+      expect(list).toMatch(/<h1 className="[^"]*max-sm:sr-only/);
+      expect(list).toContain(
+        "if (activeCount > 0 && !pendingPayment) return null;",
+      );
+    });
+
+    it("quita el banner decorativo y el precio repetido del detalle", () => {
+      expect(detail).not.toContain("Ficha ilustrada de");
+      expect(detail).not.toMatch(
+        /Con \{detail\.counterparty_name\} · \{price\}/,
+      );
+    });
+
+    it("pone 'Qué sigue' antes del seguimiento y deja la barra sólo con acciones", () => {
+      expect(detail.indexOf('id="proxima-accion"')).toBeLessThan(
+        detail.indexOf('aria-label="Seguimiento del servicio"'),
+      );
+      expect(detail).toContain("{nextAction.kind || nextAction.href ? (");
+      expect(detail).not.toContain('aria-label="Abrir chat del servicio"');
+    });
+  });
 });

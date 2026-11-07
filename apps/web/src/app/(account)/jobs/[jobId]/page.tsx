@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-﻿import Link from "next/link";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { formatMinorUnits, type JobStatus } from "@changas/domain";
@@ -413,25 +413,6 @@ export default async function JobPage({
         ) : null}
 
         <header className="consumer-card bg-surface mt-3 overflow-hidden sm:mt-5">
-          <div
-            className="relative h-20 overflow-hidden sm:h-24"
-            style={{
-              background:
-                "#F5B942",
-            }}
-            role="img"
-            aria-label={`Ficha ilustrada de ${detail.service_title}`}
-          >
-            
-            <span
-              className="absolute -right-6 -bottom-8 h-24 w-24 rounded-full bg-white/20"
-              aria-hidden="true"
-            />
-            <span
-              className="absolute -top-4 -left-4 h-14 w-14 rounded-full bg-white/15"
-              aria-hidden="true"
-            />
-          </div>
           <div className="p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-1.5">
               <StatusChip tone={status.tone}>{status.label}</StatusChip>
@@ -443,7 +424,7 @@ export default async function JobPage({
               {detail.service_title}
             </h1>
             <p className="text-ink/70 mt-1.5 text-sm leading-6">
-              Con {detail.counterparty_name} · {price}
+              Con {detail.counterparty_name}
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
               <div className="border-ink/[0.08] bg-canvas rounded-2xl border p-3.5">
@@ -465,6 +446,39 @@ export default async function JobPage({
             </div>
           </div>
         </header>
+
+        {/* La próxima acción va antes de la línea de tiempo. */}
+        <section
+          id="proxima-accion"
+          className="brand-gradient-surface relative mt-5 scroll-mt-20 overflow-hidden rounded-2xl p-5 text-white shadow-[0_30px_64px_-18px_rgb(13_18_27/28%)]"
+          aria-label="Qué sigue"
+        >
+          <p className="relative text-[11px] font-semibold text-white/70">
+            Qué sigue
+          </p>
+          <h2 className="font-display relative mt-1 text-lg leading-7 font-semibold">
+            {nextAction.heading}
+          </h2>
+          <p className="relative mt-1 text-sm leading-6 text-white/85">
+            {nextAction.sub}
+          </p>
+          <div className="relative mt-4 grid gap-2 sm:grid-cols-2">
+            <PrimaryAction
+              jobId={jobId}
+              providerName={detail.counterparty_name}
+              conversationId={detail.conversation_id}
+              kind={nextAction.kind}
+              href={nextAction.href}
+              hrefLabel={nextAction.hrefLabel}
+              reviewAmounts={{
+                baseMinor: detail.base_price_amount,
+                extrasMinor: detail.settlement_unpaid_extras_minor,
+                totalMinor: detail.settlement_total_minor,
+              }}
+              remote={detail.modality === "REMOTE"}
+            />
+          </div>
+        </section>
 
         <section
           className="border-ink/[0.08] bg-surface consumer-card mt-5 rounded-2xl border p-4 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] sm:p-5 dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
@@ -610,47 +624,6 @@ export default async function JobPage({
             </p>
           </section>
         ) : null}
-
-        <section
-          id="proxima-accion"
-          className="brand-gradient-surface relative mt-5 scroll-mt-20 overflow-hidden rounded-2xl p-5 text-white shadow-[0_30px_64px_-18px_rgb(13_18_27/28%)]"
-          aria-label="Qué sigue"
-        >
-          
-          
-          
-          <p className="relative text-[11px] font-semibold text-white/70">
-            Qué sigue
-          </p>
-          <h2 className="font-display relative mt-1 text-lg leading-7 font-semibold">
-            {nextAction.heading}
-          </h2>
-          <p className="relative mt-1 text-sm leading-6 text-white/85">
-            {nextAction.sub}
-          </p>
-          <div className="relative mt-4 grid gap-2 sm:grid-cols-2">
-            <PrimaryAction
-              jobId={jobId}
-              providerName={detail.counterparty_name}
-              conversationId={detail.conversation_id}
-              kind={nextAction.kind}
-              href={nextAction.href}
-              hrefLabel={nextAction.hrefLabel}
-              reviewAmounts={{
-                baseMinor: detail.base_price_amount,
-                extrasMinor: detail.settlement_unpaid_extras_minor,
-                totalMinor: detail.settlement_total_minor,
-              }}
-              remote={detail.modality === "REMOTE"}
-            />
-            <Link
-              href={`/messages/${detail.conversation_id}`}
-              className="consumer-pressable inline-flex min-h-[52px] items-center justify-center rounded-xl border border-white/25 px-4 text-sm font-bold text-white"
-            >
-              Ver chat
-            </Link>
-          </div>
-        </section>
 
         {autoCompleteDisputeEligible ? (
           <div className="mt-5 scroll-mt-24" id="apelar-cierre">
@@ -1352,43 +1325,27 @@ export default async function JobPage({
           </aside>
         </div>
       </div>
-      <div className="yalo-job-mobile-cta bg-surface/95 border-ink/10 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur md:hidden">
-        <div className="mx-auto grid max-w-4xl grid-cols-[1fr_auto] items-center gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-          <div className="min-w-0">
-            {nextAction.kind || nextAction.href ? (
-              <PrimaryAction
-                jobId={jobId}
-                providerName={detail.counterparty_name}
-                conversationId={detail.conversation_id}
-                kind={nextAction.kind}
-                href={nextAction.href}
-                hrefLabel={nextAction.hrefLabel}
-                compact
-                reviewAmounts={{
-                  baseMinor: detail.base_price_amount,
-                  extrasMinor: detail.settlement_unpaid_extras_minor,
-                  totalMinor: detail.settlement_total_minor,
-                }}
-                remote={detail.modality === "REMOTE"}
-              />
-            ) : (
-              <a
-                href="#proxima-accion"
-                className="consumer-pressable inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-4 text-sm font-bold"
-              >
-                Ver qué sigue
-              </a>
-            )}
+      {nextAction.kind || nextAction.href ? (
+        <div className="yalo-job-mobile-cta bg-surface/95 border-ink/10 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur md:hidden">
+          <div className="mx-auto max-w-4xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <PrimaryAction
+              jobId={jobId}
+              providerName={detail.counterparty_name}
+              conversationId={detail.conversation_id}
+              kind={nextAction.kind}
+              href={nextAction.href}
+              hrefLabel={nextAction.hrefLabel}
+              compact
+              reviewAmounts={{
+                baseMinor: detail.base_price_amount,
+                extrasMinor: detail.settlement_unpaid_extras_minor,
+                totalMinor: detail.settlement_total_minor,
+              }}
+              remote={detail.modality === "REMOTE"}
+            />
           </div>
-          <Link
-            href={`/messages/${detail.conversation_id}`}
-            className="consumer-pressable border-ink/10 inline-flex min-h-[52px] items-center justify-center rounded-xl border px-4 text-sm font-bold"
-            aria-label="Abrir chat del servicio"
-          >
-            Chat
-          </Link>
         </div>
-      </div>
+      ) : null}
     </section>
   );
 }
@@ -1396,9 +1353,7 @@ export default async function JobPage({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-ink/42 text-[11px] font-bold">
-        {label}
-      </p>
+      <p className="text-ink/42 text-[11px] font-bold">{label}</p>
       <p className="mt-1 text-sm font-semibold">{value}</p>
     </div>
   );

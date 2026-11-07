@@ -24,7 +24,10 @@ describe("job detail marketplace UI", () => {
     expect(source).toContain("Qué sigue");
     expect(source).toContain("nextAction");
     expect(source).toContain("PrimaryAction");
-    expect(source).toContain("Ver chat");
+    // Auditoría 2026-11-07: el chat queda en el header ("Chat"), sin
+    // repetirse en "Qué sigue" ni en la barra fija.
+    expect(source).not.toContain("Ver chat");
+    expect(source).toContain('aria-label="Abrir conversación"');
     expect(source).toContain("collapsible");
     expect(source).toContain("border-l-2");
   });
