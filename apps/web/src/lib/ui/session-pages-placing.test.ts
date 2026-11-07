@@ -123,4 +123,38 @@ describe("Secciones con sesión — auditoría de placing 2026-11-07", () => {
       );
     });
   });
+  describe("/provider/manage", () => {
+    const page = read("../../app/(provider)/provider/manage/page.tsx");
+    const management = read(
+      "../../components/provider/marketplace-management.tsx",
+    );
+
+    it("muestra una sección por pestaña, con 'Resumen' primero", () => {
+      expect(management).toContain('["resumen", "Resumen"]');
+      expect(management).toContain('useState("resumen")');
+      expect(management).toContain("hidden={!active}");
+      for (const id of ["perfil", "servicios", "zonas", "disponibilidad"]) {
+        expect(management).toContain(`active={activeSection === "${id}"}`);
+      }
+      expect(page).toContain("summary={summary}");
+    });
+
+    it("resume estado, ingresos y acciones en una tarjeta", () => {
+      expect(page).toContain("function IncomeMetric");
+      expect(page).toContain('className="mt-4 grid grid-cols-3 gap-2"');
+      expect(page).not.toContain("Ver oportunidades para ofertar");
+    });
+
+    it("pliega los cobros online mientras no están disponibles", () => {
+      expect(page).toContain("open={Boolean(paymentFeedback)}");
+      expect(page).toContain("Próximamente · hoy cobrás directo");
+    });
+
+    it("hace de 'Editar' la acción principal de cada servicio", () => {
+      expect(management).toContain("function ManagedServiceCard");
+      expect(management).toContain('submitTone="secondary"');
+      expect(management).not.toContain("Ver enlace técnico");
+      expect(management).not.toContain('"Pausar servicio"');
+    });
+  });
 });

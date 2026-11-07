@@ -68,10 +68,14 @@ function ActionForm({
   encType,
   directUpload,
   className = "space-y-4",
+  submitTone = "primary",
+  submitClassName = "",
 }: {
   action: ProviderAction;
   children: React.ReactNode;
   submitLabel: string;
+  submitTone?: "primary" | "secondary";
+  submitClassName?: string;
   encType?: "multipart/form-data";
   directUpload?: { bucket: string; fieldName: string };
   className?: string;
@@ -176,7 +180,7 @@ function ActionForm({
         </>
       ) : null}
       <button
-        className="button-primary disabled:cursor-wait disabled:opacity-60"
+        className={`${submitTone === "secondary" ? "button-secondary" : "button-primary"} disabled:cursor-wait disabled:opacity-60 ${submitClassName}`}
         type="submit"
         disabled={pending || compressing || uploading}
       >
@@ -477,6 +481,7 @@ const SECTION_BADGES: Record<
   disponibilidad: { tone: "blue", icon: "calendar" },
 };
 const MANAGE_SECTIONS: Array<[string, string]> = [
+  ["resumen", "Resumen"],
   ["perfil", "Perfil"],
   ["habilidades", "Habilidades"],
   ["servicios", "Servicios"],
@@ -511,12 +516,16 @@ function Section({
   title,
   description,
   anchor,
+  active = true,
   children,
 }: {
   eyebrow: string;
   title: string;
   description: string;
   anchor?: string;
+  /** Pestañas: sólo la sección activa se muestra (las demás quedan en el
+      DOM para no perder lo que se esté editando). */
+  active?: boolean;
   children: React.ReactNode;
 }) {
   const badge: { tone: IllustratedTone; icon: IllustratedIconName } = (anchor
@@ -528,6 +537,7 @@ function Section({
   return (
     <section
       id={anchor}
+      hidden={!active}
       className="border-ink/10 consumer-card scroll-mt-32 overflow-hidden rounded-2xl border bg-white/65 dark:border-white/10 dark:bg-[#1b2b3d]"
     >
       <span
@@ -807,6 +817,7 @@ function ProfessionalRecordList({
 }
 
 export function MarketplaceManagement({
+  summary,
   provider,
   skills,
   catalogSkills,
@@ -825,6 +836,9 @@ export function MarketplaceManagement({
   suggestedSlug,
   actions,
 }: {
+  /** Estado, ingresos y cobros (render del servidor) para la pestaña
+      "Resumen". */
+  summary?: React.ReactNode;
   suggestedSlug?: string | undefined;
   provider: Provider;
   skills: Skill[];
@@ -870,7 +884,7 @@ export function MarketplaceManagement({
   const skillName = new Map(
     catalogSkills.map((skill) => [skill.id, skill.name]),
   );
-  const [activeSection, setActiveSection] = useState("perfil");
+  const [activeSection, setActiveSection] = useState("resumen");
   useEffect(() => {
     const applyHash = () => {
       const id = window.location.hash.replace("#", "");
@@ -886,35 +900,47 @@ export function MarketplaceManagement({
         className="consumer-scrollbar-none bg-canvas/97 sticky top-14 z-20 -mx-4 flex gap-2 overflow-x-auto px-4 py-2 backdrop-blur-xl sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none"
         aria-label="Secciones de gestión"
       >
-        {MANAGE_SECTIONS.map(([id, label]) => {
-          const active = activeSection === id;
-          return (
-            <a
-              key={id}
-              href={`#${id}`}
-              onClick={() => setActiveSection(id)}
-              aria-current={active ? "true" : undefined}
-              className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-colors duration-200 ${
-                active
-                  ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
-                  : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#1b2b3d] dark:text-[#f5efe8]"
-              }`}
-              style={
-                active
-                  ? {
-                      background:
-                        "#0D121B",
-                    }
-                  : undefined
-              }
-            >
-              {label}
-            </a>
-          );
-        })}
+        {MANAGE_SECTIONS.filter(([id]) => id !== "resumen" || summary).map(
+          ([id, label]) => {
+            const active = activeSection === id;
+            return (
+              <a
+                key={id}
+                href={`#${id}`}
+                onClick={() => setActiveSection(id)}
+                aria-current={active ? "true" : undefined}
+                className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-colors duration-200 ${
+                  active
+                    ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
+                    : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#1b2b3d] dark:text-[#f5efe8]"
+                }`}
+                style={
+                  active
+                    ? {
+                        background: "#0D121B",
+                      }
+                    : undefined
+                }
+              >
+                {label}
+              </a>
+            );
+          },
+        )}
       </nav>
+      {summary ? (
+        <section
+          id="resumen"
+          hidden={activeSection !== "resumen"}
+          className="scroll-mt-32"
+          aria-label="Resumen"
+        >
+          {summary}
+        </section>
+      ) : null}
       <Section
         anchor="perfil"
+        active={activeSection === "perfil"}
         eyebrow="Perfil público"
         title="Tu escaparate, bajo tu control"
         description="Editá sólo la información que querés publicar. La identidad privada y los documentos de onboarding quedan fuera de esta pantalla."
@@ -963,6 +989,7 @@ export function MarketplaceManagement({
 
       <Section
         anchor="habilidades"
+        active={activeSection === "habilidades"}
         eyebrow="Lo que sabés hacer"
         title="Habilidades que ofrecés"
         description="Elegí tus habilidades de la lista. Después las usás para armar servicios concretos con precio."
@@ -1027,6 +1054,7 @@ export function MarketplaceManagement({
 
       <Section
         anchor="servicios"
+        active={activeSection === "servicios"}
         eyebrow="Servicios"
         title="Ofertas concretas"
         description="Cada servicio tiene su precio (fijo, desde, por hora, por unidad o a cotizar) y su modalidad (presencial, remota o ambas). Podés pausarlos cuando quieras."
@@ -1052,93 +1080,22 @@ export function MarketplaceManagement({
             </div>
           </details>
           {services.map((service) => (
-            <div
-              className="border-ink/10 bg-surface/75 rounded-xl border p-4 dark:border-white/10 dark:bg-[#1b2b3d]"
+            <ManagedServiceCard
               key={service.id}
-            >
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="flex flex-wrap items-center gap-2 font-semibold">
-                    {service.title}
-                    {service.is_published ? null : (
-                      <StatusChip tone="warning">
-                        Borrador: solo vos lo ves
-                      </StatusChip>
-                    )}
-                  </p>
-                  <p className="text-ink/70 text-xs">
-                    {service.is_published ? "Publicado" : "Borrador"}
-                    {service.is_paused ? " · pausado" : ""}
-                  </p>
-                  <details className="text-ink/60 mt-1 text-xs">
-                    <summary className="consumer-pressable inline-flex min-h-11 cursor-pointer items-center">
-                      Ver enlace técnico
-                    </summary>
-                    <p>{service.public_slug}</p>
-                  </details>
-                </div>
-                <span className="bg-moss/10 text-moss rounded-full px-3 py-1 text-xs font-semibold">
-                  {formatServicePrice(
-                    service.price_model,
-                    service.price_amount,
-                    service.currency_code,
-                    service.price_unit,
-                  )}
-                </span>
-                {service.is_paused ? (
-                  <span className="bg-ink/[0.06] text-ink/70 rounded-full px-3 py-1 text-xs font-semibold">
-                    Pausado
-                  </span>
-                ) : null}
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <ActionForm
-                  action={actions.pauseService}
-                  submitLabel={
-                    service.is_paused ? "Reanudar servicio" : "Pausar servicio"
-                  }
-                  className="flex items-center gap-2"
-                >
-                  <input type="hidden" name="serviceId" value={service.id} />
-                  <input
-                    type="hidden"
-                    name="paused"
-                    value={String(!service.is_paused)}
-                  />
-                </ActionForm>
-              </div>
-              <details className="border-ink/10 mt-3 border-t pt-2">
-                <summary className="consumer-pressable flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-semibold">
-                  Editar servicio
-                  <span className="text-ink/40 text-xl" aria-hidden="true">
-                    ›
-                  </span>
-                </summary>
-                <div className="pt-2">
-                  <ServiceForm
-                    action={actions.saveService}
-                    service={service}
-                    skills={skills}
-                    serviceTags={serviceTagsByServiceId[service.id] ?? []}
-                    canPublish={provider.status === "ACTIVE"}
-                  />
-                  <div className="border-ink/10 mt-3 border-t pt-2">
-                    <DeleteForm
-                      action={actions.deleteService}
-                      recordId={service.id}
-                      recordLabel={"el servicio «" + service.title + "»"}
-                    />
-                  </div>
-                </div>
-              </details>
-            </div>
+              service={service}
+              actions={actions}
+              skills={skills}
+              serviceTags={serviceTagsByServiceId[service.id] ?? []}
+              canPublish={provider.status === "ACTIVE"}
+            />
           ))}
         </div>
       </Section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="contents">
         <Section
           anchor="experiencia"
+          active={activeSection === "experiencia"}
           eyebrow="Trayectoria"
           title="Experiencia"
           description="Mostrá experiencia pública o conservá registros privados para tu gestión."
@@ -1192,6 +1149,7 @@ export function MarketplaceManagement({
         </Section>
         <Section
           anchor="formacion"
+          active={activeSection === "formacion"}
           eyebrow="Formación"
           title="Educación"
           description="Compartí estudios relevantes sin exponer información privada de identidad."
@@ -1241,9 +1199,10 @@ export function MarketplaceManagement({
         </Section>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="contents">
         <Section
           anchor="certificaciones"
+          active={activeSection === "certificaciones"}
           eyebrow="Certificaciones"
           title="Credenciales"
           description="La ficha pública puede mostrar el título y emisor; el archivo que adjuntes como prueba queda privado."
@@ -1310,6 +1269,7 @@ export function MarketplaceManagement({
         </Section>
         <Section
           anchor="portfolio"
+          active={activeSection === "portfolio"}
           eyebrow="Portfolio"
           title="Trabajo visible"
           description="Las piezas de portfolio pueden ser públicas sólo cuando vos las marcás así. Tus documentos de identidad nunca se mezclan con ellas."
@@ -1329,7 +1289,6 @@ export function MarketplaceManagement({
                     }}
                     aria-hidden="true"
                   >
-                    
                     <span className="absolute -right-4 -bottom-6 h-16 w-16 rounded-full bg-white/20" />
                   </span>
                   <span className="block p-4">
@@ -1393,9 +1352,10 @@ export function MarketplaceManagement({
         </Section>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="contents">
         <Section
           anchor="zonas"
+          active={activeSection === "zonas"}
           eyebrow="Zonas"
           title="Área de servicio"
           description="Guardamos un centro exacto privado para futuras consultas geográficas, pero la vista pública sólo muestra etiqueta y radio aproximado."
@@ -1470,6 +1430,7 @@ export function MarketplaceManagement({
         </Section>
         <Section
           anchor="disponibilidad"
+          active={activeSection === "disponibilidad"}
           eyebrow="Disponibilidad"
           title="Reglas y bloqueos"
           description="La disponibilidad guardada todavía no permite reservar ni agenda turnos."
@@ -1573,6 +1534,104 @@ export function MarketplaceManagement({
           </div>
         </Section>
       </div>
+    </div>
+  );
+}
+
+function ManagedServiceCard({
+  service,
+  actions,
+  skills,
+  serviceTags,
+  canPublish,
+}: {
+  service: Parameters<typeof ServiceForm>[0]["service"] & {
+    id: string;
+    title: string;
+    is_published: boolean;
+    is_paused: boolean;
+    price_model: string;
+    price_amount: number | null;
+    currency_code: string;
+    price_unit: string | null;
+  };
+  actions: {
+    saveService: ProviderAction;
+    pauseService: ProviderAction;
+    deleteService: ProviderAction;
+  };
+  skills: Parameters<typeof ServiceForm>[0]["skills"];
+  serviceTags: string[];
+  canPublish: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const formId = `editar-servicio-${service.id}`;
+  return (
+    <div className="border-ink/10 bg-surface/75 rounded-xl border p-4 dark:border-white/10 dark:bg-[#1b2b3d]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-semibold">{service.title}</p>
+          <p className="text-ink/70 mt-0.5 text-xs">
+            {formatServicePrice(
+              service.price_model as Parameters<typeof formatServicePrice>[0],
+              service.price_amount,
+              service.currency_code,
+              service.price_unit,
+            )}
+          </p>
+        </div>
+        {service.is_paused ? (
+          <StatusChip tone="neutral">Pausado</StatusChip>
+        ) : service.is_published ? (
+          <StatusChip tone="success">Publicado</StatusChip>
+        ) : (
+          <StatusChip tone="warning">Borrador: solo vos lo ves</StatusChip>
+        )}
+      </div>
+      {/* Editar es lo frecuente; pausar queda como acción secundaria. */}
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          className="button-primary w-full"
+          aria-expanded={editing}
+          aria-controls={formId}
+          onClick={() => setEditing((value) => !value)}
+        >
+          {editing ? "Cerrar edición" : "Editar"}
+        </button>
+        <ActionForm
+          action={actions.pauseService}
+          submitLabel={service.is_paused ? "Reanudar" : "Pausar"}
+          submitTone="secondary"
+          submitClassName="w-full"
+          className="contents"
+        >
+          <input type="hidden" name="serviceId" value={service.id} />
+          <input
+            type="hidden"
+            name="paused"
+            value={String(!service.is_paused)}
+          />
+        </ActionForm>
+      </div>
+      {editing ? (
+        <div id={formId} className="border-ink/10 mt-3 border-t pt-3">
+          <ServiceForm
+            action={actions.saveService}
+            service={service}
+            skills={skills}
+            serviceTags={serviceTags}
+            canPublish={canPublish}
+          />
+          <div className="border-ink/10 mt-3 border-t pt-2">
+            <DeleteForm
+              action={actions.deleteService}
+              recordId={service.id}
+              recordLabel={"el servicio «" + service.title + "»"}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
