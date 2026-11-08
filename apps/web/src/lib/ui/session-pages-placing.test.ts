@@ -207,4 +207,20 @@ describe("Secciones con sesión — auditoría de placing 2026-11-07", () => {
       expect(review).not.toContain("Ir a mi cuenta");
     });
   });
+  describe("/admin/catalog", () => {
+    const catalog = read("../../app/admin/catalog/page.tsx");
+
+    it("muestra una sección por pestaña", () => {
+      expect(catalog).toContain("const CATALOG_TABS = [");
+      expect(catalog).toContain("href={`?tab=${id}`}");
+      expect(catalog).toContain('{tab === "sinonimos" ? (');
+      expect(catalog).not.toContain('id="crear"');
+    });
+
+    it("deja el alta plegada y el borrado como enlace", () => {
+      expect(catalog).toContain("+ Nueva categoría");
+      expect(catalog).not.toContain("bg-danger inline-block cursor-pointer");
+      expect(catalog).toContain("Cambiar estado");
+    });
+  });
 });
