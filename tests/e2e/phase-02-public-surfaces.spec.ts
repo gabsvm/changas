@@ -77,8 +77,14 @@ test.describe("Phase 02 mobile web smoke", () => {
       await expect(
         page.getByRole("heading", { name: "Gestioná tu oferta" }),
       ).toBeVisible();
+      // El panel muestra una sección por pestaña (arranca en "Resumen").
+      const sections = page.getByRole("navigation", {
+        name: "Secciones de gestión",
+      });
+      await sections.getByRole("link", { name: "Habilidades" }).click();
       await expect(page.getByText("Habilidades que ofrecés")).toBeVisible();
 
+      await sections.getByRole("link", { name: "Perfil", exact: true }).click();
       await page
         .getByRole("button", { name: "Guardar perfil público" })
         .click();
