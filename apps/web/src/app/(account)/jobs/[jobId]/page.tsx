@@ -292,6 +292,18 @@ export default async function JobPage({
     correctionCount: detail.correction_count,
     correctionReason: latestCorrectionReason,
   });
+  const closingShortcuts: { href: string; label: string }[] = [];
+  if (detail.job_status === "COMPLETED") {
+    if (settlementPending && !pendingExternalDeclaration) {
+      closingShortcuts.push({
+        href: "#pago",
+        label: isClient ? "Informar que pagué" : "Registrar lo recibido",
+      });
+    }
+    if (isClient && reviewState?.can_review && !hasReview) {
+      closingShortcuts.push({ href: "#resena", label: "Dejar reseña" });
+    }
+  }
   const needsRescheduleAttention = reschedules.some(
     (request) =>
       request.request_status === "OPEN" &&
@@ -355,7 +367,7 @@ export default async function JobPage({
   );
 
   return (
-    <section className="pb-28 sm:py-14">
+    <section className="pb-8 sm:py-14">
       <MobileAppBar
         title="Seguimiento"
         backHref="/jobs"
@@ -462,22 +474,37 @@ export default async function JobPage({
           <p className="relative mt-1 text-sm leading-6 text-white/85">
             {nextAction.sub}
           </p>
-          <div className="relative mt-4 grid gap-2 sm:grid-cols-2">
-            <PrimaryAction
-              jobId={jobId}
-              providerName={detail.counterparty_name}
-              conversationId={detail.conversation_id}
-              kind={nextAction.kind}
-              href={nextAction.href}
-              hrefLabel={nextAction.hrefLabel}
-              reviewAmounts={{
-                baseMinor: detail.base_price_amount,
-                extrasMinor: detail.settlement_unpaid_extras_minor,
-                totalMinor: detail.settlement_total_minor,
-              }}
-              remote={detail.modality === "REMOTE"}
-            />
-          </div>
+          {nextAction.kind || nextAction.href || closingShortcuts.length ? (
+            <div className="relative mt-4 grid gap-2 sm:grid-cols-2">
+              {nextAction.kind || nextAction.href ? (
+                <PrimaryAction
+                  jobId={jobId}
+                  providerName={detail.counterparty_name}
+                  conversationId={detail.conversation_id}
+                  kind={nextAction.kind}
+                  href={nextAction.href}
+                  hrefLabel={nextAction.hrefLabel}
+                  reviewAmounts={{
+                    baseMinor: detail.base_price_amount,
+                    extrasMinor: detail.settlement_unpaid_extras_minor,
+                    totalMinor: detail.settlement_total_minor,
+                  }}
+                  remote={detail.modality === "REMOTE"}
+                />
+              ) : null}
+              {/* Cierre: las tareas pendientes (pago y reseña) quedan a un
+                  toque en vez de 1.200px más abajo. */}
+              {closingShortcuts.map((shortcut) => (
+                <a
+                  key={shortcut.href}
+                  href={shortcut.href}
+                  className="consumer-pressable inline-flex min-h-[52px] items-center justify-center rounded-xl bg-white px-4 text-center text-sm font-bold text-[#0D121B]"
+                >
+                  {shortcut.label}
+                </a>
+              ))}
+            </div>
+          ) : null}
         </section>
 
         <section
@@ -613,11 +640,13 @@ export default async function JobPage({
               </a>
             ) : null}
             <p className="text-ink/70 mt-2 text-[13px] leading-5">
-              {detail.modality === "REMOTE"
-                ? "Entrega digital en revisión: no usa PIN."
-                : detail.handover_verified_at !== null
-                  ? "Constancia presencial registrada. Falta tu confirmación final."
-                  : "Falta la constancia presencial del PIN."}
+              {detail.job_status === "COMPLETED"
+                ? "Entrega aceptada."
+                : detail.modality === "REMOTE"
+                  ? "Entrega digital en revisión: no usa PIN."
+                  : detail.handover_verified_at !== null
+                    ? "Constancia presencial registrada. Falta tu confirmación final."
+                    : "Falta la constancia presencial del PIN."}
               {detail.correction_count > 0
                 ? ` Correcciones pedidas: ${detail.correction_count}.`
                 : ""}
@@ -1325,27 +1354,6 @@ export default async function JobPage({
           </aside>
         </div>
       </div>
-      {nextAction.kind || nextAction.href ? (
-        <div className="yalo-job-mobile-cta bg-surface/95 border-ink/10 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur md:hidden">
-          <div className="mx-auto max-w-4xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-            <PrimaryAction
-              jobId={jobId}
-              providerName={detail.counterparty_name}
-              conversationId={detail.conversation_id}
-              kind={nextAction.kind}
-              href={nextAction.href}
-              hrefLabel={nextAction.hrefLabel}
-              compact
-              reviewAmounts={{
-                baseMinor: detail.base_price_amount,
-                extrasMinor: detail.settlement_unpaid_extras_minor,
-                totalMinor: detail.settlement_total_minor,
-              }}
-              remote={detail.modality === "REMOTE"}
-            />
-          </div>
-        </div>
-      ) : null}
     </section>
   );
 }

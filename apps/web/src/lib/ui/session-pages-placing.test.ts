@@ -157,4 +157,28 @@ describe("Secciones con sesión — auditoría de placing 2026-11-07", () => {
       expect(management).not.toContain('"Pausar servicio"');
     });
   });
+  describe("cierre del trabajo", () => {
+    const detail = read("../../app/(account)/jobs/[jobId]/page.tsx");
+    const review = read("../../components/reputation/job-reputation-panel.tsx");
+
+    it("ofrece pago y reseña desde 'Qué sigue'", () => {
+      expect(detail).toContain('href: "#pago"');
+      expect(detail).toContain('{ href: "#resena", label: "Dejar reseña" }');
+      expect(detail).toContain("closingShortcuts.map");
+    });
+
+    it("no usa barra fija y actualiza el copy de la entrega", () => {
+      expect(detail).not.toContain("yalo-job-mobile-cta");
+      expect(detail).toContain('"Entrega aceptada."');
+    });
+
+    it("pone la calificación primero y recontratar al final", () => {
+      expect(review).toContain(
+        "Detallar calidad, puntualidad y comunicación (opcional)",
+      );
+      expect(review.indexOf("Publicar reseña")).toBeLessThan(
+        review.indexOf("Volver a contratar"),
+      );
+    });
+  });
 });

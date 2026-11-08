@@ -116,14 +116,6 @@ export async function JobReputationPanel({
             </p>
           ) : null}
         </div>
-        {isClient ? (
-          <form action={rehireJobAction}>
-            <input type="hidden" name="jobId" value={jobId} />
-            <button className="button-primary" type="submit">
-              Volver a contratar
-            </button>
-          </form>
-        ) : null}
       </div>
 
       {showReviewRequest ? (
@@ -169,11 +161,19 @@ export async function JobReputationPanel({
             Tenés que elegir las estrellas para publicar: sin calificación no se
             envía la reseña.
           </p>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <DimensionSelect name="qualityRating" label="Calidad" />
-            <DimensionSelect name="punctualityRating" label="Puntualidad" />
-            <DimensionSelect name="communicationRating" label="Comunicación" />
-          </div>
+          <details className="border-ink/10 rounded-xl border">
+            <summary className="consumer-pressable min-h-11 cursor-pointer px-4 py-2.5 text-sm font-semibold">
+              Detallar calidad, puntualidad y comunicación (opcional)
+            </summary>
+            <div className="grid gap-3 px-4 pb-4 sm:grid-cols-3">
+              <DimensionSelect name="qualityRating" label="Calidad" />
+              <DimensionSelect name="punctualityRating" label="Puntualidad" />
+              <DimensionSelect
+                name="communicationRating"
+                label="Comunicación"
+              />
+            </div>
+          </details>
           <label className="text-sm font-semibold">
             Comentario
             <textarea
@@ -308,6 +308,25 @@ export async function JobReputationPanel({
             </div>
           ) : null}
         </article>
+      ) : null}
+      {/* Volver a contratar es secundario: va al final, sin competir con
+          la reseña. */}
+      {isClient ? (
+        <form
+          action={rehireJobAction}
+          className="border-ink/[0.08] mt-5 border-t pt-3"
+        >
+          <input type="hidden" name="jobId" value={jobId} />
+          <button
+            className="consumer-pressable flex min-h-11 w-full items-center justify-between text-sm font-bold"
+            type="submit"
+          >
+            Volver a contratar
+            <span className="text-ink/40 text-xl" aria-hidden="true">
+              ›
+            </span>
+          </button>
+        </form>
       ) : null}
     </section>
   );
