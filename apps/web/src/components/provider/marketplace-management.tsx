@@ -911,16 +911,9 @@ export function MarketplaceManagement({
                 aria-current={active ? "true" : undefined}
                 className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[13px] font-bold transition-colors duration-200 ${
                   active
-                    ? "border-transparent text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)]"
+                    ? "border-transparent bg-[#0D121B] text-white shadow-[0_10px_24px_-8px_rgb(13_18_27/55%)] dark:bg-[#F5F8FC] dark:text-[#0D121B]"
                     : "border-ink/[0.08] border bg-white dark:border-white/10 dark:bg-[#1b2b3d] dark:text-[#f5efe8]"
                 }`}
-                style={
-                  active
-                    ? {
-                        background: "#0D121B",
-                      }
-                    : undefined
-                }
               >
                 {label}
               </a>

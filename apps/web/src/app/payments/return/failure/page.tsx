@@ -12,7 +12,7 @@ export default async function PaymentReturnFailurePage({
 }) {
   const params = await searchParams;
   return (
-    <section className="mx-auto max-w-2xl py-16 sm:py-24">
+    <section className="mx-auto max-w-2xl px-4 py-16 sm:px-0 sm:py-24">
       <p className="text-terracotta text-xs font-semibold">
         Pago no completado
       </p>

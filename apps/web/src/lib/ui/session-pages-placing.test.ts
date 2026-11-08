@@ -223,4 +223,30 @@ describe("Secciones con sesión — auditoría de placing 2026-11-07", () => {
       expect(catalog).toContain("Cambiar estado");
     });
   });
+  describe("modo oscuro, cards y retornos de pago", () => {
+    it("invierte a claro el estado activo en oscuro", () => {
+      expect(read("../../app/buscar/page.tsx")).toContain(
+        "dark:bg-[#F5F8FC] dark:text-[#0D121B]",
+      );
+      expect(
+        read("../../components/provider/marketplace-management.tsx"),
+      ).toContain("bg-[#0D121B] text-white");
+    });
+
+    it("trunca la zona y no el nombre del prestador", () => {
+      const card = read("../../components/ui/marketplace/service-card.tsx");
+      expect(card).toContain(
+        '<span className="shrink-0">{row.provider_display_name}</span>',
+      );
+      expect(card).toContain('<span className="min-w-0 truncate font-normal">');
+    });
+
+    it("da margen lateral a los retornos de pago", () => {
+      for (const kind of ["success", "pending", "failure"]) {
+        expect(read(`../../app/payments/return/${kind}/page.tsx`)).toContain(
+          "px-4 py-16 sm:px-0",
+        );
+      }
+    });
+  });
 });

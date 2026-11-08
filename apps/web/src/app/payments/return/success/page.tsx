@@ -12,10 +12,8 @@ export default async function PaymentReturnSuccessPage({
 }) {
   const params = await searchParams;
   return (
-    <section className="mx-auto max-w-2xl py-16 sm:py-24">
-      <p className="text-moss text-xs font-semibold">
-        Pago enviado
-      </p>
+    <section className="mx-auto max-w-2xl px-4 py-16 sm:px-0 sm:py-24">
+      <p className="text-moss text-xs font-semibold">Pago enviado</p>
       <h1 className="font-display mt-3 text-4xl font-semibold tracking-[-0.03em]">
         ¡Pago enviado!
       </h1>

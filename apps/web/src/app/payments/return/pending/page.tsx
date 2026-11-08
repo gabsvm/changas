@@ -12,10 +12,8 @@ export default async function PaymentReturnPendingPage({
 }) {
   const params = await searchParams;
   return (
-    <section className="mx-auto max-w-2xl py-16 sm:py-24">
-      <p className="text-terracotta text-xs font-semibold">
-        Pago en proceso
-      </p>
+    <section className="mx-auto max-w-2xl px-4 py-16 sm:px-0 sm:py-24">
+      <p className="text-terracotta text-xs font-semibold">Pago en proceso</p>
       <h1 className="font-display mt-3 text-4xl font-semibold tracking-[-0.03em]">
         El pago todavía está en proceso
       </h1>

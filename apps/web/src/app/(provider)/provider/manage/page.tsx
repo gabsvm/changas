@@ -393,7 +393,7 @@ export default async function ProviderMarketplaceManagePage({
             <span className="text-ink/70 min-w-0 flex-1 truncate">
               Próximamente · hoy cobrás directo
             </span>
-            <span className="text-brand-primary shrink-0 text-[13px] font-bold">
+            <span className="text-brand-primary shrink-0 text-[13px] font-bold dark:text-[#8AB4F8]">
               Detalles
             </span>
           </summary>

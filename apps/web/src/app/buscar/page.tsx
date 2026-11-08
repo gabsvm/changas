@@ -222,7 +222,7 @@ export default async function SearchPage({
                       aria-current={selected ? "true" : undefined}
                       className={`consumer-pressable inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-semibold transition-colors duration-200 ${
                         selected
-                          ? "border-transparent bg-[#161D2A] text-white"
+                          ? "border-transparent bg-[#161D2A] text-white dark:bg-[#F5F8FC] dark:text-[#0D121B]"
                           : "yalo-filter-pill border-ink/10 bg-canvas text-ink/70 hover:bg-ink/[0.04]"
                       }`}
                     >

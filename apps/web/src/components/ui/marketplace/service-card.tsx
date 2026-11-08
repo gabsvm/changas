@@ -83,15 +83,8 @@ function CoverFallback({
       role="img"
       aria-label={`Imagen ilustrativa de ${serviceTitle}`}
     >
-      
-      <span
-        className="hidden"
-        aria-hidden="true"
-      />
-      <span
-        className="hidden"
-        aria-hidden="true"
-      />
+      <span className="hidden" aria-hidden="true" />
+      <span className="hidden" aria-hidden="true" />
       <span className="service-card-cover-fallback-label relative flex items-center gap-2 text-left">
         <svg
           aria-hidden="true"
@@ -175,9 +168,9 @@ export function ServiceCard({
               />
               <div className="service-card-provider min-w-0 flex-1">
                 <p className="text-ink/70 flex items-center gap-1.5 truncate text-[13px] font-semibold">
-                  <span className="truncate">{row.provider_display_name}</span>
+                  <span className="shrink-0">{row.provider_display_name}</span>
                   {row.provider_zone ? (
-                    <span className="shrink-0 font-normal">
+                    <span className="min-w-0 truncate font-normal">
                       · {row.provider_zone}
                     </span>
                   ) : null}
@@ -267,12 +260,12 @@ export function ServiceCard({
                 <p className="text-ink/70 flex items-center gap-1.5 truncate text-[13px] font-semibold">
                   <Link
                     href={providerHref}
-                    className="focus-visible:ring-focus/45 inline-flex min-h-11 max-w-full items-center truncate rounded underline-offset-4 hover:underline focus-visible:ring-2"
+                    className="focus-visible:ring-focus/45 inline-flex min-h-11 max-w-[60%] shrink-0 items-center truncate rounded underline-offset-4 hover:underline focus-visible:ring-2"
                   >
                     {row.provider_display_name}
                   </Link>
                   {row.provider_zone ? (
-                    <span className="shrink-0 font-normal">
+                    <span className="min-w-0 truncate font-normal">
                       · {row.provider_zone}
                     </span>
                   ) : null}
@@ -280,10 +273,24 @@ export function ServiceCard({
                       (revisión de identidad aprobada por el servidor en
                       search_discovery_services_v4): el badge es dato real. */}
                   <span
-                    className="shrink-0 font-bold text-ink"
+                    className="text-ink shrink-0 font-bold"
                     title="Identidad verificada por YALO"
                   >
-                    <svg aria-hidden="true" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{display:"inline",verticalAlign:"-2px"}}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg> Verificado
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      width="13"
+                      height="13"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ display: "inline", verticalAlign: "-2px" }}
+                    >
+                      <path d="M5 12.5l4.5 4.5L19 7.5" />
+                    </svg>{" "}
+                    Verificado
                   </span>
                 </p>
                 <h3 className="service-card-title text-ink mt-1.5 line-clamp-2 text-[15px] leading-5 font-bold tracking-[-0.01em]">
