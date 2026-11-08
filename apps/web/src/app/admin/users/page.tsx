@@ -15,10 +15,18 @@ import {
   AdminStatusBadge,
   providerTone,
 } from "@/components/admin/admin-ui";
-import { getAdminUserDetail, listAdminUsers } from "@/lib/admin/server";
+import {
+  ADMIN_USERS_PAGE_SIZE,
+  getAdminUserDetail,
+  listAdminUsers,
+} from "@/lib/admin/server";
 import { getProviderStatusPresentation } from "@/lib/ui/provider-status";
 
-type SearchParams = { q?: string | string[]; user?: string | string[] };
+type SearchParams = {
+  q?: string | string[];
+  user?: string | string[];
+  page?: string | string[];
+};
 const first = (value: string | string[] | undefined) =>
   Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 
@@ -36,8 +44,18 @@ export default async function AdminUsersPage({
   const params = await searchParams;
   const query = first(params.q);
   const selectedUserId = first(params.user);
+  const page = Math.min(
+    10000,
+    Math.max(0, Number.parseInt(first(params.page), 10) || 0),
+  );
+  const pageHref = (target: number) =>
+    "/admin/users?" +
+    new URLSearchParams({
+      ...(query ? { q: query } : {}),
+      ...(target > 0 ? { page: String(target) } : {}),
+    }).toString();
   const [users, detail] = await Promise.all([
-    listAdminUsers(query),
+    listAdminUsers(query, page),
     selectedUserId && isUuid(selectedUserId)
       ? getAdminUserDetail(selectedUserId).catch(() => null)
       : Promise.resolve(null),
@@ -208,29 +226,28 @@ export default async function AdminUsersPage({
                     "&user=" +
                     user.user_id
                   }
-                  className="admin-mobile-record consumer-pressable hover:bg-ink/[0.04] flex flex-col gap-1.5 px-4 py-3 transition-colors"
+                  aria-label={`Ver cuenta y permisos de ${user.display_name ?? user.email ?? user.user_id}`}
+                  className="admin-mobile-record consumer-pressable hover:bg-ink/[0.04] flex items-center gap-3 px-4 py-2.5 transition-colors"
                 >
-                  <span className="flex items-start justify-between gap-3">
-                    <span className="text-ink min-w-0 font-semibold">
+                  {/* Fila compacta: toda la fila abre la cuenta. */}
+                  <span className="min-w-0 flex-1">
+                    <span className="text-ink block truncate text-sm font-semibold">
                       {user.display_name ?? user.email ?? user.user_id}
+                      {user.role === "admin" ? (
+                        <span className="ml-1.5 text-[11px] font-bold text-[#087681] dark:text-[#7BF2E7]">
+                          ADMIN
+                        </span>
+                      ) : null}
                     </span>
-                    <span className="shrink-0">
-                      <AdminStatusBadge
-                        label={providerLabel(user.provider_status)}
-                        tone={providerTone(user.provider_status)}
-                      />
+                    <span className="text-ink/70 block truncate text-xs leading-5">
+                      {user.email ?? user.user_id}
                     </span>
                   </span>
-                  <span className="text-ink/70 text-xs leading-5 break-all">
-                    {user.email ?? user.user_id}
-                  </span>
-                  {user.role === "admin" ? (
-                    <span className="text-xs font-semibold text-[#087681] dark:text-[#7BF2E7]">
-                      ADMIN
-                    </span>
-                  ) : null}
-                  <span className="text-xs font-semibold text-[#087681] dark:text-[#7BF2E7]">
-                    Ver cuenta y permisos →
+                  <span className="shrink-0">
+                    <AdminStatusBadge
+                      label={providerLabel(user.provider_status)}
+                      tone={providerTone(user.provider_status)}
+                    />
                   </span>
                 </Link>
               ))}
@@ -298,6 +315,34 @@ export default async function AdminUsersPage({
                 </tbody>
               </table>
             </div>
+            {page > 0 || users.length === ADMIN_USERS_PAGE_SIZE ? (
+              <nav
+                aria-label="Páginas de usuarios"
+                className="flex items-center justify-between gap-3 pt-3 text-sm font-semibold"
+              >
+                {page > 0 ? (
+                  <Link
+                    className="consumer-pressable min-h-11 content-center"
+                    href={pageHref(page - 1)}
+                  >
+                    ← Anterior
+                  </Link>
+                ) : (
+                  <span />
+                )}
+                <span className="text-ink/60 text-xs">Página {page + 1}</span>
+                {users.length === ADMIN_USERS_PAGE_SIZE ? (
+                  <Link
+                    className="consumer-pressable min-h-11 content-center"
+                    href={pageHref(page + 1)}
+                  >
+                    Siguiente →
+                  </Link>
+                ) : (
+                  <span />
+                )}
+              </nav>
+            ) : null}
           </>
         ) : (
           <AdminEmptyState

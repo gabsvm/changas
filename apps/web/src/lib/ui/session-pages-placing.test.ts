@@ -249,4 +249,24 @@ describe("Secciones con sesión — auditoría de placing 2026-11-07", () => {
       }
     });
   });
+  describe("admin usuarios y notificaciones", () => {
+    it("pagina los usuarios y usa filas compactas", () => {
+      const users = read("../../app/admin/users/page.tsx");
+      const server = read("../../lib/admin/server.ts");
+      expect(server).toContain(
+        "page_offset: Math.max(0, page) * ADMIN_USERS_PAGE_SIZE",
+      );
+      expect(users).toContain('aria-label="Páginas de usuarios"');
+      expect(users).not.toContain("Ver cuenta y permisos →");
+    });
+
+    it("pone 'Marcar' con el contenido y no junto a la hora", () => {
+      const notifications = read(
+        "../../app/(account)/account/notifications/page.tsx",
+      );
+      expect(notifications.indexOf("{item.body}")).toBeLessThan(
+        notifications.indexOf("action={markNotificationReadAction}"),
+      );
+    });
+  });
 });

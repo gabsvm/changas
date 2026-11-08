@@ -91,11 +91,8 @@ export default async function NotificationCenterPage({
       <div className="pt-4 sm:pt-0">
         {page.windowed ? (
           <p className="text-ink/60 mb-3 text-sm">
-            Mostrando un bloque del historial. {" "}
-            <Link
-              href="/account/notifications"
-              className="text-ink underline"
-            >
+            Mostrando un bloque del historial.{" "}
+            <Link href="/account/notifications" className="text-ink underline">
               Volver al inicio
             </Link>
           </p>
@@ -217,26 +214,30 @@ export default async function NotificationCenterPage({
                                       new Date(item.createdAt),
                                     )}
                                   </time>
-                                  {item.unread ? (
-                                    <form action={markNotificationReadAction}>
-                                      <input
-                                        type="hidden"
-                                        name="notificationId"
-                                        value={item.id}
-                                      />
-                                      <button
-                                        className="consumer-pressable text-moss hover:bg-moss/[0.07] inline-flex min-h-11 items-center rounded-lg px-2 text-[11px] font-bold"
-                                        type="submit"
-                                      >
-                                        Marcar
-                                      </button>
-                                    </form>
-                                  ) : null}
                                 </div>
                               </div>
                               <p className="text-ink/70 mt-0.5 text-sm leading-5">
                                 {item.body}
                               </p>
+                              {/* "Marcar" va con el contenido, no pegado a la hora. */}
+                              {item.unread ? (
+                                <form
+                                  action={markNotificationReadAction}
+                                  className="mt-1"
+                                >
+                                  <input
+                                    type="hidden"
+                                    name="notificationId"
+                                    value={item.id}
+                                  />
+                                  <button
+                                    className="consumer-pressable text-moss hover:bg-moss/[0.07] -ml-2 inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-bold"
+                                    type="submit"
+                                  >
+                                    Marcar
+                                  </button>
+                                </form>
+                              ) : null}
                             </div>
                           </div>
                         </li>

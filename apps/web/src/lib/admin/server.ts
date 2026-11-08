@@ -208,11 +208,13 @@ export type AdminServiceTagRow = {
   normalized_tag: string;
 };
 
-export async function listAdminUsers(searchText = "") {
+export const ADMIN_USERS_PAGE_SIZE = 50;
+
+export async function listAdminUsers(searchText = "", page = 0) {
   return adminRpc<AdminUserRow[]>("list_admin_users", {
     search_text: searchText.trim() || null,
-    page_size: 50,
-    page_offset: 0,
+    page_size: ADMIN_USERS_PAGE_SIZE,
+    page_offset: Math.max(0, page) * ADMIN_USERS_PAGE_SIZE,
   });
 }
 
