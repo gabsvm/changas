@@ -194,36 +194,20 @@ export default async function ProviderOnboardingDocumentsPage() {
           )}
         </section>
 
-        {editable ? (
+        {/* Mientras faltan archivos, lo pendiente ya se ve en "Requisitos":
+            no se fija un botón deshabilitado sobre el cargador. */}
+        {editable && documentsComplete ? (
           <StickyActionBar className="mt-6">
-            {documentsComplete ? (
-              <div>
-                <p className="text-ink/70 mb-2 text-xs leading-5">
-                  Al enviar, la evidencia entra en la cola administrativa de
-                  revisión.
-                </p>
-                <OnboardingAdvanceForm
-                  action={submitProviderIdentityReview}
-                  nextStep={4}
-                  nextHref="/provider/onboarding/review"
-                  label={rejected ? "Reenviar a revisión" : "Enviar a revisión"}
-                />
-              </div>
-            ) : (
-              <div>
-                <p className="text-ink/70 mb-2 text-xs leading-5">
-                  Faltan:{" "}
-                  {missingDocuments.map(getDocumentTypeLabel).join(", ")}.
-                </p>
-                <button
-                  className="button-primary w-full opacity-50 sm:w-auto"
-                  type="button"
-                  disabled
-                >
-                  {rejected ? "Reenviar a revisión" : "Enviar a revisión"}
-                </button>
-              </div>
-            )}
+            <p className="text-ink/70 mb-2 text-xs leading-5">
+              Al enviar, la evidencia entra en la cola administrativa de
+              revisión.
+            </p>
+            <OnboardingAdvanceForm
+              action={submitProviderIdentityReview}
+              nextStep={4}
+              nextHref="/provider/onboarding/review"
+              label={rejected ? "Reenviar a revisión" : "Enviar a revisión"}
+            />
           </StickyActionBar>
         ) : null}
       </div>

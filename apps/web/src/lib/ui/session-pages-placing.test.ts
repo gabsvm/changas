@@ -181,4 +181,30 @@ describe("Secciones con sesión — auditoría de placing 2026-11-07", () => {
       );
     });
   });
+  describe("alta de prestador", () => {
+    const hub = read("../../app/(provider)/provider/onboarding/page.tsx");
+    const review = read(
+      "../../app/(provider)/provider/onboarding/review/page.tsx",
+    );
+    const documents = read(
+      "../../app/(provider)/provider/onboarding/documents/page.tsx",
+    );
+
+    it("muestra un solo progreso y un solo botón en el resumen", () => {
+      expect(hub).not.toContain("<NextStepBanner");
+      expect(hub).not.toContain('aria-label="Pasos de verificación"');
+      expect(hub.match(/href=\{primaryHref\}/g)).toHaveLength(1);
+    });
+
+    it("no fija un botón deshabilitado mientras faltan papeles", () => {
+      expect(documents).toContain("{editable && documentsComplete ? (");
+      expect(documents).not.toMatch(/type="button"\s*disabled/);
+    });
+
+    it("usa una sola lista y una sola salida en la revisión", () => {
+      expect(review).not.toContain('aria-label="Lo que cargaste"');
+      expect(review).toContain("<StepStatusChip complete={publicComplete} />");
+      expect(review).not.toContain("Ir a mi cuenta");
+    });
+  });
 });

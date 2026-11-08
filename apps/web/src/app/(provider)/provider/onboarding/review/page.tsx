@@ -8,7 +8,6 @@ import { maskPrivateReference } from "@/lib/ui/documents";
 import { Avatar } from "@/components/ui/marketplace/avatar";
 import { MobileAppBar } from "@/components/ui/mobile-app-bar";
 import { IllustratedBadge } from "@/components/ui/marketplace/illustrated-badge";
-import { EmptyState } from "@/components/ui/marketplace/empty-state";
 import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
@@ -20,6 +19,14 @@ import { submitProviderIdentityReview } from "../documents/actions";
 export const metadata: Metadata = { title: "Estado de verificación" };
 
 export const dynamic = "force-dynamic";
+
+function StepStatusChip({ complete }: { complete: boolean }) {
+  return (
+    <StatusChip tone={complete ? "success" : "warning"}>
+      {complete ? "Completo" : "Revisar"}
+    </StatusChip>
+  );
+}
 
 function CompletionRow({
   label,
@@ -223,45 +230,13 @@ export default async function ProviderOnboardingReviewPage() {
           </div>
         </div>
 
-        <section className="border-ink/[0.08] bg-surface divide-ink/[0.07] mt-5 divide-y rounded-2xl border px-3 shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
-          <CompletionRow
-            label="Perfil público"
-            complete={publicComplete}
-            href="/provider/onboarding/profile"
-            editable={editable}
-          />
-          <CompletionRow
-            label="Identidad privada"
-            complete={privateComplete}
-            href="/provider/onboarding/identity"
-            editable={editable}
-          />
-          <CompletionRow
-            label="Documentos requeridos"
-            complete={documentsComplete}
-            href="/provider/onboarding/documents"
-            editable={editable}
-          />
-        </section>
-
-        <section className="mt-6" aria-label="Lo que cargaste">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <IllustratedBadge
-              tone="violet"
-              icon="user"
-              size="sm"
-              label="Lo que cargaste"
-            />
-            <h2 className="font-display min-w-0 flex-1 truncate text-lg leading-7 font-bold">
-              Lo que cargaste
-            </h2>
-          </div>
-          <details className="border-ink/10 mt-3 border-y">
+        {/* Una sola lista (antes: estado arriba y "Lo que cargaste" abajo con
+            los mismos tres ítems). */}
+        <section className="mt-5" aria-label="Lo que vas a enviar">
+          <details className="border-ink/10 border-y">
             <summary className="consumer-pressable flex min-h-14 cursor-pointer items-center justify-between gap-3 py-3 text-sm font-bold">
               Perfil público
-              <span className="text-ink/40 text-xl" aria-hidden="true">
-                ›
-              </span>
+              <StepStatusChip complete={publicComplete} />
             </summary>
             <dl className="space-y-2.5 pb-4 text-sm">
               <div>
@@ -273,17 +248,13 @@ export default async function ProviderOnboardingReviewPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/70 text-xs font-bold">
-                  Zona
-                </dt>
+                <dt className="text-ink/70 text-xs font-bold">Zona</dt>
                 <dd className="mt-0.5 font-semibold">
                   {profile?.public_zone ?? "—"}
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/70 text-xs font-bold">
-                  Presentación
-                </dt>
+                <dt className="text-ink/70 text-xs font-bold">Presentación</dt>
                 <dd className="mt-0.5 leading-6">{profile?.bio ?? "—"}</dd>
               </div>
             </dl>
@@ -299,31 +270,23 @@ export default async function ProviderOnboardingReviewPage() {
           <details className="border-ink/10 border-b">
             <summary className="consumer-pressable flex min-h-14 cursor-pointer items-center justify-between gap-3 py-3 text-sm font-bold">
               Identidad privada
-              <span className="text-ink/40 text-xl" aria-hidden="true">
-                ›
-              </span>
+              <StepStatusChip complete={privateComplete} />
             </summary>
             <dl className="space-y-2.5 pb-4 text-sm">
               <div>
-                <dt className="text-ink/70 text-xs font-bold">
-                  Nombre legal
-                </dt>
+                <dt className="text-ink/70 text-xs font-bold">Nombre legal</dt>
                 <dd className="mt-0.5 font-semibold">
                   {privateProfile?.legal_name ?? "—"}
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/70 text-xs font-bold">
-                  DNI
-                </dt>
+                <dt className="text-ink/70 text-xs font-bold">DNI</dt>
                 <dd className="mt-0.5 font-semibold">
                   {maskPrivateReference(privateProfile?.dni_number ?? null)}
                 </dd>
               </div>
               <div>
-                <dt className="text-ink/70 text-xs font-bold">
-                  Teléfono
-                </dt>
+                <dt className="text-ink/70 text-xs font-bold">Teléfono</dt>
                 <dd className="mt-0.5 font-semibold">
                   {maskPrivateReference(privateProfile?.private_phone ?? null)}
                 </dd>
@@ -338,6 +301,14 @@ export default async function ProviderOnboardingReviewPage() {
               </Link>
             ) : null}
           </details>
+          <div className="border-ink/10 border-b">
+            <CompletionRow
+              label="Documentos requeridos"
+              complete={documentsComplete}
+              href="/provider/onboarding/documents"
+              editable={editable}
+            />
+          </div>
         </section>
 
         <div className="border-ink/[0.08] bg-surface consumer-card mt-5 overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]">
@@ -431,28 +402,18 @@ export default async function ProviderOnboardingReviewPage() {
               ))}
             </ul>
           ) : (
-            <EmptyState
-              tone="blue"
-              title="Todavía no hay documentos registrados"
-              description="Subilos desde Documentos para completar la verificación."
-              actionHref="/provider/onboarding/documents"
-              actionLabel="Ir a documentos"
-              className="border-ink/[0.08] bg-surface consumer-card mt-2 rounded-2xl border shadow-[0_1px_2px_rgb(23_20_15/6%),0_8px_20px_-6px_rgb(23_20_15/12%)] dark:shadow-[0_8px_20px_-6px_rgb(0_0_0/60%)]"
-            />
+            <p className="text-ink/70 mt-2 text-sm leading-6">
+              Todavía no hay documentos registrados.
+            </p>
           )}
         </section>
 
-        <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-          <Link
-            className="consumer-pressable cta-ink inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 text-[15px] font-semibold sm:w-auto"
-            href="/provider/onboarding"
-          >
-            Volver al resumen
-          </Link>
-          <Link className="button-secondary w-full sm:w-auto" href="/account">
-            Ir a mi cuenta
-          </Link>
-        </div>
+        <Link
+          className="button-secondary mt-6 w-full sm:w-auto"
+          href="/provider/onboarding"
+        >
+          Volver al resumen
+        </Link>
       </div>
     </section>
   );

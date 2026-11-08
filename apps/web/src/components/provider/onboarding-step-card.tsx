@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
 import { ListRow } from "@/components/ui/marketplace/list-row";
-import { StatusChip } from "@/components/ui/marketplace/status-chip";
 import type { OnboardingStepPresentation } from "@/lib/ui/onboarding";
 
 const stateCopy = {
@@ -28,16 +27,11 @@ function StepBadge({ step }: { step: OnboardingStepPresentation }) {
 }
 
 function StepStatus({ step }: { step: OnboardingStepPresentation }) {
-  const tone =
-    step.state === "current"
-      ? "brand"
-      : step.state === "complete"
-        ? "success"
-        : "neutral";
-
+  // El estado ya se ve en el número (✓ / resaltado); el texto queda sólo
+  // para lectores de pantalla.
   return (
     <span className="flex items-center gap-1.5">
-      <StatusChip tone={tone}>{stateCopy[step.state]}</StatusChip>
+      <span className="sr-only">{stateCopy[step.state]}</span>
       <span className="text-ink/25 text-xl" aria-hidden="true">
         ›
       </span>
